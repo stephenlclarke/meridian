@@ -1,9 +1,20 @@
 {
   "base": "641dfc9b2f1834412cff3831d1b2eb5296dec507",
   "files": {
+    "celestial.rs": {
+      "beforeSHA256": "468102c7fadcccb6d06c572798eef7fa002ede64e01b7c20c2284088a1ffc7cc",
+      "afterSHA256": "d3e2e99240aede308242ba434f69a17b4e8e3ebe4d3638ed8dd6d1f43bd98acc",
+      "hunks": [
+        {
+          "offset": 2285,
+          "before": "",
+          "after": "}\nimpl Snapshot {\n    pub(crate) fn blocks_motion(\n        &self,\n        before: [f32; 3],\n        after: [f32; 3],\n        hull_radius: f64,\n    ) -> bool {\n        [self.planet, self.sun]\n            .into_iter()\n            .any(|body| body.blocks_motion(before, after, hull_radius))\n    }\n"
+        }
+      ]
+    },
     "flight.rs": {
       "beforeSHA256": "62471ae9a52e13e16a239900827724e3fe155dd39ef16024497466d4a26320d5",
-      "afterSHA256": "cdb51c869616e1b1e08cc1d4c1e6440f4596c720f01ee42ddc51948d79a687a7",
+      "afterSHA256": "bbd2e1876d1c689c0f3381916fc0cfd8bd91de04f992414899d58a1399be7ff1",
       "hunks": [
         {
           "offset": 237,
@@ -28,50 +39,55 @@
         {
           "offset": 24500,
           "before": "            return self.publish_step(stopped);\n",
-          "after": "            return self.publish_step(stopped, Some(solar::Motion::Stopped));\n"
+          "after": "            return self.publish_step(\n                stopped,\n                Some(solar::Motion::Stopped {\n                    input,\n                    kind: solar::StopKind::Celestial,\n                }),\n            );\n"
         },
         {
-          "offset": 25419,
+          "offset": 25567,
           "before": "                return self.publish_step(stopped);\n",
-          "after": "                return self.publish_step(stopped, Some(solar::Motion::Stopped));\n"
+          "after": "                let kind = if self.traffic_motion_clear(before, after) {\n                    solar::StopKind::Mule\n                } else {\n                    solar::StopKind::Traffic\n                };\n                return self.publish_step(stopped, Some(solar::Motion::Stopped { input, kind }));\n"
         },
         {
-          "offset": 25792,
+          "offset": 26160,
           "before": "                return self.publish_step(stopped);\n",
-          "after": "                return self.publish_step(stopped, Some(solar::Motion::Stopped));\n"
+          "after": "                return self.publish_step(\n                    stopped,\n                    Some(solar::Motion::Stopped {\n                        input,\n                        kind: solar::StopKind::Asteroid,\n                    }),\n                );\n"
         },
         {
-          "offset": 26489,
+          "offset": 27028,
           "before": "                    return self.publish_step(stopped);\n",
-          "after": "                    return self.publish_step(stopped, Some(solar::Motion::Stopped));\n"
+          "after": "                    return self.publish_step(\n                        stopped,\n                        Some(solar::Motion::Stopped {\n                            input,\n                            kind: solar::StopKind::Entry,\n                        }),\n                    );\n"
         },
         {
-          "offset": 27040,
+          "offset": 27771,
           "before": "                    return self.publish_step(stopped);\n",
-          "after": "                    return self.publish_step(stopped, Some(solar::Motion::Stopped));\n"
+          "after": "                    return self.publish_step(\n                        stopped,\n                        Some(solar::Motion::Stopped {\n                            input,\n                            kind: solar::StopKind::Station,\n                        }),\n                    );\n"
         },
         {
-          "offset": 27215,
+          "offset": 28140,
           "before": "        self.publish_step(next)\n",
           "after": "        self.publish_step(next, Some(solar::Motion::Active(input)))\n"
         },
         {
-          "offset": 27776,
+          "offset": 28490,
+          "before": "            [scene.planet, scene.sun]\n                .into_iter()\n                .any(|body| body.blocks_motion(self.state.position, position, hull_radius))\n",
+          "after": "            scene.blocks_motion(self.state.position, position, hull_radius)\n"
+        },
+        {
+          "offset": 28618,
           "before": "    fn publish_step(&mut self, mut next: Snapshot) -> Result<(), StepError> {\n",
           "after": "    fn publish_step(\n        &mut self,\n        mut next: Snapshot,\n        motion: Option<solar::Motion>,\n    ) -> Result<(), StepError> {\n"
         },
         {
-          "offset": 33028,
+          "offset": 33870,
           "before": "",
           "after": "        let (solar, gained_fuel) = self\n            .solar\n            .prepare(\n                self,\n                next,\n                navigation,\n                prepared.combat.physical_tick(),\n                motion,\n                prepared.pulse.alive(),\n            )\n            .map_err(|_| StepError::TickOverflow)?;\n        if solar.fatal_clock() == Some(prepared.combat.physical_tick()) {\n            prepared.pulse.damage_energy(u16::MAX);\n            self.clear_missing_missile_lock(\n                &mut prepared.missiles,\n                &prepared.traffic,\n                prepared.practice,\n                false,\n            );\n        }\n        let solar_account = if gained_fuel == 0 {\n            None\n        } else {\n            if planned_debit.is_some() {\n                return Err(StepError::NonFiniteState);\n            }\n            Some(\n                self.commander_account\n                    .as_ref()\n                    .ok_or(StepError::NonFiniteState)?\n                    .prepare_solar_fuel(gained_fuel)\n                    .map_err(|_| StepError::NonFiniteState)?,\n            )\n        };\n"
         },
         {
-          "offset": 35143,
+          "offset": 35985,
           "before": "",
           "after": "        if let Some(account) = solar_account {\n            self.commander_account = Some(account);\n        }\n"
         },
         {
-          "offset": 35930,
+          "offset": 36772,
           "before": "",
           "after": "        self.solar = solar;\n"
         }
@@ -135,6 +151,27 @@
         }
       ]
     },
+    "flight/mining.rs": {
+      "beforeSHA256": "4a98a804180f35d44577ad99c051fe84c4d0db318f9c9c61f8d6424d155e2459",
+      "afterSHA256": "0adb85d84d4db6783fec3dff02cdb66a1ebeafc26d7637be43d56e8a9930cbdf",
+      "hunks": [
+        {
+          "offset": 3097,
+          "before": "        if !self.mining.enabled() {\n",
+          "after": "        let Some(identity) = self.combat_identity() else {\n            return true;\n        };\n        self.mining_motion_clear_with(&self.mining, identity.system, before, after, angular)\n    }\n    pub(super) fn mining_motion_clear_at_step(\n        &self,\n        system: SystemId,\n        tick: u64,\n        before: RigidPose,\n        after: RigidPose,\n        angular: f64,\n    ) -> bool {\n        if system != SystemId::AVENOR || !self.mining.enabled() {\n"
+        },
+        {
+          "offset": 3590,
+          "before": "        if self\n            .combat_identity()\n            .is_none_or(|id| id.system != SystemId::AVENOR)\n        {\n",
+          "after": "        self.mining_motion_clear_with(&self.mining.at_step(tick), system, before, after, angular)\n    }\n    fn mining_motion_clear_with(\n        &self,\n        mining: &crate::mining::State,\n        system: SystemId,\n        before: RigidPose,\n        after: RigidPose,\n        angular: f64,\n    ) -> bool {\n        if system != SystemId::AVENOR || !mining.enabled() {\n"
+        },
+        {
+          "offset": 4050,
+          "before": "            self.mining\n",
+          "after": "            mining\n"
+        }
+      ]
+    },
     "flight/modular.rs": {
       "beforeSHA256": "6ebaa1a887aa4f3c4240ed55e42e17af071a4320935f5264f99e24e618af97ca",
       "afterSHA256": "d06bcef71e77e3719d0dda7c029b22587c7968784df949f754420f9ec8e93bd9",
@@ -179,7 +216,7 @@
     },
     "flight/persistence.rs": {
       "beforeSHA256": "69f972ef162a618a50a3ce7e295702a5cf3c4afe99ff99abfbe85eb19978f70e",
-      "afterSHA256": "bdfdfbae02d9b802e88f8db1ca2a1282083050fd83a70758d325f1dedddf01ec",
+      "afterSHA256": "bf7de1efc927e43a90ac307c70eb37f13f9fcf33c192b8060de8b38f03035211",
       "hunks": [
         {
           "offset": 459,
@@ -189,127 +226,127 @@
         {
           "offset": 912,
           "before": "",
-          "after": "const SOLAR_EXTENSION: &[u8; 8] = b\"MSOL0002\";\n"
+          "after": "const SOLAR_EXTENSION: &[u8; 8] = b\"MSOL0003\";\n"
         },
         {
           "offset": 3221,
           "before": "",
-          "after": "/// Distinguish genuine pre-solar v17 saves from current saves independently of the trailer.\nfn solar_content_fingerprint(has_history: bool) -> u64 {\n    let mut bytes = compiled_content_fingerprint(CONTENT).to_le_bytes().to_vec();\n    bytes.extend(b\"solar-history/v2-chunks\");\n    bytes.push(u8::from(has_history));\n    checksum(&bytes)\n}\n\n"
+          "after": "/// Distinguish genuine pre-solar v17 saves from current saves independently of the trailer.\nfn solar_content_fingerprint(has_history: bool) -> u64 {\n    let mut bytes = compiled_content_fingerprint(CONTENT).to_le_bytes().to_vec();\n    bytes.extend(b\"solar-history/v3-refusals\");\n    bytes.push(u8::from(has_history));\n    checksum(&bytes)\n}\n\n"
         },
         {
-          "offset": 4438,
+          "offset": 4440,
           "before": "",
           "after": "    /// The ordinary domains retain their original independent byte ceiling. The\n    /// separately bounded solar trailer never participates in per-step admission.\n"
         },
         {
-          "offset": 4678,
+          "offset": 4680,
           "before": "        self.encode_saved_world(\n",
           "after": "        self.encode_saved_base(\n"
         },
         {
-          "offset": 4890,
+          "offset": 4892,
           "before": "        .map(|b| b.len())\n",
           "after": "        .map(|w| w.bytes.len() + 8)\n"
         },
         {
-          "offset": 11274,
+          "offset": 11276,
           "before": "",
-          "after": "        let mut w = self.encode_saved_base(practice, history, trace, lesson, commerce)?;\n        self.encode_solar_extension(&mut w, MAX_SOLAR_HISTORY_BYTES)?;\n        let digest = checksum(&w.bytes);\n        w.u64(digest);\n        if w.bytes.len() > MAX_SAVE_FILE_BYTES {\n            return Err(SaveError::TooLarge);\n        }\n        Ok(w.bytes)\n    }\n\n    fn encode_solar_extension(&self, w: &mut Writer, limit: usize) -> Result<(), SaveError> {\n        if self.solar.encoded_len() > limit {\n            return Err(SaveError::TooLarge);\n        }\n        if !self.solar.is_empty() {\n            let base_len = u32::try_from(w.bytes.len()).map_err(|_| SaveError::TooLarge)?;\n            w.bytes.extend(SOLAR_EXTENSION);\n            self.solar.encode(w);\n            // Locate the bounded base before parsing any of its variable-length domains.\n            w.u32(base_len);\n        }\n        Ok(())\n    }\n\n    fn encode_saved_base(\n        &self,\n        practice: Option<practice::Practice>,\n        history: &[practice::Practice],\n        trace: Option<practice::PracticeAttemptId>,\n        lesson: &flight_reception::State,\n        commerce: &Commerce<'_>,\n    ) -> Result<Writer, SaveError> {\n"
+          "after": "        let mut w = self.encode_saved_base(practice, history, trace, lesson, commerce)?;\n        self.encode_solar_extension(&mut w, self.solar.file_limit())?;\n        let digest = checksum(&w.bytes);\n        w.u64(digest);\n        if w.bytes.len() > MAX_SAVE_FILE_BYTES {\n            return Err(SaveError::TooLarge);\n        }\n        Ok(w.bytes)\n    }\n\n    fn encode_solar_extension(&self, w: &mut Writer, limit: usize) -> Result<(), SaveError> {\n        if self.solar.encoded_len() > limit {\n            return Err(SaveError::TooLarge);\n        }\n        if !self.solar.is_empty() {\n            let base_len = u32::try_from(w.bytes.len()).map_err(|_| SaveError::TooLarge)?;\n            w.bytes.extend(SOLAR_EXTENSION);\n            self.solar.encode(w)?;\n            // Locate the bounded base before parsing any of its variable-length domains.\n            w.u32(base_len);\n        }\n        Ok(())\n    }\n\n    fn encode_saved_base(\n        &self,\n        practice: Option<practice::Practice>,\n        history: &[practice::Practice],\n        trace: Option<practice::PracticeAttemptId>,\n        lesson: &flight_reception::State,\n        commerce: &Commerce<'_>,\n    ) -> Result<Writer, SaveError> {\n"
         },
         {
-          "offset": 12600,
+          "offset": 12603,
           "before": "        w.u64(compiled_content_fingerprint(CONTENT));\n",
           "after": "        w.u64(if self.solar.legacy_header() {\n            compiled_content_fingerprint(CONTENT)\n        } else {\n            solar_content_fingerprint(!self.solar.is_empty())\n        });\n"
         },
         {
-          "offset": 14293,
+          "offset": 14296,
           "before": "        let digest = checksum(&w.bytes);\n        w.u64(digest);\n        if w.bytes.len() > MAX_SAVE_BYTES {\n",
           "after": "        // The checksum remains part of the original fixed ordinary budget.\n        if w.bytes.len() + 8 > MAX_SAVE_BYTES {\n"
         },
         {
-          "offset": 14472,
+          "offset": 14475,
           "before": "        Ok(w.bytes)\n",
           "after": "        Ok(w)\n"
         },
         {
-          "offset": 15919,
+          "offset": 15922,
           "before": "        if bytes.len() > MAX_SAVE_BYTES {\n",
           "after": "        if bytes.len() > MAX_SAVE_FILE_BYTES {\n"
         },
         {
-          "offset": 16292,
+          "offset": 16295,
           "before": "        let mut r = Reader::new(body);\n        if &r.fixed::<8>()? != MAGIC {\n",
           "after": "        let mut header = Reader::new(body);\n        if &header.fixed::<8>()? != MAGIC {\n"
         },
         {
-          "offset": 16442,
+          "offset": 16445,
           "before": "        let version = r.u16()?;\n",
           "after": "        let version = header.u16()?;\n"
         },
         {
-          "offset": 16581,
+          "offset": 16584,
           "before": "        if r.fixed::<{ CONTENT.len() }>()?.as_slice() != CONTENT\n            || r.u64()? != compiled_content_fingerprint(CONTENT)\n        {\n",
           "after": "        if header.fixed::<{ CONTENT.len() }>()?.as_slice() != CONTENT {\n"
         },
         {
-          "offset": 16715,
+          "offset": 16718,
           "before": "",
           "after": "        let fingerprint = header.u64()?;\n        let solar_expected = if fingerprint == solar_content_fingerprint(true) {\n            Some(true)\n        } else if fingerprint == solar_content_fingerprint(false) {\n            Some(false)\n        } else if fingerprint == compiled_content_fingerprint(CONTENT) {\n            None\n        } else {\n            return Err(SaveError::ContentMismatch);\n        };\n        let (base_end, solar_end) = if solar_expected == Some(true) {\n            let solar_end = body.len().checked_sub(4).ok_or(SaveError::Truncated)?;\n            let base_end = Reader::new(&body[solar_end..]).u32()? as usize;\n            if base_end < header.consumed()\n                || base_end >= solar_end\n                || solar_end - base_end + 4 > MAX_SOLAR_HISTORY_BYTES\n            {\n                return Err(SaveError::InvalidEncoding);\n            }\n            (base_end, solar_end)\n        } else {\n            (body.len(), body.len())\n        };\n        if base_end + 8 > MAX_SAVE_BYTES {\n            return Err(SaveError::TooLarge);\n        }\n        let mut r = Reader::new(&body[header.consumed()..base_end]);\n"
         },
         {
-          "offset": 19427,
+          "offset": 19430,
           "before": "",
           "after": "            solar: super::solar::State::default(),\n"
         },
         {
-          "offset": 21156,
+          "offset": 21159,
           "before": "            if r.fixed::<8>().map_err(|_| SaveError::InvalidEncoding)? != *ROUTE_EXTENSION {\n",
           "after": "            let tag = r.fixed::<8>().map_err(|_| SaveError::InvalidEncoding)?;\n            if tag == *ROUTE_EXTENSION {\n                candidate.navigation_route =\n                    Some(crate::navigation::RoutePlan::decode_save(&mut r)?);\n            } else {\n"
         },
         {
-          "offset": 21490,
+          "offset": 21493,
           "before": "            candidate.navigation_route = Some(crate::navigation::RoutePlan::decode_save(&mut r)?);\n",
           "after": ""
         },
         {
-          "offset": 21579,
+          "offset": 21582,
           "before": "",
           "after": "        }\n        if solar_expected == Some(true) {\n            let mut solar = Reader::new(&body[base_end..solar_end]);\n            if solar.fixed::<8>()? != *SOLAR_EXTENSION {\n                return Err(SaveError::InvalidEncoding);\n            }\n            candidate.solar = super::solar::State::decode(&mut solar)?;\n            if !solar.finished() {\n                return Err(SaveError::InvalidEncoding);\n            }\n        }\n        if solar_expected.is_none() {\n            let mut solar = super::solar::State::default();\n            solar.initialize_legacy_origin(&candidate)?;\n            candidate.solar = solar;\n"
         },
         {
-          "offset": 24161,
+          "offset": 24164,
           "before": "",
-          "after": "        if self.solar.encoded_len() > MAX_SOLAR_HISTORY_BYTES {\n            return Err(SaveError::TooLarge);\n        }\n"
+          "after": "        if self.solar.encoded_len() > self.solar.file_limit() {\n            return Err(SaveError::TooLarge);\n        }\n"
         },
         {
-          "offset": 25741,
+          "offset": 25744,
           "before": "",
           "after": "        self.solar.validate(self, account, commerce.modular)?;\n"
         },
         {
-          "offset": 31069,
+          "offset": 31072,
           "before": "            secret,\n",
           "after": "            (\n                secret,\n                (\n                    self.solar\n                        .receipts()\n                        .map(|receipt| u64::from(receipt.added))\n                        .sum(),\n                    self.solar.receipt_count() as u64,\n                ),\n            ),\n"
         },
         {
-          "offset": 32542,
+          "offset": 32545,
           "before": "    secret: super::xyzzy::Terms,\n",
           "after": "    (secret, solar): (super::xyzzy::Terms, (u64, u64)),\n"
         },
         {
-          "offset": 32898,
+          "offset": 32901,
           "before": "    let fuel = 130_u128 + u128::from(s.refilled_units) + secret.fuel_supplied;\n",
           "after": "    let fuel = 130_u128 + u128::from(s.refilled_units) + secret.fuel_supplied + u128::from(solar.0);\n"
         },
         {
-          "offset": 34049,
+          "offset": 34052,
           "before": "",
           "after": "                + u128::from(solar.1)\n"
         },
         {
-          "offset": 37751,
+          "offset": 37754,
           "before": "",
-          "after": "#[cfg(test)]\npub(in crate::flight) fn solar_trailer_removed_test_input(\n    world: &World,\n    genuine_legacy_header: bool,\n) -> Result<Vec<u8>, SaveError> {\n    let mut bytes = world.save_bytes()?;\n    let length = world.solar.encoded_len();\n    assert!(length > 0);\n    let end = bytes.len() - 8 - length;\n    assert_eq!(&bytes[end..end + 8], SOLAR_EXTENSION);\n    bytes.truncate(end);\n    if genuine_legacy_header {\n        let start = 10 + CONTENT.len();\n        bytes[start..start + 8]\n            .copy_from_slice(&compiled_content_fingerprint(CONTENT).to_le_bytes());\n    }\n    let digest = checksum(&bytes);\n    bytes.extend(digest.to_le_bytes());\n    Ok(bytes)\n}\n\n#[cfg(test)]\npub(in crate::flight) fn solar_file_with_limit_test_input(\n    world: &World,\n    limit: usize,\n) -> Result<Vec<u8>, SaveError> {\n    let commerce = Commerce::current(world);\n    world.validate_saved_world(\n        world.practice,\n        &world.practice_history,\n        world.practice_trace,\n        &world.flight_reception,\n        &commerce,\n    )?;\n    let mut w = world.encode_saved_base(\n        world.practice,\n        &world.practice_history,\n        world.practice_trace,\n        &world.flight_reception,\n        &commerce,\n    )?;\n    world.encode_solar_extension(&mut w, limit)?;\n    let digest = checksum(&w.bytes);\n    w.u64(digest);\n    Ok(w.bytes)\n}\n\n"
+          "after": "#[cfg(test)]\npub(in crate::flight) fn solar_trailer_removed_test_input(\n    world: &World,\n    genuine_legacy_header: bool,\n) -> Result<Vec<u8>, SaveError> {\n    let mut bytes = world.save_bytes()?;\n    let length = world.solar.encoded_len();\n    assert!(length > 0);\n    let end = bytes.len() - 8 - length;\n    assert_eq!(&bytes[end..end + 8], SOLAR_EXTENSION);\n    bytes.truncate(end);\n    if genuine_legacy_header {\n        let start = 10 + CONTENT.len();\n        bytes[start..start + 8]\n            .copy_from_slice(&compiled_content_fingerprint(CONTENT).to_le_bytes());\n    }\n    let digest = checksum(&bytes);\n    bytes.extend(digest.to_le_bytes());\n    Ok(bytes)\n}\n\n"
         }
       ]
     },
@@ -461,6 +498,17 @@
           "offset": 3223,
           "before": "",
           "after": "    pub(crate) fn consumed(&self) -> usize {\n        self.offset\n    }\n    pub(crate) fn subreader(&mut self, length: usize) -> Result<Self, SaveError> {\n        let end = self.offset.checked_add(length).ok_or(SaveError::TooLarge)?;\n        let bytes = self\n            .bytes\n            .get(self.offset..end)\n            .ok_or(SaveError::Truncated)?;\n        self.offset = end;\n        Ok(Self::new(bytes))\n    }\n"
+        }
+      ]
+    },
+    "traffic/missiles.rs": {
+      "beforeSHA256": "7351a146ca966eefab59143c33217cc230f9aa35c5ee081a036c32fe53be3ec3",
+      "afterSHA256": "5ed5c76ec4e9a29cfbacdc1454e6a9f10456dbd8942426aaa3c0c525f17aab30",
+      "hunks": [
+        {
+          "offset": 978,
+          "before": "",
+          "after": "    pub(crate) fn player_motion_clear(&self, before: Vec3, after: Vec3, radius: f64) -> bool {\n        self.bodies.iter().all(|body| {\n            super::segment_distance(before, after, body.pose.position) > radius * 2.0 + 1.0\n        })\n    }\n"
         }
       ]
     }

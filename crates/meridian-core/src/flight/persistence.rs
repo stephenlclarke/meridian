@@ -18,7 +18,7 @@ const MAGIC: &[u8; 8] = b"MERSAVE1";
 // A route is optional in v17. The exact legacy encoding is retained when no
 // route exists; a distinct tag separates the additive trailer from corruption.
 const ROUTE_EXTENSION: &[u8; 8] = b"MRTE0001";
-const SOLAR_EXTENSION: &[u8; 8] = b"MSOL0002";
+const SOLAR_EXTENSION: &[u8; 8] = b"MSOL0003";
 const CONTENT: &[u8] = concat!(
     "meridian-world/rules/17;explicit-xyzzy/account-prefix-replay-v2/a11fe169;distinct-emp/paid-defensive-local-v1/a11fe169;navigation-computer/exact-route-journal/a11fe169;lareria-main-services/station-combat-three-v1/a11fe169;rapid-lasers-energy/shared-nine-byte-resources-v1/a11fe169;mining/native-work-pending-v2;fuel-scoops/paid-utility-v1;npc-missiles/canonical-native-ray-v3;traffic/local-paid-sh025-v2;npc-player/exact-pools-journal-v1;modular-mining/front-paid-v1/a11fe169;paid-standard-missile/pylon-nine-retained-v1/a11fe169;t04/8c23ce72936e8bdfa47978f7d7d4240171babe05c2da5ac49727d2616e38d802/a11fe169/fuel-chain-v1;t01/native-main-berth-flight-v1/a11fe169;practice-attempts/a11fe169;durable-missiles/a11fe169;ordinary-impact/a11fe169;t02/4e55aeba14211b7b064088f1248602161a53c728f5447f1bd29a3f7cec6f81d7;",
     "37ca73ed1b3f3656c42baedaf8dbaa3ee8aa3798ccf23e376c3c25ceac9bd572;",
@@ -54,7 +54,7 @@ fn compiled_content_fingerprint(content: &[u8]) -> u64 {
 /// Distinguish genuine pre-solar v17 saves from current saves independently of the trailer.
 fn solar_content_fingerprint(has_history: bool) -> u64 {
     let mut bytes = compiled_content_fingerprint(CONTENT).to_le_bytes().to_vec();
-    bytes.extend(b"solar-history/v2-chunks");
+    bytes.extend(b"solar-history/v3-refusals");
     bytes.push(u8::from(has_history));
     checksum(&bytes)
 }
@@ -282,7 +282,7 @@ impl World {
         commerce: &Commerce<'_>,
     ) -> Result<Vec<u8>, SaveError> {
         let mut w = self.encode_saved_base(practice, history, trace, lesson, commerce)?;
-        self.encode_solar_extension(&mut w, MAX_SOLAR_HISTORY_BYTES)?;
+        self.encode_solar_extension(&mut w, self.solar.file_limit())?;
         let digest = checksum(&w.bytes);
         w.u64(digest);
         if w.bytes.len() > MAX_SAVE_FILE_BYTES {
@@ -298,7 +298,7 @@ impl World {
         if !self.solar.is_empty() {
             let base_len = u32::try_from(w.bytes.len()).map_err(|_| SaveError::TooLarge)?;
             w.bytes.extend(SOLAR_EXTENSION);
-            self.solar.encode(w);
+            self.solar.encode(w)?;
             // Locate the bounded base before parsing any of its variable-length domains.
             w.u32(base_len);
         }
@@ -600,7 +600,7 @@ impl World {
         lesson: &flight_reception::State,
         commerce: &Commerce<'_>,
     ) -> Result<(), SaveError> {
-        if self.solar.encoded_len() > MAX_SOLAR_HISTORY_BYTES {
+        if self.solar.encoded_len() > self.solar.file_limit() {
             return Err(SaveError::TooLarge);
         }
         let navigation = self.navigation.ok_or(SaveError::NoCommander)?;
@@ -976,32 +976,6 @@ pub(in crate::flight) fn solar_trailer_removed_test_input(
     let digest = checksum(&bytes);
     bytes.extend(digest.to_le_bytes());
     Ok(bytes)
-}
-
-#[cfg(test)]
-pub(in crate::flight) fn solar_file_with_limit_test_input(
-    world: &World,
-    limit: usize,
-) -> Result<Vec<u8>, SaveError> {
-    let commerce = Commerce::current(world);
-    world.validate_saved_world(
-        world.practice,
-        &world.practice_history,
-        world.practice_trace,
-        &world.flight_reception,
-        &commerce,
-    )?;
-    let mut w = world.encode_saved_base(
-        world.practice,
-        &world.practice_history,
-        world.practice_trace,
-        &world.flight_reception,
-        &commerce,
-    )?;
-    world.encode_solar_extension(&mut w, limit)?;
-    let digest = checksum(&w.bytes);
-    w.u64(digest);
-    Ok(w.bytes)
 }
 
 /// Locate the current pulse field for semantic corruption tests without assuming

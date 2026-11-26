@@ -80,7 +80,8 @@ impl Cockpit {
                 .navigation
                 .map(|n| f32::from(n.fuel_units) / f32::from(n.fuel_capacity_units)),
             solar: world.solar_snapshot(),
-            solar_limited: world.solar_save_limit_reached(),
+            solar_limited: world
+                .solar_save_limit_reached(meridian_core::save::MAX_SOLAR_HISTORY_BYTES),
             missiles: world
                 .missile_rounds()
                 .map_or(0, |rounds| rounds.iter().flatten().count()),

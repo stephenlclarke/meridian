@@ -18,6 +18,7 @@ const NOSE_THRESHOLD: f64 = 0.8;
 const MAX_RUN_STEPS: u16 = 600;
 const RUNS_PER_CHUNK: usize = 64;
 const RECEIPTS_PER_CHUNK: usize = 256;
+const NPC_STOPS_PER_CHUNK: usize = 16;
 
 /// Immutable completed chunks are shared across prospective flight steps. Only the
 /// current, fixed-size tail is cloned for a normal append or held-control extension.
@@ -127,7 +128,16 @@ impl From<Snapshot> for MotionFrame {
 #[derive(Debug, Clone, Copy, PartialEq)]
 pub(super) enum Motion {
     Active(FlightInput),
-    Stopped,
+    Stopped { input: FlightInput, kind: StopKind },
+}
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub(super) enum StopKind {
+    Celestial,
+    Traffic,
+    Mule,
+    Asteroid,
+    Station,
+    Entry,
 }
 impl MotionFrame {
     fn advance(self, motion: Motion) -> Option<Self> {
@@ -187,6 +197,26 @@ impl MotionFrame {
             && norm.is_finite()
             && (norm - 1.0).abs() <= 1e-5
             && crate::station::flight_pose(self.position, self.orientation).is_some()
+    }
+}
+impl Motion {
+    fn input(self) -> FlightInput {
+        match self {
+            Self::Active(input) | Self::Stopped { input, .. } => input,
+        }
+    }
+    fn refusal(self) -> Option<super::MotionRefusal> {
+        use super::MotionRefusal;
+        match self {
+            Self::Active(_) => None,
+            Self::Stopped { kind, .. } => Some(match kind {
+                StopKind::Celestial => MotionRefusal::CelestialContact,
+                StopKind::Traffic | StopKind::Mule => MotionRefusal::NpcContact,
+                StopKind::Asteroid => MotionRefusal::AsteroidContact,
+                StopKind::Station => MotionRefusal::StationContact,
+                StopKind::Entry => MotionRefusal::EntryConditions,
+            }),
+        }
     }
 }
 
@@ -267,6 +297,11 @@ pub(super) struct Receipt {
     pub(super) before: u16,
     pub(super) added: u16,
 }
+#[derive(Debug, Clone, PartialEq)]
+struct NpcRefusal {
+    clock: u64,
+    scene: crate::traffic::MissileScene,
+}
 #[derive(Debug, Clone, Copy, PartialEq)]
 struct Last {
     anchor: Anchor,
@@ -278,9 +313,12 @@ struct Last {
 pub(super) struct State {
     runs: ChunkLog<Run, RUNS_PER_CHUNK>,
     receipts: ChunkLog<Receipt, RECEIPTS_PER_CHUNK>,
+    npc_refusals: ChunkLog<NpcRefusal, NPC_STOPS_PER_CHUNK>,
     last: Option<Last>,
     legacy_origin: Option<Anchor>,
     legacy_format: bool,
+    #[cfg(test)]
+    file_limit: Option<usize>,
 }
 impl State {
     pub(super) fn current(&self, mode: FlightMode, visit: u64, clock: u64) -> SolarSnapshot {
@@ -342,11 +380,26 @@ impl State {
     pub(super) fn legacy_header(&self) -> bool {
         self.legacy_format && self.is_empty()
     }
-    fn sun(world: &World, system: SystemId, visit: u64, tick: u64) -> Result<Body, SaveError> {
+    pub(super) fn file_limit(&self) -> usize {
+        #[cfg(test)]
+        if let Some(limit) = self.file_limit {
+            return limit;
+        }
+        crate::save::MAX_SOLAR_HISTORY_BYTES
+    }
+    fn scene(
+        world: &World,
+        system: SystemId,
+        visit: u64,
+        tick: u64,
+    ) -> Result<crate::celestial::Snapshot, SaveError> {
         let catalogue = world.navigation_catalogue.as_ref().ok_or(INVALID)?;
         let system = catalogue.system(system).map_err(|_| INVALID)?;
         let anchor = world.state.station.ok_or(INVALID)?.pose.position;
-        Ok(crate::celestial::scene(system, visit, tick, anchor).sun)
+        Ok(crate::celestial::scene(system, visit, tick, anchor))
+    }
+    fn sun(world: &World, system: SystemId, visit: u64, tick: u64) -> Result<Body, SaveError> {
+        Ok(Self::scene(world, system, visit, tick)?.sun)
     }
     fn anchor(frame: Snapshot, system: SystemId, visit: u64, clock: u64) -> Anchor {
         Anchor {
@@ -400,6 +453,9 @@ impl State {
             return Err(INVALID);
         }
         let motion = motion.ok_or(INVALID)?;
+        if motion.refusal() != next.motion_refusal {
+            return Err(INVALID);
+        }
         let opening = Self::anchor(
             world.state,
             nav.system,
@@ -444,6 +500,22 @@ impl State {
         };
         let mut state = self.clone();
         state.legacy_format = false;
+        if matches!(
+            motion,
+            Motion::Stopped {
+                kind: StopKind::Traffic,
+                ..
+            }
+        ) {
+            state.npc_refusals.push(NpcRefusal {
+                clock: opening.clock,
+                scene: world.traffic.missile_scene(
+                    nav.system,
+                    opening.tick,
+                    crate::traffic::SceneStage::Command(world.combat.emissions),
+                ),
+            });
+        }
         let extends = self.last.is_some_and(|last| {
             last.anchor == opening && last.fuel == fuel && last.revision == revision
         }) && self.runs.last().is_some_and(|run| {
@@ -518,8 +590,8 @@ impl World {
         )
     }
     /// Storage exhaustion is a save refusal, never a flight-control condition.
-    pub fn solar_save_limit_reached(&self) -> bool {
-        self.solar.encoded_len() > crate::save::MAX_SOLAR_HISTORY_BYTES
+    pub fn solar_save_limit_reached(&self, limit: usize) -> bool {
+        self.solar.encoded_len() > limit
     }
 }
 

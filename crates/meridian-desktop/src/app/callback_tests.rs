@@ -1,5 +1,5 @@
 //! Callback decisions exercised without an event loop, window, GPU or private player save.
-use super::{App, FrameAdvance, step_frame};
+use super::{App, FrameAdvance, QuitRecovery, step_frame};
 use crate::{
     docked_screens as ui,
     profile::tests::{TestDirectory, open},
@@ -32,6 +32,65 @@ fn launched(app: &mut App) {
         assert_eq!(app.advance_frame(true, 1), FrameAdvance::Continue(None));
     }
     assert_eq!(app.game.world.snapshot().mode, FlightMode::Flight);
+}
+
+#[test]
+fn solar_outer_limit_quit_requires_explicit_discard_and_p_resumes_actual_controls() {
+    use meridian_core::save::{MAX_SAVE_FILE_BYTES, MAX_SOLAR_HISTORY_BYTES};
+    let directory = TestDirectory::new();
+    let mut profile = crate::profile::tests::solar_history_profile(&directory);
+    assert!(
+        !profile
+            .world
+            .solar_save_limit_reached(MAX_SOLAR_HISTORY_BYTES)
+    );
+    assert!(profile.world.solar_save_limit_reached(1));
+    ok(profile.save());
+    let slot = directory.0.join("commander.meridian");
+    let durable = ok(std::fs::read(&slot));
+    let durable_world = ok(World::from_save_bytes(&durable));
+    let mut app = App::with_profile(profile);
+    let error = app
+        .game
+        .prepare_quit_with_limits(MAX_SAVE_FILE_BYTES, 1)
+        .err()
+        .unwrap_or_else(|| panic!("outer limit admitted normal Quit"));
+    app.record_quit_failure(&error);
+    assert!(app.quit_failed && app.paused);
+    let notice = app.notice.text.as_deref().unwrap_or_default();
+    assert!(notice.contains("Solar save history is full"));
+    assert!(notice.contains("P resumes; Q discards unsaved progress"));
+    assert_eq!(app.quit_recovery_key(KeyCode::F5), None);
+    assert_eq!(
+        app.quit_recovery_key(KeyCode::KeyP),
+        Some(QuitRecovery::Resume)
+    );
+    assert!(!app.quit_failed && !app.paused);
+    let tick = app.game.world.snapshot().tick;
+    let orientation = app.game.world.snapshot().orientation;
+    app.keys.insert(KeyCode::KeyD);
+    assert_eq!(app.advance_frame(true, 1), FrameAdvance::Continue(None));
+    assert_eq!(app.game.world.snapshot().tick, tick + 1);
+    assert_ne!(app.game.world.snapshot().orientation, orientation);
+    let again = app
+        .game
+        .prepare_quit_with_limits(MAX_SAVE_FILE_BYTES, 1)
+        .err()
+        .unwrap_or_else(|| panic!("outer limit admitted subsequent Quit"));
+    app.record_quit_failure(&again);
+    assert_eq!(
+        app.quit_recovery_key(KeyCode::KeyQ),
+        Some(QuitRecovery::Discard)
+    );
+    assert_eq!(ok(std::fs::read(&slot)), durable);
+    drop(app); // the callback's explicit Discard action exits without another save.
+    let mut reopened = open(&directory.0);
+    ok(reopened.continue_saved());
+    assert_eq!(reopened.world.snapshot(), durable_world.snapshot());
+    assert_eq!(
+        reopened.world.solar_snapshot(),
+        durable_world.solar_snapshot()
+    );
 }
 
 #[derive(Default)]

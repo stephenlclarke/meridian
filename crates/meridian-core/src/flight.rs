@@ -614,7 +614,13 @@ impl World {
             stopped.tick = next.tick;
             stopped.speed = 0.0;
             stopped.motion_refusal = Some(MotionRefusal::CelestialContact);
-            return self.publish_step(stopped, Some(solar::Motion::Stopped));
+            return self.publish_step(
+                stopped,
+                Some(solar::Motion::Stopped {
+                    input,
+                    kind: solar::StopKind::Celestial,
+                }),
+            );
         }
         if let Some(data) = &self.station_data {
             let before = flight_pose(self.state.position, self.state.orientation)
@@ -631,14 +637,25 @@ impl World {
                 stopped.tick = next.tick;
                 stopped.speed = 0.0;
                 stopped.motion_refusal = Some(MotionRefusal::NpcContact);
-                return self.publish_step(stopped, Some(solar::Motion::Stopped));
+                let kind = if self.traffic_motion_clear(before, after) {
+                    solar::StopKind::Mule
+                } else {
+                    solar::StopKind::Traffic
+                };
+                return self.publish_step(stopped, Some(solar::Motion::Stopped { input, kind }));
             }
             if !self.mining_motion_clear(before, after, angular_travel) {
                 let mut stopped = self.state;
                 stopped.tick = next.tick;
                 stopped.speed = 0.0;
                 stopped.motion_refusal = Some(MotionRefusal::AsteroidContact);
-                return self.publish_step(stopped, Some(solar::Motion::Stopped));
+                return self.publish_step(
+                    stopped,
+                    Some(solar::Motion::Stopped {
+                        input,
+                        kind: solar::StopKind::Asteroid,
+                    }),
+                );
             }
             if data.crosses_aperture(before, after) {
                 if !data.entry_clear(
@@ -653,7 +670,13 @@ impl World {
                     stopped.speed = 0.0;
                     stopped.mode = FlightMode::Flight;
                     stopped.motion_refusal = Some(MotionRefusal::EntryConditions);
-                    return self.publish_step(stopped, Some(solar::Motion::Stopped));
+                    return self.publish_step(
+                        stopped,
+                        Some(solar::Motion::Stopped {
+                            input,
+                            kind: solar::StopKind::Entry,
+                        }),
+                    );
                 }
                 next.mode = FlightMode::Docked;
                 next.speed = 0.0;
@@ -664,7 +687,13 @@ impl World {
                     stopped.speed = 0.0;
                     stopped.mode = FlightMode::Flight;
                     stopped.motion_refusal = Some(MotionRefusal::StationContact);
-                    return self.publish_step(stopped, Some(solar::Motion::Stopped));
+                    return self.publish_step(
+                        stopped,
+                        Some(solar::Motion::Stopped {
+                            input,
+                            kind: solar::StopKind::Station,
+                        }),
+                    );
                 }
                 next.mode = FlightMode::Flight;
             }
@@ -678,9 +707,7 @@ impl World {
                 .station_data
                 .as_ref()
                 .map_or(0.0, |data| data.player_radius());
-            [scene.planet, scene.sun]
-                .into_iter()
-                .any(|body| body.blocks_motion(self.state.position, position, hull_radius))
+            scene.blocks_motion(self.state.position, position, hull_radius)
         } else {
             false
         }

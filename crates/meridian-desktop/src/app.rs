@@ -90,6 +90,12 @@ enum FrameAdvance {
     Fatal(StepError),
 }
 
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+enum QuitRecovery {
+    Resume,
+    Discard,
+}
+
 const DEFAULT_FLIGHT_WINDOW: [u32; 2] = [1280, 720];
 pub(crate) const MIN_WINDOW_LOGICAL: [f64; 2] = [640.0, 360.0];
 
@@ -446,6 +452,16 @@ impl App {
             }
             return;
         }
+        if let Some(recovery) = self.quit_recovery_key(code) {
+            match recovery {
+                QuitRecovery::Resume => self.request_redraw(),
+                QuitRecovery::Discard => {
+                    self.shutdown_audio();
+                    event_loop.exit();
+                }
+            }
+            return;
+        }
         if code == KeyCode::Digit0 && !self.commander_open && self.has_berth() {
             self.show_station_commander();
             self.request_redraw();
@@ -458,7 +474,7 @@ impl App {
         let global = matches!(
             code,
             KeyCode::F5 | KeyCode::F9 | KeyCode::F11 | KeyCode::KeyP
-        ) || (self.quit_failed && code == KeyCode::KeyQ);
+        );
         if self.menu_active() && !global {
             if self.open_menu_key(code) {
                 return;
@@ -475,10 +491,6 @@ impl App {
         }
         match code {
             KeyCode::Escape => self.request_quit(event_loop),
-            KeyCode::KeyQ if self.quit_failed => {
-                self.shutdown_audio();
-                event_loop.exit();
-            }
             KeyCode::KeyN if !self.game.playing() => {
                 let message = match self.game.new_commander(fresh_profile_seed()) {
                     Ok(true) => {
@@ -653,14 +665,34 @@ impl App {
                 event_loop.exit();
             }
             Err(error) => {
-                self.paused = true;
-                self.reset_input();
-                self.quit_failed = true;
-                self.notice.set(format!(
-                    "P resumes; Q discards unsaved progress and quits. {error}"
-                ));
+                self.record_quit_failure(&error);
                 self.request_redraw();
             }
+        }
+    }
+
+    fn record_quit_failure(&mut self, error: &str) {
+        self.paused = true;
+        self.reset_input();
+        self.quit_failed = true;
+        self.notice.set(format!(
+            "P resumes; Q discards unsaved progress and quits. {error}"
+        ));
+    }
+
+    fn quit_recovery_key(&mut self, code: KeyCode) -> Option<QuitRecovery> {
+        if !self.quit_failed {
+            return None;
+        }
+        match code {
+            KeyCode::KeyP => {
+                self.quit_failed = false;
+                self.paused = false;
+                self.reset_input();
+                Some(QuitRecovery::Resume)
+            }
+            KeyCode::KeyQ => Some(QuitRecovery::Discard),
+            _ => None,
         }
     }
 

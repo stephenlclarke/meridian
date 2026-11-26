@@ -3,7 +3,10 @@ use crate::{
     session::{Action, PracticeSelection, Session},
     storage::{SaveCommit, Store},
 };
-use meridian_core::{FlightMode, World, save::MAX_SAVE_FILE_BYTES};
+use meridian_core::{
+    FlightMode, World,
+    save::{MAX_SAVE_FILE_BYTES, MAX_SOLAR_HISTORY_BYTES},
+};
 use std::{io, path::PathBuf};
 
 pub struct Profile {
@@ -477,15 +480,19 @@ impl Profile {
     }
 
     pub fn save(&mut self) -> Result<String, String> {
-        self.save_with_file_limit(MAX_SAVE_FILE_BYTES)
+        self.save_with_limits(MAX_SAVE_FILE_BYTES, MAX_SOLAR_HISTORY_BYTES)
     }
 
-    fn save_with_file_limit(&mut self, limit: usize) -> Result<String, String> {
+    fn save_with_limits(
+        &mut self,
+        file_limit: usize,
+        solar_limit: usize,
+    ) -> Result<String, String> {
         self.require_profile()?;
         if !self.playing {
             return Err("No active commander to save".into());
         }
-        if self.world.solar_save_limit_reached() {
+        if self.world.solar_save_limit_reached(solar_limit) {
             return Err(
                 "Solar save history is full. Flight continues; the previous save is retained."
                     .into(),
@@ -496,7 +503,7 @@ impl Profile {
             .store
             .as_ref()
             .ok_or("Internal validation has no profile storage")?
-            .save(&bytes, limit)
+            .save(&bytes, file_limit)
             .map_err(|e| format!("Save failed; previous file retained: {e}"))?;
         self.has_save = true;
         match committed {
@@ -514,15 +521,19 @@ impl Profile {
     }
 
     pub fn prepare_quit(&mut self) -> Result<(), String> {
-        self.prepare_quit_with_file_limit(MAX_SAVE_FILE_BYTES)
+        self.prepare_quit_with_limits(MAX_SAVE_FILE_BYTES, MAX_SOLAR_HISTORY_BYTES)
     }
 
-    fn prepare_quit_with_file_limit(&mut self, limit: usize) -> Result<(), String> {
+    pub(crate) fn prepare_quit_with_limits(
+        &mut self,
+        file_limit: usize,
+        solar_limit: usize,
+    ) -> Result<(), String> {
         if self.is_internal_validation() {
             return Ok(());
         }
         if self.playing {
-            self.save_with_file_limit(limit)?;
+            self.save_with_limits(file_limit, solar_limit)?;
         }
         Ok(())
     }
@@ -701,9 +712,7 @@ pub(crate) mod tests {
     pub(super) fn action(profile: &mut Profile, value: Action) {
         profile.command(value).unwrap_or_else(|e| panic!("{e}"));
     }
-    #[test]
-    fn chunked_solar_profile_publishes_atomically_and_refuses_small_or_failed_writer() {
-        let directory = TestDirectory::new();
+    pub(crate) fn solar_history_profile(directory: &TestDirectory) -> Profile {
         let mut profile = open(&directory.0);
         assert!(
             profile
@@ -799,28 +808,52 @@ pub(crate) mod tests {
                 },
             );
         }
+        profile
+    }
+    #[test]
+    fn chunked_solar_profile_publishes_atomically_and_refuses_small_or_failed_writer() {
+        let directory = TestDirectory::new();
+        let mut profile = solar_history_profile(&directory);
         let before = profile.world.save_bytes().unwrap_or_else(|e| panic!("{e}"));
         assert!(before.len() > meridian_core::save::MAX_SAVE_BYTES);
         profile.save().unwrap_or_else(|e| panic!("{e}"));
         let path = directory.0.join("commander.meridian");
         assert_eq!(fs::read(&path).unwrap_or_else(|e| panic!("{e}")), before);
-        step(
-            &mut profile,
-            FlightInput {
+        profile
+            .world
+            .step(FlightInput {
                 yaw: 0.2,
                 ..FlightInput::default()
-            },
-        );
+            })
+            .unwrap_or_else(|e| panic!("{e}"));
         let current = profile.world.save_bytes().unwrap_or_else(|e| panic!("{e}"));
         assert!(
             profile
-                .save_with_file_limit(meridian_core::save::MAX_SAVE_BYTES)
+                .save_with_limits(meridian_core::save::MAX_SAVE_BYTES, MAX_SOLAR_HISTORY_BYTES)
                 .is_err()
         );
         assert!(
             profile
-                .prepare_quit_with_file_limit(meridian_core::save::MAX_SAVE_BYTES)
+                .prepare_quit_with_limits(
+                    meridian_core::save::MAX_SAVE_BYTES,
+                    MAX_SOLAR_HISTORY_BYTES
+                )
                 .is_err()
+        );
+        assert!(
+            !profile
+                .world
+                .solar_save_limit_reached(MAX_SOLAR_HISTORY_BYTES)
+        );
+        assert!(profile.world.solar_save_limit_reached(1));
+        let failure = profile
+            .save_with_limits(MAX_SAVE_FILE_BYTES, 1)
+            .err()
+            .unwrap_or_else(|| panic!("solar limit admitted save"));
+        assert!(failure.contains("Solar save history is full"));
+        assert_eq!(
+            profile.prepare_quit_with_limits(MAX_SAVE_FILE_BYTES, 1),
+            Err(failure)
         );
         assert!(profile.playing());
         assert_eq!(fs::read(&path).unwrap_or_else(|e| panic!("{e}")), before);

@@ -198,7 +198,7 @@ fn real_earned_paid_scoops_add_unbought_fuel_to_the_extended_tank_and_resume_mid
     );
     assert!(world.solar.runs.len() < 50);
     let mut encoded = Writer::new();
-    world.solar.encode(&mut encoded);
+    world.solar.encode(&mut encoded).unwrap();
     assert_eq!(world.solar.encoded_len(), encoded.bytes.len() + 12);
     let previous = world.solar_snapshot().unwrap();
     world.request_pause(true, world.snapshot().tick).unwrap();
@@ -469,10 +469,9 @@ fn chunked_history_crosses_old_limit_and_repeated_same_commander_scooping_remain
             forced_limit = world.solar.encoded_len();
             first_disk = current;
         } else {
-            assert_eq!(
-                super::super::persistence::solar_file_with_limit_test_input(&world, forced_limit),
-                Err(SaveError::TooLarge)
-            );
+            world.solar.file_limit = Some(forced_limit);
+            assert!(world.solar_save_limit_reached(forced_limit));
+            assert_eq!(world.save_bytes(), Err(SaveError::TooLarge));
             let previous = World::from_save_bytes(&first_disk).unwrap();
             assert_eq!(previous.commander_id(), identity);
             assert!(fuel(&previous) < fuel(&world));
@@ -484,14 +483,15 @@ fn chunked_history_crosses_old_limit_and_repeated_same_commander_scooping_remain
     }
     assert!(fuel(&world) >= initial_fuel + 12);
     assert_eq!(world.credits_tenths(), initial_cash);
-    assert!(!world.solar_save_limit_reached());
+    assert!(!world.solar_save_limit_reached(crate::save::MAX_SOLAR_HISTORY_BYTES));
+    world.solar.file_limit = Some(forced_limit);
+    assert!(world.solar_save_limit_reached(forced_limit));
+    assert_eq!(world.save_bytes(), Err(SaveError::TooLarge));
     return_to_corona(&mut world);
     // Even after the forced outer refusal, the exact same pilot can still steer and scoop.
     refill_solar(&mut world, 2);
-    assert_eq!(
-        super::super::persistence::solar_file_with_limit_test_input(&world, forced_limit),
-        Err(SaveError::TooLarge)
-    );
+    assert!(world.solar_save_limit_reached(forced_limit));
+    assert_eq!(world.save_bytes(), Err(SaveError::TooLarge));
     assert!(fuel(&world) >= initial_fuel + 14);
 }
 
@@ -531,6 +531,223 @@ fn malformed_chunk_size_and_truncated_history_refuse_without_live_replacement() 
         assert!(world.restore_bytes(&bad).is_err());
         assert_eq!(world.save_bytes().unwrap(), before);
     }
+}
+
+#[test]
+fn genuine_planet_refusal_replays_attempted_input_and_rejects_forged_clear_stop_or_crossing() {
+    let mut world = World::new_commander(18307).unwrap();
+    let initial_fuel = fuel(&world);
+    solar_approach(&mut world);
+    leave_corona(&mut world);
+    let planet = world.celestial_snapshot().unwrap().planet;
+    aim_3d(&mut world, planet.position);
+    for _ in 0..6000 {
+        cruise(&mut world, 34.3);
+        if world.snapshot().motion_refusal == Some(crate::MotionRefusal::CelestialContact) {
+            break;
+        }
+    }
+    assert_eq!(
+        world.snapshot().motion_refusal,
+        Some(crate::MotionRefusal::CelestialContact)
+    );
+    assert_eq!(world.snapshot().speed, 0.0);
+    let last = world.solar.runs.last().unwrap();
+    let Motion::Stopped {
+        kind: StopKind::Celestial,
+        input,
+    } = last.motion
+    else {
+        panic!("actual stop lost its attempted control");
+    };
+    let scene = State::scene(
+        &world,
+        last.opening.system,
+        last.opening.visit,
+        last.opening.tick,
+    )
+    .unwrap();
+    let hull = world.station_data.as_ref().unwrap().player_radius();
+    let attempted = last.opening.frame.advance(Motion::Active(input)).unwrap();
+    assert!(
+        scene
+            .planet
+            .blocks_motion(last.opening.frame.position, attempted.position, hull)
+    );
+    assert!(
+        !scene
+            .sun
+            .blocks_motion(last.opening.frame.position, attempted.position, hull)
+    );
+    assert!(
+        super::history::replay_motion(
+            &world,
+            last.opening,
+            Motion::Active(input),
+            &scene,
+            &mut std::iter::empty()
+        )
+        .is_err()
+    );
+    let bytes = world.save_bytes().unwrap();
+    let cold = World::from_save_bytes(&bytes).unwrap();
+    assert_eq!(cold.snapshot(), world.snapshot());
+    assert_eq!(cold.solar_snapshot(), world.solar_snapshot());
+    assert_eq!(fuel(&cold), initial_fuel);
+    let mut crossing = World::from_save_bytes(&bytes).unwrap();
+    let index = crossing.solar.runs.len() - 1;
+    crossing.solar.runs.get_mut(index).unwrap().motion = Motion::Active(input);
+    assert!(crossing.save_bytes().is_err());
+    assert!(
+        world
+            .restore_bytes(&crossing.unchecked_test_save().unwrap())
+            .is_err()
+    );
+    assert_eq!(world.save_bytes().unwrap(), bytes);
+
+    // A stationary turn near the genuine obstacle is legal, and must not be replaced
+    // by a made-up stop merely because a stop occurred on the preceding tick.
+    let orientation = world.snapshot().orientation;
+    world
+        .step(FlightInput {
+            yaw: 0.25,
+            ..FlightInput::default()
+        })
+        .unwrap();
+    assert_eq!(world.snapshot().motion_refusal, None);
+    assert_ne!(world.snapshot().orientation, orientation);
+    let genuine = world.save_bytes().unwrap();
+    let mut forged = World::from_save_bytes(&genuine).unwrap();
+    let index = forged.solar.runs.len() - 1;
+    let run = forged.solar.runs.last().unwrap();
+    let Motion::Active(input) = run.motion else {
+        panic!("expected clear movement");
+    };
+    let clear_scene = State::scene(
+        &world,
+        run.opening.system,
+        run.opening.visit,
+        run.opening.tick,
+    )
+    .unwrap();
+    let attempted = run.opening.frame.advance(Motion::Active(input)).unwrap();
+    assert!(!clear_scene.blocks_motion(run.opening.frame.position, attempted.position, hull));
+    let fake = Motion::Stopped {
+        input,
+        kind: StopKind::Celestial,
+    };
+    assert!(
+        super::history::replay_motion(
+            &world,
+            run.opening,
+            fake,
+            &clear_scene,
+            &mut std::iter::empty()
+        )
+        .is_err()
+    );
+    forged.solar.runs.get_mut(index).unwrap().motion = fake;
+    assert!(forged.save_bytes().is_err());
+    assert!(
+        world
+            .restore_bytes(&forged.unchecked_test_save().unwrap())
+            .is_err()
+    );
+    assert_eq!(world.save_bytes().unwrap(), genuine);
+    let recovered = World::from_save_bytes(&genuine).unwrap();
+    assert_eq!(recovered.solar_snapshot(), world.solar_snapshot());
+    assert_eq!(fuel(&recovered), initial_fuel);
+}
+
+#[test]
+fn actual_npc_scene_proves_only_the_bound_attempted_sweep_and_witness_codec() {
+    let mut world = World::new_commander(18308).unwrap();
+    launch(&mut world);
+    let mut retained = None;
+    for _ in 0..1800 {
+        cruise(&mut world, 34.3);
+        let identity = world.combat_identity().unwrap();
+        let scene = world.traffic.missile_scene(
+            identity.system,
+            world.state.tick,
+            crate::traffic::SceneStage::Command(world.combat.emissions),
+        );
+        if !scene.bodies.is_empty() {
+            retained = Some(scene);
+            break;
+        }
+    }
+    let identity = world.combat_identity().unwrap();
+    let scene = retained.unwrap_or_else(|| panic!("actual traffic scene"));
+    let actor = scene
+        .bodies
+        .first()
+        .unwrap_or_else(|| panic!("actual traffic scene"));
+    let radius = world
+        .station_data
+        .as_ref()
+        .unwrap()
+        .player_clearance_radius()
+        * 2.0
+        + 1.0;
+    // This is an isolated geometry fixture using an actual retained scene, not a claimed
+    // public collision journey. The attempted player pose is deliberately placed just outside.
+    let frame = MotionFrame {
+        position: [
+            actor.pose.position.x as f32,
+            actor.pose.position.y as f32,
+            (actor.pose.position.z - radius - 0.1) as f32,
+        ],
+        orientation: [0.0, 0.0, 0.0, 1.0],
+        speed: 34.3,
+    };
+    let opening = Anchor {
+        system: identity.system,
+        visit: identity.visit,
+        tick: world.state.tick,
+        clock: world.combat.physical_tick(),
+        frame,
+    };
+    let witness = NpcRefusal {
+        clock: opening.clock,
+        scene,
+    };
+    let mut writer = Writer::new();
+    witness.encode(&mut writer).unwrap();
+    let mut reader = Reader::new(&writer.bytes);
+    assert_eq!(NpcRefusal::decode(&mut reader).unwrap(), witness);
+    assert!(reader.finished());
+    let motion = Motion::Stopped {
+        input: FlightInput::default(),
+        kind: StopKind::Traffic,
+    };
+    let scene = State::scene(&world, identity.system, identity.visit, opening.tick).unwrap();
+    let stopped = super::history::replay_motion(
+        &world,
+        opening,
+        motion,
+        &scene,
+        &mut std::iter::once(&witness),
+    )
+    .unwrap();
+    assert_eq!(stopped.position, frame.position);
+    assert_eq!(stopped.speed, 0.0);
+    assert!(
+        super::history::replay_motion(&world, opening, motion, &scene, &mut std::iter::empty())
+            .is_err()
+    );
+    let mut wrong = witness;
+    wrong.clock += 1;
+    assert!(
+        super::history::replay_motion(
+            &world,
+            opening,
+            motion,
+            &scene,
+            &mut std::iter::once(&wrong)
+        )
+        .is_err()
+    );
 }
 #[test]
 fn fitted_partially_charged_emp_keeps_actual_final_transfer_when_solar_heat_kills() {

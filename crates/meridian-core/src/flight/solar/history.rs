@@ -7,6 +7,8 @@ const RUN_BYTES: usize = 99;
 const RECEIPT_BYTES: usize = 20;
 const ANCHOR_BYTES: usize = 59;
 const LAST_BYTES: usize = 86;
+const NPC_SCENE_BYTES: usize = 512;
+const NPC_REFUSAL_BYTES: usize = 8 + 2 + NPC_SCENE_BYTES;
 
 fn log_bytes<T, const N: usize>(log: &ChunkLog<T, N>, record_bytes: usize) -> usize {
     4usize
@@ -18,15 +20,16 @@ fn encode_log<T, const N: usize>(
     w: &mut Writer,
     log: &ChunkLog<T, N>,
     record_bytes: usize,
-    mut encode: impl FnMut(&mut Writer, &T),
-) {
-    w.u32(log.len() as u32);
+    mut encode: impl FnMut(&mut Writer, &T) -> Result<(), SaveError>,
+) -> Result<(), SaveError> {
+    w.u32(u32::try_from(log.len()).map_err(|_| SaveError::TooLarge)?);
     for chunk in log.chunks() {
-        w.u16((chunk.len() * record_bytes) as u16);
+        w.u16(u16::try_from(chunk.len() * record_bytes).map_err(|_| SaveError::TooLarge)?);
         for entry in chunk {
-            encode(w, entry);
+            encode(w, entry)?;
         }
     }
+    Ok(())
 }
 
 fn decode_log<T: Clone, const N: usize>(
@@ -179,10 +182,18 @@ impl Anchor {
 }
 impl Motion {
     fn encode(self, w: &mut Writer) {
-        let (tag, input) = match self {
-            Self::Stopped => (0, FlightInput::default()),
-            Self::Active(input) => (1, input),
+        let tag = match self {
+            Self::Active(_) => 1,
+            Self::Stopped { kind, .. } => match kind {
+                StopKind::Celestial => 2,
+                StopKind::Traffic => 3,
+                StopKind::Mule => 4,
+                StopKind::Asteroid => 5,
+                StopKind::Station => 6,
+                StopKind::Entry => 7,
+            },
         };
+        let input = self.input();
         w.u8(tag);
         for value in [input.pitch, input.yaw, input.roll, input.throttle] {
             w.f32(value);
@@ -199,12 +210,148 @@ impl Motion {
             brake: r.bool()?,
         };
         input.validate().map_err(|_| INVALID)?;
-        match tag {
-            0 if input == FlightInput::default() => Ok(Self::Stopped),
-            1 => Ok(Self::Active(input)),
-            _ => Err(INVALID),
+        if tag == 1 {
+            return Ok(Self::Active(input));
         }
+        let kind = match tag {
+            2 => StopKind::Celestial,
+            3 => StopKind::Traffic,
+            4 => StopKind::Mule,
+            5 => StopKind::Asteroid,
+            6 => StopKind::Station,
+            7 => StopKind::Entry,
+            _ => return Err(INVALID),
+        };
+        Ok(Self::Stopped { input, kind })
     }
+}
+impl NpcRefusal {
+    pub(super) fn encode(&self, w: &mut Writer) -> Result<(), SaveError> {
+        let mut scene = Writer::new();
+        self.scene.encode(&mut scene);
+        // Existing scene type has at most four fixed-size actors; the padded
+        // record keeps chunk decoding bounded before reading its variable scene.
+        if scene.bytes.len() > NPC_SCENE_BYTES {
+            return Err(SaveError::TooLarge);
+        }
+        w.u64(self.clock);
+        w.u16(scene.bytes.len() as u16);
+        w.bytes.extend(&scene.bytes);
+        w.bytes
+            .resize(w.bytes.len() + NPC_SCENE_BYTES - scene.bytes.len(), 0);
+        Ok(())
+    }
+    pub(super) fn decode(r: &mut Reader<'_>) -> Result<Self, SaveError> {
+        let clock = r.u64()?;
+        let length = usize::from(r.u16()?);
+        if length > NPC_SCENE_BYTES {
+            return Err(INVALID);
+        }
+        let mut payload = r.subreader(length)?;
+        let scene = crate::traffic::MissileScene::decode(&mut payload)?;
+        if !payload.finished() {
+            return Err(INVALID);
+        }
+        for _ in length..NPC_SCENE_BYTES {
+            if r.u8()? != 0 {
+                return Err(INVALID);
+            }
+        }
+        Ok(Self { clock, scene })
+    }
+}
+
+pub(super) fn replay_motion<'a>(
+    world: &World,
+    anchor: Anchor,
+    motion: Motion,
+    scene: &crate::celestial::Snapshot,
+    witnesses: &mut impl Iterator<Item = &'a NpcRefusal>,
+) -> Result<MotionFrame, SaveError> {
+    let input = motion.input();
+    let attempted = anchor.frame.advance(Motion::Active(input)).ok_or(INVALID)?;
+    let data = world.station_data.as_ref().ok_or(INVALID)?;
+    let celestial_blocked = scene.blocks_motion(
+        anchor.frame.position,
+        attempted.position,
+        data.player_radius(),
+    );
+    if let Motion::Stopped {
+        kind: StopKind::Celestial,
+        ..
+    } = motion
+    {
+        return if celestial_blocked {
+            anchor.frame.advance(motion).ok_or(INVALID)
+        } else {
+            Err(INVALID)
+        };
+    }
+    if celestial_blocked {
+        return Err(INVALID);
+    }
+    let before = crate::station::flight_pose(anchor.frame.position, anchor.frame.orientation)
+        .ok_or(INVALID)?;
+    let after =
+        crate::station::flight_pose(attempted.position, attempted.orientation).ok_or(INVALID)?;
+    let angular = f64::from(
+        input.pitch.abs() * super::super::PITCH_RATE
+            + input.yaw.abs() * super::super::YAW_RATE
+            + input.roll.abs() * super::super::ROLL_RATE,
+    ) * f64::from(super::super::FIXED_DELTA_SECONDS);
+    let next_tick = anchor.tick.checked_add(1).ok_or(INVALID)?;
+    let asteroid_clear =
+        || world.mining_motion_clear_at_step(anchor.system, next_tick, before, after, angular);
+    let crosses = || data.crosses_aperture(before, after);
+    let station_clear = || data.motion_clear(before, after, angular);
+    let Motion::Stopped { kind, .. } = motion else {
+        if crosses() || !station_clear() || !asteroid_clear() {
+            return Err(INVALID);
+        }
+        return Ok(attempted);
+    };
+    let justified = match kind {
+        StopKind::Celestial => false,
+        StopKind::Traffic => {
+            let witness = witnesses.next().ok_or(INVALID)?;
+            let s = &witness.scene;
+            if witness.clock != anchor.clock
+                || s.world_tick != anchor.tick
+                || s.system != anchor.system
+                || !matches!(s.stage, crate::traffic::SceneStage::Command(emission) if emission <= world.combat.emissions)
+            {
+                return Err(INVALID);
+            }
+            world
+                .traffic
+                .validate_missile_scene(s, world.state.tick, data)?;
+            !s.player_motion_clear(
+                before.position,
+                after.position,
+                data.player_clearance_radius(),
+            )
+        }
+        StopKind::Mule => world
+            .historic_renas_mule_motion_blocked(anchor.system, anchor.visit, before, after, angular)
+            .map_err(|_| INVALID)?,
+        StopKind::Asteroid => !asteroid_clear(),
+        StopKind::Station => asteroid_clear() && !crosses() && !station_clear(),
+        StopKind::Entry => {
+            asteroid_clear()
+                && crosses()
+                && !data.entry_clear(
+                    before,
+                    after,
+                    f64::from(attempted.speed * super::super::DISTANCE_PER_SPEED_UNIT),
+                    f64::from(input.roll * super::super::ROLL_RATE),
+                    angular,
+                )
+        }
+    };
+    if !justified {
+        return Err(INVALID);
+    }
+    anchor.frame.advance(motion).ok_or(INVALID)
 }
 impl SolarSnapshot {
     fn encode(self, w: &mut Writer) {
@@ -255,9 +402,10 @@ impl State {
                 + usize::from(self.last.is_some()) * LAST_BYTES)
                 .saturating_add(log_bytes(&self.runs, RUN_BYTES))
                 .saturating_add(log_bytes(&self.receipts, RECEIPT_BYTES))
+                .saturating_add(log_bytes(&self.npc_refusals, NPC_REFUSAL_BYTES))
         }
     }
-    pub(in crate::flight) fn encode(&self, w: &mut Writer) {
+    pub(in crate::flight) fn encode(&self, w: &mut Writer) -> Result<(), SaveError> {
         w.option(self.legacy_origin.as_ref(), |w, anchor| anchor.encode(w));
         encode_log(w, &self.runs, RUN_BYTES, |w, run| {
             run.opening.encode(w);
@@ -267,19 +415,25 @@ impl State {
             w.u64(run.item);
             run.motion.encode(w);
             w.u16(run.steps);
-        });
+            Ok(())
+        })?;
         encode_log(w, &self.receipts, RECEIPT_BYTES, |w, receipt| {
             w.u64(receipt.revision);
             w.u64(receipt.tick);
             w.u16(receipt.before);
             w.u16(receipt.added);
-        });
+            Ok(())
+        })?;
+        encode_log(w, &self.npc_refusals, NPC_REFUSAL_BYTES, |w, witness| {
+            witness.encode(w)
+        })?;
         w.option(self.last.as_ref(), |w, last| {
             last.anchor.encode(w);
             w.u16(last.fuel);
             w.u64(last.revision);
             last.condition.encode(w);
         });
+        Ok(())
     }
     pub(in crate::flight) fn decode(r: &mut Reader<'_>) -> Result<Self, SaveError> {
         let legacy_origin = r.option(Anchor::decode)?;
@@ -302,6 +456,7 @@ impl State {
                 added: r.u16()?,
             })
         })?;
+        let npc_refusals = decode_log(r, NPC_REFUSAL_BYTES, NpcRefusal::decode)?;
         let last = r.option(|r| {
             Ok(Last {
                 anchor: Anchor::decode(r)?,
@@ -313,9 +468,12 @@ impl State {
         let result = Self {
             runs,
             receipts,
+            npc_refusals,
             last,
             legacy_origin,
             legacy_format: false,
+            #[cfg(test)]
+            file_limit: None,
         };
         if result.is_empty() {
             return Err(INVALID);
@@ -329,13 +487,14 @@ impl State {
         account: &CommanderAccount,
         modular: &crate::flight::modular::State,
     ) -> Result<(), SaveError> {
-        if self.encoded_len() > crate::save::MAX_SOLAR_HISTORY_BYTES {
+        if self.encoded_len() > self.file_limit() {
             return Err(SaveError::TooLarge);
         }
         if self.is_empty() {
             let mut origin = Self::default();
             origin.initialize_legacy_origin(world)?;
             return if self.receipts.is_empty()
+                && self.npc_refusals.is_empty()
                 && self.last.is_none()
                 && origin.legacy_origin.is_none()
             {
@@ -358,9 +517,9 @@ impl State {
             }
         }
         let owner = world.combat_identity().ok_or(INVALID)?.owner;
-        let hull = world.station_data.as_ref().ok_or(INVALID)?.player_radius();
         let mut previous: Option<Last> = None;
         let mut receipts = self.receipts.iter();
+        let mut witnesses = self.npc_refusals.iter();
         for run in self.runs.iter() {
             run.opening.validate(world)?;
             if run.steps == 0
@@ -376,12 +535,13 @@ impl State {
                 return Err(INVALID);
             }
             let mut condition = SolarSnapshot::default();
-            let sun = Self::sun(
+            let scene = Self::scene(
                 world,
                 run.opening.system,
                 run.opening.visit,
                 run.opening.tick,
             )?;
+            let sun = scene.sun;
             let opening_ratio = run.opening.frame.ratio_and_nose(sun).0;
             let first_of_visit = previous.is_none_or(|last| last.anchor.visit != run.opening.visit);
             if let Some(last) = previous {
@@ -413,7 +573,7 @@ impl State {
             let mut fuel = run.first_fuel;
             let mut revision = run.first_revision;
             for step in 0..run.steps {
-                let next = anchor.frame.advance(run.motion).ok_or(INVALID)?;
+                let next = replay_motion(world, anchor, run.motion, &scene, &mut witnesses)?;
                 let (ratio, nose) = next.ratio_and_nose(sun);
                 if !next.valid()
                     || !ratio.is_finite()
@@ -423,7 +583,6 @@ impl State {
                         && step == 0
                         && opening_ratio > THERMAL_LIMIT
                         && ratio > THERMAL_LIMIT + 0.00001)
-                    || sun.blocks_motion(anchor.frame.position, next.position, hull)
                 {
                     return Err(INVALID);
                 }
@@ -469,7 +628,7 @@ impl State {
                 condition,
             });
         }
-        if receipts.next().is_some() {
+        if receipts.next().is_some() || witnesses.next().is_some() {
             return Err(INVALID);
         }
         match (previous, self.last) {
@@ -490,7 +649,9 @@ impl State {
                 if saved.anchor.visit == current.visit
                     && saved.anchor.clock == world.combat.physical_tick()
                     && world.state.mode == FlightMode::Flight
-                    && !saved.anchor.frame.near(world.state.into())
+                    && (!saved.anchor.frame.near(world.state.into())
+                        || self.runs.last().and_then(|run| run.motion.refusal())
+                            != world.state.motion_refusal)
                 {
                     return Err(INVALID);
                 }

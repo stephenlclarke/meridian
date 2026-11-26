@@ -134,6 +134,46 @@ impl World {
                 })
             })
     }
+
+    pub(super) fn historic_renas_mule_motion_blocked(
+        &self,
+        system: SystemId,
+        visit: u64,
+        before: RigidPose,
+        after: RigidPose,
+        angular_travel: f64,
+    ) -> Result<bool, StationError> {
+        let Some((owner, hull, _, arrival_visit)) = self
+            .freight_session
+            .as_ref()
+            .and_then(|session| session.state.snapshot().clue)
+            .and_then(|clue| clue.completion().renas_departure_binding())
+        else {
+            return Ok(false);
+        };
+        let Some(identity) = self.combat_identity() else {
+            return Ok(false);
+        };
+        if system != SystemId::RENAS
+            || arrival_visit.checked_add(1) != Some(visit)
+            || owner != identity.owner
+            || hull != identity.hull
+        {
+            return Ok(false);
+        }
+        let data = self
+            .station_data
+            .as_ref()
+            .ok_or(StationError::InvalidPose)?;
+        let source = MuleHullSource::bundled().map_err(|_| StationError::InvalidMesh)?;
+        let pose = data.renas_mule_berth(&source)?;
+        // A genuine old overlapping save defers the collider until it is physically clear.
+        // A refused attempt must start at a clear pose before crossing the exact fixed hull.
+        Ok(
+            data.mule_ordinary_player_clear(&source, pose, before, before, 0.0)
+                && !data.mule_ordinary_player_clear(&source, pose, before, after, angular_travel),
+        )
+    }
 }
 
 #[cfg(test)]
