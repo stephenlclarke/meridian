@@ -191,7 +191,9 @@
     "tools/vulture_mk_i_exact_fit.py": "479b31f8714a198a82c0e2888b8d19efe46c7b4c43a576b83ab84c571ae738c6",
     "tools/prepare_dzo.py": "4113d48de7b17d2576d0bf5910bf3b209e59204a0557de777b09a4871af8d6a5",
     "tools/verify_dzo.py": "27f9c0c923ab1070ee2098b8e86e455b9910ad8554bbbe52995cda42de28e67e",
-    "tools/measure_dzo.py": "162f2916e48d06ccd7dab7323ffd503d6c24a28a594bf10227f55b35c3f9b3aa",
-    "tools/hull_contact_geometry.py": "07606202e6a298ad375a7504991fe6fb93da6a07f9b5cc4a22167bd570b07839"
+    "tools/measure_dzo.py": "d7839dfc76640330d6c9188c525ad5dab8137c75a28725a9d7c6eae3de1c2a97",
+    "tools/hull_contact_geometry.py": "07606202e6a298ad375a7504991fe6fb93da6a07f9b5cc4a22167bd570b07839",
+    "integration/sh074-dzo/OPTION-SUPPORT-FANS.json": "34ed9ca5999194f0252d3f973670464cb0aeca92732d6ba96af54578196b9618",
+    "tools/measure_collar_support_fans.py": "8cf3668680568929c5f6d579d40b5d21c58b35c7bd36581ef7c273b10b84944b"
   }
 }

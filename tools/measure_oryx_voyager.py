@@ -12,7 +12,7 @@ import trimesh
 import measure_goshawk_surface_fit as fit
 from prepare_oryx_voyager import INTEGRATION, ORIGINAL, prepare, require
 from measure_banteng_geometry import adaptive_upper
-from measure_lanner_geometry import make_fan
+from measure_collar_support_fans import load_span_fans, validate_span_fans
 from dzo_collar_support import collar_spans
 from vulture_mk_i_exact_fit import TriangleIndex, bound_fan, grid_index
 
@@ -55,6 +55,7 @@ def ring_options(vertices, meshes, groups):
     targets = baseline["minimumRefinementTargetsMillimetres"]
     indices = {lod: grid_index(mesh) for lod, (_, mesh) in meshes.items()}
     collars = ("ring-wing",)
+    authored_fans = load_span_fans(INTEGRATION / "OPTION-SUPPORT-FANS.json", collars)
     other = {
         lod: max(piece[lod] for name, piece in baseline["pieces"].items() if name not in collars)
         for lod in indices
@@ -73,7 +74,7 @@ def ring_options(vertices, meshes, groups):
                 require(len(collars_faces) == expected, "changed Oryx Voyager ring triangle count")
                 require(all(any(set(face + offset) <= span for span in memberships) for face in collars_faces),
                         "uncovered Oryx Voyager ring triangle")
-            fans = [make_fan(vertices, np.asarray(span)) for span in spans]
+            fans = validate_span_fans(vertices, spans, authored_fans[name][str(count)])
             options[name][f"{count}SpansUpperMillimetres"] = {
                 lod: max(adaptive_upper(index, vertices[fan], targets[lod]) for fan in fans)
                 for lod, index in indices.items()

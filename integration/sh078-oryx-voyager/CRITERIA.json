@@ -199,7 +199,9 @@
     "tools/vulture_mk_i_exact_fit.py": "479b31f8714a198a82c0e2888b8d19efe46c7b4c43a576b83ab84c571ae738c6",
     "tools/prepare_oryx_voyager.py": "8ba71103ee295ed42102c82091e40887982aadf38fcee2bc2194e6aa07b06b9f",
     "tools/verify_oryx_voyager.py": "b2d8c341e0b1c28251046e1ffdc09572d5ea8ae6ff5353856d543667bd661c68",
-    "tools/measure_oryx_voyager.py": "2dd9432c8a6ae211173b9e48cfa4e70b87c973fc489efae2116e9d53253dbe9e",
-    "tools/hull_contact_geometry.py": "07606202e6a298ad375a7504991fe6fb93da6a07f9b5cc4a22167bd570b07839"
+    "tools/measure_oryx_voyager.py": "6e4d4940583a411e89014b99eabb34f07fefce9a0c66b3036e69709dfb35ce2e",
+    "tools/hull_contact_geometry.py": "07606202e6a298ad375a7504991fe6fb93da6a07f9b5cc4a22167bd570b07839",
+    "integration/sh078-oryx-voyager/OPTION-SUPPORT-FANS.json": "113b6333612d563185b9bd7908ae2a337c9ee14f11c0dbfd83e76b0676a328c5",
+    "tools/measure_collar_support_fans.py": "8cf3668680568929c5f6d579d40b5d21c58b35c7bd36581ef7c273b10b84944b"
   }
 }
