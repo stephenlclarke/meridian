@@ -1,0 +1,6 @@
+# Preserve the original Swift blob and exact published replay data.
+LEGACY-ACTIVATION.swift.txt -text
+CONTACT-RESULT.json text eol=lf
+FIXTURES.json text eol=lf
+ORIGINAL-DIFFERENCE.json text eol=lf
+SURFACE-FIT.json text eol=lf

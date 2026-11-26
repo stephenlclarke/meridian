@@ -5,6 +5,7 @@ use crate::{
     profile::tests::{TestDirectory, open},
     renderer::Presentation,
 };
+use meridian_core::FlightMode;
 use std::ffi::OsString;
 use winit::keyboard::KeyCode;
 
@@ -25,6 +26,10 @@ fn normal_game_entry_searches_authored_package_and_never_changes_owned_ship_or_s
     let mut app = ok(App::from_launch(ok(Launch::parse(args.into_iter()))));
     assert!(app.commander_open && app.game.playing());
     assert!(app.studio_ready.is_none());
+    assert_eq!(
+        app.frame_title(false, FlightMode::Docked),
+        "Meridian | DOCKED | COMMANDER | H / ? Help"
+    );
     let before = ok(app.game.world.save_bytes());
     // Ordinary navigation out of Commander Details invalidates freight review authority
     // via request_pause, even when the pause value is unchanged. Match that actual transition.
@@ -94,6 +99,29 @@ fn normal_game_entry_searches_authored_package_and_never_changes_owned_ship_or_s
             .any(|label| label.text.contains("Core sweep Side pass: CLEAR"))
     );
     assert_eq!(ok(app.game.world.save_bytes()), after_open);
+}
+
+#[test]
+fn inspection_windows_distinguish_packages_with_the_same_display_name() {
+    let directory = TestDirectory::new();
+    let fixture = ok(std::fs::read_to_string(fixture_path(false)));
+    for id in ["TEST901", "TEST902"] {
+        let package = directory.0.join(format!("{id}.json"));
+        ok(std::fs::write(&package, fixture.replace("TEST901", id)));
+        let args = [
+            OsString::from("--inspect-hull-package"),
+            package.into_os_string(),
+            OsString::from("--save-dir"),
+            directory.0.join(id).into_os_string(),
+        ];
+        let app = ok(App::from_launch(ok(Launch::parse(args.into_iter()))));
+        assert_eq!(
+            app.frame_title(false, FlightMode::Docked),
+            format!(
+                "Meridian | Fixture Skiff (local package) [LOCAL:{id}] | DOCKED | COMMANDER | H / ? Help"
+            )
+        );
+    }
 }
 
 #[test]
@@ -179,6 +207,9 @@ fn one_click_authored_showroom_opens_actual_local_model_once_without_world_mutat
     ];
     let mut app = ok(App::from_launch(ok(Launch::parse(args.into_iter()))));
     assert!(!app.commander_open && app.menu_active());
+    let expected_title =
+        "Meridian | Peregrine Mk III (local package) [LOCAL:SH023] | DOCKED | PAUSED | H / ? Help";
+    assert_eq!(app.frame_title(false, FlightMode::Docked), expected_title);
     let seed = app
         .game
         .world
@@ -243,6 +274,8 @@ fn one_click_authored_showroom_opens_actual_local_model_once_without_world_mutat
         ok(menu.input(&mut app.game, action));
     }
     assert_eq!(ok(app.game.world.save_bytes()), initial);
+    assert!(app.studio_ready.is_none());
+    assert_eq!(app.frame_title(false, FlightMode::Docked), expected_title);
     app.show_station_commander();
     assert!(app.commander_key(KeyCode::Digit3));
     let menu = app
