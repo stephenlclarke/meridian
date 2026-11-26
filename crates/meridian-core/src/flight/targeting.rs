@@ -93,6 +93,7 @@ pub enum TargetMode {
 
 #[derive(Debug, Clone, PartialEq)]
 pub struct TargetingSnapshot {
+    pub tracked_fragment: Option<crate::mining::OreId>,
     pub identity: TargetIdentity,
     pub tier: TargetingTier,
     pub filter: TargetFilter,
@@ -548,6 +549,10 @@ impl World {
     pub fn targeting_snapshot(&self) -> Option<TargetingSnapshot> {
         let (tier, candidate) = self.current_target()?;
         let identity = candidate.identity();
+        let displayed_work = match candidate {
+            Candidate::Work(work) => Some(self.automatic_work_target(candidate).unwrap_or(work)),
+            _ => None,
+        };
         let (mode, guidance, pose, model, status, fields) = match candidate {
             Candidate::Ship(actor) => {
                 let identified = tier >= TargetingTier::Identification;
@@ -625,7 +630,8 @@ impl World {
                     fields,
                 )
             }
-            Candidate::Work(work) => {
+            Candidate::Work(selected) => {
+                let work = displayed_work.unwrap_or(selected);
                 let (model, guidance) = match work.role {
                     WorkTargetRole::RockHold => ("Asteroid", "Rock guidance"),
                     WorkTargetRole::OreTracking => ("Ore", "Ore tracking"),
@@ -654,6 +660,10 @@ impl World {
             }
         };
         Some(TargetingSnapshot {
+            tracked_fragment: displayed_work.and_then(|work| match work.id {
+                WorkTargetId::Ore(id) => Some(id),
+                _ => None,
+            }),
             identity,
             tier,
             filter: self.targeting.filter,

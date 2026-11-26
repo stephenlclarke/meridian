@@ -403,9 +403,16 @@ impl Renderer {
                     work_front.push(WorkTargetId::Asteroid(body.id));
                 }
             }
+            for ore in &belt.pending_ore {
+                let pose = meridian_core::docking::RigidPose {
+                    position: ore.position,
+                    orientation: meridian_core::docking::Basis3::IDENTITY,
+                };
+                if targeting::visible(&targeting::ore_model(ore), camera, pose, projection) {
+                    work_front.push(WorkTargetId::Ore(ore.id));
+                }
+            }
         }
-        // Pending ore has an actual World position but no ordinary visual mesh in this build.
-        // Its fitted work identity remains selectable as known/offscreen, never fake-visible.
         Ok((
             meridian_core::TargetingViewport {
                 size: [self.size.width, self.size.height],
@@ -851,9 +858,19 @@ impl Renderer {
             self.prepare_scene_surfaces(snapshot, &effects)?;
             let target = match (effects.targeting, station.as_ref()) {
                 (Some(target), Some(station)) => {
-                    let work_mesh = match target.identity {
-                        meridian_core::TargetIdentity::Work(
-                            meridian_core::equipment::WorkTargetId::Asteroid(id),
+                    let work_mesh = match (target.tracked_fragment, target.identity) {
+                        (Some(id), _) => effects
+                            .mining
+                            .as_ref()
+                            .and_then(|scene| {
+                                scene.belt.pending_ore.iter().find(|ore| ore.id == id)
+                            })
+                            .map(targeting::ore_model),
+                        (
+                            None,
+                            meridian_core::TargetIdentity::Work(
+                                meridian_core::equipment::WorkTargetId::Asteroid(id),
+                            ),
                         ) => effects
                             .mining
                             .as_ref()

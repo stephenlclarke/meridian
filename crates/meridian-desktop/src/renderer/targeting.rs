@@ -106,16 +106,27 @@ pub(super) fn visible(
 
 /// The same physical asteroid corners and face ordering as the ordinary belt renderer.
 pub(super) fn asteroid_model(body: &meridian_core::mining::AsteroidSnapshot) -> Vec<Vertex> {
+    mineral_model(body.vertices, body.position)
+}
+
+pub(super) fn ore_model(ore: &meridian_core::mining::OreSnapshot) -> Vec<Vertex> {
+    mineral_model(ore.vertices(), ore.position)
+}
+
+fn mineral_model(
+    vertices: [meridian_core::docking::Vec3; 6],
+    centre: meridian_core::docking::Vec3,
+) -> Vec<Vertex> {
     meridian_core::mining::ASTEROID_FACES
         .into_iter()
         .flatten()
         .map(|index| {
-            let p = body.vertices[index];
+            let p = vertices[index];
             Vertex {
                 position: [
-                    (p.x - body.position.x) as f32,
-                    (p.y - body.position.y) as f32,
-                    (p.z - body.position.z) as f32,
+                    (p.x - centre.x) as f32,
+                    (p.y - centre.y) as f32,
+                    (p.z - centre.z) as f32,
                 ],
                 color: [0.31, 0.23, 0.14],
             }
@@ -379,6 +390,7 @@ mod tests {
             ..camera
         };
         let target = TargetingSnapshot {
+            tracked_fragment: None,
             identity: TargetIdentity::Station {
                 system: SystemId::AVENOR,
                 visit: 1,
