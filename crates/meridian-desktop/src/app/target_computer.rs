@@ -152,6 +152,7 @@ mod tests {
             .unwrap_or_else(|| panic!("belt"));
         let rock = belt.bodies[0];
         let original = TargetingSnapshot {
+            tracked_fragment: None,
             identity: TargetIdentity::Work(WorkTargetId::Asteroid(rock.id)),
             tier: TargetingTier::Docking,
             filter: TargetFilter::All,
