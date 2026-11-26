@@ -1,0 +1,12 @@
+{
+  "schema": 1,
+  "id": "sh078-oryx-voyager",
+  "undoBefore": [
+    "sh077-tamaraw"
+  ],
+  "undoAfter": [],
+  "kind": "declaration",
+  "module": "oryx_voyager",
+  "before": "pub mod navigation;\n",
+  "after": "pub mod rabbit_explorer;\n"
+}
