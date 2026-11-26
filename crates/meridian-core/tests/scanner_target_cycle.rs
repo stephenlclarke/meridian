@@ -358,10 +358,29 @@ fn rock_is_a_real_track_without_specialist_and_auto_work_requires_matching_fit()
         ..FlightInput::default()
     };
     assert_eq!(fitted.targeting_flight_input(manual), manual);
-    assert!(fitted.targeting_snapshot().is_none());
+    assert!(fitted.manual_scanner_target());
+    assert_eq!(some(fitted.targeting_snapshot()).identity, id);
     ok(fitted.step(manual));
+    assert!(fitted.manual_scanner_target());
+    assert_eq!(some(fitted.targeting_snapshot()).identity, id);
     assert_eq!(
         some(fitted.front_laser_snapshot()).fitted_item_id,
         original_front
     );
+
+    // F resumes assistance on the same retained mark after a stick override.
+    assert!(ok(fitted.toggle_scanner_assistance()));
+    assert!(!fitted.manual_scanner_target());
+    assert_eq!(some(fitted.targeting_snapshot()).identity, id);
+    ok(fitted.step(FlightInput::default()));
+    assert!(fitted.fitted_mining_tool().is_some());
+
+    // Tab after another stick override selects the next physical scanner contact
+    // and restores assistance instead of remaining in the temporary pilot override.
+    assert_eq!(fitted.targeting_flight_input(manual), manual);
+    assert!(fitted.manual_scanner_target());
+    let next = cycle(&mut fitted);
+    assert_ne!(next, id);
+    assert!(!fitted.manual_scanner_target());
+    assert_eq!(some(fitted.targeting_snapshot()).identity, next);
 }
