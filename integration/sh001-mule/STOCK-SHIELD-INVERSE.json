@@ -19,7 +19,7 @@
     },
     "flight/combat.rs": {
       "beforeSHA256": "d11aa779db3dc3e035da1b4f0251ecf769f12aa67872b5901ea1d008ca865c90",
-      "afterSHA256": "2c331f63998c055cca4db3b36f9e310f49cf5a1d8276a8f1e4cf22fba61ee758",
+      "afterSHA256": "b34743521b5bbdf8f4664e6497ed8d5fb50e76e4ad447449ee5922a710ba8aa1",
       "hunks": [
         {
           "offset": 83,
@@ -37,57 +37,62 @@
           "after": "    pub front_shield_hundredths: u32,\n    pub rear_shield_hundredths: u32,\n    pub shield_capacity_hundredths: u32,\n    pub shield_grade: ShieldGrade,\n"
         },
         {
-          "offset": 4467,
+          "offset": 4314,
+          "before": "#[derive(Debug, Clone, Copy, PartialEq)]\n",
+          "after": "#[derive(Debug, Clone, Copy, Default, PartialEq)]\n"
+        },
+        {
+          "offset": 4476,
           "before": "    front: u16,\n    rear: u16,\n",
           "after": "    shields: ShieldPools,\n"
         },
         {
-          "offset": 4770,
-          "before": "            front: SHIELD_CAPACITY,\n            rear: SHIELD_CAPACITY,\n",
-          "after": "            shields: ShieldPools::default(),\n"
+          "offset": 4628,
+          "before": "}\nimpl Default for State {\n    fn default() -> Self {\n        Self {\n            emissions: 0,\n            incidents: 0,\n            physical_tick: 0,\n            front: SHIELD_CAPACITY,\n            rear: SHIELD_CAPACITY,\n            windows: [None; 3],\n            penalties: 0,\n            unbound_player_impact: false,\n            last: None,\n        }\n    }\n",
+          "after": ""
         },
         {
-          "offset": 5769,
+          "offset": 5442,
           "before": "    pub(super) fn shields(self) -> [u16; 2] {\n        [self.front, self.rear]\n",
           "after": "    pub(super) fn shields(self) -> ShieldPools {\n        self.shields\n    }\n    pub(super) fn refit_shields(&mut self, grade: ShieldGrade) {\n        self.shields.refit(grade);\n"
         },
         {
-          "offset": 6208,
+          "offset": 5881,
           "before": "        let shield = if front {\n            &mut self.front\n        } else {\n            &mut self.rear\n        };\n        let absorbed = (*shield).min(damage);\n        *shield -= absorbed;\n",
           "after": "        let absorbed = self.shields.absorb(front, damage);\n"
         },
         {
-          "offset": 6483,
+          "offset": 6156,
           "before": "        let shield = if front {\n            &mut self.front\n        } else {\n            &mut self.rear\n        };\n        let absorbed = (*shield).min(power);\n        *shield -= absorbed;\n        absorbed\n",
           "after": "        self.shields.absorb(front, power)\n"
         },
         {
-          "offset": 9290,
+          "offset": 8963,
           "before": "            self.front = SHIELD_CAPACITY;\n            self.rear = SHIELD_CAPACITY;\n",
           "after": "            self.shields.fill();\n"
         },
         {
-          "offset": 9340,
+          "offset": 9013,
           "before": "            self.front = (self.front + SHIELD_RECHARGE).min(SHIELD_CAPACITY);\n            self.rear = (self.rear + SHIELD_RECHARGE).min(SHIELD_CAPACITY);\n",
           "after": "            self.shields.advance(1);\n"
         },
         {
-          "offset": 10589,
+          "offset": 10262,
           "before": "        w.u16(self.front);\n        w.u16(self.rear);\n",
           "after": "        self.shields.encode(w);\n"
         },
         {
-          "offset": 11171,
+          "offset": 10844,
           "before": "            front: r.u16()?,\n            rear: r.u16()?,\n",
           "after": "            shields: ShieldPools::decode(r)?,\n"
         },
         {
-          "offset": 11771,
+          "offset": 11444,
           "before": "            || self.front > SHIELD_CAPACITY\n            || self.rear > SHIELD_CAPACITY\n            || ((self.front != SHIELD_CAPACITY || self.rear != SHIELD_CAPACITY)\n",
           "after": "            || !self.shields.valid()\n            || (!self.shields.is_full()\n"
         },
         {
-          "offset": 15891,
+          "offset": 15564,
           "before": "                front_shield_hundredths: self.combat.front,\n                rear_shield_hundredths: self.combat.rear,\n",
           "after": "                front_shield_hundredths: self.combat.shields.amounts()[0],\n                rear_shield_hundredths: self.combat.shields.amounts()[1],\n                shield_capacity_hundredths: self.combat.shields.capacity(),\n                shield_grade: self.combat.shields.grade(),\n"
         }

@@ -129,7 +129,7 @@ struct AttackWindow {
     visit: u64,
     physical_tick: u64,
 }
-#[derive(Debug, Clone, Copy, PartialEq)]
+#[derive(Debug, Clone, Copy, Default, PartialEq)]
 pub(super) struct State {
     pub(super) emissions: u64,
     pub(super) incidents: u64,
@@ -139,20 +139,6 @@ pub(super) struct State {
     penalties: u8,
     unbound_player_impact: bool,
     last: Option<OrdinaryImpact>,
-}
-impl Default for State {
-    fn default() -> Self {
-        Self {
-            emissions: 0,
-            incidents: 0,
-            physical_tick: 0,
-            shields: ShieldPools::default(),
-            windows: [None; 3],
-            penalties: 0,
-            unbound_player_impact: false,
-            last: None,
-        }
-    }
 }
 /// Only the verified current command in this module can create this transaction.
 pub(super) struct PreparedPulseImpact {
