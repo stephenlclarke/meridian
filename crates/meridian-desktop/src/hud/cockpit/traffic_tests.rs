@@ -2,6 +2,7 @@
 use super::{
     BLUE, CYAN, Cockpit, GREEN, Layout, MAX_CONTACTS, MAX_SCANNER_TARGETS, MAX_VERTICES,
     NPC_CONTACT_START, RED, YELLOW, append, fill_traffic_contacts, relative, scanner,
+    selected_scanner_identity,
 };
 use crate::mesh::Vertex;
 use meridian_core::docking::Vec3;
@@ -439,4 +440,34 @@ fn no_core_scanner_shows_real_work_and_one_selected_contact_not_context_markers(
         [1280.0, 720.0],
     );
     assert_eq!(cross.len(), bar.len() + 6);
+}
+
+#[test]
+fn selected_marker_follows_tracked_identity_when_logical_contact_leaves_projection() {
+    // Projection-only fixture: use three real, distinct admitted identities as stand-ins
+    // for the logical parent, its tracked fragment and an unrelated contact. The core's
+    // physical ore lifecycle tests establish the actual parent/fragment relationship.
+    // This test does not create ore, alter a World, or claim an automatic work success.
+    let world = traffic_world();
+    let actual = world.scanner_targets();
+    let [parent, fragment, other, ..] = actual.as_slice() else {
+        panic!("expected three distinct actual scanner contacts");
+    };
+    assert_ne!(parent.0, fragment.0);
+    assert_ne!(parent.0, other.0);
+    assert_ne!(fragment.0, other.0);
+    let mark = |projected: &[(TargetIdentity, Vec3)], tracked| {
+        selected_scanner_identity(projected, parent.0, tracked)
+    };
+    assert_eq!(
+        mark(&[*fragment, *other, *parent], Some(fragment.0)),
+        Some(parent.0)
+    );
+    assert_eq!(
+        mark(&[*other, *fragment], Some(fragment.0)),
+        Some(fragment.0)
+    );
+    assert_eq!(mark(&[*other, *fragment], None), None);
+    assert_eq!(mark(&[*other], Some(fragment.0)), None);
+    assert_eq!(mark(&[], Some(fragment.0)), None);
 }

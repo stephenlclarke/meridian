@@ -181,6 +181,21 @@ impl Cockpit {
     }
 }
 
+/// Prefer the player's logical selection until that contact leaves the scanner.
+/// An active work sequence can then keep its physical fragment highlighted.
+fn selected_scanner_identity(
+    projected: &[(TargetIdentity, meridian_core::docking::Vec3)],
+    logical: TargetIdentity,
+    tracked_fragment: Option<TargetIdentity>,
+) -> Option<TargetIdentity> {
+    let admitted = |id| projected.iter().any(|(identity, _)| *identity == id);
+    if admitted(logical) {
+        Some(logical)
+    } else {
+        tracked_fragment.filter(|id| admitted(*id))
+    }
+}
+
 fn capture_scanner_targets(
     world: &World,
     flight: Snapshot,
@@ -190,17 +205,14 @@ fn capture_scanner_targets(
     if projected.len() > MAX_SCANNER_TARGETS {
         return Err("Selectable scanner targets exceed the admitted body bound".into());
     }
-    let selected = world.targeting_snapshot().map(|target| {
-        if projected
-            .iter()
-            .any(|(identity, _)| *identity == target.identity)
-        {
-            target.identity
-        } else {
-            target.tracked_fragment.map_or(target.identity, |id| {
-                TargetIdentity::Work(WorkTargetId::Ore(id))
-            })
-        }
+    let selected = world.targeting_snapshot().and_then(|target| {
+        selected_scanner_identity(
+            projected,
+            target.identity,
+            target
+                .tracked_fragment
+                .map(|id| TargetIdentity::Work(WorkTargetId::Ore(id))),
+        )
     });
     let mule = world.mule_actor_snapshot();
     projected

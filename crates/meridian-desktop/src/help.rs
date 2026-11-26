@@ -117,13 +117,12 @@ impl Panel {
         let mut panel = Self::new(
             "Flight controls",
             &[
-                "W / S Accelerate / slow | Space Brake to zero",
-                "Arrows Pitch | A / D Yaw | Q / E Roll",
+                "W/S Accelerate/slow | Space Brake to zero | Arrows Pitch | A/D Yaw | Q/E Roll",
                 "N Start or cancel auto-docking | 0 Front | 1 Rear | 2 Left | 3 Right view",
                 "T Lock selected ship for missiles | F1 Next missile target | F2 Arm / safe",
                 "F3 Launch missile | F4 Safe/clear target | K E.C.M. (22 energy)",
                 "J Jump | Shift+J Clue Journal | P Pause / resume",
-                "F6 Flight lesson | F12 Cancel | C Details | F7 Close attempt | F8 Reception",
+                "F6 Flight lesson | F12 Cancel | C Lesson details | F7 Close run | F8 Reception",
                 "Tab Next scanner target (no core: mark) | F Manual/assist | Delete Release",
                 "Basic aligns | Advanced approaches | Docking+nav docks | Specialists auto-work",
                 "I Mission details | Shift+I Target details | Occupied: Enter/Escape",
@@ -133,7 +132,7 @@ impl Panel {
             ],
         );
         panel.lines.insert(
-            2,
+            1,
             weapon.map_or_else(
                 || "Z: no fitted front laser | scoop ore | cut wreck | occupied review".into(),
                 |weapon| {
@@ -146,7 +145,8 @@ impl Panel {
             ),
         );
         panel.review(review, "After help: B cancels; Escape saves and quits");
-        if panel.lines.len() < MAX_LINES - 2 {
+        // The host app appends the audio control; reserve that row as well as title/footer.
+        if panel.lines.len() < MAX_LINES - 3 {
             panel
                 .lines
                 .push("Solar fuel: fitted scoops, face sun and cruise; watch cabin temp".into());
@@ -394,5 +394,44 @@ mod tests {
                 .iter()
                 .any(|line| line.contains("exchange is unavailable"))
         );
+    }
+
+    #[test]
+    fn flight_help_with_review_and_host_audio_fits_minimum_viewport() {
+        use meridian_core::ModuleKind;
+        for weapon in [
+            None,
+            Some(ModuleKind::PulseLaser.name()),
+            Some(ModuleKind::MiningLaser.name()),
+            Some(ModuleKind::BeamLaser.name()),
+            Some(ModuleKind::MilitaryLaser.name()),
+            Some(ModuleKind::NavalLaser.name()),
+        ] {
+            for review in [None, Some("Trade lesson review")] {
+                let mut panel = Panel::flight(weapon, review);
+                panel
+                    .lines
+                    .push("Ctrl+Shift+M Toggle sound | Audio: Unavailable".into());
+                let text = panel.lines.join("\n");
+                for required in [
+                    "C Lesson details",
+                    "I Mission details",
+                    "Shift+I Target details",
+                    "Tab Next scanner target",
+                    "F Manual/assist",
+                    "Ctrl+Shift+M Toggle sound",
+                ] {
+                    assert!(text.contains(required), "Missing {required}");
+                }
+                assert!(panel.lines.len() + 2 <= MAX_LINES);
+                assert!(panel.lines.iter().all(|line| line.len() <= MAX_COLUMNS));
+                assert!(panel.title.len() <= MAX_COLUMNS);
+                assert!(panel.footer.len() <= MAX_COLUMNS);
+                let mut vertices = Vec::new();
+                crate::hud::append_help(&panel, 640, 360, &mut vertices);
+                assert!(!vertices.is_empty());
+                assert!(vertices.len() <= MAX_VERTICES);
+            }
+        }
     }
 }
