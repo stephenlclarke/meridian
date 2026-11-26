@@ -88,6 +88,206 @@ fn cold(w: &World) -> World {
     );
     loaded
 }
+
+#[test]
+fn paid_scoops_take_one_physical_fragment_once_and_sell_it_after_cold_continue() {
+    let (mut world, _) = paid(12005);
+    module(&mut world, ModuleAction::PurchaseFuelScoops);
+    approach(&mut world);
+    let cash = world.credits_tenths();
+    work(&mut world);
+    steps(&mut world, 18);
+    let shot = work(&mut world);
+    let t = world.snapshot().tick;
+    let before = ok(world.save_bytes());
+    assert_eq!(
+        world.request_collect_mined_ore(t - 1),
+        Err(MiningError::StaleCommand)
+    );
+    assert_eq!(
+        world.request_collect_mined_ore(t),
+        Err(MiningError::NoEligibleOreBody)
+    );
+    assert_eq!(ok(world.save_bytes()), before);
+
+    // Real flight controls only. Approach the drifting source horizontally, then rotate
+    // the lower-forward aperture towards the fragment while stopped.
+    for _ in 0..2200 {
+        let ore = some(world.mining_collection_target(shot.contact.asteroid));
+        let player = some(flight_pose(
+            world.snapshot().position,
+            world.snapshot().orientation,
+        ));
+        let horizontal =
+            (ore.position.x - player.position.x).hypot(ore.position.z - player.position.z);
+        let speed = world.snapshot().speed;
+        if horizontal < 65.0 && speed == 0.0 {
+            break;
+        }
+        let desired = ((2.0 * 9.1 * (horizontal - 58.0).max(0.0) / 18.0).sqrt() as f32).min(30.0);
+        ok(world.step(FlightInput {
+            throttle: ((desired - speed) / (9.1 / 60.0)).clamp(-1.0, 1.0),
+            ..FlightInput::default()
+        }));
+        assert_eq!(world.snapshot().motion_refusal, None);
+    }
+    stop(&mut world);
+    let mut collected = false;
+    for _ in 0..100 {
+        let tick = world.snapshot().tick;
+        match world.request_collect_mined_ore(tick) {
+            Ok(()) => {
+                collected = true;
+                break;
+            }
+            Err(MiningError::NoEligibleOreBody) => {}
+            Err(error) => panic!("unexpected actual scoop refusal: {error:?}"),
+        }
+        ok(world.step(FlightInput {
+            pitch: 1.0,
+            ..FlightInput::default()
+        }));
+    }
+    assert!(
+        collected,
+        "physical controls never reached the lower-forward fragment"
+    );
+    assert_eq!(world.credits_tenths(), cash);
+    assert_eq!(world.commodity_quantity(shot.commodity), Some(1));
+    assert!(some(world.mining_belt_snapshot()).pending_ore.is_empty());
+    let mut loaded = cold(&world);
+    assert_eq!(loaded.commodity_quantity(shot.commodity), Some(1));
+    let before = ok(loaded.save_bytes());
+    let tick = loaded.snapshot().tick;
+    assert_eq!(
+        loaded.request_collect_mined_ore(tick),
+        Err(MiningError::NoEligibleOreBody)
+    );
+    assert_eq!(ok(loaded.save_bytes()), before);
+    // Route away from the empty source with public controls before a normal station sale.
+    // Returning the pitch to horizontal avoids a vertical drift on the dock helper.
+    let current = some(flight_pose(
+        loaded.snapshot().position,
+        loaded.snapshot().orientation,
+    ));
+    let pitch = current.orientation.z.y.asin();
+    let ticks = (pitch.abs() / (0.7 / 60.0)).ceil() as u16;
+    if ticks != 0 {
+        for _ in 0..ticks {
+            ok(loaded.step(FlightInput {
+                pitch: -(pitch / (0.7 / 60.0) / f64::from(ticks)) as f32,
+                ..FlightInput::default()
+            }));
+        }
+    }
+    fly_axis(&mut loaded, 0, 0.0, 10.0);
+    dock(&mut loaded);
+    let tick = loaded.snapshot().tick;
+    ok(loaded.request_station_service(
+        crate::station_services::Command::SellCommodity(shot.commodity),
+        tick,
+    ));
+    assert_eq!(loaded.commodity_quantity(shot.commodity), Some(0));
+    assert!(some(loaded.credits_tenths()) > some(cash));
+    let _ = cold(&loaded);
+}
+
+#[test]
+fn explicit_max_owns_stored_mining_tool_and_reversible_exchange_preserves_shared_pools() {
+    use crate::{ModuleKind, ModuleSlot, XyzzyAction};
+    let mut world = ok(World::new_commander(12005));
+    let review = ok(world.review_xyzzy(XyzzyAction::Enter, 0));
+    ok(world.prepare_xyzzy(review, 0)).commit();
+    let items = some(world.modular_equipment_snapshot()).items;
+    let mining = some(
+        items
+            .iter()
+            .find(|i| i.kind == ModuleKind::MiningLaser)
+            .copied(),
+    );
+    let naval = some(
+        items
+            .iter()
+            .find(|i| i.kind == ModuleKind::NavalLaser)
+            .copied(),
+    );
+    assert_eq!(mining.slot, None);
+    assert_eq!(naval.slot, Some(ModuleSlot::FrontLaser));
+    use crate::station_services::{CargoUnit, Command, CommodityId};
+    for commodity in CommodityId::ALL
+        .into_iter()
+        .filter(|id| id.unit() == CargoUnit::Tonne && id.departure_legal_weight() == 0)
+    {
+        loop {
+            let service = some(world.service_snapshot());
+            if service.used_tonnes == service.hold_capacity_tonnes
+                || some(world.commodity_quote(commodity)).stock == 0
+            {
+                break;
+            }
+            let tick = world.snapshot().tick;
+            ok(world.request_station_service(Command::BuyCommodity(commodity), tick));
+        }
+    }
+    let full = some(world.service_snapshot());
+    assert_eq!(full.used_tonnes, full.hold_capacity_tonnes);
+    let unchanged = ok(world.save_bytes());
+    assert_eq!(
+        world.prepare_mining_intake_account(CommodityId::Alloys),
+        Err(MiningError::HoldFull)
+    );
+    assert!(
+        world
+            .prepare_mining_intake_account(CommodityId::Gold)
+            .is_ok()
+    );
+    assert_eq!(ok(world.save_bytes()), unchanged);
+    launch(&mut world);
+    stop(&mut world);
+    let target = some(world.mining_belt_snapshot()).bodies[0].id;
+    ok(world.cycle_target_filter());
+    let tick = world.snapshot().tick;
+    ok(world.cycle_targeting_with_work(
+        tick,
+        crate::TargetingViewport {
+            size: [800, 600],
+            front: Vec::new(),
+        },
+        &[crate::equipment::WorkTargetId::Asteroid(target)],
+    ));
+    let cash = world.credits_tenths();
+    let pools = world.flight_resources_snapshot();
+    ok(world.select_auto_mining_tool());
+    assert_eq!(some(world.fitted_mining_tool()).item, mining.id);
+    assert_eq!(world.credits_tenths(), cash);
+    assert_eq!(world.flight_resources_snapshot(), pools);
+    let before = ok(world.save_bytes());
+    assert_eq!(world.auto_mine_tick(target), "Cargo hold full");
+    assert_eq!(ok(world.save_bytes()), before);
+    let mut cold_world = cold(&world);
+    world.cancel_targeting();
+    assert_eq!(world.auto_mine_tick(target), "Target released");
+    assert_eq!(ok(world.save_bytes()), before);
+    ok(world.restore_auto_mining_tool());
+    ok(cold_world.restore_auto_mining_tool());
+    for restored in [&mut world, &mut cold_world] {
+        let fit = some(restored.modular_equipment_snapshot());
+        assert_eq!(
+            some(fit.items.iter().find(|item| item.id == naval.id)).slot,
+            Some(ModuleSlot::FrontLaser)
+        );
+        assert_eq!(
+            some(fit.items.iter().find(|item| item.id == mining.id)).slot,
+            None
+        );
+        let before = ok(restored.save_bytes());
+        ok(restored.restore_auto_mining_tool());
+        assert_eq!(ok(restored.save_bytes()), before);
+        assert_eq!(restored.flight_resources_snapshot(), pools);
+        assert_eq!(restored.credits_tenths(), cash);
+    }
+    let _ = cold(&world);
+}
 #[test]
 fn genuinely_paid_tool_applies_original_partial_damage_then_releases_pending_ore_without_cargo_or_cash_credit()
  {

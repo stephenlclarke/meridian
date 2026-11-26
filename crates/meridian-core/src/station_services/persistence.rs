@@ -83,6 +83,7 @@ impl StationMarkets {
             receipts: std::sync::Arc::new(Self::decode_receipts(r)?),
         })
     }
+    #[cfg(test)]
     pub(crate) fn validate_save(
         &self,
         owner: u64,
@@ -96,6 +97,7 @@ impl StationMarkets {
             crate::traffic::Flows::default(),
         )
     }
+    #[cfg(test)]
     pub(crate) fn validate_save_with_traffic(
         &self,
         owner: u64,

@@ -200,7 +200,10 @@ impl State {
             let ore = self
                 .fragment_at(receipt.id, receipt.physical_tick)
                 .ok_or(INVALID)?;
-            if receipt.owner != terminal.owner
+            if receipt.owner.owner != terminal.owner.owner
+                || receipt.owner.hull != terminal.owner.hull
+                || receipt.owner.system != terminal.owner.system
+                || receipt.owner.visit < terminal.owner.visit
                 || receipt.item == 0
                 || receipt.revision <= terminal.account_revision
                 || receipt.world_tick < terminal.world_tick

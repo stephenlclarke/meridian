@@ -98,6 +98,77 @@ fn partial_work_then_terminal_native_hit_releases_unique_pending_ore_and_no_carg
     assert_eq!(depleted.work_count(), 2);
     ok(depleted.validate());
 }
+
+#[test]
+fn moving_authored_shard_has_outward_faces_and_once_only_lower_forward_intake() {
+    let mut state = State::default();
+    for sequence in 1..=2 {
+        state = ok(state.prepare_work(component_stroke(&state, 0, sequence, 2))).0;
+    }
+    let ore = state.pending_ore(97)[0];
+    let vertices = ore.vertices();
+    let offset = |p: Vec3| {
+        Vec3::new(
+            p.x - ore.position.x,
+            p.y - ore.position.y,
+            p.z - ore.position.z,
+        )
+    };
+    for face in ASTEROID_FACES {
+        let [a, b, c] = face.map(|i| offset(vertices[i]));
+        let ab = Vec3::new(b.x - a.x, b.y - a.y, b.z - a.z);
+        let ac = Vec3::new(c.x - a.x, c.y - a.y, c.z - a.z);
+        let cross = Vec3::new(
+            ab.y * ac.z - ab.z * ac.y,
+            ab.z * ac.x - ab.x * ac.z,
+            ab.x * ac.y - ab.y * ac.x,
+        );
+        assert!(
+            cross.dot(a) > 0.0,
+            "authored shard has inward or degenerate face"
+        );
+    }
+    let pose = RigidPose {
+        position: add(ore.position, Vec3::new(0.0, 45.0, -55.0)),
+        orientation: crate::docking::Basis3::IDENTITY,
+    };
+    assert!(ore.scoop_admissible(pose, 0.0, true));
+    assert!(!ore.scoop_admissible(pose, 2.0, true));
+    assert!(ore.scoop_admissible(pose, 2.0, false));
+    let above = RigidPose {
+        position: add(ore.position, Vec3::new(0.0, -45.0, -55.0)),
+        ..pose
+    };
+    assert!(!ore.scoop_admissible(above, 0.0, false));
+    let receipt = Collection {
+        id: ore.id,
+        owner: state.strokes()[1].owner,
+        item: 123,
+        revision: 3,
+        world_tick: 97,
+        physical_tick: 97,
+        pose,
+        speed: 0.0,
+        automatic: true,
+    };
+    let collected = ok(state.prepare_collection(receipt));
+    assert!(collected.pending_ore(98).is_empty());
+    assert!(collected.prepare_collection(receipt).is_err());
+    assert_eq!(
+        collected.cargo_intakes().collect::<Vec<_>>(),
+        vec![crate::station_services::CargoIntake {
+            revision: 3,
+            commodity: ore.commodity
+        }]
+    );
+    let mut base = Writer::new();
+    collected.encode(&mut base);
+    let mut trailer = Writer::new();
+    collected.encode_collections(&mut trailer);
+    let mut restored = ok(State::decode_base(&mut Reader::new(&base.bytes)));
+    ok(restored.decode_collections(&mut Reader::new(&trailer.bytes)));
+    assert_eq!(restored, collected);
+}
 #[test]
 fn exact_range_closed_native_mesh_and_legacy_absence_never_make_a_mining_capability() {
     let state = State::default();
