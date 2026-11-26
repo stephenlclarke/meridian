@@ -481,12 +481,6 @@ impl World {
             .filter(|item| item.kind == ModuleKind::SalvageCutter)
     }
 
-    pub(in crate::flight) fn salvage_cargo_intakes(
-        &self,
-    ) -> impl Iterator<Item = CargoIntake> + '_ {
-        self.modular.salvage_intakes()
-    }
-
     pub fn auto_salvage_eligible(&self, id: NpcId) -> bool {
         self.external_claim(id)
             .is_some_and(|claim| self.modular.salvage.recovered(id) < usize::from(claim.quantity))
