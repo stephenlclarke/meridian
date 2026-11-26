@@ -162,6 +162,76 @@ fn select_rock(world: &mut World, target: WorkTargetId) {
     assert!(world.automatic_work_status().is_some());
 }
 
+fn select_scanner_work(world: &mut World, target: WorkTargetId) {
+    let count = world.scanner_targets().len();
+    for _ in 0..count {
+        assert!(ok(
+            world.cycle_scanner_target(world.snapshot().tick, [1280, 720])
+        ));
+        if some(world.targeting_snapshot()).identity == TargetIdentity::Work(target) {
+            return;
+        }
+    }
+    panic!("real scanner work contact unavailable: {target:?}");
+}
+
+fn verify_fresh_scanner_after_depletion(world: &World, rock: AsteroidSnapshot, ore: OreSnapshot) {
+    let tombstone = TargetIdentity::Work(WorkTargetId::Asteroid(rock.id));
+    let fragment = TargetIdentity::Work(WorkTargetId::Ore(ore.id));
+    let contacts = world.scanner_targets();
+    assert!(!contacts.iter().any(|(id, _)| *id == tombstone));
+    assert!(contacts.contains(&(fragment, ore.position)));
+    let belt = some(world.mining_belt_snapshot());
+    for body in belt
+        .bodies
+        .into_iter()
+        .filter(|body| body.remaining_units > 0 && body.remaining_energy > 0.0)
+    {
+        assert!(contacts.contains(&(
+            TargetIdentity::Work(WorkTargetId::Asteroid(body.id)),
+            body.position
+        )));
+    }
+    // Branch the actual accepted release, not an invented ore fixture. Each fresh
+    // controller has no retained selection; the original assisted journey is unchanged.
+    let bytes = ok(world.save_bytes());
+    for manual in [false, true] {
+        let mut fresh = ok(World::from_save_bytes(&bytes));
+        assert!(fresh.targeting_snapshot().is_none());
+        if manual {
+            assert!(!ok(fresh.toggle_scanner_assistance()));
+        }
+        let opening = fresh.snapshot();
+        let cargo = fresh.commodity_quantity(ore.commodity);
+        let expected = fresh.scanner_targets();
+        assert_eq!(expected, contacts);
+        let mut visited = Vec::new();
+        for (id, _) in &expected {
+            assert!(ok(fresh.cycle_scanner_target(opening.tick, [1280, 720])));
+            let selected = some(fresh.targeting_snapshot());
+            assert_eq!(selected.identity, *id);
+            assert_ne!(selected.identity, tombstone);
+            assert_eq!(fresh.manual_scanner_target(), manual);
+            if selected.identity == fragment && manual {
+                let input = FlightInput {
+                    yaw: 0.2,
+                    throttle: 0.15,
+                    ..FlightInput::default()
+                };
+                assert_eq!(fresh.targeting_flight_input(input), input);
+                assert_eq!(some(fresh.targeting_snapshot()).identity, fragment);
+            }
+            visited.push(selected.identity);
+        }
+        assert!(visited.contains(&fragment));
+        assert!(ok(fresh.cycle_scanner_target(opening.tick, [1280, 720])));
+        assert_eq!(some(fresh.targeting_snapshot()).identity, visited[0]);
+        assert_eq!(fresh.snapshot(), opening);
+        assert_eq!(fresh.commodity_quantity(ore.commodity), cargo);
+        assert_eq!(fresh.mining_collection_target(rock.id), Some(ore));
+    }
+}
+
 fn launch_mining(world: &mut World) -> AsteroidSnapshot {
     ok(world.request_launch(world.snapshot().tick));
     ok(world.step(FlightInput::default()));
@@ -280,6 +350,58 @@ fn verify_manual_override(mut world: World, mining_item: u64, pulse_item: u64) {
     assert!(world.fitted_mining_tool().is_none());
 }
 
+fn verify_manual_marks_actual_released_fragment(mut world: World) {
+    let rock = launch_mining(&mut world);
+    let parent = TargetIdentity::Work(WorkTargetId::Asteroid(rock.id));
+    let cargo = world.commodity_quantity(rock.commodity);
+    select_scanner_work(&mut world, WorkTargetId::Asteroid(rock.id));
+    for _ in 0..12000 {
+        ok(world.step(FlightInput::default()));
+        let Some(ore) = world.mining_collection_target(rock.id) else {
+            continue;
+        };
+        let assisted = some(world.targeting_snapshot());
+        assert_eq!(assisted.identity, parent);
+        assert_eq!(assisted.tracked_fragment, Some(ore.id));
+        let fragment = TargetIdentity::Work(WorkTargetId::Ore(ore.id));
+        assert!(!ok(world.toggle_scanner_assistance()));
+        assert!(world.manual_scanner_target());
+        assert_eq!(some(world.targeting_snapshot()).identity, fragment);
+        let manual = FlightInput {
+            yaw: -0.25,
+            throttle: 0.2,
+            ..FlightInput::default()
+        };
+        assert_eq!(world.targeting_flight_input(manual), manual);
+        assert_eq!(some(world.targeting_snapshot()).identity, fragment);
+        assert_eq!(world.commodity_quantity(rock.commodity), cargo);
+        assert_eq!(world.mining_collection_target(rock.id), Some(ore));
+        assert!(ok(world.toggle_scanner_assistance()));
+        assert!(!world.manual_scanner_target());
+        assert_eq!(some(world.targeting_snapshot()).identity, fragment);
+        // The same previously used controller must also discard the old parent when
+        // the pilot presses Tab again, not merely a newly loaded controller.
+        let contacts = world.scanner_targets();
+        assert!(contacts.contains(&(fragment, ore.position)));
+        assert!(!contacts.iter().any(|(id, _)| *id == parent));
+        let mut selected = Vec::new();
+        for _ in 0..contacts.len() {
+            assert!(ok(
+                world.cycle_scanner_target(world.snapshot().tick, [1280, 720])
+            ));
+            let identity = some(world.targeting_snapshot()).identity;
+            assert_ne!(identity, parent);
+            assert!(contacts.iter().any(|(id, _)| *id == identity));
+            selected.push(identity);
+        }
+        assert!(selected.contains(&fragment));
+        assert_eq!(world.commodity_quantity(rock.commodity), cargo);
+        assert_eq!(world.mining_collection_target(rock.id), Some(ore));
+        return;
+    }
+    panic!("real paid branch never released the ore for manual marker regression");
+}
+
 #[test]
 fn earned_mining_select_once_delivers_one_real_ore_unit_and_retains_it_on_continue() {
     let mut world = market_funded(ok(World::new_commander(16844)));
@@ -350,6 +472,7 @@ fn earned_mining_select_once_delivers_one_real_ore_unit_and_retains_it_on_contin
         mining.id,
         pulse.id,
     );
+    verify_manual_marks_actual_released_fragment(ok(World::from_save_bytes(&docked_save)));
 
     let rock = launch_mining(&mut world);
     let target = WorkTargetId::Asteroid(rock.id);
@@ -358,7 +481,7 @@ fn earned_mining_select_once_delivers_one_real_ore_unit_and_retains_it_on_contin
 
     // One selection starts extraction and physical intake. No manual fire, scoop,
     // second target selection, test-only movement or direct resource mutation follows.
-    select_rock(&mut world, target);
+    select_scanner_work(&mut world, target);
     let mut complete = false;
     let mut witnessed_ore = None;
     let mut witnessed_mining_tool = false;
@@ -397,6 +520,10 @@ fn earned_mining_select_once_delivers_one_real_ore_unit_and_retains_it_on_contin
             );
             assert_eq!(some(world.fitted_mining_tool()).item, mining.id);
             verify_fragment(&world, rock, ore);
+            assert_eq!(
+                some(world.targeting_snapshot()).tracked_fragment,
+                Some(ore.id)
+            );
             if let Some((id, released_tick, released_physical_tick)) = witnessed_ore {
                 assert_eq!(
                     (ore.id, ore.released_tick, ore.released_physical_tick),
@@ -404,6 +531,7 @@ fn earned_mining_select_once_delivers_one_real_ore_unit_and_retains_it_on_contin
                 );
             } else {
                 witnessed_ore = Some((ore.id, ore.released_tick, ore.released_physical_tick));
+                verify_fresh_scanner_after_depletion(&world, rock, ore);
             }
         }
     }
@@ -426,6 +554,9 @@ fn earned_mining_select_once_delivers_one_real_ore_unit_and_retains_it_on_contin
             .all(|ore| ore.id.asteroid() != rock.id)
     );
     assert!(world.mining_collection_target(rock.id).is_none());
+    assert!(!world.scanner_targets().iter().any(|(id, _)| matches!(id,
+        TargetIdentity::Work(WorkTargetId::Asteroid(asteroid)) if *asteroid == rock.id)
+        || matches!(id, TargetIdentity::Work(WorkTargetId::Ore(ore)) if ore.asteroid() == rock.id)));
     assert_eq!(world.credits_tenths(), paid_cash);
     let retained_equipment = some(world.modular_equipment_snapshot());
     assert_eq!(retained_equipment.items, paid_equipment.items);
