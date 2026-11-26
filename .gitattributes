@@ -309,3 +309,8 @@ tools/verify_aurochs.py text eol=lf
 tools/measure_giraffe_liner.py text eol=lf
 tools/prepare_giraffe_liner.py text eol=lf
 tools/verify_giraffe_liner.py text eol=lf
+
+# Byte-pinned Shikra replay programs.
+tools/measure_shikra.py text eol=lf
+tools/prepare_shikra.py text eol=lf
+tools/verify_shikra.py text eol=lf

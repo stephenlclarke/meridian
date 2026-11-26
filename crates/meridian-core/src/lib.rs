@@ -60,6 +60,7 @@ pub mod saiga;
 pub mod saker;
 pub mod save;
 pub mod seriema_courier;
+pub mod shikra;
 pub mod springbok_starliner;
 pub mod station;
 pub mod station_services;
