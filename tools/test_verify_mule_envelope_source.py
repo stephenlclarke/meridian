@@ -31,7 +31,7 @@ class MuleSourceVerification(unittest.TestCase):
         self.assertEqual(result['protectedCoreFilesWithStockShieldChanges'], 16)
         self.assertEqual(result['protectedCoreFilesWithFuelStorageChanges'], 22)
         self.assertEqual(result['protectedCoreFilesWithSolarScoopsChanges'], 16)
-        self.assertEqual(result['protectedCoreFilesWithStockEcmChanges'], 15)
+        self.assertEqual(result['protectedCoreFilesWithStockEcmChanges'], 16)
         self.assertEqual(result['protectedCoreFilesWithStockEcmFieldChanges'], 12)
         self.assertEqual(result['geometryCoreTests'], 1)
         self.assertEqual(result['restoreCoreTests'], 1)
@@ -162,7 +162,7 @@ class MuleSourceVerification(unittest.TestCase):
             for publication in (
                 b'pub mod stag_liner;\n\n', b'pub mod saker;\n', b'pub mod eagle_cruiser;\n',
                 b'pub mod harpy_assault;\n', b'pub mod erne_corvette;\n', b'pub mod harpy_dropship;\n',
-                b'pub mod harpy_gunship;\n', b'pub mod lanner;\n', b'pub mod hyena;\n', b'pub mod yak;\n', b'pub mod jackal;\n', b'pub mod banteng;\n', b'pub mod caracal_scout;\n', b'pub mod hobby_fighter;\n', b'pub mod condor;\n', b'pub mod aplomado_interceptor;\n', b'pub mod falconet;\n', b'pub mod muskox;\n', b'pub mod barbary;\n', b'pub mod wombat;\n', b'pub mod saiga;\n', b'pub mod moose_clipper;\n', b'pub mod seriema_courier;\n',
+                b'pub mod harpy_gunship;\n', b'pub mod lanner;\n', b'pub mod hyena;\n', b'pub mod yak;\n', b'pub mod jackal;\n', b'pub mod banteng;\n', b'pub mod caracal_scout;\n', b'pub mod hobby_fighter;\n', b'pub mod condor;\n', b'pub mod aplomado_interceptor;\n', b'pub mod falconet;\n', b'pub mod muskox;\n', b'pub mod barbary;\n', b'pub mod wombat;\n', b'pub mod saiga;\n', b'pub mod moose_clipper;\n', b'pub mod seriema_courier;\n', b'pub mod medusa;\n',
             ):
                 for altered in (original.replace(publication, b''), original + publication):
                     with self.subTest(publication=publication):
@@ -171,7 +171,7 @@ class MuleSourceVerification(unittest.TestCase):
                             verifier.verify_protected_core(root)
             for declaration in (
                 b'pub mod saker;\n', b'pub mod eagle_cruiser;\n', b'pub mod harpy_assault;\n', b'pub mod erne_corvette;\n', b'pub mod harpy_dropship;\n',
-                b'pub mod harpy_gunship;\n', b'pub mod lanner;\n', b'pub mod hyena;\n', b'pub mod yak;\n', b'pub mod jackal;\n', b'pub mod banteng;\n', b'pub mod caracal_scout;\n', b'pub mod hobby_fighter;\n', b'pub mod condor;\n', b'pub mod aplomado_interceptor;\n', b'pub mod falconet;\n', b'pub mod muskox;\n', b'pub mod barbary;\n', b'pub mod wombat;\n', b'pub mod saiga;\n', b'pub mod moose_clipper;\n', b'pub mod seriema_courier;\n',
+                b'pub mod harpy_gunship;\n', b'pub mod lanner;\n', b'pub mod hyena;\n', b'pub mod yak;\n', b'pub mod jackal;\n', b'pub mod banteng;\n', b'pub mod caracal_scout;\n', b'pub mod hobby_fighter;\n', b'pub mod condor;\n', b'pub mod aplomado_interceptor;\n', b'pub mod falconet;\n', b'pub mod muskox;\n', b'pub mod barbary;\n', b'pub mod wombat;\n', b'pub mod saiga;\n', b'pub mod moose_clipper;\n', b'pub mod seriema_courier;\n', b'pub mod medusa;\n',
             ):
                 source.write_bytes(original.replace(declaration, b'') + declaration)
                 with self.assertRaisesRegex(AssertionError, 'lib.rs'):
@@ -182,7 +182,7 @@ class MuleSourceVerification(unittest.TestCase):
             root = Path(directory)
             core = self.copy_protected_sources(root)
             inverse = verifier.stock_ecm_inverse(root, verifier.protected_core_pins(root))
-            self.assertEqual(len(inverse), 15)
+            self.assertEqual(len(inverse), 16)
             for relative in inverse:
                 with self.subTest(relative=relative):
                     source = core / relative
@@ -228,6 +228,7 @@ class MuleSourceVerification(unittest.TestCase):
                                                      verifier.stock_ecm_field_inverse(root, protected))
             current = verifier.undo_flight_computer(relative, current,
                                                      verifier.stock_ecm_inverse(root, protected))
+            current = verifier.undo_medusa_stock_publication(relative, current)
             current = verifier.undo_flight_computer(relative, current,
                                                      verifier.solar_scoops_inverse(root, protected))
             current = verifier.undo_flight_computer(relative, current,

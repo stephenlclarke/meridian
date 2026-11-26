@@ -33,11 +33,11 @@ SOLAR_SCOOPS_INVERSE = Path('integration/sh001-mule/SOLAR-SCOOPS-INVERSE.json')
 SOLAR_SCOOPS_BASE = '641dfc9b2f1834412cff3831d1b2eb5296dec507'
 SOLAR_SCOOPS_INVERSE_SHA256 = '0c68577f581d05cf490cbdfaa1488bdc361d712b30751f68300f1eb23da7ba67'
 STOCK_ECM_INVERSE = Path('integration/sh001-mule/STOCK-ECM-INVERSE.json')
-STOCK_ECM_BASE = 'f32ada6970976e1a1e609e4777b3ef5c333f055d'
-STOCK_ECM_INVERSE_SHA256 = 'a470932b8b411825325bdb3e0fb9e38cb5919a44bac7e90d55332dfcff0d6a32'
+STOCK_ECM_BASE = 'f04385c9fd3119d6ddb797ea80ca419f7495944b'
+STOCK_ECM_INVERSE_SHA256 = '65c8433601da990abea476d880e6ec1e312189856d7ede5e9da1d03d0ba81a79'
 STOCK_ECM_FIELD_INVERSE = Path('integration/sh001-mule/STOCK-ECM-FIELD-INVERSE.json')
-STOCK_ECM_FIELD_BASE = '8ba79ea995cd9439723a3c1e271ed4ecd6387e24'
-STOCK_ECM_FIELD_INVERSE_SHA256 = '79dae295d74a7aee4115d3ec32022cfd72ca08d09e46021c9eefce4f11aa03ba'
+STOCK_ECM_FIELD_BASE = '1068fc7b96f44e6acb259b75ad69a87e8701b306'
+STOCK_ECM_FIELD_INVERSE_SHA256 = 'beaf93a35300d439024d6073312bfdcf99687e77d9581d42d073155a004ab07d'
 
 
 def sha(data):
@@ -94,6 +94,16 @@ def stock_ecm_inverse(root, protected):
 def stock_ecm_field_inverse(root, protected):
     return approved_inverse(root, protected, STOCK_ECM_FIELD_INVERSE,
                             STOCK_ECM_FIELD_INVERSE_SHA256, STOCK_ECM_FIELD_BASE, 'stock ECM field')
+
+
+def undo_medusa_stock_publication(relative, data):
+    if relative != LIB_SOURCE:
+        return data
+    declaration = b'pub mod medusa;\n'
+    before, after = b'pub mod lanner;\n', b'pub mod mining;\n'
+    span = before + declaration + after
+    assert data.count(declaration) == 1 and data.count(span) == 1, relative
+    return data.replace(span, before + after, 1)
 
 
 def undo_seriema_courier_publication(relative, data):
@@ -546,6 +556,7 @@ def verify_protected_core(root):
         current = (root / 'crates/meridian-core/src' / relative).read_bytes()
         data = undo_flight_computer(relative, current, ecm_field_inverse)
         data = undo_flight_computer(relative, data, ecm_inverse)
+        data = undo_medusa_stock_publication(relative, data)
         data = undo_flight_computer(relative, data, solar_inverse)
         data = undo_flight_computer(relative, data, fuel_inverse)
         data = undo_flight_computer(relative, data, shield_inverse)

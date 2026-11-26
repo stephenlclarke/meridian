@@ -13,7 +13,7 @@ Immutable original revision `a11fe16924d87d06021816f9037952afcbac08db`:
 | `Sources/L337Core/EquipmentRuntimeCatalog.swift` | `ccf1ee2a940175f0d1a26a65aaa7b62ca7cf61d0eb33906f8b8feb6664210e27` | Unique `utility-ecm` inventory family |
 | `Tests/L337CoreTests/OriginalCombatCostsUnitTests.swift` | `c1e024b22b885ee6395b188fbcf3add2b5310bdb88f9041d859759f918cd3487` | Exact energy debit and strict refusal at insufficient energy |
 
-The Meridian SH025 uses a shared ordinary three-mount budget. Its stock ECM uses one mount and one equipment unit. The existing explicit four-tank test exception does not add another ordinary utility mount. The current maximum outfit retains its existing utility choices; fitting ECM separately requires a free ordinary mount. Fitted ECM must be stored before invoking TEST MAX if the latter would add the three other reserved utilities.
+The Meridian SH025 uses a shared ordinary three-mount budget. Its stock ECM uses one mount and one equipment unit. The existing explicit four-tank test exception does not add another ordinary utility mount. The current maximum outfit retains its existing utility choices; fitting ECM separately requires a free ordinary mount. Fitted ECM must be stored before invoking TEST MAX. The saved MAX history checks the actual fit immediately before the command, not the later or current fit.
 
 ## Current candidate
 

@@ -1,5 +1,5 @@
 {
-  "base": "8ba79ea995cd9439723a3c1e271ed4ecd6387e24",
+  "base": "1068fc7b96f44e6acb259b75ad69a87e8701b306",
   "files": {
     "flight.rs": {
       "beforeSHA256": "c95aebe87d3313fb1ab9a0d9d29c1561929d3b5f5759c3675a45d6b3be52c00c",
@@ -288,11 +288,11 @@
       ]
     },
     "lib.rs": {
-      "beforeSHA256": "6abd79a54f4f9af2249c5efa518dc47f2930fb58b0978f7df8902c400e7bb4db",
-      "afterSHA256": "55ed01f56fe757bfd684d9e7f9d0c5adf654f8f9fc44de98c81177e2e6a1f520",
+      "beforeSHA256": "38ae457cfc73ed33c4015289d188cc2bda92e19bf050eca9c37f45a7594e34a9",
+      "afterSHA256": "e9e2fbced8ce2b03f5180f18048568f5527fde82ce44a45db4ef5191d20e83e4",
       "hunks": [
         {
-          "offset": 970,
+          "offset": 986,
           "before": "    ECM_ENERGY_HUNDREDTHS, ECM_FIELD_TICKS, EcmActivation, EcmError, EcmSnapshot, EcmTrigger,\n",
           "after": "    ECM_ENERGY_HUNDREDTHS, ECM_FIELD_TICKS, EcmActivation, EcmError, EcmSnapshot, EcmTermination,\n    EcmTrigger, PreparedEcm,\n"
         }
