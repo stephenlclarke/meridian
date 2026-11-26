@@ -8,6 +8,8 @@ use meridian_core::{
     navigation::SystemId,
     station_services::{Command, CommodityId},
 };
+#[path = "automatic_work_public/salvage.rs"]
+mod salvage;
 
 fn ok<T, E: core::fmt::Debug>(value: Result<T, E>) -> T {
     value.unwrap_or_else(|error| panic!("{error:?}"))
@@ -57,10 +59,9 @@ fn refuel_for_return(world: &mut World) {
     }
 }
 
-fn market_funded_commander() -> World {
+fn market_funded(mut world: World) -> World {
     // The same finite public market and journey checkpoints as the existing equipment tests.
     // No test-only state, credit grant, XYZZY action or fabricated item is used.
-    let mut world = ok(World::new_commander(16844));
     for (quantity, expected_cash) in [(29, 11434), (47, 18296), (75, 29042)] {
         if some(world.snapshot().navigation).system != SystemId::AVENOR {
             refuel_for_return(&mut world);
@@ -259,7 +260,7 @@ fn refuse_missing_scoops(mut world: World) {
 
 #[test]
 fn earned_mining_select_once_delivers_one_real_ore_unit_and_retains_it_on_continue() {
-    let mut world = market_funded_commander();
+    let mut world = market_funded(ok(World::new_commander(16844)));
     let basic = ModuleKind::Targeting(TargetingTier::Basic);
     buy_fitted(
         &mut world,
