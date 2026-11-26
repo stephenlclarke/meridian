@@ -25,7 +25,7 @@
     },
     "flight/mining.rs": {
       "beforeSHA256": "0adb85d84d4db6783fec3dff02cdb66a1ebeafc26d7637be43d56e8a9930cbdf",
-      "afterSHA256": "9b57fa350f66d7b690a3d5464e545347f9b59a280fdb4bdd7cecf232a0776e2b",
+      "afterSHA256": "22defdcc8cf656efa55f7419c957a98b28246eee79c4fc729a388a5b09a8e284",
       "hunks": [
         {
           "offset": 332,
@@ -33,19 +33,24 @@
           "after": "mod collection;\n"
         },
         {
-          "offset": 11060,
+          "offset": 6528,
+          "before": "    /// A genuine paid fitted tool emits only after the actual native first-contact query.\n",
+          "after": "    /// An actual owned fitted tool emits only after the native first-contact query.\n"
+        },
+        {
+          "offset": 11054,
           "before": "    /// Paid fitted equipment alone cannot replace an eligible original physical ore actor.\n    /// Pending descriptions never confer collection authority or cargo ownership.\n    pub fn request_collect_mined_ore(&mut self, tick: u64) -> Result<(), MiningError> {\n        if tick != self.state.tick {\n            return Err(MiningError::StaleCommand);\n",
           "after": "    pub(in crate::flight) fn auto_mine_tick(\n        &mut self,\n        id: crate::mining::AsteroidId,\n    ) -> &'static str {\n        if !self.mining_selected(id) {\n            return \"Target released\";\n"
         },
         {
-          "offset": 11274,
+          "offset": 11268,
           "before": "        if self.is_paused() {\n            return Err(MiningError::Paused);\n        }\n        if self.state.mode != FlightMode::Flight {\n            return Err(MiningError::NotInFlight);\n",
           "after": "        let Some(body) = self\n            .mining\n            .body(usize::from(id.ordinal()))\n            .filter(|b| b.id == id)\n        else {\n            return \"Target unavailable\";\n        };\n        if body.remaining_energy <= 0.0 {\n            return if self.mining_collection_target(id).is_some() {\n                \"Ore ready\"\n            } else {\n                \"Mining complete\"\n            };\n"
         },
         {
-          "offset": 11739,
+          "offset": 11733,
           "before": "            Err(MiningError::NoScoops)\n        } else {\n            Err(MiningError::NoEligibleOreBody)\n",
-          "after": "            return \"Fit fuel scoops\";\n        }\n        match self.prepare_mining_intake_account(body.commodity) {\n            Err(MiningError::HoldFull) => return \"Cargo hold full\",\n            Err(_) => return \"Cargo unavailable\",\n            Ok(_) => {}\n        }\n        if self\n            .mining_belt_snapshot()\n            .and_then(|belt| belt.front_contact)\n            .is_none_or(|contact| contact.asteroid != id)\n        {\n            return \"Align mining laser\";\n        }\n        if self.select_auto_mining_tool().is_err() {\n            return \"Fit mining laser\";\n        }\n        let Ok(tool) = self.mining_tool_authority() else {\n            return \"Fit mining laser\";\n        };\n        match self.request_mining(tool, self.state.tick) {\n            Ok(shot) if shot.extracted_units > 0 => \"Ore ready\",\n            Ok(_) => \"Mining pulse\",\n            Err(MiningError::Resources) => \"Mining recharging\",\n            Err(MiningError::ProtectedActivity) => \"Protected activity\",\n            Err(_) => \"Mining unavailable\",\n"
+          "after": "            return \"Fit fuel scoops\";\n        }\n        match self.prepare_mining_intake_account(body.commodity) {\n            Err(MiningError::HoldFull) => return \"Cargo hold full\",\n            Err(_) => return \"Cargo unavailable\",\n            Ok(_) => {}\n        }\n        if self\n            .mining_belt_snapshot()\n            .and_then(|belt| belt.front_contact)\n            .is_none_or(|contact| contact.asteroid != id)\n        {\n            return \"Align mining laser\";\n        }\n        match self.select_auto_mining_tool() {\n            Ok(()) => {}\n            Err(MiningError::NoCompatibleFittedTool) => return \"Fit mining laser\",\n            Err(MiningError::ProtectedActivity) => return \"Protected activity\",\n            Err(MiningError::Resources) => return \"Mining recharging\",\n            Err(_) => return \"Mining unavailable\",\n        }\n        let Ok(tool) = self.mining_tool_authority() else {\n            return \"Fit mining laser\";\n        };\n        match self.request_mining(tool, self.state.tick) {\n            Ok(shot) if shot.extracted_units > 0 => \"Ore ready\",\n            Ok(_) => \"Mining pulse\",\n            Err(MiningError::Resources) => \"Mining recharging\",\n            Err(MiningError::ProtectedActivity) => \"Protected activity\",\n            Err(_) => \"Mining unavailable\",\n"
         }
       ]
     },
@@ -84,7 +89,7 @@
     },
     "flight/modular.rs": {
       "beforeSHA256": "048ce47658907fadd51459d1a53d630a9ba6d8536a663186770efa06e78d98fd",
-      "afterSHA256": "aa227eb0d8ae71896c80778d6ae26c752953fc13a7603f8b02076f74c09ef202",
+      "afterSHA256": "c3407f086780a3b919d7fd704b354f0486277b0a40dc495266927b68763c25d6",
       "hunks": [
         {
           "offset": 7259,
@@ -197,57 +202,67 @@
           "after": "                && matches!(\n                    i.provenance,\n                    ModuleProvenance::Paid { .. } | ModuleProvenance::XYZzy { .. }\n                )\n"
         },
         {
-          "offset": 71331,
+          "offset": 70788,
+          "before": "    pub(crate) fn paid_fitted_mining_item(&self) -> Option<u64> {\n",
+          "after": "    fn owned_fitted_mining_item(&self) -> Option<u64> {\n"
+        },
+        {
+          "offset": 71016,
+          "before": "            .paid_fitted_mining_item()\n",
+          "after": "            .owned_fitted_mining_item()\n"
+        },
+        {
+          "offset": 71322,
           "before": "        if action == ModuleAction::GrantStoredSalvageCutter {\n",
           "after": "        if matches!(\n            action,\n            ModuleAction::GrantStoredSalvageCutter\n                | ModuleAction::GrantStoredMiningLaser\n                | ModuleAction::FlightLaserExchange { .. }\n        ) {\n"
         },
         {
-          "offset": 81725,
+          "offset": 81716,
           "before": "    pub(super) fn front_at_physical(&self, world: &World, clock: u64) -> Option<OwnedModule> {\n",
           "after": "    pub(super) fn front_at_physical(\n        &self,\n        world: &World,\n        clock: u64,\n        firing_emission: u64,\n    ) -> Option<OwnedModule> {\n"
         },
         {
-          "offset": 82029,
+          "offset": 82020,
           "before": "            let at = world.damage.berth_clock(event.dock.sequence())?;\n            if at > clock {\n",
           "after": "            if let ModuleAction::FlightLaserExchange {\n                clock: at,\n                emission,\n                ..\n            } = event.action\n            {\n                if at > clock || (at == clock && emission >= firing_emission) {\n                    break;\n                }\n            } else if world.damage.berth_clock(event.dock.sequence())? > clock {\n"
         },
         {
-          "offset": 82553,
+          "offset": 82544,
           "before": "    fn historical_front_at_tick(&self, tick: u64) -> Option<OwnedModule> {\n",
           "after": "    fn historical_front_at_tick(&self, tick: u64, firing_emission: u64) -> Option<OwnedModule> {\n"
         },
         {
-          "offset": 82906,
+          "offset": 82897,
           "before": "",
           "after": "            if matches!(event.action, ModuleAction::FlightLaserExchange { emission, .. } if event.tick == tick && emission >= firing_emission)\n            {\n                break;\n            }\n"
         },
         {
-          "offset": 83288,
+          "offset": 83279,
           "before": "",
           "after": "        emission: u64,\n"
         },
         {
-          "offset": 83352,
+          "offset": 83343,
           "before": "        let fitted = self.historical_front_at_tick(tick)?;\n",
           "after": "        let fitted = self.historical_front_at_tick(tick, emission)?;\n"
         },
         {
-          "offset": 83623,
+          "offset": 83614,
           "before": "        super::OrdinaryWeapon::from_module(self.historical_front_at_tick(tick)?.kind)\n",
           "after": "        super::OrdinaryWeapon::from_module(self.historical_front_at_tick(tick, u64::MAX)?.kind)\n"
         },
         {
-          "offset": 83797,
+          "offset": 83788,
           "before": "",
           "after": "    /// Select an actual owned work tool in the original front laser mount. No purchase,\n    /// new item, resource refill or extra mount is implied by selecting a rock.\n    pub(in crate::flight) fn select_auto_mining_tool(\n        &mut self,\n    ) -> Result<(), crate::mining::MiningError> {\n        use crate::mining::MiningError;\n        if self.state.mode != super::FlightMode::Flight || self.is_paused() || !self.pulse.alive() {\n            return Err(MiningError::NotInFlight);\n        }\n        if self.emp.input_blocked() {\n            return Err(MiningError::Resources);\n        }\n        if self\n            .selected_work_target()\n            .is_none_or(|target| !matches!(target.id, crate::equipment::WorkTargetId::Asteroid(_)))\n        {\n            return Err(MiningError::NoTarget);\n        }\n        if self.flight_reception.occupancy().1 > 0\n            || self.navigation_trade.occupancy().1 > 0\n            || self.practice.is_some_and(|p| !p.reception_is_terminal())\n            || self\n                .mission_snapshot()\n                .is_some_and(|s| s.freight.held_tonnes > 0)\n        {\n            return Err(MiningError::ProtectedActivity);\n        }\n        let account = self\n            .commander_account\n            .as_ref()\n            .ok_or(MiningError::NoCommander)?;\n        let ledger = self\n            .modular\n            .ledger(self, account)\n            .map_err(|_| MiningError::InvalidState)?;\n        let front = ledger.front().ok_or(MiningError::NoCompatibleFittedTool)?;\n        if front.kind == ModuleKind::MiningLaser {\n            if ledger.auto_return.is_some() {\n                return Ok(());\n            }\n            let combat = ledger\n                .items\n                .iter()\n                .filter(|i| {\n                    i.slot.is_none()\n                        && i.kind != ModuleKind::MiningLaser\n                        && super::OrdinaryWeapon::from_module(i.kind).is_some()\n                })\n                .max_by_key(|i| {\n                    (\n                        super::OrdinaryWeapon::from_module(i.kind).map(|w| w.damage_hundredths()),\n                        i.id,\n                    )\n                })\n                .copied();\n            return if let Some(combat) = combat {\n                self.exchange_auto_mining_tool(ledger, front, combat, false)\n            } else {\n                Ok(())\n            };\n        }\n        let mining = ledger\n            .items\n            .iter()\n            .find(|i| {\n                i.slot.is_none()\n                    && i.kind == ModuleKind::MiningLaser\n                    && matches!(\n                        i.provenance,\n                        ModuleProvenance::Paid { .. } | ModuleProvenance::XYZzy { .. }\n                    )\n            })\n            .copied()\n            .ok_or(MiningError::NoCompatibleFittedTool)?;\n        self.exchange_auto_mining_tool(ledger, front, mining, false)\n    }\n\n    pub(in crate::flight) fn restore_auto_mining_tool(\n        &mut self,\n    ) -> Result<(), crate::mining::MiningError> {\n        use crate::mining::MiningError;\n        // No full ledger replay on ordinary flight before automatic mining is used.\n        if !self\n            .modular\n            .events\n            .iter()\n            .rev()\n            .find_map(|e| match e.action {\n                ModuleAction::FlightLaserExchange { restoring, .. } => Some(!restoring),\n                _ => None,\n            })\n            .unwrap_or(false)\n        {\n            return Ok(());\n        }\n        let account = self\n            .commander_account\n            .as_ref()\n            .ok_or(MiningError::NoCommander)?;\n        let ledger = self\n            .modular\n            .ledger(self, account)\n            .map_err(|_| MiningError::InvalidState)?;\n        let Some(item) = ledger.auto_return else {\n            return Ok(());\n        };\n        if self.is_paused() || self.emp.input_blocked() || !self.pulse.alive() {\n            return Err(MiningError::Resources);\n        }\n        let front = ledger.front().ok_or(MiningError::InvalidState)?;\n        let combat = ledger\n            .items\n            .iter()\n            .find(|i| i.id == item && i.slot.is_none())\n            .copied()\n            .ok_or(MiningError::InvalidState)?;\n        self.exchange_auto_mining_tool(ledger, front, combat, true)\n    }\n\n    fn exchange_auto_mining_tool(\n        &mut self,\n        mut ledger: Ledger,\n        front: OwnedModule,\n        next: OwnedModule,\n        restoring: bool,\n    ) -> Result<(), crate::mining::MiningError> {\n        use crate::mining::MiningError;\n        let owner = self.combat_identity().ok_or(MiningError::NoCommander)?;\n        let current = self\n            .commander_account\n            .as_ref()\n            .ok_or(MiningError::NoCommander)?;\n        let dock = self\n            .modular\n            .events\n            .last()\n            .ok_or(MiningError::InvalidState)?\n            .dock;\n        let event = Event {\n            xyzzy: false,\n            action: ModuleAction::FlightLaserExchange {\n                item: next.id,\n                replacing: front.id,\n                visit: owner.visit,\n                clock: self.combat.physical_tick(),\n                emission: self.combat.emissions,\n                restoring,\n            },\n            item: next.id,\n            dock,\n            tick: self.state.tick,\n            revision: current\n                .revision()\n                .checked_add(1)\n                .ok_or(MiningError::ProofCapacity)?,\n        };\n        ledger\n            .apply(event, 0)\n            .map_err(|_| MiningError::InvalidState)?;\n        let allowance = if self.test_tank_custody_clear() {\n            ledger.test_tank_count()\n        } else {\n            0\n        };\n        ledger\n            .validate_budgets(current, self.emp.utility_mounts(), allowance)\n            .map_err(|_| MiningError::InvalidState)?;\n        let born = |slot, offset| {\n            ledger\n                .fitted(slot)\n                .is_some_and(|item| item.id == owner.owner + offset)\n        };\n        let account = current\n            .prepare_module(\n                0,\n                [\n                    born(ModuleSlot::FrontLaser, 7),\n                    born(ModuleSlot::Energy, 5),\n                    born(ModuleSlot::Navigation, 4),\n                    born(ModuleSlot::Drive, 6),\n                    born(ModuleSlot::Shield, 3),\n                ],\n                ledger.fuel_storage_count(),\n            )\n            .map_err(|_| MiningError::InvalidState)?;\n        let mut modules = self.modular.clone();\n        modules.events.push(event);\n        self.save_bytes_with_modules(&account, &modules)\n            .map_err(|_| MiningError::ProofCapacity)?;\n        self.modular = modules;\n        self.commander_account = Some(account);\n        Ok(())\n    }\n\n"
         },
         {
-          "offset": 91890,
+          "offset": 91881,
           "before": "        if cutter_stored && existing.is_some() {\n",
           "after": "        if (cutter_stored || kind == ModuleKind::MiningLaser) && existing.is_some() {\n"
         },
         {
-          "offset": 92847,
+          "offset": 92838,
           "before": "",
           "after": "                } else if kind == ModuleKind::MiningLaser {\n                    ModuleAction::GrantStoredMiningLaser\n"
         }
@@ -345,7 +360,7 @@
     },
     "mining.rs": {
       "beforeSHA256": "6b8278efa71647548b317bedf352b9026eefbcdc1c7e738717f7df6da58ed798",
-      "afterSHA256": "645e1badff564ac2b6df2929f0f7c595821654adb7ee07d2e6a0ea006a12fd77",
+      "afterSHA256": "9b91c21045f2eb465154e69f532d95c4b9f460801336833b2c035a8ffce251e9",
       "hunks": [
         {
           "offset": 438,
@@ -353,12 +368,17 @@
           "after": "pub(crate) use ore::Collection;\npub use ore::{OreId, OreSnapshot, SCOOP_DISTANCE, SCOOP_MAX_RELATIVE_SPEED};\n"
         },
         {
-          "offset": 7219,
+          "offset": 5672,
+          "before": "/// can produce it, after checking genuine paid ownership, mining compatibility and actual fit.\n",
+          "after": "/// can produce it, after checking actual paid or explicit maximum-owned equipment and fit.\n"
+        },
+        {
+          "offset": 7215,
           "before": "",
           "after": "    collected: Arc<Vec<Collection>>,\n"
         },
         {
-          "offset": 7441,
+          "offset": 7437,
           "before": "",
           "after": "            collected: Arc::new(Vec::new()),\n"
         }
