@@ -553,10 +553,14 @@ impl World {
             match work.id {
                 WorkTargetId::Asteroid(id) => self.auto_mine_tick(id),
                 WorkTargetId::Wreck(id) if self.selected_disabled_salvage_target() == Some(id) => {
-                    if self.fitted_salvage_cutter().is_none() {
-                        "Cutter not fitted"
-                    } else {
-                        "Occupied: confirm cut"
+                    match self.review_occupied_cut(id, self.state.tick) {
+                        Ok(_) => "Occupied: confirm cut",
+                        Err(super::OccupiedCutError::MissingFit) => {
+                            "Check cutter and scoop fittings"
+                        }
+                        Err(super::OccupiedCutError::UnsafeHold) => "Establish salvage hold",
+                        Err(super::OccupiedCutError::Cooldown) => "Cutter cooling",
+                        Err(_) => "Occupied contact unavailable",
                     }
                 }
                 WorkTargetId::Wreck(id) => self.auto_salvage_tick(id),
