@@ -121,7 +121,8 @@ impl World {
             }
             // Traffic rejects centre distances <= 2 * radius + 1.
             WorkTargetId::Wreck(_) => Some(2.0 * player_radius + 2.0),
-            WorkTargetId::Ore(_) => Some(0.0),
+            // Original local scoop aperture is 45 below and 55 forward.
+            WorkTargetId::Ore(_) => Some(45.0_f64.hypot(55.0)),
         }
     }
 
@@ -140,7 +141,8 @@ impl World {
         let to_target = difference(target.position, player.position);
         let distance = to_target.dot(to_target).sqrt();
         let separation_error = distance - stand_off;
-        let retreating = separation_error < -0.25;
+        let collecting = matches!(target.id, WorkTargetId::Ore(_));
+        let retreating = !collecting && separation_error < -0.25;
         let room = if retreating {
             -separation_error
         } else {
@@ -157,6 +159,12 @@ impl World {
             (tick_brake.hypot((2.0 * acceleration * room).sqrt()) - tick_brake) / units
         } else {
             0.0
+        };
+        // Match the original intake speed gate as we enter the fragment envelope.
+        let desired = if collecting && distance < 150.0 {
+            desired.min(8.0 / units)
+        } else {
+            desired
         };
         let throttle = ((desired - f64::from(self.state.speed)) / (acceleration * delta_t / units))
             .clamp(-1.0, 1.0) as f32;

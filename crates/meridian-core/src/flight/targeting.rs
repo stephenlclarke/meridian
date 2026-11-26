@@ -497,7 +497,8 @@ impl World {
             return input;
         };
         let mut aim = work.map_or_else(|| target.position(), |work| work.position);
-        if let Some(standoff) = work.and_then(|w| self.work_standoff(w)) {
+        let collecting = work.is_some_and(|w| matches!(w.id, WorkTargetId::Ore(_)));
+        if !collecting && let Some(standoff) = work.and_then(|w| self.work_standoff(w)) {
             let delta = offset(aim, player.position);
             if delta.dot(delta).sqrt() < standoff - 0.25 {
                 // Only forward thrust is available. Face away to recover the work distance,
@@ -505,7 +506,14 @@ impl World {
                 aim = offset(player.position, delta);
             }
         }
-        let [bearing, elevation] = target_bearing(player, aim);
+        let [bearing, mut elevation] = target_bearing(player, aim);
+        if collecting {
+            let range = offset(aim, player.position);
+            if range.dot(range) < 85.0 * 85.0 {
+                // At pickup range bring the fragment below the nose into the scoop aperture.
+                elevation += 45.0_f64.atan2(55.0);
+            }
+        }
         let tolerance = 1.5 / (f64::from(self.targeting.size[1].max(1)) * 0.8);
         let control = |angle: f64, rate: f32| {
             if angle.abs() <= tolerance {
