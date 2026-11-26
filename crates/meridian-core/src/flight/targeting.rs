@@ -324,7 +324,11 @@ impl World {
                 .then_with(|| distance(*a).total_cmp(&distance(*b)))
                 .then_with(|| a.identity().order().cmp(&b.identity().order()))
         });
-        let ordered = candidates.into_iter().map(Candidate::identity).collect();
+        let ordered = candidates
+            .iter()
+            .copied()
+            .map(Candidate::identity)
+            .collect();
         let station_was_selected = matches!(
             self.targeting.selected,
             Some(TargetIdentity::Station { .. })
@@ -335,6 +339,14 @@ impl World {
         {
             self.auto_docking = None;
         }
+        self.targeting.work_status = selected
+            .and_then(|id| {
+                candidates
+                    .iter()
+                    .find(|candidate| candidate.identity() == id)
+            })
+            .and_then(|candidate| self.automatic_work_target(*candidate))
+            .map(|_| "Approaching work target");
         // Selection is a cockpit command, not an automatic launch or weapon command.
         if selected.is_some() {
             self.request_flight_view(FlightView::Front, expected_tick)
