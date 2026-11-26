@@ -1,0 +1,661 @@
+{
+  "candidateTopology": {
+    "componentCount": 30,
+    "surfaceTriangles": 512,
+    "interiorOverlaps": [
+      {
+        "parts": [
+          0,
+          10
+        ],
+        "pointMetres": [
+          -4.1023015,
+          -1.195683,
+          -0.8643787
+        ],
+        "hitCountsAboveBelow": [
+          [
+            1,
+            1
+          ],
+          [
+            1,
+            1
+          ]
+        ]
+      },
+      {
+        "parts": [
+          0,
+          12
+        ],
+        "pointMetres": [
+          -4.7725446,
+          1.0339021,
+          -6.6693196
+        ],
+        "hitCountsAboveBelow": [
+          [
+            1,
+            1
+          ],
+          [
+            1,
+            1
+          ]
+        ]
+      },
+      {
+        "parts": [
+          0,
+          20
+        ],
+        "pointMetres": [
+          -5.3319809,
+          0.2027397,
+          -12.2960704
+        ],
+        "hitCountsAboveBelow": [
+          [
+            1,
+            1
+          ],
+          [
+            1,
+            1
+          ]
+        ]
+      },
+      {
+        "parts": [
+          0,
+          21
+        ],
+        "pointMetres": [
+          -4.1543852,
+          -1.354898,
+          -12.5597455
+        ],
+        "hitCountsAboveBelow": [
+          [
+            1,
+            1
+          ],
+          [
+            1,
+            1
+          ]
+        ]
+      },
+      {
+        "parts": [
+          0,
+          26
+        ],
+        "pointMetres": [
+          -3.2734461,
+          -1.9439002,
+          6.845465
+        ],
+        "hitCountsAboveBelow": [
+          [
+            1,
+            1
+          ],
+          [
+            1,
+            1
+          ]
+        ]
+      },
+      {
+        "parts": [
+          1,
+          12
+        ],
+        "pointMetres": [
+          -2.5570212,
+          0.8001621,
+          -7.7065521
+        ],
+        "hitCountsAboveBelow": [
+          [
+            1,
+            1
+          ],
+          [
+            1,
+            1
+          ]
+        ]
+      },
+      {
+        "parts": [
+          1,
+          20
+        ],
+        "pointMetres": [
+          -2.3084499,
+          0.6031998,
+          -8.619622
+        ],
+        "hitCountsAboveBelow": [
+          [
+            1,
+            1
+          ],
+          [
+            1,
+            1
+          ]
+        ]
+      },
+      {
+        "parts": [
+          5,
+          11
+        ],
+        "pointMetres": [
+          5.819585,
+          -1.1380932,
+          -0.8643787
+        ],
+        "hitCountsAboveBelow": [
+          [
+            1,
+            1
+          ],
+          [
+            1,
+            1
+          ]
+        ]
+      },
+      {
+        "parts": [
+          5,
+          12
+        ],
+        "pointMetres": [
+          5.2061872,
+          0.9437186,
+          -7.9891915
+        ],
+        "hitCountsAboveBelow": [
+          [
+            1,
+            1
+          ],
+          [
+            1,
+            1
+          ]
+        ]
+      },
+      {
+        "parts": [
+          5,
+          23
+        ],
+        "pointMetres": [
+          4.7274703,
+          0.6085931,
+          -12.1893388
+        ],
+        "hitCountsAboveBelow": [
+          [
+            1,
+            1
+          ],
+          [
+            1,
+            1
+          ]
+        ]
+      },
+      {
+        "parts": [
+          5,
+          24
+        ],
+        "pointMetres": [
+          5.2448765,
+          0.0327746,
+          -14.7504859
+        ],
+        "hitCountsAboveBelow": [
+          [
+            1,
+            1
+          ],
+          [
+            1,
+            1
+          ]
+        ]
+      },
+      {
+        "parts": [
+          5,
+          28
+        ],
+        "pointMetres": [
+          3.6822751,
+          -2.0747453,
+          7.1658846
+        ],
+        "hitCountsAboveBelow": [
+          [
+            1,
+            1
+          ],
+          [
+            1,
+            1
+          ]
+        ]
+      },
+      {
+        "parts": [
+          7,
+          12
+        ],
+        "pointMetres": [
+          2.5884976,
+          0.7067387,
+          -8.3247356
+        ],
+        "hitCountsAboveBelow": [
+          [
+            1,
+            1
+          ],
+          [
+            1,
+            1
+          ]
+        ]
+      },
+      {
+        "parts": [
+          7,
+          23
+        ],
+        "pointMetres": [
+          2.319142,
+          0.4999721,
+          -8.5614773
+        ],
+        "hitCountsAboveBelow": [
+          [
+            1,
+            1
+          ],
+          [
+            1,
+            1
+          ]
+        ]
+      },
+      {
+        "parts": [
+          10,
+          20
+        ],
+        "pointMetres": [
+          -4.1114828,
+          0.0823223,
+          -10.6288786
+        ],
+        "hitCountsAboveBelow": [
+          [
+            1,
+            1
+          ],
+          [
+            1,
+            1
+          ]
+        ]
+      },
+      {
+        "parts": [
+          11,
+          23
+        ],
+        "pointMetres": [
+          4.118366,
+          0.2055362,
+          -10.6096472
+        ],
+        "hitCountsAboveBelow": [
+          [
+            1,
+            1
+          ],
+          [
+            1,
+            1
+          ]
+        ]
+      },
+      {
+        "parts": [
+          12,
+          13
+        ],
+        "pointMetres": [
+          -0.3228857,
+          1.9091698,
+          -9.3420742
+        ],
+        "hitCountsAboveBelow": [
+          [
+            1,
+            1
+          ],
+          [
+            1,
+            1
+          ]
+        ]
+      },
+      {
+        "parts": [
+          12,
+          16
+        ],
+        "pointMetres": [
+          -1.7116017,
+          0.8101579,
+          -7.3392823
+        ],
+        "hitCountsAboveBelow": [
+          [
+            1,
+            1
+          ],
+          [
+            1,
+            1
+          ]
+        ]
+      },
+      {
+        "parts": [
+          12,
+          17
+        ],
+        "pointMetres": [
+          1.5411723,
+          0.6419314,
+          -8.3288217
+        ],
+        "hitCountsAboveBelow": [
+          [
+            1,
+            1
+          ],
+          [
+            1,
+            3
+          ]
+        ]
+      },
+      {
+        "parts": [
+          12,
+          20
+        ],
+        "pointMetres": [
+          -0.8013377,
+          1.0256334,
+          -7.7421849
+        ],
+        "hitCountsAboveBelow": [
+          [
+            1,
+            1
+          ],
+          [
+            1,
+            1
+          ]
+        ]
+      },
+      {
+        "parts": [
+          12,
+          23
+        ],
+        "pointMetres": [
+          1.358357,
+          1.2597162,
+          -7.5361909
+        ],
+        "hitCountsAboveBelow": [
+          [
+            1,
+            1
+          ],
+          [
+            1,
+            1
+          ]
+        ]
+      },
+      {
+        "parts": [
+          13,
+          18
+        ],
+        "pointMetres": [
+          -0.1847582,
+          4.2522922,
+          -0.0358556
+        ],
+        "hitCountsAboveBelow": [
+          [
+            1,
+            1
+          ],
+          [
+            1,
+            1
+          ]
+        ]
+      },
+      {
+        "parts": [
+          13,
+          20
+        ],
+        "pointMetres": [
+          -0.9553885,
+          0.7045972,
+          -7.7762787
+        ],
+        "hitCountsAboveBelow": [
+          [
+            1,
+            1
+          ],
+          [
+            1,
+            1
+          ]
+        ]
+      },
+      {
+        "parts": [
+          13,
+          23
+        ],
+        "pointMetres": [
+          0.942961,
+          1.2056039,
+          -7.9892674
+        ],
+        "hitCountsAboveBelow": [
+          [
+            1,
+            1
+          ],
+          [
+            1,
+            1
+          ]
+        ]
+      },
+      {
+        "parts": [
+          16,
+          20
+        ],
+        "pointMetres": [
+          -1.8457628,
+          0.6351567,
+          -8.8517294
+        ],
+        "hitCountsAboveBelow": [
+          [
+            1,
+            1
+          ],
+          [
+            1,
+            1
+          ]
+        ]
+      },
+      {
+        "parts": [
+          17,
+          23
+        ],
+        "pointMetres": [
+          1.6375048,
+          0.6021839,
+          -7.7675921
+        ],
+        "hitCountsAboveBelow": [
+          [
+            1,
+            1
+          ],
+          [
+            1,
+            1
+          ]
+        ]
+      },
+      {
+        "parts": [
+          18,
+          19
+        ],
+        "pointMetres": [
+          1.6786447,
+          4.8732155,
+          1.0716622
+        ],
+        "hitCountsAboveBelow": [
+          [
+            1,
+            1
+          ],
+          [
+            1,
+            1
+          ]
+        ]
+      },
+      {
+        "parts": [
+          20,
+          21
+        ],
+        "pointMetres": [
+          -5.4593813,
+          -0.4631369,
+          -12.9672385
+        ],
+        "hitCountsAboveBelow": [
+          [
+            1,
+            1
+          ],
+          [
+            1,
+            1
+          ]
+        ]
+      },
+      {
+        "parts": [
+          23,
+          24
+        ],
+        "pointMetres": [
+          5.4017966,
+          0.0619902,
+          -12.5070818
+        ],
+        "hitCountsAboveBelow": [
+          [
+            1,
+            1
+          ],
+          [
+            1,
+            1
+          ]
+        ]
+      },
+      {
+        "parts": [
+          26,
+          27
+        ],
+        "pointMetres": [
+          -2.9094975,
+          -3.6343885,
+          7.1658846
+        ],
+        "hitCountsAboveBelow": [
+          [
+            1,
+            1
+          ],
+          [
+            1,
+            1
+          ]
+        ]
+      },
+      {
+        "parts": [
+          28,
+          29
+        ],
+        "pointMetres": [
+          3.5105467,
+          -3.6343885,
+          7.1658846
+        ],
+        "hitCountsAboveBelow": [
+          [
+            1,
+            1
+          ],
+          [
+            1,
+            1
+          ]
+        ]
+      }
+    ]
+  },
+  "additionalMeasuredOverlaps": [],
+  "missingMeasuredOverlaps": []
+}

@@ -182,7 +182,7 @@ impl Panel {
                     "/ Search | Type a name | Enter Select result",
                     "H types into an active search; ? opens help",
                     "R Review route | L Local chart | Home Current location",
-                    "P Toggle best-profit scan of reachable markets",
+                    "P Toggle best-profit scan | Route D trade details",
                     "[ / ] Previous / next galaxy | Drag Pan | Wheel Zoom",
                 ],
             ),
@@ -190,6 +190,7 @@ impl Panel {
                 "System",
                 &[
                     "Up / Down Select route | Enter / R Review route",
+                    "Route D Trade details | Page Up / Down Scroll | B Back",
                     "Physical-body chart routing is unavailable",
                     "Home Current location | Wheel Scroll",
                 ],
@@ -210,6 +211,7 @@ impl Panel {
                 &[
                     "Up / Down Select goods | Page Up / Down Scroll",
                     "G Buy | Shift+G Sell | Enter Review current trade mode",
+                    "Left / Right Quantity -/+1 | Shift+Left / Right -/+10",
                     "F Refuel actual tank at the displayed price",
                     "Trade confirmation uses the current price and native unit",
                 ],

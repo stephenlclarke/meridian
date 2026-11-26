@@ -1,14 +1,33 @@
 //! Host menu state is ephemeral. Only Profile's prepared commands can change the game.
-use crate::{docked_screens as ui, profile::Profile, session::Action};
+use crate::{
+    authored_hull::AuthoredHulls, docked_screens as ui, profile::Profile, session::Action,
+};
 use meridian_core::{
     AmmunitionAction, ModuleAction, ModuleKind, ModuleSlot, PassageStatus, PassengerAction, World,
     equipment,
     navigation::{DockContext, SystemId},
     station_services::{self, CommodityId},
 };
+use std::sync::Arc;
 
 use meridian_core::navigation::ROUTE_SYSTEMS;
 pub const BINDINGS: &[ui::BindingHint<'static>] = &[
+    ui::BindingHint {
+        key: ui::Key::QuantityLess,
+        label: "Left -1",
+    },
+    ui::BindingHint {
+        key: ui::Key::QuantityMore,
+        label: "Right +1",
+    },
+    ui::BindingHint {
+        key: ui::Key::QuantityLessTen,
+        label: "Shift+Left -10",
+    },
+    ui::BindingHint {
+        key: ui::Key::QuantityMoreTen,
+        label: "Shift+Right +10",
+    },
     ui::BindingHint {
         key: ui::Key::Previous,
         label: "Up",
@@ -83,6 +102,7 @@ fn context<'a>(
     review: Option<&'a ui::Review>,
     stamp: ui::Stamp,
     selected: SystemId,
+    models: &'a [ui::AvailableModel<'a>],
 ) -> ui::Context<'a> {
     let navigation = world.snapshot().navigation;
     let reach = world.jump_reach_ly();
@@ -99,7 +119,7 @@ fn context<'a>(
             .zip(reach)
             .map(|(n, reach)| reach.min(f64::from(n.fuel_capacity_units) / 10.0)),
         route_targets: &ROUTE_SYSTEMS,
-        models: &crate::docked_render::MODELS,
+        models,
         planet_previews: navigation.is_some_and(|n| n.system == selected)
             && world.celestial_snapshot().is_some(),
         navigation_bodies: &[],
@@ -160,6 +180,7 @@ struct Pending {
 
 pub struct Docked {
     catalogue: ui::Catalogue,
+    authored: Arc<AuthoredHulls>,
     screens: ui::DockedScreens,
     pub open: bool,
     slot: String,
@@ -172,13 +193,24 @@ pub struct Docked {
 }
 impl Docked {
     pub fn new(world: &World) -> Result<Self, String> {
+        Self::with_authored(world, Arc::default())
+    }
+    pub(crate) fn with_authored(
+        world: &World,
+        authored: Arc<AuthoredHulls>,
+    ) -> Result<Self, String> {
         let current = world
             .snapshot()
             .navigation
             .ok_or("No commander navigation")?
             .system;
+        let mut catalogue = ui::Catalogue::bundled().map_err(str::to_owned)?;
+        for record in authored.records() {
+            catalogue.add_authored(record.clone())?;
+        }
         Ok(Self {
-            catalogue: ui::Catalogue::bundled().map_err(str::to_owned)?,
+            catalogue,
+            authored,
             screens: ui::DockedScreens::new(current, hull(world)?),
             open: false,
             slot: "front-laser".into(),
@@ -201,6 +233,20 @@ impl Docked {
         self.painted = None;
         self.screens.open(screen);
         self.open = true;
+        Ok(())
+    }
+    pub(crate) fn open_authored_showroom(&mut self, world: &World) -> Result<(), String> {
+        let id = self
+            .authored
+            .inspection_record()
+            .ok_or("Expected exactly one isolated authored hull")?
+            .id
+            .clone();
+        if self.catalogue.object(&id).is_none() {
+            return Err("Isolated authored hull missing from the Showroom catalogue".into());
+        }
+        self.open(world, ui::Screen::Showroom)?;
+        self.screens.select_initial_showroom_ship(&id);
         Ok(())
     }
     pub(crate) fn review_pending(&self) -> bool {
@@ -256,6 +302,7 @@ impl Docked {
             session: 1,
             revision: self.serial,
         };
+        let models = self.authored.available_models();
         let c = context(
             world,
             &self.catalogue,
@@ -263,6 +310,7 @@ impl Docked {
             self.pending.as_ref().map(|p| &p.view),
             stamp,
             self.screens.selected_system(),
+            &models,
         );
         Ok(self.screens.frame(&c, viewport))
     }
@@ -285,6 +333,7 @@ impl Docked {
             .as_ref()
             .ok_or("Wait for the current screen to draw")?;
         let panel = equipment_panel(&profile.world, &self.slot, &self.feedback)?;
+        let models = self.authored.available_models();
         let c = context(
             &profile.world,
             &self.catalogue,
@@ -295,6 +344,7 @@ impl Docked {
                 revision: self.serial,
             },
             self.screens.selected_system(),
+            &models,
         );
         let outcome = self.screens.handle(input, painted, &c);
         match outcome {
@@ -394,7 +444,11 @@ impl Docked {
                     ],
                 )?;
             }
-            ui::Request::ReviewCommodity { commodity, buy } => {
+            ui::Request::ReviewCommodity {
+                commodity,
+                buy,
+                quantity,
+            } => {
                 let quote = world
                     .commodity_quote(commodity)
                     .ok_or("No current commodity offer")?;
@@ -406,14 +460,34 @@ impl Docked {
                 } else {
                     quote.bid_tenths
                 };
-                let command = if buy {
-                    station_services::Command::BuyCommodity(commodity)
+                let command = station_services::CommodityTrade {
+                    commodity,
+                    quantity,
+                    side: if buy {
+                        station_services::TradeSide::Buy
+                    } else {
+                        station_services::TradeSide::Sell
+                    },
+                };
+                let total = u64::from(price)
+                    .checked_mul(quantity)
+                    .ok_or("Trade total is too large")?;
+                let cash = world.credits_tenths().ok_or("No commander wallet")?;
+                let credited = total.min(u64::from(u32::MAX - cash));
+                let settlement = if buy {
+                    format!("Pay {}.{} CR in total", total / 10, total % 10)
                 } else {
-                    station_services::Command::SellCommodity(commodity)
+                    format!(
+                        "Gross {}.{} CR; actual credit {}.{} CR",
+                        total / 10,
+                        total % 10,
+                        credited / 10,
+                        credited % 10
+                    )
                 };
                 self.review(
                     world,
-                    Intent::Change(Action::StationService(command)),
+                    Intent::Change(Action::CommodityTrade(command)),
                     if buy {
                         "Buy commodity"
                     } else {
@@ -421,13 +495,14 @@ impl Docked {
                     },
                     vec![
                         format!(
-                            "{}: 1 {} | {}.{} CR",
+                            "{}: {quantity} {} | {}.{} CR each",
                             definition.name,
                             definition.unit.symbol(),
                             price / 10,
                             price % 10
                         ),
-                        "Confirm changes cargo and credits together".into(),
+                        settlement,
+                        "Confirm trades all requested units or none".into(),
                     ],
                 )?;
             }
@@ -1524,6 +1599,10 @@ pub fn key(code: winit::keyboard::KeyCode, shift: bool, screen: ui::Screen) -> O
         C::Tab => K::NextTab,
         C::Escape | C::KeyB if !shift => K::Back,
         C::Enter => K::Confirm,
+        C::ArrowLeft if screen == ui::Screen::Trading && shift => K::QuantityLessTen,
+        C::ArrowRight if screen == ui::Screen::Trading && shift => K::QuantityMoreTen,
+        C::ArrowLeft if screen == ui::Screen::Trading => K::QuantityLess,
+        C::ArrowRight if screen == ui::Screen::Trading => K::QuantityMore,
         C::ArrowUp => K::Previous,
         C::ArrowDown => K::Next,
         C::PageUp => K::PagePrevious,
@@ -1576,6 +1655,71 @@ mod tests {
         let mut menu = ok(Docked::new(&profile.world));
         ok(menu.open(&profile.world, ui::Screen::Trading));
         (directory, profile, menu)
+    }
+
+    #[test]
+    fn bulk_market_review_and_atomic_publication_continue_exactly() {
+        let (directory, mut profile, mut menu) = start();
+        let before = ok(profile.world.save_bytes());
+        present(&mut menu, &profile);
+        ok(menu.input(&mut profile, ui::Input::Key(ui::Key::QuantityMoreTen)));
+        present(&mut menu, &profile);
+        ok(menu.input(&mut profile, ui::Input::Key(ui::Key::Buy)));
+        assert_eq!(ok(profile.world.save_bytes()), before);
+        assert!(
+            menu.pending.as_ref().is_some_and(|p| p
+                .view
+                .details
+                .iter()
+                .any(|s| s.contains("11 t")))
+        );
+        present(&mut menu, &profile);
+        ok(menu.input(&mut profile, ui::Input::Key(ui::Key::Confirm)));
+        assert_eq!(
+            profile.world.commodity_quantity(CommodityId::Food),
+            Some(11)
+        );
+        assert_visible_feedback(&mut menu, &profile, "Bought 11 t Food");
+        let saved = ok(profile.world.save_bytes());
+        assert_eq!(
+            ok(std::fs::read(directory.0.join("commander.meridian"))),
+            saved
+        );
+        drop(profile);
+        let mut cold = open(&directory.0);
+        ok(cold.continue_saved());
+        // Continue uses the same cold session review rebind as direct decoding.
+        let decoded = ok(World::from_save_bytes(&saved));
+        assert_eq!(ok(cold.world.save_bytes()), ok(decoded.save_bytes()));
+        assert_eq!(cold.world.commodity_quantity(CommodityId::Food), Some(11));
+        assert_eq!(
+            ok(std::fs::read(directory.0.join("commander.meridian"))),
+            saved
+        );
+    }
+
+    #[test]
+    fn bulk_market_failed_writer_preserves_previous_save_and_all_live_units() {
+        let (directory, mut profile, mut menu) = start();
+        ok(profile.save());
+        let file = directory.0.join("commander.meridian");
+        let backup = directory.0.join("bulk-before-save");
+        let before = ok(profile.world.save_bytes());
+        present(&mut menu, &profile);
+        ok(menu.input(&mut profile, ui::Input::Key(ui::Key::QuantityMoreTen)));
+        present(&mut menu, &profile);
+        ok(menu.input(&mut profile, ui::Input::Key(ui::Key::Buy)));
+        present(&mut menu, &profile);
+        ok(std::fs::rename(&file, &backup));
+        ok(std::fs::create_dir(&file));
+        assert!(
+            menu.input(&mut profile, ui::Input::Key(ui::Key::Confirm))
+                .is_err()
+        );
+        assert_eq!(ok(profile.world.save_bytes()), before);
+        assert_eq!(ok(std::fs::read(&backup)), before);
+        ok(std::fs::remove_dir(&file));
+        ok(std::fs::rename(&backup, &file));
     }
     fn present(menu: &mut Docked, profile: &Profile) {
         let viewport = ui::Viewport::new(1280.0, 720.0).unwrap_or_else(|| panic!("viewport"));

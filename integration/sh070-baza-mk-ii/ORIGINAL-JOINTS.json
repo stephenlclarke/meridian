@@ -1,0 +1,380 @@
+[
+  {
+    "name": "dorsal-canopy-to-central-hull",
+    "pointMetres": [
+      -2.1,
+      3.499,
+      5.5
+    ],
+    "originalFaces": {
+      "detailed": {
+        "dorsal-canopy": {
+          "faceRange": [
+            1224,
+            2184
+          ],
+          "hitCountsAboveBelow": [
+            1,
+            1
+          ]
+        },
+        "central-hull": {
+          "faceRange": [
+            0,
+            384
+          ],
+          "hitCountsAboveBelow": [
+            1,
+            1
+          ]
+        }
+      },
+      "native": {
+        "dorsal-canopy": {
+          "faceRange": [
+            168,
+            176
+          ],
+          "hitCountsAboveBelow": [
+            1,
+            1
+          ]
+        },
+        "central-hull": {
+          "faceRange": [
+            0,
+            64
+          ],
+          "hitCountsAboveBelow": [
+            1,
+            1
+          ]
+        }
+      }
+    }
+  },
+  {
+    "name": "port-wing-to-central-hull",
+    "pointMetres": [
+      -5.72,
+      1.06,
+      -7.712
+    ],
+    "originalFaces": {
+      "detailed": {
+        "port-wing": {
+          "faceRange": [
+            384,
+            396
+          ],
+          "hitCountsAboveBelow": [
+            1,
+            1
+          ]
+        },
+        "central-hull": {
+          "faceRange": [
+            0,
+            384
+          ],
+          "hitCountsAboveBelow": [
+            1,
+            1
+          ]
+        }
+      },
+      "native": {
+        "port-wing": {
+          "faceRange": [
+            64,
+            76
+          ],
+          "hitCountsAboveBelow": [
+            1,
+            1
+          ]
+        },
+        "central-hull": {
+          "faceRange": [
+            0,
+            64
+          ],
+          "hitCountsAboveBelow": [
+            1,
+            1
+          ]
+        }
+      }
+    }
+  },
+  {
+    "name": "port-pylon-to-wing",
+    "pointMetres": [
+      -6.40202844,
+      -2.40100783,
+      -8.74510624
+    ],
+    "originalFaces": {
+      "detailed": {
+        "port-pylon": {
+          "faceRange": [
+            396,
+            408
+          ],
+          "hitCountsAboveBelow": [
+            1,
+            1
+          ]
+        },
+        "port-wing": {
+          "faceRange": [
+            384,
+            396
+          ],
+          "hitCountsAboveBelow": [
+            1,
+            1
+          ]
+        }
+      },
+      "native": {
+        "port-pylon": {
+          "faceRange": [
+            76,
+            88
+          ],
+          "hitCountsAboveBelow": [
+            1,
+            1
+          ]
+        },
+        "port-wing": {
+          "faceRange": [
+            64,
+            76
+          ],
+          "hitCountsAboveBelow": [
+            1,
+            1
+          ]
+        }
+      }
+    }
+  },
+  {
+    "name": "port-pylon-to-engine",
+    "pointMetres": [
+      -8.42208532,
+      -4.20492953,
+      -13.73317032
+    ],
+    "originalFaces": {
+      "detailed": {
+        "port-pylon": {
+          "faceRange": [
+            396,
+            408
+          ],
+          "hitCountsAboveBelow": [
+            1,
+            1
+          ]
+        },
+        "port-engine": {
+          "faceRange": [
+            408,
+            792
+          ],
+          "hitCountsAboveBelow": [
+            1,
+            1
+          ]
+        }
+      },
+      "native": {
+        "port-pylon": {
+          "faceRange": [
+            76,
+            88
+          ],
+          "hitCountsAboveBelow": [
+            1,
+            1
+          ]
+        },
+        "port-engine": {
+          "faceRange": [
+            88,
+            104
+          ],
+          "hitCountsAboveBelow": [
+            1,
+            1
+          ]
+        }
+      }
+    }
+  },
+  {
+    "name": "starboard-wing-to-central-hull",
+    "pointMetres": [
+      5.619999999999999,
+      1.06,
+      -7.712
+    ],
+    "originalFaces": {
+      "detailed": {
+        "starboard-wing": {
+          "faceRange": [
+            804,
+            816
+          ],
+          "hitCountsAboveBelow": [
+            1,
+            1
+          ]
+        },
+        "central-hull": {
+          "faceRange": [
+            0,
+            384
+          ],
+          "hitCountsAboveBelow": [
+            1,
+            1
+          ]
+        }
+      },
+      "native": {
+        "starboard-wing": {
+          "faceRange": [
+            116,
+            128
+          ],
+          "hitCountsAboveBelow": [
+            1,
+            1
+          ]
+        },
+        "central-hull": {
+          "faceRange": [
+            0,
+            64
+          ],
+          "hitCountsAboveBelow": [
+            1,
+            1
+          ]
+        }
+      }
+    }
+  },
+  {
+    "name": "starboard-pylon-to-wing",
+    "pointMetres": [
+      6.00101422,
+      -2.40100783,
+      -8.74510624
+    ],
+    "originalFaces": {
+      "detailed": {
+        "starboard-pylon": {
+          "faceRange": [
+            816,
+            828
+          ],
+          "hitCountsAboveBelow": [
+            1,
+            1
+          ]
+        },
+        "starboard-wing": {
+          "faceRange": [
+            804,
+            816
+          ],
+          "hitCountsAboveBelow": [
+            1,
+            1
+          ]
+        }
+      },
+      "native": {
+        "starboard-pylon": {
+          "faceRange": [
+            128,
+            140
+          ],
+          "hitCountsAboveBelow": [
+            1,
+            1
+          ]
+        },
+        "starboard-wing": {
+          "faceRange": [
+            116,
+            128
+          ],
+          "hitCountsAboveBelow": [
+            1,
+            1
+          ]
+        }
+      }
+    }
+  },
+  {
+    "name": "starboard-pylon-to-engine",
+    "pointMetres": [
+      8.42208532,
+      -4.20492953,
+      -13.73317032
+    ],
+    "originalFaces": {
+      "detailed": {
+        "starboard-pylon": {
+          "faceRange": [
+            816,
+            828
+          ],
+          "hitCountsAboveBelow": [
+            1,
+            1
+          ]
+        },
+        "starboard-engine": {
+          "faceRange": [
+            828,
+            1212
+          ],
+          "hitCountsAboveBelow": [
+            1,
+            1
+          ]
+        }
+      },
+      "native": {
+        "starboard-pylon": {
+          "faceRange": [
+            128,
+            140
+          ],
+          "hitCountsAboveBelow": [
+            1,
+            1
+          ]
+        },
+        "starboard-engine": {
+          "faceRange": [
+            140,
+            156
+          ],
+          "hitCountsAboveBelow": [
+            1,
+            1
+          ]
+        }
+      }
+    }
+  }
+]

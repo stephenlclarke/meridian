@@ -1,0 +1,39 @@
+{
+  "exactParts": 7,
+  "resampledParts": [
+    0,
+    1,
+    6,
+    9,
+    10,
+    12,
+    13
+  ],
+  "closedLoopSolidTopology": {
+    "detailed": 0,
+    "archivedNative": 0,
+    "candidateNative": 0
+  },
+  "closedLoopOriginalToCandidateUpperMm": 1120,
+  "closedLoopCandidateToOriginalUpperMm": 1248,
+  "sampledSilhouetteOffsetMm": {
+    "detailed": {
+      "xy": 529,
+      "xz": 135,
+      "yz": 529
+    },
+    "archivedNative": {
+      "xy": 598,
+      "xz": 135,
+      "yz": 598
+    }
+  },
+  "wholeSurfaceUpperMm": {
+    "archivedNativeToCandidateNative": 1491,
+    "candidateNativeToArchivedNative": 1248,
+    "detailedToCandidateNative": 2634,
+    "candidateNativeToDetailed": 1493,
+    "detailedToArchivedNative": 2492,
+    "archivedNativeToDetailed": 1478
+  }
+}

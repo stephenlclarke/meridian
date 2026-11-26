@@ -1,0 +1,14 @@
+{
+  "schema": 1,
+  "id": "sh099-ox",
+  "undoBefore": [
+    "sh098-anoa",
+    "followup-trade-detail",
+    "followup-bulk-market"
+  ],
+  "undoAfter": [],
+  "kind": "declaration",
+  "module": "ox",
+  "before": "pub mod oryx_voyager;\n",
+  "after": "pub mod peregrine_mk3;\n"
+}

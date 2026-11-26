@@ -1,0 +1,63 @@
+"""Measure SH088 local supports and the derived open arc against pinned references."""
+import argparse
+import json
+import sys
+
+import numpy as np
+import trimesh
+
+from measure_banteng_geometry import adaptive_upper, upper
+from prepare_springbok_starliner import INTEGRATION, RADIUS, RING_SAMPLING, collision_inputs, load_source, require
+from vulture_mk_i_exact_fit import bound_fan, grid_index
+
+
+def load():
+    _, _, _, _, names, raw = collision_inputs()
+    vertices, groups, meshes = [], {name:[] for name in names}, {}
+    for lod,(model,membership) in zip(("detailed","archivedNative","candidateNative"),raw,strict=True):
+        offset = len(vertices)
+        vertices.extend(model["vertices"])
+        meshes[lod] = trimesh.Trimesh(model["vertices"],model["faces"],process=False)
+        for index,slots in enumerate(membership):
+            for slot in slots:
+                groups[names[slot]].append(offset+index)
+    return np.array(vertices), meshes, {name:np.array(ids) for name,ids in groups.items()}
+
+
+def fit(vertices, meshes, groups):
+    fans = json.loads((INTEGRATION/"SUPPORT-FAN.json").read_bytes())
+    targets = {"detailed":2600,"archivedNative":2840,"candidateNative":3000}
+    indices = {name:grid_index(mesh) for name,mesh in meshes.items()}
+    per_group = {}
+    for name,faces in fans.items():
+        i = groups[name]
+        local = np.searchsorted(i,faces)
+        require(np.all(local < len(i)) and np.array_equal(i[local],faces), "Springbok Starliner support face spans groups")
+        bound_fan(vertices[i],local)
+        per_group[name] = {lod:adaptive_upper(index,vertices[faces],targets[lod]) for lod,index in indices.items()}
+    return {"nominalPaddingMetres":RADIUS,"minimumRefinementTargetsMillimetres":targets,
+            "fullUpperMillimetres":{lod:max(record[lod] for record in per_group.values()) for lod in meshes},
+            "pieces":per_group}
+
+
+def profile(meshes):
+    parts = load_source()[-1]
+    rings = {}
+    for (lod,mesh), group, (major, minor) in zip(meshes.items(),parts,RING_SAMPLING,strict=True):
+        count = group[0]["faceCount"]
+        ring = trimesh.Trimesh(mesh.vertices[:major*minor],mesh.faces[:count],process=False)
+        require(ring.is_watertight and ring.is_winding_consistent and ring.volume > 0, "Springbok Starliner arc has invalid outward winding")
+        rings[lod] = ring
+    original, candidate = rings["archivedNative"], rings["candidateNative"]
+    return {"openArcVolumeCubicMetres":{name:round(float(ring.volume),6) for name,ring in rings.items()},
+            "originalToCandidateUpperMillimetres":upper(original,grid_index(candidate)),
+            "candidateToOriginalUpperMillimetres":upper(candidate,grid_index(original))}
+
+
+if __name__ == "__main__":
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("--arc", action="store_true")
+    args = parser.parse_args()
+    vertices, meshes, groups = load()
+    report = profile(meshes) if args.arc else fit(vertices,meshes,groups)
+    sys.stdout.buffer.write((json.dumps(report,indent=2)+"\n").encode())

@@ -1,0 +1,12 @@
+{
+  "schema": 1,
+  "id": "sh075-dzo-mk-ii",
+  "undoBefore": [
+    "sh074-dzo"
+  ],
+  "undoAfter": [],
+  "kind": "declaration",
+  "module": "dzo_mk_ii",
+  "before": "pub mod dzo;\n",
+  "after": "pub mod eagle_cruiser;\n"
+}

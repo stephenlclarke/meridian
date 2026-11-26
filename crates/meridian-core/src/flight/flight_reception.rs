@@ -237,7 +237,13 @@ impl World {
         view: FlightView,
         expected_tick: u64,
     ) -> Result<(), FlightReceptionError> {
-        self.flight_reception_admission(expected_tick)?;
+        if self.medusa_preview_fit.is_some() {
+            if expected_tick != self.state.tick {
+                return Err(FlightReceptionError::StaleReview);
+            }
+        } else {
+            self.flight_reception_admission(expected_tick)?;
+        }
         self.flight_reception.view = view;
         Ok(())
     }

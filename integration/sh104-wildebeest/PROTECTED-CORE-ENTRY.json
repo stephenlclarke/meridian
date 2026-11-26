@@ -1,0 +1,12 @@
+{
+  "schema": 1,
+  "id": "sh104-wildebeest",
+  "undoBefore": [
+    "sh101-cavy-racer"
+  ],
+  "undoAfter": [],
+  "kind": "declaration",
+  "module": "wildebeest",
+  "before": "pub mod vulture_raider;\n",
+  "after": "pub mod wisent;\n"
+}

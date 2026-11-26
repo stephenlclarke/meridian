@@ -1,0 +1,12 @@
+{
+  "schema": 1,
+  "id": "sh088-springbok-starliner",
+  "undoBefore": [
+    "sh087-elk"
+  ],
+  "undoAfter": [],
+  "kind": "declaration",
+  "module": "springbok_starliner",
+  "before": "pub mod sparrowhawk;\n",
+  "after": "pub mod station;\n"
+}

@@ -1,0 +1,12 @@
+{
+  "schema": 1,
+  "id": "sh083-hare-explorer",
+  "undoBefore": [
+    "sh081-jaguar"
+  ],
+  "undoAfter": [],
+  "kind": "declaration",
+  "module": "hare_explorer",
+  "before": "pub mod griffon_spectre;\n",
+  "after": "pub mod harpy_assault;\n"
+}

@@ -28,13 +28,33 @@ The [six paid passenger cabin layouts](PASSENGER-CABINS.md) use actual hold and 
 
 ## Medusa Showroom inspection
 
-The empty stock reference exposes 40,712 kg in the Showroom. The MacBook Air replayed the original 14 finite distributions and passed all six source tests. The live preview and exact-head compiler validation remain pending for this addition. Flight, exchange and PLUGH fabrication remain unavailable.
+The empty stock reference exposes 40,712 kg in the Showroom. The MacBook Air replayed the original 14 finite distributions and passed all six source tests. The `5a924315` Mac desktop test also checked this stock mass and the ordinary Showroom purchase refusal. Final native verification of the ordinary inspection screen remains separate. Ordinary player acquisition, exchange and PLUGH fabrication remain unavailable.
 
-SH171 is available for catalogue inspection with the original detailed artwork and seven materials. The archived native mesh has 76,228 faces and stays outside the 512-face flight gate. The source-bound shield uses 729 local supports and keeps the crown opening clear in its own geometry. See the [Medusa inspection record](../integration/sh171-medusa/README.md) for the measured bounds and the remaining flight, player and PLUGH fabrication work.
+SH171 is available for catalogue inspection with the original detailed artwork and seven materials. The archived native mesh has 76,228 faces and stays outside the 512-face flight gate. The source-bound shield uses 729 local supports and keeps the crown opening clear in its own geometry. The [Medusa inspection record](../integration/sh171-medusa/README.md) describes the measured bounds and the separate isolated flight preview. Ordinary acquisition and PLUGH fabrication remain open.
+
+## Combined Showroom and Hull Studio source candidate
+
+The ordinary station Showroom has 115 selectable stock previews: 109 authenticated schema-1 packages and six original stock models. The final fleet intake adds 78 authored stock packages from SH070 through SH170. The Showroom keeps the linked source identities, engineering readouts and inspection-only exchange rules. The combined source also restores the Studio launcher, including explicit inspection of schema-2 archives. Stock ship and station finishes are display-only; local authored material colours remain exact. Mac build `5a924315` passed 647 core unit tests, 382 desktop unit tests and 13 core integration tests; 20 desktop tests were ignored. The desktop tests checked all 31 schema-package previews on that 37-preview build. The MacBook Air's exact final 50-hull source packet at `e10ab45b` passed 259 Python tests and 107 focused Rust tests with 210 matching replay receipts. Final compiler checks and native presentation acceptance of the 115-preview registry remain separate.
+
+The separate [Medusa player preview](../integration/sh171-medusa-preview/README.md) connects the active World hull identity to the original detailed flight rendering. The renderer retains the Peregrine model for ordinary players and existing traffic. It does not use the archived 729-piece inspection shield or reduced contact hull as flight artwork. On the signed Mac build `5a924315` (tree `61214e3e28f6b2830cfd5c71d52482e049f29ef3`), the Orchestrator saw the original Medusa in flight at 50.30/50.30. The isolated pilot fitted the cargo expansion, launched, saved and cold-restarted. The new process restored FLIGHT, 50.30 and the expanded 32 t hold. The 69-byte save remained byte-identical through both process exits and the ordinary decoder refused it. Core tests at that source passed the actual launch/return, rear-side save and fit-limit cases; native docking return and fit-limit refusal were not observed in that run. This evidence is not publication or full final-build acceptance.
+
+### Outstanding fleet inspection scope
+
+Cheetah (SH082) remains outside the rendered stock registry because its candidate loses four required contacts. The final intake also excludes the following 22 entries in SH099–SH170:
+
+- SH102 Dhole Haven, SH103 Redtail Mk III, SH108 Besra, SH161 Wolf Citadel, SH162 Larvaal Probe and SH164 Toad Drug Factory: original source is outstanding in the queue.
+- SH112 Larvaal Warden, SH113 Larvaal Ravager, SH114 Larvaal Sentinel, SH115 Larvaal Lancer, SH116 Larvaal Broodlord, SH117 Larvaal Provoker, SH118 Larvaal Reaver, SH119 Larvaal Wraith, SH120 Larvaal Seeker, SH121 Larvaal Mender, SH122 Larvaal Harvester, SH123 Larvaal Sovereign, SH124 Larvaal Warship and SH125 Larvaal Drone: original finite-dry record is outstanding. SH123 also has unresolved engineering.
+- SH141 Salamander Station and SH156 Lion Bastion: no authored inspection packet is in the queued refs.
+
+These are outstanding content requirements, not an admission or acquisition decision. No placeholder artwork is registered for them.
 
 ## Station chart best-profit scan source candidate
 
 The station Galaxy chart now offers a read-only P toggle for up to five positive, directly reachable trade estimates, with an explicit empty state. The scan uses current in-game stocks and quotes, unreserved cargo, wallet, fitted jump range and fuel. It adapts `Sources/EliteCore/ProfitScan.swift` from immutable Elite source `34790e313c0d6cf8be84fe74aaf8f2f228cd3b3f` to the admitted Meridian markets; unsupported markets and speculative multi-leg refuelling do not count. The toggle is session-local and local flight P remains pause. Authored core and desktop regressions cover finite trade bounds, reserved cargo, range/fuel exclusions, stable ranking, read-only saves and the chart input path. Compiler, CI and native qualification are pending.
+
+The [trade-detail source candidate](../integration/followup-trade-detail/README.md) extends the existing live quote estimates with sale values for unreserved cargo, finite export quantities and unit ask/bid prices. In a route review, D opens per-leg allocations and estimated value. D, B or Enter closes details without installing the route. The underlying estimate and transaction authority are unchanged. The protected-source check passed; focused compiler and native interface checks await execution on the combined candidate.
+
+The [atomic market quantity source candidate](../integration/followup-bulk-market/README.md) adds Market quantity controls in native units, with a review of unit price and total. Every requested unit stages the existing ordinary market receipt and account checks; all settle in a single prospective save or none do. The existing save format, finite markets, paid cabin mass and reserved cargo rules remain. Direct source and protected-source checks passed; focused platform and native Market tests await execution on the combined candidate.
 
 ## Generated desktop audio source candidate
 
@@ -175,6 +195,142 @@ Vulture Raider preserves the original 4,120-face detailed and 368-face native me
 ## Rabbit Explorer catalogue source
 
 Rabbit Explorer retains its original 2,648-face detailed and 888-face native artwork. The frozen creator recipe generated a separate 480-face inspection candidate. Signed Studio exports include four exterior probes. Independent source checks verify seven guarded routes, including the open bow. [Rabbit Explorer source and evidence](RABBIT-EXPLORER-SOURCE.md)
+
+## Rhinoceros Trader catalogue source
+
+Rhinoceros Trader preserves the original 700-face detailed and 388-face native meshes and their exact calibration. Signed Studio exports and independent checks cover seven inspection paths. [Rhinoceros Trader source and evidence](RHINOCEROS-TRADER-SOURCE.md)
+
+## Badger catalogue source
+
+Badger preserves the original 5,912-face detailed and 284-face native meshes in metres. Seven source checks verify guarded routes outside the collars. Both original meshes confirm that the forward pods occupy the collar centres. [Badger source and evidence](BADGER-SOURCE.md)
+
+## Baza Fighter catalogue source
+
+Baza Fighter preserves the original 2,340-face detailed and 152-face native meshes in metres. Signed Studio and independent source evidence cover seven guarded inspection routes. [Baza Fighter source and evidence](BAZA-FIGHTER-SOURCE.md)
+
+## Baza Mk II catalogue source
+
+Baza Mk II preserves the original 2,364-face detailed and 176-face native meshes in metres. Signed Studio and independent source evidence cover seven guarded inspection routes. [Baza Mk II source and evidence](BAZA-MK-II-SOURCE.md)
+
+## Griffon catalogue source
+
+Griffon retains both original visible meshes, with 1,644 detailed and 596 native faces. The separately archived 512-face collision artifact preserves seven guarded inspection routes. [Griffon source and evidence](GRIFFON-SOURCE.md)
+
+## Griffon Mk II catalogue source
+
+Griffon Mk II retains both original visible meshes, with 1,644 detailed and 596 native faces. The separate 380-face generated inspection candidate preserves seven guarded routes. [Griffon Mk II source and evidence](GRIFFON-MK-II-SOURCE.md)
+
+## Griffon Spectre catalogue source
+
+Griffon Spectre retains both original visible meshes, with 1,644 detailed and 596 native faces. Its separate 380-face generated inspection geometry preserves seven guarded routes. [Griffon Spectre source and evidence](GRIFFON-SPECTRE-SOURCE.md)
+
+## Dzo catalogue source
+
+Dzo preserves the original 9,228-face detailed and 416-face native meshes. Eight overlapping spans per collar tighten the inspection envelope and preserve seven guarded routes. [Dzo source and evidence](DZO-SOURCE.md)
+
+## Dzo Mk II catalogue source
+
+Dzo Mk II preserves the original 9,612-face detailed and 448-face native meshes. Eight overlapping spans per collar tighten the inspection envelope and preserve seven guarded routes. [Dzo Mk II source and evidence](DZO-MK-II-SOURCE.md)
+
+## Hog catalogue source
+
+Hog preserves the original 868-face detailed and 448-face native meshes with their original calibration. Exact source evidence verifies seven guarded routes across the stacked hull. [Hog source and evidence](HOG-SOURCE.md)
+
+## Tamaraw catalogue source
+
+Tamaraw preserves the original 3,864-face detailed and 212-face native artwork. Source checks verify seven guarded routes, eight shared overlaps and two flush rails present in the detailed mesh. [Tamaraw source and evidence](TAMARAW-SOURCE.md)
+
+## Oryx Voyager catalogue source
+
+Oryx Voyager preserves its original 4,620-face detailed and 200-face native meshes. Eight overlapping ring supports preserve two inner passages and all five exterior routes. [Oryx Voyager source and evidence](ORYX-VOYAGER-SOURCE.md)
+
+## Carabao Freighter catalogue source
+
+Carabao Freighter preserves the original 2,448-face detailed and 204-face native artwork. Six guarded lateral routes cross the gaps between cargo bays. [Carabao Freighter source and evidence](CARABAO-FREIGHTER-SOURCE.md)
+
+## Carabao Highliner catalogue source
+
+Carabao Highliner preserves its original 2,856-face detailed and 236-face native artwork. Both original meshes include the passenger spine and preserve seven guarded inspection routes. [Carabao Highliner source and evidence](CARABAO-HIGHLINER-SOURCE.md)
+
+## Jaguar catalogue source
+
+Jaguar preserves its original 5,820-face detailed and 432-face native artwork. Both original records keep Jaguar unavailable for player flight and purchase. Four nozzle contacts and 14 overlap witnesses reproduce in both meshes. [Jaguar source and evidence](JAGUAR-SOURCE.md)
+
+## Hare Explorer catalogue source
+
+Hare Explorer preserves its original 3,108-face detailed and 184-face native artwork. Both meshes retain the canopy and wing-mount overlaps. The detailed nozzles seat flush on the hull, and the original native mesh keeps those parts apart. [Hare Explorer source and evidence](HARE-EXPLORER-SOURCE.md)
+
+## Llama catalogue source
+
+Llama preserves its original 3,096-face detailed and 172-face native artwork. Both meshes preserve the nozzle and deck-rail contacts, plus the canopy and crossbeam overlaps with the cabin. [Llama source and evidence](LLAMA-SOURCE.md)
+
+## Laggar catalogue source
+
+Laggar preserves 3,108 detailed and 184 native original faces. Both meshes retain seven structural overlaps, including the canopy and outrigger assemblies, and preserve the original fin clearances. [Laggar source and evidence](LAGGAR-SOURCE.md)
+
+## Alpaca catalogue source
+
+Alpaca preserves 2,724 detailed and 908 native original faces. A separate, source-derived 508-face inspection candidate preserves the closed shield and ten measured original joins. [Alpaca source and evidence](ALPACA-SOURCE.md)
+
+## Elk catalogue source
+
+Elk preserves its original 1,584 detailed and 536 native faces. A separate 464-face inspection candidate retains all 14 parts and all nine measured original joins. [Elk source and evidence](ELK-SOURCE.md)
+
+## Springbok Starliner catalogue source
+
+Springbok Starliner preserves 2,672 detailed and 912 native original faces. A separate 504-face inspection candidate retains both caps, the open bow gap, and 12 measured original overlaps. [Springbok Starliner source and evidence](SPRINGBOK-STARLINER-SOURCE.md)
+
+## Antelope catalogue source
+
+Antelope preserves 2,672 detailed and 912 native original faces. A separate 504-face inspection candidate retains both caps, the open bow gap, and 14 measured original overlaps. [Antelope source and evidence](ANTELOPE-SOURCE.md)
+
+## Gopher catalogue source
+
+Gopher preserves its original 4,696 detailed and 212 native faces. Both meshes retain the roll frame, the bore assembly and nine measured joints. Four inspection routes pass through the frame openings. [Gopher source and evidence](GOPHER-SOURCE.md)
+
+## Elephant catalogue source
+
+Elephant preserves its original 4,368 detailed and 1,112 native faces. Its separate 512-face inspection candidate retains the shield shoulders, 19 exact original parts and all 22 measured original joins. [Elephant source and evidence](ELEPHANT-SOURCE.md)
+
+## Aurochs catalogue source
+
+Aurochs preserves its original 2,504 detailed and 720 native faces. Its separate 444-face inspection candidate preserves the staggered cargo capsules, 11 exact original parts and all 12 measured original overlaps. [Aurochs source and evidence](AUROCHS-SOURCE.md)
+
+## Giraffe Liner catalogue source
+
+Giraffe Liner preserves 3,492 detailed and 216 native faces, including both elevated galleries. Its evidence records the pressure-hull contacts in the detailed mesh and the gallery-strut separations in the native mesh. [Giraffe Liner source and evidence](GIRAFFE-LINER-SOURCE.md)
+
+## Shikra catalogue source
+
+Shikra preserves the original 5,396 detailed and 1,404 native faces. Its separate 512-face inspection candidate retains all 41 native parts and all 18 measured native overlaps, with clear routes between the diagonal spars. [Shikra source and evidence](SHIKRA-SOURCE.md)
+
+## Shikra Interdictor catalogue source
+
+Shikra Interdictor preserves its original 5,396 detailed and 1,404 native faces. A separate 512-face candidate retains all 41 native parts and 18 measured original overlaps. The seven clearance guards include a 359 mm lower bound in each diagonal-spar opening. [Shikra Interdictor source and evidence](SHIKRA-INTERDICTOR-SOURCE.md)
+
+## Wisent catalogue source
+
+Wisent preserves the original 2,600 detailed and 816 native faces. Its historical 488-face candidate retains 26 native parts and all 35 measured original overlaps. The seven guarded routes include the dock aperture and central freight-bay lane. [Wisent source and evidence](WISENT-SOURCE.md)
+
+## Wisent Mk II catalogue source
+
+Wisent Mk II preserves the original 2,600 detailed and 816 native faces. Its independent 488-face historical candidate retains 26 native parts and all 35 measured native overlaps. The dock aperture retains a 1,469 mm guarded lower bound. [Wisent Mk II source and evidence](WISENT-MK-II-SOURCE.md)
+
+## Anoa catalogue source
+
+Anoa preserves its original 6,720 detailed and 1,928 native faces. Its separate 512-face candidate retains all 34 native parts, the two closed collars, and all 40 measured native overlaps. [Anoa source and evidence](ANOA-SOURCE.md)
+
+## Ox catalogue source
+
+Ox preserves its original 688 detailed and 376 native faces. Both originals retain all 13 measured overlap pairs. Seven swept guards include the longitudinal service gap between the two freight decks. [Ox source and evidence](OX-SOURCE.md)
+
+## Ox Mk II catalogue source
+
+Ox Mk II preserves its own 688 detailed and 376 native faces. Both originals retain the same 13 measured overlap pairs. The seven guarded routes include the service gap between the original freight decks. [Ox Mk II source and evidence](OX-MK-II-SOURCE.md)
+
+## Cavy Racer catalogue source
+
+Cavy Racer preserves both original meshes at 3,084 detailed and 160 native faces. Both contain the same eight measured structural overlap pairs. Seven swept guards include the gap between the aft nozzles. [Cavy Racer source and evidence](CAVY-RACER-SOURCE.md)
 
 ## Goshawk Mk II Custom candidate
 

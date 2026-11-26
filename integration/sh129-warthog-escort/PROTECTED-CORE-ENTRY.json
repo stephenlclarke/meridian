@@ -1,0 +1,12 @@
+{
+  "schema": 1,
+  "id": "sh129-warthog-escort",
+  "undoBefore": [
+    "sh128-boar-transport"
+  ],
+  "undoAfter": [],
+  "kind": "declaration",
+  "module": "warthog_escort",
+  "before": "pub mod vulture_raider;\n",
+  "after": "pub mod wildebeest;\n"
+}

@@ -1,0 +1,174 @@
+{
+  "clearanceMillimetres": {
+    "left-bow-channel": 1706,
+    "left-underslab-channel": 528,
+    "left-inboard-dorsal-channel": 599,
+    "right-bow-channel": 1706,
+    "right-underslab-channel": 528,
+    "right-inboard-dorsal-channel": 599
+  },
+  "alignedMillimetres": 45278,
+  "offsetStartMillimetres": 979,
+  "sourceLipWitness": {
+    "fraction": 0.5,
+    "pointMetres": [
+      69.4,
+      0.0,
+      136.32
+    ],
+    "barycentrics": [
+      0.35999999999999716,
+      0.14000000000000284,
+      0.5
+    ]
+  },
+  "sourceSolidContactsMetres": [
+    [
+      1.28,
+      0.0,
+      -12.5
+    ],
+    [
+      -2.0,
+      -1.6,
+      -8.0
+    ],
+    [
+      2.0,
+      -1.6,
+      -8.0
+    ]
+  ],
+  "originalJoints": [
+    {
+      "name": "fuselage-to-glazing",
+      "pointMetres": [
+        0.07,
+        1.08,
+        4.87
+      ],
+      "sourceFaceHitCountsAboveBelow": [
+        [
+          1,
+          1
+        ],
+        [
+          1,
+          1
+        ],
+        [
+          1,
+          1
+        ],
+        [
+          1,
+          1
+        ]
+      ]
+    },
+    {
+      "name": "left-slab-to-fuselage",
+      "pointMetres": [
+        -2.38,
+        -0.45,
+        -4.2
+      ],
+      "sourceFaceHitCountsAboveBelow": [
+        [
+          1,
+          1
+        ],
+        [
+          1,
+          1
+        ],
+        [
+          1,
+          1
+        ],
+        [
+          1,
+          1
+        ]
+      ]
+    },
+    {
+      "name": "right-slab-to-fuselage",
+      "pointMetres": [
+        2.38,
+        -0.45,
+        -4.2
+      ],
+      "sourceFaceHitCountsAboveBelow": [
+        [
+          1,
+          1
+        ],
+        [
+          1,
+          1
+        ],
+        [
+          1,
+          1
+        ],
+        [
+          1,
+          1
+        ]
+      ]
+    },
+    {
+      "name": "left-slab-to-boom",
+      "pointMetres": [
+        -10.03,
+        -0.77,
+        0.13
+      ],
+      "sourceFaceHitCountsAboveBelow": [
+        [
+          1,
+          1
+        ],
+        [
+          1,
+          1
+        ],
+        [
+          1,
+          1
+        ],
+        [
+          1,
+          1
+        ]
+      ]
+    },
+    {
+      "name": "right-slab-to-boom",
+      "pointMetres": [
+        10.03,
+        -0.77,
+        0.13
+      ],
+      "sourceFaceHitCountsAboveBelow": [
+        [
+          1,
+          1
+        ],
+        [
+          1,
+          1
+        ],
+        [
+          1,
+          1
+        ],
+        [
+          1,
+          1
+        ]
+      ]
+    }
+  ]
+}

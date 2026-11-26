@@ -1,0 +1,905 @@
+{
+  "nominalPaddingMetres": 0.02,
+  "minimumRefinementTargetsMillimetres": {
+    "detailed": 2800,
+    "archivedNative": 3800,
+    "candidateNative": 4400
+  },
+  "fullUpperMillimetres": {
+    "detailed": 2788,
+    "archivedNative": 3614,
+    "candidateNative": 2646
+  },
+  "pieces": {
+    "arched connected boom 1 span 1": {
+      "detailed": 2040,
+      "archivedNative": 1998,
+      "candidateNative": 1611
+    },
+    "arched connected boom 1 span 2": {
+      "detailed": 2788,
+      "archivedNative": 2818,
+      "candidateNative": 1152
+    },
+    "arched connected boom 1 span 3": {
+      "detailed": 2206,
+      "archivedNative": 3614,
+      "candidateNative": 1907
+    },
+    "arched connected boom 1 span 4": {
+      "detailed": 2206,
+      "archivedNative": 3614,
+      "candidateNative": 1907
+    },
+    "arched connected boom 1 span 5": {
+      "detailed": 2788,
+      "archivedNative": 2818,
+      "candidateNative": 1152
+    },
+    "arched connected boom 1 span 6": {
+      "detailed": 2040,
+      "archivedNative": 1998,
+      "candidateNative": 1611
+    },
+    "arched connected boom 2 span 1": {
+      "detailed": 2040,
+      "archivedNative": 1998,
+      "candidateNative": 1626
+    },
+    "arched connected boom 2 span 2": {
+      "detailed": 2788,
+      "archivedNative": 2818,
+      "candidateNative": 1152
+    },
+    "arched connected boom 2 span 3": {
+      "detailed": 2206,
+      "archivedNative": 3614,
+      "candidateNative": 1907
+    },
+    "arched connected boom 2 span 4": {
+      "detailed": 2206,
+      "archivedNative": 3614,
+      "candidateNative": 1907
+    },
+    "arched connected boom 2 span 5": {
+      "detailed": 2788,
+      "archivedNative": 2818,
+      "candidateNative": 1152
+    },
+    "arched connected boom 2 span 6": {
+      "detailed": 2040,
+      "archivedNative": 1998,
+      "candidateNative": 1611
+    },
+    "pods explicit member 0": {
+      "detailed": 836,
+      "archivedNative": 782,
+      "candidateNative": 2646
+    },
+    "pods explicit member 0/service-well-0-0": {
+      "detailed": 2290,
+      "archivedNative": 2290,
+      "candidateNative": 2290
+    },
+    "pods explicit member 0/service-well-0-0/recess-service-strut-0": {
+      "detailed": 148,
+      "archivedNative": 398,
+      "candidateNative": 441
+    },
+    "pods explicit member 0/service-well-0-0/recess-service-strut-1": {
+      "detailed": 148,
+      "archivedNative": 401,
+      "candidateNative": 584
+    },
+    "pods explicit member 0/service-well-0-0/recess-service-strut-2": {
+      "detailed": 148,
+      "archivedNative": 404,
+      "candidateNative": 467
+    },
+    "pods explicit member 0/service-well-0-1": {
+      "detailed": 1952,
+      "archivedNative": 772,
+      "candidateNative": 816
+    },
+    "pods explicit member 0/service-well-0-1/recess-service-strut-0": {
+      "detailed": 148,
+      "archivedNative": 572,
+      "candidateNative": 573
+    },
+    "pods explicit member 0/service-well-0-1/recess-service-strut-1": {
+      "detailed": 148,
+      "archivedNative": 597,
+      "candidateNative": 577
+    },
+    "pods explicit member 0/service-well-0-1/recess-service-strut-2": {
+      "detailed": 148,
+      "archivedNative": 466,
+      "candidateNative": 586
+    },
+    "pods explicit member 0/service-well-0-2": {
+      "detailed": 1952,
+      "archivedNative": 579,
+      "candidateNative": 846
+    },
+    "pods explicit member 0/service-well-0-2/recess-service-strut-0": {
+      "detailed": 148,
+      "archivedNative": 395,
+      "candidateNative": 569
+    },
+    "pods explicit member 0/service-well-0-2/recess-service-strut-1": {
+      "detailed": 148,
+      "archivedNative": 398,
+      "candidateNative": 573
+    },
+    "pods explicit member 0/service-well-0-2/recess-service-strut-2": {
+      "detailed": 148,
+      "archivedNative": 402,
+      "candidateNative": 576
+    },
+    "pods explicit member 0/service-well-1-0": {
+      "detailed": 2290,
+      "archivedNative": 2290,
+      "candidateNative": 2290
+    },
+    "pods explicit member 0/service-well-1-0/recess-service-strut-0": {
+      "detailed": 148,
+      "archivedNative": 403,
+      "candidateNative": 583
+    },
+    "pods explicit member 0/service-well-1-0/recess-service-strut-1": {
+      "detailed": 140,
+      "archivedNative": 401,
+      "candidateNative": 583
+    },
+    "pods explicit member 0/service-well-1-0/recess-service-strut-2": {
+      "detailed": 148,
+      "archivedNative": 404,
+      "candidateNative": 587
+    },
+    "pods explicit member 0/service-well-1-1": {
+      "detailed": 1952,
+      "archivedNative": 937,
+      "candidateNative": 815
+    },
+    "pods explicit member 0/service-well-1-1/recess-service-strut-0": {
+      "detailed": 148,
+      "archivedNative": 439,
+      "candidateNative": 573
+    },
+    "pods explicit member 0/service-well-1-1/recess-service-strut-1": {
+      "detailed": 148,
+      "archivedNative": 454,
+      "candidateNative": 577
+    },
+    "pods explicit member 0/service-well-1-1/recess-service-strut-2": {
+      "detailed": 148,
+      "archivedNative": 470,
+      "candidateNative": 585
+    },
+    "pods explicit member 0/service-well-1-2": {
+      "detailed": 1952,
+      "archivedNative": 987,
+      "candidateNative": 844
+    },
+    "pods explicit member 0/service-well-1-2/recess-service-strut-0": {
+      "detailed": 140,
+      "archivedNative": 413,
+      "candidateNative": 569
+    },
+    "pods explicit member 0/service-well-1-2/recess-service-strut-1": {
+      "detailed": 140,
+      "archivedNative": 402,
+      "candidateNative": 573
+    },
+    "pods explicit member 0/service-well-1-2/recess-service-strut-2": {
+      "detailed": 140,
+      "archivedNative": 402,
+      "candidateNative": 576
+    },
+    "pods explicit member 0/service-well-2-0": {
+      "detailed": 2290,
+      "archivedNative": 2290,
+      "candidateNative": 2290
+    },
+    "pods explicit member 0/service-well-2-0/recess-service-strut-0": {
+      "detailed": 148,
+      "archivedNative": 404,
+      "candidateNative": 745
+    },
+    "pods explicit member 0/service-well-2-0/recess-service-strut-1": {
+      "detailed": 148,
+      "archivedNative": 402,
+      "candidateNative": 618
+    },
+    "pods explicit member 0/service-well-2-0/recess-service-strut-2": {
+      "detailed": 148,
+      "archivedNative": 404,
+      "candidateNative": 608
+    },
+    "pods explicit member 0/service-well-2-1": {
+      "detailed": 1952,
+      "archivedNative": 774,
+      "candidateNative": 774
+    },
+    "pods explicit member 0/service-well-2-1/recess-service-strut-0": {
+      "detailed": 148,
+      "archivedNative": 568,
+      "candidateNative": 568
+    },
+    "pods explicit member 0/service-well-2-1/recess-service-strut-1": {
+      "detailed": 148,
+      "archivedNative": 593,
+      "candidateNative": 593
+    },
+    "pods explicit member 0/service-well-2-1/recess-service-strut-2": {
+      "detailed": 148,
+      "archivedNative": 465,
+      "candidateNative": 619
+    },
+    "pods explicit member 0/service-well-2-2": {
+      "detailed": 1952,
+      "archivedNative": 580,
+      "candidateNative": 733
+    },
+    "pods explicit member 0/service-well-2-2/recess-service-strut-0": {
+      "detailed": 148,
+      "archivedNative": 395,
+      "candidateNative": 544
+    },
+    "pods explicit member 0/service-well-2-2/recess-service-strut-1": {
+      "detailed": 148,
+      "archivedNative": 399,
+      "candidateNative": 555
+    },
+    "pods explicit member 0/service-well-2-2/recess-service-strut-2": {
+      "detailed": 148,
+      "archivedNative": 402,
+      "candidateNative": 566
+    },
+    "pods explicit member 0/service-well-3-0": {
+      "detailed": 2290,
+      "archivedNative": 2290,
+      "candidateNative": 2290
+    },
+    "pods explicit member 0/service-well-3-0/recess-service-strut-0": {
+      "detailed": 140,
+      "archivedNative": 403,
+      "candidateNative": 584
+    },
+    "pods explicit member 0/service-well-3-0/recess-service-strut-1": {
+      "detailed": 140,
+      "archivedNative": 401,
+      "candidateNative": 576
+    },
+    "pods explicit member 0/service-well-3-0/recess-service-strut-2": {
+      "detailed": 140,
+      "archivedNative": 403,
+      "candidateNative": 454
+    },
+    "pods explicit member 0/service-well-3-1": {
+      "detailed": 1952,
+      "archivedNative": 830,
+      "candidateNative": 830
+    },
+    "pods explicit member 0/service-well-3-1/recess-service-strut-0": {
+      "detailed": 140,
+      "archivedNative": 440,
+      "candidateNative": 485
+    },
+    "pods explicit member 0/service-well-3-1/recess-service-strut-1": {
+      "detailed": 140,
+      "archivedNative": 455,
+      "candidateNative": 482
+    },
+    "pods explicit member 0/service-well-3-1/recess-service-strut-2": {
+      "detailed": 140,
+      "archivedNative": 548,
+      "candidateNative": 548
+    },
+    "pods explicit member 0/service-well-3-2": {
+      "detailed": 1952,
+      "archivedNative": 871,
+      "candidateNative": 871
+    },
+    "pods explicit member 0/service-well-3-2/recess-service-strut-0": {
+      "detailed": 140,
+      "archivedNative": 412,
+      "candidateNative": 412
+    },
+    "pods explicit member 0/service-well-3-2/recess-service-strut-1": {
+      "detailed": 140,
+      "archivedNative": 401,
+      "candidateNative": 401
+    },
+    "pods explicit member 0/service-well-3-2/recess-service-strut-2": {
+      "detailed": 148,
+      "archivedNative": 401,
+      "candidateNative": 401
+    },
+    "pods explicit member 0/longitudinal-service-strut-0": {
+      "detailed": 166,
+      "archivedNative": 384,
+      "candidateNative": 532
+    },
+    "pods explicit member 0/longitudinal-service-strut-1": {
+      "detailed": 166,
+      "archivedNative": 385,
+      "candidateNative": 532
+    },
+    "pods explicit member 1": {
+      "detailed": 836,
+      "archivedNative": 782,
+      "candidateNative": 2105
+    },
+    "pods explicit member 1/service-well-0-0": {
+      "detailed": 2290,
+      "archivedNative": 2290,
+      "candidateNative": 2290
+    },
+    "pods explicit member 1/service-well-0-0/recess-service-strut-0": {
+      "detailed": 148,
+      "archivedNative": 403,
+      "candidateNative": 535
+    },
+    "pods explicit member 1/service-well-0-0/recess-service-strut-1": {
+      "detailed": 148,
+      "archivedNative": 401,
+      "candidateNative": 528
+    },
+    "pods explicit member 1/service-well-0-0/recess-service-strut-2": {
+      "detailed": 148,
+      "archivedNative": 404,
+      "candidateNative": 525
+    },
+    "pods explicit member 1/service-well-0-1": {
+      "detailed": 1952,
+      "archivedNative": 772,
+      "candidateNative": 772
+    },
+    "pods explicit member 1/service-well-0-1/recess-service-strut-0": {
+      "detailed": 148,
+      "archivedNative": 572,
+      "candidateNative": 572
+    },
+    "pods explicit member 1/service-well-0-1/recess-service-strut-1": {
+      "detailed": 148,
+      "archivedNative": 591,
+      "candidateNative": 591
+    },
+    "pods explicit member 1/service-well-0-1/recess-service-strut-2": {
+      "detailed": 148,
+      "archivedNative": 466,
+      "candidateNative": 623
+    },
+    "pods explicit member 1/service-well-0-2": {
+      "detailed": 1952,
+      "archivedNative": 579,
+      "candidateNative": 734
+    },
+    "pods explicit member 1/service-well-0-2/recess-service-strut-0": {
+      "detailed": 148,
+      "archivedNative": 395,
+      "candidateNative": 544
+    },
+    "pods explicit member 1/service-well-0-2/recess-service-strut-1": {
+      "detailed": 148,
+      "archivedNative": 398,
+      "candidateNative": 555
+    },
+    "pods explicit member 1/service-well-0-2/recess-service-strut-2": {
+      "detailed": 148,
+      "archivedNative": 402,
+      "candidateNative": 566
+    },
+    "pods explicit member 1/service-well-1-0": {
+      "detailed": 2290,
+      "archivedNative": 2290,
+      "candidateNative": 2449
+    },
+    "pods explicit member 1/service-well-1-0/recess-service-strut-0": {
+      "detailed": 140,
+      "archivedNative": 517,
+      "candidateNative": 517
+    },
+    "pods explicit member 1/service-well-1-0/recess-service-strut-1": {
+      "detailed": 140,
+      "archivedNative": 401,
+      "candidateNative": 528
+    },
+    "pods explicit member 1/service-well-1-0/recess-service-strut-2": {
+      "detailed": 140,
+      "archivedNative": 404,
+      "candidateNative": 525
+    },
+    "pods explicit member 1/service-well-1-1": {
+      "detailed": 1952,
+      "archivedNative": 937,
+      "candidateNative": 771
+    },
+    "pods explicit member 1/service-well-1-1/recess-service-strut-0": {
+      "detailed": 148,
+      "archivedNative": 439,
+      "candidateNative": 564
+    },
+    "pods explicit member 1/service-well-1-1/recess-service-strut-1": {
+      "detailed": 148,
+      "archivedNative": 454,
+      "candidateNative": 589
+    },
+    "pods explicit member 1/service-well-1-1/recess-service-strut-2": {
+      "detailed": 148,
+      "archivedNative": 470,
+      "candidateNative": 621
+    },
+    "pods explicit member 1/service-well-1-2": {
+      "detailed": 1952,
+      "archivedNative": 987,
+      "candidateNative": 734
+    },
+    "pods explicit member 1/service-well-1-2/recess-service-strut-0": {
+      "detailed": 140,
+      "archivedNative": 413,
+      "candidateNative": 544
+    },
+    "pods explicit member 1/service-well-1-2/recess-service-strut-1": {
+      "detailed": 140,
+      "archivedNative": 402,
+      "candidateNative": 555
+    },
+    "pods explicit member 1/service-well-1-2/recess-service-strut-2": {
+      "detailed": 140,
+      "archivedNative": 402,
+      "candidateNative": 566
+    },
+    "pods explicit member 1/service-well-2-0": {
+      "detailed": 2290,
+      "archivedNative": 2290,
+      "candidateNative": 2290
+    },
+    "pods explicit member 1/service-well-2-0/recess-service-strut-0": {
+      "detailed": 148,
+      "archivedNative": 404,
+      "candidateNative": 535
+    },
+    "pods explicit member 1/service-well-2-0/recess-service-strut-1": {
+      "detailed": 148,
+      "archivedNative": 402,
+      "candidateNative": 528
+    },
+    "pods explicit member 1/service-well-2-0/recess-service-strut-2": {
+      "detailed": 148,
+      "archivedNative": 404,
+      "candidateNative": 524
+    },
+    "pods explicit member 1/service-well-2-1": {
+      "detailed": 1952,
+      "archivedNative": 774,
+      "candidateNative": 774
+    },
+    "pods explicit member 1/service-well-2-1/recess-service-strut-0": {
+      "detailed": 148,
+      "archivedNative": 568,
+      "candidateNative": 568
+    },
+    "pods explicit member 1/service-well-2-1/recess-service-strut-1": {
+      "detailed": 148,
+      "archivedNative": 593,
+      "candidateNative": 593
+    },
+    "pods explicit member 1/service-well-2-1/recess-service-strut-2": {
+      "detailed": 148,
+      "archivedNative": 465,
+      "candidateNative": 619
+    },
+    "pods explicit member 1/service-well-2-2": {
+      "detailed": 1952,
+      "archivedNative": 580,
+      "candidateNative": 733
+    },
+    "pods explicit member 1/service-well-2-2/recess-service-strut-0": {
+      "detailed": 148,
+      "archivedNative": 395,
+      "candidateNative": 544
+    },
+    "pods explicit member 1/service-well-2-2/recess-service-strut-1": {
+      "detailed": 148,
+      "archivedNative": 399,
+      "candidateNative": 555
+    },
+    "pods explicit member 1/service-well-2-2/recess-service-strut-2": {
+      "detailed": 148,
+      "archivedNative": 402,
+      "candidateNative": 566
+    },
+    "pods explicit member 1/service-well-3-0": {
+      "detailed": 1952,
+      "archivedNative": 2290,
+      "candidateNative": 2290
+    },
+    "pods explicit member 1/service-well-3-0/recess-service-strut-0": {
+      "detailed": 148,
+      "archivedNative": 403,
+      "candidateNative": 536
+    },
+    "pods explicit member 1/service-well-3-0/recess-service-strut-1": {
+      "detailed": 148,
+      "archivedNative": 401,
+      "candidateNative": 535
+    },
+    "pods explicit member 1/service-well-3-0/recess-service-strut-2": {
+      "detailed": 148,
+      "archivedNative": 403,
+      "candidateNative": 537
+    },
+    "pods explicit member 1/service-well-3-1": {
+      "detailed": 1952,
+      "archivedNative": 935,
+      "candidateNative": 998
+    },
+    "pods explicit member 1/service-well-3-1/recess-service-strut-0": {
+      "detailed": 140,
+      "archivedNative": 440,
+      "candidateNative": 530
+    },
+    "pods explicit member 1/service-well-3-1/recess-service-strut-1": {
+      "detailed": 140,
+      "archivedNative": 455,
+      "candidateNative": 533
+    },
+    "pods explicit member 1/service-well-3-1/recess-service-strut-2": {
+      "detailed": 140,
+      "archivedNative": 548,
+      "candidateNative": 535
+    },
+    "pods explicit member 1/service-well-3-2": {
+      "detailed": 1952,
+      "archivedNative": 871,
+      "candidateNative": 992
+    },
+    "pods explicit member 1/service-well-3-2/recess-service-strut-0": {
+      "detailed": 148,
+      "archivedNative": 412,
+      "candidateNative": 616
+    },
+    "pods explicit member 1/service-well-3-2/recess-service-strut-1": {
+      "detailed": 140,
+      "archivedNative": 401,
+      "candidateNative": 649
+    },
+    "pods explicit member 1/service-well-3-2/recess-service-strut-2": {
+      "detailed": 140,
+      "archivedNative": 401,
+      "candidateNative": 685
+    },
+    "pods explicit member 1/longitudinal-service-strut-0": {
+      "detailed": 166,
+      "archivedNative": 384,
+      "candidateNative": 519
+    },
+    "pods explicit member 1/longitudinal-service-strut-1": {
+      "detailed": 166,
+      "archivedNative": 385,
+      "candidateNative": 669
+    },
+    "aft transverse bridge": {
+      "detailed": 1466,
+      "archivedNative": 1466,
+      "candidateNative": 1466
+    },
+    "body primary pressure envelope": {
+      "detailed": 763,
+      "archivedNative": 963,
+      "candidateNative": 1047
+    },
+    "body primary pressure envelope/service-well-0-0": {
+      "detailed": 1958,
+      "archivedNative": 1782,
+      "candidateNative": 1635
+    },
+    "body primary pressure envelope/service-well-0-0/recess-service-strut-0": {
+      "detailed": 148,
+      "archivedNative": 495,
+      "candidateNative": 666
+    },
+    "body primary pressure envelope/service-well-0-0/recess-service-strut-1": {
+      "detailed": 148,
+      "archivedNative": 210,
+      "candidateNative": 228
+    },
+    "body primary pressure envelope/service-well-0-0/recess-service-strut-2": {
+      "detailed": 148,
+      "archivedNative": 198,
+      "candidateNative": 158
+    },
+    "body primary pressure envelope/service-well-0-1": {
+      "detailed": 1958,
+      "archivedNative": 994,
+      "candidateNative": 1206
+    },
+    "body primary pressure envelope/service-well-0-1/recess-service-strut-0": {
+      "detailed": 148,
+      "archivedNative": 617,
+      "candidateNative": 598
+    },
+    "body primary pressure envelope/service-well-0-1/recess-service-strut-1": {
+      "detailed": 148,
+      "archivedNative": 674,
+      "candidateNative": 605
+    },
+    "body primary pressure envelope/service-well-0-1/recess-service-strut-2": {
+      "detailed": 148,
+      "archivedNative": 506,
+      "candidateNative": 611
+    },
+    "body primary pressure envelope/service-well-0-2": {
+      "detailed": 1958,
+      "archivedNative": 1132,
+      "candidateNative": 1331
+    },
+    "body primary pressure envelope/service-well-0-2/recess-service-strut-0": {
+      "detailed": 148,
+      "archivedNative": 413,
+      "candidateNative": 596
+    },
+    "body primary pressure envelope/service-well-0-2/recess-service-strut-1": {
+      "detailed": 148,
+      "archivedNative": 421,
+      "candidateNative": 602
+    },
+    "body primary pressure envelope/service-well-0-2/recess-service-strut-2": {
+      "detailed": 148,
+      "archivedNative": 429,
+      "candidateNative": 609
+    },
+    "body primary pressure envelope/service-well-1-0": {
+      "detailed": 1958,
+      "archivedNative": 1782,
+      "candidateNative": 1677
+    },
+    "body primary pressure envelope/service-well-1-0/recess-service-strut-0": {
+      "detailed": 148,
+      "archivedNative": 494,
+      "candidateNative": 667
+    },
+    "body primary pressure envelope/service-well-1-0/recess-service-strut-1": {
+      "detailed": 148,
+      "archivedNative": 208,
+      "candidateNative": 228
+    },
+    "body primary pressure envelope/service-well-1-0/recess-service-strut-2": {
+      "detailed": 141,
+      "archivedNative": 195,
+      "candidateNative": 158
+    },
+    "body primary pressure envelope/service-well-1-1": {
+      "detailed": 1958,
+      "archivedNative": 1053,
+      "candidateNative": 1209
+    },
+    "body primary pressure envelope/service-well-1-1/recess-service-strut-0": {
+      "detailed": 141,
+      "archivedNative": 464,
+      "candidateNative": 599
+    },
+    "body primary pressure envelope/service-well-1-1/recess-service-strut-1": {
+      "detailed": 141,
+      "archivedNative": 500,
+      "candidateNative": 605
+    },
+    "body primary pressure envelope/service-well-1-1/recess-service-strut-2": {
+      "detailed": 141,
+      "archivedNative": 699,
+      "candidateNative": 612
+    },
+    "body primary pressure envelope/service-well-1-2": {
+      "detailed": 1958,
+      "archivedNative": 973,
+      "candidateNative": 1333
+    },
+    "body primary pressure envelope/service-well-1-2/recess-service-strut-0": {
+      "detailed": 141,
+      "archivedNative": 445,
+      "candidateNative": 596
+    },
+    "body primary pressure envelope/service-well-1-2/recess-service-strut-1": {
+      "detailed": 141,
+      "archivedNative": 421,
+      "candidateNative": 602
+    },
+    "body primary pressure envelope/service-well-1-2/recess-service-strut-2": {
+      "detailed": 141,
+      "archivedNative": 428,
+      "candidateNative": 609
+    },
+    "body primary pressure envelope/service-well-2-0": {
+      "detailed": 1958,
+      "archivedNative": 1782,
+      "candidateNative": 2190
+    },
+    "body primary pressure envelope/service-well-2-0/recess-service-strut-0": {
+      "detailed": 148,
+      "archivedNative": 495,
+      "candidateNative": 942
+    },
+    "body primary pressure envelope/service-well-2-0/recess-service-strut-1": {
+      "detailed": 148,
+      "archivedNative": 210,
+      "candidateNative": 228
+    },
+    "body primary pressure envelope/service-well-2-0/recess-service-strut-2": {
+      "detailed": 148,
+      "archivedNative": 198,
+      "candidateNative": 153
+    },
+    "body primary pressure envelope/service-well-2-1": {
+      "detailed": 1958,
+      "archivedNative": 997,
+      "candidateNative": 997
+    },
+    "body primary pressure envelope/service-well-2-1/recess-service-strut-0": {
+      "detailed": 148,
+      "archivedNative": 619,
+      "candidateNative": 619
+    },
+    "body primary pressure envelope/service-well-2-1/recess-service-strut-1": {
+      "detailed": 148,
+      "archivedNative": 676,
+      "candidateNative": 676
+    },
+    "body primary pressure envelope/service-well-2-1/recess-service-strut-2": {
+      "detailed": 148,
+      "archivedNative": 505,
+      "candidateNative": 734
+    },
+    "body primary pressure envelope/service-well-2-2": {
+      "detailed": 1958,
+      "archivedNative": 1130,
+      "candidateNative": 1002
+    },
+    "body primary pressure envelope/service-well-2-2/recess-service-strut-0": {
+      "detailed": 148,
+      "archivedNative": 413,
+      "candidateNative": 593
+    },
+    "body primary pressure envelope/service-well-2-2/recess-service-strut-1": {
+      "detailed": 148,
+      "archivedNative": 421,
+      "candidateNative": 618
+    },
+    "body primary pressure envelope/service-well-2-2/recess-service-strut-2": {
+      "detailed": 148,
+      "archivedNative": 429,
+      "candidateNative": 642
+    },
+    "body primary pressure envelope/service-well-3-0": {
+      "detailed": 1958,
+      "archivedNative": 1782,
+      "candidateNative": 1982
+    },
+    "body primary pressure envelope/service-well-3-0/recess-service-strut-0": {
+      "detailed": 148,
+      "archivedNative": 494,
+      "candidateNative": 1009
+    },
+    "body primary pressure envelope/service-well-3-0/recess-service-strut-1": {
+      "detailed": 148,
+      "archivedNative": 212,
+      "candidateNative": 817
+    },
+    "body primary pressure envelope/service-well-3-0/recess-service-strut-2": {
+      "detailed": 148,
+      "archivedNative": 195,
+      "candidateNative": 794
+    },
+    "body primary pressure envelope/service-well-3-1": {
+      "detailed": 1958,
+      "archivedNative": 907,
+      "candidateNative": 1048
+    },
+    "body primary pressure envelope/service-well-3-1/recess-service-strut-0": {
+      "detailed": 148,
+      "archivedNative": 466,
+      "candidateNative": 639
+    },
+    "body primary pressure envelope/service-well-3-1/recess-service-strut-1": {
+      "detailed": 141,
+      "archivedNative": 502,
+      "candidateNative": 646
+    },
+    "body primary pressure envelope/service-well-3-1/recess-service-strut-2": {
+      "detailed": 148,
+      "archivedNative": 686,
+      "candidateNative": 660
+    },
+    "body primary pressure envelope/service-well-3-2": {
+      "detailed": 1958,
+      "archivedNative": 976,
+      "candidateNative": 1003
+    },
+    "body primary pressure envelope/service-well-3-2/recess-service-strut-0": {
+      "detailed": 141,
+      "archivedNative": 444,
+      "candidateNative": 633
+    },
+    "body primary pressure envelope/service-well-3-2/recess-service-strut-1": {
+      "detailed": 141,
+      "archivedNative": 420,
+      "candidateNative": 641
+    },
+    "body primary pressure envelope/service-well-3-2/recess-service-strut-2": {
+      "detailed": 141,
+      "archivedNative": 428,
+      "candidateNative": 648
+    },
+    "body primary pressure envelope/longitudinal-service-strut-0": {
+      "detailed": 166,
+      "archivedNative": 402,
+      "candidateNative": 403
+    },
+    "body primary pressure envelope/longitudinal-service-strut-1": {
+      "detailed": 166,
+      "archivedNative": 401,
+      "candidateNative": 602
+    },
+    "cockpit glazing envelope": {
+      "detailed": 551,
+      "archivedNative": 633,
+      "candidateNative": 961
+    },
+    "cockpit connected structural crossmember": {
+      "detailed": 182,
+      "archivedNative": 182,
+      "candidateNative": 182
+    },
+    "engine_pair/negative side/connected support": {
+      "detailed": 905,
+      "archivedNative": 905,
+      "candidateNative": 905
+    },
+    "engine_pair/negative side/propulsion casing": {
+      "detailed": 2207,
+      "archivedNative": 2297,
+      "candidateNative": 2383
+    },
+    "engine_pair/negative side/propulsion luminous recess": {
+      "detailed": 1311,
+      "archivedNative": 1016,
+      "candidateNative": 1500
+    },
+    "engine_pair/positive side/connected support": {
+      "detailed": 905,
+      "archivedNative": 905,
+      "candidateNative": 905
+    },
+    "engine_pair/positive side/propulsion casing": {
+      "detailed": 2207,
+      "archivedNative": 2297,
+      "candidateNative": 2383
+    },
+    "engine_pair/positive side/propulsion luminous recess": {
+      "detailed": 1311,
+      "archivedNative": 1016,
+      "candidateNative": 1484
+    },
+    "explicit military mount upright": {
+      "detailed": 844,
+      "archivedNative": 844,
+      "candidateNative": 844
+    },
+    "explicit military mount longitudinal member": {
+      "detailed": 580,
+      "archivedNative": 580,
+      "candidateNative": 580
+    },
+    "explicit military mount upright (2)": {
+      "detailed": 844,
+      "archivedNative": 844,
+      "candidateNative": 844
+    },
+    "explicit military mount longitudinal member (2)": {
+      "detailed": 580,
+      "archivedNative": 580,
+      "candidateNative": 580
+    }
+  }
+}

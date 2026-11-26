@@ -1,0 +1,12 @@
+{
+  "schema": 1,
+  "id": "sh079-carabao-freighter",
+  "undoBefore": [
+    "sh078-oryx-voyager"
+  ],
+  "undoAfter": [],
+  "kind": "declaration",
+  "module": "carabao_freighter",
+  "before": "pub mod baza_mk_ii;\n",
+  "after": "pub mod caracal_scout;\n"
+}

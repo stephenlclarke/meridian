@@ -1,0 +1,225 @@
+"""Build the SH078 collision, visual, and Studio streams from pinned originals."""
+
+import argparse
+from hashlib import sha256
+import json
+import math
+from pathlib import Path
+import struct
+import tomllib
+
+from atomic_asset_output import checked_directory, checked_file, replace_output
+from encode_goshawk_visual import TEXTURES
+from import_goshawk_envelope_source import components
+from oryx_voyager_ring_support import ring_supports
+from prepare_eagle_cruiser_geometry import encode_visual
+
+ROOT = Path(__file__).resolve().parents[1]
+ORIGINAL = ROOT / "assets/fleet/sh078"
+INTEGRATION = ROOT / "integration/sh078-oryx-voyager"
+STUDIO_NAME = "ORYX-VOYAGER-STUDIO.json"
+REVISION = "a11fe16924d87d06021816f9037952afcbac08db"
+SOURCE_HASHES = {
+    'resource.toml': 'e0cdca9444f098043bc896ba2eac703111b226a8544e80225f4488df07fb9f3a',
+    'native-export.json': '3024e1ba80616236321d721173ca1a28a683f542205232e9edc0a2d88d479450',
+    'contract.toml': 'ec614af96ca542fc5ad47f512bd5d3a88aa04b46f86fa5a0cd7f72b7d00031b9',
+    'engineering.json': '7c1d1b23584d79f839880e4786fe92274709a2be6c097201adf9dc5592107009',
+    'finite-dry-source.json': '5d5b9d5c3c0333f8081fc6f82a765fc4a9bd91e262c804e64dc5ceeb08e8bdba',
+    'LEGACY-FINITE-DRY.swift.txt': '04746f8bff682cdf6e2203fbdc08054143ab394131dc81135ae826661a8b1615',
+    'LEGACY-PHYSICAL-CONTRACT.swift.txt': '2c68d8d51acdd469faa25124bcc19027aec1a8f747eb267da2e84e5a98e3c027',
+    'LICENSE': '033b7058d73f22c3c6b8a5825eb866ca2d67088f3ee94dd5f3e46da59d624766',
+    'l337-patrol-diffuse.rgba': '9699517d12b4fbbb28746e00bed9ee65c19a098d14402b1d5160280c6f6bfc54',
+    'l337-strike-diffuse.rgba': 'e56f149228caf90237a652d720ae549768bde1056af3d903dc8a5c243ad26e97',
+    'l337-service-details.rgba': '35edd84f6ce527195dd8a9bcc039521a6efc5aa2333452bbbc30217b8372103d',
+}
+SHAPE_NAMES = (
+    'central-hull',
+    'ring-wing',
+    'port-nacelle',
+    'port-engine',
+    'port-engine',
+    'port-engine',
+    'port-rail',
+    'starboard-nacelle',
+    'starboard-engine',
+    'starboard-engine',
+    'starboard-engine',
+    'starboard-rail',
+    'dorsal-canopy',
+    'dorsal-cap',
+    'port-service-pipe',
+    'port-instrument-housing',
+    'port-louvre-1',
+    'port-louvre-2',
+    'port-louvre-3',
+    'port-louvre-4',
+    'port-louvre-5',
+    'starboard-service-pipe',
+    'starboard-instrument-housing',
+    'starboard-louvre-1',
+    'starboard-louvre-2',
+    'starboard-louvre-3',
+    'starboard-louvre-4',
+    'starboard-louvre-5',
+)
+NATIVE_COMPONENTS = (0, 1, 2, 3, 7, 8, 12)
+RADIUS = .02
+PROBE_RADIUS = .1
+
+
+def require(condition, reason):
+    if not condition:
+        raise ValueError(reason)
+
+
+def encode_json(value):
+    return (json.dumps(value, allow_nan=False, separators=(",", ":")) + "\n").encode()
+
+
+def assignments(mesh, labels, slots):
+    output = [None] * len(mesh["vertices"])
+    for group, label in zip(components(mesh), labels, strict=True):
+        for vertex in group:
+            output[vertex] = slots[label]
+    require(all(output[a] == output[b] == output[c] for a, b, c in mesh["faces"]), 'original triangle spans supports')
+    return bytes(output)
+
+
+def pin(data):
+    return {"bytes": len(data), "sha256": sha256(data).hexdigest()}
+
+
+def load_source():
+    provenance = json.loads((INTEGRATION / "FROZEN-SOURCES.json").read_bytes())
+    if provenance["revision"] != REVISION or set(provenance["paths"]) != set(SOURCE_HASHES):
+        raise ValueError("Changed frozen SH078 origin")
+    inputs = {}
+    for name in SOURCE_HASHES:
+        parent = INTEGRATION if name.startswith("LEGACY-") else ORIGINAL
+        if name.endswith(".rgba"):
+            parent = ROOT / "assets/fleet/sh001"
+        inputs[name] = (parent / name).read_bytes()
+    for name, data in inputs.items():
+        expected = provenance["paths"][name]
+        if pin(data) != {"bytes": expected["bytes"], "sha256": SOURCE_HASHES[name]} or expected["sha256"] != SOURCE_HASHES[name]:
+            raise ValueError(f"Changed original SH078 source {name}")
+    resource = tomllib.loads(inputs["resource.toml"].decode())
+    detailed, native = resource["design"], resource["nativeDesign"]
+    archive = json.loads(inputs["native-export.json"])
+    contract = tomllib.loads(inputs["contract.toml"].decode())
+    require(resource["id"] == archive["id"] == contract["id"] == "SH078", 'wrong original SH078 identity')
+    require(native == archive["nativeDesign"], 'changed approved original native mesh')
+    require(archive["coordinateUnits"] == "metres", 'wrong original metre units')
+    require(archive["sourceSHA256"] == contract["source"]["geometrySHA256"], 'changed approved original mesh digest')
+    require(len(native["faces"]) <= contract["geometry"]["nativeFaceLimit"] == 512, 'wrong original native face limit')
+    for mesh in (detailed, native):
+        require(mesh["paletteName"] == "sand-maroon", 'wrong original palette')
+        require(mesh["license"] == mesh["appearanceLicense"] == "MIT", 'wrong original visual licence')
+        require([item["asset"] for item in mesh["textures"]] == TEXTURES, 'wrong original texture atlas order')
+    return provenance, inputs, resource, detailed, native
+
+
+def studio_definition(provenance, inputs, resource, detailed, native, detail_membership, native_membership, streams):
+    finite = json.loads(inputs["finite-dry-source.json"])["emptyDryReference"]
+    require(finite["massKg"] == json.loads(inputs["engineering.json"])["dryMassKilograms"] == 50196, 'changed original dry mass')
+    require(finite["id"] == "finite-intrinsic-empty-oryx-voyager", 'wrong original dry reference')
+    probes = []
+    for route in json.loads((INTEGRATION / "CONTACT-CANDIDATE.json").read_bytes()):
+        require(route["clearanceMillimetres"] > PROBE_RADIUS * 1000, 'insufficient original probe clearance')
+        start = [math.fsum(axis) / 3 for axis in zip(*route["triangle"], strict=True)]
+        end = [a - b for a, b in zip(start, route["travel"], strict=True)]
+        probes.append({"name": route["name"], "start": start, "end": end, "radiusMetres": PROBE_RADIUS})
+
+    def mesh(source, groups):
+        return {"vertices": source["vertices"], "triangles": source["faces"], "groups": list(groups)}
+
+    return {
+        "schema": 1, "id": "SH078", "name": "Oryx Voyager", "metresPerUnit": 1, "roundingMetres": RADIUS,
+        "detail": mesh(detailed, detail_membership), "native": mesh(native, native_membership),
+        "materials": [
+            {"name": m["name"], "rgb": [m["colour"] >> shift & 255 for shift in (24, 16, 8)],
+             "alpha": m["colour"] & 255, "emissive": m["emissive"]}
+            for m in detailed["materials"]
+        ],
+        "faceMaterials": detailed["faceMaterials"],
+        "faceTextures": [
+            {"uv": mapping["uv"], "texture": detailed["textures"][mapping["texture"]]["asset"]
+             if mapping["texture"] >= 0 else None}
+            for mapping in detailed["faceTextures"]
+        ],
+        "engineering": {
+            "massKg": finite["massKg"],
+            "centerOfMass": finite["centreMetres"],
+            "inertia": [finite["inertiaAboutCentreOfMassKgM2"][i:i + 3] for i in range(0, 9, 3)],
+        },
+        "flight": {"maxSpeed": resource["game"]["speed"]},
+        "clearances": probes,
+        "provenance": {
+            "sourceId": "SH078", "revision": provenance["revision"],
+            "sourceHashes": {name: sha256(data).hexdigest() for name, data in inputs.items()},
+            "derivedHashes": {name: pin(data) for name, data in streams.items()},
+            "engineeringReference": finite["id"], "license": inputs["LICENSE"].decode(),
+            "originalMetresPerUnit": 1, "scope": "catalogue inspection only",
+        },
+    }
+
+
+def prepare():
+    provenance, inputs, resource, detailed, native = load_source()
+    slots = {name: slot for slot, name in enumerate(dict.fromkeys(SHAPE_NAMES))}
+    require(len(slots) == 24, 'wrong original support count')
+    detail_membership = assignments(detailed, SHAPE_NAMES, slots)
+    native_membership = assignments(native, [SHAPE_NAMES[i] for i in NATIVE_COMPONENTS], slots)
+    detail_count, native_count = len(detail_membership), len(native_membership)
+    require((detail_count, native_count) == (2364, 112), "wrong original vertex count")
+    membership = detail_membership + native_membership
+    vertices = detailed["vertices"] + native["vertices"]
+    faces = detailed["faces"] + [[i + detail_count for i in face] for face in native["faces"]]
+    streams = {
+        "source.vertices": struct.pack("<8sII", b"MSH078V1", detail_count, native_count)
+            + b"".join(struct.pack("<3d", *p) for p in vertices),
+        "source-triangles.bin": b"".join(struct.pack("<3I", *f) for f in faces),
+        "source-piece-membership.bin": membership,
+        "PIECES.json": encode_json({"pieces": list(slots), "roundingMetres": RADIUS}),
+        "visual.bin": b"ORYXVIZ1" + encode_visual(detailed)[8:],
+        "native-visual.bin": b"ORYXVIZ1" + encode_visual(native)[8:],
+    }
+    fans = json.loads((INTEGRATION / "SUPPORT-FAN.json").read_bytes())
+    require(list(fans) == list(slots), 'wrong original fan order')
+    require(all(0 <= index < len(membership) and membership[index] == slots[name]
+                for name, faces in fans.items() for face in faces for index in face),
+            "original support fan spans groups")
+    definition = studio_definition(
+        provenance, inputs, resource, detailed, native, detail_membership, native_membership, streams
+    )
+    streams[STUDIO_NAME] = encode_json(definition)
+    collision_names, collision_membership = ring_supports(slots, membership, faces, detail_count)
+    streams["COLLISION-PIECES.json"] = encode_json({"pieces": collision_names, "roundingMetres": RADIUS})
+    streams["collision-piece-membership.bin"] = collision_membership
+    streams["SOURCE-GEOMETRY.json"] = encode_json({
+        "id": "SH078", "name": "Oryx Voyager", "sourceUnits": "metres", "revision": REVISION,
+        "references": {"detailed": [2364, 4620, 28], "native": [112, 200, 7]},
+        "nativeFaceLimit": 512, "artworkGroups": 24, "collisionGroups": len(collision_names), "roundingMetres": RADIUS, "pins": SOURCE_HASHES,
+        "outputs": {name: pin(data) for name, data in streams.items()},
+    })
+    return streams
+
+
+def main():
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("--check", action="store_true")
+    args = parser.parse_args()
+    checked_directory(ORIGINAL)
+    checked_directory(INTEGRATION)
+    streams = prepare()
+    paths = {name: checked_file((INTEGRATION if name == STUDIO_NAME else ORIGINAL) / name) for name in streams}
+    for name, data in streams.items():
+        path = paths[name]
+        if args.check:
+            require(path.read_bytes() == data, f"changed SH078 encoding: {name}")
+        else:
+            replace_output(path, data)
+
+
+if __name__ == "__main__":
+    main()

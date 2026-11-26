@@ -1,0 +1,856 @@
+{
+  "hull": "SH090",
+  "trial": "shoulder-reallocated",
+  "sourceMeshSHA256": "9a117e4f23f1ea6e7022cd4b3c8bb783c3745159ab117450683a7ed46f3299d5",
+  "candidateSHA256": "26c3849433f3d5fd19e6d77a9a756acdf63a993665d60a210753a012017080d6",
+  "parts": 28,
+  "fixedParts": 19,
+  "candidateFaces": 512,
+  "selectedSourceVertices": true,
+  "preservedLongitudinalEndpoints": true,
+  "retainedOriginalWitnesses": [
+    {
+      "parts": [
+        0,
+        10
+      ],
+      "names": [
+        "body primary pressure envelope",
+        "pods explicit member 1"
+      ],
+      "pointMetres": [
+        -0.0459017,
+        1.1879495,
+        -0.0141084
+      ],
+      "exactRayHits": {
+        "original": [
+          [
+            1,
+            1
+          ],
+          [
+            1,
+            1
+          ]
+        ],
+        "candidate": [
+          [
+            1,
+            1
+          ],
+          [
+            1,
+            1
+          ]
+        ]
+      }
+    },
+    {
+      "parts": [
+        3,
+        5
+      ],
+      "names": [
+        "body primary pressure envelope/service-well-2-0",
+        "pods explicit member 0"
+      ],
+      "pointMetres": [
+        -10.3777962,
+        0.9104881,
+        2.5880392
+      ],
+      "exactRayHits": {
+        "original": [
+          [
+            1,
+            1
+          ],
+          [
+            1,
+            1
+          ]
+        ],
+        "candidate": [
+          [
+            1,
+            1
+          ],
+          [
+            1,
+            1
+          ]
+        ]
+      }
+    },
+    {
+      "parts": [
+        4,
+        15
+      ],
+      "names": [
+        "body primary pressure envelope/service-well-3-0",
+        "pods explicit member 2"
+      ],
+      "pointMetres": [
+        10.1260922,
+        0.9350383,
+        2.6071467
+      ],
+      "exactRayHits": {
+        "original": [
+          [
+            1,
+            1
+          ],
+          [
+            1,
+            1
+          ]
+        ],
+        "candidate": [
+          [
+            1,
+            1
+          ],
+          [
+            1,
+            1
+          ]
+        ]
+      }
+    },
+    {
+      "parts": [
+        5,
+        10
+      ],
+      "names": [
+        "pods explicit member 0",
+        "pods explicit member 1"
+      ],
+      "pointMetres": [
+        -5.4078099,
+        -2.5572253,
+        -5.9632982
+      ],
+      "exactRayHits": {
+        "original": [
+          [
+            1,
+            1
+          ],
+          [
+            1,
+            1
+          ]
+        ],
+        "candidate": [
+          [
+            1,
+            1
+          ],
+          [
+            1,
+            1
+          ]
+        ]
+      }
+    },
+    {
+      "parts": [
+        5,
+        12
+      ],
+      "names": [
+        "pods explicit member 0",
+        "pods explicit member 1/service-well-1-0"
+      ],
+      "pointMetres": [
+        -5.65531,
+        -0.8799351,
+        -8.4995286
+      ],
+      "exactRayHits": {
+        "original": [
+          [
+            1,
+            1
+          ],
+          [
+            1,
+            1
+          ]
+        ],
+        "candidate": [
+          [
+            1,
+            1
+          ],
+          [
+            1,
+            1
+          ]
+        ]
+      }
+    },
+    {
+      "parts": [
+        5,
+        13
+      ],
+      "names": [
+        "pods explicit member 0",
+        "pods explicit member 1/service-well-2-0"
+      ],
+      "pointMetres": [
+        -4.8534759,
+        -4.8948203,
+        -10.2202537
+      ],
+      "exactRayHits": {
+        "original": [
+          [
+            1,
+            1
+          ],
+          [
+            1,
+            1
+          ]
+        ],
+        "candidate": [
+          [
+            1,
+            1
+          ],
+          [
+            1,
+            1
+          ]
+        ]
+      }
+    },
+    {
+      "parts": [
+        5,
+        22
+      ],
+      "names": [
+        "pods explicit member 0",
+        "engine_pair/negative side/connected support"
+      ],
+      "pointMetres": [
+        -8.9984794,
+        -0.0462891,
+        -14.3337916
+      ],
+      "exactRayHits": {
+        "original": [
+          [
+            1,
+            1
+          ],
+          [
+            1,
+            1
+          ]
+        ],
+        "candidate": [
+          [
+            1,
+            1
+          ],
+          [
+            1,
+            1
+          ]
+        ]
+      }
+    },
+    {
+      "parts": [
+        5,
+        23
+      ],
+      "names": [
+        "pods explicit member 0",
+        "engine_pair/negative side/propulsion casing"
+      ],
+      "pointMetres": [
+        -11.1686083,
+        -1.4708197,
+        -15.2657808
+      ],
+      "exactRayHits": {
+        "original": [
+          [
+            1,
+            1
+          ],
+          [
+            1,
+            1
+          ]
+        ],
+        "candidate": [
+          [
+            1,
+            1
+          ],
+          [
+            1,
+            1
+          ]
+        ]
+      }
+    },
+    {
+      "parts": [
+        6,
+        10
+      ],
+      "names": [
+        "pods explicit member 0/service-well-0-0",
+        "pods explicit member 1"
+      ],
+      "pointMetres": [
+        -3.8628288,
+        -0.9141071,
+        -10.3519169
+      ],
+      "exactRayHits": {
+        "original": [
+          [
+            1,
+            1
+          ],
+          [
+            1,
+            1
+          ]
+        ],
+        "candidate": [
+          [
+            1,
+            1
+          ],
+          [
+            1,
+            1
+          ]
+        ]
+      }
+    },
+    {
+      "parts": [
+        9,
+        10
+      ],
+      "names": [
+        "pods explicit member 0/service-well-3-0",
+        "pods explicit member 1"
+      ],
+      "pointMetres": [
+        -4.6410431,
+        -4.9105465,
+        -10.2202537
+      ],
+      "exactRayHits": {
+        "original": [
+          [
+            1,
+            1
+          ],
+          [
+            1,
+            1
+          ]
+        ],
+        "candidate": [
+          [
+            1,
+            1
+          ],
+          [
+            1,
+            1
+          ]
+        ]
+      }
+    },
+    {
+      "parts": [
+        10,
+        15
+      ],
+      "names": [
+        "pods explicit member 1",
+        "pods explicit member 2"
+      ],
+      "pointMetres": [
+        4.0623141,
+        -2.5572253,
+        -5.9632982
+      ],
+      "exactRayHits": {
+        "original": [
+          [
+            1,
+            1
+          ],
+          [
+            1,
+            1
+          ]
+        ],
+        "candidate": [
+          [
+            1,
+            1
+          ],
+          [
+            1,
+            1
+          ]
+        ]
+      }
+    },
+    {
+      "parts": [
+        10,
+        17
+      ],
+      "names": [
+        "pods explicit member 1",
+        "pods explicit member 2/service-well-1-0"
+      ],
+      "pointMetres": [
+        3.814814,
+        -0.8799351,
+        -8.4995286
+      ],
+      "exactRayHits": {
+        "original": [
+          [
+            1,
+            1
+          ],
+          [
+            1,
+            1
+          ]
+        ],
+        "candidate": [
+          [
+            1,
+            1
+          ],
+          [
+            1,
+            1
+          ]
+        ]
+      }
+    },
+    {
+      "parts": [
+        10,
+        18
+      ],
+      "names": [
+        "pods explicit member 1",
+        "pods explicit member 2/service-well-2-0"
+      ],
+      "pointMetres": [
+        4.6166481,
+        -4.8948203,
+        -10.2202537
+      ],
+      "exactRayHits": {
+        "original": [
+          [
+            1,
+            1
+          ],
+          [
+            1,
+            1
+          ]
+        ],
+        "candidate": [
+          [
+            1,
+            1
+          ],
+          [
+            1,
+            1
+          ]
+        ]
+      }
+    },
+    {
+      "parts": [
+        10,
+        22
+      ],
+      "names": [
+        "pods explicit member 1",
+        "engine_pair/negative side/connected support"
+      ],
+      "pointMetres": [
+        -2.3437479,
+        0.8401495,
+        -9.9913544
+      ],
+      "exactRayHits": {
+        "original": [
+          [
+            1,
+            1
+          ],
+          [
+            1,
+            1
+          ]
+        ],
+        "candidate": [
+          [
+            1,
+            1
+          ],
+          [
+            1,
+            1
+          ]
+        ]
+      }
+    },
+    {
+      "parts": [
+        10,
+        25
+      ],
+      "names": [
+        "pods explicit member 1",
+        "engine_pair/positive side/connected support"
+      ],
+      "pointMetres": [
+        1.1782907,
+        1.0643117,
+        -9.4368658
+      ],
+      "exactRayHits": {
+        "original": [
+          [
+            1,
+            1
+          ],
+          [
+            1,
+            1
+          ]
+        ],
+        "candidate": [
+          [
+            1,
+            1
+          ],
+          [
+            1,
+            1
+          ]
+        ]
+      }
+    },
+    {
+      "parts": [
+        11,
+        15
+      ],
+      "names": [
+        "pods explicit member 1/service-well-0-0",
+        "pods explicit member 2"
+      ],
+      "pointMetres": [
+        5.6072952,
+        -0.9141071,
+        -10.3519169
+      ],
+      "exactRayHits": {
+        "original": [
+          [
+            1,
+            1
+          ],
+          [
+            1,
+            1
+          ]
+        ],
+        "candidate": [
+          [
+            1,
+            1
+          ],
+          [
+            1,
+            1
+          ]
+        ]
+      }
+    },
+    {
+      "parts": [
+        14,
+        15
+      ],
+      "names": [
+        "pods explicit member 1/service-well-3-0",
+        "pods explicit member 2"
+      ],
+      "pointMetres": [
+        4.8290809,
+        -4.9105465,
+        -10.2202537
+      ],
+      "exactRayHits": {
+        "original": [
+          [
+            1,
+            1
+          ],
+          [
+            1,
+            1
+          ]
+        ],
+        "candidate": [
+          [
+            1,
+            1
+          ],
+          [
+            1,
+            1
+          ]
+        ]
+      }
+    },
+    {
+      "parts": [
+        15,
+        25
+      ],
+      "names": [
+        "pods explicit member 2",
+        "engine_pair/positive side/connected support"
+      ],
+      "pointMetres": [
+        7.4883562,
+        0.1381892,
+        -12.9269498
+      ],
+      "exactRayHits": {
+        "original": [
+          [
+            1,
+            1
+          ],
+          [
+            1,
+            1
+          ]
+        ],
+        "candidate": [
+          [
+            1,
+            1
+          ],
+          [
+            1,
+            1
+          ]
+        ]
+      }
+    },
+    {
+      "parts": [
+        15,
+        26
+      ],
+      "names": [
+        "pods explicit member 2",
+        "engine_pair/positive side/propulsion casing"
+      ],
+      "pointMetres": [
+        10.0331905,
+        -1.9664193,
+        -14.9973067
+      ],
+      "exactRayHits": {
+        "original": [
+          [
+            1,
+            1
+          ],
+          [
+            1,
+            1
+          ]
+        ],
+        "candidate": [
+          [
+            1,
+            1
+          ],
+          [
+            1,
+            1
+          ]
+        ]
+      }
+    },
+    {
+      "parts": [
+        20,
+        21
+      ],
+      "names": [
+        "cockpit glazing envelope",
+        "cockpit connected structural crossmember"
+      ],
+      "pointMetres": [
+        2.6705304,
+        7.7662875,
+        9.0682495
+      ],
+      "exactRayHits": {
+        "original": [
+          [
+            1,
+            1
+          ],
+          [
+            1,
+            1
+          ]
+        ],
+        "candidate": [
+          [
+            1,
+            1
+          ],
+          [
+            1,
+            1
+          ]
+        ]
+      }
+    },
+    {
+      "parts": [
+        22,
+        23
+      ],
+      "names": [
+        "engine_pair/negative side/connected support",
+        "engine_pair/negative side/propulsion casing"
+      ],
+      "pointMetres": [
+        -11.4982601,
+        0.1730818,
+        -14.9949891
+      ],
+      "exactRayHits": {
+        "original": [
+          [
+            1,
+            1
+          ],
+          [
+            1,
+            1
+          ]
+        ],
+        "candidate": [
+          [
+            1,
+            1
+          ],
+          [
+            1,
+            1
+          ]
+        ]
+      }
+    },
+    {
+      "parts": [
+        25,
+        26
+      ],
+      "names": [
+        "engine_pair/positive side/connected support",
+        "engine_pair/positive side/propulsion casing"
+      ],
+      "pointMetres": [
+        10.8456113,
+        0.43868,
+        -15.2529732
+      ],
+      "exactRayHits": {
+        "original": [
+          [
+            1,
+            1
+          ],
+          [
+            1,
+            1
+          ]
+        ],
+        "candidate": [
+          [
+            1,
+            1
+          ],
+          [
+            1,
+            1
+          ]
+        ]
+      }
+    }
+  ],
+  "routeClearanceMillimetres": {
+    "detailed": {
+      "dorsal": 1576,
+      "ventral": 1801,
+      "between-aft-drives": 711,
+      "port-outboard": 1813,
+      "port-forward-inner": 1283,
+      "starboard-outboard": 1813,
+      "starboard-forward-inner": 1287
+    },
+    "archivedNative": {
+      "dorsal": 1576,
+      "ventral": 2122,
+      "between-aft-drives": 700,
+      "port-outboard": 1813,
+      "port-forward-inner": 1797,
+      "starboard-outboard": 1813,
+      "starboard-forward-inner": 1797
+    },
+    "candidateNative": {
+      "dorsal": 1899,
+      "ventral": 2122,
+      "between-aft-drives": 2339,
+      "port-outboard": 1886,
+      "port-forward-inner": 1797,
+      "starboard-outboard": 1881,
+      "starboard-forward-inner": 1797
+    }
+  }
+}

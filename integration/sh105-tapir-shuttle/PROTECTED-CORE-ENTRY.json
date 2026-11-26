@@ -1,0 +1,12 @@
+{
+  "schema": 1,
+  "id": "sh105-tapir-shuttle",
+  "undoBefore": [
+    "sh104-wildebeest"
+  ],
+  "undoAfter": [],
+  "kind": "declaration",
+  "module": "tapir_shuttle",
+  "before": "pub mod tamaraw;\n",
+  "after": "pub mod traffic;\n"
+}

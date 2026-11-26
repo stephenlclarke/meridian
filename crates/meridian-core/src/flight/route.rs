@@ -1,5 +1,5 @@
 //! World-owned route review, publication, and progress on real jumps and docks.
-use super::profit_scan::{cargo_sale_tenths, trade_profit_tenths};
+use super::profit_scan::{cargo_sale_tenths, trade_estimate};
 use super::{FlightMode, World};
 use crate::navigation::{
     NavigationGrade, ROUTE_SYSTEMS, RouteAlternative, RouteEconomy, RouteError, RoutePlan,
@@ -273,7 +273,9 @@ fn estimate_route_economy(
             if from != to
                 && let Some(origin) = origin
             {
-                economy.trade[from][to] = trade_profit_tenths(cargo, origin, target);
+                let (profit, exports) = trade_estimate(cargo, origin, target);
+                economy.trade[from][to] = profit;
+                economy.exports[from][to] = exports;
             }
         }
     }

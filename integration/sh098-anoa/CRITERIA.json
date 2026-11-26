@@ -1,0 +1,221 @@
+{
+  "hull": "SH098 Anoa",
+  "scope": "Original catalogue inspection and geometry queries",
+  "source": "assets/fleet/sh098/SOURCE-GEOMETRY.json",
+  "frozenSources": "integration/sh098-anoa/FROZEN-SOURCES.json",
+  "sourceScaleMetresPerUnit": "190/9",
+  "faces": {
+    "detailed": 6720,
+    "archivedNative": 1928,
+    "candidateNative": 512,
+    "candidateMaximum": 512
+  },
+  "originalAccess": {
+    "runtimeCatalogue": {
+      "playerFlyable": false,
+      "normalPurchaseEligible": false,
+      "purchasePolicy": "pendingFabrication"
+    },
+    "r3DesignContract": {
+      "playerFlyable": true,
+      "purchasePolicy": "blueprintFabrication"
+    }
+  },
+  "engineering": {
+    "sourceReference": "finite-intrinsic-empty-anoa",
+    "massKg": 442139
+  },
+  "supportGroups": 88,
+  "collars": {
+    "closed": 2,
+    "candidateFaces": [
+      48,
+      48
+    ],
+    "spansPerRing": 8,
+    "dualMembershipVertices": 368
+  },
+  "minimumRouteClearanceMillimetres": 1656,
+  "sourceContactCounts": {
+    "overlap": 40
+  },
+  "candidateRebuild": "integration/sh098-anoa/CANDIDATE-REPLAY.json",
+  "fitUpperMillimetres": {
+    "detailed": 2591,
+    "archivedNative": 2742,
+    "candidateNative": 3984
+  },
+  "continuousCandidateFitMillimetres": {
+    "archiveToCandidate": {
+      "lowerFloor": 1864,
+      "upperCeiling": 1887
+    },
+    "candidateToArchive": {
+      "lowerFloor": 1730,
+      "upperCeiling": 1754
+    },
+    "detailedToCandidate": {
+      "lowerFloor": 3533,
+      "upperCeiling": 3534
+    },
+    "candidateToDetailed": {
+      "lowerFloor": 1803,
+      "upperCeiling": 1827
+    }
+  },
+  "hullStudio": {
+    "definition": "integration/sh098-anoa/ANOA-STUDIO.json",
+    "bytes": 1050513,
+    "sha256": "0d937caa9ab24ae6313f2751f255afadc7d787d6949079477b7ff15b441db282",
+    "supports": 88,
+    "probes": 7,
+    "detail": "6,720 original detailed faces",
+    "native": "512 separate candidate faces",
+    "loaderRevision": "27121e66ba37a29781135b56924a9d6e7f38a70a",
+    "signedInstalledExport": {
+      "status": "PASS",
+      "scope": "Signed installed Studio offline original artwork import/export",
+      "bundleIdentifier": "io.xyzzy.meridian.hullstudio",
+      "bundleVersion": "0.0.0",
+      "codeDirectoryHash": "93938bda9242ebdff508bfb9e16b3cdf83c0a200",
+      "developerIdTeam": "4MEB7MUTAV",
+      "signatureVerification": "deep strict",
+      "definition": {
+        "bytes": 1050513,
+        "sha256": "0d937caa9ab24ae6313f2751f255afadc7d787d6949079477b7ff15b441db282"
+      },
+      "exportExitStatuses": [
+        0,
+        0
+      ],
+      "exportMatchesDefinitionExceptTrailingLf": true,
+      "valid": true,
+      "diagnostics": [],
+      "detailedTriangles": 6720,
+      "nativeTriangles": 512,
+      "supportGroups": 88,
+      "engineeringReference": "finite-intrinsic-empty-anoa",
+      "massKg": 442139,
+      "receiptFiles": {
+        "anoa.hull.json": {
+          "bytes": 1050512,
+          "sha256": "bab07f339552e6c3f85b028800b422cb732744fbdf6ed40682ad014908085772"
+        },
+        "anoa-repeat.hull.json": {
+          "bytes": 1050512,
+          "sha256": "bab07f339552e6c3f85b028800b422cb732744fbdf6ed40682ad014908085772"
+        },
+        "studio.stdout.json": {
+          "bytes": 245206,
+          "sha256": "c0f4c30e164f9c003d85b88a7e30c907870c50f905a196576653344698599aa9"
+        },
+        "studio-repeat.stdout.json": {
+          "bytes": 245206,
+          "sha256": "c0f4c30e164f9c003d85b88a7e30c907870c50f905a196576653344698599aa9"
+        },
+        "codesign.log": {
+          "bytes": 13038,
+          "sha256": "2fb6805346a201395c1c96db0974f2f1a33b9f6c33f6db29d3b29d84a29bffd9"
+        },
+        "codesign-identity.log": {
+          "bytes": 988,
+          "sha256": "f6d772f29f9e72421e98a6d7243102b92b77b5995acbe6cda7ddb3bbfc3b1706"
+        }
+      },
+      "artworkProbeResults": [
+        {
+          "name": "dorsal",
+          "passed": true
+        },
+        {
+          "name": "ventral",
+          "passed": true
+        },
+        {
+          "name": "port-outboard",
+          "passed": true
+        },
+        {
+          "name": "starboard-outboard",
+          "passed": true
+        },
+        {
+          "name": "through-aft-collar",
+          "passed": true
+        },
+        {
+          "name": "through-forward-collar",
+          "passed": true
+        },
+        {
+          "name": "upper-diagonal",
+          "passed": true
+        }
+      ],
+      "triangleRoles": {
+        "detail": "original detailed visible",
+        "native": "derived native inspection candidate"
+      }
+    }
+  },
+  "byteReplay": {
+    "commands": [
+      "python3 -B tools/prepare_anoa.py --check",
+      "python3 -B tools/verify_anoa.py | cmp - integration/sh098-anoa/CONTACT-RESULT.json",
+      "python3 -B tools/measure_anoa.py | cmp - integration/sh098-anoa/SURFACE-FIT.json",
+      "python3 -B tools/measure_anoa.py --directions | cmp - integration/sh098-anoa/CANDIDATE-FIT-LOCALIZATION.json",
+      "python3 -B tools/measure_anoa.py --reference-directions | cmp - integration/sh098-anoa/REFERENCE-FIT-LOCALIZATION.json"
+    ],
+    "host": "SteveMBA",
+    "startedUtc": "2026-11-25T04:08:02Z",
+    "finishedUtc": "2026-11-25T04:09:23Z",
+    "log": {
+      "bytes": 537,
+      "sha256": "5912379cd55fb34c079caa4e327c3f577d963bf24e4d42006510d865e82acfd2"
+    },
+    "fitDependencies": {
+      "python": "3.14.3",
+      "numpy": "2.5.5",
+      "scipy": "1.18.1",
+      "trimesh": "5.2.1",
+      "rtree": "1.4.1"
+    },
+    "originalCommit": "a1179a6bf8eb3f561e930a131e259dd67b7978ab",
+    "historicalReplayPins": {
+      "tools/measure_banteng_geometry.py": "4b7d8d5d972e30d93bebf7f422be71e415d6e4a9c4b622582ecf6e30a6bb9235",
+      "tools/measure_lanner_geometry.py": "cabbaf17ff7efdbcbee9a1fba67c7edafd59dceb8e97f367824a51c134479992",
+      "tools/verify_eagle_cruiser_geometry.py": "c7926cb6e699ae5ffb445951ce9d4e98a64018a7ecb1db2e5e77a611d742a783"
+    }
+  },
+  "replayPins": {
+    "integration/sh098-anoa/ANOA-STUDIO.json": "0d937caa9ab24ae6313f2751f255afadc7d787d6949079477b7ff15b441db282",
+    "integration/sh098-anoa/FROZEN-SOURCES.json": "79acfd2415cda4d5245d90bc5740a95de7c547425fbd96fe35c1d36cb86055f1",
+    "integration/sh098-anoa/CONTACT-CANDIDATE.json": "98da73dcbc4abd0a7d97cd80eb411dc1d5d8a770ea95aea9343ff3f03a841d41",
+    "integration/sh098-anoa/CONTACT-RESULT.json": "99bbe44204b8c8795b116340330e44c5c9b1f333e7832be5f4cac14bbe741213",
+    "integration/sh098-anoa/ORIGINAL-OWNERSHIP.json": "e5c790227927e5891c0d0fbcbc680b7a1dde99c2ac93060b0afa708cf6c792ba",
+    "integration/sh098-anoa/RETAINED-OVERLAPS.json": "f2ecb15bee86084be4ee1f03a2a2f08913f00bed464d87282ad19429113d1a41",
+    "integration/sh098-anoa/CANDIDATE-FIDELITY.json": "160cf2a71411eb6ef8b030f962ad4395462803a9b03bb7bf712825f4949caa45",
+    "integration/sh098-anoa/SUPPORT-FAN.json": "3ceedfb7098c96dc9ddb504039aea2043a6ea065bafac8d41801c6524f1aed61",
+    "integration/sh098-anoa/SURFACE-FIT.json": "5e530693ffc8a677417ad1ba44fe28ee2f0ebc6160202cbfcc650a4ac35f5fd3",
+    "integration/sh098-anoa/CANDIDATE-REPLAY.json": "af814f44005405d9aa1ff570f0015e10a93f8945fed7b8f4f6fd82f0348f8672",
+    "integration/sh098-anoa/CANDIDATE-TOPOLOGY-SURVEY.json": "7070ece499b4a105de78b9ddc0f52b8e9dbbd4d9e040bcb165000e9cfcabed79",
+    "integration/sh098-anoa/CANDIDATE-FIT-LOCALIZATION.json": "a44cfd6fba81e0f0daef8db806b8c5810baee075930b33b1981155d59ef195b0",
+    "integration/sh098-anoa/REFERENCE-FIT-LOCALIZATION.json": "11a7435a3b0b9846ba970f40a51ce856f0b257d657baf9f3fb0b30d3d768e243",
+    "tools/atomic_asset_output.py": "2d13803823645d3bdea7c855af958eb54d7ebe513ec1bcb0af34e82870164bf0",
+    "tools/banteng_art_mesh.py": "ef5c0f538510486238d69dc301da80026fc93326767b38c50a04756ab9890a09",
+    "tools/encode_goshawk_visual.py": "9e524e9a32a237d71d212c8b5c34ecf12cde5a8e08885b1d03991b95c278f61c",
+    "tools/import_goshawk_envelope_source.py": "14b530725629ee3eaa5b3fd69f01fe00fe371564a1a52cb398d3969142db977e",
+    "tools/measure_banteng_geometry.py": "9356864e227302598fcae4e833ecb706b1ed8a5e600cbb4076b7165dc1e54bea",
+    "tools/measure_goshawk_surface_fit.py": "5407ef1e5fad41810aa95444ca1338fe33a91e5c9857dcb752b4e4cf2fca6d0b",
+    "tools/measure_lanner_geometry.py": "55d13a28602e6ed791adecd85ff43f3c8a7fbe118cf0977272e1747422c2408d",
+    "tools/measure_anoa.py": "e6b0d001d10d50fbccd8bb7625afb0ce7656425175264126e76a46991977fc62",
+    "tools/prepare_eagle_cruiser_geometry.py": "a1ea3b5d72f35e1f2932da71afa3ff8a276a504f7309a1086a2b3df35988addc",
+    "tools/prepare_anoa.py": "4b9a33bb56fe820542eeb26dd082cbf1353ca044fc7d6a11bc10b95f243d828c",
+    "tools/verify_eagle_cruiser_geometry.py": "cb053ee5873fee62ee456bb3776e98d29b2cbb44c7344599bc617a8579164d43",
+    "tools/verify_anoa.py": "0eb70ccfc96996f9eb4761fd1148e9007979ce3db8847f88e12317592cba2325",
+    "tools/vulture_mk_i_exact_fit.py": "479b31f8714a198a82c0e2888b8d19efe46c7b4c43a576b83ab84c571ae738c6",
+    "assets/fleet/sh098/GENERATED-COLLISION.json": "d150c102f20437c477023c9040841a8cc824fd56aa433bf2f25461503d214c81",
+    "assets/fleet/sh098/SOURCE-GEOMETRY.json": "6c12116c10e267c07bb59352b8b8c8d046a4c1c203b64f50ee566aad86ae96f3",
+    "tools/hull_contact_geometry.py": "07606202e6a298ad375a7504991fe6fb93da6a07f9b5cc4a22167bd570b07839"
+  }
+}

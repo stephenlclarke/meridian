@@ -581,6 +581,7 @@ impl World {
             damage: super::damage::State::default(),
             solar: super::solar::State::default(),
             station_data: Some(station_data),
+            medusa_preview_fit: None,
             navigation_catalogue: Some(
                 OriginalNavigation::bundled().map_err(|_| SaveError::ContentMismatch)?,
             ),

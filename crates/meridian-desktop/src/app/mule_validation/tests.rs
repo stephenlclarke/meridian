@@ -57,6 +57,32 @@ fn opt_in_parser_accepts_only_six_exact_internal_forms_and_keeps_normal_save_slo
 }
 
 #[test]
+fn medusa_preview_launch_option_refuses_mixed_or_missing_profile_arguments() {
+    assert_eq!(
+        ok(Launch::parse(args(&[
+            "--medusa-preview-dir",
+            "preview-slot"
+        ]))),
+        Launch::MedusaPreview(PathBuf::from("preview-slot"))
+    );
+    for values in [
+        vec!["--medusa-preview-dir"],
+        vec!["--medusa-preview-dir", ""],
+        vec!["--medusa-preview-dir", "--save-dir"],
+        vec!["--medusa-preview-dir", "slot", "--save-dir", "other"],
+        vec!["--save-dir", "slot", "--medusa-preview-dir", "other"],
+        vec![
+            "--medusa-preview-dir",
+            "slot",
+            "--internal-mule-validation",
+            "front",
+        ],
+    ] {
+        assert!(Launch::parse(args(&values)).is_err(), "{values:?}");
+    }
+}
+
+#[test]
 fn all_source_derived_views_publish_actual_fresh_scoped_world_and_stationary_pilot() {
     let q = profile(View::Far);
     for view in [View::Front, View::Rear, View::Far, View::Side] {

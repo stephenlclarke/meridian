@@ -72,7 +72,7 @@ fn wrapped(text: &str, columns: usize) -> Vec<String> {
     }
     result
 }
-fn paragraphs(f: &mut Frame, lines: &[String], area: Rect, scroll: usize) {
+pub(super) fn paragraphs(f: &mut Frame, lines: &[String], area: Rect, scroll: usize) {
     let columns = (area.width / 7.5).floor() as usize;
     let rows: Vec<_> = lines.iter().flat_map(|s| wrapped(s, columns)).collect();
     let count = (area.height / 18.0).floor() as usize;
@@ -502,7 +502,7 @@ fn chart(s: &DockedScreens, c: &Context<'_>, f: &mut Frame) {
     );
     let mut fields = Vec::new();
     if s.profit_scan {
-        fields.extend(profit_fields(c.catalogue, &c.world.profit_destinations()));
+        fields.extend(profit_fields(c.catalogue, &c.world.profit_details()));
     }
     fields.extend(world_details(s, c));
     let details = Rect::new(
@@ -588,23 +588,51 @@ fn chart(s: &DockedScreens, c: &Context<'_>, f: &mut Frame) {
 }
 pub(super) fn profit_fields(
     catalogue: &super::Catalogue,
-    results: &[meridian_core::ProfitDestination],
+    results: &[meridian_core::ProfitDetail],
 ) -> Vec<String> {
     if results.is_empty() {
         return vec!["No profitable destinations in range".into()];
     }
     let mut fields = vec!["Estimated profit (before fuel/risk):".into()];
     for (index, result) in results.iter().enumerate() {
-        if let Some(world) = catalogue.world(result.system) {
+        if let Some(world) = catalogue.world(result.destination.system) {
             fields.push(format!(
                 "{}. {}: {} CR",
                 index + 1,
                 world.name,
-                money(result.profit_tenths)
+                money(result.destination.profit_tenths)
             ));
+            fields.push(format!(
+                "Owned cargo sale here {} / there {} CR",
+                money(result.sale_here_tenths),
+                money(result.sale_there_tenths)
+            ));
+            fields.push(format!(
+                "Extra exports est. {} CR",
+                money(result.trade_tenths)
+            ));
+            fields.extend(result.exports.iter().map(export_line));
+            if result.exports.is_empty() {
+                fields.push("No affordable extra exports".into());
+            }
         }
     }
     fields
+}
+
+pub(super) fn export_line(row: &meridian_core::navigation::TradeExportEstimate) -> String {
+    let name = row
+        .commodity
+        .definition()
+        .map_or("Commodity", |definition| definition.name);
+    format!(
+        "{} {} {} | ask {} / bid {} CR/unit",
+        name,
+        row.quantity,
+        row.commodity.unit().symbol(),
+        money(u64::from(row.ask_tenths)),
+        money(u64::from(row.bid_tenths))
+    )
 }
 fn world_details(s: &DockedScreens, c: &Context<'_>) -> Vec<String> {
     let Some(w) = c.catalogue.world(s.selected_world) else {
@@ -793,8 +821,8 @@ fn showroom(s: &DockedScreens, c: &Context<'_>, f: &mut Frame) {
         f,
         format!(
             "{} ships; {} catalogue objects",
-            162,
-            c.catalogue.objects.len()
+            c.catalogue.ship_count(),
+            c.catalogue.object_count()
         ),
         details.x,
         details.y + 18.0,
@@ -906,7 +934,7 @@ fn showroom_previews(
     c: &Context<'_>,
     f: &mut Frame,
     model: Rect,
-    ship: &ObjectRecord,
+    ship: &ObjectRecord<'_>,
     baseline: &str,
 ) {
     let preview_ids = if s.compare {
@@ -944,7 +972,7 @@ fn showroom_previews(
 fn showroom_specifications(
     s: &DockedScreens,
     c: &Context<'_>,
-    ship: &ObjectRecord,
+    ship: &ObjectRecord<'_>,
     baseline: &str,
 ) -> Vec<String> {
     let mut lines = if ship.id == "SH171" {
@@ -980,6 +1008,10 @@ fn showroom_specifications(
             ship.name
         ));
     }
+    if let Some(specs) = c.catalogue.authored_specifications(ship.id) {
+        lines.extend(specs.iter().cloned());
+        return lines;
+    }
     for spec in c
         .catalogue
         .specifications
@@ -1014,8 +1046,8 @@ fn category(id: meridian_core::station_services::CommodityId) -> Ink {
     }
 }
 fn market(s: &DockedScreens, c: &Context<'_>, f: &mut Frame) {
-    let body = f.viewport.body();
-    let cell = body.width / 4.0;
+    let area = f.viewport.body();
+    let cell = area.width / 4.0;
     for (i, (title, control)) in [
         ("Buy", Control::TradeMode(false)),
         ("Sell", Control::TradeMode(true)),
@@ -1040,12 +1072,39 @@ fn market(s: &DockedScreens, c: &Context<'_>, f: &mut Frame) {
         button(
             f,
             title,
-            Rect::new(body.x + i as f64 * cell, 77.0, cell - 4.0, 21.0),
+            Rect::new(area.x + i as f64 * cell, 77.0, cell - 4.0, 21.0),
             control,
             refusal.is_none(),
             refusal,
         );
     }
+    for (index, (title, key)) in [
+        ("-10", Key::QuantityLessTen),
+        ("-1", Key::QuantityLess),
+        ("+1", Key::QuantityMore),
+        ("+10", Key::QuantityMoreTen),
+    ]
+    .into_iter()
+    .enumerate()
+    {
+        button(
+            f,
+            title,
+            Rect::new(area.x + index as f64 * 38.0, area.y, 34.0, 20.0),
+            Control::Key(key),
+            true,
+            None,
+        );
+    }
+    label(
+        f,
+        format!("Qty {} {}", s.quantity, s.commodity.unit().symbol()),
+        area.x + 152.0,
+        area.y,
+        Ink::Yellow,
+        area,
+    );
+    let body = Rect::new(area.x, area.y + 25.0, area.width, area.height - 25.0);
     let offsets = [0.0, 0.38, 0.57, 0.73, 0.87];
     for (i, title) in ["Product", "Price CR", "Stock", "Hold", "Unit"]
         .iter()
@@ -1072,7 +1131,7 @@ fn market(s: &DockedScreens, c: &Context<'_>, f: &mut Frame) {
         return;
     };
     let selected = order.iter().position(|id| *id == s.commodity).unwrap_or(0);
-    let count = f.viewport.rows(body, 60.0);
+    let count = f.viewport.rows(body, 60.0).max(1);
     let offset = start(selected, count, order.len());
     for (i, id) in order.iter().skip(offset).take(count).enumerate() {
         let y = body.y + 22.0 + i as f64 * 20.0;
@@ -1137,17 +1196,25 @@ fn market(s: &DockedScreens, c: &Context<'_>, f: &mut Frame) {
             )
         },
     );
-    label(
-        f,
-        quote,
-        body.x,
-        body.y + body.height - 40.0,
-        Ink::Yellow,
-        body,
-    );
+    if body.height >= 84.0 {
+        label(
+            f,
+            quote,
+            body.x,
+            body.y + body.height - 40.0,
+            Ink::Yellow,
+            body,
+        );
+    }
     let text = reserved.map_or_else(
         || "Cargo custody unavailable".into(),
-        |n| format!("Reserved: {n}; Mission cargo requires authorisation for sale."),
+        |n| {
+            if body.height >= 84.0 {
+                format!("Reserved: {n}; Mission cargo requires authorisation for sale.")
+            } else {
+                format!("Reserved: {n} | F Refuel")
+            }
+        },
     );
     label(
         f,

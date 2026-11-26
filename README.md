@@ -24,6 +24,10 @@ The development source also provides a separate Goshawk Mk II Custom Showroom an
 
 Medusa (SH171) can be inspected in the station Showroom. The source package preserves both original meshes and the inspection shield. The Showroom lists the verified empty stock dry mass. [Medusa inspection and flight limits](integration/sh171-medusa/README.md)
 
+The follow-up development candidate offers 115 selectable stock previews in the ordinary station Showroom. This includes 109 validated Hull Studio schema-1 fleet packages and six original stock models. Cheetah (SH082) and the 22 outstanding entries in the final fleet intake remain outside the preview registry. These are catalogue previews, not new ships for purchase or flight. [Hull Studio](docs/HULL-STUDIO.md) also opens a local or archived preview in a disposable Showroom session without changing the player's ship. The earlier 37-preview Mac build passed the stock loader and station Showroom tests; the expanded registry still needs final platform and native presentation validation. [Outstanding fleet scope](docs/IMPLEMENTATION-STATUS.md#outstanding-fleet-inspection-scope)
+
+The separate [Medusa player flight preview](integration/sh171-medusa-preview/README.md) uses a dedicated profile and the admitted reduced flight geometry. On signed Mac build `5a924315`, the original SH171 artwork was visible in actual flight at 50.30/50.30. A cold restart restored the same ship, speed and expanded 32 t hold. Native docking return and fit-limit refusal were not observed in that run. Ordinary progression, fabrication and exchange do not grant the Medusa. Final release qualification remains separate.
+
 ## Internal Mule docking validation
 
 The internal SH001 Mule scene uses the original SH028 station. On Mac build `ffb7112`, Mule entered the clear opening at tick 104. On the obstructed approach it stopped at the station lip at tick 11. In the development build, completing all eight G02 freight handovers unlocks a single Mule encounter on the next launch from Renas. A returning pilot whose saved ship overlaps the Mule’s berth can fly clear before the Mule appears. Preview 8 predates this encounter. The reviewed renderer build `1cdac5e` also passed the aligned crossing on Mac and the docking regressions on Linux and native Windows. [Controls and test scope](docs/MULE-VALIDATION-LAUNCH.md)
@@ -116,16 +120,21 @@ H or ? opens a dismissible help popup for the current screen, including station 
 | Ctrl+Shift+X when docked | Explicit XYZZY testing menu; Enter reviews then confirms |
 | 0 when docked (current source) | Commander details |
 | 1 / 2 / 3 / 4 / 5 when docked | Galaxy / System / Ships / Market / Equipment |
-| P on the station Galaxy chart (development) | Toggle the best-profit scan of reachable markets; P in flight still pauses |
+| P on the station Galaxy chart (development) | Toggle the best-profit scan with commodity quantities and live quote estimates; P in flight still pauses |
+| R, then D in a station route review (development) | Inspect estimated trade per leg; D, B or Enter closes details without installing a route |
 | L; W/S; arrows; A/D; Q/E; Space | Launch; thrust; pitch; yaw; roll; brake |
 | N in flight (development) | Engage the fitted navigation computer for docking, or cancel the approach |
 | Tab / F / Delete / Shift+I in flight (development) | Cycle scanner contacts by distance / switch between assisted and manual targeting / release target / show target details |
 | J; T (docked); R; Enter; B; F (docked) | Travel; select contact; review; confirm; cancel; buy fuel |
-| M; [ / ]; G / Shift+G | Market; commodity selection; buy/sell one native unit |
+| M; [ / ]; Left/Right; Shift+Left/Right; G / Shift+G | Market; commodity selection; adjust quantity by 1 / 10; review buy/sell |
 | O; K; U; Y | Equipment panel; buy/fit cargo bay; store when docked; refit |
 | Hold U in active flight | Charge the fitted EMP for 600 accepted ticks; early release cancels |
 | I; V; X | Mission details; review all held freight deliveries; review abandonment |
 | T in flight; F1; F2; F3; F4 | Lock the selected ship for missiles; next ship/practice lock; arm/safe; launch one missile; safe/unlock |
+
+The [station trade estimate details](integration/followup-trade-detail/README.md) show the current finite commodity allocation behind the chart scan and route estimates. They do not purchase, sell or install a route.
+
+The [atomic market quantity controls](integration/followup-bulk-market/README.md) review and settle all requested native units together or refuse the entire purchase or sale. They retain the existing per-unit receipts and save format.
 | F7; F8; F10 | Review attempt closure; reception; fresh consent |
 | F6; F12; C; 0/1/2/3 | Flight lesson consent/reception; cancellation; details; view direction |
 | P; F11; F5; F9 | Pause; fullscreen; save; reload the current qualified save |
@@ -163,6 +172,40 @@ The workspace pins Rust and dependencies in [rust-toolchain.toml](rust-toolchain
 - [Arna Cutter source envelope and Hull Studio definition](docs/ARNA-CUTTER-SOURCE.md)
 - [Vulture Raider source envelope and Hull Studio definition](docs/VULTURE-RAIDER-SOURCE.md)
 - [Rabbit Explorer source envelope and Hull Studio definition](docs/RABBIT-EXPLORER-SOURCE.md)
+- [Rhinoceros Trader source envelope and Hull Studio definition](docs/RHINOCEROS-TRADER-SOURCE.md)
+- [Badger source envelope and Hull Studio definition](docs/BADGER-SOURCE.md)
+- [Baza Fighter source envelope and Hull Studio definition](docs/BAZA-FIGHTER-SOURCE.md)
+- [Baza Mk II source envelope and Hull Studio definition](docs/BAZA-MK-II-SOURCE.md)
+- [Griffon source envelope and Hull Studio definition](docs/GRIFFON-SOURCE.md)
+- [Griffon Mk II source envelope and Hull Studio definition](docs/GRIFFON-MK-II-SOURCE.md)
+- [Griffon Spectre source envelope and Hull Studio definition](docs/GRIFFON-SPECTRE-SOURCE.md)
+- [Dzo source envelope and Hull Studio definition](docs/DZO-SOURCE.md)
+- [Dzo Mk II source envelope and Hull Studio definition](docs/DZO-MK-II-SOURCE.md)
+- [Hog source envelope and Hull Studio definition](docs/HOG-SOURCE.md)
+- [Tamaraw source envelope and Hull Studio definition](docs/TAMARAW-SOURCE.md)
+- [Oryx Voyager source envelope and Hull Studio definition](docs/ORYX-VOYAGER-SOURCE.md)
+- [Carabao Freighter source envelope and Hull Studio definition](docs/CARABAO-FREIGHTER-SOURCE.md)
+- [Carabao Highliner source envelope and Hull Studio definition](docs/CARABAO-HIGHLINER-SOURCE.md)
+- [Jaguar source envelope and Hull Studio definition](docs/JAGUAR-SOURCE.md)
+- [Hare Explorer source envelope and Hull Studio definition](docs/HARE-EXPLORER-SOURCE.md)
+- [Llama source envelope and Hull Studio definition](docs/LLAMA-SOURCE.md)
+- [Laggar source envelope and Hull Studio definition](docs/LAGGAR-SOURCE.md)
+- [Alpaca source envelope and Hull Studio definition](docs/ALPACA-SOURCE.md)
+- [Elk source envelope and Hull Studio definition](docs/ELK-SOURCE.md)
+- [Springbok Starliner source envelope and Hull Studio definition](docs/SPRINGBOK-STARLINER-SOURCE.md)
+- [Antelope source envelope and Hull Studio definition](docs/ANTELOPE-SOURCE.md)
+- [Gopher source envelope and Hull Studio definition](docs/GOPHER-SOURCE.md)
+- [Elephant source envelope and Hull Studio definition](docs/ELEPHANT-SOURCE.md)
+- [Aurochs source envelope and Hull Studio definition](docs/AUROCHS-SOURCE.md)
+- [Giraffe Liner source envelope and Hull Studio definition](docs/GIRAFFE-LINER-SOURCE.md)
+- [Shikra source envelope and Hull Studio definition](docs/SHIKRA-SOURCE.md)
+- [Shikra Interdictor source envelope and Hull Studio definition](docs/SHIKRA-INTERDICTOR-SOURCE.md)
+- [Wisent source envelope and Hull Studio definition](docs/WISENT-SOURCE.md)
+- [Wisent Mk II source envelope and Hull Studio definition](docs/WISENT-MK-II-SOURCE.md)
+- [Anoa source envelope and Hull Studio definition](docs/ANOA-SOURCE.md)
+- [Ox source envelope and Hull Studio definition](docs/OX-SOURCE.md)
+- [Ox Mk II source envelope and Hull Studio definition](docs/OX-MK-II-SOURCE.md)
+- [Cavy Racer source envelope and Hull Studio definition](docs/CAVY-RACER-SOURCE.md)
 - [Stag Liner source envelope and Hull Studio definition](docs/STAG-LINER-GAMEPLAY-ENVELOPE.md)
 - [Architecture](docs/ARCHITECTURE.md) and [core API](crates/meridian-core/README.md)
 - [First playable criteria](docs/FIRST-PLAYABLE.md) and [source-grounded roadmap](docs/LEGACY-MILESTONES.md)

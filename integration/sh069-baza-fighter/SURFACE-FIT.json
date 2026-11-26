@@ -1,0 +1,105 @@
+{
+  "nominalPaddingMetres": 0.02,
+  "minimumRefinementTargetsMillimetres": {
+    "detailed": 2000,
+    "native": 2900
+  },
+  "fullUpperMillimetres": {
+    "detailed": 1983,
+    "native": 2810
+  },
+  "pieces": {
+    "central-hull": {
+      "detailed": 1911,
+      "native": 2810
+    },
+    "port-wing": {
+      "detailed": 1752,
+      "native": 2419
+    },
+    "port-pylon": {
+      "detailed": 1307,
+      "native": 1307
+    },
+    "port-engine": {
+      "detailed": 1983,
+      "native": 2381
+    },
+    "starboard-wing": {
+      "detailed": 1752,
+      "native": 2419
+    },
+    "starboard-pylon": {
+      "detailed": 1307,
+      "native": 1307
+    },
+    "starboard-engine": {
+      "detailed": 1983,
+      "native": 2381
+    },
+    "dorsal-canopy": {
+      "detailed": 415,
+      "native": 1222
+    },
+    "dorsal-cap": {
+      "detailed": 339,
+      "native": 1841
+    },
+    "port-service-pipe": {
+      "detailed": 260,
+      "native": 322
+    },
+    "port-instrument-housing": {
+      "detailed": 668,
+      "native": 1110
+    },
+    "port-louvre-1": {
+      "detailed": 247,
+      "native": 420
+    },
+    "port-louvre-2": {
+      "detailed": 247,
+      "native": 415
+    },
+    "port-louvre-3": {
+      "detailed": 247,
+      "native": 411
+    },
+    "port-louvre-4": {
+      "detailed": 247,
+      "native": 406
+    },
+    "port-louvre-5": {
+      "detailed": 247,
+      "native": 401
+    },
+    "starboard-service-pipe": {
+      "detailed": 260,
+      "native": 1407
+    },
+    "starboard-instrument-housing": {
+      "detailed": 668,
+      "native": 1237
+    },
+    "starboard-louvre-1": {
+      "detailed": 247,
+      "native": 428
+    },
+    "starboard-louvre-2": {
+      "detailed": 247,
+      "native": 423
+    },
+    "starboard-louvre-3": {
+      "detailed": 247,
+      "native": 418
+    },
+    "starboard-louvre-4": {
+      "detailed": 247,
+      "native": 413
+    },
+    "starboard-louvre-5": {
+      "detailed": 247,
+      "native": 408
+    }
+  }
+}

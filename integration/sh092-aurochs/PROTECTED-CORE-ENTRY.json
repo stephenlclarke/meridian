@@ -1,0 +1,12 @@
+{
+  "schema": 1,
+  "id": "sh092-aurochs",
+  "undoBefore": [
+    "sh090-elephant"
+  ],
+  "undoAfter": [],
+  "kind": "declaration",
+  "module": "aurochs",
+  "before": "pub mod arna_cutter;\n",
+  "after": "pub mod badger;\n"
+}

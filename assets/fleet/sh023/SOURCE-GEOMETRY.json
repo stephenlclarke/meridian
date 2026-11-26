@@ -1,0 +1,85 @@
+{
+  "id": "SH023",
+  "name": "Peregrine Mk III",
+  "legacyRevision": "a11fe16924d87d06021816f9037952afcbac08db",
+  "metresPerSourceUnit": "250000/19057",
+  "sourceOriginUnchanged": true,
+  "detail": {
+    "vertices": 2072,
+    "faces": 3484,
+    "components": 165,
+    "bounds": [
+      [
+        -16.077924122369733,
+        -6.165713386157318,
+        -20.230886288502912
+      ],
+      [
+        16.07295219604345,
+        8.874691714330693,
+        19.76911371149709
+      ]
+    ]
+  },
+  "native": {
+    "vertices": 310,
+    "faces": 512,
+    "components": 27,
+    "bounds": [
+      [
+        -16.033911423623866,
+        -6.165713386157318,
+        -20.230886288502912
+      ],
+      [
+        16.02900508999318,
+        8.874691714330693,
+        19.76911371149709
+      ]
+    ],
+    "faceLimit": 512,
+    "faceLimitStatus": "ORIGINAL_AT_LIMIT",
+    "successor": "docs/fleet-design-v2/successors/SH023-station-ring-512.json"
+  },
+  "shapePieces": 69,
+  "membershipEncoding": "one u8 support index per source vertex",
+  "textures": [
+    "l337-patrol-diffuse",
+    "l337-strike-diffuse",
+    "l337-service-details"
+  ],
+  "pins": {
+    "resource.toml": "02c305ee07a18212f3f72261bd3e511f9d9f57e61f97ab3e1028a5bfe750760d",
+    "native-export.json": "4b98f4397dd006608962d8cfce1dd5a879a63096da4af32acb2a6ff97e9c55cc",
+    "engineering.json": "faed5a093132a6c6477937468a5ee21ca52f2b76f968c6f5921d8246d2da0698",
+    "contract.toml": "a9a7493a346f06aa594ce764e64bcb6635b8284c78293c3a2724c4607472887e",
+    "native-successor.json": "5997060c2e36909aff5de387bd6d6a5676a13679ddeeedc66e2fafecd4d01b40",
+    "LICENSE": "033b7058d73f22c3c6b8a5825eb866ca2d67088f3ee94dd5f3e46da59d624766"
+  },
+  "outputs": {
+    "source.vertices": {
+      "bytes": 57184,
+      "sha256": "c0705163d1754209d22ba06a4290bde972f900bc4a70f60bade707c372a3c607"
+    },
+    "source-triangles.bin": {
+      "bytes": 47952,
+      "sha256": "8706cd84db308c4b837ec0277403b148eadc9c41050e5418dfe5b5c78183cf28"
+    },
+    "source-piece-membership.bin": {
+      "bytes": 2382,
+      "sha256": "5bcc48259caa45c06aebbeb30c36d3a11a22e01b9f345333eaa7103c0ed9d116"
+    },
+    "PIECES.json": {
+      "bytes": 3394,
+      "sha256": "a70f8bcabc02ff32cbfbe0bcd9197faa08cff9cba0c57e1de160503f64d6a52d"
+    },
+    "visual.bin": {
+      "bytes": 585328,
+      "sha256": "3da7a631ea3f9c4361bf4bfc6972b6a84f94acf4a32adb8936caf53215f36150"
+    },
+    "native-visual.bin": {
+      "bytes": 86032,
+      "sha256": "cb4fe246ce3afc7b81cbf278d7a4b4d81862dc3c5fea03142a6aa370abdca6a4"
+    }
+  }
+}
