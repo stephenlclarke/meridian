@@ -175,3 +175,5 @@ integration/*/PROTECTED-CORE-ENTRY.json text eol=lf
 integration/*/PROTECTED-CORE-INVERSE.json text eol=lf
 integration/sh001-mule/*.patch -text
 integration/sh008-goshawk/*.json text eol=lf
+integration/scanner-preview/*.json text eol=lf
+integration/scanner-preview/historical/*.json text eol=lf
