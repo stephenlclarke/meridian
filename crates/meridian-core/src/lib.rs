@@ -2,6 +2,7 @@
 
 #![forbid(unsafe_code)]
 
+pub mod alpaca;
 pub mod aplomado_interceptor;
 pub mod arna_cutter;
 pub mod badger;
