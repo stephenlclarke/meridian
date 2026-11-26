@@ -3,6 +3,7 @@
 #![forbid(unsafe_code)]
 
 pub mod aplomado_interceptor;
+pub mod arna_cutter;
 pub mod banteng;
 pub mod barbary;
 pub mod caracal_scout;
