@@ -244,6 +244,10 @@ Hare Explorer preserves its original 3,108-face detailed and 184-face native art
 
 Llama preserves its original 3,096-face detailed and 172-face native artwork. Both meshes preserve the nozzle and deck-rail contacts, plus the canopy and crossbeam overlaps with the cabin. [Llama source and evidence](LLAMA-SOURCE.md)
 
+## Laggar catalogue source
+
+Laggar preserves 3,108 detailed and 184 native original faces. Both meshes retain seven structural overlaps, including the canopy and outrigger assemblies, and preserve the original fin clearances. [Laggar source and evidence](LAGGAR-SOURCE.md)
+
 ## Goshawk Mk II Custom candidate
 
 SH010 has its own original detailed preview, authenticated engineering record and 73 rounded collision supports. Independent source projection checks cover its open forward channel, both original station fit controls and a strict SH028 lip-contact witness. The Rust controlled World, core fit, shader and minimum Showroom regressions are authored and await the owned platform runs. No additional ordinary ship placement, acquisition or native acceptance follows from this source update. [SH010 geometry and acceptance criteria](GOSHAWK-MK-II-CUSTOM.md)

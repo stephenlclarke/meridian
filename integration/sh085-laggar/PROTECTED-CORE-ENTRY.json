@@ -1,0 +1,12 @@
+{
+  "schema": 1,
+  "id": "sh085-laggar",
+  "undoBefore": [
+    "sh084-llama"
+  ],
+  "undoAfter": [],
+  "kind": "declaration",
+  "module": "laggar",
+  "before": "pub mod jaguar;\n",
+  "after": "pub mod lanner;\n"
+}
