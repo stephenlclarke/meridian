@@ -258,6 +258,28 @@ fn refuse_missing_scoops(mut world: World) {
     assert!(cold.mining_collection_target(rock.id).is_none());
 }
 
+fn verify_manual_override(mut world: World, mining_item: u64, pulse_item: u64) {
+    let rock = launch_mining(&mut world);
+    let target = WorkTargetId::Asteroid(rock.id);
+    let held = some(world.commodity_quantity(rock.commodity));
+    select_rock(&mut world, target);
+    ok(world.step(FlightInput::default()));
+    assert_eq!(some(world.fitted_mining_tool()).item, mining_item);
+    ok(world.step(FlightInput {
+        yaw: 0.5,
+        ..FlightInput::default()
+    }));
+    assert!(world.automatic_work_status().is_none());
+    assert!(world.targeting_snapshot().is_none());
+    assert_eq!(some(world.mining_belt_snapshot()).bodies[0], rock);
+    assert_eq!(world.commodity_quantity(rock.commodity), Some(held));
+    assert_eq!(
+        some(world.pulse_laser_snapshot()).fitted_item_id,
+        pulse_item
+    );
+    assert!(world.fitted_mining_tool().is_none());
+}
+
 #[test]
 fn earned_mining_select_once_delivers_one_real_ore_unit_and_retains_it_on_continue() {
     let mut world = market_funded(ok(World::new_commander(16844)));
@@ -319,29 +341,20 @@ fn earned_mining_select_once_delivers_one_real_ore_unit_and_retains_it_on_contin
     assert_eq!(some(world.pulse_laser_snapshot()).fitted_item_id, pulse.id);
     assert!(world.fitted_mining_tool().is_none());
 
-    // A separately continued copy of the normally earned profile exercises refusal.
-    // It never mutates the paid positive journey below.
-    refuse_missing_scoops(ok(World::from_save_bytes(&ok(world.save_bytes()))));
+    // Refusal and manual cancellation each start from the same paid fit.
+    // The delivery journey gets its own first target selection.
+    let docked_save = ok(world.save_bytes());
+    refuse_missing_scoops(ok(World::from_save_bytes(&docked_save)));
+    verify_manual_override(
+        ok(World::from_save_bytes(&docked_save)),
+        mining.id,
+        pulse.id,
+    );
 
     let rock = launch_mining(&mut world);
     let target = WorkTargetId::Asteroid(rock.id);
     let identity = TargetIdentity::Work(target);
     let held = some(world.commodity_quantity(rock.commodity));
-
-    // A manual override ends the original lock before it can work.
-    select_rock(&mut world, target);
-    ok(world.step(FlightInput::default()));
-    assert_eq!(some(world.fitted_mining_tool()).item, mining.id);
-    ok(world.step(FlightInput {
-        yaw: 0.5,
-        ..FlightInput::default()
-    }));
-    assert!(world.automatic_work_status().is_none());
-    assert!(world.targeting_snapshot().is_none());
-    assert_eq!(some(world.mining_belt_snapshot()).bodies[0], rock);
-    assert_eq!(world.commodity_quantity(rock.commodity), Some(held));
-    assert_eq!(some(world.pulse_laser_snapshot()).fitted_item_id, pulse.id);
-    assert!(world.fitted_mining_tool().is_none());
 
     // One selection starts extraction and physical intake. No manual fire, scoop,
     // second target selection, test-only movement or direct resource mutation follows.
