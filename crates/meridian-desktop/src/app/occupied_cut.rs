@@ -143,8 +143,122 @@ impl App {
 #[cfg(test)]
 mod tests {
     use super::*;
+    use crate::app::FrameAdvance;
     use crate::profile::tests::{TestDirectory, open};
-    use meridian_core::FlightInput;
+    use meridian_core::{FlightInput, TargetFilter, TargetingViewport};
+    use std::fs;
+    use winit::{event::ElementState, keyboard::PhysicalKey};
+
+    // Produced by the existing core disabled_native_target_with_fit fixture at its first
+    // successful actual review. The retained save has no occupied-cut contact or selected lock.
+    const HELD_OCCUPIED: &[u8] =
+        include_bytes!("../../../meridian-core/tests/fixtures/occupied-cut-held-v17.bin");
+
+    fn ok<T, E: core::fmt::Debug>(value: Result<T, E>) -> T {
+        value.unwrap_or_else(|error| panic!("{error:?}"))
+    }
+
+    fn some<T>(value: Option<T>) -> T {
+        value.unwrap_or_else(|| panic!("required actual occupied state"))
+    }
+
+    fn press(app: &mut App, code: KeyCode, repeat: bool) -> Option<KeyCode> {
+        app.route_keyboard(PhysicalKey::Code(code), ElementState::Pressed, repeat, None)
+    }
+
+    fn ready_app(directory: &TestDirectory, filter: TargetFilter) -> (App, NpcId) {
+        assert_eq!(HELD_OCCUPIED.len(), 39_168);
+        ok(fs::write(
+            directory.0.join("commander.meridian"),
+            HELD_OCCUPIED,
+        ));
+        let mut profile = open(&directory.0);
+        ok(profile.continue_saved());
+        let mut app = App::with_profile(profile);
+        assert_eq!(app.game.world.snapshot().tick, 34_515);
+        let target = some(
+            some(app.game.world.traffic_snapshot())
+                .actors
+                .into_iter()
+                .find(|actor| actor.electrical_disabled && actor.emp_crew_aboard == Some(1)),
+        )
+        .id;
+        assert_eq!(target.profile(), 16_101);
+        assert_eq!(target.system(), meridian_core::navigation::SystemId::RENAS);
+        assert_eq!(target.serial(), 2);
+        assert_eq!(some(app.game.world.fitted_salvage_cutter()).id, 116_114);
+        assert_eq!(app.game.world.occupied_cut_contacts().count(), 0);
+        assert_eq!(app.game.world.target_filter(), TargetFilter::Ships);
+        if matches!(filter, TargetFilter::Salvage | TargetFilter::All) {
+            assert_eq!(
+                ok(app.game.world.cycle_target_filter()),
+                TargetFilter::Mining
+            );
+            assert_eq!(
+                ok(app.game.world.cycle_target_filter()),
+                TargetFilter::Salvage
+            );
+            if filter == TargetFilter::All {
+                assert_eq!(ok(app.game.world.cycle_target_filter()), TargetFilter::All);
+            }
+        } else {
+            assert_eq!(filter, TargetFilter::Ships);
+        }
+        // Supply only the actual actor ID to the public viewport contract.
+        // A headless host route does not qualify native clipping or keyboard delivery.
+        let viewport = TargetingViewport {
+            size: [1280, 720],
+            front: vec![target],
+        };
+        let hint = [WorkTargetId::Wreck(target)];
+        for _ in 0..4 {
+            assert!(ok(app.game.world.cycle_targeting_with_work(
+                app.game.world.snapshot().tick,
+                viewport.clone(),
+                &hint
+            )));
+            if app.game.world.selected_disabled_salvage_target() == Some(target) {
+                break;
+            }
+        }
+        assert_eq!(
+            app.game.world.selected_disabled_salvage_target(),
+            Some(target)
+        );
+        let before = app.game.world.snapshot().tick;
+        ok(app.game.world.review_occupied_cut(target, before)).cancel();
+        // Existing physical hold means the next accepted tick is sufficient; a catch-up
+        // frame must stop there, before any extra simulation time or held weapon input.
+        assert!(matches!(
+            app.advance_frame(true, 8),
+            FrameAdvance::Continue(_)
+        ));
+        assert!(app.modal_open(), "occupied hold did not open confirmation");
+        assert!(app.game.world.snapshot().tick <= before + 1);
+        assert_eq!(some(app.occupied_cut.as_ref()).target(), target);
+        let warning = some(app.occupied_cut_panel());
+        assert!(warning.title.contains("Occupied salvage"));
+        assert!(
+            warning
+                .lines
+                .iter()
+                .any(|line| line.contains(&format!("Target #{}", target.serial())))
+        );
+        assert!(
+            warning
+                .lines
+                .iter()
+                .any(|line| line.contains("No verified"))
+        );
+        assert!(warning.lines.len() + 2 <= crate::help::MAX_LINES);
+        assert!(
+            warning
+                .lines
+                .iter()
+                .all(|line| line.len() <= crate::help::MAX_COLUMNS)
+        );
+        (app, target)
+    }
 
     #[test]
     fn confirmation_key_policy_consumes_ordinary_controls_and_repeats() {
@@ -210,5 +324,162 @@ mod tests {
                 .unwrap_or_else(|e| panic!("{e}")),
             before
         );
+    }
+
+    #[test]
+    fn actual_occupied_ships_warning_freezes_and_cancels_without_any_contact_or_repeat() {
+        let directory = TestDirectory::new();
+        let (mut app, target) = ready_app(&directory, TargetFilter::Ships);
+        let slot = directory.0.join("commander.meridian");
+        let opening = ok(app.game.world.save_bytes());
+        let tick = app.game.world.snapshot().tick;
+        for key in [
+            KeyCode::KeyW,
+            KeyCode::KeyA,
+            KeyCode::KeyZ,
+            KeyCode::KeyU,
+            KeyCode::KeyJ,
+            KeyCode::KeyP,
+            KeyCode::KeyH,
+            KeyCode::Tab,
+            KeyCode::F5,
+            KeyCode::F9,
+        ] {
+            assert_eq!(press(&mut app, key, false), None);
+            assert!(app.keys.is_empty());
+        }
+        assert_eq!(press(&mut app, KeyCode::Enter, true), None);
+        assert!(matches!(
+            app.advance_frame(true, 16),
+            FrameAdvance::Continue(_)
+        ));
+        assert_eq!(app.game.world.snapshot().tick, tick);
+        assert_eq!(ok(app.game.world.save_bytes()), opening);
+        assert_eq!(ok(fs::read(&slot)), HELD_OCCUPIED);
+        assert_eq!(app.game.world.occupied_cut_contacts().count(), 0);
+        assert_eq!(some(app.occupied_cut.as_ref()).target(), target);
+
+        assert_eq!(press(&mut app, KeyCode::Escape, false), None);
+        assert!(!app.modal_open());
+        assert!(app.game.world.targeting_snapshot().is_none());
+        assert_eq!(ok(app.game.world.save_bytes()), opening);
+        assert_eq!(ok(fs::read(&slot)), HELD_OCCUPIED);
+        assert!(matches!(
+            app.advance_frame(true, 8),
+            FrameAdvance::Continue(_)
+        ));
+        assert!(!app.modal_open());
+        assert!(app.game.world.snapshot().tick > tick);
+        assert_eq!(app.game.world.occupied_cut_contacts().count(), 0);
+    }
+
+    #[test]
+    fn actual_occupied_warning_abandons_stale_target_and_focus_loss_without_contact() {
+        let stale = TestDirectory::new();
+        let (mut app, _) = ready_app(&stale, TargetFilter::Salvage);
+        let tick = app.game.world.snapshot().tick;
+        app.game.world.cancel_targeting();
+        assert!(matches!(
+            app.advance_frame(true, 8),
+            FrameAdvance::Continue(_)
+        ));
+        assert_eq!(app.game.world.snapshot().tick, tick);
+        assert!(!app.modal_open());
+        assert_eq!(app.game.world.occupied_cut_contacts().count(), 0);
+        assert_eq!(
+            ok(fs::read(stale.0.join("commander.meridian"))),
+            HELD_OCCUPIED
+        );
+
+        let focus = TestDirectory::new();
+        let (mut app, _) = ready_app(&focus, TargetFilter::All);
+        app.focus_changed(false);
+        assert!(!app.modal_open());
+        assert!(app.game.world.targeting_snapshot().is_none());
+        assert_eq!(app.game.world.occupied_cut_contacts().count(), 0);
+        assert_eq!(
+            ok(fs::read(focus.0.join("commander.meridian"))),
+            HELD_OCCUPIED
+        );
+    }
+
+    #[test]
+    fn actual_occupied_salvage_confirmation_publishes_one_contact_and_survives_cold_continue() {
+        let directory = TestDirectory::new();
+        let (mut app, target) = ready_app(&directory, TargetFilter::Salvage);
+        let opening = ok(app.game.world.save_bytes());
+        let tick = app.game.world.snapshot().tick;
+        let cutter = some(app.game.world.fitted_salvage_cutter()).id;
+        let unlawful = some(app.occupied_cut.as_ref()).is_unlawful();
+        let actor = some(app.game.world.traffic_snapshot()).actors;
+        let hold = app.game.world.service_snapshot();
+        let cash = app.game.world.credits_tenths();
+        assert_eq!(press(&mut app, KeyCode::Enter, false), None);
+        assert!(!app.modal_open());
+        assert!(app.game.world.targeting_snapshot().is_none());
+        let contacts: Vec<_> = app.game.world.occupied_cut_contacts().collect();
+        assert_eq!(contacts.len(), 1);
+        assert_eq!(contacts[0].target, target);
+        assert_eq!(contacts[0].cutter_item, cutter);
+        assert_eq!(contacts[0].world_tick, tick);
+        assert_eq!(contacts[0].unlawful, unlawful);
+        assert_eq!(some(app.game.world.traffic_snapshot()).actors, actor);
+        assert_eq!(app.game.world.service_snapshot(), hold);
+        assert_eq!(app.game.world.credits_tenths(), cash);
+        let durable = ok(fs::read(directory.0.join("commander.meridian")));
+        assert_ne!(durable, opening);
+        let decoded = ok(World::from_save_bytes(&durable));
+        assert_eq!(
+            decoded.occupied_cut_contacts().collect::<Vec<_>>(),
+            contacts
+        );
+        assert_eq!(decoded.service_snapshot(), hold);
+        assert_eq!(decoded.credits_tenths(), cash);
+        assert_eq!(press(&mut app, KeyCode::Enter, true), None);
+        assert!(matches!(
+            app.advance_frame(true, 8),
+            FrameAdvance::Continue(_)
+        ));
+        assert!(!app.modal_open());
+        assert_eq!(
+            app.game.world.occupied_cut_contacts().collect::<Vec<_>>(),
+            contacts
+        );
+        drop(app);
+        let mut profile = open(&directory.0);
+        ok(profile.continue_saved());
+        assert_eq!(
+            profile.world.occupied_cut_contacts().collect::<Vec<_>>(),
+            contacts
+        );
+        assert_eq!(profile.world.service_snapshot(), hold);
+        assert_eq!(profile.world.credits_tenths(), cash);
+        assert!(profile.world.targeting_snapshot().is_none());
+    }
+
+    #[test]
+    fn actual_occupied_confirmation_failed_writer_publishes_no_contact_or_repeats() {
+        let directory = TestDirectory::new();
+        let (mut app, _) = ready_app(&directory, TargetFilter::Salvage);
+        let opening = ok(app.game.world.save_bytes());
+        let slot = directory.0.join("commander.meridian");
+        let retained = directory.0.join("retained-occupied-commander");
+        ok(fs::rename(&slot, &retained));
+        ok(fs::create_dir(&slot));
+        assert_eq!(press(&mut app, KeyCode::Enter, false), None);
+        assert!(!app.modal_open());
+        assert!(app.game.world.targeting_snapshot().is_none());
+        assert_eq!(app.game.world.occupied_cut_contacts().count(), 0);
+        assert_eq!(ok(app.game.world.save_bytes()), opening);
+        assert_eq!(ok(fs::read(&retained)), HELD_OCCUPIED);
+        assert!(some(app.notice.text.as_ref()).contains("could not be saved"));
+        ok(fs::remove_dir(&slot));
+        ok(fs::rename(&retained, &slot));
+        assert!(matches!(
+            app.advance_frame(true, 8),
+            FrameAdvance::Continue(_)
+        ));
+        assert!(!app.modal_open());
+        assert_eq!(app.game.world.occupied_cut_contacts().count(), 0);
     }
 }
