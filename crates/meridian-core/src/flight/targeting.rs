@@ -275,10 +275,7 @@ impl World {
 
     fn scanner_candidates(&self, origin: CombatIdentity) -> Vec<Candidate> {
         let mut contacts = self.targeting_candidates(origin, true);
-        for work in self.available_work_contacts(crate::equipment::WorkTargetingFit {
-            mining: true,
-            salvage: true,
-        }) {
+        for work in self.available_work_contacts() {
             if matches!(work.id, WorkTargetId::Wreck(id) if contacts.iter().any(|c| c.identity() == TargetIdentity::Ship(id)))
             {
                 continue;
@@ -564,7 +561,10 @@ impl World {
     }
 
     pub fn targeting_station_selected(&self) -> bool {
-        matches!(self.current_target(), Some((_, Candidate::Station(..))))
+        matches!(
+            self.targeting.selected,
+            Some(TargetIdentity::Station { .. })
+        ) && matches!(self.current_target(), Some((_, Candidate::Station(..))))
     }
 
     pub fn selected_work_target(&self) -> Option<WorkTarget> {
