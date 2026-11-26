@@ -169,7 +169,12 @@ impl Profile {
 
     pub fn new_commander(&mut self, seed: u64) -> Result<bool, String> {
         self.require_profile()?;
-        if self.playing {
+        if self.playing
+            && !self
+                .world
+                .combat_snapshot()
+                .is_some_and(|combat| combat.player.destroyed)
+        {
             return Err("Start a new commander from the title screen".into());
         }
         if self.has_save && !self.new_armed {
@@ -533,6 +538,13 @@ impl Profile {
             return Ok(());
         }
         if self.playing {
+            if self
+                .world
+                .combat_snapshot()
+                .is_some_and(|combat| combat.player.destroyed)
+            {
+                return Err("Commander destroyed; normal Quit retains the previous save. F5 explicitly saves terminal state.".into());
+            }
             self.save_with_limits(file_limit, solar_limit)?;
         }
         Ok(())

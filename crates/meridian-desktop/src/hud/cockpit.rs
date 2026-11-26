@@ -105,6 +105,9 @@ impl Cockpit {
     }
     pub fn solar_label(&self) -> Option<(&'static str, [f32; 3])> {
         let solar = self.solar?;
+        if self.destroyed && solar.cabin_temperature >= 1.0 {
+            return Some(("CABIN OVERHEAT - HULL DESTROYED", RED));
+        }
         if solar.cabin_temperature >= 0.9 {
             return Some(("CABIN CRITICAL - LEAVE CORONA", RED));
         }

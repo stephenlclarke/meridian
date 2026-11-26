@@ -1,5 +1,8 @@
 //! Actual per-physical-tick held control; the core alone owns release and electrical effects.
-use super::{App, FlightInput, KeyCode, MotionRefusal, StepError, step_frame};
+use super::{
+    App, DESTROYED_NOTICE, FlightInput, KeyCode, MotionRefusal, StepError, player_destroyed,
+    step_frame,
+};
 impl App {
     pub(super) fn cancel_emp_input(&mut self) {
         let tick = self.game.world.snapshot().tick;
@@ -16,6 +19,10 @@ impl App {
     ) -> Result<Option<MotionRefusal>, StepError> {
         let mut refusal = None;
         for _ in 0..ticks {
+            if player_destroyed(&self.game.world) {
+                self.clear_held_input();
+                break;
+            }
             let previous = self.game.world.emp_snapshot().and_then(|s| s.charge_phase);
             let held = self.keys.contains(&KeyCode::KeyU);
             if held || self.game.world.emp_snapshot().is_some() {
@@ -39,6 +46,11 @@ impl App {
             .or(refusal);
             self.emp_feedback(previous);
             self.publish_audio(fired);
+            if player_destroyed(&self.game.world) {
+                self.clear_held_input();
+                self.notice.set(DESTROYED_NOTICE.into());
+                break;
+            }
         }
         Ok(refusal)
     }
