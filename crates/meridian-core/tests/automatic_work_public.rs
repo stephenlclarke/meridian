@@ -181,19 +181,26 @@ fn verify_fragment(world: &World, rock: AsteroidSnapshot, ore: OreSnapshot) {
     assert_eq!(
         ore.vertices(),
         [
-            Vec3::new(p.x + 8.0, p.y, p.z),
-            Vec3::new(p.x - 8.0, p.y, p.z),
-            Vec3::new(p.x, p.y + 8.0, p.z),
-            Vec3::new(p.x, p.y - 8.0, p.z),
-            Vec3::new(p.x, p.y, p.z + 8.0),
-            Vec3::new(p.x, p.y, p.z - 8.0),
+            Vec3::new(p.x + 7.0, p.y + 1.0, p.z - 2.0),
+            Vec3::new(p.x - 5.0, p.y - 1.0, p.z + 2.0),
+            Vec3::new(p.x + 1.0, p.y + 10.0, p.z + 1.0),
+            Vec3::new(p.x - 2.0, p.y - 6.0, p.z - 1.0),
+            Vec3::new(p.x + 2.0, p.y + 3.0, p.z + 6.0),
+            Vec3::new(p.x - 1.0, p.y, p.z - 8.0),
         ]
     );
-    assert_eq!(ASTEROID_FACES.len(), 8);
-    assert!(
-        ASTEROID_FACES
-            .iter()
-            .all(|face| face.iter().all(|&index| index < 6))
+    assert_eq!(
+        ASTEROID_FACES,
+        [
+            [0, 2, 4],
+            [2, 1, 4],
+            [1, 3, 4],
+            [3, 0, 4],
+            [2, 0, 5],
+            [1, 2, 5],
+            [3, 1, 5],
+            [0, 3, 5]
+        ]
     );
 }
 
