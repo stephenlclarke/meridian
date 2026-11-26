@@ -317,6 +317,11 @@ impl State {
             }
             events.push((clock, 3, sequence as u64, Effect::Emp { contact }));
         }
+        for activation in world.ecm.activations() {
+            // Manual activation belongs after the completed step. There is no
+            // supported incoming NPC projectile producer or automatic receipt yet.
+            events.push((activation.physical_tick, 5, u64::MAX, Effect::Ecm));
+        }
         if let Some(clock) = world.solar.fatal_clock() {
             if clock != end
                 || events.iter().any(|&(at, _, _, effect)| {
@@ -341,6 +346,7 @@ impl State {
                 && world.traffic.player_hits().is_empty()
                 && world.mining.strokes().is_empty()
                 && world.emp.resource_effects().is_empty()
+                && world.ecm.is_empty()
                 && world.solar.fatal_clock().is_none()
             {
                 Ok(())
@@ -470,6 +476,7 @@ enum Effect {
     Mining,
     Hit { front: bool, damage: u16 },
     Emp { contact: Option<(bool, u16, u16)> },
+    Ecm,
     SolarFatal,
 }
 #[derive(Debug, Default, Clone, Copy, PartialEq, Eq)]
@@ -514,6 +521,9 @@ fn replay(events: &[ResourceEvent], end: u64) -> Result<Pools, SaveError> {
                         return Err(INVALID);
                     }
                 }
+            }
+            Effect::Ecm => {
+                pools.pulse = pools.pulse.prepare_ecm_discharge().map_err(|_| INVALID)?
             }
             Effect::Hit { front, damage } => {
                 if phase == 2 && !pools.pulse.alive() {

@@ -3,6 +3,10 @@ pub use emp::{
     EmpAxis, EmpChargePhase, EmpEquipmentAction, EmpEquipmentOffer, EmpEquipmentReview, EmpError,
     EmpGrades, EmpOrigin, EmpProvenance, EmpSnapshot, OwnedEmp, PreparedEmpEquipment,
 };
+mod ecm;
+pub use ecm::{
+    ECM_ENERGY_HUNDREDTHS, ECM_FIELD_TICKS, EcmActivation, EcmError, EcmSnapshot, EcmTrigger,
+};
 mod celestial;
 mod solar;
 pub use solar::{SolarScoopStatus, SolarSnapshot};
@@ -205,6 +209,7 @@ pub struct World {
     modular: modular::State,
     xyzzy: xyzzy::State,
     emp: emp::State,
+    ecm: ecm::State,
     navigation_trade: navigation_trade::State,
     flight_reception: flight_reception::State,
     practice: Option<practice::Practice>,
@@ -256,6 +261,7 @@ impl World {
             modular: modular::State::default(),
             xyzzy: xyzzy::State::default(),
             emp: emp::State::default(),
+            ecm: ecm::State::default(),
             navigation_trade: navigation_trade::State::default(),
             flight_reception: flight_reception::State::default(),
             practice: None,

@@ -628,6 +628,19 @@ fn equipment_action(
     {
         return Err("Owned fuel storage selection changed".into());
     }
+    let ecm_node = node == ModuleKind::Ecm.node();
+    if ecm_node != (slot == "utility-ecm") {
+        return Err("Select the E.C.M. utility slot".into());
+    }
+    if ecm_node
+        && operation != Buy
+        && !modules
+            .items
+            .iter()
+            .any(|owned| Some(owned.id) == instance && owned.kind == ModuleKind::Ecm)
+    {
+        return Err("Owned E.C.M. selection changed".into());
+    }
     if targeting_node
         && operation != Buy
         && !modules
@@ -714,6 +727,7 @@ fn module_rows(
         ModuleSlot::MiningTargeting => "Mining targeting",
         ModuleSlot::SalvageTargeting => "Salvage targeting",
         ModuleSlot::UtilityFuelScoops => "Fuel Scoops",
+        ModuleSlot::UtilityEcm => "E.C.M. utility",
         ModuleSlot::FuelStorage(_) => "Fuel storage",
     };
     let fitted = modules.items.iter().find(|item| item.slot == Some(slot));
@@ -734,6 +748,10 @@ fn module_rows(
                 row.readout
                     .push(format!("Fitted tank position {}", index + 1));
             }
+        } else if item.kind == ModuleKind::Ecm {
+            row.compatibility = "Unique SH025 utility; 1 shared mount and 1 equipment unit".into();
+            row.readout
+                .push("K: activate E.C.M. in flight | Requires more than 22 energy".into());
         } else if let ModuleKind::Shield(grade) = item.kind {
             row.compatibility = "Owned SH025 shield module; one fitted shield required".into();
             row.readout.push(format!(
@@ -841,6 +859,13 @@ fn module_rows(
                 .push("Adds 7.0 LY of tank fuel; fuel not included".into());
             row.readout
                 .push("Normal SH025: 3 shared utility mounts; global ownership cap 4".into());
+        }
+        if offer.kind == ModuleKind::Ecm {
+            row.readout
+                .push("Unique utility; 1 shared mount | E.C.M. is distinct from EMP".into());
+            row.readout.push(
+                "Manual field available; incoming NPC missile effects not supported yet".into(),
+            );
         }
         let action = if offer.kind == ModuleKind::MiningLaser {
             ModuleAction::PurchaseMiningLaser
@@ -1020,6 +1045,17 @@ fn equipment_panel(
         ),
         available: true,
     });
+    slots.push(ui::EquipmentSlot {
+        id: "utility-ecm".into(),
+        label: "E.C.M. utility".into(),
+        fitted: modules
+            .items
+            .iter()
+            .find(|item| item.slot == Some(ModuleSlot::UtilityEcm))
+            .map_or("Empty", |item| item.kind.name())
+            .into(),
+        available: true,
+    });
     let mut rows = Vec::new();
     let module_slot = match selected {
         "front-laser" => Some(ModuleSlot::FrontLaser),
@@ -1028,6 +1064,7 @@ fn equipment_panel(
         "drive" => Some(ModuleSlot::Drive),
         "shield" => Some(ModuleSlot::Shield),
         "fuel-storage" => Some(ModuleSlot::FuelStorage(0)),
+        "utility-ecm" => Some(ModuleSlot::UtilityEcm),
         "targeting" => Some(ModuleSlot::Targeting),
         "targeting-mining" => Some(ModuleSlot::MiningTargeting),
         "targeting-salvage" => Some(ModuleSlot::SalvageTargeting),

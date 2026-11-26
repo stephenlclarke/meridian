@@ -38,7 +38,9 @@ const ACTIONS: [(XyzzyAction, &str); 5] = [
 ];
 const SHIELD_ACTION: usize = ACTIONS.len();
 const MAX_TANK_ACTION: usize = SHIELD_ACTION + 1;
-const ACTION_COUNT: usize = ACTIONS.len() + 2;
+const ECM_FIT_ACTION: usize = MAX_TANK_ACTION + 1;
+const ECM_AUTO_ACTION: usize = ECM_FIT_ACTION + 1;
+const ACTION_COUNT: usize = ACTIONS.len() + 4;
 
 impl Menu {
     pub fn action(&self) -> XyzzyAction {
@@ -46,6 +48,10 @@ impl Menu {
             XyzzyAction::FitShield(ShieldGrade::ALL[self.shield_index])
         } else if self.selected == MAX_TANK_ACTION {
             XyzzyAction::MaximumFuelStorage
+        } else if self.selected == ECM_FIT_ACTION {
+            XyzzyAction::FitEcm
+        } else if self.selected == ECM_AUTO_ACTION {
+            XyzzyAction::ToggleAutoEcm
         } else {
             ACTIONS[self.selected].0
         }
@@ -106,6 +112,27 @@ impl Menu {
                 " "
             }
         ));
+        lines.push(format!(
+            "{} Fit E.C.M. only",
+            if self.selected == ECM_FIT_ACTION {
+                ">"
+            } else {
+                " "
+            }
+        ));
+        lines.push(format!(
+            "{} Toggle automatic E.C.M. ({})",
+            if self.selected == ECM_AUTO_ACTION {
+                ">"
+            } else {
+                " "
+            },
+            if snapshot.is_some_and(|s| s.automatic_ecm) {
+                "ON"
+            } else {
+                "OFF"
+            }
+        ));
         if let Some(combat) = world.combat_snapshot() {
             lines.push(format!(
                 "Fitted shield: {}",
@@ -132,6 +159,12 @@ impl Menu {
                 }
                 XyzzyAction::FitFuelScoops => {
                     "Fits only an eligible scoop in a free ordinary mount; no refuel."
+                }
+                XyzzyAction::FitEcm => {
+                    "Fits only stock E.C.M. in a free ordinary mount; no refuel."
+                }
+                XyzzyAction::ToggleAutoEcm => {
+                    "Save automatic intent; incoming NPC missiles are not yet supported."
                 }
                 XyzzyAction::MaximumFuelStorage => {
                     "Test-only 4 tanks; exceeds normal mounts. No active custody."
@@ -173,6 +206,8 @@ impl Menu {
                 "TEST MAX fits 4 tanks beyond normal SH025 mounts; no active custody",
                 "Store test tanks to meet ordinary fitting limits before contracts",
                 "Limited outfits keep fitted tanks; optional utilities use free mounts",
+                "E.C.M. test fit needs a free mount, or an already fitted module",
+                "Auto E.C.M. setting only; incoming NPC missiles remain unavailable",
                 "After confirmation you can choose another action here",
                 "Fuel mode is accounted separately; paid transactions still charge",
                 "Missiles and cargo remain finite; full original parity is incomplete",

@@ -176,8 +176,9 @@ fn disposable_preview_selects_each_stock_shield_without_replacing_maximum_other_
     };
     let original = other_modules(&app.game.world);
     menu(&mut app);
-    press(&mut app, KeyCode::ArrowUp);
-    press(&mut app, KeyCode::ArrowUp);
+    for _ in 0..5 {
+        press(&mut app, KeyCode::ArrowDown);
+    }
     for grade in ShieldGrade::ALL {
         assert_eq!(
             app.xyzzy.as_ref().map(crate::xyzzy::Menu::action),
@@ -236,7 +237,9 @@ fn actual_max_tank_row_is_explicit_and_publishes_four_distinct_items_to_disk() {
     let directory = TestDirectory::new();
     let mut app = app(&directory);
     menu(&mut app);
-    press(&mut app, KeyCode::ArrowUp);
+    for _ in 0..6 {
+        press(&mut app, KeyCode::ArrowDown);
+    }
     assert_eq!(
         app.xyzzy.as_ref().map(crate::xyzzy::Menu::action),
         Some(XyzzyAction::MaximumFuelStorage)
@@ -319,6 +322,80 @@ fn dedicated_fuel_scoops_row_does_not_change_other_equipment_or_fuel() {
 }
 
 #[test]
+fn ecm_test_rows_persist_intent_and_manual_flight_binding_uses_real_energy() {
+    let directory = TestDirectory::new();
+    let mut app = app(&directory);
+    activate(&mut app);
+    let scoop = app
+        .game
+        .world
+        .fitted_fuel_scoops()
+        .unwrap_or_else(|| panic!("scoop"));
+    ok(app
+        .game
+        .command(Action::Module(meridian_core::ModuleAction::Store {
+            item: scoop.item,
+        })));
+    menu(&mut app);
+    press(&mut app, KeyCode::ArrowUp);
+    assert_eq!(
+        app.xyzzy.as_ref().map(crate::xyzzy::Menu::action),
+        Some(XyzzyAction::ToggleAutoEcm)
+    );
+    press(&mut app, KeyCode::Enter);
+    press(&mut app, KeyCode::Enter);
+    assert!(
+        app.game
+            .world
+            .xyzzy_snapshot()
+            .is_some_and(|s| !s.automatic_ecm)
+    );
+    press(&mut app, KeyCode::ArrowUp);
+    assert_eq!(
+        app.xyzzy.as_ref().map(crate::xyzzy::Menu::action),
+        Some(XyzzyAction::FitEcm)
+    );
+    press(&mut app, KeyCode::Enter);
+    press(&mut app, KeyCode::Enter);
+    press(&mut app, KeyCode::Escape);
+    let fitted = app.game.world.fitted_ecm().unwrap_or_else(|| panic!("ecm"));
+    let bytes = ok(fs::read(directory.0.join("commander.meridian")));
+    let cold = ok(World::from_save_bytes(&bytes));
+    assert_eq!(cold.fitted_ecm(), Some(fitted));
+    assert!(cold.xyzzy_snapshot().is_some_and(|s| !s.automatic_ecm));
+    ok(app.game.command(Action::Launch));
+    ok(app.game.world.step(FlightInput::default()));
+    let before = app
+        .game
+        .world
+        .flight_resources_snapshot()
+        .unwrap_or_else(|| panic!("resources"));
+    assert_eq!(press(&mut app, KeyCode::KeyK), Some(KeyCode::KeyK));
+    app.game_key(KeyCode::KeyK);
+    let energy = app
+        .game
+        .world
+        .flight_resources_snapshot()
+        .unwrap_or_else(|| panic!("resources"));
+    assert_eq!(energy.energy_hundredths, before.energy_hundredths - 2200);
+    let capture = ok(crate::hud::cockpit::Cockpit::capture(
+        &app.game.world,
+        app.game.world.snapshot(),
+    ));
+    assert!(capture.ecm.is_some_and(|ecm| ecm.active.is_some()));
+    assert!(
+        app.route_keyboard(
+            PhysicalKey::Code(KeyCode::KeyK),
+            ElementState::Pressed,
+            true,
+            None
+        )
+        .is_none()
+    );
+    assert_eq!(app.game.world.flight_resources_snapshot(), Some(energy));
+}
+
+#[test]
 fn failed_actual_profile_publication_retains_world_saved_bytes_and_secret_review() {
     let directory = TestDirectory::new();
     let mut app = app(&directory);
@@ -388,7 +465,7 @@ fn activate_refit_and_toggle_fuel_without_leaving_the_menu() {
     assert!(app.xyzzy.as_ref().is_some_and(|menu| !menu.reviewing));
     let items = app.game.world.ammunition_snapshot();
     let modules = app.game.world.modular_equipment_snapshot();
-    for steps in [1, 1, 5] {
+    for steps in [1, 1, 7] {
         for _ in 0..steps {
             press(&mut app, KeyCode::ArrowDown);
         }
@@ -399,11 +476,10 @@ fn activate_refit_and_toggle_fuel_without_leaving_the_menu() {
         assert_eq!(app.game.world.modular_equipment_snapshot(), modules);
     }
     assert!(app.xyzzy.as_ref().is_some_and(|menu| !menu.reviewing));
-    // Up wraps through tank, shield and scoop testing rows to the fuel action.
-    press(&mut app, KeyCode::ArrowUp);
-    press(&mut app, KeyCode::ArrowUp);
-    press(&mut app, KeyCode::ArrowUp);
-    press(&mut app, KeyCode::ArrowUp);
+    // Wrap through the testing rows to the fuel action.
+    for _ in 0..6 {
+        press(&mut app, KeyCode::ArrowUp);
+    }
     press(&mut app, KeyCode::Enter);
     press(&mut app, KeyCode::ArrowDown);
     assert_eq!(

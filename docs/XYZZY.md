@@ -16,6 +16,8 @@ The stock-shield candidate adds actual Elite to the maximum outfit, plus a disti
 
 The [fuel storage candidate](FUEL-STORAGE.md) adds a separately labelled TEST MAX action for the original four-tank maximum exception. It can fit all four identified units and refill the actual 410-unit tank, while the ordinary SH025 still has three shared utility mounts. Active custody refuses this exception. A player must restore ordinary limits before accepting G02 freight or T04 trade custody. Limited outfit actions preserve fitted tanks and only add utilities into remaining ordinary mounts.
 
+The [stock ECM candidate](STOCK-ECM.md) adds Fit E.C.M. only and Toggle automatic E.C.M. after explicit activation. The first reuses or grants one fit in a free ordinary mount; neither action grants other equipment, cash or fuel. The automatic setting is durable intent only, not a claim of automatic defence: current NPCs do not emit missiles. Manual field energy, duration and save state are real and remain separate from EMP.
+
 In the flight-computer development build, activating or refitting XYZZY fits the Military targeting computer, both Mining and Salvage targeting modules, and raises all three EMP grades to 3. Local technology and shop stock apply to ordinary purchases. Returning to the same menu after a save lets you refit and change fuel mode in one visit.
 
 Explicit `Enter` persists mode/name and the once-only cash adjustment. Normal commanders remain Rowan Calder with their own720 CR birth balance. No getter, saved descriptor, purchase API or capability readout activates mode. Ordinary paid purchases continue to charge their actual prices and retain paid provenance, technology, prerequisites and limits.

@@ -869,6 +869,7 @@ impl App {
         }
         let action = match code {
             KeyCode::KeyN if in_flight => Action::ToggleAutoDocking,
+            KeyCode::KeyK if in_flight => Action::ActivateEcm,
             KeyCode::Digit0 => Action::SetFlightView(FlightView::Front),
             KeyCode::Digit1 => Action::SetFlightView(FlightView::Rear),
             KeyCode::Digit2 => Action::SetFlightView(FlightView::Left),

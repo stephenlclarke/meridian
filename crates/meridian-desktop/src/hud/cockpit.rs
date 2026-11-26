@@ -3,7 +3,9 @@
 use super::{glyph, quad};
 use crate::mesh::{Vertex, rotate_inverse};
 use meridian_core::traffic::{MAX_TRAFFIC_ACTORS, NpcPhase, Population, TrafficSnapshot};
-use meridian_core::{FlightMode, FlightView, Snapshot, SolarScoopStatus, SolarSnapshot, World};
+use meridian_core::{
+    EcmSnapshot, FlightMode, FlightView, Snapshot, SolarScoopStatus, SolarSnapshot, World,
+};
 
 const YELLOW: [f32; 3] = [1.0, 1.0, 0.0];
 const GREEN: [f32; 3] = [0.0, 1.0, 0.0];
@@ -27,6 +29,7 @@ pub struct Cockpit {
     pub fuel: Option<f32>,
     pub solar: Option<SolarSnapshot>,
     pub solar_limited: bool,
+    pub ecm: Option<EcmSnapshot>,
     pub missiles: usize,
     pub armed: bool,
     pub locked: bool,
@@ -82,6 +85,7 @@ impl Cockpit {
             solar: world.solar_snapshot(),
             solar_limited: world
                 .solar_save_limit_reached(meridian_core::save::MAX_SOLAR_HISTORY_BYTES),
+            ecm: world.ecm_snapshot(),
             missiles: world
                 .missile_rounds()
                 .map_or(0, |rounds| rounds.iter().flatten().count()),
@@ -504,6 +508,25 @@ pub fn append(c: &Cockpit, width: u32, height: u32, out: &mut Vec<Vertex>) {
         && let Some((text, color)) = c.solar_label()
     {
         label(out, text, 12.0, l.top - 14.0, l.scale, color, size);
+    }
+    if c.flight.mode == FlightMode::Flight
+        && !c.destroyed
+        && let Some(ecm) = c.ecm.filter(|s| s.fitted.is_some())
+    {
+        let (message, color) = if ecm.active.is_some() {
+            ("ECM ACTIVE", GREEN)
+        } else {
+            ("ECM FITTED", YELLOW)
+        };
+        label(
+            out,
+            message,
+            size[0] - 12.0 - message.len() as f32 * 6.0 * l.scale,
+            l.top - 14.0,
+            l.scale,
+            color,
+            size,
+        );
     }
 }
 

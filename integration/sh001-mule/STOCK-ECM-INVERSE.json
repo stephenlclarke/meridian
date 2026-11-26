@@ -1,0 +1,365 @@
+{
+  "base": "f32ada6970976e1a1e609e4777b3ef5c333f055d",
+  "files": {
+    "flight.rs": {
+      "beforeSHA256": "bbd2e1876d1c689c0f3381916fc0cfd8bd91de04f992414899d58a1399be7ff1",
+      "afterSHA256": "f9abe48972d1421011361f493688c30d2e02649e27ce32cb9aee4225e73b9e8d",
+      "hunks": [
+        {
+          "offset": 219,
+          "before": "",
+          "after": "};\nmod ecm;\npub use ecm::{\n    ECM_ENERGY_HUNDREDTHS, ECM_FIELD_TICKS, EcmActivation, EcmError, EcmSnapshot, EcmTrigger,\n"
+        },
+        {
+          "offset": 8040,
+          "before": "",
+          "after": "    ecm: ecm::State,\n"
+        },
+        {
+          "offset": 9873,
+          "before": "",
+          "after": "            ecm: ecm::State::default(),\n"
+        }
+      ]
+    },
+    "flight/damage.rs": {
+      "beforeSHA256": "4dc1b948a8dc704c315aac0f8be2642c1828ac41415062087058cdc4cb85c2ae",
+      "afterSHA256": "fda4bd0e2c89c75a827f7811c22169491541febbabd4399f3f67e5eafbc0e246",
+      "hunks": [
+        {
+          "offset": 11509,
+          "before": "",
+          "after": "        for activation in world.ecm.activations() {\n            // Manual activation belongs after the completed step. There is no\n            // supported incoming NPC projectile producer or automatic receipt yet.\n            events.push((activation.physical_tick, 5, u64::MAX, Effect::Ecm));\n        }\n"
+        },
+        {
+          "offset": 12778,
+          "before": "",
+          "after": "                && world.ecm.is_empty()\n"
+        },
+        {
+          "offset": 16670,
+          "before": "",
+          "after": "    Ecm,\n"
+        },
+        {
+          "offset": 18340,
+          "before": "",
+          "after": "            Effect::Ecm => {\n                pools.pulse = pools.pulse.prepare_ecm_discharge().map_err(|_| INVALID)?\n            }\n"
+        }
+      ]
+    },
+    "flight/emp/runtime.rs": {
+      "beforeSHA256": "754f048a0fbb59a55822d664192e74ca0c0134b17b1bee14b66f26ec5ce32140",
+      "afterSHA256": "951e8fd668ea30d86f4cd5bf632cb108a99114eba9b78c565a6b7973b2390222",
+      "hunks": [
+        {
+          "offset": 5653,
+          "before": "",
+          "after": "    }\n    pub(in crate::flight) fn cancel_for_ecm(&mut self, clock: u64) {\n        self.cancel(clock);\n        self.held_tick = None;\n"
+        },
+        {
+          "offset": 15459,
+          "before": "",
+          "after": "        if self.active_ecm().is_some() {\n            return Err(EmpError::Resources);\n        }\n"
+        }
+      ]
+    },
+    "flight/emp/validation.rs": {
+      "beforeSHA256": "2d005616d4689727d27b859967d91757db6bdee86c06183e3ef35ccda35cb411",
+      "afterSHA256": "37a9126433098e39fe54586fbe1ea5089297ae048ae2a48dc3315af11e528090",
+      "hunks": [
+        {
+          "offset": 14395,
+          "before": "            .filter(|i| i.slot == Some(super::super::ModuleSlot::UtilityFuelScoops))\n",
+          "after": "            .filter(|i| {\n                matches!(\n                    i.slot,\n                    Some(\n                        super::super::ModuleSlot::UtilityFuelScoops\n                            | super::super::ModuleSlot::UtilityEcm\n                    )\n                )\n            })\n"
+        }
+      ]
+    },
+    "flight/modular.rs": {
+      "beforeSHA256": "d06bcef71e77e3719d0dda7c029b22587c7968784df949f754420f9ec8e93bd9",
+      "afterSHA256": "03d646172b9c461e07a8f5e61536cb690569c3a39bb23844c0214e907107c99d",
+      "hunks": [
+        {
+          "offset": 953,
+          "before": "",
+          "after": "    Ecm,\n"
+        },
+        {
+          "offset": 1478,
+          "before": "",
+          "after": "            Self::Ecm => \"utility-ecm\",\n"
+        },
+        {
+          "offset": 3153,
+          "before": "",
+          "after": "            Self::Ecm => \"E.C.M. System\",\n"
+        },
+        {
+          "offset": 5198,
+          "before": "",
+          "after": "            Self::Ecm => ModuleSlot::UtilityEcm,\n"
+        },
+        {
+          "offset": 6671,
+          "before": "",
+          "after": "                | Self::Ecm\n"
+        },
+        {
+          "offset": 7472,
+          "before": "            Self::FuelStorage => 1,\n",
+          "after": "            Self::FuelStorage | Self::Ecm => 1,\n"
+        },
+        {
+          "offset": 7761,
+          "before": "",
+          "after": "            Self::Ecm => Some((21_000, 5)),\n"
+        },
+        {
+          "offset": 11251,
+          "before": "",
+          "after": "            Self::Ecm => 32,\n"
+        },
+        {
+          "offset": 12396,
+          "before": "",
+          "after": "            32 => Ok(Self::Ecm),\n"
+        },
+        {
+          "offset": 12615,
+          "before": "",
+          "after": "    UtilityEcm,\n"
+        },
+        {
+          "offset": 19134,
+          "before": "    fn fitted(&self, slot: ModuleSlot) -> Option<OwnedModule> {\n",
+          "after": "    pub(super) fn fitted(&self, slot: ModuleSlot) -> Option<OwnedModule> {\n"
+        },
+        {
+          "offset": 34002,
+          "before": "",
+          "after": "                    ModuleKind::Ecm => world.xyzzy.authorizes_ecm(e.dock, e.tick, e.revision),\n"
+        },
+        {
+          "offset": 35828,
+          "before": "",
+          "after": "                        + u16::from(ledger.fitted(ModuleSlot::UtilityEcm).is_some())\n"
+        },
+        {
+          "offset": 39392,
+          "before": "    pub(super) fn validate_scoop_test_record(\n",
+          "after": "    pub(super) fn ecm_item_at(&self, owner: u64, tick: u64, visit: u64) -> Option<OwnedModule> {\n        self.ledger_at(owner, tick, visit)?\n            .fitted(ModuleSlot::UtilityEcm)\n    }\n    pub(super) fn validate_utility_test_record(\n"
+        },
+        {
+          "offset": 39773,
+          "before": "",
+          "after": "        kind: ModuleKind,\n"
+        },
+        {
+          "offset": 40265,
+          "before": "        let before = fit_at(start)?.fitted(ModuleSlot::UtilityFuelScoops);\n",
+          "after": "        let slot = kind.slot();\n        let before = fit_at(start)?.fitted(slot);\n"
+        },
+        {
+          "offset": 40388,
+          "before": "        let after = after_ledger\n            .fitted(ModuleSlot::UtilityFuelScoops)\n            .ok_or(INVALID)?;\n",
+          "after": "        let after = after_ledger.fitted(slot).ok_or(INVALID)?;\n"
+        },
+        {
+          "offset": 41078,
+          "before": "            + 1\n",
+          "after": "            + u16::from(after_ledger.fitted(ModuleSlot::UtilityFuelScoops).is_some())\n            + u16::from(after_ledger.fitted(ModuleSlot::UtilityEcm).is_some())\n"
+        },
+        {
+          "offset": 41570,
+          "before": "            ModuleAction::Purchase {\n                kind: ModuleKind::FuelScoops,\n            } if event.xyzzy => Ok(()),\n",
+          "after": "            ModuleAction::Purchase { kind: purchased } if event.xyzzy && purchased == kind => {\n                Ok(())\n            }\n"
+        },
+        {
+          "offset": 47823,
+          "before": "",
+          "after": "            ModuleKind::Ecm,\n"
+        },
+        {
+          "offset": 54223,
+          "before": "",
+          "after": "            )));\n        }\n        if action.purchase_kind() == Some(ModuleKind::Ecm) && !self.damage.enabled() {\n            return Err(ModuleError::Save(SaveError::InvalidState(\n                \"ECM fitting requires resource birth provenance\",\n"
+        }
+      ]
+    },
+    "flight/modular/scoops.rs": {
+      "beforeSHA256": "91a34dc7d3d4289a70fe995ecff90af52e950d5415aba0b34ea71a30fdfe9e5e",
+      "afterSHA256": "c5176dd7df6d8709283e34d9a499166d4939128cc1e77a05aef70b8a334b42a0",
+      "hunks": [
+        {
+          "offset": 1076,
+          "before": "    /// Actual implemented cargo-expansion and scoop mounts; other utility families are absent.\n",
+          "after": "    /// All fitted utilities sharing this hull's mount budget.\n"
+        },
+        {
+          "offset": 2252,
+          "before": "                Some(ModuleSlot::UtilityFuelScoops | ModuleSlot::FuelStorage(_))\n",
+          "after": "                Some(\n                    ModuleSlot::UtilityFuelScoops\n                        | ModuleSlot::UtilityEcm\n                        | ModuleSlot::FuelStorage(_)\n                )\n"
+        }
+      ]
+    },
+    "flight/persistence.rs": {
+      "beforeSHA256": "bf7de1efc927e43a90ac307c70eb37f13f9fcf33c192b8060de8b38f03035211",
+      "afterSHA256": "42a1e3f4b33b6ac42a0ef781833253ce9b2cb803dc87546345cd5c4cd3464d89",
+      "hunks": [
+        {
+          "offset": 959,
+          "before": "",
+          "after": "const ECM_EXTENSION: &[u8; 8] = b\"MECM0001\";\n"
+        },
+        {
+          "offset": 3585,
+          "before": "",
+          "after": "    checksum(&bytes)\n}\nfn ecm_content_fingerprint(base: u64) -> u64 {\n    let mut bytes = base.to_le_bytes().to_vec();\n    bytes.extend(b\"stock-ecm-history/v1\");\n"
+        },
+        {
+          "offset": 12810,
+          "before": "        w.u64(if self.solar.legacy_header() {\n",
+          "after": "        let base_fingerprint = if self.solar.legacy_header() {\n"
+        },
+        {
+          "offset": 13002,
+          "before": "",
+          "after": "        };\n        w.u64(if self.ecm.is_empty() {\n            base_fingerprint\n        } else {\n            ecm_content_fingerprint(base_fingerprint)\n"
+        },
+        {
+          "offset": 14660,
+          "before": "",
+          "after": "        }\n        if !self.ecm.is_empty() {\n            w.bytes.extend(ECM_EXTENSION);\n            self.ecm.encode(&mut w);\n"
+        },
+        {
+          "offset": 17257,
+          "before": "",
+          "after": "        let (fingerprint, ecm_expected) = [\n            compiled_content_fingerprint(CONTENT),\n            solar_content_fingerprint(true),\n            solar_content_fingerprint(false),\n        ]\n        .into_iter()\n        .find(|base| ecm_content_fingerprint(*base) == fingerprint)\n        .map_or((fingerprint, false), |base| (base, true));\n"
+        },
+        {
+          "offset": 20923,
+          "before": "",
+          "after": "            ecm: super::ecm::State::default(),\n"
+        },
+        {
+          "offset": 22292,
+          "before": "",
+          "after": "                if ecm_expected {\n                    if r.fixed::<8>()? != *ECM_EXTENSION {\n                        return Err(SaveError::InvalidEncoding);\n                    }\n                    candidate.ecm = super::ecm::State::decode(&mut r)?;\n                }\n            } else if ecm_expected && tag == *ECM_EXTENSION {\n                candidate.ecm = super::ecm::State::decode(&mut r)?;\n"
+        },
+        {
+          "offset": 22792,
+          "before": "        if !r.finished() {\n",
+          "after": "        if !r.finished() || ecm_expected == candidate.ecm.is_empty() {\n"
+        },
+        {
+          "offset": 27140,
+          "before": "",
+          "after": "        self.ecm.validate(self, commerce.modular)?;\n"
+        }
+      ]
+    },
+    "flight/weapons.rs": {
+      "beforeSHA256": "87f2c747dfdb44e1f39d16142273f59cfe18c0cfcf31f8cf98bbb7bc6315d600",
+      "afterSHA256": "635d6d624283c410b5fbcbf24cbe92be1c24abbeccf46649f3537f081077bb65",
+      "hunks": [
+        {
+          "offset": 5789,
+          "before": "",
+          "after": "        })\n    }\n    pub(super) fn prepare_ecm_discharge(self) -> Result<Self, FireError> {\n        if self.energy <= super::ecm::ECM_ENERGY_HUNDREDTHS {\n            return Err(FireError::InsufficientEnergy);\n        }\n        Ok(Self {\n            energy: self.energy - super::ecm::ECM_ENERGY_HUNDREDTHS,\n            ..self\n"
+        }
+      ]
+    },
+    "flight/xyzzy.rs": {
+      "beforeSHA256": "8415a0cc0e089914b528a7c9bb910fb5f2caccae3d109490f5e5aba7195c8140",
+      "afterSHA256": "7a793e726ce975c44b132b2caecbe36c36a92a037d42ac4a3049a6df8b0ec057",
+      "hunks": [
+        {
+          "offset": 1063,
+          "before": "",
+          "after": "    FitEcm,\n    ToggleAutoEcm,\n"
+        },
+        {
+          "offset": 1393,
+          "before": "        self.outfit() || matches!(self, Self::FitShield(_) | Self::FitFuelScoops)\n",
+          "after": "        self.outfit()\n            || matches!(\n                self,\n                Self::FitShield(_) | Self::FitFuelScoops | Self::FitEcm\n            )\n"
+        },
+        {
+          "offset": 1597,
+          "before": "        !matches!(self, Self::FitShield(_) | Self::FitFuelScoops) && (self.outfit() || mode)\n",
+          "after": "        !matches!(\n            self,\n            Self::FitShield(_) | Self::FitFuelScoops | Self::FitEcm | Self::ToggleAutoEcm\n        ) && (self.outfit() || mode)\n"
+        },
+        {
+          "offset": 2113,
+          "before": "",
+          "after": "            Self::FitEcm => 13,\n            Self::ToggleAutoEcm => 14,\n"
+        },
+        {
+          "offset": 2619,
+          "before": "",
+          "after": "            13 => Ok(Self::FitEcm),\n            14 => Ok(Self::ToggleAutoEcm),\n"
+        },
+        {
+          "offset": 3585,
+          "before": "",
+          "after": "    pub automatic_ecm: bool,\n"
+        },
+        {
+          "offset": 4573,
+          "before": "",
+          "after": "    }\n    pub(super) fn automatic_ecm(&self) -> bool {\n        self.active()\n            && self\n                .records\n                .iter()\n                .filter(|record| record.action == XyzzyAction::ToggleAutoEcm)\n                .count()\n                % 2\n                == 0\n"
+        },
+        {
+          "offset": 6593,
+          "before": "",
+          "after": "    }\n    pub(super) fn authorizes_ecm(&self, dock: DockContext, tick: u64, revision: u64) -> bool {\n        self.records.iter().any(|record| {\n            record.action == XyzzyAction::FitEcm\n                && record.dock == dock\n                && record.tick == tick\n                && revision > record.revision\n                && revision <= record.end_revision\n        })\n"
+        },
+        {
+          "offset": 13672,
+          "before": "            if r.action == XyzzyAction::FitFuelScoops {\n                commerce.modular.validate_scoop_test_record(\n",
+          "after": "            if matches!(r.action, XyzzyAction::FitFuelScoops | XyzzyAction::FitEcm) {\n                commerce.modular.validate_utility_test_record(\n"
+        },
+        {
+          "offset": 13995,
+          "before": "",
+          "after": "                    if r.action == XyzzyAction::FitEcm {\n                        super::ModuleKind::Ecm\n                    } else {\n                        super::ModuleKind::FuelScoops\n                    },\n"
+        },
+        {
+          "offset": 14225,
+          "before": "",
+          "after": "            }\n            if r.action == XyzzyAction::ToggleAutoEcm && r.end_revision != r.revision {\n                return Err(INVALID);\n"
+        },
+        {
+          "offset": 19459,
+          "before": "",
+          "after": "            automatic_ecm: self.xyzzy.automatic_ecm(),\n"
+        },
+        {
+          "offset": 20870,
+          "before": "        if action == XyzzyAction::FitFuelScoops\n            && self.fitted_fuel_scoops().is_none()\n",
+          "after": "        if action == XyzzyAction::MaximumFuelStorage && self.fitted_ecm().is_some() {\n            // The existing four-tank exception reserves three other utility mounts;\n            // it does not grant permission for a fourth non-tank utility.\n            return Err(XyzzyError::UtilityFitConflict);\n        }\n        if action == XyzzyAction::FitEcm && !self.damage.enabled() {\n            return Err(XyzzyError::Save(SaveError::InvalidState(\n                \"ECM fitting requires resource birth provenance\",\n            )));\n        }\n        if ((action == XyzzyAction::FitFuelScoops && self.fitted_fuel_scoops().is_none())\n            || (action == XyzzyAction::FitEcm && self.fitted_ecm().is_none()))\n"
+        },
+        {
+          "offset": 28478,
+          "before": "        } else if review.action == XyzzyAction::FitFuelScoops {\n",
+          "after": "        } else if matches!(\n            review.action,\n            XyzzyAction::FitFuelScoops | XyzzyAction::FitEcm\n        ) {\n"
+        },
+        {
+          "offset": 28701,
+          "before": "                super::modular::ModuleKind::FuelScoops,\n",
+          "after": "                if review.action == XyzzyAction::FitEcm {\n                    super::ModuleKind::Ecm\n                } else {\n                    super::ModuleKind::FuelScoops\n                },\n"
+        }
+      ]
+    },
+    "lib.rs": {
+      "beforeSHA256": "2d724e7055494933eff5b194a17a939f9d1fca959c1ffb87e078e10321300a61",
+      "afterSHA256": "6abd79a54f4f9af2249c5efa518dc47f2930fb58b0978f7df8902c400e7bb4db",
+      "hunks": [
+        {
+          "offset": 952,
+          "before": "",
+          "after": "pub use flight::{\n    ECM_ENERGY_HUNDREDTHS, ECM_FIELD_TICKS, EcmActivation, EcmError, EcmSnapshot, EcmTrigger,\n};\n"
+        }
+      ]
+    }
+  }
+}
