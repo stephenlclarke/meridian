@@ -1,6 +1,6 @@
 //! Ordinary paid auto-work acceptance through the public World command boundary.
 use meridian_core::{
-    FlightInput, FlightMode, ModuleAction, ModuleKind, ModuleProvenance, TargetFilter,
+    FlightInput, FlightMode, ModuleAction, ModuleKind, ModuleProvenance, ModuleSlot, TargetFilter,
     TargetIdentity, TargetingViewport, World,
     docking::Vec3,
     equipment::{TargetingTier, WorkTargetId},
@@ -287,8 +287,36 @@ fn earned_mining_select_once_delivers_one_real_ore_unit_and_retains_it_on_contin
         ModuleAction::PurchaseFuelScoops,
         19000,
     );
+    // The paid Mining Laser remains owned, but automatic selection must replace and
+    // later restore the real born combat laser rather than requiring a manual pre-fit.
+    let equipment = some(world.modular_equipment_snapshot());
+    let mining = *some(
+        equipment
+            .items
+            .iter()
+            .find(|item| item.kind == ModuleKind::MiningLaser),
+    );
+    let pulse = *some(
+        equipment
+            .items
+            .iter()
+            .find(|item| item.kind == ModuleKind::PulseLaser),
+    );
+    assert_eq!(mining.slot, Some(ModuleSlot::FrontLaser));
+    assert_eq!(pulse.slot, None);
+    let tick = world.snapshot().tick;
+    let review = ok(world.review_module(
+        ModuleAction::Install {
+            item: pulse.id,
+            replacing: Some(mining.id),
+        },
+        tick,
+    ));
+    assert_eq!(ok(world.prepare_module(review, tick)).commit(), pulse.id);
     let paid_cash = world.credits_tenths();
     let paid_equipment = some(world.modular_equipment_snapshot());
+    assert_eq!(some(world.pulse_laser_snapshot()).fitted_item_id, pulse.id);
+    assert!(world.fitted_mining_tool().is_none());
 
     // A separately continued copy of the normally earned profile exercises refusal.
     // It never mutates the paid positive journey below.
@@ -301,6 +329,8 @@ fn earned_mining_select_once_delivers_one_real_ore_unit_and_retains_it_on_contin
 
     // A manual override ends the original lock before it can work.
     select_rock(&mut world, target);
+    ok(world.step(FlightInput::default()));
+    assert_eq!(some(world.fitted_mining_tool()).item, mining.id);
     ok(world.step(FlightInput {
         yaw: 0.5,
         ..FlightInput::default()
@@ -309,12 +339,15 @@ fn earned_mining_select_once_delivers_one_real_ore_unit_and_retains_it_on_contin
     assert!(world.targeting_snapshot().is_none());
     assert_eq!(some(world.mining_belt_snapshot()).bodies[0], rock);
     assert_eq!(world.commodity_quantity(rock.commodity), Some(held));
+    assert_eq!(some(world.pulse_laser_snapshot()).fitted_item_id, pulse.id);
+    assert!(world.fitted_mining_tool().is_none());
 
     // One selection starts extraction and physical intake. No manual fire, scoop,
     // second target selection, test-only movement or direct resource mutation follows.
     select_rock(&mut world, target);
     let mut complete = false;
     let mut witnessed_ore = None;
+    let mut witnessed_mining_tool = false;
     for _ in 0..12000 {
         ok(world.step(FlightInput::default()));
         if world.commodity_quantity(rock.commodity) == Some(held + 1) {
@@ -328,6 +361,10 @@ fn earned_mining_select_once_delivers_one_real_ore_unit_and_retains_it_on_contin
         );
         assert_eq!(world.commodity_quantity(rock.commodity), Some(held));
         assert_eq!(world.credits_tenths(), paid_cash);
+        if let Some(tool) = world.fitted_mining_tool() {
+            assert_eq!(tool.item, mining.id);
+            witnessed_mining_tool = true;
+        }
         let belt = some(world.mining_belt_snapshot());
         if let Some(ore) = belt
             .pending_ore
@@ -364,6 +401,7 @@ fn earned_mining_select_once_delivers_one_real_ore_unit_and_retains_it_on_contin
         witnessed_ore.is_some(),
         "delivery must follow a real released fragment"
     );
+    assert!(witnessed_mining_tool);
     let belt = some(world.mining_belt_snapshot());
     assert_eq!(belt.bodies[0].remaining_units, 0);
     assert_eq!(belt.bodies[0].extracted_units, 1);
@@ -376,7 +414,9 @@ fn earned_mining_select_once_delivers_one_real_ore_unit_and_retains_it_on_contin
     assert_eq!(world.credits_tenths(), paid_cash);
     let retained_equipment = some(world.modular_equipment_snapshot());
     assert_eq!(retained_equipment.items, paid_equipment.items);
-    assert_eq!(retained_equipment.fit_revision, paid_equipment.fit_revision);
+    assert!(retained_equipment.fit_revision > paid_equipment.fit_revision);
+    assert_eq!(some(world.pulse_laser_snapshot()).fitted_item_id, pulse.id);
+    assert!(world.fitted_mining_tool().is_none());
 
     let saved = ok(world.save_bytes());
     let mut cold = ok(World::from_save_bytes(&saved));
