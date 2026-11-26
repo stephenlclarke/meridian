@@ -119,7 +119,7 @@ fn normal_readouts_and_normal_continue_never_activate_grant_or_rename() {
         assert!(!w.xyzzy_snapshot().unwrap().active);
         assert!(!w.xyzzy_snapshot().unwrap().unlimited_fuel);
         assert_eq!(w.ammunition_snapshot().unwrap().items.len(), 3);
-        assert_eq!(w.modular_equipment_snapshot().unwrap().items.len(), 3);
+        assert_eq!(w.modular_equipment_snapshot().unwrap().items.len(), 4);
         assert!(w.equipment_snapshot().unwrap().owned.is_none());
     }
     assert_eq!(w.save_bytes().unwrap(), before);

@@ -10,6 +10,8 @@ The [complete action inventory](XYZZY-ACTIONS.json) covers every secret key and 
 
 ## Actual supported effects
 
+The ordinary-drive development candidate adds the actual Advanced Hyperspace Drive to maximum activation/refitting. It uses a one-second spool and the original 0.6 station mass-lock ratio without changing jump reach or fuel accounting. Held paid Advanced property is reused. See [equipment implementation and testing ledger](EQUIPMENT-PLAYABLE.md) for source, grade progression and current validation limits. This is not included in the historical Preview 7 evidence above.
+
 In the flight-computer development build, activating or refitting XYZZY fits the Military targeting computer, both Mining and Salvage targeting modules, and raises all three EMP grades to 3. Local technology and shop stock apply to ordinary purchases. Returning to the same menu after a save lets you refit and change fuel mode in one visit.
 
 Explicit `Enter` persists mode/name and the once-only cash adjustment. Normal commanders remain Rowan Calder with their own720 CR birth balance. No getter, saved descriptor, purchase API or capability readout activates mode. Ordinary paid purchases continue to charge their actual prices and retain paid provenance, technology, prerequisites and limits.

@@ -572,6 +572,19 @@ fn equipment_action(
     if targeting_node != (slot == "targeting") {
         return Err("Select the targeting computer slot".into());
     }
+    let drive_node = node.ends_with(" Hyperspace Drive");
+    if drive_node != (slot == "drive") {
+        return Err("Select the hyperspace drive slot".into());
+    }
+    if drive_node
+        && operation != Buy
+        && !modules
+            .items
+            .iter()
+            .any(|owned| Some(owned.id) == instance && owned.kind.node() == node)
+    {
+        return Err("Owned drive selection changed".into());
+    }
     if targeting_node
         && operation != Buy
         && !modules
@@ -648,6 +661,7 @@ fn module_rows(
         ModuleSlot::FrontLaser => "Front laser",
         ModuleSlot::Energy => "Energy system",
         ModuleSlot::Navigation => "Navigation computer",
+        ModuleSlot::Drive => "Hyperspace drive",
         ModuleSlot::Targeting => "Targeting computer",
         ModuleSlot::MiningTargeting => "Mining targeting",
         ModuleSlot::SalvageTargeting => "Salvage targeting",
@@ -662,7 +676,14 @@ fn module_rows(
         row.fitted = u32::from(item.slot.is_some());
         row.readout
             .push(crate::xyzzy::provenance(item.provenance).into());
-        if let Some(reach) = item.kind.navigation_reach_ly() {
+        if let ModuleKind::Drive(grade) = item.kind {
+            row.compatibility = "Owned SH025 hyperspace drive; one fitted drive required".into();
+            row.readout.push(format!(
+                "Spool {}s | Station mass lock {}",
+                grade.spool_ticks() / 60,
+                grade.mass_lock_distance()
+            ));
+        } else if let Some(reach) = item.kind.navigation_reach_ly() {
             row.compatibility = "Owned SH025 navigation module".into();
             row.readout.push(format!("Module jump limit {reach} LY"));
         } else if matches!(item.kind, ModuleKind::Targeting(_)) {
@@ -724,8 +745,22 @@ fn module_rows(
             offer.required_technology, offer.technology, offer.equipment_units
         );
         if let Some(required) = offer.prerequisite {
-            row.readout
-                .push(format!("Requires owned {}", required.name()));
+            row.readout.push(format!(
+                "Requires {}{}",
+                if offer.slot == ModuleSlot::Drive {
+                    "fitted "
+                } else {
+                    "owned "
+                },
+                required.name()
+            ));
+        }
+        if let ModuleKind::Drive(grade) = offer.kind {
+            row.readout.push(format!(
+                "Spool {}s | Station mass lock {}",
+                grade.spool_ticks() / 60,
+                grade.mass_lock_distance()
+            ));
         }
         let action = if offer.kind == ModuleKind::MiningLaser {
             ModuleAction::PurchaseMiningLaser
@@ -812,6 +847,17 @@ fn equipment_panel(
             .into(),
         available: true,
     });
+    slots.push(ui::EquipmentSlot {
+        id: "drive".into(),
+        label: "Hyperspace drive".into(),
+        fitted: modules
+            .items
+            .iter()
+            .find(|item| item.slot == Some(ModuleSlot::Drive))
+            .map_or("Empty", |item| item.kind.name())
+            .into(),
+        available: true,
+    });
     slots.push(ui::fuel_scoops::slot(world)?);
     slots.push(ui::emp::slot(world));
     append_pylon_slots(&mut slots, &ammo);
@@ -845,6 +891,7 @@ fn equipment_panel(
         "front-laser" => Some(ModuleSlot::FrontLaser),
         "energy" => Some(ModuleSlot::Energy),
         "navigation" => Some(ModuleSlot::Navigation),
+        "drive" => Some(ModuleSlot::Drive),
         "targeting" => Some(ModuleSlot::Targeting),
         "targeting-mining" => Some(ModuleSlot::MiningTargeting),
         "targeting-salvage" => Some(ModuleSlot::SalvageTargeting),
@@ -1302,6 +1349,51 @@ mod tests {
         assert_eq!(ok(profile.world.save_bytes()), after_external_purchase);
     }
     #[test]
+    fn hyperspace_drive_panel_uses_actual_fitted_item_and_paid_offer_rules() {
+        use meridian_core::navigation::DriveGrade;
+        let (_directory, profile, _menu) = start();
+        let panel = ok(equipment_panel(&profile.world, "drive", ""));
+        let slot = panel
+            .slots
+            .iter()
+            .find(|slot| slot.id == "drive")
+            .unwrap_or_else(|| panic!("missing drive slot"));
+        assert_eq!(slot.fitted, "Basic Hyperspace Drive");
+        let basic = panel
+            .rows
+            .iter()
+            .find(|row| row.node == ModuleKind::Drive(DriveGrade::Basic).node())
+            .unwrap_or_else(|| panic!("missing born drive"));
+        assert_eq!(basic.fitted, 1);
+        assert!(!basic.can_store);
+        assert!(basic.readout.iter().any(|line| line.contains("Spool 10s")));
+        for (grade, price, text) in [
+            (DriveGrade::Intermediate, 50_000, "Spool 5s"),
+            (DriveGrade::Advanced, 150_000, "Spool 1s"),
+        ] {
+            let kind = ModuleKind::Drive(grade);
+            let row = panel
+                .rows
+                .iter()
+                .find(|row| row.node == kind.node())
+                .unwrap_or_else(|| panic!("missing drive offer"));
+            assert_eq!(row.price_tenths, Some(price));
+            assert!(!row.can_buy);
+            assert!(row.readout.iter().any(|line| line.contains(text)));
+            assert!(
+                equipment_action(
+                    &profile.world,
+                    kind.node(),
+                    None,
+                    "energy",
+                    ui::EquipmentOperation::Buy
+                )
+                .is_err()
+            );
+        }
+    }
+
+    #[test]
     fn navigation_computer_panel_uses_owned_slot_and_source_prices() {
         let (_directory, profile, _menu) = start();
         let panel = ok(equipment_panel(&profile.world, "navigation", ""));
@@ -1335,7 +1427,7 @@ mod tests {
     fn front_module_rows_and_pylon_slots_use_real_owned_instances_and_admission() {
         let (_directory, profile, _menu) = start();
         let panel = ok(equipment_panel(&profile.world, "front-laser", ""));
-        assert_eq!(panel.slots.len(), 18);
+        assert_eq!(panel.slots.len(), 19);
         let targeting: Vec<_> = panel.slots[15..]
             .iter()
             .map(|slot| slot.id.as_str())

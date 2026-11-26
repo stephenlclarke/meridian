@@ -225,7 +225,7 @@ struct AccountData {
 impl AccountData {
     fn allows_stored_starter(&self, index: usize, item: OwnedStarterItem) -> bool {
         // The World separately requires the fit to match its retained modular ledger.
-        matches!(index, 1 | 2 | 4) && self.modular_revision > 0 && item.fitted_hull.is_none()
+        matches!(index, 1 | 2 | 3 | 4) && self.modular_revision > 0 && item.fitted_hull.is_none()
     }
 }
 
@@ -303,6 +303,7 @@ impl CommanderAccount {
         pulse_fitted: bool,
         energy_fitted: bool,
         navigation_fitted: bool,
+        drive_fitted: bool,
     ) -> Result<Self, Error> {
         let mut data = self.data;
         data.credits = data
@@ -335,6 +336,12 @@ impl CommanderAccount {
             .and_then(|fit| fit.items[1].as_mut())
             .ok_or(Error::MissingEquipment)?;
         navigation.fitted_hull = navigation_fitted.then_some(data.hull);
+        let drive = data
+            .fit
+            .as_mut()
+            .and_then(|fit| fit.items[3].as_mut())
+            .ok_or(Error::MissingEquipment)?;
+        drive.fitted_hull = drive_fitted.then_some(data.hull);
         Ok(Self { data })
     }
     pub(crate) fn ammunition_revision(&self) -> u64 {
@@ -1278,7 +1285,9 @@ fn validate_account(data: &Data, account: &AccountData) -> Result<(), Error> {
             return Err(Error::InvalidFit);
         }
     }
-    if fit.items[3].is_none_or(|item| item.fitted_hull != Some(account.hull)) {
+    if fit.items[3].is_none_or(|item| {
+        item.fitted_hull != Some(account.hull) && !account.allows_stored_starter(3, item)
+    }) {
         return Err(Error::MissingEquipment);
     }
     validate_cargo_and_utility(data, account, &fit)
@@ -1289,7 +1298,7 @@ fn validate_cargo_and_utility(
     account: &AccountData,
     fit: &StarterFit,
 ) -> Result<(), Error> {
-    // The modular ledger can store the born Basic Energy or front Pulse. Consumed
+    // The modular ledger can displace born foundations or front Pulse. Consumed
     // pylon rounds are absent. Other retained birth items must stay fitted.
     if account.equipment.owned().is_some()
         && fit.items.iter().enumerate().any(|(index, item)| {
