@@ -1,0 +1,246 @@
+{
+  "design": [
+    {
+      "parts": [
+        0,
+        1
+      ],
+      "axis": [
+        -106734,
+        332809,
+        3735
+      ],
+      "separationMillimetres": 2246
+    },
+    {
+      "parts": [
+        0,
+        4
+      ],
+      "axis": [
+        -836017,
+        104109,
+        -624298
+      ],
+      "separationMillimetres": 422
+    },
+    {
+      "parts": [
+        0,
+        7
+      ],
+      "axis": [
+        106734,
+        332809,
+        3735
+      ],
+      "separationMillimetres": 2246
+    },
+    {
+      "parts": [
+        0,
+        10
+      ],
+      "axis": [
+        836017,
+        -104109,
+        -624298
+      ],
+      "separationMillimetres": 422
+    },
+    {
+      "parts": [
+        1,
+        7
+      ],
+      "axis": [
+        1,
+        0,
+        0
+      ],
+      "separationMillimetres": 5400
+    },
+    {
+      "parts": [
+        2,
+        13
+      ],
+      "axis": [
+        818535,
+        654502,
+        -33762
+      ],
+      "separationMillimetres": 185
+    },
+    {
+      "parts": [
+        8,
+        13
+      ],
+      "axis": [
+        -818535,
+        654502,
+        -33762
+      ],
+      "separationMillimetres": 185
+    },
+    {
+      "parts": [
+        4,
+        10
+      ],
+      "axis": [
+        1,
+        0,
+        0
+      ],
+      "separationMillimetres": 7503
+    },
+    {
+      "parts": [
+        1,
+        2
+      ],
+      "axis": [
+        0,
+        -173413,
+        303473
+      ],
+      "separationMillimetres": 450
+    },
+    {
+      "parts": [
+        7,
+        8
+      ],
+      "axis": [
+        0,
+        -173413,
+        303473
+      ],
+      "separationMillimetres": 450
+    }
+  ],
+  "nativeDesign": [
+    {
+      "parts": [
+        0,
+        1
+      ],
+      "axis": [
+        -539471,
+        899119,
+        8199
+      ],
+      "separationMillimetres": 4296
+    },
+    {
+      "parts": [
+        0,
+        2
+      ],
+      "axis": [
+        -539189,
+        879927,
+        185783
+      ],
+      "separationMillimetres": 878
+    },
+    {
+      "parts": [
+        0,
+        5
+      ],
+      "axis": [
+        539471,
+        899119,
+        8199
+      ],
+      "separationMillimetres": 4296
+    },
+    {
+      "parts": [
+        0,
+        6
+      ],
+      "axis": [
+        539189,
+        879927,
+        185783
+      ],
+      "separationMillimetres": 878
+    },
+    {
+      "parts": [
+        1,
+        5
+      ],
+      "axis": [
+        1,
+        0,
+        0
+      ],
+      "separationMillimetres": 5400
+    },
+    {
+      "parts": [
+        2,
+        9
+      ],
+      "axis": [
+        582598,
+        871536,
+        -22725
+      ],
+      "separationMillimetres": 1117
+    },
+    {
+      "parts": [
+        6,
+        9
+      ],
+      "axis": [
+        -582598,
+        871536,
+        -22725
+      ],
+      "separationMillimetres": 1117
+    },
+    {
+      "parts": [
+        4,
+        8
+      ],
+      "axis": [
+        1,
+        0,
+        0
+      ],
+      "separationMillimetres": 7503
+    },
+    {
+      "parts": [
+        1,
+        2
+      ],
+      "axis": [
+        0,
+        -173413,
+        303473
+      ],
+      "separationMillimetres": 450
+    },
+    {
+      "parts": [
+        5,
+        6
+      ],
+      "axis": [
+        0,
+        -173413,
+        303473
+      ],
+      "separationMillimetres": 450
+    }
+  ]
+}

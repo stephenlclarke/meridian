@@ -28,6 +28,7 @@ pub mod erne_corvette;
 pub mod falconet;
 mod flight;
 pub mod freight;
+pub mod giraffe_liner;
 pub mod gopher;
 pub mod goshawk;
 pub mod goshawk_custom;
