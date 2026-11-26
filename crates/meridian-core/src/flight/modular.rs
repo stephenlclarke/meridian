@@ -1134,6 +1134,7 @@ impl State {
         let mut transaction = 0_u32;
         let mut grants = 0_u32;
         let mut previous: Option<Event> = None;
+        let mut previous_exchange: Option<(u64, u64, u64)> = None;
         let budget = crate::equipment::definition().map_err(|_| INVALID)?;
         for e in &self.events {
             super::ammunition::validate_berth_event(
@@ -1148,10 +1149,18 @@ impl State {
                 visit,
                 clock,
                 emission,
+                restoring,
                 ..
             } = e.action
             {
                 let prior_dock = previous.map(|event| event.dock).ok_or(INVALID)?;
+                let system = world.jump_journal.system_at_visit(visit, e.tick)?;
+                let (jumps, arrival) = world.jump_journal.visit_origin(visit);
+                let launch = visit
+                    .checked_sub(1)
+                    .and_then(|v| v.checked_sub(jumps))
+                    .ok_or(INVALID)?;
+                let berth = world.damage.berth_clock(launch).ok_or(INVALID)?;
                 if e.dock != prior_dock
                     || visit <= e.dock.visit()
                     || visit > world.combat_identity().ok_or(INVALID)?.visit
@@ -1159,10 +1168,30 @@ impl State {
                     || clock > world.combat.physical_tick()
                     || clock > e.tick
                     || emission > world.combat.emissions
-                    || world.jump_journal.system_at_visit(visit, e.tick).is_err()
+                    || (e.tick - clock)
+                        > world
+                            .state
+                            .tick
+                            .checked_sub(world.combat.physical_tick())
+                            .ok_or(INVALID)?
+                    || (!restoring
+                        && (system != crate::navigation::SystemId::AVENOR
+                            || ledger.fitted(ModuleSlot::MiningTargeting).is_none()
+                            || ledger.fitted(ModuleSlot::Targeting).is_none()))
+                    || arrival.map_or(clock <= berth, |arrival| clock < arrival)
+                    || world
+                        .damage
+                        .berth_clock(launch.checked_add(1).ok_or(INVALID)?)
+                        .is_some_and(|next| clock > next || (!restoring && clock == next))
+                    || previous_exchange.is_some_and(
+                        |(prior_visit, prior_clock, prior_emission)| {
+                            visit < prior_visit || clock < prior_clock || emission < prior_emission
+                        },
+                    )
                 {
                     return Err(INVALID);
                 }
+                previous_exchange = Some((visit, clock, emission));
             }
             let serial = if e.xyzzy {
                 let kind = e

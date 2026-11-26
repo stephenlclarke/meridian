@@ -143,6 +143,23 @@ impl World {
             {
                 return Err(invalid);
             }
+            let (jumps, arrival) = self.jump_journal.visit_origin(receipt.owner.visit);
+            let launch = receipt
+                .owner
+                .visit
+                .checked_sub(1)
+                .and_then(|v| v.checked_sub(jumps))
+                .ok_or(invalid)?;
+            let berth = self.damage.berth_clock(launch).ok_or(invalid)?;
+            if arrival.map_or(receipt.physical_tick <= berth, |arrival| {
+                receipt.physical_tick < arrival
+            }) || self
+                .damage
+                .berth_clock(launch.checked_add(1).ok_or(invalid)?)
+                .is_some_and(|next| receipt.physical_tick >= next)
+            {
+                return Err(invalid);
+            }
         }
         if self.state.mode != FlightMode::Docked
             && !self.mining_motion_clear(

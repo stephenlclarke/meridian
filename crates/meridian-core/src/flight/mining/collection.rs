@@ -31,12 +31,6 @@ impl World {
             return None;
         }
         let pose = flight_pose(self.state.position, self.state.orientation)?;
-        let explicit_ore = self
-            .selected_work_target()
-            .and_then(|target| match target.id {
-                WorkTargetId::Ore(ore) if ore.asteroid() == id => Some(ore),
-                _ => None,
-            });
         let distance = |ore: &OreSnapshot| {
             let p = ore.position;
             let d = crate::docking::Vec3::new(
@@ -49,9 +43,7 @@ impl World {
         self.mining
             .pending_ore(self.combat.physical_tick())
             .into_iter()
-            .filter(|ore| {
-                ore.id.asteroid() == id && explicit_ore.is_none_or(|selected| selected == ore.id)
-            })
+            .filter(|ore| ore.id.asteroid() == id)
             .min_by(|a, b| {
                 distance(a)
                     .total_cmp(&distance(b))
@@ -59,11 +51,28 @@ impl World {
             })
     }
 
+    pub fn mining_ore_target(&self, id: OreId) -> Option<OreSnapshot> {
+        if self.combat_identity()?.system != id.asteroid().system() {
+            return None;
+        }
+        self.mining
+            .pending_ore(self.combat.physical_tick())
+            .into_iter()
+            .find(|ore| ore.id == id)
+    }
+
     pub(in crate::flight) fn auto_scoop_mined_ore_tick(&mut self, id: AsteroidId) -> &'static str {
         if !self.mining_selected(id) {
             return "Target released";
         }
-        let Some(ore) = self.mining_collection_target(id) else {
+        let target = self
+            .selected_work_target()
+            .and_then(|target| match target.id {
+                WorkTargetId::Ore(ore) => self.mining_ore_target(ore),
+                WorkTargetId::Asteroid(_) => self.mining_collection_target(id),
+                _ => None,
+            });
+        let Some(ore) = target else {
             return "Mining complete";
         };
         match self.collect_mined_ore(self.state.tick, Some(ore.id), true) {
