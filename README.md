@@ -24,6 +24,8 @@ The development source also provides a separate Goshawk Mk II Custom Showroom an
 
 Medusa (SH171) can be inspected in the station Showroom. The source package preserves both original meshes and the inspection shield. The Showroom lists the verified empty stock dry mass. [Medusa inspection and flight limits](integration/sh171-medusa/README.md)
 
+The follow-up development candidate offers 34 selectable stock previews in the ordinary station Showroom. This includes 28 validated Hull Studio schema-1 fleet packages and six original stock models. These are catalogue previews, not new ships for purchase or flight. [Hull Studio](docs/HULL-STUDIO.md) also opens a local or archived preview in a disposable Showroom session without changing the player's ship. Native qualification of the combined candidate is pending.
+
 ## Internal Mule docking validation
 
 The internal SH001 Mule scene uses the original SH028 station. On Mac build `ffb7112`, Mule entered the clear opening at tick 104. On the obstructed approach it stopped at the station lip at tick 11. In the development build, completing all eight G02 freight handovers unlocks a single Mule encounter on the next launch from Renas. A returning pilot whose saved ship overlaps the Mule’s berth can fly clear before the Mule appears. Preview 8 predates this encounter. The reviewed renderer build `1cdac5e` also passed the aligned crossing on Mac and the docking regressions on Linux and native Windows. [Controls and test scope](docs/MULE-VALIDATION-LAUNCH.md)

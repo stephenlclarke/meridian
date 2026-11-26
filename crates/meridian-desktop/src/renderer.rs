@@ -82,6 +82,8 @@ impl PendingProjection {
 
 pub struct Renderer {
     flight_view: FlightView,
+    player_hull: mesh::PlayerRenderHull,
+    player_medusa: Option<crate::mule_render::showroom::PlayerMedusaPass>,
     celestial: crate::celestial::Pass,
     mule: Option<crate::mule_render::Pass>,
     docked: crate::docked_render::Pass,
@@ -274,6 +276,8 @@ impl Renderer {
             surface,
             window,
             flight_view: FlightView::Front,
+            player_hull: mesh::PlayerRenderHull::Peregrine,
+            player_medusa: None,
             celestial,
             mule: None,
             docked,
@@ -346,6 +350,10 @@ impl Renderer {
         self.flight_view = view;
     }
 
+    pub(crate) fn set_player_hull(&mut self, hull: mesh::PlayerRenderHull) {
+        self.player_hull = hull;
+    }
+
     fn targeting_camera(
         &self,
         snapshot: &Snapshot,
@@ -358,6 +366,7 @@ impl Renderer {
                 pose: station.pose,
                 port: station.port,
                 docked: station.docked,
+                player_hull: self.player_hull,
             },
         )
     }
@@ -589,6 +598,7 @@ impl Renderer {
             pose: scene.pose,
             port: scene.port,
             docked: scene.docked,
+            player_hull: self.player_hull,
         });
         if let (Some(placement), Some(station)) = (mule, station) {
             let scene = placement.for_camera(|| mesh::scene_camera_pose(snapshot, station))?;
@@ -617,6 +627,36 @@ impl Renderer {
             pass.hide();
         }
         let internal_observer = mule.and_then(crate::mule_render::Placement::internal_observer);
+        let medusa_camera = if let Some(station) = station {
+            mesh::medusa_chase_camera(snapshot, station)?
+        } else if self.player_hull == mesh::PlayerRenderHull::Medusa {
+            return Err("Active Medusa has no station presentation frame".into());
+        } else {
+            None
+        };
+        if let Some(camera) = medusa_camera.filter(|_| internal_observer.is_none()) {
+            if self.player_medusa.is_none() {
+                self.player_medusa = Some(crate::mule_render::showroom::PlayerMedusaPass::new(
+                    &self.device,
+                    &self.queue,
+                    self.config.format,
+                )?);
+            }
+            if let Some(pass) = &mut self.player_medusa {
+                pass.prepare(
+                    &self.queue,
+                    mesh::player_pose(snapshot),
+                    crate::mule_render::View {
+                        camera,
+                        flight: self.flight_view,
+                        projection: flight_projection(self.config.width, self.config.height),
+                        tick: snapshot.tick,
+                    },
+                )?;
+            }
+        } else if let Some(pass) = &mut self.player_medusa {
+            pass.hide();
+        }
         mesh::frame_vertices_for_observer(
             snapshot,
             &self.ship,
@@ -712,6 +752,9 @@ impl Renderer {
             pass.set_bind_group(0, &self.projection_group, &[]);
             pass.set_vertex_buffer(0, self.vertices.slice(..));
             pass.draw(0..self.frame.len() as u32, 0..1);
+            if let Some(player) = &self.player_medusa {
+                player.draw(&mut pass);
+            }
             if let Some(mule) = &self.mule {
                 mule.draw_solid(&mut pass);
             }

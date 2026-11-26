@@ -2,6 +2,8 @@
 
 The development desktop game accepts self-contained schema-1 JSON exported by Hull Studio or the shared validator. This is an explicit, read-only session asset; opening it never buys, spawns or replaces a ship in World and never writes the package or data into a save.
 
+Schema-2 archived artwork is also accepted through the explicit `--inspect-hull-package` option only. Its native mesh can exceed the schema-1 flight limit of 512 faces. It has no engineering or flight qualification, cannot be exported for flight from Studio and cannot acquire a hull or authorise flight. See [archived mesh inspection](HULL-STUDIO.md#archived-mesh-inspection).
+
 Run from the repository root with its pinned toolchain:
 
 ```bash
@@ -18,7 +20,7 @@ The explicit launch prints and flushes `MERIDIAN_HULL_STUDIO_READY` once, only a
 
 Only a regular local file within the shared 64 MiB validator bound is accepted. The shared core validates all fields, material/texture indices, finite UVs, support groups, engineering and native topology limits; any declared blocked or indeterminate clearance refuses the launch. Accepted clearance readouts come from the actual conservative continuous collision kernel, with the same package's rounded pieces also consumed for the local-origin contact readout. Source engineering values and positive clearance results are not acquired mass or flight admission.
 
-The generic renderer submits the detailed face order, winding, exact tint channels including alpha, emissive flags and optional corner UVs against the three shared original atlases. Untextured non-emissive surfaces use restrained directional relief; original maps retain baked relief. Partial alpha uses face-centre depth sorting over opaque depth, not order-independent translucency. Presentation uses a uniform fit independent of unscaled collision coordinates and reports physical metres separately. Device and shared core geometry limits still apply; authored assets do not modify built-ins or request external textures.
+The generic renderer submits the detailed face order, winding, exact tint channels including alpha, emissive flags and optional corner UVs against the three shared original atlases. The richer stock display palette is not applied to local assets. Untextured non-emissive surfaces use restrained directional relief; original maps retain baked relief. Partial alpha uses face-centre depth sorting over opaque depth, not order-independent translucency. Presentation uses a uniform fit independent of unscaled collision coordinates and reports physical metres separately. Device and shared core geometry limits still apply; authored assets do not modify built-ins or request external textures.
 
 ## Owned verification
 

@@ -136,6 +136,7 @@ fn the_paid_freight_sortie_adds_mule_to_the_existing_camera_and_flight_mesh() {
         pose: some(snapshot.station),
         port: some(world.station_port()),
         docked: false,
+        player_hull: crate::mesh::PlayerRenderHull::Peregrine,
     };
     let camera = ok(mesh::scene_camera_pose(&snapshot, station));
     let scene = ok(placement.for_camera(|| mesh::scene_camera_pose(&snapshot, station)));
@@ -219,6 +220,7 @@ fn isolated_frame_keeps_its_world_owned_observer_and_rejects_stale_publications(
         pose: some(snapshot.station),
         port: some(world.station_port()),
         docked: false,
+        player_hull: crate::mesh::PlayerRenderHull::Peregrine,
     };
     let mut frame_vertices = Vec::new();
     ok(mesh::frame_vertices_for_observer(

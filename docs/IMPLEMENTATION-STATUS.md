@@ -32,6 +32,10 @@ The empty stock reference exposes 40,712 kg in the Showroom. The MacBook Air rep
 
 SH171 is available for catalogue inspection with the original detailed artwork and seven materials. The archived native mesh has 76,228 faces and stays outside the 512-face flight gate. The source-bound shield uses 729 local supports and keeps the crown opening clear in its own geometry. See the [Medusa inspection record](../integration/sh171-medusa/README.md) for the measured bounds and the remaining flight, player and PLUGH fabrication work.
 
+## Combined Showroom and Hull Studio source candidate
+
+The ordinary station Showroom has 34 selectable stock previews: 28 authenticated schema-1 packages and six original stock models. It keeps the linked source identities, engineering readouts and inspection-only exchange rules. The combined source also restores the Studio launcher, including explicit inspection of schema-2 archives. Stock ship and station finishes are display-only; local authored material colours remain exact. Portable Studio and source checks have passed during integration. Combined compiler checks and native presentation acceptance are pending.
+
 ## Station chart best-profit scan source candidate
 
 The station Galaxy chart now offers a read-only P toggle for up to five positive, directly reachable trade estimates, with an explicit empty state. The scan uses current in-game stocks and quotes, unreserved cargo, wallet, fitted jump range and fuel. It adapts `Sources/EliteCore/ProfitScan.swift` from immutable Elite source `34790e313c0d6cf8be84fe74aaf8f2f228cd3b3f` to the admitted Meridian markets; unsupported markets and speculative multi-leg refuelling do not count. The toggle is session-local and local flight P remains pause. Authored core and desktop regressions cover finite trade bounds, reserved cargo, range/fuel exclusions, stable ranking, read-only saves and the chart input path. Compiler, CI and native qualification are pending.

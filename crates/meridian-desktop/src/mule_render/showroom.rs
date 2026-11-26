@@ -27,6 +27,8 @@ mod authored;
 pub(crate) use authored::{AuthoredFace, AuthoredPass, AuthoredVisual};
 
 mod medusa;
+mod player;
+pub(crate) use player::PlayerMedusaPass;
 
 pub(crate) const MEDUSA_GEOMETRY_KEY: &str = "assets/fleet/sh171/visual.bin";
 pub(crate) const GEOMETRY_KEY: &str = "assets/fleet/sh008/visual.bin";

@@ -35,6 +35,14 @@ pub struct StationRender<'a> {
     pub pose: StationPose,
     pub port: &'a DockingPort,
     pub docked: bool,
+    pub(crate) player_hull: PlayerRenderHull,
+}
+
+#[derive(Clone, Copy, Debug, Default, PartialEq, Eq)]
+pub(crate) enum PlayerRenderHull {
+    #[default]
+    Peregrine,
+    Medusa,
 }
 
 struct Camera {
@@ -46,7 +54,7 @@ fn point(values: [f32; 3]) -> Vec3 {
     Vec3::new(values[0].into(), values[1].into(), values[2].into())
 }
 
-fn player_pose(snapshot: &Snapshot) -> RigidPose {
+pub(crate) fn player_pose(snapshot: &Snapshot) -> RigidPose {
     let [x, y, z, w] = snapshot.orientation.map(f64::from);
     RigidPose {
         position: point(snapshot.position),
@@ -114,7 +122,11 @@ fn camera_for(snapshot: &Snapshot, station: StationRender<'_>) -> Result<Camera,
             draw_ship: false,
         });
     }
-    let offset = player.orientation.apply(Vec3::new(0.0, 45.0, -220.0));
+    let local_offset = match station.player_hull {
+        PlayerRenderHull::Peregrine => Vec3::new(0.0, 45.0, -220.0),
+        PlayerRenderHull::Medusa => Vec3::new(0.0, 15.0, -76.0),
+    };
+    let offset = player.orientation.apply(local_offset);
     Ok(Camera {
         pose: RigidPose {
             position: Vec3::new(
@@ -133,6 +145,18 @@ pub(crate) fn scene_camera_pose(
     station: StationRender<'_>,
 ) -> Result<RigidPose, String> {
     Ok(camera_for(snapshot, station)?.pose)
+}
+
+/// The detailed active hull is only shown in the same chase view as the ordinary player.
+pub(crate) fn medusa_chase_camera(
+    snapshot: &Snapshot,
+    station: StationRender<'_>,
+) -> Result<Option<RigidPose>, String> {
+    if station.player_hull != PlayerRenderHull::Medusa {
+        return Ok(None);
+    }
+    let camera = camera_for(snapshot, station)?;
+    Ok(camera.draw_ship.then_some(camera.pose))
 }
 
 /// Controlled World-owned observer: draw the actual station in its first-person frame.
@@ -433,7 +457,7 @@ pub fn frame_vertices(
     output.clear();
     if let Some(station) = station {
         let camera = camera_for(snapshot, station)?;
-        if camera.draw_ship {
+        if camera.draw_ship && station.player_hull == PlayerRenderHull::Peregrine {
             append_mesh(ship, player_pose(snapshot), &camera, output)?;
         }
         append_mesh(
@@ -535,6 +559,7 @@ mod tests {
                     .station_port()
                     .unwrap_or_else(|| panic!("Expected station_port")),
                 docked: false,
+                player_hull: crate::mesh::PlayerRenderHull::Peregrine,
             };
             let mut frame = Vec::new();
             append_missiles(
@@ -691,6 +716,7 @@ mod tests {
             pose: reference_station_pose(),
             port: &port,
             docked: true,
+            player_hull: crate::mesh::PlayerRenderHull::Peregrine,
         };
         let camera = camera_for(&snapshot, station).unwrap_or_else(|e| panic!("{e}"));
         assert!(!camera.draw_ship);
@@ -726,6 +752,7 @@ mod tests {
             pose: reference_station_pose(),
             port: &port,
             docked: false,
+            player_hull: crate::mesh::PlayerRenderHull::Peregrine,
         };
         assert!(
             !camera_for(&snapshot, station)
@@ -782,6 +809,7 @@ mod tests {
             pose: reference_station_pose(),
             port: &port,
             docked: false,
+            player_hull: crate::mesh::PlayerRenderHull::Peregrine,
         };
         let camera = camera_for(&snapshot, station).unwrap_or_else(|e| panic!("{e}"));
         assert!(!camera.draw_ship);
@@ -796,6 +824,57 @@ mod tests {
             assert_eq!(frame.capacity(), capacity);
             assert_eq!(frame[0].position, [1.0, 2.0, 136.32_f32 - 300.0]);
         }
+    }
+
+    #[test]
+    fn active_medusa_uses_scaled_chase_camera_without_peregrine_vertices() {
+        let mut snapshot = meridian_core::World::new().snapshot();
+        snapshot.position = [0.0, 0.0, 2000.0];
+        snapshot.orientation = [0.0, 0.0, 0.0, 1.0];
+        let port = reference_port();
+        let vertices = [Vertex {
+            position: [0.0, 0.0, 0.0],
+            color: [1.0; 3],
+        }; 3];
+        let stock = StationRender {
+            vertices: &vertices,
+            pose: reference_station_pose(),
+            port: &port,
+            docked: false,
+            player_hull: PlayerRenderHull::Peregrine,
+        };
+        let mut medusa = StationRender {
+            player_hull: PlayerRenderHull::Medusa,
+            ..stock
+        };
+        let camera = camera_for(&snapshot, stock).unwrap_or_else(|e| panic!("{e}"));
+        assert_eq!(camera.pose.position, Vec3::new(0.0, 45.0, 1780.0));
+        assert_eq!(medusa_chase_camera(&snapshot, stock), Ok(None));
+        let camera = medusa_chase_camera(&snapshot, medusa).unwrap_or_else(|e| panic!("{e}"));
+        assert_eq!(
+            camera,
+            Some(RigidPose {
+                position: Vec3::new(0.0, 15.0, 1924.0),
+                orientation: Basis3::IDENTITY
+            })
+        );
+        assert_eq!(camera, scene_camera_pose(&snapshot, medusa).ok());
+        let mut frame = Vec::new();
+        frame_vertices(&snapshot, &vertices, Some(stock), &mut frame)
+            .unwrap_or_else(|e| panic!("{e}"));
+        assert_eq!(frame.len(), 6);
+        frame_vertices(&snapshot, &vertices, Some(medusa), &mut frame)
+            .unwrap_or_else(|e| panic!("{e}"));
+        assert_eq!(frame.len(), 3);
+        snapshot.position = [0.0, 0.0, 300.0];
+        assert_eq!(medusa_chase_camera(&snapshot, medusa), Ok(None));
+        assert_eq!(
+            scene_camera_pose(&snapshot, medusa),
+            Ok(player_pose(&snapshot))
+        );
+        snapshot.position = [0.0, 0.0, 2000.0];
+        medusa.docked = true;
+        assert_eq!(medusa_chase_camera(&snapshot, medusa), Ok(None));
     }
 }
 
