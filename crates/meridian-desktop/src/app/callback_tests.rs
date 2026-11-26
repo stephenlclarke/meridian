@@ -170,6 +170,62 @@ fn actual_solar_destruction_freezes_catchup_keeps_hud_and_requires_explicit_reco
     assert_eq!(ok(std::fs::read(&slot)), durable);
     assert!(app.error.is_none());
 
+    app.focus_changed(false);
+    app.occlusion_changed(true);
+    let _ = app.route_keyboard(
+        PhysicalKey::Code(KeyCode::KeyU),
+        ElementState::Released,
+        false,
+        None,
+    );
+    app.focus_changed(true);
+    app.occlusion_changed(false);
+    assert_eq!(ok(app.game.world.save_bytes()), terminal_bytes);
+
+    // The actual presentation outcome router retries a skipped terminal cockpit even
+    // though the simulation is stopped; zero size/occlusion suppresses the retry.
+    let mut redraws = 0;
+    let eligible = app.terminal_cockpit_visible();
+    let skipped = ok(App::complete_presentation(
+        Ok(crate::renderer::Presentation::Skipped),
+        &mut app.docked,
+        None,
+        false,
+        eligible,
+        || redraws += 1,
+    ));
+    app.record_terminal_presentation(skipped);
+    assert_eq!(redraws, 1);
+    assert!(app.terminal_retry_needed(false));
+    assert!(!app.terminal_retry_needed(true));
+    app.occlusion_changed(true);
+    assert!(!app.terminal_retry_needed(false));
+    app.occlusion_changed(false);
+    assert!(app.terminal_retry_needed(false));
+    assert_eq!(app.advance_frame(false, 8), FrameAdvance::Continue(None));
+    assert_eq!(ok(app.game.world.save_bytes()), terminal_bytes);
+    let skipped = ok(App::complete_presentation(
+        Ok(crate::renderer::Presentation::Skipped),
+        &mut app.docked,
+        None,
+        true,
+        eligible,
+        || redraws += 1,
+    ));
+    app.record_terminal_presentation(skipped);
+    assert_eq!(redraws, 1);
+    let presented = ok(App::complete_presentation(
+        Ok(crate::renderer::Presentation::Presented),
+        &mut app.docked,
+        None,
+        false,
+        eligible,
+        || redraws += 1,
+    ));
+    app.record_terminal_presentation(presented);
+    assert!(!app.terminal_retry_needed(false));
+    assert_eq!(redraws, 1);
+
     let refusal = app
         .game
         .prepare_quit()
@@ -185,6 +241,7 @@ fn actual_solar_destruction_freezes_catchup_keeps_hud_and_requires_explicit_reco
         Some(QuitRecovery::Resume)
     );
     assert!(!app.simulation_active()); // P closes the prompt; it cannot resurrect the hull.
+    assert_eq!(ok(app.game.world.save_bytes()), terminal_bytes);
     assert_eq!(ok(std::fs::read(&slot)), durable);
     app.load_profile();
     assert_eq!(app.game.world.snapshot(), alive.snapshot());
@@ -201,11 +258,42 @@ fn actual_solar_destruction_freezes_catchup_keeps_hud_and_requires_explicit_reco
     app.load_profile();
     assert!(!app.simulation_active());
     assert_eq!(app.notice.text.as_deref(), Some(super::DESTROYED_NOTICE));
-    assert!(!ok(app.game.new_commander(19804)));
-    assert!(super::player_destroyed(&app.game.world));
+    let post_restore = ok(app.game.world.save_bytes());
+    assert_eq!(post_restore, ok(cold_terminal.save_bytes()));
+    app.focus_changed(false);
+    app.occlusion_changed(true);
+    app.focus_changed(true);
+    app.occlusion_changed(false);
+    app.reset_input();
+    assert_eq!(ok(app.game.world.save_bytes()), post_restore);
     assert_eq!(ok(std::fs::read(&slot)), terminal_disk);
-    assert!(ok(app.game.new_commander(19804)));
-    assert!(!super::player_destroyed(&app.game.world));
+    drop(app);
+
+    // Actual cold startup opens the Commander screen, which must release N to the
+    // common two-press route even though a destroyed profile is still playing.
+    let mut startup = ok(App::from_launch(super::mule_validation::Launch::Profile(
+        directory.0.clone(),
+    )));
+    assert!(startup.commander_open && super::player_destroyed(&startup.game.world));
+    let startup_bytes = ok(startup.game.world.save_bytes());
+    assert_eq!(startup_bytes, ok(cold_terminal.save_bytes()));
+    assert_eq!(
+        startup.route_keyboard(
+            PhysicalKey::Code(KeyCode::KeyN),
+            ElementState::Pressed,
+            false,
+            None
+        ),
+        Some(KeyCode::KeyN)
+    );
+    assert!(!startup.commander_key(KeyCode::KeyN));
+    startup.new_commander_from_key(19804);
+    assert!(super::player_destroyed(&startup.game.world));
+    assert_eq!(ok(startup.game.world.save_bytes()), startup_bytes);
+    assert_eq!(ok(std::fs::read(&slot)), terminal_disk);
+    assert!(!startup.commander_key(KeyCode::KeyN));
+    startup.new_commander_from_key(19804);
+    assert!(!super::player_destroyed(&startup.game.world));
     assert_eq!(ok(std::fs::read(&slot)), terminal_disk);
 }
 

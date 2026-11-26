@@ -5,6 +5,9 @@ use super::{
 };
 impl App {
     pub(super) fn cancel_emp_input(&mut self) {
+        if player_destroyed(&self.game.world) {
+            return;
+        }
         let tick = self.game.world.snapshot().tick;
         // A paused core cannot accept a command; no held host key survives, and the next
         // accepted step submits false before it can advance the restored charge.
