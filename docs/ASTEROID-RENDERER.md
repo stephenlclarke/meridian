@@ -1,5 +1,7 @@
 # Physical asteroid renderer
 
+The automatic-work branch adds an approved Meridian ore shard. Its immutable snapshot supplies both flight geometry and physical intake. The earlier checkpoint below records the original implementation. [Current mining and scoop behaviour](AUTOMATIC-MINING.md)
+
 The renderer descends from the physical asteroid implementation in
 `b38aa1b1283288f8c68afb8bed495f633db760c5`. It adapts the MC1 renderer proposal
 to the staged M02 `World::mining_belt_snapshot()` and desktop presentation.

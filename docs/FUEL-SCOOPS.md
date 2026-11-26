@@ -1,10 +1,14 @@
-# Fuel Scoops source and physical ore dependency
+# Fuel Scoops and physical ore intake
 
 For the later explicit authored Meridian ore acceptance, see [Automatic asteroid mining and physical ore intake](AUTOMATIC-MINING.md). The original-source asset investigation below is retained as the historical pre-authoring baseline.
 
+The automatic-work branch uses a newly authored Meridian ore fragment approved on 26 November 2026. Each finite unit has six asymmetric vertices and eight outward-facing triangles. The flight renderer, target display and scoop checks use the same moving body. See [automatic mining and physical intake](AUTOMATIC-MINING.md) for the current implementation and validation scope.
+
+## Historical source investigation
+
 The separately tracked [solar fuel source candidate](SOLAR-FUEL-SCOOPS.md) gives the same actual paid/test scoop its original near-sun fuel and thermal path. It uses the existing local celestial scene and does not change the physical ore/cargo custody blockers below.
 
-The following source trace is complete against immutable L337 `a11fe16924d87d06021816f9037952afcbac08db`, tree `68fec574df12ddf74acb14747e0dd6839f478642`. It identifies the real catalogue, paid fitting, pickup and actor-custody rules. **Positive physical ore collection is blocked by the missing eligible original cargo geometry input.** The following [paid equipment source](PAID-FUEL-SCOOPS.md) implements only genuine ownership/fitting. No physical collection implementation, positive intake or sale test, new actor, cargo credit or replacement mesh was invented. The existing mining checkpoint `03682dd` and its 15 authored **UNRUN** tests remain intact; `NoScoops` is still an explicit refusal, not full mining/cargo acceptance.
+The following source trace is complete against immutable L337 `a11fe16924d87d06021816f9037952afcbac08db`, tree `68fec574df12ddf74acb14747e0dd6839f478642`. It identifies the real catalogue, paid fitting, pickup and actor-custody rules. At this checkpoint, the missing original cargo geometry blocked physical ore collection. The following [paid equipment source](PAID-FUEL-SCOOPS.md) implements only genuine ownership/fitting. No physical collection implementation, positive intake or sale test, new actor, cargo credit or replacement mesh was invented. The existing mining checkpoint `03682dd` and its 15 authored **UNRUN** tests remain intact; `NoScoops` is still an explicit refusal, not full mining/cargo acceptance.
 
 ## Verified original equipment and pickup contract
 
@@ -26,9 +30,9 @@ The geometry call chain is concrete: `GameplayWeapons.swift` resolves ordinary o
 
 The assignment explicitly excludes placeholder geometry and fallback preservation. Promoting that generic branch, shrinking it to fit an aperture, reusing SH025 or a practice beacon, or binding a pending description to a fabricated body would evade that requirement. This is an asset/physical-source dependency in the inspected immutable revision, not a claim that source rules are unknown, that future MBA content lacks a pod, or that repository-wide licensing grants asset acceptance. Original notices remain pinned separately; no new asset is copied.
 
-Root must supply or select a concrete immutable eligible original cargo/ore geometry definition with source identity/hash and notice, physical dimensions/axes/winding, render/collision representation and intended pickup-body binding. Its exact geometry must then pass shared native ray, collision, physical motion and scoop-approach admission. A later authenticated packet is a deliberate new source reference; the human WIP is not an implicit latest source.
+The original-only implementation required a concrete immutable eligible original cargo/ore geometry definition with source identity/hash and notice, physical dimensions/axes/winding, render/collision representation and intended pickup-body binding. Its exact geometry must then pass shared native ray, collision, physical motion and scoop-approach admission. A later authenticated packet is a deliberate new source reference; the human WIP is not an implicit latest source.
 
-## Following implementation and acceptance
+## Acceptance criteria recorded at the original checkpoint
 
 Paid owned/fitted Fuel Scoops now have their separate [equipment source increment](PAID-FUEL-SCOOPS.md), with the final shared loader/Profile join still Root-owned. With the eligible geometry input, continue on the same existing mining branch and one World: real finite ore materialization/binding/motion, physically observed manual pickup, capacity/protection admission, candidate cargo/account revision and a consumed-fragment receipt before atomic publication. Reconcile collected native units with current cargo, market sales and ordinary account chronology. Retain original Mining Laser damage50/range6000, partial energy/terminal ownership, journal tags32..43, existing caps, all assertions and irreversible source history. Bind cold restoration to the same finite fragments without replaying collection effects or minting new paid equipment.
 
