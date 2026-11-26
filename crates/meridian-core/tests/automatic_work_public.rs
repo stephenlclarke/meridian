@@ -2,7 +2,9 @@
 use meridian_core::{
     FlightInput, FlightMode, ModuleAction, ModuleKind, ModuleProvenance, TargetFilter,
     TargetIdentity, TargetingViewport, World,
+    docking::Vec3,
     equipment::{TargetingTier, WorkTargetId},
+    mining::{ASTEROID_FACES, AsteroidSnapshot, OreSnapshot},
     navigation::SystemId,
     station_services::{Command, CommodityId},
 };
@@ -155,6 +157,95 @@ fn select_rock(world: &mut World, target: WorkTargetId) {
     assert!(world.automatic_work_status().is_some());
 }
 
+fn launch_mining(world: &mut World) -> AsteroidSnapshot {
+    ok(world.request_launch(world.snapshot().tick));
+    ok(world.step(FlightInput::default()));
+    assert_eq!(ok(world.cycle_target_filter()), TargetFilter::Mining);
+    let rock = some(world.mining_belt_snapshot()).bodies[0];
+    assert_eq!(rock.initial_units, 1);
+    assert_eq!(rock.remaining_units, 1);
+    rock
+}
+
+fn verify_fragment(world: &World, rock: AsteroidSnapshot, ore: OreSnapshot) {
+    assert_eq!(ore.id.asteroid(), rock.id);
+    assert_eq!(ore.id.fragment(), 0);
+    assert_eq!(ore.commodity, rock.commodity);
+    assert_eq!(ore.quantity, 1);
+    assert!(ore.released_tick <= world.snapshot().tick);
+    assert_eq!(ore.velocity, Vec3::new(0.0, 2.0, 3.0));
+    assert_eq!(world.mining_collection_target(rock.id), Some(ore));
+    let p = ore.position;
+    // The same approved Meridian six-vertex fragment consumed by the ordinary renderer.
+    // This verifies the projected body, not actual screen rendering.
+    assert_eq!(
+        ore.vertices(),
+        [
+            Vec3::new(p.x + 8.0, p.y, p.z),
+            Vec3::new(p.x - 8.0, p.y, p.z),
+            Vec3::new(p.x, p.y + 8.0, p.z),
+            Vec3::new(p.x, p.y - 8.0, p.z),
+            Vec3::new(p.x, p.y, p.z + 8.0),
+            Vec3::new(p.x, p.y, p.z - 8.0),
+        ]
+    );
+    assert_eq!(ASTEROID_FACES.len(), 8);
+    assert!(
+        ASTEROID_FACES
+            .iter()
+            .all(|face| face.iter().all(|&index| index < 6))
+    );
+}
+
+fn refuse_missing_scoops(mut world: World) {
+    let cash = world.credits_tenths();
+    let equipment = some(world.modular_equipment_snapshot());
+    let scoop = some(
+        equipment
+            .items
+            .into_iter()
+            .find(|item| item.kind == ModuleKind::FuelScoops),
+    );
+    let tick = world.snapshot().tick;
+    let reviewed = ok(world.review_module(ModuleAction::Store { item: scoop.id }, tick));
+    ok(world.prepare_module(reviewed, tick)).commit();
+    assert_eq!(world.credits_tenths(), cash);
+    let stored = some(
+        some(world.modular_equipment_snapshot())
+            .items
+            .into_iter()
+            .find(|item| item.id == scoop.id),
+    );
+    assert_eq!(stored.slot, None);
+    assert_eq!(stored.provenance, scoop.provenance);
+
+    let rock = launch_mining(&mut world);
+    let held = world.commodity_quantity(rock.commodity);
+    select_rock(&mut world, WorkTargetId::Asteroid(rock.id));
+    let mut refused = false;
+    for _ in 0..12000 {
+        ok(world.step(FlightInput::default()));
+        assert_eq!(world.commodity_quantity(rock.commodity), held);
+        assert_eq!(world.credits_tenths(), cash);
+        assert_eq!(some(world.mining_belt_snapshot()).bodies[0], rock);
+        if world.automatic_work_status() == Some("Fit fuel scoops") {
+            refused = true;
+            break;
+        }
+    }
+    assert!(
+        refused,
+        "missing-scoops refusal unavailable: {:?}",
+        world.automatic_work_status()
+    );
+    assert!(world.mining_collection_target(rock.id).is_none());
+    let cold = ok(World::from_save_bytes(&ok(world.save_bytes())));
+    assert_eq!(cold.commodity_quantity(rock.commodity), held);
+    assert_eq!(cold.credits_tenths(), cash);
+    assert_eq!(some(cold.mining_belt_snapshot()).bodies[0], rock);
+    assert!(cold.mining_collection_target(rock.id).is_none());
+}
+
 #[test]
 fn earned_mining_select_once_delivers_one_real_ore_unit_and_retains_it_on_continue() {
     let mut world = market_funded_commander();
@@ -188,12 +279,11 @@ fn earned_mining_select_once_delivers_one_real_ore_unit_and_retains_it_on_contin
     let paid_cash = world.credits_tenths();
     let paid_equipment = some(world.modular_equipment_snapshot());
 
-    ok(world.request_launch(world.snapshot().tick));
-    ok(world.step(FlightInput::default()));
-    assert_eq!(ok(world.cycle_target_filter()), TargetFilter::Mining);
-    let rock = some(world.mining_belt_snapshot()).bodies[0];
-    assert_eq!(rock.initial_units, 1);
-    assert_eq!(rock.remaining_units, 1);
+    // A separately continued copy of the normally earned profile exercises refusal.
+    // It never mutates the paid positive journey below.
+    refuse_missing_scoops(ok(World::from_save_bytes(&ok(world.save_bytes()))));
+
+    let rock = launch_mining(&mut world);
     let target = WorkTargetId::Asteroid(rock.id);
     let identity = TargetIdentity::Work(target);
     let held = some(world.commodity_quantity(rock.commodity));
@@ -213,6 +303,7 @@ fn earned_mining_select_once_delivers_one_real_ore_unit_and_retains_it_on_contin
     // second target selection, test-only movement or direct resource mutation follows.
     select_rock(&mut world, target);
     let mut complete = false;
+    let mut witnessed_ore = None;
     for _ in 0..12000 {
         ok(world.step(FlightInput::default()));
         if world.commodity_quantity(rock.commodity) == Some(held + 1) {
@@ -226,11 +317,41 @@ fn earned_mining_select_once_delivers_one_real_ore_unit_and_retains_it_on_contin
         );
         assert_eq!(world.commodity_quantity(rock.commodity), Some(held));
         assert_eq!(world.credits_tenths(), paid_cash);
+        let belt = some(world.mining_belt_snapshot());
+        if let Some(ore) = belt
+            .pending_ore
+            .iter()
+            .find(|ore| ore.id.asteroid() == rock.id)
+            .copied()
+        {
+            assert_eq!(belt.bodies[0].remaining_units, 0);
+            assert_eq!(belt.bodies[0].extracted_units, 1);
+            assert_eq!(
+                belt.pending_ore
+                    .iter()
+                    .filter(|other| other.id.asteroid() == rock.id)
+                    .count(),
+                1
+            );
+            verify_fragment(&world, rock, ore);
+            if let Some((id, released_tick, released_physical_tick)) = witnessed_ore {
+                assert_eq!(
+                    (ore.id, ore.released_tick, ore.released_physical_tick),
+                    (id, released_tick, released_physical_tick)
+                );
+            } else {
+                witnessed_ore = Some((ore.id, ore.released_tick, ore.released_physical_tick));
+            }
+        }
     }
     assert!(
         complete,
         "automatic intake did not complete: {:?}",
         world.automatic_work_status()
+    );
+    assert!(
+        witnessed_ore.is_some(),
+        "delivery must follow a real released fragment"
     );
     let belt = some(world.mining_belt_snapshot());
     assert_eq!(belt.bodies[0].remaining_units, 0);
@@ -240,6 +361,7 @@ fn earned_mining_select_once_delivers_one_real_ore_unit_and_retains_it_on_contin
             .iter()
             .all(|ore| ore.id.asteroid() != rock.id)
     );
+    assert!(world.mining_collection_target(rock.id).is_none());
     assert_eq!(world.credits_tenths(), paid_cash);
     let retained_equipment = some(world.modular_equipment_snapshot());
     assert_eq!(retained_equipment.items, paid_equipment.items);
@@ -249,6 +371,7 @@ fn earned_mining_select_once_delivers_one_real_ore_unit_and_retains_it_on_contin
     let mut cold = ok(World::from_save_bytes(&saved));
     assert_eq!(cold.commodity_quantity(rock.commodity), Some(held + 1));
     assert_eq!(cold.mining_belt_snapshot(), Some(belt));
+    assert!(cold.mining_collection_target(rock.id).is_none());
     assert_eq!(cold.credits_tenths(), paid_cash);
     assert_eq!(cold.modular_equipment_snapshot(), Some(retained_equipment));
     assert!(cold.automatic_work_status().is_none());
