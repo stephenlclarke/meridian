@@ -1,0 +1,98 @@
+[
+  {
+    "name": "port-forward-boom-to-hull",
+    "pointMetres": [
+      -3.0072705,
+      -0.4804853,
+      8.1031656
+    ],
+    "originalFaces": {
+      "detailed": {
+        "central-hull": {
+          "faceRange": [
+            0,
+            384
+          ],
+          "hitCountsAboveBelow": [
+            1,
+            1
+          ]
+        },
+        "port-forward-boom": {
+          "faceRange": [
+            408,
+            792
+          ],
+          "hitCountsAboveBelow": [
+            1,
+            1
+          ]
+        }
+      }
+    }
+  },
+  {
+    "name": "starboard-forward-boom-to-hull",
+    "pointMetres": [
+      2.5762634,
+      -0.8594567,
+      8.2326489
+    ],
+    "originalFaces": {
+      "detailed": {
+        "central-hull": {
+          "faceRange": [
+            0,
+            384
+          ],
+          "hitCountsAboveBelow": [
+            1,
+            1
+          ]
+        },
+        "starboard-forward-boom": {
+          "faceRange": [
+            1200,
+            1584
+          ],
+          "hitCountsAboveBelow": [
+            1,
+            1
+          ]
+        }
+      }
+    }
+  },
+  {
+    "name": "canopy-ridge-to-canopy",
+    "pointMetres": [
+      -0.0994546,
+      5.9981387,
+      2.3932379
+    ],
+    "originalFaces": {
+      "detailed": {
+        "canopy": {
+          "faceRange": [
+            1968,
+            2928
+          ],
+          "hitCountsAboveBelow": [
+            1,
+            1
+          ]
+        },
+        "canopy-ridge": {
+          "faceRange": [
+            2928,
+            2940
+          ],
+          "hitCountsAboveBelow": [
+            1,
+            1
+          ]
+        }
+      }
+    }
+  }
+]

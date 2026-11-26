@@ -269,6 +269,72 @@ const DESCRIPTORS: &[StockDescriptor] = &[
         "integration/sh073-griffon-spectre/GRIFFON-SPECTRE-STUDIO.json",
         0xf80f_0554_1e38_ec7e
     ),
+    stock_package!(
+        "SH074",
+        "Dzo",
+        "integration/sh074-dzo/DZO-STUDIO.json",
+        0xb550_069d_57af_1c43
+    ),
+    stock_package!(
+        "SH075",
+        "Dzo Mk II",
+        "integration/sh075-dzo-mk-ii/DZO-MK-II-STUDIO.json",
+        0xe069_7e74_81f3_0b3a
+    ),
+    stock_package!(
+        "SH076",
+        "Hog",
+        "integration/sh076-hog/HOG-STUDIO.json",
+        0x7018_0451_efa5_4ce4
+    ),
+    stock_package!(
+        "SH077",
+        "Tamaraw",
+        "integration/sh077-tamaraw/TAMARAW-STUDIO.json",
+        0x09fb_db87_451c_03ec
+    ),
+    stock_package!(
+        "SH078",
+        "Oryx Voyager",
+        "integration/sh078-oryx-voyager/ORYX-VOYAGER-STUDIO.json",
+        0x613e_5338_6bbc_ee60
+    ),
+    stock_package!(
+        "SH079",
+        "Carabao Freighter",
+        "integration/sh079-carabao-freighter/CARABAO-FREIGHTER-STUDIO.json",
+        0x1325_166c_b510_d541
+    ),
+    stock_package!(
+        "SH080",
+        "Carabao Highliner",
+        "integration/sh080-carabao-highliner/CARABAO-HIGHLINER-STUDIO.json",
+        0xa46d_48a4_709f_dddc
+    ),
+    stock_package!(
+        "SH081",
+        "Jaguar",
+        "integration/sh081-jaguar/JAGUAR-STUDIO.json",
+        0xcfd2_50eb_de3f_33b5
+    ),
+    stock_package!(
+        "SH083",
+        "Hare Explorer",
+        "integration/sh083-hare-explorer/HARE-EXPLORER-STUDIO.json",
+        0x1c6e_f49a_e3ad_b79e
+    ),
+    stock_package!(
+        "SH084",
+        "Llama",
+        "integration/sh084-llama/LLAMA-STUDIO.json",
+        0x97cd_de0d_df47_8f10
+    ),
+    stock_package!(
+        "SH085",
+        "Laggar",
+        "integration/sh085-laggar/LAGGAR-STUDIO.json",
+        0xab22_1cd2_128f_187d
+    ),
 ];
 pub(crate) const STOCK_MODELS: [AvailableModel<'static>; DESCRIPTORS.len()] = {
     let mut models = [DESCRIPTORS[0].model; DESCRIPTORS.len()];
@@ -371,7 +437,8 @@ mod tests {
     #[test]
     fn every_stock_descriptor_authenticates_its_own_source_and_real_preview() {
         let catalogue = ok(crate::docked_screens::Catalogue::bundled());
-        assert_eq!(STOCK_MODELS.len(), 35);
+        assert_eq!(STOCK_MODELS.len(), 46);
+        assert!(!STOCK_MODELS.iter().any(|model| model.object == "SH082"));
         let mut identities = std::collections::BTreeSet::new();
         let mut keys = std::collections::BTreeSet::new();
         for entry in DESCRIPTORS {

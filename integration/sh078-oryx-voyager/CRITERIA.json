@@ -1,0 +1,205 @@
+{
+  "hull": "SH078 Oryx Voyager",
+  "scope": "Original catalogue artwork and independent segmented geometry inspection",
+  "source": "assets/fleet/sh078/SOURCE-GEOMETRY.json",
+  "frozenSources": "integration/sh078-oryx-voyager/FROZEN-SOURCES.json",
+  "sourceScaleMetresPerUnit": "1",
+  "faces": {
+    "detailed": 4620,
+    "native": 200,
+    "nativeMaximum": 512
+  },
+  "originalAccess": {
+    "runtimeCatalogue": {
+      "playerFlyable": false,
+      "normalPurchaseEligible": false,
+      "purchasePolicy": "pendingFabrication"
+    },
+    "r3DesignContract": {
+      "playerFlyable": true,
+      "purchasePolicy": "blueprintFabrication"
+    }
+  },
+  "engineering": {
+    "sourceReference": "finite-intrinsic-empty-oryx-voyager",
+    "massKg": 50196
+  },
+  "supportGroups": 31,
+  "minimumRouteClearanceMillimetres": 1229,
+  "sourceContactCounts": {
+    "overlap": 5,
+    "centreHullOccupied": true
+  },
+  "ringSupports": {
+    "selectedSpans": 8,
+    "sharedSeamVertices": 128,
+    "sourceTopology": {
+      "detailed": {
+        "vertices": 768,
+        "faces": 1536,
+        "eulerCharacteristic": 0
+      },
+      "native": {
+        "vertices": 32,
+        "faces": 64,
+        "eulerCharacteristic": 0
+      }
+    },
+    "alternatives": "integration/sh078-oryx-voyager/RING-OPTIONS.json"
+  },
+  "unsegmentedFitUpperMillimetres": {
+    "detailed": 5000,
+    "native": 4997
+  },
+  "fitUpperMillimetres": {
+    "detailed": 3286,
+    "native": 4321
+  },
+  "hullStudio": {
+    "definition": "integration/sh078-oryx-voyager/ORYX-VOYAGER-STUDIO.json",
+    "bytes": 610052,
+    "sha256": "5c85d7d6f5af018949a032d2ae3a566a232ef6499c6539c523a28c69cfcf570a",
+    "supports": 24,
+    "probes": 5,
+    "loaderRevision": "27121e66ba37a29781135b56924a9d6e7f38a70a",
+    "signedInstalledExport": {
+      "status": "PASS",
+      "scope": "Signed installed Studio offline original artwork import/export",
+      "bundleIdentifier": "io.xyzzy.meridian.hullstudio",
+      "bundleVersion": "0.0.0",
+      "codeDirectoryHash": "93938bda9242ebdff508bfb9e16b3cdf83c0a200",
+      "developerIdTeam": "4MEB7MUTAV",
+      "signatureVerification": "deep strict",
+      "definition": {
+        "bytes": 610052,
+        "sha256": "5c85d7d6f5af018949a032d2ae3a566a232ef6499c6539c523a28c69cfcf570a"
+      },
+      "exportExitStatuses": [
+        0,
+        0
+      ],
+      "exportMatchesDefinitionExceptTrailingLf": true,
+      "valid": true,
+      "diagnostics": [],
+      "detailedTriangles": 4620,
+      "nativeTriangles": 200,
+      "supportGroups": 24,
+      "engineeringReference": "finite-intrinsic-empty-oryx-voyager",
+      "massKg": 50196,
+      "receiptFiles": {
+        "ORYX-VOYAGER.hull.json": {
+          "bytes": 610051,
+          "sha256": "aa9d398e6ad9f90ad7a947ae0b1222c1e59394e9b11db3e409c93282ccd6db15"
+        },
+        "ORYX-VOYAGER-repeat.hull.json": {
+          "bytes": 610051,
+          "sha256": "aa9d398e6ad9f90ad7a947ae0b1222c1e59394e9b11db3e409c93282ccd6db15"
+        },
+        "studio.stdout.json": {
+          "bytes": 80235,
+          "sha256": "346876e6004ef63dea99d06114cbcc746b21c274a4eec8007fef0a663501ae8c"
+        },
+        "studio-repeat.stdout.json": {
+          "bytes": 80235,
+          "sha256": "346876e6004ef63dea99d06114cbcc746b21c274a4eec8007fef0a663501ae8c"
+        },
+        "codesign.log": {
+          "bytes": 13038,
+          "sha256": "a4937a1844a94125fc817712522fbb602145f4e2f1b7050270a4adaf41705f07"
+        },
+        "codesign-details.log": {
+          "bytes": 1145,
+          "sha256": "46f22bef73c8eab385775b9c33eb76171b43a06b700a46282ba7683d72e141bb"
+        }
+      },
+      "artworkProbeResults": [
+        {
+          "name": "central-dorsal",
+          "passed": true
+        },
+        {
+          "name": "central-ventral",
+          "passed": true
+        },
+        {
+          "name": "above-forward-ring",
+          "passed": true
+        },
+        {
+          "name": "port-outboard",
+          "passed": true
+        },
+        {
+          "name": "starboard-outboard",
+          "passed": true
+        }
+      ],
+      "triangleRoles": {
+        "detail": "original detailed visible",
+        "native": "original native visible"
+      }
+    }
+  },
+  "byteReplay": {
+    "commands": [
+      "python3 -B tools/prepare_oryx_voyager.py --check",
+      "python3 -B tools/verify_oryx_voyager.py | cmp - integration/sh078-oryx-voyager/CONTACT-RESULT.json",
+      "python3 -B tools/measure_oryx_voyager.py --difference | cmp - integration/sh078-oryx-voyager/ORIGINAL-DIFFERENCE.json",
+      "python3 -B tools/measure_oryx_voyager.py | cmp - integration/sh078-oryx-voyager/SURFACE-FIT.json",
+      "python3 -B tools/measure_oryx_voyager.py --ring-options | cmp - integration/sh078-oryx-voyager/RING-OPTIONS.json"
+    ],
+    "host": "SteveMBA",
+    "startedUtc": "2026-11-24T23:29:41Z",
+    "finishedUtc": "2026-11-24T23:30:07Z",
+    "log": {
+      "bytes": 624,
+      "sha256": "d99ff78daf3c7b66d88859c7bc81d4c0106049145189758d45cc3aaf3dc5e666"
+    },
+    "fitDependencies": {
+      "python": "3.14.3",
+      "numpy": "2.5.5",
+      "scipy": "1.18.1",
+      "trimesh": "5.2.1",
+      "rtree": "1.4.1"
+    },
+    "originalCommit": "c880b6fd7c047caf8e9091908a83af789292cf0f",
+    "historicalReplayPins": {
+      "tools/measure_banteng_geometry.py": "4b7d8d5d972e30d93bebf7f422be71e415d6e4a9c4b622582ecf6e30a6bb9235",
+      "tools/measure_lanner_geometry.py": "cabbaf17ff7efdbcbee9a1fba67c7edafd59dceb8e97f367824a51c134479992",
+      "tools/verify_eagle_cruiser_geometry.py": "c7926cb6e699ae5ffb445951ce9d4e98a64018a7ecb1db2e5e77a611d742a783"
+    }
+  },
+  "replayPins": {
+    "integration/sh078-oryx-voyager/ORYX-VOYAGER-STUDIO.json": "5c85d7d6f5af018949a032d2ae3a566a232ef6499c6539c523a28c69cfcf570a",
+    "integration/sh078-oryx-voyager/FROZEN-SOURCES.json": "f21c74567d45d87b612c5d06ddf46dccfeee2ca57b4f8b922b3ec8ccc845fe30",
+    "integration/sh078-oryx-voyager/CONTACT-CANDIDATE.json": "5cb204f427a093a3e1486e6ed37fddfe9398a58c82b9638d7b508f526a79531d",
+    "integration/sh078-oryx-voyager/CONTACT-RESULT.json": "77eef1cc8fdd9100bf134119467b56ee048187195be29b31dc231146fa275beb",
+    "integration/sh078-oryx-voyager/ORIGINAL-DIFFERENCE.json": "305e4c6da45108b299abca01537ee039ddfb4bac8757acd0d4249cadd13805c4",
+    "integration/sh078-oryx-voyager/ORIGINAL-JOINTS.json": "c5b40fd64758c2df6bf705d670613303ce1fbd79e021acfc1ffd4d3d1fca272f",
+    "integration/sh078-oryx-voyager/SPLIT-ROUTES.json": "8d5deab0a13e7d71f4b5b94d310687219be27c71728f68acbdce07489fb1c765",
+    "integration/sh078-oryx-voyager/SUPPORT-FAN.json": "81bdf4f3a87c046b46b37be88b42c9d1d123adf0af78bcccebc243a97b7a6e32",
+    "integration/sh078-oryx-voyager/SURFACE-FIT.json": "4cc046e19fe97b23e79eb96f98e62e8abb26b23bcbcb76b3c602d0ddfcb98ad8",
+    "integration/sh078-oryx-voyager/RING-OPTIONS.json": "b2ff062fe986555d438a39f02ff93105efc492177ff5b6d4babab6d58ab92d92",
+    "assets/fleet/sh078/COLLISION-PIECES.json": "9ae8090866abe88cc6c7840db3e67c69222a04b0a3f10992d10ad8b316a4f55d",
+    "assets/fleet/sh078/collision-piece-membership.bin": "0923d222bc6c7425710d646f28250a207a4384e99c6b424205c7c2bfed34f9ac",
+    "tools/atomic_asset_output.py": "2d13803823645d3bdea7c855af958eb54d7ebe513ec1bcb0af34e82870164bf0",
+    "tools/banteng_art_mesh.py": "ef5c0f538510486238d69dc301da80026fc93326767b38c50a04756ab9890a09",
+    "tools/dzo_collar_support.py": "e0be79ecdd3e908ff6215d38381e1e2dd9585ded810888ec1ed4cb644cdb6d07",
+    "tools/oryx_voyager_ring_support.py": "b60643b01dc4feb65e9240600efb948bdcb5b0c84b69ae1e009ce7af355c2f2e",
+    "tools/encode_goshawk_visual.py": "9e524e9a32a237d71d212c8b5c34ecf12cde5a8e08885b1d03991b95c278f61c",
+    "tools/import_goshawk_envelope_source.py": "14b530725629ee3eaa5b3fd69f01fe00fe371564a1a52cb398d3969142db977e",
+    "tools/measure_banteng_geometry.py": "9356864e227302598fcae4e833ecb706b1ed8a5e600cbb4076b7165dc1e54bea",
+    "tools/measure_goshawk_surface_fit.py": "5407ef1e5fad41810aa95444ca1338fe33a91e5c9857dcb752b4e4cf2fca6d0b",
+    "tools/measure_lanner_geometry.py": "55d13a28602e6ed791adecd85ff43f3c8a7fbe118cf0977272e1747422c2408d",
+    "tools/lanner_art_mesh.py": "f5cb59dcc0940ee02e039ba5218eb42c638ba0fed692f4b2216699620aba334b",
+    "tools/prepare_banteng_geometry.py": "30366a23a0deff7856d45719267e8cf57cfed24b1cea7e3655d998253afec972",
+    "tools/prepare_lanner_geometry.py": "3e1dc0ba15e493f8d53f385c7e2e166420e0082228b355547b3810fb028cdbc8",
+    "tools/prepare_eagle_cruiser_geometry.py": "a1ea3b5d72f35e1f2932da71afa3ff8a276a504f7309a1086a2b3df35988addc",
+    "tools/verify_eagle_cruiser_geometry.py": "cb053ee5873fee62ee456bb3776e98d29b2cbb44c7344599bc617a8579164d43",
+    "tools/vulture_mk_i_exact_fit.py": "479b31f8714a198a82c0e2888b8d19efe46c7b4c43a576b83ab84c571ae738c6",
+    "tools/prepare_oryx_voyager.py": "8ba71103ee295ed42102c82091e40887982aadf38fcee2bc2194e6aa07b06b9f",
+    "tools/verify_oryx_voyager.py": "b2d8c341e0b1c28251046e1ffdc09572d5ea8ae6ff5353856d543667bd661c68",
+    "tools/measure_oryx_voyager.py": "2dd9432c8a6ae211173b9e48cfa4e70b87c973fc489efae2116e9d53253dbe9e",
+    "tools/hull_contact_geometry.py": "07606202e6a298ad375a7504991fe6fb93da6a07f9b5cc4a22167bd570b07839"
+  }
+}

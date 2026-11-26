@@ -1,0 +1,66 @@
+[
+  {
+    "name": "port-spine-rail",
+    "pointMetres": [
+      -6.5,
+      10.32,
+      -5.0
+    ],
+    "originalFaces": {
+      "detailed": {
+        "port-spine-rail": {
+          "faceRange": [
+            1692,
+            1704
+          ],
+          "hitCountsAboveBelow": [
+            1,
+            1
+          ]
+        },
+        "passenger-spine": {
+          "faceRange": [
+            1308,
+            1692
+          ],
+          "hitCountsAboveBelow": [
+            1,
+            1
+          ]
+        }
+      }
+    }
+  },
+  {
+    "name": "starboard-spine-rail",
+    "pointMetres": [
+      6.300000000000001,
+      10.32,
+      -5.0
+    ],
+    "originalFaces": {
+      "detailed": {
+        "starboard-spine-rail": {
+          "faceRange": [
+            1704,
+            1716
+          ],
+          "hitCountsAboveBelow": [
+            1,
+            1
+          ]
+        },
+        "passenger-spine": {
+          "faceRange": [
+            1308,
+            1692
+          ],
+          "hitCountsAboveBelow": [
+            1,
+            1
+          ]
+        }
+      }
+    }
+  }
+]

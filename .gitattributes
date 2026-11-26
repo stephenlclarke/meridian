@@ -1,3 +1,60 @@
+# Laggar source preparation and replay use exact LF bytes.
+tools/measure_laggar.py text eol=lf
+tools/prepare_laggar.py text eol=lf
+tools/verify_laggar.py text eol=lf
+
+# Llama source preparation and replay use exact LF bytes.
+tools/measure_llama.py text eol=lf
+tools/prepare_llama.py text eol=lf
+tools/verify_llama.py text eol=lf
+
+# Hare Explorer source preparation and replay use exact LF bytes.
+tools/measure_hare_explorer.py text eol=lf
+tools/prepare_hare_explorer.py text eol=lf
+tools/verify_hare_explorer.py text eol=lf
+
+# Jaguar source preparation and replay use exact LF bytes.
+tools/measure_jaguar.py text eol=lf
+tools/prepare_jaguar.py text eol=lf
+tools/verify_jaguar.py text eol=lf
+
+# Carabao Highliner source preparation and replay use exact LF bytes.
+tools/measure_carabao_highliner.py text eol=lf
+tools/prepare_carabao_highliner.py text eol=lf
+tools/verify_carabao_highliner.py text eol=lf
+
+# Carabao Freighter source preparation and replay use exact LF bytes.
+tools/measure_carabao_freighter.py text eol=lf
+tools/prepare_carabao_freighter.py text eol=lf
+tools/verify_carabao_freighter.py text eol=lf
+
+# Oryx Voyager source preparation and replay use exact LF bytes.
+tools/measure_oryx_voyager.py text eol=lf
+tools/prepare_oryx_voyager.py text eol=lf
+tools/verify_oryx_voyager.py text eol=lf
+tools/oryx_voyager_ring_support.py text eol=lf
+
+# Tamaraw source preparation and replay use exact LF bytes.
+tools/measure_tamaraw.py text eol=lf
+tools/prepare_tamaraw.py text eol=lf
+tools/verify_tamaraw.py text eol=lf
+
+# Hog source preparation and replay use exact LF bytes.
+tools/measure_hog.py text eol=lf
+tools/prepare_hog.py text eol=lf
+tools/verify_hog.py text eol=lf
+
+# Dzo Mk II source preparation and replay use exact LF bytes.
+tools/measure_dzo_mk_ii.py text eol=lf
+tools/prepare_dzo_mk_ii.py text eol=lf
+tools/verify_dzo_mk_ii.py text eol=lf
+
+# Dzo source preparation and replay use exact LF bytes.
+tools/dzo_collar_support.py text eol=lf
+tools/measure_dzo.py text eol=lf
+tools/prepare_dzo.py text eol=lf
+tools/verify_dzo.py text eol=lf
+
 # Griffon Spectre source preparation and replay use exact LF bytes.
 tools/measure_griffon_spectre_geometry.py text eol=lf
 tools/prepare_griffon_spectre_geometry.py text eol=lf

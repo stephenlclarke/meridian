@@ -34,7 +34,7 @@ SH171 is available for catalogue inspection with the original detailed artwork a
 
 ## Combined Showroom and Hull Studio source candidate
 
-The ordinary station Showroom has 41 selectable stock previews: 35 authenticated schema-1 packages and six original stock models. It keeps the linked source identities, engineering readouts and inspection-only exchange rules. The combined source also restores the Studio launcher, including explicit inspection of schema-2 archives. Stock ship and station finishes are display-only; local authored material colours remain exact. Portable Studio and source checks have passed during integration. Combined compiler checks and native presentation acceptance are pending.
+The ordinary station Showroom has 52 selectable stock previews: 46 authenticated schema-1 packages and six original stock models. The latest fleet batch includes SH070–SH081 and SH083–SH085. Cheetah (SH082) is excluded from the rendered stock registry because its contact requirement is unresolved. The Showroom keeps the linked source identities, engineering readouts and inspection-only exchange rules. The combined source also restores the Studio launcher, including explicit inspection of schema-2 archives. Stock ship and station finishes are display-only; local authored material colours remain exact. Portable Studio and source checks have passed during integration. Compiler checks and native presentation acceptance of the expanded registry are pending.
 
 The separate [Medusa player preview](../integration/sh171-medusa-preview/README.md) now connects the active World hull identity to the original detailed flight rendering. The renderer retains the Peregrine model for ordinary players and existing traffic. It does not use the archived 729-piece inspection shield or reduced contact hull as flight artwork. The combined native acceptance is pending.
 
@@ -209,6 +209,50 @@ Griffon Mk II retains both original visible meshes, with 1,644 detailed and 596 
 ## Griffon Spectre catalogue source
 
 Griffon Spectre retains both original visible meshes, with 1,644 detailed and 596 native faces. Its separate 380-face generated inspection geometry preserves seven guarded routes. [Griffon Spectre source and evidence](GRIFFON-SPECTRE-SOURCE.md)
+
+## Dzo catalogue source
+
+Dzo preserves the original 9,228-face detailed and 416-face native meshes. Eight overlapping spans per collar tighten the inspection envelope and preserve seven guarded routes. [Dzo source and evidence](DZO-SOURCE.md)
+
+## Dzo Mk II catalogue source
+
+Dzo Mk II preserves the original 9,612-face detailed and 448-face native meshes. Eight overlapping spans per collar tighten the inspection envelope and preserve seven guarded routes. [Dzo Mk II source and evidence](DZO-MK-II-SOURCE.md)
+
+## Hog catalogue source
+
+Hog preserves the original 868-face detailed and 448-face native meshes with their original calibration. Exact source evidence verifies seven guarded routes across the stacked hull. [Hog source and evidence](HOG-SOURCE.md)
+
+## Tamaraw catalogue source
+
+Tamaraw preserves the original 3,864-face detailed and 212-face native artwork. Source checks verify seven guarded routes, eight shared overlaps and two flush rails present in the detailed mesh. [Tamaraw source and evidence](TAMARAW-SOURCE.md)
+
+## Oryx Voyager catalogue source
+
+Oryx Voyager preserves its original 4,620-face detailed and 200-face native meshes. Eight overlapping ring supports preserve two inner passages and all five exterior routes. [Oryx Voyager source and evidence](ORYX-VOYAGER-SOURCE.md)
+
+## Carabao Freighter catalogue source
+
+Carabao Freighter preserves the original 2,448-face detailed and 204-face native artwork. Six guarded lateral routes cross the gaps between cargo bays. [Carabao Freighter source and evidence](CARABAO-FREIGHTER-SOURCE.md)
+
+## Carabao Highliner catalogue source
+
+Carabao Highliner preserves its original 2,856-face detailed and 236-face native artwork. Both original meshes include the passenger spine and preserve seven guarded inspection routes. [Carabao Highliner source and evidence](CARABAO-HIGHLINER-SOURCE.md)
+
+## Jaguar catalogue source
+
+Jaguar preserves its original 5,820-face detailed and 432-face native artwork. Both original records keep Jaguar unavailable for player flight and purchase. Four nozzle contacts and 14 overlap witnesses reproduce in both meshes. [Jaguar source and evidence](JAGUAR-SOURCE.md)
+
+## Hare Explorer catalogue source
+
+Hare Explorer preserves its original 3,108-face detailed and 184-face native artwork. Both meshes retain the canopy and wing-mount overlaps. The detailed nozzles seat flush on the hull, and the original native mesh keeps those parts apart. [Hare Explorer source and evidence](HARE-EXPLORER-SOURCE.md)
+
+## Llama catalogue source
+
+Llama preserves its original 3,096-face detailed and 172-face native artwork. Both meshes preserve the nozzle and deck-rail contacts, plus the canopy and crossbeam overlaps with the cabin. [Llama source and evidence](LLAMA-SOURCE.md)
+
+## Laggar catalogue source
+
+Laggar preserves 3,108 detailed and 184 native original faces. Both meshes retain seven structural overlaps, including the canopy and outrigger assemblies, and preserve the original fin clearances. [Laggar source and evidence](LAGGAR-SOURCE.md)
 
 ## Goshawk Mk II Custom candidate
 

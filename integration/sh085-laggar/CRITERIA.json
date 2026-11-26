@@ -1,0 +1,205 @@
+{
+  "hull": "SH085 Laggar",
+  "scope": "Original catalogue inspection and geometry queries",
+  "source": "assets/fleet/sh085/SOURCE-GEOMETRY.json",
+  "frozenSources": "integration/sh085-laggar/FROZEN-SOURCES.json",
+  "sourceScaleMetresPerUnit": "1",
+  "faces": {
+    "detailed": 3108,
+    "native": 184,
+    "nativeMaximum": 512
+  },
+  "originalAccess": {
+    "runtimeCatalogue": {
+      "playerFlyable": false,
+      "normalPurchaseEligible": false,
+      "purchasePolicy": "pendingFabrication"
+    },
+    "r3DesignContract": {
+      "playerFlyable": true,
+      "purchasePolicy": "blueprintFabrication"
+    }
+  },
+  "engineering": {
+    "sourceReference": "finite-intrinsic-empty-laggar",
+    "massKg": 24443
+  },
+  "supportGroups": 25,
+  "minimumRouteClearanceMillimetres": 1238,
+  "sourceContactCounts": {
+    "overlap": 7
+  },
+  "detailedOnlyJoints": 1,
+  "originalFinSeparationsMillimetres": {
+    "detailed-port": {
+      "aboveArm": 799,
+      "inboardOfPod": 849,
+      "outboardOfHull": 1149
+    },
+    "detailed-starboard": {
+      "aboveArm": 799,
+      "inboardOfPod": 849,
+      "outboardOfHull": 1149
+    },
+    "native-port": {
+      "aboveArm": 799,
+      "inboardOfPod": 849,
+      "outboardOfHull": 1149
+    },
+    "native-starboard": {
+      "aboveArm": 799,
+      "inboardOfPod": 849,
+      "outboardOfHull": 1149
+    }
+  },
+  "fitUpperMillimetres": {
+    "detailed": 2381,
+    "native": 3080
+  },
+  "hullStudio": {
+    "definition": "integration/sh085-laggar/LAGGAR-STUDIO.json",
+    "bytes": 402672,
+    "sha256": "101af818ad670d065905e76a657f5215717c41452a98db7061112d81258453b9",
+    "supports": 25,
+    "probes": 7,
+    "loaderRevision": "27121e66ba37a29781135b56924a9d6e7f38a70a",
+    "signedInstalledExport": {
+      "status": "PASS",
+      "scope": "Signed installed Studio offline original artwork import/export",
+      "bundleIdentifier": "io.xyzzy.meridian.hullstudio",
+      "bundleVersion": "0.0.0",
+      "codeDirectoryHash": "93938bda9242ebdff508bfb9e16b3cdf83c0a200",
+      "developerIdTeam": "4MEB7MUTAV",
+      "signatureVerification": "deep strict",
+      "definition": {
+        "bytes": 402672,
+        "sha256": "101af818ad670d065905e76a657f5215717c41452a98db7061112d81258453b9"
+      },
+      "exportExitStatuses": [
+        0,
+        0
+      ],
+      "exportMatchesDefinitionExceptTrailingLf": true,
+      "valid": true,
+      "diagnostics": [],
+      "detailedTriangles": 3108,
+      "nativeTriangles": 184,
+      "supportGroups": 25,
+      "engineeringReference": "finite-intrinsic-empty-laggar",
+      "massKg": 24443,
+      "receiptFiles": {
+        "laggar.hull.json": {
+          "bytes": 402671,
+          "sha256": "b1947d28117d8f44aaeb545d75606f13c138d090ebce4e78a0bab53b98897dec"
+        },
+        "laggar-repeat.hull.json": {
+          "bytes": 402671,
+          "sha256": "b1947d28117d8f44aaeb545d75606f13c138d090ebce4e78a0bab53b98897dec"
+        },
+        "studio.stdout.json": {
+          "bytes": 55087,
+          "sha256": "4f64ecf9fa4643801834bf044b435c763ab8db792c8014b2d4b6683e0b7cb9b4"
+        },
+        "studio-repeat.stdout.json": {
+          "bytes": 55087,
+          "sha256": "4f64ecf9fa4643801834bf044b435c763ab8db792c8014b2d4b6683e0b7cb9b4"
+        },
+        "codesign.log": {
+          "bytes": 13038,
+          "sha256": "a31d746c78dd0cf51720c021297be3083432217e9f964902a7e97a11edd0b0d6"
+        },
+        "codesign-identity.log": {
+          "bytes": 988,
+          "sha256": "f6d772f29f9e72421e98a6d7243102b92b77b5995acbe6cda7ddb3bbfc3b1706"
+        }
+      },
+      "artworkProbeResults": [
+        {
+          "name": "dorsal",
+          "passed": true
+        },
+        {
+          "name": "ventral",
+          "passed": true
+        },
+        {
+          "name": "central-aft",
+          "passed": true
+        },
+        {
+          "name": "port-outboard",
+          "passed": true
+        },
+        {
+          "name": "port-inner-aft",
+          "passed": true
+        },
+        {
+          "name": "starboard-outboard",
+          "passed": true
+        },
+        {
+          "name": "starboard-inner-aft",
+          "passed": true
+        }
+      ],
+      "triangleRoles": {
+        "detail": "original detailed visible",
+        "native": "original native visible"
+      }
+    }
+  },
+  "byteReplay": {
+    "commands": [
+      "python3 -B tools/prepare_laggar.py --check",
+      "python3 -B tools/verify_laggar.py | cmp - integration/sh085-laggar/CONTACT-RESULT.json",
+      "python3 -B tools/measure_laggar.py --difference | cmp - integration/sh085-laggar/ORIGINAL-DIFFERENCE.json",
+      "python3 -B tools/measure_laggar.py | cmp - integration/sh085-laggar/SURFACE-FIT.json"
+    ],
+    "host": "SteveMBA",
+    "startedUtc": "2026-11-25T01:30:04Z",
+    "finishedUtc": "2026-11-25T01:30:11Z",
+    "log": {
+      "bytes": 417,
+      "sha256": "faa7ecb286447241a3b2138edead3947313e0d9e78bcf120d2a89a3fd3c2540e"
+    },
+    "fitDependencies": {
+      "python": "3.14.3",
+      "numpy": "2.5.5",
+      "scipy": "1.18.1",
+      "trimesh": "5.2.1",
+      "rtree": "1.4.1"
+    },
+    "originalCommit": "681259f0e75e74fc2f45f32d17597f899becbe3d",
+    "historicalReplayPins": {
+      "tools/measure_banteng_geometry.py": "4b7d8d5d972e30d93bebf7f422be71e415d6e4a9c4b622582ecf6e30a6bb9235",
+      "tools/measure_lanner_geometry.py": "cabbaf17ff7efdbcbee9a1fba67c7edafd59dceb8e97f367824a51c134479992",
+      "tools/verify_eagle_cruiser_geometry.py": "c7926cb6e699ae5ffb445951ce9d4e98a64018a7ecb1db2e5e77a611d742a783"
+    }
+  },
+  "replayPins": {
+    "integration/sh085-laggar/LAGGAR-STUDIO.json": "101af818ad670d065905e76a657f5215717c41452a98db7061112d81258453b9",
+    "integration/sh085-laggar/FROZEN-SOURCES.json": "5a01ce4376f3ef5ea79224349ad6129355afd7627f7b1488ef1640fef233ae73",
+    "integration/sh085-laggar/CONTACT-CANDIDATE.json": "79b4702d77bd6062aa60245dd3391d193b5ddba89d9c8ad2d0c899478106d860",
+    "integration/sh085-laggar/CONTACT-RESULT.json": "5646921aa1f1bd6fc3a32d0a9ec533e76fc20d7b2d29d4eb609101ff59449e6d",
+    "integration/sh085-laggar/ORIGINAL-DIFFERENCE.json": "08eba46b21ae7d9a70ef09b34dcad18ba6d066ca34d43a43ea637ff3d054cae2",
+    "integration/sh085-laggar/ORIGINAL-JOINTS.json": "b21229da8f83f8e3e3d90cb399e01871a150ec8981ceeadb5830c7e48e98f677",
+    "integration/sh085-laggar/DETAILED-ONLY-JOINTS.json": "99ba4f18263325c7ca42630977612475663b4a62eccd8bc2a2d3b75acfa3eee1",
+    "integration/sh085-laggar/SUPPORT-FAN.json": "ed5f5a6be662b43370e013a9a5202f53761eb2e0a5a166e19bde50d10de23900",
+    "integration/sh085-laggar/SURFACE-FIT.json": "0d742126b542e4048d3454255d8a07b24ed5ea126dc2259f70111a093ff5c5b7",
+    "tools/atomic_asset_output.py": "2d13803823645d3bdea7c855af958eb54d7ebe513ec1bcb0af34e82870164bf0",
+    "tools/banteng_art_mesh.py": "ef5c0f538510486238d69dc301da80026fc93326767b38c50a04756ab9890a09",
+    "tools/encode_goshawk_visual.py": "9e524e9a32a237d71d212c8b5c34ecf12cde5a8e08885b1d03991b95c278f61c",
+    "tools/import_goshawk_envelope_source.py": "14b530725629ee3eaa5b3fd69f01fe00fe371564a1a52cb398d3969142db977e",
+    "tools/measure_banteng_geometry.py": "9356864e227302598fcae4e833ecb706b1ed8a5e600cbb4076b7165dc1e54bea",
+    "tools/measure_goshawk_surface_fit.py": "5407ef1e5fad41810aa95444ca1338fe33a91e5c9857dcb752b4e4cf2fca6d0b",
+    "tools/measure_lanner_geometry.py": "55d13a28602e6ed791adecd85ff43f3c8a7fbe118cf0977272e1747422c2408d",
+    "tools/measure_laggar.py": "c01cf81a7de04f9241d394499301003ebeae226ca3f867badc6637d14af29c97",
+    "tools/prepare_eagle_cruiser_geometry.py": "a1ea3b5d72f35e1f2932da71afa3ff8a276a504f7309a1086a2b3df35988addc",
+    "tools/prepare_laggar.py": "bbe341b890be1641e058a0fc3c9f980396ed3c6b3c392445db810fa1054a6d79",
+    "tools/verify_eagle_cruiser_geometry.py": "cb053ee5873fee62ee456bb3776e98d29b2cbb44c7344599bc617a8579164d43",
+    "tools/verify_laggar.py": "4c05b2fb0f8823839417168046919a1dd506f85ff5136e4cfe6ad8a308e935b8",
+    "tools/vulture_mk_i_exact_fit.py": "479b31f8714a198a82c0e2888b8d19efe46c7b4c43a576b83ab84c571ae738c6",
+    "tools/hull_contact_geometry.py": "07606202e6a298ad375a7504991fe6fb93da6a07f9b5cc4a22167bd570b07839"
+  }
+}

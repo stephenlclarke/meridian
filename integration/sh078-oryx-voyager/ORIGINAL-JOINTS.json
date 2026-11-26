@@ -1,0 +1,272 @@
+[
+  {
+    "name": "canopy-to-central-hull",
+    "pointMetres": [
+      -0.8799999999999999,
+      2.2632000000000003,
+      11.2
+    ],
+    "originalFaces": {
+      "detailed": {
+        "dorsal-canopy": {
+          "faceRange": [
+            3480,
+            4440
+          ],
+          "hitCountsAboveBelow": [
+            1,
+            1
+          ]
+        },
+        "central-hull": {
+          "faceRange": [
+            0,
+            384
+          ],
+          "hitCountsAboveBelow": [
+            1,
+            1
+          ]
+        }
+      },
+      "native": {
+        "dorsal-canopy": {
+          "faceRange": [
+            192,
+            200
+          ],
+          "hitCountsAboveBelow": [
+            1,
+            1
+          ]
+        },
+        "central-hull": {
+          "faceRange": [
+            0,
+            32
+          ],
+          "hitCountsAboveBelow": [
+            1,
+            1
+          ]
+        }
+      }
+    }
+  },
+  {
+    "name": "port-nacelle-to-ring",
+    "pointMetres": [
+      -12.0,
+      -1.2000000000000002,
+      -19.0
+    ],
+    "originalFaces": {
+      "detailed": {
+        "port-nacelle": {
+          "faceRange": [
+            1920,
+            2304
+          ],
+          "hitCountsAboveBelow": [
+            1,
+            1
+          ]
+        },
+        "ring-wing": {
+          "faceRange": [
+            384,
+            1920
+          ],
+          "hitCountsAboveBelow": [
+            1,
+            1
+          ]
+        }
+      },
+      "native": {
+        "port-nacelle": {
+          "faceRange": [
+            96,
+            128
+          ],
+          "hitCountsAboveBelow": [
+            1,
+            1
+          ]
+        },
+        "ring-wing": {
+          "faceRange": [
+            32,
+            96
+          ],
+          "hitCountsAboveBelow": [
+            1,
+            1
+          ]
+        }
+      }
+    }
+  },
+  {
+    "name": "port-engine-to-nacelle",
+    "pointMetres": [
+      -11.5,
+      -1.0,
+      -24.45
+    ],
+    "originalFaces": {
+      "detailed": {
+        "port-engine": {
+          "faceRange": [
+            2304,
+            2688
+          ],
+          "hitCountsAboveBelow": [
+            1,
+            1
+          ]
+        },
+        "port-nacelle": {
+          "faceRange": [
+            1920,
+            2304
+          ],
+          "hitCountsAboveBelow": [
+            1,
+            1
+          ]
+        }
+      },
+      "native": {
+        "port-engine": {
+          "faceRange": [
+            128,
+            144
+          ],
+          "hitCountsAboveBelow": [
+            1,
+            1
+          ]
+        },
+        "port-nacelle": {
+          "faceRange": [
+            96,
+            128
+          ],
+          "hitCountsAboveBelow": [
+            1,
+            1
+          ]
+        }
+      }
+    }
+  },
+  {
+    "name": "starboard-nacelle-to-ring",
+    "pointMetres": [
+      8.0,
+      -0.9000000000000001,
+      -21.6
+    ],
+    "originalFaces": {
+      "detailed": {
+        "starboard-nacelle": {
+          "faceRange": [
+            2700,
+            3084
+          ],
+          "hitCountsAboveBelow": [
+            1,
+            1
+          ]
+        },
+        "ring-wing": {
+          "faceRange": [
+            384,
+            1920
+          ],
+          "hitCountsAboveBelow": [
+            1,
+            1
+          ]
+        }
+      },
+      "native": {
+        "starboard-nacelle": {
+          "faceRange": [
+            144,
+            176
+          ],
+          "hitCountsAboveBelow": [
+            1,
+            1
+          ]
+        },
+        "ring-wing": {
+          "faceRange": [
+            32,
+            96
+          ],
+          "hitCountsAboveBelow": [
+            1,
+            1
+          ]
+        }
+      }
+    }
+  },
+  {
+    "name": "starboard-engine-to-nacelle",
+    "pointMetres": [
+      8.5,
+      -1.0,
+      -24.45
+    ],
+    "originalFaces": {
+      "detailed": {
+        "starboard-engine": {
+          "faceRange": [
+            3084,
+            3468
+          ],
+          "hitCountsAboveBelow": [
+            1,
+            1
+          ]
+        },
+        "starboard-nacelle": {
+          "faceRange": [
+            2700,
+            3084
+          ],
+          "hitCountsAboveBelow": [
+            1,
+            1
+          ]
+        }
+      },
+      "native": {
+        "starboard-engine": {
+          "faceRange": [
+            176,
+            192
+          ],
+          "hitCountsAboveBelow": [
+            1,
+            1
+          ]
+        },
+        "starboard-nacelle": {
+          "faceRange": [
+            144,
+            176
+          ],
+          "hitCountsAboveBelow": [
+            1,
+            1
+          ]
+        }
+      }
+    }
+  }
+]
