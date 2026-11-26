@@ -10,6 +10,8 @@ The station Equipment screen exposes the born Basic drive and the two original p
 
 The [seven shield grades](SHIELD-GRADES.md) use the source-defined bank capacities from 300 to 2,760 and unchanged recharge. Four successive shop grades are payable through the existing account; Advanced II retains its unavailable Elite-rank and PLUGH-only acquisition paths, and Elite remains acquisition-only with explicit maximum test access. A separate XYZZY grade selector exercises each real fit without cash, fuel or unrelated equipment changes. The wider bank codec, historical fit/damage replay, actual incoming hit, HUD and paid/refit/Continue regressions await owned execution; no native preview claim follows from authored source.
 
+The [fuel storage source candidate](FUEL-STORAGE.md) implements four separately owned and paid physical units, up to three fitted normally on SH025, actual tank capacity and paid refuel, refusal to store occupied capacity, and an explicit four-tank XYZZY exception with current freight and trade custody guards. Gameplay replay, account/route persistence and native acceptance require owned validation.
+
 ## Passenger cabins and G04 source candidate
 
 The [six paid passenger cabin layouts](PASSENGER-CABINS.md) use actual hold and equipment capacity. The original G04 finite pair requires separate current consent, two distinct private awake cabin reservations, physical Renas reception or Avenor cancellation, and durable settlement once. The source candidate includes focused core and desktop regressions but awaits owned compilation, review, hosted and native testing. General life-support damage, hull-loss custody and other passenger contracts are open.

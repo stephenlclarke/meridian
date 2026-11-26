@@ -264,10 +264,13 @@ impl World {
 
     pub fn snapshot(&self) -> Snapshot {
         let mut snapshot = self.state;
-        snapshot.navigation = self
-            .navigation
-            .zip(self.commander_account.as_ref())
-            .map(|(navigation, account)| navigation.snapshot(account.fuel_tenths()));
+        snapshot.navigation =
+            self.navigation
+                .zip(self.commander_account.as_ref())
+                .map(|(navigation, account)| {
+                    navigation
+                        .snapshot_with_capacity(account.fuel_tenths(), account.fuel_capacity())
+                });
         snapshot
     }
 

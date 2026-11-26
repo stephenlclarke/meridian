@@ -652,6 +652,12 @@ impl World {
             .modular
             .validate_capacity_history(self, account, markets, commerce.lesson)?;
         let secret = self.xyzzy.validate(self, account, commerce)?;
+        commerce.modular.validate_test_custody_history(
+            self,
+            account,
+            commerce.emp,
+            commerce.lesson,
+        )?;
         validate_accounting(
             domain,
             services,

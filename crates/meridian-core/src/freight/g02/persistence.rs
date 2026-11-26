@@ -147,7 +147,10 @@ impl CommanderAccount {
         w.u16(d.other_tonnes);
         w.u16(d.food_tonnes);
         w.u16(d.reserved_food_tonnes);
-        w.u16(d.fuel_tenths);
+        w.u16(crate::navigation::pack_fuel(
+            d.fuel_tenths,
+            d.fuel_storage_count,
+        ));
         w.option(d.fit.as_ref(), |w, fit| {
             w.u64(fit.owner);
             w.u64(fit.hull);
@@ -180,16 +183,25 @@ impl CommanderAccount {
         }
     }
     pub(crate) fn decode_save(r: &mut Reader<'_>, version: u16) -> Result<Self, SaveError> {
+        let owner = r.u64()?;
+        let hull = r.u64()?;
+        let revision = r.u64()?;
+        let credits = r.u32()?;
+        let other_tonnes = r.u16()?;
+        let food_tonnes = r.u16()?;
+        let reserved_food_tonnes = r.u16()?;
+        let (fuel_tenths, fuel_storage_count) = crate::navigation::unpack_fuel(r.u16()?)?;
         let mut account = Self {
             data: AccountData {
-                owner: r.u64()?,
-                hull: r.u64()?,
-                revision: r.u64()?,
-                credits: r.u32()?,
-                other_tonnes: r.u16()?,
-                food_tonnes: r.u16()?,
-                reserved_food_tonnes: r.u16()?,
-                fuel_tenths: r.u16()?,
+                owner,
+                hull,
+                revision,
+                credits,
+                other_tonnes,
+                food_tonnes,
+                reserved_food_tonnes,
+                fuel_tenths,
+                fuel_storage_count,
                 fit: r.option(|r| {
                     Ok(StarterFit {
                         owner: r.u64()?,
@@ -268,6 +280,31 @@ impl CommanderAccount {
                 "freight account transaction prefix",
             ));
         }
+        if state.data.jobs.iter().flatten().any(|job| {
+            [job.issue_account_revision, job.abandoned_account_revision]
+                .into_iter()
+                .flatten()
+                .any(|revision| revision == 0 || revision > self.data.revision)
+                || job
+                    .issue_account_revision
+                    .zip(job.abandoned_account_revision)
+                    .is_some_and(|(issue, close)| issue >= close)
+                || job.transfers.iter().flatten().any(|transfer| {
+                    job.issue_account_revision
+                        .is_some_and(|issue| issue >= transfer.account_revision)
+                        || job
+                            .abandoned_account_revision
+                            .is_some_and(|close| close <= transfer.account_revision)
+                })
+                || (job.status != JobStatus::Abandoned && job.abandoned_account_revision.is_some())
+                || (job.status == JobStatus::Abandoned
+                    && job.issue_account_revision.is_some()
+                    && job.abandoned_account_revision.is_none())
+        }) {
+            return Err(SaveError::InvalidState(
+                "freight custody account chronology",
+            ));
+        }
         state.validate_saved(nav, epoch)?;
         Ok(SavedDomainSummary {
             revision: self.data.revision,
@@ -298,7 +335,12 @@ fn write_job(w: &mut Writer, j: &Job) {
         JobStatus::Delivered => 1,
         JobStatus::Abandoned => 2,
     });
-    w.u64(j.issue_sequence);
+    let extended = j.issue_account_revision.is_some() || j.abandoned_account_revision.is_some();
+    w.u64(j.issue_sequence | if extended { 1 << 63 } else { 0 });
+    if extended {
+        w.option(j.issue_account_revision.as_ref(), |w, r| w.u64(*r));
+        w.option(j.abandoned_account_revision.as_ref(), |w, r| w.u64(*r));
+    }
     write_dock(w, j.issuer);
     w.u8(j.transfer_count);
     for t in &j.transfers {
@@ -328,13 +370,26 @@ fn read_job(r: &mut Reader<'_>) -> Result<Job, SaveError> {
         2 => JobStatus::Abandoned,
         _ => return Err(SaveError::InvalidEncoding),
     };
+    let sequence = r.u64()?;
+    let extended = sequence & (1 << 63) != 0;
+    let (issue_account_revision, abandoned_account_revision) = if extended {
+        let values = (r.option(|r| r.u64())?, r.option(|r| r.u64())?);
+        if values == (None, None) {
+            return Err(SaveError::InvalidEncoding);
+        }
+        values
+    } else {
+        (None, None)
+    };
     Ok(Job {
         id,
         issued,
         held,
         delivered,
         status,
-        issue_sequence: r.u64()?,
+        issue_sequence: sequence & !(1 << 63),
+        issue_account_revision,
+        abandoned_account_revision,
         issuer: read_dock(r)?,
         transfer_count: r.u8()?,
         transfers: r.array(|r| {

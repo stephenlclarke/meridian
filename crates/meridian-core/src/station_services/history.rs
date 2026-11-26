@@ -1,8 +1,5 @@
 //! Retained player service receipts, independent of the secret journal and final wallet.
-use super::{
-    CommodityId, Event, FUEL_PRICE_TENTHS, MarketSite, STOCK_FUEL_TENTHS, StationMarkets,
-    record_accounting,
-};
+use super::{CommodityId, Event, FUEL_PRICE_TENTHS, MarketSite, StationMarkets, record_accounting};
 use crate::flight::{AccountEffect, AccountEvent};
 use crate::save::{MAX_SAVE_BYTES, Reader, SaveError, Writer};
 pub(super) const MAX_RECEIPTS: usize = MAX_SAVE_BYTES / 25;
@@ -110,7 +107,7 @@ impl StationMarkets {
                     added_fuel_tenths,
                     paid_tenths,
                 } => {
-                    if added_fuel_tenths > STOCK_FUEL_TENTHS
+                    if added_fuel_tenths > crate::navigation::MAX_FUEL_CAPACITY
                         || paid_tenths != u32::from(added_fuel_tenths) * FUEL_PRICE_TENTHS
                     {
                         return Err(invalid);

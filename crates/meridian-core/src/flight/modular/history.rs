@@ -37,6 +37,19 @@ pub(super) struct History {
 }
 
 impl History {
+    pub(super) fn tracks_revision(&self, revision: u64) -> bool {
+        self.anchor.is_some_and(|anchor| revision > anchor.revision)
+    }
+    pub(super) fn bay_fitted_at(&self, revision: u64) -> Option<u16> {
+        let anchor = self.anchor.filter(|anchor| revision >= anchor.revision)?;
+        let sequence = self
+            .bay
+            .iter()
+            .take_while(|record| record.revision <= revision)
+            .last()
+            .map_or(anchor.bay_revision, |record| record.sequence);
+        Some(u16::from(sequence % 2 == 1))
+    }
     pub(super) fn active(&self) -> bool {
         self.anchor.is_some()
     }
@@ -64,7 +77,9 @@ impl History {
         let events = freight.cargo_mass_events();
         if freight.snapshot().held_tonnes != 0
             || events.last().is_some_and(|event| event.revision.is_none())
-            || account.equipment_state().revision() > 1
+            || !world
+                .modular
+                .cargo_anchor_is_proven(account.revision(), account.equipment_state().revision())
         {
             return Err(ModuleError::PassageHistory);
         }
@@ -272,15 +287,20 @@ impl State {
         &self,
         freight: &crate::freight::g02::State,
     ) -> Vec<crate::flight::AccountEvent> {
-        let Some(anchor) = self.history.anchor else {
+        if !self.history.active() {
             return Vec::new();
-        };
+        }
         let mut revisions = Vec::new();
         revisions.extend(
             self.history
                 .bay
                 .iter()
-                .filter(|record| record.sequence > 1)
+                .filter(|record| {
+                    record.sequence > 1
+                        && !self
+                            .cargo_account_events()
+                            .any(|event| event.revision == record.revision)
+                })
                 .map(|record| record.revision),
         );
         let completed = freight.account_events();
@@ -294,18 +314,6 @@ impl State {
                         .any(|event| event.revision == record.revision)
                 })
                 .map(|record| record.revision),
-        );
-        revisions.extend(
-            self.events
-                .iter()
-                .filter(|event| {
-                    event.revision > anchor.revision
-                        && matches!(
-                            event.action,
-                            ModuleAction::Store { .. } | ModuleAction::Install { .. }
-                        )
-                })
-                .map(|event| event.revision),
         );
         revisions
             .into_iter()
@@ -373,7 +381,7 @@ impl State {
             }
         }
         let purchase = bay.account_event().map(|event| event.revision);
-        if anchor.bay_revision > 1
+        if !self.cargo_anchor_is_proven(anchor.revision, anchor.bay_revision)
             || (anchor.bay_revision > 0)
                 != purchase.is_some_and(|revision| revision <= anchor.revision)
             || anchor.bay_revision > bay.revision()
@@ -388,6 +396,11 @@ impl State {
             account.revision(),
         )?;
         for change in &self.history.bay {
+            self.validate_passenger_cargo_fit_overlap(
+                change.revision,
+                change.sequence,
+                change.dock,
+            )?;
             if change.sequence == 1
                 && (purchase != Some(change.revision)
                     || super::super::services::service_site(change.dock.system())
@@ -442,18 +455,31 @@ impl State {
         let mut fitted_units = 0;
         let mut cabin_mass = 0;
         for event in &self.events {
+            let previous_tanks = ledger.fuel_storage_count();
             ledger.replay(*event, &mut counters).map_err(|_| INVALID)?;
+            if ledger.fuel_storage_count() > previous_tanks
+                && world
+                    .xyzzy
+                    .authorizes_max_tanks(event.dock, event.tick, event.revision)
+            {
+                ledger.mark_test_tanks();
+            }
+            let units =
+                ledger
+                    .fitted_units()
+                    .saturating_sub(if self.passenger_aboard_at(event.revision) {
+                        0
+                    } else {
+                        ledger.test_tank_count()
+                    });
             if event.revision <= anchor.revision {
-                fitted_units = ledger.fitted_units();
+                fitted_units = units;
                 cabin_mass = ledger.cabin_tonnes();
             } else {
                 if !self.history.owns_berth(event.dock) {
                     return Err(INVALID);
                 }
-                changes.push((
-                    event.revision,
-                    Change::Fit(ledger.fitted_units(), ledger.cabin_tonnes()),
-                ));
+                changes.push((event.revision, Change::Fit(units, ledger.cabin_tonnes())));
             }
         }
         // A plan changes reserved mass without changing the account revision. Join its

@@ -27,7 +27,10 @@ impl NavigationGrade {
     }
 
     pub fn planning_radius_ly(self) -> Option<f64> {
-        let tank = f64::from(FUEL_CAPACITY) / 10.0;
+        self.planning_radius_with_capacity(FUEL_CAPACITY)
+    }
+    pub fn planning_radius_with_capacity(self, capacity: u16) -> Option<f64> {
+        let tank = f64::from(capacity) / 10.0;
         match self {
             Self::Empty => Some(0.0),
             Self::Basic => Some(tank + 7.0),
@@ -76,6 +79,7 @@ pub(crate) struct NavigationFitChange {
     pub(crate) tick: u64,
     pub(crate) grade: NavigationGrade,
     pub(crate) drive: DriveGrade,
+    pub(crate) fuel_storage_count: u8,
 }
 
 #[derive(Debug, Clone, Copy)]
@@ -289,6 +293,7 @@ impl JumpJournal {
         let mut earliest_tick = 0;
         let mut grade = NavigationGrade::Basic;
         let mut drive = DriveGrade::Basic;
+        let mut tank = FUEL_CAPACITY;
         let mut changes = changes.iter().peekable();
 
         for (index, next) in self
@@ -332,6 +337,7 @@ impl JumpJournal {
                 }
                 grade = change.grade;
                 drive = change.drive;
+                tank = super::fuel_capacity(change.fuel_storage_count);
                 let _ = changes.next();
             }
             let Some(leg) = next else {
@@ -362,7 +368,7 @@ impl JumpJournal {
                 || leg.grade != grade
                 || leg.drive != drive
                 || distance <= 0.0
-                || distance > grade.reach_ly().min(f64::from(FUEL_CAPACITY) / 10.0)
+                || distance > grade.reach_ly().min(f64::from(tank) / 10.0)
                 || stock_jump_fuel_cost(distance).map_err(|_| INVALID)? != leg.debit
                 || leg.source_visit < earliest_visit
                 || jumps
@@ -433,6 +439,7 @@ mod tests {
             tick: 0,
             grade: NavigationGrade::Basic,
             drive: DriveGrade::Advanced,
+            fuel_storage_count: 0,
         };
         assert_eq!(
             journal.validate(nav, &catalogue, 61, 61, &[fit], DriveGrade::Advanced),
@@ -472,6 +479,7 @@ mod tests {
             tick: 1300,
             grade: NavigationGrade::Intermediate,
             drive: DriveGrade::Basic,
+            fuel_storage_count: 0,
         };
         let journal = JumpJournal {
             legs: vec![

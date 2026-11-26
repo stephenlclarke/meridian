@@ -49,6 +49,9 @@ impl World {
         let dock = self.navigation_trade_berth(tick)?;
         let plan = match action {
             Action::Accept => {
+                if self.test_tank_overfit() {
+                    return Err(Error::TestFit);
+                }
                 if self.xyzzy_snapshot().is_some_and(|s| s.unlimited_fuel) {
                     return Err(Error::Fuel);
                 }
@@ -193,6 +196,12 @@ impl World {
             Action::Accept => candidate.attempts.push(Attempt {
                 dock: current.dock,
                 accepted_tick: current.tick,
+                accepted_account_revision: Some(
+                    self.commander_account
+                        .as_ref()
+                        .ok_or(Error::NoCommander)?
+                        .revision(),
+                ),
                 plan: None,
                 buy: None,
                 journeys: Vec::new(),
@@ -214,19 +223,6 @@ impl World {
                 } else {
                     Outcome::Abandoned
                 };
-                let reservation_release_revision = if outcome == Outcome::Abandoned
-                    && candidate.attempts[i].plan.is_some()
-                    && candidate.attempts[i].buy.is_none()
-                {
-                    Some(
-                        self.commander_account
-                            .as_ref()
-                            .ok_or(Error::NoCommander)?
-                            .revision(),
-                    )
-                } else {
-                    None
-                };
                 candidate.attempts[i].terminal = Some(Terminal {
                     dock: current.dock,
                     tick: current.tick,
@@ -234,7 +230,12 @@ impl World {
                     fuel: self
                         .navigation_trade_fuel_anchor()
                         .ok_or(Error::NoCommander)?,
-                    reservation_release_revision,
+                    account_revision: Some(
+                        self.commander_account
+                            .as_ref()
+                            .ok_or(Error::NoCommander)?
+                            .revision(),
+                    ),
                 });
                 if outcome == Outcome::Complete && candidate.trace.is_none() {
                     candidate.trace = Some(i as u8);

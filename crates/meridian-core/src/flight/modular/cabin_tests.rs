@@ -275,6 +275,15 @@ fn original_two_private_cabins_board_travel_receive_once_and_continue() {
     passage(&mut world, PassengerAction::Board);
     let aboard = world.passenger_journey_snapshot().unwrap();
     assert_eq!(aboard.status, PassageStatus::Aboard);
+    assert_eq!(aboard.clue, None);
+    assert!(
+        world
+            .review_xyzzy(
+                crate::XyzzyAction::MaximumFuelStorage,
+                world.snapshot().tick
+            )
+            .is_err()
+    );
     assert_eq!(aboard.cabins, Some([first, second]));
     assert_eq!(aboard.people.map(|p| p.person), ["mira-talen", "oren-vey"]);
     for cabin in world.passenger_cabins().unwrap() {
@@ -502,7 +511,7 @@ fn extended_receipt_requires_marker_and_exact_bounded_sixteen_bit_fuel() {
         world.modular
     );
     assert!(reader.finished());
-    writer.bytes[3] &= 0x7f;
+    writer.bytes[3] &= 0xbf;
     assert!(State::decode(&mut Reader::new(&writer.bytes), crate::save::SAVE_VERSION).is_err());
     assert!(
         State::decode(
@@ -642,4 +651,70 @@ fn cabin_capacity_respects_t04_reservation_purchase_and_cancel_at_every_prefix()
     // Actual mass would have been 92t, not 93t, but the still-reserved T04 tonne
     // makes the reordered historical account impossible. Final 87t still fits.
     reject_changed_history(&world, &mut live, &retained);
+}
+
+#[test]
+fn actual_four_tank_commander_records_410_fuel_refusal_and_cold_resume_without_passengers() {
+    use crate::{XyzzyAction, navigation::MAX_FUEL_CAPACITY};
+    let mut world = World::new_commander(31009).unwrap();
+    let fuel_review = world
+        .review_xyzzy(XyzzyAction::MaximumFuelStorage, 0)
+        .unwrap();
+    world.prepare_xyzzy(fuel_review, 0).unwrap().commit();
+    let tanks = world
+        .modular_equipment_snapshot()
+        .unwrap()
+        .items
+        .into_iter()
+        .filter(|item| matches!(item.slot, Some(ModuleSlot::FuelStorage(_))))
+        .collect::<Vec<_>>();
+    assert_eq!(tanks.len(), 4);
+    assert_eq!(
+        tanks
+            .iter()
+            .map(|item| item.id)
+            .collect::<std::collections::BTreeSet<_>>()
+            .len(),
+        4
+    );
+    let opening = world.snapshot().navigation.unwrap();
+    assert_eq!(
+        (opening.fuel_units, opening.fuel_capacity_units),
+        (410, MAX_FUEL_CAPACITY)
+    );
+    assert!(world.test_tank_overfit());
+    assert!(world.passenger_cabins().unwrap().is_empty());
+    passage(&mut world, PassengerAction::RequestReplies);
+    let request = world
+        .modular
+        .events
+        .iter()
+        .find(|event| event.action == ModuleAction::Passenger(PassengerAction::RequestReplies))
+        .unwrap();
+    assert_eq!(cabins::receipt_fuel(request.item), Some(410));
+    assert_eq!(
+        world.passenger_journey_snapshot().unwrap().status,
+        PassageStatus::Refused
+    );
+    let bytes = world.save_bytes().unwrap();
+    let cold = World::from_save_bytes(&bytes).unwrap();
+    assert_eq!(cold.snapshot().navigation.unwrap(), opening);
+    assert_eq!(
+        cold.modular_equipment_snapshot()
+            .unwrap()
+            .items
+            .into_iter()
+            .filter(|item| matches!(item.slot, Some(ModuleSlot::FuelStorage(_))))
+            .map(|item| item.id)
+            .collect::<Vec<_>>(),
+        tanks.iter().map(|item| item.id).collect::<Vec<_>>()
+    );
+    assert_eq!(
+        cold.passenger_journey_snapshot().unwrap().status,
+        PassageStatus::Refused
+    );
+    assert!(!cold.passenger_journey_snapshot().unwrap().reply_is_current);
+    assert!(cold.passenger_cabins().unwrap().is_empty());
+    assert_eq!(cold.passenger_journey_snapshot().unwrap().clue, None);
+    assert!(review(&cold, ModuleAction::Passenger(PassengerAction::Board)).is_err());
 }

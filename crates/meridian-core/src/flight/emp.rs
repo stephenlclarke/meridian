@@ -230,6 +230,21 @@ impl State {
     pub(super) fn utility_mounts(&self) -> u16 {
         u16::from(self.owned().ok().flatten().is_some_and(|item| item.fitted))
     }
+    pub(super) fn utility_mounts_at_revision(&self, revision: u64) -> u16 {
+        let mut fitted = false;
+        for event in self
+            .equipment
+            .iter()
+            .take_while(|event| event.revision <= revision)
+        {
+            match event.action {
+                EmpEquipmentAction::Purchase | EmpEquipmentAction::Fit { .. } => fitted = true,
+                EmpEquipmentAction::Store { .. } => fitted = false,
+                EmpEquipmentAction::Upgrade { .. } => {}
+            }
+        }
+        u16::from(fitted)
+    }
 }
 
 pub(crate) const EMP_RESOURCE_SCALE: u32 = policy::SCALE;

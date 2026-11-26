@@ -8,6 +8,8 @@ The ordinary-drive development candidate adds the Basic, Intermediate and Advanc
 
 The stock-shield development candidate adds seven independently testable shield grades, an actual finite bank capacity for each grade, four ordinary paid upgrades and a dedicated XYZZY test selector. It preserves the original maximum outfit and the distinct unresolved Elite-rank and PLUGH-only acquisition paths. [Shield source, fitting and test controls](docs/SHIELD-GRADES.md). Owned validation is pending.
 
+The [fuel storage development candidate](docs/FUEL-STORAGE.md) adds four separately owned repeatable units, actual paid refuelling and capacity changes. SH025 has three shared normal utility mounts; the explicitly labelled four-tank test maximum uses a guarded exception. Owned validation is pending.
+
 The passenger-cabin development candidate offers all six original paid cabin layouts, with real five-tonne fit costs and separate Avenor-to-Renas G04 passenger consent, boarding and reception. See [passenger cabins and G04 controls](docs/PASSENGER-CABINS.md). Owned validation is pending.
 
 ## Goshawk Explorer in the Ship Showroom
