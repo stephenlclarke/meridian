@@ -28,7 +28,7 @@ uses the emitted bytes to check explicit V16 refusal and live-state preservation
 
 `occupied-cut-held-v17.bin` is the exact 39,168-byte scratch profile emitted on 26 November 2026 by G1 from the existing `disabled_native_target_with_fit` / `occupied_cut_requires_explicit_review_and_retains_actual_finite_game_contact` core test at its first genuine occupied contact review. The source producer starts with the retained paid-base and explicitly XYZZY-supported fixture, uses public flight, paid grades, actual laser and EMP contacts and native selected hold; it does not inject a ship or a writeable contact. This is headless actual simulation evidence, not a native UI or normally earned whole-profile acceptance.
 
-- Source producer's committed base: `6a21c890f5ec2e33c44f037cacdac825570592dd`; the owning G1 correction/export delta and exact joined-runner qualification remain separate evidence.
+- Source producer's committed base: `6a21c890f5ec2e33c44f037cacdac825570592dd`; the occupied selection correction is `93d752c65f2989b9bea8626a4ae1aba66c060c95`. Desktop confirmation tests passed on Mac, Linux and Windows on combined commit `d0f7daba`.
 - SHA-256: `e9e156f9761d7c39e7c2c9767574ae73d7d4b6204527c5bb59647c127f62b9b9`.
 - Save format: V17; World tick 34,515; target profile 16,101, galaxy 0, system 185 (Renas), serial 2; fitted cutter item 116,114; no occupied contact receipt.
 
