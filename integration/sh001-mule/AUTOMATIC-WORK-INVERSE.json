@@ -56,12 +56,17 @@
     },
     "flight/mining/persistence.rs": {
       "beforeSHA256": "ead28490b90682e5d10eaafa9144b3225dd21337048e2dd09112109384d65e3b",
-      "afterSHA256": "d489d996e01d6534a3f60adf0eeaf03a365b7e62f4b3f507b4f29a8625dd60ad",
+      "afterSHA256": "bb89cd2d613a6452f256a13fbb7377fc5041d82e23aa9e4f5ddf528c6b443417",
       "hunks": [
         {
           "offset": 4905,
           "before": "        // Without an eligible original ore-body/intake producer, there is no cargo credit,\n        // market/revision adjustment or collected receipt to synthesize during load.\n",
           "after": "        for receipt in self.mining.collections() {\n            if receipt.owner.owner != owner.owner\n                || receipt.owner.hull != owner.hull\n                || receipt.owner.visit > owner.visit\n                || receipt.world_tick > self.state.tick\n                || receipt.physical_tick > self.combat.physical_tick()\n                || self\n                    .jump_journal\n                    .system_at_visit(receipt.owner.visit, receipt.world_tick)?\n                    != receipt.owner.system\n                || self\n                    .commander_account\n                    .as_ref()\n                    .is_none_or(|a| receipt.revision > a.revision())\n                || !modules.scoop_was_fitted_for_collection(receipt)\n                || (receipt.world_tick == self.state.tick\n                    && (flight_pose(self.state.position, self.state.orientation)\n                        != Some(receipt.pose)\n                        || self.state.speed != receipt.speed))\n            {\n                return Err(invalid);\n            }\n            let (jumps, arrival) = self.jump_journal.visit_origin(receipt.owner.visit);\n            let launch = receipt\n                .owner\n                .visit\n                .checked_sub(1)\n                .and_then(|v| v.checked_sub(jumps))\n                .ok_or(invalid)?;\n            let berth = self.damage.berth_clock(launch).ok_or(invalid)?;\n            if arrival.map_or(receipt.physical_tick <= berth, |arrival| {\n                receipt.physical_tick < arrival\n            }) || self\n                .damage\n                .berth_clock(launch.checked_add(1).ok_or(invalid)?)\n                .is_some_and(|next| receipt.physical_tick >= next)\n            {\n                return Err(invalid);\n            }\n        }\n"
+        },
+        {
+          "offset": 7404,
+          "before": "        let Some(data) = &self.station_data else {\n            return false;\n        };\n        original\n            .bodies()\n            .into_iter()\n            .filter(|body| body.remaining_energy > 0.0)\n            .all(|body| {\n                !body.contains_point(pose.position)\n                    && data.asteroid_motion_clear(pose, pose, 0.0, body)\n            })\n",
+          "after": "        self.mining_motion_clear_with(\n            &original,\n            crate::navigation::SystemId::AVENOR,\n            pose,\n            pose,\n            0.0,\n        )\n"
         }
       ]
     },
