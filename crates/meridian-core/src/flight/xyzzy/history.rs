@@ -14,6 +14,7 @@ pub(crate) enum AccountEffect {
     Sale { bid: u32, credited: u32 },
     Refill { units: u16, paid: u32 },
     TankFit { count: u8, paid: u32 },
+    Solar { before: u16, units: u16 },
     Jump(u16),
     Secret(usize),
     SecretRefill(usize),
@@ -86,6 +87,13 @@ impl State {
                 }),
         );
         events.extend(world.jump_journal.account_events());
+        events.extend(world.solar.receipts().map(|receipt| AccountEvent {
+            revision: receipt.revision,
+            effect: AccountEffect::Solar {
+                before: receipt.before,
+                units: receipt.added,
+            },
+        }));
         events.extend(
             self.records
                 .iter()
@@ -102,9 +110,19 @@ impl State {
         let mut spent = 0_u64;
         let mut unlimited = false;
         let mut previous = 0;
+        let mut solar_anchors = world.solar.opening_fuel_anchors().peekable();
         for event in events {
             if event.revision <= previous || event.revision > account.revision() {
                 return Err(INVALID);
+            }
+            while let Some((revision, opening)) = solar_anchors.peek().copied() {
+                if revision >= event.revision {
+                    break;
+                }
+                if revision < previous || opening != fuel {
+                    return Err(INVALID);
+                }
+                let _ = solar_anchors.next();
             }
             match event.effect {
                 AccountEffect::Debit(paid) => cash = cash.checked_sub(paid).ok_or(INVALID)?,
@@ -132,6 +150,15 @@ impl State {
                     }
                     cash = cash.checked_sub(paid).ok_or(INVALID)?;
                 }
+                AccountEffect::Solar { before, units } => {
+                    if fuel != before || units == 0 {
+                        return Err(INVALID);
+                    }
+                    fuel = fuel
+                        .checked_add(units)
+                        .filter(|&value| value <= capacity)
+                        .ok_or(INVALID)?;
+                }
                 AccountEffect::Jump(debit) => {
                     if fuel < debit {
                         return Err(INVALID);
@@ -156,6 +183,11 @@ impl State {
                 }
             }
             previous = event.revision;
+        }
+        for (revision, opening) in solar_anchors {
+            if revision < previous || revision > account.revision() || opening != fuel {
+                return Err(INVALID);
+            }
         }
         if cash != account.credits_tenths()
             || fuel != account.fuel_tenths()

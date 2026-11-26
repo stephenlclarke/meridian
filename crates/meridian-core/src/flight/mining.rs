@@ -83,17 +83,37 @@ impl World {
         after: RigidPose,
         angular: f64,
     ) -> bool {
-        if !self.mining.enabled() {
+        let Some(identity) = self.combat_identity() else {
+            return true;
+        };
+        self.mining_motion_clear_with(&self.mining, identity.system, before, after, angular)
+    }
+    pub(super) fn mining_motion_clear_at_step(
+        &self,
+        system: SystemId,
+        tick: u64,
+        before: RigidPose,
+        after: RigidPose,
+        angular: f64,
+    ) -> bool {
+        if system != SystemId::AVENOR || !self.mining.enabled() {
             return true;
         }
-        if self
-            .combat_identity()
-            .is_none_or(|id| id.system != SystemId::AVENOR)
-        {
+        self.mining_motion_clear_with(&self.mining.at_step(tick), system, before, after, angular)
+    }
+    fn mining_motion_clear_with(
+        &self,
+        mining: &crate::mining::State,
+        system: SystemId,
+        before: RigidPose,
+        after: RigidPose,
+        angular: f64,
+    ) -> bool {
+        if system != SystemId::AVENOR || !mining.enabled() {
             return true;
         }
         self.station_data.as_ref().is_some_and(|data| {
-            self.mining
+            mining
                 .bodies()
                 .into_iter()
                 .filter(|body| body.remaining_energy > 0.0)

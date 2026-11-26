@@ -1,0 +1,12 @@
+{
+  "schema": 1,
+  "id": "sh067-rhinoceros-trader",
+  "undoBefore": [
+    "sh066-rabbit-explorer"
+  ],
+  "undoAfter": [],
+  "kind": "declaration",
+  "module": "rhinoceros_trader",
+  "before": "pub mod rabbit_explorer;\n",
+  "after": "pub mod saiga;\n"
+}

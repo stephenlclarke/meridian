@@ -1,0 +1,12 @@
+{
+  "schema": 1,
+  "id": "sh060-wombat",
+  "undoBefore": [
+    "sh059-barbary"
+  ],
+  "undoAfter": [],
+  "kind": "declaration",
+  "module": "wombat",
+  "before": "pub mod traffic;\n",
+  "after": "pub mod yak;\n"
+}

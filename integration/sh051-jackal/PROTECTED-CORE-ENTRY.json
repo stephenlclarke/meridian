@@ -1,0 +1,12 @@
+{
+  "schema": 1,
+  "id": "sh051-jackal",
+  "undoBefore": [
+    "sh050-yak"
+  ],
+  "undoAfter": [],
+  "kind": "declaration",
+  "module": "jackal",
+  "before": "pub mod hyena;\n",
+  "after": "pub mod lanner;\n"
+}

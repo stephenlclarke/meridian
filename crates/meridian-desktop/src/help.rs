@@ -59,7 +59,7 @@ impl Panel {
                 "Arrows Pitch | A / D Yaw | Q / E Roll | N Start / cancel auto-docking",
                 "0 Front | 1 Rear | 2 Left | 3 Right view",
                 "T Lock selected ship | F1 Next missile target | F2 Arm / safe",
-                "F3 Launch one missile | F4 Safe and clear target",
+                "F3 Launch missile | F4 Safe/clear target | K E.C.M. (22 energy)",
                 "J Jump to selected route | P Pause / resume",
                 "F6 Flight lesson | F12 Cancel | C Lesson details",
                 "I Mission details | Shift+I Target details | Tab Next target | Delete Release",
@@ -84,6 +84,11 @@ impl Panel {
             ),
         );
         panel.review(review, "After help: B cancels; Escape saves and quits");
+        if panel.lines.len() < MAX_LINES - 2 {
+            panel
+                .lines
+                .push("Solar fuel: fitted scoops, face sun and cruise; watch cabin temp".into());
+        }
         panel
     }
 
@@ -154,6 +159,7 @@ impl Panel {
                     "G / Enter Review purchase | Y Review fit | U Review store",
                     "D Details | O Options",
                     "EMP slot: G reviews base/grade; Y fits; U stores; no free charge",
+                    "E.C.M. utility: G buy; Y fit; U store; K activates in flight",
                     "An unavailable offer explains its current refusal",
                 ],
             ),

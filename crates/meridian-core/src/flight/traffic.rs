@@ -37,7 +37,7 @@ impl World {
             }
         }
         for hit in self.traffic.player_hits() {
-            self.missiles.validate_npc_beam_scene(hit)?;
+            self.missiles.validate_npc_beam_scene(&self.ecm, hit)?;
             let system = self
                 .navigation_catalogue
                 .as_ref()

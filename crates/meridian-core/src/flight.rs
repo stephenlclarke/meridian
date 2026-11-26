@@ -3,7 +3,14 @@ pub use emp::{
     EmpAxis, EmpChargePhase, EmpEquipmentAction, EmpEquipmentOffer, EmpEquipmentReview, EmpError,
     EmpGrades, EmpOrigin, EmpProvenance, EmpSnapshot, OwnedEmp, PreparedEmpEquipment,
 };
+mod ecm;
+pub use ecm::{
+    ECM_ENERGY_HUNDREDTHS, ECM_FIELD_TICKS, EcmActivation, EcmError, EcmSnapshot, EcmTermination,
+    EcmTrigger, PreparedEcm,
+};
 mod celestial;
+mod solar;
+pub use solar::{SolarScoopStatus, SolarSnapshot};
 mod damage;
 mod goshawk_validation;
 pub use goshawk_validation::GoshawkCustomApproachSnapshot;
@@ -187,6 +194,7 @@ pub struct World {
     mining: crate::mining::State,
     mining_scope: std::sync::Arc<()>,
     damage: damage::State,
+    solar: solar::State,
     station_data: Option<OriginalStationData>,
     navigation_catalogue: Option<OriginalNavigation>,
     navigation: Option<NavigationState>,
@@ -202,6 +210,7 @@ pub struct World {
     modular: modular::State,
     xyzzy: xyzzy::State,
     emp: emp::State,
+    ecm: ecm::State,
     navigation_trade: navigation_trade::State,
     flight_reception: flight_reception::State,
     practice: Option<practice::Practice>,
@@ -237,6 +246,7 @@ impl World {
             mining: crate::mining::State::legacy_absent(),
             mining_scope: std::sync::Arc::new(()),
             damage: damage::State::default(),
+            solar: solar::State::default(),
             station_data: None,
             navigation_catalogue: None,
             navigation: None,
@@ -252,6 +262,7 @@ impl World {
             modular: modular::State::default(),
             xyzzy: xyzzy::State::default(),
             emp: emp::State::default(),
+            ecm: ecm::State::default(),
             navigation_trade: navigation_trade::State::default(),
             flight_reception: flight_reception::State::default(),
             practice: None,
@@ -418,7 +429,38 @@ impl World {
         if !self.jump_journal.has_room() {
             return Err(NavigationError::SequenceExhausted);
         }
+        let owner = self.combat_identity().ok_or(NavigationError::WrongMode)?;
+        let tick = self.state.tick;
+        let clock = self.combat.physical_tick();
+        let ecm_start = ledger.fitted(ModuleSlot::UtilityEcm).is_some().then(|| {
+            crate::navigation::EcmJumpStart {
+                source: owner.system,
+                destination: target,
+                visit: owner.visit,
+                tick,
+                clock,
+                spool: drive.1.spool_ticks(),
+                before_activation: self.ecm.preceding_activation(owner, tick, clock),
+            }
+        });
+        let journal_growth = if ecm_start.is_some() {
+            self.jump_journal
+                .ecm_start_growth()
+                .ok_or(NavigationError::SequenceExhausted)?
+        } else {
+            0
+        };
+        let ecm = self
+            .ecm
+            .prepare_departure(owner, ecm_start)
+            .map_err(|_| NavigationError::SequenceExhausted)?;
+        self.check_ecm_command_capacity(&ecm, Some(navigation), journal_growth)
+            .map_err(|_| NavigationError::SequenceExhausted)?;
+        if let Some(start) = ecm_start {
+            self.jump_journal.append_ecm_start(start);
+        }
         self.navigation = Some(navigation);
+        self.ecm = ecm;
         self.cancel_route_on_manual_jump(origin, target);
         Ok(())
     }
@@ -517,11 +559,18 @@ impl World {
         if let Some(actor) = &mule_renas {
             self.validate_renas_mule_launch(actor, launch_pose)?;
         }
+        let ecm = self
+            .ecm
+            .prepare_launch(self, navigation)
+            .map_err(|_| StepError::TickOverflow)?;
+        self.check_ecm_command_capacity(&ecm, navigation, 0)
+            .map_err(|_| StepError::TickOverflow)?;
         if let Some(account) = &mut self.commander_account {
             account.record_departure_legality();
         }
         self.state = next;
         self.navigation = navigation;
+        self.ecm = ecm;
         self.missiles.berth();
         self.mule_renas = mule_renas;
         if let Some((session, epoch)) = self.freight_session.as_mut().zip(mission_epoch) {
@@ -575,7 +624,7 @@ impl World {
         next.tick = next.tick.checked_add(1).ok_or(StepError::TickOverflow)?;
         next.motion_refusal = None;
         if next.mode == FlightMode::Docked {
-            return self.publish_step(next);
+            return self.publish_step(next, None);
         }
         if !(0.0..=MAX_SPEED).contains(&self.state.speed) {
             return Err(StepError::NonFiniteState);
@@ -610,7 +659,13 @@ impl World {
             stopped.tick = next.tick;
             stopped.speed = 0.0;
             stopped.motion_refusal = Some(MotionRefusal::CelestialContact);
-            return self.publish_step(stopped);
+            return self.publish_step(
+                stopped,
+                Some(solar::Motion::Stopped {
+                    input,
+                    kind: solar::StopKind::Celestial,
+                }),
+            );
         }
         if let Some(data) = &self.station_data {
             let before = flight_pose(self.state.position, self.state.orientation)
@@ -627,14 +682,25 @@ impl World {
                 stopped.tick = next.tick;
                 stopped.speed = 0.0;
                 stopped.motion_refusal = Some(MotionRefusal::NpcContact);
-                return self.publish_step(stopped);
+                let kind = if self.traffic_motion_clear(before, after) {
+                    solar::StopKind::Mule
+                } else {
+                    solar::StopKind::Traffic
+                };
+                return self.publish_step(stopped, Some(solar::Motion::Stopped { input, kind }));
             }
             if !self.mining_motion_clear(before, after, angular_travel) {
                 let mut stopped = self.state;
                 stopped.tick = next.tick;
                 stopped.speed = 0.0;
                 stopped.motion_refusal = Some(MotionRefusal::AsteroidContact);
-                return self.publish_step(stopped);
+                return self.publish_step(
+                    stopped,
+                    Some(solar::Motion::Stopped {
+                        input,
+                        kind: solar::StopKind::Asteroid,
+                    }),
+                );
             }
             if data.crosses_aperture(before, after) {
                 if !data.entry_clear(
@@ -649,7 +715,13 @@ impl World {
                     stopped.speed = 0.0;
                     stopped.mode = FlightMode::Flight;
                     stopped.motion_refusal = Some(MotionRefusal::EntryConditions);
-                    return self.publish_step(stopped);
+                    return self.publish_step(
+                        stopped,
+                        Some(solar::Motion::Stopped {
+                            input,
+                            kind: solar::StopKind::Entry,
+                        }),
+                    );
                 }
                 next.mode = FlightMode::Docked;
                 next.speed = 0.0;
@@ -660,12 +732,18 @@ impl World {
                     stopped.speed = 0.0;
                     stopped.mode = FlightMode::Flight;
                     stopped.motion_refusal = Some(MotionRefusal::StationContact);
-                    return self.publish_step(stopped);
+                    return self.publish_step(
+                        stopped,
+                        Some(solar::Motion::Stopped {
+                            input,
+                            kind: solar::StopKind::Station,
+                        }),
+                    );
                 }
                 next.mode = FlightMode::Flight;
             }
         }
-        self.publish_step(next)
+        self.publish_step(next, Some(solar::Motion::Active(input)))
     }
 
     fn celestial_blocks_motion(&self, position: [f32; 3]) -> bool {
@@ -674,15 +752,17 @@ impl World {
                 .station_data
                 .as_ref()
                 .map_or(0.0, |data| data.player_radius());
-            [scene.planet, scene.sun]
-                .into_iter()
-                .any(|body| body.blocks_motion(self.state.position, position, hull_radius))
+            scene.blocks_motion(self.state.position, position, hull_radius)
         } else {
             false
         }
     }
 
-    fn publish_step(&mut self, mut next: Snapshot) -> Result<(), StepError> {
+    fn publish_step(
+        &mut self,
+        mut next: Snapshot,
+        motion: Option<solar::Motion>,
+    ) -> Result<(), StepError> {
         let flight_reception_start = self.flight_reception_start();
         let mut navigation = self.navigation;
         let mut mission_epoch = None;
@@ -790,9 +870,21 @@ impl World {
             prepared.practice,
             prepared.pulse.alive(),
         );
-        let damage =
-            self.damage
-                .step(self.state.mode, next.mode, prepared.combat.physical_tick())?;
+        let cancelled_ecm_jump = entry
+            && self
+                .navigation
+                .is_some_and(|n| n.snapshot(0).travel.is_some())
+            && self.fitted_ecm().is_some();
+        let ecm_launch_admitted = self.state.mode == FlightMode::Launching
+            && next.mode == FlightMode::Flight
+            && self.fitted_ecm().is_some();
+        let damage = self.damage.step(
+            self.state.mode,
+            next.mode,
+            prepared.combat.physical_tick(),
+            cancelled_ecm_jump,
+            ecm_launch_admitted,
+        )?;
         let emp = self.emp.prepare_step(
             self,
             emp::Frame {
@@ -807,11 +899,55 @@ impl World {
         prepared.traffic = emp.traffic.clone();
         prepared.pulse = emp.pulse;
         prepared.combat = emp.combat;
+        let (solar, gained_fuel) = self
+            .solar
+            .prepare(
+                self,
+                next,
+                navigation,
+                prepared.combat.physical_tick(),
+                motion,
+                prepared.pulse.alive(),
+            )
+            .map_err(|_| StepError::TickOverflow)?;
+        if solar.fatal_clock() == Some(prepared.combat.physical_tick()) {
+            prepared.pulse.damage_energy(u16::MAX);
+            self.clear_missing_missile_lock(
+                &mut prepared.missiles,
+                &prepared.traffic,
+                prepared.practice,
+                false,
+            );
+        }
+        let solar_account = if gained_fuel == 0 {
+            None
+        } else {
+            if planned_debit.is_some() {
+                return Err(StepError::NonFiniteState);
+            }
+            Some(
+                self.commander_account
+                    .as_ref()
+                    .ok_or(StepError::NonFiniteState)?
+                    .prepare_solar_fuel(gained_fuel)
+                    .map_err(|_| StepError::NonFiniteState)?,
+            )
+        };
         if let Some((traffic, _)) = &mut traffic {
             *traffic = prepared.traffic.clone();
         }
         let navigation_trade =
             self.prepare_navigation_trade_step(navigation, planned_debit, next.tick)?;
+        let ecm = self
+            .ecm
+            .prepare_step(
+                self,
+                next,
+                navigation,
+                prepared.combat.physical_tick(),
+                motion,
+            )
+            .map_err(|_| StepError::TickOverflow)?;
         if let (Some(practice), Some(nav), Some(data)) =
             (&mut prepared.practice, navigation, &self.station_data)
         {
@@ -822,7 +958,7 @@ impl World {
             navigation,
             &prepared,
             traffic.as_ref(),
-            (&damage, &mining, &emp.state),
+            (&damage, &mining, &emp.state, &ecm),
             navigation_trade.as_ref(),
         )
         .map_err(|_| StepError::TickOverflow)?;
@@ -832,6 +968,9 @@ impl World {
                 .ok_or(StepError::NonFiniteState)?
                 .debit_fuel(debit)
                 .map_err(|_| StepError::NonFiniteState)?;
+        }
+        if let Some(account) = solar_account {
+            self.commander_account = Some(account);
         }
         // The receipt and the existing navigation, dock and wallet changes publish together.
         if let Some(leg) = completed_leg {
@@ -849,7 +988,9 @@ impl World {
         self.combat = prepared.combat;
         self.pulse = prepared.pulse;
         self.damage = damage;
+        self.solar = solar;
         self.emp = emp.state;
+        self.ecm = ecm;
         self.mining = mining;
         self.practice = prepared.practice;
         if let Some(account) = &mut self.commander_account {
