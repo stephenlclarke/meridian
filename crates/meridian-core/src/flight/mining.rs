@@ -168,12 +168,35 @@ impl World {
             scope: std::sync::Arc::downgrade(&self.mining_scope),
         })
     }
+    /// A manual designation never bends the beam to the selected rock.
+    pub fn request_manual_mining(&mut self) -> Result<MiningShot, MiningError> {
+        let tool = self.mining_tool_authority()?;
+        let Some(crate::equipment::WorkTargetId::Asteroid(id)) =
+            self.selected_work_target().map(|work| work.id)
+        else {
+            return Err(MiningError::NoTarget);
+        };
+        if !self.pilot_operates_selected_tool() {
+            return Err(MiningError::NoTarget);
+        }
+        self.mine(tool, self.state.tick, Some(id))
+    }
+
     /// An actual owned fitted tool emits only after the native first-contact query.
     /// Damage releases finite pending ore; it does not credit cargo or a wallet.
     pub fn request_mining(
         &mut self,
         tool: MiningToolAuthority,
         tick: u64,
+    ) -> Result<MiningShot, MiningError> {
+        self.mine(tool, tick, None)
+    }
+
+    fn mine(
+        &mut self,
+        tool: MiningToolAuthority,
+        tick: u64,
+        selected: Option<crate::mining::AsteroidId>,
     ) -> Result<MiningShot, MiningError> {
         if tick != self.state.tick {
             return Err(MiningError::StaleCommand);
@@ -234,6 +257,7 @@ impl World {
         }
         let contact = self
             .mining_beam_contact(pose, MINING_RANGE)
+            .filter(|hit| selected.is_none_or(|id| id == hit.asteroid))
             .ok_or(MiningError::NoTarget)?;
         if !self.mining_contact_visible(pose, contact) {
             return Err(MiningError::Blocked);

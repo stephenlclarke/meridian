@@ -456,3 +456,53 @@ fn check_paid_wreck_recovery(mut world: World) {
     );
     assert!(!cold.auto_salvage_eligible(manifest.source));
 }
+
+#[test]
+fn manual_scanner_recovers_finite_wreck_cargo_without_targeting_modules() {
+    // Replay flight inputs from a separate assisted pilot flying the same encounter.
+    // Only the physical hardware on the manual pilot's own ship can produce a receipt.
+    let mut guide = finance_salvage();
+    let mut pilot = ok(World::from_save_bytes(&ok(guide.save_bytes())));
+    for kind in [
+        ModuleKind::SalvageTargeting,
+        ModuleKind::Targeting(TargetingTier::Basic),
+    ] {
+        let items = some(pilot.modular_equipment_snapshot()).items;
+        let item = some(items.iter().find(|item| item.kind == kind)).id;
+        let tick = pilot.snapshot().tick;
+        let review = ok(pilot.review_module(ModuleAction::Store { item }, tick));
+        ok(pilot.prepare_module(review, tick)).commit();
+    }
+    assert_eq!(pilot.targeting_tier(), None);
+    let manifest = terminal_source(&mut pilot);
+    assert_eq!(terminal_source(&mut guide), manifest);
+    let target = WorkTargetId::Wreck(manifest.source);
+    salvage_filter(&mut guide);
+    assert!(select_wreck(&mut guide, target));
+    for _ in pilot.scanner_targets() {
+        ok(pilot.cycle_scanner_target(pilot.snapshot().tick, [1280, 720]));
+        if pilot.selected_work_target().is_some_and(|w| w.id == target) {
+            break;
+        }
+    }
+    assert!(pilot.pilot_operates_selected_tool());
+    assert_eq!(pilot.request_manual_wreck_recovery(), "Hold for recovery");
+    let initial = some(pilot.commodity_quantity(manifest.commodity));
+    for _ in 0..12000 {
+        let input = guide.targeting_flight_input(FlightInput::default());
+        ok(guide.step(FlightInput::default()));
+        ok(pilot.step(input));
+        assert_eq!(pilot.commodity_quantity(manifest.commodity), Some(initial));
+        if some(guide.commodity_quantity(manifest.commodity)) > initial {
+            break;
+        }
+    }
+    assert_eq!(pilot.request_manual_wreck_recovery(), "Salvage recovered");
+    assert_eq!(pilot.request_manual_wreck_recovery(), "Recovering salvage");
+    let continued = ok(World::from_save_bytes(&ok(pilot.save_bytes())));
+    assert_eq!(
+        continued.commodity_quantity(manifest.commodity),
+        Some(initial + 1)
+    );
+    assert_eq!(continued.targeting_tier(), None);
+}

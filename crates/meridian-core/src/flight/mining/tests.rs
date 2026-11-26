@@ -91,13 +91,91 @@ fn cold(w: &World) -> World {
 
 #[test]
 fn paid_scoops_take_one_physical_fragment_once_and_sell_it_after_cold_continue() {
+    paid_fragment_journey(false);
+}
+
+#[test]
+fn manual_scanner_laser_and_scoop_use_actual_hardware_without_computers() {
+    paid_fragment_journey(true);
+}
+
+fn designate(world: &mut World, id: crate::equipment::WorkTargetId) {
+    for _ in world.scanner_targets() {
+        assert!(ok(
+            world.cycle_scanner_target(world.snapshot().tick, [1280, 720])
+        ));
+        if world
+            .selected_work_target()
+            .is_some_and(|work| work.id == id)
+        {
+            return;
+        }
+    }
+    panic!("scanner did not offer {id:?}");
+}
+
+#[test]
+fn manual_mining_accepts_basic_alignment_without_mining_targeting() {
+    use crate::{
+        ModuleKind,
+        equipment::{TargetingTier, WorkTargetId},
+    };
+    let (mut world, _) = paid(12005);
+    module(
+        &mut world,
+        ModuleAction::Purchase {
+            kind: ModuleKind::Targeting(TargetingTier::Basic),
+        },
+    );
+    approach(&mut world);
+    let contact = some(some(world.mining_belt_snapshot()).front_contact);
+    designate(&mut world, WorkTargetId::Asteroid(contact.asteroid));
+    assert!(!world.manual_scanner_target());
+    assert!(!world.work_targeting_fit().mining);
+    assert!(world.pilot_operates_selected_tool());
+    assert_eq!(
+        ok(world.request_manual_mining()).contact.asteroid,
+        contact.asteroid
+    );
+}
+
+fn paid_fragment_journey(manual: bool) {
+    use crate::equipment::WorkTargetId;
     let (mut world, _) = paid(12005);
     module(&mut world, ModuleAction::PurchaseFuelScoops);
     approach(&mut world);
     let cash = world.credits_tenths();
-    work(&mut world);
+    if manual {
+        assert_eq!(world.targeting_tier(), None);
+        let belt = some(world.mining_belt_snapshot());
+        let rock = some(belt.front_contact).asteroid;
+        let other = some(belt.bodies.iter().find(|body| body.id != rock)).id;
+        designate(&mut world, WorkTargetId::Asteroid(other));
+        let before = ok(world.save_bytes());
+        assert!(matches!(
+            world.request_manual_mining(),
+            Err(MiningError::NoTarget)
+        ));
+        assert_eq!(ok(world.save_bytes()), before);
+        designate(&mut world, WorkTargetId::Asteroid(rock));
+        ok(world.request_manual_mining());
+    } else {
+        work(&mut world);
+    }
     steps(&mut world, 18);
-    let shot = work(&mut world);
+    let shot = if manual {
+        ok(world.request_manual_mining())
+    } else {
+        work(&mut world)
+    };
+    if manual {
+        let ore = some(world.mining_collection_target(shot.contact.asteroid));
+        designate(&mut world, WorkTargetId::Ore(ore.id));
+        assert_eq!(
+            world.request_manual_ore_collection(),
+            Err(MiningError::NoEligibleOreBody)
+        );
+    }
     let t = world.snapshot().tick;
     let before = ok(world.save_bytes());
     assert_eq!(
@@ -153,7 +231,11 @@ fn paid_scoops_take_one_physical_fragment_once_and_sell_it_after_cold_continue()
     let mut pitch_ticks = 0;
     for _ in 0..100 {
         let tick = world.snapshot().tick;
-        match world.request_collect_mined_ore(tick) {
+        match if manual {
+            world.request_manual_ore_collection()
+        } else {
+            world.request_collect_mined_ore(tick)
+        } {
             Ok(()) => {
                 collected = true;
                 break;

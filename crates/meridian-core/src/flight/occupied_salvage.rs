@@ -32,7 +32,7 @@ impl core::fmt::Display for OccupiedCutError {
     fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         f.write_str(match self {
             Self::FlightRequired => "Occupied salvage requires active local flight",
-            Self::MissingFit => "Fit Salvage Module, Cutter and Fuel Scoops",
+            Self::MissingFit => "Fit the salvage cutter and fuel scoops",
             Self::SelectionChanged => "Occupied salvage target changed",
             Self::NotDisabledOccupied => "Target is not a proved disabled occupied ship",
             Self::UnsafeHold => "Establish the safe salvage hold first",
@@ -459,7 +459,9 @@ impl World {
         {
             return Err(OccupiedCutError::NotDisabledOccupied);
         }
-        if !self.work_targeting_fit().salvage || self.fitted_fuel_scoops().is_none() {
+        if (!self.pilot_operates_selected_tool() && !self.work_targeting_fit().salvage)
+            || self.fitted_fuel_scoops().is_none()
+        {
             return Err(OccupiedCutError::MissingFit);
         }
         if self

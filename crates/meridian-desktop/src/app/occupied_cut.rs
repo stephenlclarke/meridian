@@ -105,7 +105,13 @@ impl App {
         let Some(review) = self.occupied_cut.as_ref() else {
             return false;
         };
-        if ready_target(&self.game.world) == Some(review.target()) {
+        let world = &self.game.world;
+        if ready_target(world) == Some(review.target())
+            || (world.pilot_operates_selected_tool()
+                && world
+                    .review_occupied_cut(review.target(), world.snapshot().tick)
+                    .is_ok())
+        {
             return false;
         }
         self.cancel_occupied_cut("Occupied contact cancelled: target or hold lost")
@@ -373,6 +379,37 @@ mod tests {
         assert!(!app.modal_open());
         assert!(app.game.world.snapshot().tick > tick);
         assert_eq!(app.game.world.occupied_cut_contacts().count(), 0);
+    }
+
+    #[test]
+    fn manual_scanner_occupied_cut_needs_fire_then_separate_confirmation() {
+        let directory = TestDirectory::new();
+        let (mut app, target) = ready_app(&directory, TargetFilter::Ships);
+        some(app.occupied_cut.take()).cancel();
+        ok(app.game.world.toggle_scanner_assistance());
+        for _ in app.game.world.scanner_targets() {
+            ok(app
+                .game
+                .world
+                .cycle_scanner_target(app.game.world.snapshot().tick, [1280, 720]));
+            if app.game.world.selected_disabled_salvage_target() == Some(target) {
+                break;
+            }
+        }
+        assert!(app.game.world.manual_scanner_target());
+        assert!(!app.maybe_open_occupied_cut());
+        assert_eq!(press(&mut app, KeyCode::KeyZ, true), None);
+        assert!(!app.modal_open());
+        assert_eq!(press(&mut app, KeyCode::KeyZ, false), None);
+        assert!(app.modal_open());
+        assert_eq!(app.game.world.occupied_cut_contacts().count(), 0);
+        assert_eq!(press(&mut app, KeyCode::Enter, false), None);
+        assert!(!app.modal_open());
+        assert_eq!(app.game.world.occupied_cut_contacts().count(), 1);
+        let cold = ok(World::from_save_bytes(&ok(fs::read(
+            directory.0.join("commander.meridian"),
+        ))));
+        assert_eq!(cold.occupied_cut_contacts().count(), 1);
     }
 
     #[test]

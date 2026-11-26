@@ -86,6 +86,17 @@ impl World {
         }
     }
 
+    /// Designated collection uses the full aperture and relative-velocity checks.
+    pub fn request_manual_ore_collection(&mut self) -> Result<(), MiningError> {
+        let Some(WorkTargetId::Ore(id)) = self.selected_work_target().map(|work| work.id) else {
+            return Err(MiningError::NoEligibleOreBody);
+        };
+        if !self.pilot_operates_selected_tool() {
+            return Err(MiningError::NoEligibleOreBody);
+        }
+        self.collect_mined_ore(self.state.tick, Some(id), true)
+    }
+
     pub fn request_collect_mined_ore(&mut self, tick: u64) -> Result<(), MiningError> {
         self.collect_mined_ore(tick, None, false)
     }

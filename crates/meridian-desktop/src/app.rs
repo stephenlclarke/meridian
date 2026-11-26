@@ -1,5 +1,6 @@
 mod audio;
 mod emp;
+mod manual_work;
 mod mule_presentation;
 mod mule_validation;
 mod occupied_cut;
@@ -76,7 +77,10 @@ fn step_frame(
         {
             *pulse = None;
             *mining = None;
-        } else if fire_held && occupied_cut::ready_target(world).is_none() {
+        } else if fire_held
+            && !world.pilot_operates_selected_tool()
+            && occupied_cut::ready_target(world).is_none()
+        {
             if let Ok(tool) = world.mining_tool_authority() {
                 if let Ok(shot) = world.request_mining(tool, state.tick) {
                     *mining = Some(asteroid_render::MiningVisual {
@@ -1138,6 +1142,9 @@ impl App {
                         | KeyCode::Backspace
                 ))
         {
+            return None;
+        }
+        if code == KeyCode::KeyZ && self.simulation_active() && self.use_manual_tool() {
             return None;
         }
         if !self.menu_active() {

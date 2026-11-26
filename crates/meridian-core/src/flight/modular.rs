@@ -1473,8 +1473,6 @@ impl State {
         {
             return None;
         }
-        ledger.fitted(ModuleSlot::Targeting)?;
-        ledger.fitted(ModuleSlot::SalvageTargeting)?;
         ledger.fitted(ModuleSlot::UtilityFuelScoops)?;
         ledger.fitted(ModuleSlot::UtilitySalvageCutter)
     }

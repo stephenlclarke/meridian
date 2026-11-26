@@ -573,8 +573,6 @@ impl super::State {
                 || fit
                     .fitted(ModuleSlot::UtilityFuelScoops)
                     .is_none_or(|item| item.id != r.scoops)
-                || fit.fitted(ModuleSlot::Targeting).is_none()
-                || fit.fitted(ModuleSlot::SalvageTargeting).is_none()
             {
                 return Err(INVALID);
             }
@@ -830,6 +828,23 @@ impl World {
     /// Called only at an accepted selected-target work tick. This transfer cannot damage
     /// a vessel, create a new source manifest or take intact cargo from a disabled actor.
     pub(in crate::flight) fn auto_salvage_tick(&mut self, id: NpcId) -> &'static str {
+        if !self.work_targeting_fit().salvage {
+            return "Salvage module required";
+        }
+        self.recover_selected_wreck(id)
+    }
+
+    /// The pilot supplies the working pose. Only fitted tools can move a finite unit.
+    pub fn request_manual_wreck_recovery(&mut self) -> &'static str {
+        if self.pilot_operates_selected_tool()
+            && let Some(WorkTargetId::Wreck(id)) = self.selected_work_target().map(|work| work.id)
+        {
+            return self.recover_selected_wreck(id);
+        }
+        "Select a wreck on the manual scanner"
+    }
+
+    fn recover_selected_wreck(&mut self, id: NpcId) -> &'static str {
         if self.state.mode != crate::FlightMode::Flight
             || self.is_paused()
             || self.emp.electrical_disabled()
@@ -849,9 +864,6 @@ impl World {
         let Some(scoops) = self.fitted_fuel_scoops() else {
             return "Scoops not fitted";
         };
-        if !self.work_targeting_fit().salvage {
-            return "Salvage module required";
-        }
         let Ok(manifest) = self.wreck_manifest(id) else {
             return "Claim unavailable";
         };
