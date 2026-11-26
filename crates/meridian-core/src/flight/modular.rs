@@ -389,6 +389,15 @@ pub enum ModuleAction {
     PurchaseFuelScoops,
     /// Reserved for the explicit XYZZY outfit; ordinary reviews refuse it.
     GrantStoredSalvageCutter,
+    /// Internal reversible utility placement for an admitted external recovery.
+    FlightSalvageExchange {
+        source: crate::traffic::NpcId,
+        cutter: u64,
+        displaced_emp: Option<u64>,
+        visit: u64,
+        clock: u64,
+        restoring: bool,
+    },
     Store {
         item: u64,
     },
@@ -542,6 +551,7 @@ pub(super) struct Ledger {
     test_tank_items: Vec<u64>,
     passage: cabins::Passage,
     auto_return: Option<u64>,
+    salvage_return: Option<salvage::Exchange>,
 }
 impl Ledger {
     pub(super) fn passenger_totals(&self) -> (u32, u64) {
@@ -729,6 +739,11 @@ impl Ledger {
         })
     }
     fn apply(&mut self, event: Event, transaction: u32) -> Result<(), ModuleError> {
+        if self.salvage_return.is_some()
+            && !matches!(event.action, ModuleAction::FlightSalvageExchange { .. })
+        {
+            return Err(ModuleError::Capacity);
+        }
         if let ModuleAction::FlightLaserExchange {
             item,
             replacing,
@@ -844,7 +859,14 @@ impl Ledger {
                 .ok_or(ModuleError::SequenceExhausted)?;
         } else {
             match event.action {
+                ModuleAction::FlightSalvageExchange { .. } => self.apply_salvage_exchange(event)?,
                 ModuleAction::Store { item } => {
+                    if self
+                        .salvage_return
+                        .is_some_and(|exchange| exchange.cutter == item)
+                    {
+                        return Err(ModuleError::Capacity);
+                    }
                     if self.passage.occupied(item) {
                         return Err(ModuleError::CabinOccupied);
                     }
@@ -1021,6 +1043,8 @@ impl State {
                     PassengerAction::Receive => super::AccountEffect::Reward(PASSAGE_REWARD_TENTHS),
                     PassengerAction::Cancel => super::AccountEffect::Debit(0),
                 }
+            } else if matches!(e.action, ModuleAction::FlightSalvageExchange { .. }) {
+                super::AccountEffect::Debit(0)
             } else if self.history.tracks_revision(e.revision)
                 && matches!(
                     e.action,
@@ -1192,6 +1216,9 @@ impl State {
                     return Err(INVALID);
                 }
                 previous_exchange = Some((visit, clock, emission));
+            }
+            if let Some(exchange) = salvage::Exchange::from_action(e.action) {
+                self.validate_salvage_exchange(world, account, *e, previous, exchange)?;
             }
             let serial = if e.xyzzy {
                 let kind = e
@@ -1535,6 +1562,21 @@ impl State {
                 }
                 ModuleAction::PurchaseFuelScoops => w.u8(16),
                 ModuleAction::GrantStoredSalvageCutter => w.u8(17),
+                ModuleAction::FlightSalvageExchange {
+                    source,
+                    displaced_emp,
+                    visit,
+                    clock,
+                    restoring,
+                    ..
+                } => {
+                    w.u8(20);
+                    source.encode(w);
+                    w.option(displaced_emp.as_ref(), |w, item| w.u64(*item));
+                    w.u64(visit);
+                    w.u64(clock);
+                    w.bool(restoring);
+                }
                 ModuleAction::Store { .. } => w.u8(1),
                 ModuleAction::Install { replacing, .. } => {
                     w.u8(2);
@@ -1592,6 +1634,17 @@ impl State {
             } else {
                 None
             };
+            let salvage_exchange = if tag == 20 {
+                Some((
+                    crate::traffic::NpcId::decode(r)?,
+                    r.option(|r| r.u64())?,
+                    r.u64()?,
+                    r.u64()?,
+                    r.bool()?,
+                ))
+            } else {
+                None
+            };
             let item = r.u64()?;
             let dock = DockContext::decode_save(r)?;
             let tick = r.u64()?;
@@ -1614,6 +1667,18 @@ impl State {
                 }
                 16 if version >= 16 => ModuleAction::PurchaseFuelScoops,
                 17 => ModuleAction::GrantStoredSalvageCutter,
+                20 => {
+                    let (source, displaced_emp, visit, clock, restoring) =
+                        salvage_exchange.ok_or(SaveError::InvalidEncoding)?;
+                    ModuleAction::FlightSalvageExchange {
+                        source,
+                        cutter: item,
+                        displaced_emp,
+                        visit,
+                        clock,
+                        restoring,
+                    }
+                }
                 1 => ModuleAction::Store { item },
                 2 => ModuleAction::Install { item, replacing },
                 3 if version >= 16 => ModuleAction::Purchase {
@@ -1873,8 +1938,12 @@ impl World {
             ModuleAction::GrantStoredSalvageCutter
                 | ModuleAction::GrantStoredMiningLaser
                 | ModuleAction::FlightLaserExchange { .. }
+                | ModuleAction::FlightSalvageExchange { .. }
         ) {
             return Err(ModuleError::NotForSale);
+        }
+        if self.modular.salvage_exchange_pending() {
+            return Err(ModuleError::Capacity);
         }
         if tick != self.state.tick {
             return Err(ModuleError::StaleReview);

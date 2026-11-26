@@ -3,6 +3,9 @@ use super::{MissionError, World};
 use crate::equipment::{self, Command, Event, Snapshot};
 impl World {
     fn check_cargo_mount(&self, command: Command) -> Result<(), MissionError> {
+        if self.modular.salvage_exchange_pending() {
+            return Err(MissionError::Equipment(equipment::Error::Unavailable));
+        }
         let account = self
             .commander_account
             .as_ref()

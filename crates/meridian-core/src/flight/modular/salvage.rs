@@ -1,5 +1,9 @@
 //! Finite external recovery from terminal ordinary cargo. No live hull or crew effects.
-use super::{CommanderAccount, ModuleKind, ModuleSlot, OwnedModule, World};
+use super::{
+    CommanderAccount, Event, Ledger, ModuleAction, ModuleError, ModuleKind, ModuleSlot,
+    OwnedModule, World,
+};
+use crate::flight::emp::SalvageEmpLink;
 use crate::{
     docking::Vec3,
     equipment::WorkTargetId,
@@ -12,6 +16,59 @@ const INVALID: SaveError = SaveError::InvalidState("external salvage custody");
 const MAX_SOURCES: usize = 2;
 const MAX_UNITS: usize = 24;
 const RECOVERY_TICKS: u64 = 60;
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub(super) struct Exchange {
+    source: NpcId,
+    pub(super) cutter: u64,
+    displaced_emp: Option<u64>,
+    visit: u64,
+    clock: u64,
+    restoring: bool,
+}
+
+impl Exchange {
+    pub(super) fn from_action(action: ModuleAction) -> Option<Self> {
+        let ModuleAction::FlightSalvageExchange {
+            source,
+            cutter,
+            displaced_emp,
+            visit,
+            clock,
+            restoring,
+        } = action
+        else {
+            return None;
+        };
+        Some(Self {
+            source,
+            cutter,
+            displaced_emp,
+            visit,
+            clock,
+            restoring,
+        })
+    }
+
+    fn action(self) -> ModuleAction {
+        ModuleAction::FlightSalvageExchange {
+            source: self.source,
+            cutter: self.cutter,
+            displaced_emp: self.displaced_emp,
+            visit: self.visit,
+            clock: self.clock,
+            restoring: self.restoring,
+        }
+    }
+
+    fn paired_emp_revision(self, revision: u64) -> Option<u64> {
+        if self.restoring {
+            revision.checked_add(1)
+        } else {
+            revision.checked_sub(1)
+        }
+    }
+}
 
 /// The finite ordinary source is established independently of the player's cargo account.
 /// Only its detached cargo is declared recoverable, never the source hull or its crew.
@@ -67,7 +124,59 @@ fn collection_envelope(world: &World, source: Vec3, position: [f32; 3]) -> bool 
     );
     let distance = offset.dot(offset).sqrt();
     let clearance = station.player_clearance_radius() * 2.0;
-    distance >= clearance && distance <= clearance + 2.0
+    (clearance + 1.5..=clearance + 2.5).contains(&distance)
+}
+
+fn historical_claim(world: &World, id: NpcId) -> Option<Claim> {
+    let manifest = world.traffic.wreck_manifest(id).ok()?;
+    let actor = world
+        .traffic
+        .snapshot(id.system())?
+        .actors
+        .into_iter()
+        .find(|actor| actor.id == id)?;
+    if actor.phase != NpcPhase::Destroyed || actor.emp_crew_aboard.is_some() {
+        return None;
+    }
+    claim_for(manifest)
+}
+
+impl Ledger {
+    pub(super) fn apply_salvage_exchange(&mut self, event: Event) -> Result<(), ModuleError> {
+        let exchange = Exchange::from_action(event.action).ok_or(ModuleError::NotForSale)?;
+        if event.xyzzy || exchange.cutter != event.item {
+            return Err(ModuleError::NotForSale);
+        }
+        let index = self
+            .items
+            .iter()
+            .position(|item| item.id == exchange.cutter && item.kind == ModuleKind::SalvageCutter)
+            .ok_or(ModuleError::MissingItem)?;
+        if exchange.restoring {
+            let prior = self.salvage_return.ok_or(ModuleError::NoChange)?;
+            if prior.source != exchange.source
+                || prior.cutter != exchange.cutter
+                || prior.displaced_emp != exchange.displaced_emp
+                || self.items[index].slot != Some(ModuleSlot::UtilitySalvageCutter)
+            {
+                return Err(ModuleError::StaleOccupant);
+            }
+            self.items[index].slot = None;
+            self.salvage_return = None;
+        } else {
+            if self.salvage_return.is_some()
+                || self.items[index].slot.is_some()
+                || self.fitted(ModuleSlot::UtilityFuelScoops).is_none()
+                || self.fitted(ModuleSlot::Targeting).is_none()
+                || self.fitted(ModuleSlot::SalvageTargeting).is_none()
+            {
+                return Err(ModuleError::MissingPrerequisite);
+            }
+            self.install(index, None)?;
+            self.salvage_return = Some(exchange);
+        }
+        Ok(())
+    }
 }
 
 impl State {
@@ -171,6 +280,95 @@ impl State {
 }
 
 impl super::State {
+    pub(in crate::flight) fn salvage_exchange_pending(&self) -> bool {
+        self.events
+            .iter()
+            .rev()
+            .find_map(|event| Exchange::from_action(event.action))
+            .is_some_and(|exchange| !exchange.restoring)
+    }
+
+    pub(in crate::flight) fn matches_salvage_emp_event(&self, link: SalvageEmpLink) -> bool {
+        let SalvageEmpLink {
+            item,
+            cutter,
+            revision,
+            tick,
+            visit,
+            clock,
+            restoring,
+        } = link;
+        self.events.iter().any(|event| {
+            let Some(exchange) = Exchange::from_action(event.action) else {
+                return false;
+            };
+            !event.xyzzy
+                && event.tick == tick
+                && exchange.cutter == cutter
+                && exchange.displaced_emp == Some(item)
+                && exchange.visit == visit
+                && exchange.clock == clock
+                && exchange.restoring == restoring
+                && exchange.paired_emp_revision(event.revision) == Some(revision)
+        })
+    }
+
+    pub(super) fn validate_salvage_exchange(
+        &self,
+        world: &World,
+        account: &CommanderAccount,
+        event: Event,
+        previous: Option<Event>,
+        exchange: Exchange,
+    ) -> Result<(), SaveError> {
+        let identity = world.combat_identity().ok_or(INVALID)?;
+        if previous.is_none_or(|prior| prior.dock != event.dock)
+            || exchange.source.profile() != identity.owner
+            || exchange.visit <= event.dock.visit()
+            || exchange.visit > identity.visit
+            || exchange.clock == 0
+            || exchange.clock > world.combat.physical_tick()
+            || exchange.clock > event.tick
+            || event.tick - exchange.clock
+                > world
+                    .state
+                    .tick
+                    .saturating_sub(world.combat.physical_tick())
+            || world
+                .jump_journal
+                .system_at_visit(exchange.visit, event.tick)
+                .is_err()
+            || (!exchange.restoring
+                && (world
+                    .jump_journal
+                    .system_at_visit(exchange.visit, event.tick)?
+                    != exchange.source.system()
+                    || historical_claim(world, exchange.source)
+                        .is_none_or(|claim| claim.terminal_tick >= event.tick)))
+        {
+            return Err(INVALID);
+        }
+        if let Some(item) = exchange.displaced_emp {
+            let revision = exchange
+                .paired_emp_revision(event.revision)
+                .ok_or(INVALID)?;
+            if revision > account.revision()
+                || !world.emp.matches_salvage_handover(SalvageEmpLink {
+                    item,
+                    cutter: exchange.cutter,
+                    revision,
+                    tick: event.tick,
+                    visit: exchange.visit,
+                    clock: exchange.clock,
+                    restoring: exchange.restoring,
+                })
+            {
+                return Err(INVALID);
+            }
+        }
+        Ok(())
+    }
+
     pub(in crate::flight) fn validate_salvage(
         &self,
         world: &World,
@@ -290,18 +488,217 @@ impl World {
     }
 
     fn external_claim(&self, id: NpcId) -> Option<Claim> {
-        let manifest = self.wreck_manifest(id).ok()?;
-        let actor = self
-            .traffic_snapshot()?
-            .actors
-            .into_iter()
-            .find(|actor| actor.id == id)?;
-        // No live crew or ordinary cargo that remains in the intact hull is eligible.
-        // An electrical crew record on a destroyed target still has unresolved custody.
-        if actor.phase != NpcPhase::Destroyed || actor.emp_crew_aboard.is_some() {
-            return None;
+        self.wreck_manifest(id).ok()?;
+        historical_claim(self, id)
+    }
+
+    /// Select an owned cutter solely for a selected, independently admitted terminal cargo source.
+    pub(in crate::flight) fn select_auto_salvage_tool(
+        &mut self,
+        id: NpcId,
+    ) -> Result<(), ModuleError> {
+        if self.state.mode != crate::FlightMode::Flight
+            || self.is_paused()
+            || self.emp.input_blocked()
+            || self.combat_snapshot().is_none_or(|s| s.player.destroyed)
+            || !self.auto_salvage_eligible(id)
+            || self
+                .selected_work_target()
+                .is_none_or(|target| target.id != WorkTargetId::Wreck(id))
+        {
+            return Err(ModuleError::MissingPrerequisite);
         }
-        claim_for(manifest)
+        let account = self
+            .commander_account
+            .as_ref()
+            .ok_or(ModuleError::NoCommander)?;
+        let ledger = self
+            .modular
+            .ledger(self, account)
+            .map_err(ModuleError::Save)?;
+        if let Some(active) = ledger.salvage_return {
+            return if active.source == id {
+                Ok(())
+            } else {
+                Err(ModuleError::StaleOccupant)
+            };
+        }
+        if ledger.fitted(ModuleSlot::UtilitySalvageCutter).is_some() {
+            return Ok(());
+        }
+        let item = ledger
+            .items
+            .iter()
+            .find(|item| item.kind == ModuleKind::SalvageCutter && item.slot.is_none())
+            .copied()
+            .ok_or(ModuleError::MissingItem)?;
+        let definition = crate::equipment::definition().map_err(|_| ModuleError::Capacity)?;
+        let (units, mounts) = ledger.budget_usage(account, self.emp.utility_mounts())?;
+        if units >= definition.equipment_units_capacity
+            || mounts > definition.utility_mounts_capacity
+        {
+            return Err(ModuleError::Capacity);
+        }
+        let displaced_emp = if mounts == definition.utility_mounts_capacity {
+            let emp = self
+                .emp
+                .owned()
+                .map_err(ModuleError::Save)?
+                .filter(|emp| emp.fitted)
+                .ok_or(ModuleError::Capacity)?;
+            if self.emp.travel_blocked(&self.traffic) {
+                return Err(ModuleError::Capacity);
+            }
+            Some(emp.item)
+        } else {
+            None
+        };
+        let identity = self.combat_identity().ok_or(ModuleError::NoCommander)?;
+        self.exchange_salvage(
+            ledger,
+            Exchange {
+                source: id,
+                cutter: item.id,
+                displaced_emp,
+                visit: identity.visit,
+                clock: self.combat.physical_tick(),
+                restoring: false,
+            },
+        )
+    }
+
+    /// Release only the temporary fit, returning the exact displacement to its original slot.
+    pub(in crate::flight) fn restore_auto_salvage_tool(&mut self) -> Result<(), ModuleError> {
+        if !self.modular.salvage_exchange_pending() {
+            return Ok(());
+        }
+        if self.is_paused() || self.emp.input_blocked() {
+            return Err(ModuleError::Paused);
+        }
+        if self.combat_snapshot().is_none_or(|s| s.player.destroyed) {
+            return Err(ModuleError::MissingPrerequisite);
+        }
+        let account = self
+            .commander_account
+            .as_ref()
+            .ok_or(ModuleError::NoCommander)?;
+        let ledger = self
+            .modular
+            .ledger(self, account)
+            .map_err(ModuleError::Save)?;
+        let prior = ledger.salvage_return.ok_or(ModuleError::StaleOccupant)?;
+        let identity = self.combat_identity().ok_or(ModuleError::NoCommander)?;
+        self.exchange_salvage(
+            ledger,
+            Exchange {
+                visit: identity.visit,
+                clock: self.combat.physical_tick(),
+                restoring: true,
+                ..prior
+            },
+        )
+    }
+
+    fn exchange_salvage(
+        &mut self,
+        mut ledger: Ledger,
+        exchange: Exchange,
+    ) -> Result<(), ModuleError> {
+        let prior = self
+            .modular
+            .events
+            .last()
+            .ok_or(ModuleError::StaleOccupant)?;
+        let dock = prior.dock;
+        let tick = self.state.tick;
+        let current = self
+            .commander_account
+            .as_ref()
+            .ok_or(ModuleError::NoCommander)?;
+        let emp_first = exchange.displaced_emp.is_some() && !exchange.restoring;
+        let before_module = if emp_first {
+            Some(
+                current
+                    .prepare_emp_equipment(0)
+                    .map_err(|_| ModuleError::Capacity)?,
+            )
+        } else {
+            None
+        };
+        let before_module = before_module.as_ref().unwrap_or(current);
+        let revision = before_module
+            .revision()
+            .checked_add(1)
+            .ok_or(ModuleError::SequenceExhausted)?;
+        let event = Event {
+            xyzzy: false,
+            action: exchange.action(),
+            item: exchange.cutter,
+            dock,
+            tick,
+            revision,
+        };
+        ledger.apply(event, 0)?;
+        let owner = self
+            .combat_identity()
+            .ok_or(ModuleError::NoCommander)?
+            .owner;
+        let born = |slot, offset| {
+            ledger
+                .fitted(slot)
+                .is_some_and(|item| item.id == owner + offset)
+        };
+        let mut account = before_module
+            .prepare_module(
+                0,
+                [
+                    born(ModuleSlot::FrontLaser, 7),
+                    born(ModuleSlot::Energy, 5),
+                    born(ModuleSlot::Navigation, 4),
+                    born(ModuleSlot::Drive, 6),
+                    born(ModuleSlot::Shield, 3),
+                ],
+                ledger.fuel_storage_count(),
+            )
+            .map_err(|_| ModuleError::Capacity)?;
+        if exchange.displaced_emp.is_some() && exchange.restoring {
+            account = account
+                .prepare_emp_equipment(0)
+                .map_err(|_| ModuleError::Capacity)?;
+        }
+        let candidate_emp = if let Some(item) = exchange.displaced_emp {
+            self.emp
+                .prepare_salvage_handover(SalvageEmpLink {
+                    item,
+                    cutter: exchange.cutter,
+                    revision: exchange
+                        .paired_emp_revision(revision)
+                        .ok_or(ModuleError::SequenceExhausted)?,
+                    tick,
+                    visit: exchange.visit,
+                    clock: exchange.clock,
+                    restoring: exchange.restoring,
+                })
+                .map_err(ModuleError::Save)?
+        } else {
+            self.emp.clone()
+        };
+        ledger.validate_budgets(&account, candidate_emp.utility_mounts(), 0)?;
+        let mut modules = self.modular.clone();
+        modules.events.push(event);
+
+        // The full validation joins EMP and modular histories in both directions. Both candidates
+        // must be visible to that read-only validation, and neither can escape on failure.
+        let old_account = self.commander_account.replace(account);
+        let old_emp = core::mem::replace(&mut self.emp, candidate_emp);
+        let old_modules = core::mem::replace(&mut self.modular, modules);
+        if let Err(error) = self.save_bytes() {
+            self.commander_account = old_account;
+            self.emp = old_emp;
+            self.modular = old_modules;
+            return Err(ModuleError::Save(error));
+        }
+        Ok(())
     }
 
     /// Called only at an accepted selected-target work tick. This transfer cannot damage
@@ -408,6 +805,197 @@ mod tests {
         let tick = world.snapshot().tick;
         let review = world.review_module(action, tick).unwrap();
         world.prepare_module(review, tick).unwrap().commit()
+    }
+
+    fn source_id(owner: u64) -> NpcId {
+        let mut writer = Writer::new();
+        writer.u64(owner);
+        writer.u8(1);
+        writer.u16(7);
+        writer.u8(1);
+        NpcId::decode(&mut Reader::new(&writer.bytes)).unwrap()
+    }
+
+    fn exchange_fixture(world: &World, cutter: u64, displaced_emp: Option<u64>) -> (Ledger, Event) {
+        let account = world.commander_account.as_ref().unwrap();
+        let ledger = world.modular.ledger(world, account).unwrap();
+        let source = source_id(world.commander_id().unwrap().seed());
+        let exchange = Exchange {
+            source,
+            cutter,
+            displaced_emp,
+            visit: 2,
+            clock: 1,
+            restoring: false,
+        };
+        let event = Event {
+            xyzzy: false,
+            action: exchange.action(),
+            item: cutter,
+            dock: world.current_dock_context().unwrap(),
+            tick: world.state.tick,
+            revision: account.revision() + if displaced_emp.is_some() { 2 } else { 1 },
+        };
+        (ledger, event)
+    }
+
+    #[test]
+    fn real_maximum_owned_items_form_a_reversible_joint_candidate_without_changing_live_fit() {
+        // The owned property and balance are real MAX state. This exercises the isolated
+        // paired ledger transitions, not a fabricated accepted external source or live lock.
+        let mut world = World::new_commander(31906).unwrap();
+        let review = world.review_xyzzy(XyzzyAction::Enter, 0).unwrap();
+        world.prepare_xyzzy(review, 0).unwrap().commit();
+        let modules = world.modular_equipment_snapshot().unwrap();
+        let cutter = modules
+            .items
+            .iter()
+            .find(|item| item.kind == ModuleKind::SalvageCutter)
+            .unwrap()
+            .id;
+        let emp = world.owned_emp().unwrap();
+        let scoop = world.fitted_fuel_scoops().unwrap().item;
+        let bay = world.equipment_snapshot().unwrap().owned;
+        let before = world.save_bytes().unwrap();
+        let (mut ledger, select) = exchange_fixture(&world, cutter, Some(emp.item));
+        let opening = ledger.fitted(ModuleSlot::UtilitySalvageCutter);
+        assert!(opening.is_none());
+        let exchange = Exchange::from_action(select.action).unwrap();
+        let link = SalvageEmpLink {
+            item: emp.item,
+            cutter,
+            revision: select.revision - 1,
+            tick: select.tick,
+            visit: exchange.visit,
+            clock: exchange.clock,
+            restoring: false,
+        };
+        let suspended = world.emp.prepare_salvage_handover(link).unwrap();
+        assert_eq!(
+            suspended.owned().unwrap(),
+            Some(crate::flight::emp::OwnedEmp {
+                fitted: false,
+                ..emp
+            })
+        );
+        assert!(suspended.matches_salvage_handover(link));
+        ledger.apply(select, 0).unwrap();
+        assert_eq!(
+            ledger.fitted(ModuleSlot::UtilitySalvageCutter).unwrap().id,
+            cutter
+        );
+        assert_eq!(
+            ledger.fitted(ModuleSlot::UtilityFuelScoops).unwrap().id,
+            scoop
+        );
+        assert_eq!(
+            ledger
+                .budget_usage(
+                    world.commander_account.as_ref().unwrap(),
+                    suspended.utility_mounts()
+                )
+                .unwrap()
+                .1,
+            3
+        );
+        assert!(ledger.apply(select, 0).is_err());
+        let restore = Event {
+            action: Exchange {
+                restoring: true,
+                ..exchange
+            }
+            .action(),
+            revision: select.revision + 1,
+            ..select
+        };
+        ledger.apply(restore, 0).unwrap();
+        let restored = suspended
+            .prepare_salvage_handover(SalvageEmpLink {
+                revision: restore.revision + 1,
+                restoring: true,
+                ..link
+            })
+            .unwrap();
+        assert_eq!(restored.owned().unwrap(), Some(emp));
+        assert!(ledger.fitted(ModuleSlot::UtilitySalvageCutter).is_none());
+        assert_eq!(
+            ledger.fitted(ModuleSlot::UtilityFuelScoops).unwrap().id,
+            scoop
+        );
+        assert_eq!(world.equipment_snapshot().unwrap().owned, bay);
+        assert_eq!(world.save_bytes().unwrap(), before);
+        assert!(world.restore_auto_salvage_tool().is_ok());
+        assert!(world.select_auto_salvage_tool(source_id(31906)).is_err());
+        assert_eq!(world.save_bytes().unwrap(), before);
+    }
+
+    #[test]
+    fn paid_stored_cutter_free_mount_candidate_keeps_actual_scoop_and_targeting() {
+        let mut world = crate::flight::equipment::tests::earned_world(31907);
+        let cutter = apply(
+            &mut world,
+            ModuleAction::Purchase {
+                kind: ModuleKind::SalvageCutter,
+            },
+        );
+        apply(&mut world, ModuleAction::Store { item: cutter });
+        let tick = world.state.tick;
+        let review = world.review_xyzzy(XyzzyAction::Enter, tick).unwrap();
+        world.prepare_xyzzy(review, tick).unwrap().commit();
+        let owned = world
+            .modular_equipment_snapshot()
+            .unwrap()
+            .items
+            .into_iter()
+            .find(|item| item.kind == ModuleKind::SalvageCutter)
+            .unwrap();
+        assert_eq!(owned.id, cutter);
+        assert!(matches!(owned.provenance, ModuleProvenance::Paid { .. }));
+        assert!(owned.slot.is_none());
+        // The actual paid item has not been re-granted; free a real non-scoop mount at berth.
+        let emp = world.owned_emp().unwrap();
+        let tick = world.state.tick;
+        let review = world
+            .review_emp_equipment(crate::EmpEquipmentAction::Store { item: emp.item }, tick)
+            .unwrap();
+        world.prepare_emp_equipment(review, tick).unwrap().commit();
+        let (mut ledger, select) = exchange_fixture(&world, cutter, None);
+        ledger.apply(select, 0).unwrap();
+        assert_eq!(
+            ledger.fitted(ModuleSlot::UtilitySalvageCutter).unwrap().id,
+            cutter
+        );
+        assert!(ledger.fitted(ModuleSlot::UtilityFuelScoops).is_some());
+        assert_eq!(
+            ledger
+                .budget_usage(world.commander_account.as_ref().unwrap(), 0)
+                .unwrap()
+                .1,
+            3
+        );
+        let exchange = Exchange::from_action(select.action).unwrap();
+        ledger
+            .apply(
+                Event {
+                    action: Exchange {
+                        restoring: true,
+                        ..exchange
+                    }
+                    .action(),
+                    revision: select.revision + 1,
+                    ..select
+                },
+                0,
+            )
+            .unwrap();
+        assert!(ledger.fitted(ModuleSlot::UtilitySalvageCutter).is_none());
+        assert_eq!(
+            ledger
+                .budget_usage(world.commander_account.as_ref().unwrap(), 0)
+                .unwrap()
+                .1,
+            2
+        );
     }
 
     #[test]

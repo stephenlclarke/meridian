@@ -178,10 +178,14 @@ impl State {
             events.push((clock, 0_u8, Change::Boundary));
         }
         for event in self.equipment.iter() {
-            let clock = world
-                .damage
-                .berth_clock(event.dock.sequence())
-                .ok_or(INVALID)?;
+            let clock = if let Some(flight) = event.flight {
+                flight.clock
+            } else {
+                world
+                    .damage
+                    .berth_clock(event.dock.sequence())
+                    .ok_or(INVALID)?
+            };
             events.push((clock, 1, Change::Equipment(*event)));
         }
         for (clock, stage) in modular.emp_energy_changes(world)? {

@@ -275,6 +275,9 @@ impl Profile {
                 meridian_core::ModuleAction::GrantStoredSalvageCutter => {
                     "Salvage Cutter grant is available only through the explicit test outfit."
                 }
+                meridian_core::ModuleAction::FlightSalvageExchange { .. } => {
+                    "Temporary salvage fit is controlled by the selected lawful recovery."
+                }
                 meridian_core::ModuleAction::Store { .. } => "Owned module stored.",
                 meridian_core::ModuleAction::Install { .. } => "Owned module fitted.",
                 meridian_core::ModuleAction::Passenger(action) => match action {
