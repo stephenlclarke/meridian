@@ -3,7 +3,8 @@
   "id": "sh067-rhinoceros-trader",
   "undoBefore": [
     "scanner-preview",
-    "sh066-rabbit-explorer"
+    "sh066-rabbit-explorer",
+    "sh171-medusa-preview"
   ],
   "undoAfter": [],
   "kind": "declaration",

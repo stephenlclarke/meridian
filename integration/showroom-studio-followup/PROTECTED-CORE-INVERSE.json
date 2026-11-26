@@ -1,43 +1,43 @@
 {
-  "base": "9d82467c8062c0ed31edf37e4e29e485dbdc2359",
+  "base": "a8a0b94ca63acac75c7b92a5e3ce9d81bfbd6622",
   "files": {
     "flight.rs": {
-      "beforeSHA256": "3a7c020b4eef43b6c4a7ccf8db5cdb0e126451b3d94117cbfcfc460acbcc1365",
-      "afterSHA256": "9bd3427dae45fbf7c268d53d8a7b06e811f8f91f39167aaab3285a378b981816",
+      "beforeSHA256": "ec32d85a50a574e78d6903c17e51b8f19b76efbaf97fa3bd8603035babb802cc",
+      "afterSHA256": "ae570d2762ca795792238753202179829cbdc893dccbcf9f6fe02550e9d7ac30",
       "hunks": [
         {
-          "offset": 547,
+          "offset": 627,
           "before": "",
           "after": "pub use goshawk_validation::PeregrineMkIApproachSnapshot;\n"
         }
       ]
     },
     "lib.rs": {
-      "beforeSHA256": "955fb67afbfe6bfcb2678ebb1a0aeb3e2aaff03afadd3edb662a95157d55bce4",
-      "afterSHA256": "57fd76ba1752eeb4273bd660c832d440c4f97ec9f4583411bd3b8869859672b7",
+      "beforeSHA256": "df1869ef81ffff411cb56fb514a1d11a68ed94b4890e5e50a361e192f316656a",
+      "afterSHA256": "f39cd46afc4bbaabb6006bdbe3dcb51e966ab292eb22144b91129895811e9d0c",
       "hunks": [
         {
-          "offset": 526,
+          "offset": 564,
           "before": "",
           "after": "pub mod hull_package;\n"
         },
         {
-          "offset": 579,
+          "offset": 617,
           "before": "",
           "after": "pub mod kite_interceptor;\n"
         },
         {
-          "offset": 726,
+          "offset": 764,
           "before": "",
           "after": "pub mod peregrine_mk3;\npub mod peregrine_mk_i;\n"
         },
         {
-          "offset": 867,
+          "offset": 932,
           "before": "",
           "after": "pub mod sparrowhawk;\n"
         },
         {
-          "offset": 1074,
+          "offset": 1139,
           "before": "",
           "after": "pub use flight::PeregrineMkIApproachSnapshot;\n"
         }
