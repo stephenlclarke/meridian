@@ -26,6 +26,7 @@ pub struct Cockpit {
     pub heat: Option<f32>,
     pub fuel: Option<f32>,
     pub solar: Option<SolarSnapshot>,
+    pub solar_limited: bool,
     pub missiles: usize,
     pub armed: bool,
     pub locked: bool,
@@ -79,6 +80,7 @@ impl Cockpit {
                 .navigation
                 .map(|n| f32::from(n.fuel_units) / f32::from(n.fuel_capacity_units)),
             solar: world.solar_snapshot(),
+            solar_limited: world.solar_history_limited(),
             missiles: world
                 .missile_rounds()
                 .map_or(0, |rounds| rounds.iter().flatten().count()),
@@ -107,6 +109,9 @@ impl Cockpit {
         }
         if solar.cabin_temperature >= 0.75 {
             return Some(("CABIN DANGER - LEAVE CORONA", RED));
+        }
+        if self.solar_limited {
+            return Some(("SOLAR HISTORY LIMIT - KEEP CLEAR", YELLOW));
         }
         match solar.status {
             SolarScoopStatus::Inactive => None,

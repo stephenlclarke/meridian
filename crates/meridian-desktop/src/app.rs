@@ -886,6 +886,9 @@ impl App {
                         "Asteroid hull contact: stopped at last clear position"
                     }
                     MotionRefusal::NpcContact => "NPC hull contact: stopped at last clear position",
+                    MotionRefusal::SolarHistoryLimit => {
+                        "Solar history limit: steer clear of the corona"
+                    }
                     MotionRefusal::StationContact => {
                         "Station contact: stopped at last clear position"
                     }

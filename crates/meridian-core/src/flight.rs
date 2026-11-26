@@ -567,7 +567,7 @@ impl World {
         let input = if self.emp.electrical_disabled() {
             FlightInput::default()
         } else {
-            input
+            self.solar.escape_control(self).unwrap_or(input)
         };
         if self.combat_snapshot().is_some_and(|s| s.player.destroyed) {
             return Err(StepError::InvalidMode);
@@ -608,6 +608,13 @@ impl World {
         }
         if !next.speed.is_finite() || next.position.iter().any(|value| !value.is_finite()) {
             return Err(StepError::NonFiniteState);
+        }
+        if self.solar.blocks_entry(self, next) {
+            let mut stopped = self.state;
+            stopped.tick = next.tick;
+            stopped.speed = 0.0;
+            stopped.motion_refusal = Some(MotionRefusal::SolarHistoryLimit);
+            return self.publish_step(stopped, Some(solar::Motion::Stopped));
         }
         if self.celestial_blocks_motion(next.position) {
             let mut stopped = self.state;

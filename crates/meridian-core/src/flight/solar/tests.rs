@@ -316,3 +316,208 @@ fn real_unfitted_approach_overheats_and_destroys_without_granting_fuel() {
     assert_eq!(cold.solar_snapshot(), world.solar_snapshot());
     assert_eq!(cold.combat_snapshot(), world.combat_snapshot());
 }
+
+fn outward_target(world: &World) -> Vec3 {
+    let p = world.snapshot().position;
+    let sun = world.celestial_snapshot().unwrap().sun.position;
+    Vec3::new(
+        2.0 * f64::from(p[0]) - sun.x,
+        2.0 * f64::from(p[1]) - sun.y,
+        2.0 * f64::from(p[2]) - sun.z,
+    )
+}
+
+#[test]
+fn current_heat_only_trailer_removal_refuses_but_exact_legacy_airborne_continues() {
+    let mut world = World::new_commander(18301).unwrap();
+    solar_approach(&mut world);
+    assert!(world.solar_snapshot().unwrap().cabin_temperature > 0.0);
+    assert!(world.solar.receipts.is_empty());
+    let before = world.save_bytes().unwrap();
+    let removed =
+        super::super::persistence::solar_trailer_removed_test_input(&world, false).unwrap();
+    assert!(World::from_save_bytes(&removed).is_err());
+    assert!(world.restore_bytes(&removed).is_err());
+    assert_eq!(world.save_bytes().unwrap(), before);
+    let genuine_legacy =
+        super::super::persistence::solar_trailer_removed_test_input(&world, true).unwrap();
+    let mut legacy = World::from_save_bytes(&genuine_legacy).unwrap();
+    assert_eq!(legacy.snapshot(), world.snapshot());
+    assert_eq!(legacy.solar_snapshot(), Some(SolarSnapshot::default()));
+    assert!(legacy.solar.legacy_origin.is_some());
+    legacy.step(FlightInput::default()).unwrap();
+    assert!(legacy.solar_snapshot().unwrap().cabin_temperature > 0.0);
+    assert!(World::from_save_bytes(&legacy.save_bytes().unwrap()).is_ok());
+}
+
+#[test]
+fn removing_even_exterior_steps_from_a_same_visit_trace_refuses() {
+    let mut world = World::new_commander(18302).unwrap();
+    solar_approach(&mut world);
+    let outward = outward_target(&world);
+    aim_3d(&mut world, outward);
+    for _ in 0..1200 {
+        cruise(&mut world, 34.3);
+        if ratio(&world) > 4.05 {
+            break;
+        }
+    }
+    assert!(ratio(&world) > 4.05);
+    for yaw in [0.2, -0.2, 0.3, -0.3] {
+        world
+            .step(FlightInput {
+                yaw,
+                ..FlightInput::default()
+            })
+            .unwrap();
+    }
+    let bytes = world.save_bytes().unwrap();
+    let mut forged = World::from_save_bytes(&bytes).unwrap();
+    let sun = world.celestial_snapshot().unwrap().sun;
+    let remove = forged
+        .solar
+        .runs
+        .iter()
+        .enumerate()
+        .find(|(i, run)| {
+            *i > 0
+                && *i + 1 < forged.solar.runs.len()
+                && run.opening.frame.ratio_and_nose(sun).0 > THERMAL_LIMIT
+        })
+        .map(|(i, _)| i)
+        .unwrap();
+    Arc::make_mut(&mut forged.solar.runs).remove(remove);
+    assert!(forged.save_bytes().is_err());
+    assert!(
+        world
+            .restore_bytes(&forged.unchecked_test_save().unwrap())
+            .is_err()
+    );
+    assert_eq!(world.save_bytes().unwrap(), bytes);
+}
+
+#[test]
+fn proof_reserves_real_outward_steps_and_allows_safe_flight_after_exhaustion() {
+    assert!(!State::limit_for(0, 0, SOFT_PROOF_BYTES - 1));
+    assert!(State::limit_for(0, 0, SOFT_PROOF_BYTES));
+    assert!(State::limit_for(SOURCE_MAX_RUNS - EXIT_RUN_RESERVE, 0, 0));
+    assert!(State::limit_for(0, MAX_REPLAY_STEPS - EXIT_STEP_RESERVE, 0));
+    let mut world = World::new_commander(18303).unwrap();
+    solar_approach(&mut world);
+    stop(&mut world);
+    assert!(ratio(&world) <= THERMAL_LIMIT);
+    for index in 0..1000 {
+        let yaw = if index % 2 == 0 { 0.1 } else { -0.1 };
+        world
+            .step(FlightInput {
+                yaw,
+                ..FlightInput::default()
+            })
+            .unwrap();
+        if world.solar_history_limited() {
+            break;
+        }
+    }
+    assert!(world.solar_history_limited());
+    assert!(!world.solar.sealed);
+    let opening = world.solar.encoded_len();
+    assert!(opening >= SOFT_PROOF_BYTES);
+    let mut cold = World::from_save_bytes(&world.save_bytes().unwrap()).unwrap();
+    for _ in 0..EXIT_STEP_RESERVE {
+        if world.solar.sealed {
+            break;
+        }
+        let inward_command = FlightInput {
+            brake: true,
+            ..FlightInput::default()
+        };
+        world.step(inward_command).unwrap();
+        cold.step(inward_command).unwrap();
+    }
+    assert!(world.solar.sealed);
+    assert!(ratio(&world) > THERMAL_LIMIT);
+    assert!(!world.combat_snapshot().unwrap().player.destroyed);
+    assert_eq!(cold.snapshot(), world.snapshot());
+    assert!(world.solar.encoded_len() - opening < EXIT_RUN_RESERVE * 99);
+    assert!(World::from_save_bytes(&world.save_bytes().unwrap()).is_ok());
+    let sun = world.celestial_snapshot().unwrap().sun.position;
+    aim_3d(&mut world, sun);
+    for _ in 0..1200 {
+        cruise(&mut world, 34.3);
+        if world.snapshot().motion_refusal == Some(crate::MotionRefusal::SolarHistoryLimit) {
+            break;
+        }
+    }
+    assert_eq!(
+        world.snapshot().motion_refusal,
+        Some(crate::MotionRefusal::SolarHistoryLimit)
+    );
+    assert!(ratio(&world) > THERMAL_LIMIT);
+    let proof = world.solar.encoded_len();
+    let orientation = world.snapshot().orientation;
+    world
+        .step(FlightInput {
+            yaw: 1.0,
+            ..FlightInput::default()
+        })
+        .unwrap();
+    assert_ne!(world.snapshot().orientation, orientation);
+    assert_eq!(world.snapshot().motion_refusal, None);
+    assert_eq!(world.solar.encoded_len(), proof);
+    world
+        .request_jump(SystemId::RENAS, world.snapshot().tick)
+        .unwrap();
+    for _ in 0..crate::navigation::BASIC_SPOOL_TICKS {
+        world.step(FlightInput::default()).unwrap();
+    }
+    assert_eq!(world.snapshot().navigation.unwrap().system, SystemId::RENAS);
+    crate::flight::missiles::tests::dock(&mut world);
+    assert_eq!(world.snapshot().mode, FlightMode::Docked);
+    assert!(world.solar_history_limited());
+    let mut continued = World::from_save_bytes(&world.save_bytes().unwrap()).unwrap();
+    launch(&mut continued);
+    assert_eq!(continued.snapshot().mode, FlightMode::Flight);
+    assert!(continued.solar_history_limited());
+    assert!(!World::new_commander(18305).unwrap().solar_history_limited());
+}
+
+#[test]
+fn fitted_partially_charged_emp_keeps_actual_final_transfer_when_solar_heat_kills() {
+    use crate::{EmpAxis, EmpEquipmentAction};
+    let mut world = earned_world(18304);
+    let fit = |world: &mut World, command| {
+        let tick = world.snapshot().tick;
+        let review = world.review_emp_equipment(command, tick).unwrap();
+        world.prepare_emp_equipment(review, tick).unwrap().commit();
+    };
+    fit(&mut world, EmpEquipmentAction::Purchase);
+    let item = world.owned_emp().unwrap().item;
+    for _ in 0..2 {
+        fit(
+            &mut world,
+            EmpEquipmentAction::Upgrade {
+                item,
+                axis: EmpAxis::Capacity,
+            },
+        );
+    }
+    solar_approach(&mut world);
+    let mut final_before = 0.0;
+    for _ in 0..1500 {
+        if world.combat_snapshot().unwrap().player.destroyed {
+            break;
+        }
+        final_before = world.emp_snapshot().unwrap().bank_energy;
+        if ratio(&world) > 1.95 {
+            cruise(&mut world, 34.3);
+        } else {
+            cruise(&mut world, 0.0);
+        }
+    }
+    assert_eq!(world.solar_snapshot().unwrap().cabin_temperature, 1.0);
+    let emp = world.emp_snapshot().unwrap();
+    assert!(emp.bank_energy > final_before && emp.bank_energy < emp.bank_capacity);
+    let cold = World::from_save_bytes(&world.save_bytes().unwrap()).unwrap();
+    assert_eq!(cold.emp_snapshot(), Some(emp));
+    assert_eq!(cold.combat_snapshot(), world.combat_snapshot());
+}

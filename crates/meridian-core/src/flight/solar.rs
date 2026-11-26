@@ -18,6 +18,13 @@ const NOSE_THRESHOLD: f64 = 0.8;
 const SOURCE_MAX_RUNS: usize = crate::save::MAX_SAVE_BYTES / 99;
 const MAX_REPLAY_STEPS: u64 = 250_000;
 const MAX_RUN_STEPS: u16 = 600;
+// Keep a separately reserved tail for an actual outward flight rather than
+// consuming the last representable step while the commander is in the corona.
+const EXIT_RUN_RESERVE: usize = 96;
+const EXIT_STEP_RESERVE: u64 = 6000;
+const SOFT_PROOF_BYTES: usize = 24_000;
+const AGGREGATE_SOFT_BYTES: usize = crate::save::MAX_SAVE_BYTES - 14_000;
+const AGGREGATE_SHRINK_ALLOWANCE: usize = 4096;
 
 #[derive(Debug, Clone, Copy, Default, PartialEq, Eq)]
 pub enum SolarScoopStatus {
@@ -208,6 +215,8 @@ pub(super) struct State {
     receipts: Arc<Vec<Receipt>>,
     last: Option<Last>,
     legacy_origin: Option<Anchor>,
+    sealed: bool,
+    external_limit: bool,
 }
 impl State {
     pub(super) fn current(&self, mode: FlightMode, visit: u64, clock: u64) -> SolarSnapshot {
@@ -237,8 +246,110 @@ impl State {
             .filter(|last| last.condition.cabin_temperature >= 1.0)
             .map(|last| last.anchor.clock)
     }
+    #[cfg(test)]
+    pub(in crate::flight) fn phase_fixture(world: &World) -> Option<Self> {
+        // Only the isolated cross-producer ordering test uses this marker; it deliberately
+        // does not claim a valid solar flight trace or allow a whole-world save.
+        let identity = world.combat_identity()?;
+        Some(Self {
+            last: Some(Last {
+                anchor: Self::anchor(
+                    world.state,
+                    identity.system,
+                    identity.visit,
+                    world.combat.physical_tick(),
+                ),
+                fuel: 0,
+                revision: 0,
+                condition: SolarSnapshot {
+                    cabin_temperature: 1.0,
+                    ..SolarSnapshot::default()
+                },
+            }),
+            ..Self::default()
+        })
+    }
     pub(super) fn is_empty(&self) -> bool {
         self.runs.is_empty() && self.legacy_origin.is_none()
+    }
+    fn steps(&self) -> u64 {
+        self.runs.iter().map(|run| u64::from(run.steps)).sum()
+    }
+    fn soft_limit(&self) -> bool {
+        self.external_limit || Self::limit_for(self.runs.len(), self.steps(), self.encoded_len())
+    }
+    fn limit_for(runs: usize, steps: u64, bytes: usize) -> bool {
+        runs >= SOURCE_MAX_RUNS - EXIT_RUN_RESERVE
+            || steps >= MAX_REPLAY_STEPS - EXIT_STEP_RESERVE
+            || bytes >= SOFT_PROOF_BYTES
+    }
+    fn egress_input(frame: MotionFrame, sun: Body) -> Option<FlightInput> {
+        let pose = crate::station::flight_pose(frame.position, frame.orientation)?;
+        let away = pose
+            .orientation
+            .inverse_coordinates(crate::docking::Vec3::new(
+                pose.position.x - sun.position.x,
+                pose.position.y - sun.position.y,
+                pose.position.z - sun.position.z,
+            ));
+        let yaw = away.x.atan2(away.z);
+        let pitch = away.y.atan2(away.x.hypot(away.z));
+        // A dead band wider than a full per-tick turn prevents alternating controls.
+        // Brake until radial orientation, then accelerate outward without teleporting.
+        const ALIGNED: f64 = 0.025;
+        Some(if yaw.abs() > ALIGNED {
+            FlightInput {
+                yaw: yaw.signum() as f32,
+                brake: true,
+                ..FlightInput::default()
+            }
+        } else if pitch.abs() > ALIGNED {
+            FlightInput {
+                pitch: pitch.signum() as f32,
+                brake: true,
+                ..FlightInput::default()
+            }
+        } else {
+            FlightInput {
+                throttle: 1.0,
+                ..FlightInput::default()
+            }
+        })
+    }
+    pub(super) fn escape_control(&self, world: &World) -> Option<FlightInput> {
+        if self.sealed || !self.soft_limit() || world.state.mode != FlightMode::Flight {
+            return None;
+        }
+        let identity = world.combat_identity()?;
+        let sun = Self::sun(world, identity.system, identity.visit, world.state.tick).ok()?;
+        let frame = MotionFrame::from(world.state);
+        if frame.ratio_and_nose(sun).0 <= THERMAL_LIMIT {
+            Self::egress_input(frame, sun)
+        } else {
+            None
+        }
+    }
+    pub(super) fn blocks_entry(&self, world: &World, next: Snapshot) -> bool {
+        if world.state.mode != FlightMode::Flight || !world.damage.enabled() {
+            return false;
+        }
+        let Some(identity) = world.combat_identity() else {
+            return false;
+        };
+        let Ok(sun) = Self::sun(world, identity.system, identity.visit, world.state.tick) else {
+            return false;
+        };
+        let entering = MotionFrame::from(next).ratio_and_nose(sun).0 <= THERMAL_LIMIT;
+        if !entering {
+            return false;
+        }
+        if self.sealed {
+            return true;
+        }
+        MotionFrame::from(world.state).ratio_and_nose(sun).0 > THERMAL_LIMIT
+            && world
+                .encoded_current_size()
+                .is_ok_and(|size| size >= AGGREGATE_SOFT_BYTES)
     }
     fn sun(world: &World, system: SystemId, visit: u64, tick: u64) -> Result<Body, SaveError> {
         let catalogue = world.navigation_catalogue.as_ref().ok_or(INVALID)?;
@@ -285,7 +396,24 @@ impl State {
         let after = Self::anchor(next, nav.system, nav.visit, clock);
         let sun = Self::sun(world, nav.system, nav.visit, next.tick)?;
         let (ratio, nose) = after.frame.ratio_and_nose(sun);
-        if ratio > THERMAL_LIMIT {
+        if self.sealed {
+            if ratio <= THERMAL_LIMIT {
+                return Err(INVALID);
+            }
+            return Ok((self.clone(), 0));
+        }
+        // Once a visit has a solar opening, retain every subsequent accepted exterior
+        // step as well. A re-entry can no longer insert an independently invented pose.
+        let tracked = self.last.is_some_and(|last| last.anchor.visit == nav.visit)
+            || self
+                .legacy_origin
+                .is_some_and(|origin| origin.visit == nav.visit);
+        if ratio > THERMAL_LIMIT && !tracked {
+            if self.soft_limit() {
+                let mut sealed = self.clone();
+                sealed.sealed = true;
+                return Ok((sealed, 0));
+            }
             return Ok((self.clone(), 0));
         }
         if !ratio.is_finite() || ratio <= 1.0 || !nose.is_finite() {
@@ -325,13 +453,7 @@ impl State {
         } else {
             revision.checked_add(1).ok_or(INVALID)?
         };
-        if self
-            .runs
-            .iter()
-            .map(|run| u64::from(run.steps))
-            .sum::<u64>()
-            >= MAX_REPLAY_STEPS
-        {
+        if self.steps() >= MAX_REPLAY_STEPS {
             return Err(SaveError::TooLarge);
         }
         let mut state = self.clone();
@@ -374,10 +496,22 @@ impl State {
             revision: next_revision,
             condition,
         });
+        if !state.soft_limit() {
+            let growth = state.encoded_len().saturating_sub(self.encoded_len());
+            let total = world
+                .encoded_current_size()?
+                .checked_add(growth)
+                .ok_or(INVALID)?;
+            state.external_limit = total >= AGGREGATE_SOFT_BYTES;
+        }
+        if ratio > THERMAL_LIMIT && state.soft_limit() {
+            state.sealed = true;
+        }
         Ok((state, gained))
     }
     pub(super) fn initialize_legacy_origin(&mut self, world: &World) -> Result<(), SaveError> {
-        if !world.damage.enabled() || world.state.mode != FlightMode::Flight {
+        if !world.damage.enabled() || world.state.mode != FlightMode::Flight || !world.pulse.alive()
+        {
             return Ok(());
         }
         let identity = world.combat_identity().ok_or(INVALID)?;
@@ -407,6 +541,9 @@ impl World {
             self.solar
                 .current(self.state.mode, identity.visit, self.combat.physical_tick()),
         )
+    }
+    pub fn solar_history_limited(&self) -> bool {
+        self.solar.sealed || self.solar.soft_limit()
     }
 }
 

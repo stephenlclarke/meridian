@@ -252,13 +252,12 @@ impl State {
             .prepare_emp_discharge()
             .is_ok())
     }
-    pub(super) fn alive_before_commands(&self, world: &World) -> Result<bool, SaveError> {
+    /// EMP transfer/release happens inside the accepted physical step, before solar heat.
+    pub(super) fn alive_before_emp_step(&self, world: &World) -> Result<bool, SaveError> {
         let dock = world.navigation.ok_or(INVALID)?.dock_sequence();
         let end = world.combat.physical_tick();
         let mut events = self.resource_events(world, dock)?;
-        events.retain(|&(clock, phase, _, effect)| {
-            clock < end || phase < 3 || matches!(effect, Effect::SolarFatal)
-        });
+        events.retain(|&(clock, phase, _, _)| clock < end || phase < 3);
         Ok(replay(&events, end)?.pulse.alive())
     }
     fn resource_events(

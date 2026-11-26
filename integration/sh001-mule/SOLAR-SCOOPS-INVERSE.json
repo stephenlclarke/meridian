@@ -3,7 +3,7 @@
   "files": {
     "flight.rs": {
       "beforeSHA256": "62471ae9a52e13e16a239900827724e3fe155dd39ef16024497466d4a26320d5",
-      "afterSHA256": "b325541e78567bfd3e2f57af2d9873ff95ec4a48c446493879fa9ad7776874c1",
+      "afterSHA256": "283485adc6b701323d2e00b9bd73d64ccb5e97036e6c99a9918c1d6b46944c3e",
       "hunks": [
         {
           "offset": 237,
@@ -21,62 +21,72 @@
           "after": "            solar: solar::State::default(),\n"
         },
         {
-          "offset": 22930,
+          "offset": 22463,
+          "before": "            input\n",
+          "after": "            self.solar.escape_control(self).unwrap_or(input)\n"
+        },
+        {
+          "offset": 22973,
           "before": "            return self.publish_step(next);\n",
           "after": "            return self.publish_step(next, None);\n"
         },
         {
-          "offset": 24500,
+          "offset": 24297,
+          "before": "",
+          "after": "        if self.solar.blocks_entry(self, next) {\n            let mut stopped = self.state;\n            stopped.tick = next.tick;\n            stopped.speed = 0.0;\n            stopped.motion_refusal = Some(MotionRefusal::SolarHistoryLimit);\n            return self.publish_step(stopped, Some(solar::Motion::Stopped));\n        }\n"
+        },
+        {
+          "offset": 24869,
           "before": "            return self.publish_step(stopped);\n",
           "after": "            return self.publish_step(stopped, Some(solar::Motion::Stopped));\n"
         },
         {
-          "offset": 25419,
+          "offset": 25788,
           "before": "                return self.publish_step(stopped);\n",
           "after": "                return self.publish_step(stopped, Some(solar::Motion::Stopped));\n"
         },
         {
-          "offset": 25792,
+          "offset": 26161,
           "before": "                return self.publish_step(stopped);\n",
           "after": "                return self.publish_step(stopped, Some(solar::Motion::Stopped));\n"
         },
         {
-          "offset": 26489,
+          "offset": 26858,
           "before": "                    return self.publish_step(stopped);\n",
           "after": "                    return self.publish_step(stopped, Some(solar::Motion::Stopped));\n"
         },
         {
-          "offset": 27040,
+          "offset": 27409,
           "before": "                    return self.publish_step(stopped);\n",
           "after": "                    return self.publish_step(stopped, Some(solar::Motion::Stopped));\n"
         },
         {
-          "offset": 27215,
+          "offset": 27584,
           "before": "        self.publish_step(next)\n",
           "after": "        self.publish_step(next, Some(solar::Motion::Active(input)))\n"
         },
         {
-          "offset": 27776,
+          "offset": 28145,
           "before": "    fn publish_step(&mut self, mut next: Snapshot) -> Result<(), StepError> {\n",
           "after": "    fn publish_step(\n        &mut self,\n        mut next: Snapshot,\n        motion: Option<solar::Motion>,\n    ) -> Result<(), StepError> {\n"
         },
         {
-          "offset": 33028,
+          "offset": 33397,
           "before": "",
           "after": "        let (solar, gained_fuel) = self\n            .solar\n            .prepare(\n                self,\n                next,\n                navigation,\n                prepared.combat.physical_tick(),\n                motion,\n                prepared.pulse.alive(),\n            )\n            .map_err(|_| StepError::TickOverflow)?;\n        if solar.fatal_clock() == Some(prepared.combat.physical_tick()) {\n            prepared.pulse.damage_energy(u16::MAX);\n            self.clear_missing_missile_lock(\n                &mut prepared.missiles,\n                &prepared.traffic,\n                prepared.practice,\n                false,\n            );\n        }\n        let solar_account = if gained_fuel == 0 {\n            None\n        } else {\n            if planned_debit.is_some() {\n                return Err(StepError::NonFiniteState);\n            }\n            Some(\n                self.commander_account\n                    .as_ref()\n                    .ok_or(StepError::NonFiniteState)?\n                    .prepare_solar_fuel(gained_fuel)\n                    .map_err(|_| StepError::NonFiniteState)?,\n            )\n        };\n"
         },
         {
-          "offset": 34742,
+          "offset": 35111,
           "before": "            (&damage, &mining, &emp.state),\n",
           "after": "            (&damage, &mining, &emp.state, &solar),\n"
         },
         {
-          "offset": 35141,
+          "offset": 35510,
           "before": "",
           "after": "        }\n        if let Some(account) = solar_account {\n            self.commander_account = Some(account);\n"
         },
         {
-          "offset": 35938,
+          "offset": 36307,
           "before": "",
           "after": "        self.solar = solar;\n"
         }
@@ -84,30 +94,30 @@
     },
     "flight/damage.rs": {
       "beforeSHA256": "45040a25302931b577c971cf17cd474470da07732bcd36e95391ec012de82cc6",
-      "afterSHA256": "920dbb9b710d23567ea22259db9d20316c3ed5c0f90c07bb1f482458cbb0d993",
+      "afterSHA256": "4dc1b948a8dc704c315aac0f8be2642c1828ac41415062087058cdc4cb85c2ae",
       "hunks": [
         {
-          "offset": 9248,
-          "before": "        events.retain(|&(clock, phase, _, _)| clock < end || phase < 3);\n",
-          "after": "        events.retain(|&(clock, phase, _, effect)| {\n            clock < end || phase < 3 || matches!(effect, Effect::SolarFatal)\n        });\n"
+          "offset": 8979,
+          "before": "    pub(super) fn alive_before_commands(&self, world: &World) -> Result<bool, SaveError> {\n",
+          "after": "    /// EMP transfer/release happens inside the accepted physical step, before solar heat.\n    pub(super) fn alive_before_emp_step(&self, world: &World) -> Result<bool, SaveError> {\n"
         },
         {
-          "offset": 11487,
+          "offset": 11509,
           "before": "",
           "after": "        if let Some(clock) = world.solar.fatal_clock() {\n            if clock != end\n                || events.iter().any(|&(at, _, _, effect)| {\n                    at == clock && matches!(effect, Effect::Laser(_) | Effect::Mining)\n                })\n            {\n                return Err(INVALID);\n            }\n            events.push((clock, 4, 0, Effect::SolarFatal));\n        }\n"
         },
         {
-          "offset": 12452,
+          "offset": 12474,
           "before": "",
           "after": "                && world.solar.fatal_clock().is_none()\n"
         },
         {
-          "offset": 16304,
+          "offset": 16326,
           "before": "",
           "after": "    SolarFatal,\n"
         },
         {
-          "offset": 18271,
+          "offset": 18293,
           "before": "",
           "after": "            Effect::SolarFatal => {\n                if !pools.pulse.alive() {\n                    return Err(INVALID);\n                }\n                pools.pulse.damage_energy(u16::MAX);\n            }\n"
         }
@@ -139,14 +149,30 @@
         }
       ]
     },
+    "flight/emp/replay.rs": {
+      "beforeSHA256": "83518a3ee5426ad1f5079f9a4e5ed6e0e1a2d36fd97c07781bcb30ca01ed34d2",
+      "afterSHA256": "d8276192e14e2dbc21e1ac3df3ea2e762930e0d11c4477a54c32e8acc6efcf9c",
+      "hunks": [
+        {
+          "offset": 5213,
+          "before": "        if end > 0 && !world.damage.alive_before_commands(world)? {\n",
+          "after": "        if end > 0 && !world.damage.alive_before_emp_step(world)? {\n"
+        }
+      ]
+    },
     "flight/emp/tests.rs": {
       "beforeSHA256": "fab141eb5b07b2d8f8d8b70e13656e2cf11504f4206fb2e5d3524b910b1e2d2a",
-      "afterSHA256": "f130418871dbee176e4fd5e788db4313120bb6bbafc74dae7306b325995a1de2",
+      "afterSHA256": "e34a283b8bb06bb15ae093478afafd45980119e51e053d728a76485422def96e",
       "hunks": [
         {
           "offset": 24273,
           "before": "",
           "after": "        solar: w.solar.clone(),\n"
+        },
+        {
+          "offset": 26962,
+          "before": "",
+          "after": "    // A solar terminal effect occurs after this actual admitted release. It must not\n    // generate a second FinalDeath special event or suppress its accepted discharge.\n    // The cross-phase marker is intentionally an isolated ordering fixture; solar's\n    // real fatal-flight test separately proves full cold publication with fitted EMP.\n    let previous_solar = w.solar.clone();\n    w.solar = crate::flight::solar::State::phase_fixture(&w).unwrap();\n    assert!(w.damage.alive_before_emp_step(&w).unwrap());\n    w.emp.replay_meter(&w, &w.modular).unwrap();\n    w.solar = previous_solar;\n"
         }
       ]
     },
@@ -194,7 +220,7 @@
     },
     "flight/persistence.rs": {
       "beforeSHA256": "69f972ef162a618a50a3ce7e295702a5cf3c4afe99ff99abfbe85eb19978f70e",
-      "afterSHA256": "3d20a9c13a38539748f22bf2f6c8093ed899c0dd6ead80265d40f2f890dcf579",
+      "afterSHA256": "40b9d2b3ae841a5d616fabc696d9b3ad058277a4d4c294fb46bcad5786306c5f",
       "hunks": [
         {
           "offset": 855,
@@ -202,59 +228,94 @@
           "after": "const SOLAR_EXTENSION: &[u8; 8] = b\"MSOL0001\";\n"
         },
         {
-          "offset": 12391,
+          "offset": 3140,
           "before": "",
-          "after": "        if !self.solar.is_empty() {\n            w.bytes.extend(SOLAR_EXTENSION);\n            self.solar.encode(&mut w);\n        }\n"
+          "after": "    checksum(&bytes)\n}\n\n/// Distinguish genuine pre-solar v17 saves from current saves independently of the trailer.\nfn solar_content_fingerprint(has_history: bool) -> u64 {\n    let mut bytes = compiled_content_fingerprint(CONTENT).to_le_bytes().to_vec();\n    bytes.extend(b\"solar-history/v1\");\n    bytes.push(u8::from(has_history));\n"
         },
         {
-          "offset": 16551,
+          "offset": 11165,
+          "before": "        w.u64(compiled_content_fingerprint(CONTENT));\n",
+          "after": "        w.u64(solar_content_fingerprint(!self.solar.is_empty()));\n"
+        },
+        {
+          "offset": 12727,
+          "before": "",
+          "after": "        }\n        if !self.solar.is_empty() {\n            w.bytes.extend(SOLAR_EXTENSION);\n            self.solar.encode(&mut w);\n"
+        },
+        {
+          "offset": 15125,
+          "before": "        if r.fixed::<{ CONTENT.len() }>()?.as_slice() != CONTENT\n            || r.u64()? != compiled_content_fingerprint(CONTENT)\n        {\n",
+          "after": "        if r.fixed::<{ CONTENT.len() }>()?.as_slice() != CONTENT {\n"
+        },
+        {
+          "offset": 15254,
+          "before": "",
+          "after": "        let fingerprint = r.u64()?;\n        let solar_expected = if fingerprint == solar_content_fingerprint(true) {\n            Some(true)\n        } else if fingerprint == solar_content_fingerprint(false) {\n            Some(false)\n        } else if fingerprint == compiled_content_fingerprint(CONTENT) {\n            None\n        } else {\n            return Err(SaveError::ContentMismatch);\n        };\n"
+        },
+        {
+          "offset": 17226,
           "before": "",
           "after": "            solar: super::solar::State::default(),\n"
         },
         {
-          "offset": 18253,
+          "offset": 18928,
           "before": "",
           "after": "        let mut solar_present = false;\n"
         },
         {
-          "offset": 18319,
+          "offset": 18994,
           "before": "            if r.fixed::<8>().map_err(|_| SaveError::InvalidEncoding)? != *ROUTE_EXTENSION {\n",
           "after": "            let tag = r.fixed::<8>().map_err(|_| SaveError::InvalidEncoding)?;\n            if tag == *ROUTE_EXTENSION {\n                candidate.navigation_route =\n                    Some(crate::navigation::RoutePlan::decode_save(&mut r)?);\n                if !r.finished() {\n                    if r.fixed::<8>().map_err(|_| SaveError::InvalidEncoding)? != *SOLAR_EXTENSION {\n                        return Err(SaveError::InvalidEncoding);\n                    }\n                    candidate.solar = super::solar::State::decode(&mut r)?;\n                    solar_present = true;\n                }\n            } else if tag == *SOLAR_EXTENSION {\n                candidate.solar = super::solar::State::decode(&mut r)?;\n                solar_present = true;\n            } else {\n"
         },
         {
-          "offset": 19169,
+          "offset": 19844,
           "before": "            candidate.navigation_route = Some(crate::navigation::RoutePlan::decode_save(&mut r)?);\n",
           "after": ""
         },
         {
-          "offset": 19258,
+          "offset": 19933,
           "before": "",
-          "after": "        }\n        if !solar_present {\n            let mut solar = super::solar::State::default();\n            solar.initialize_legacy_origin(&candidate)?;\n            candidate.solar = solar;\n"
+          "after": "        }\n        if solar_present != solar_expected.unwrap_or(false) {\n            return Err(SaveError::InvalidEncoding);\n        }\n        if solar_expected.is_none() {\n            let mut solar = super::solar::State::default();\n            solar.initialize_legacy_origin(&candidate)?;\n            candidate.solar = solar;\n"
         },
         {
-          "offset": 22866,
+          "offset": 23675,
           "before": "",
           "after": "        self.solar.validate(self, account, commerce.modular)?;\n"
         },
         {
-          "offset": 28194,
+          "offset": 29003,
           "before": "            secret,\n",
           "after": "            (\n                secret,\n                (\n                    self.solar\n                        .receipts()\n                        .iter()\n                        .map(|receipt| u64::from(receipt.added))\n                        .sum(),\n                    self.solar.receipts().len() as u64,\n                ),\n            ),\n"
         },
         {
-          "offset": 29700,
+          "offset": 30509,
           "before": "    secret: super::xyzzy::Terms,\n",
           "after": "    (secret, solar): (super::xyzzy::Terms, (u64, u64)),\n"
         },
         {
-          "offset": 30056,
+          "offset": 30865,
           "before": "    let fuel = 130_u128 + u128::from(s.refilled_units) + secret.fuel_supplied;\n",
           "after": "    let fuel = 130_u128 + u128::from(s.refilled_units) + secret.fuel_supplied + u128::from(solar.0);\n"
         },
         {
-          "offset": 31207,
+          "offset": 32016,
           "before": "",
           "after": "                + u128::from(solar.1)\n"
+        },
+        {
+          "offset": 33542,
+          "before": "",
+          "after": "        Some(MotionRefusal::SolarHistoryLimit) => 6,\n"
+        },
+        {
+          "offset": 34373,
+          "before": "",
+          "after": "        6 if version >= 17 => Some(MotionRefusal::SolarHistoryLimit),\n"
+        },
+        {
+          "offset": 35824,
+          "before": "",
+          "after": "    Ok(bytes)\n}\n\n#[cfg(test)]\npub(in crate::flight) fn solar_trailer_removed_test_input(\n    world: &World,\n    genuine_legacy_header: bool,\n) -> Result<Vec<u8>, SaveError> {\n    let mut bytes = world.save_bytes()?;\n    let length = world.solar.encoded_len();\n    assert!(length > 0);\n    let end = bytes.len() - 8 - length;\n    assert_eq!(&bytes[end..end + 8], SOLAR_EXTENSION);\n    bytes.truncate(end);\n    if genuine_legacy_header {\n        let start = 10 + CONTENT.len();\n        bytes[start..start + 8]\n            .copy_from_slice(&compiled_content_fingerprint(CONTENT).to_le_bytes());\n    }\n    let digest = checksum(&bytes);\n    bytes.extend(digest.to_le_bytes());\n"
         }
       ]
     },
@@ -385,6 +446,17 @@
           "offset": 6545,
           "before": "",
           "after": "    }\n    /// A physical sample's system must belong to its actual retained visit,\n    /// not merely to any system in the original catalogue.\n    pub(crate) fn system_at_visit(&self, visit: u64, tick: u64) -> Result<SystemId, SaveError> {\n        let mut system = SystemId::AVENOR;\n        for leg in &self.legs {\n            if visit <= leg.source_visit {\n                if tick >= leg.arrival_tick {\n                    return Err(INVALID);\n                }\n                break;\n            }\n            if tick < leg.arrival_tick {\n                return Err(INVALID);\n            }\n            system = leg.destination;\n        }\n        Ok(system)\n    }\n    /// Completed legs before this visit and, for an actual arrival visit, its\n    /// accepted physical clock. Other visits start at a physical launch.\n    pub(crate) fn visit_origin(&self, visit: u64) -> (u64, Option<u64>) {\n        let mut count = 0;\n        let mut arrival = None;\n        for leg in self.legs.iter().take_while(|leg| leg.source_visit < visit) {\n            count += 1;\n            if leg.source_visit.checked_add(1) == Some(visit) {\n                arrival = Some(leg.physical_tick);\n            }\n        }\n        (count, arrival)\n"
+        }
+      ]
+    },
+    "station.rs": {
+      "beforeSHA256": "186f6be460f99c34065000e4c7666884abad27190864942203703c6286ca4327",
+      "afterSHA256": "e2984f4e791d18b55049cd43ba464dfec1dbb834ae75f488c9bb4f723123bc68",
+      "hunks": [
+        {
+          "offset": 1315,
+          "before": "",
+          "after": "    SolarHistoryLimit,\n"
         }
       ]
     }

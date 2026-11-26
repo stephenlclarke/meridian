@@ -203,6 +203,7 @@ impl State {
             8 + 1
                 + usize::from(self.legacy_origin.is_some()) * ANCHOR_BYTES
                 + 2
+                + 2
                 + self.runs.len() * RUN_BYTES
                 + 2
                 + self.receipts.len() * RECEIPT_BYTES
@@ -212,6 +213,8 @@ impl State {
     }
     pub(in crate::flight) fn encode(&self, w: &mut Writer) {
         w.option(self.legacy_origin.as_ref(), |w, anchor| anchor.encode(w));
+        w.bool(self.sealed);
+        w.bool(self.external_limit);
         w.u16(self.runs.len() as u16);
         for run in self.runs.iter() {
             run.opening.encode(w);
@@ -238,6 +241,8 @@ impl State {
     }
     pub(in crate::flight) fn decode(r: &mut Reader<'_>) -> Result<Self, SaveError> {
         let legacy_origin = r.option(Anchor::decode)?;
+        let sealed = r.bool()?;
+        let external_limit = r.bool()?;
         let count = usize::from(r.u16()?);
         if count > SOURCE_MAX_RUNS {
             return Err(INVALID);
@@ -280,6 +285,8 @@ impl State {
             receipts: Arc::new(receipts),
             last,
             legacy_origin,
+            sealed,
+            external_limit,
         };
         if result.is_empty() {
             return Err(INVALID);
@@ -304,13 +311,25 @@ impl State {
             return Err(INVALID);
         }
         if self.is_empty() {
-            return if self.receipts.is_empty() && self.last.is_none() {
+            let mut origin = Self::default();
+            origin.initialize_legacy_origin(world)?;
+            return if self.receipts.is_empty()
+                && self.last.is_none()
+                && origin.legacy_origin.is_none()
+                && !self.sealed
+                && !self.external_limit
+            {
                 Ok(())
             } else {
                 Err(INVALID)
             };
         }
         if !world.damage.enabled() {
+            return Err(INVALID);
+        }
+        if self.external_limit
+            && world.encoded_current_size()? < AGGREGATE_SOFT_BYTES - AGGREGATE_SHRINK_ALLOWANCE
+        {
             return Err(INVALID);
         }
         if let Some(origin) = self.legacy_origin {
@@ -346,6 +365,7 @@ impl State {
                 run.opening.tick,
             )?;
             let opening_ratio = run.opening.frame.ratio_and_nose(sun).0;
+            let first_of_visit = previous.is_none_or(|last| last.anchor.visit != run.opening.visit);
             if let Some(last) = previous {
                 if last.condition.cabin_temperature >= 1.0
                     || run.opening.visit < last.anchor.visit
@@ -357,21 +377,10 @@ impl State {
                     return Err(INVALID);
                 }
                 if last.anchor.visit == run.opening.visit {
-                    if run.first_fuel != last.fuel {
+                    if run.first_fuel != last.fuel || !last.anchor.near(run.opening) {
                         return Err(INVALID);
                     }
-                    let gap = run.opening.clock - last.anchor.clock;
-                    if gap == 0 {
-                        if !last.anchor.near(run.opening) {
-                            return Err(INVALID);
-                        }
-                        condition = last.condition;
-                    } else {
-                        if opening_ratio <= THERMAL_LIMIT {
-                            return Err(INVALID);
-                        }
-                        condition.cabin_temperature = cool(last.condition.cabin_temperature, gap);
-                    }
+                    condition = last.condition;
                 } else if opening_ratio <= THERMAL_LIMIT {
                     return Err(INVALID);
                 }
@@ -391,7 +400,11 @@ impl State {
                 if !next.valid()
                     || !ratio.is_finite()
                     || !nose.is_finite()
-                    || !(1.0..=THERMAL_LIMIT + 0.00001).contains(&ratio)
+                    || ratio <= 1.0
+                    || (first_of_visit
+                        && step == 0
+                        && opening_ratio > THERMAL_LIMIT
+                        && ratio > THERMAL_LIMIT + 0.00001)
                     || sun.blocks_motion(anchor.frame.position, next.position, hull)
                 {
                     return Err(INVALID);
@@ -441,6 +454,22 @@ impl State {
         if receipts.next().is_some() {
             return Err(INVALID);
         }
+        if self.sealed {
+            let last = self.last.ok_or(INVALID)?;
+            let sun = Self::sun(
+                world,
+                last.anchor.system,
+                last.anchor.visit,
+                last.anchor.tick,
+            )?;
+            let current = world.combat_identity().ok_or(INVALID)?;
+            if !self.soft_limit()
+                || (last.anchor.visit == current.visit
+                    && last.anchor.frame.ratio_and_nose(sun).0 <= THERMAL_LIMIT)
+            {
+                return Err(INVALID);
+            }
+        }
         match (previous, self.last) {
             (Some(replayed), Some(saved))
                 if replayed.anchor.near(saved.anchor)
@@ -475,7 +504,7 @@ impl State {
                 identity.visit,
                 world.combat.physical_tick(),
             );
-            if current
+            let ratio = current
                 .frame
                 .ratio_and_nose(Self::sun(
                     world,
@@ -483,12 +512,20 @@ impl State {
                     identity.visit,
                     current.tick,
                 )?)
-                .0
-                <= THERMAL_LIMIT
-                && self.last.is_none_or(|last| !last.anchor.near(current))
-                && self
+                .0;
+            let tracked = self
+                .last
+                .is_some_and(|last| last.anchor.visit == current.visit)
+                || self
                     .legacy_origin
-                    .is_none_or(|origin| !origin.near(current))
+                    .is_some_and(|origin| origin.visit == current.visit);
+            if (self.sealed && ratio <= THERMAL_LIMIT)
+                || (!self.sealed
+                    && (tracked || ratio <= THERMAL_LIMIT)
+                    && self.last.is_none_or(|last| !last.anchor.near(current))
+                    && self
+                        .legacy_origin
+                        .is_none_or(|origin| !origin.near(current)))
             {
                 return Err(INVALID);
             }

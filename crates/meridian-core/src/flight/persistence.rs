@@ -48,6 +48,14 @@ fn compiled_content_fingerprint(content: &[u8]) -> u64 {
     checksum(&bytes)
 }
 
+/// Distinguish genuine pre-solar v17 saves from current saves independently of the trailer.
+fn solar_content_fingerprint(has_history: bool) -> u64 {
+    let mut bytes = compiled_content_fingerprint(CONTENT).to_le_bytes().to_vec();
+    bytes.extend(b"solar-history/v1");
+    bytes.push(u8::from(has_history));
+    checksum(&bytes)
+}
+
 /// Immutable candidate references for a joint ordinary commerce/lesson save.
 /// World remains the sole live owner; these parts have no public constructor.
 pub(super) struct Commerce<'a> {
@@ -272,7 +280,7 @@ impl World {
         w.bytes.extend(MAGIC);
         w.u16(SAVE_VERSION);
         w.bytes.extend(CONTENT);
-        w.u64(compiled_content_fingerprint(CONTENT));
+        w.u64(solar_content_fingerprint(!self.solar.is_empty()));
         write_flight(&mut w, &self.state);
         self.navigation
             .ok_or(SaveError::NoCommander)?
@@ -383,11 +391,19 @@ impl World {
         if version != SAVE_VERSION {
             return Err(SaveError::UnsupportedVersion);
         }
-        if r.fixed::<{ CONTENT.len() }>()?.as_slice() != CONTENT
-            || r.u64()? != compiled_content_fingerprint(CONTENT)
-        {
+        if r.fixed::<{ CONTENT.len() }>()?.as_slice() != CONTENT {
             return Err(SaveError::ContentMismatch);
         }
+        let fingerprint = r.u64()?;
+        let solar_expected = if fingerprint == solar_content_fingerprint(true) {
+            Some(true)
+        } else if fingerprint == solar_content_fingerprint(false) {
+            Some(false)
+        } else if fingerprint == compiled_content_fingerprint(CONTENT) {
+            None
+        } else {
+            return Err(SaveError::ContentMismatch);
+        };
         let station_data =
             OriginalStationData::bundled().map_err(|_| SaveError::ContentMismatch)?;
         let mut state = read_flight(&mut r, version)?;
@@ -475,7 +491,10 @@ impl World {
         if !r.finished() {
             return Err(SaveError::InvalidEncoding);
         }
-        if !solar_present {
+        if solar_present != solar_expected.unwrap_or(false) {
+            return Err(SaveError::InvalidEncoding);
+        }
+        if solar_expected.is_none() {
             let mut solar = super::solar::State::default();
             solar.initialize_legacy_origin(&candidate)?;
             candidate.solar = solar;
@@ -820,6 +839,7 @@ pub(super) fn write_flight(w: &mut Writer, s: &Snapshot) {
         Some(MotionRefusal::CelestialContact) => 3,
         Some(MotionRefusal::NpcContact) => 4,
         Some(MotionRefusal::AsteroidContact) => 5,
+        Some(MotionRefusal::SolarHistoryLimit) => 6,
     });
 }
 pub(super) fn read_flight(r: &mut Reader<'_>, version: u16) -> Result<Snapshot, SaveError> {
@@ -840,6 +860,7 @@ pub(super) fn read_flight(r: &mut Reader<'_>, version: u16) -> Result<Snapshot, 
         3 => Some(MotionRefusal::CelestialContact),
         4 if version >= 15 => Some(MotionRefusal::NpcContact),
         5 if version >= 16 => Some(MotionRefusal::AsteroidContact),
+        6 if version >= 17 => Some(MotionRefusal::SolarHistoryLimit),
         _ => return Err(SaveError::InvalidEncoding),
     };
     Ok(Snapshot {
@@ -884,6 +905,27 @@ pub(in crate::flight) fn unsupported_version_test_input(
     let end = bytes.len() - 8;
     let digest = checksum(&bytes[..end]);
     bytes[end..].copy_from_slice(&digest.to_le_bytes());
+    Ok(bytes)
+}
+
+#[cfg(test)]
+pub(in crate::flight) fn solar_trailer_removed_test_input(
+    world: &World,
+    genuine_legacy_header: bool,
+) -> Result<Vec<u8>, SaveError> {
+    let mut bytes = world.save_bytes()?;
+    let length = world.solar.encoded_len();
+    assert!(length > 0);
+    let end = bytes.len() - 8 - length;
+    assert_eq!(&bytes[end..end + 8], SOLAR_EXTENSION);
+    bytes.truncate(end);
+    if genuine_legacy_header {
+        let start = 10 + CONTENT.len();
+        bytes[start..start + 8]
+            .copy_from_slice(&compiled_content_fingerprint(CONTENT).to_le_bytes());
+    }
+    let digest = checksum(&bytes);
+    bytes.extend(digest.to_le_bytes());
     Ok(bytes)
 }
 
