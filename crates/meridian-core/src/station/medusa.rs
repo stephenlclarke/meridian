@@ -67,30 +67,33 @@ mod tests {
     use crate::{FIXED_DELTA_SECONDS, FlightInput, FlightMode, World, station::flight_pose};
 
     fn inbound(x: f32, z: f32) -> RigidPose {
-        flight_pose([x, 0.0, z], [0.0, 1.0, 0.0, 0.0]).unwrap()
+        flight_pose([x, 0.0, z], [0.0, 1.0, 0.0, 0.0])
+            .unwrap_or_else(|| panic!("invalid Medusa approach fixture at ({x}, {z})"))
     }
 
     #[test]
-    fn medusa_geometry_is_bound_without_changing_the_ordinary_hull() {
-        let ordinary = OriginalStationData::bundled().unwrap();
-        let medusa = OriginalStationData::medusa_bundled().unwrap();
+    fn medusa_geometry_is_bound_without_changing_the_ordinary_hull() -> Result<(), StationError> {
+        let ordinary = OriginalStationData::bundled()?;
+        let medusa = OriginalStationData::medusa_bundled()?;
         assert_eq!(ordinary.hull_triangle_count(), 964);
         assert!(ordinary.medusa_pieces().is_none());
         assert_eq!(medusa.hull_triangle_count(), 512);
-        assert_eq!(medusa.medusa_pieces().unwrap().len(), 70);
+        assert_eq!(medusa.medusa_pieces().map(<[_]>::len), Some(70));
         assert_eq!(
             medusa.station_triangle_count(),
             ordinary.station_triangle_count()
         );
         assert_eq!(medusa.port().center(), ordinary.port().center());
-        assert!(medusa.initial_flight_is_clear(medusa.launch_start().unwrap()));
+        assert!(medusa.initial_flight_is_clear(medusa.launch_start()?));
         assert!(OriginalStationData::from_bytes(STATION_BYTES, PHYSICS, PORT_BYTES).is_err());
         assert!(load_supports(&SUPPORTS[..SUPPORTS.len() - 1]).is_err());
+        Ok(())
     }
 
     #[test]
-    fn medusa_swept_station_entry_accepts_routes_and_rejects_contact_and_invalid_entry() {
-        let station = OriginalStationData::medusa_bundled().unwrap();
+    fn medusa_swept_station_entry_accepts_routes_and_rejects_contact_and_invalid_entry()
+    -> Result<(), StationError> {
+        let station = OriginalStationData::medusa_bundled()?;
         for x in [0.0, 25.0] {
             let approach = inbound(x, 198.32);
             let outside = inbound(x, 137.0);
@@ -106,21 +109,21 @@ mod tests {
             0.0
         ));
         assert!(!station.entry_clear(inbound(100.0, 137.0), inbound(100.0, 136.0), 72.0, 0.0, 0.0));
+        Ok(())
     }
 
     #[test]
-    fn medusa_world_launch_and_return_use_ordinary_commands() {
-        let mut world = World::at_station(OriginalStationData::medusa_bundled().unwrap()).unwrap();
+    fn medusa_world_launch_and_return_use_ordinary_commands()
+    -> Result<(), Box<dyn std::error::Error>> {
+        let mut world = World::at_station(OriginalStationData::medusa_bundled()?)?;
         assert_eq!(world.snapshot().mode, FlightMode::Docked);
-        world.request_launch(world.snapshot().tick).unwrap();
+        world.request_launch(world.snapshot().tick)?;
         assert_eq!(world.snapshot().mode, FlightMode::Launching);
         for _ in 0..80 {
-            world
-                .step(FlightInput {
-                    brake: true,
-                    ..FlightInput::default()
-                })
-                .unwrap();
+            world.step(FlightInput {
+                brake: true,
+                ..FlightInput::default()
+            })?;
             assert_eq!(world.snapshot().motion_refusal, None);
         }
         assert_eq!(world.snapshot().speed, 0.0);
@@ -132,12 +135,10 @@ mod tests {
                 break;
             }
             let yaw = (remaining / (0.65 * f64::from(FIXED_DELTA_SECONDS))).clamp(0.0, 1.0) as f32;
-            world
-                .step(FlightInput {
-                    yaw,
-                    ..FlightInput::default()
-                })
-                .unwrap();
+            world.step(FlightInput {
+                yaw,
+                ..FlightInput::default()
+            })?;
             assert_eq!(world.snapshot().motion_refusal, None);
         }
         for _ in 0..4000 {
@@ -146,18 +147,16 @@ mod tests {
             } else {
                 0.0
             };
-            world
-                .step(FlightInput {
-                    throttle,
-                    ..FlightInput::default()
-                })
-                .unwrap();
+            world.step(FlightInput {
+                throttle,
+                ..FlightInput::default()
+            })?;
             let snapshot = world.snapshot();
             assert_eq!(snapshot.motion_refusal, None, "{:?}", snapshot.position);
             if snapshot.mode == FlightMode::Docked {
                 assert_eq!(snapshot.speed, 0.0);
                 assert!(world.commander_id().is_none());
-                return;
+                return Ok(());
             }
         }
         panic!("Medusa did not return through the authenticated station port");
