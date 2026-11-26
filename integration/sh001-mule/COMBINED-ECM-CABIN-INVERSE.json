@@ -440,7 +440,7 @@
     },
     "flight/modular.rs": {
       "beforeSHA256": "e20dae03b66bf22f516fbb640fdf9b351622be7f24e33de6337d783780a5f01e",
-      "afterSHA256": "ec44d8deb772ebeff694585815ed10bf0277ed94c16bb32191d1d6e96c9ae0cf",
+      "afterSHA256": "f9763f427721e0d5f91fc0e4c8055111869f087ad79b60063d4747f479e9be5b",
       "hunks": [
         {
           "offset": 1226,
@@ -498,52 +498,77 @@
           "after": "    pub(super) fn fitted(&self, slot: ModuleSlot) -> Option<OwnedModule> {\n"
         },
         {
-          "offset": 37942,
+          "offset": 30577,
+          "before": "    pub(super) fn fuel_capacity_at_revision(\n        &self,\n        owner: u64,\n        revision: u64,\n    ) -> Result<u16, SaveError> {\n",
+          "after": "    fn ledger_at_revision(&self, owner: u64, revision: u64) -> Result<Ledger, SaveError> {\n"
+        },
+        {
+          "offset": 30968,
+          "before": "",
+          "after": "        Ok(ledger)\n    }\n    pub(super) fn fuel_capacity_at_revision(\n        &self,\n        owner: u64,\n        revision: u64,\n    ) -> Result<u16, SaveError> {\n"
+        },
+        {
+          "offset": 31175,
+          "before": "            ledger.fuel_storage_count(),\n",
+          "after": "            self.ledger_at_revision(owner, revision)?\n                .fuel_storage_count(),\n"
+        },
+        {
+          "offset": 31279,
+          "before": "",
+          "after": "    }\n    pub(super) fn ecm_fitted_at_revision(\n        &self,\n        owner: u64,\n        revision: u64,\n    ) -> Result<bool, SaveError> {\n        Ok(self\n            .ledger_at_revision(owner, revision)?\n            .fitted(ModuleSlot::UtilityEcm)\n            .is_some())\n"
+        },
+        {
+          "offset": 38385,
           "before": "",
           "after": "                    ModuleKind::Ecm => world.xyzzy.authorizes_ecm(e.dock, e.tick, e.revision),\n"
         },
         {
-          "offset": 41338,
+          "offset": 40226,
           "before": "",
           "after": "                        + u16::from(ledger.fitted(ModuleSlot::UtilityEcm).is_some())\n"
         },
         {
-          "offset": 45774,
+          "offset": 41866,
+          "before": "",
+          "after": "                        + u16::from(ledger.fitted(ModuleSlot::UtilityEcm).is_some())\n"
+        },
+        {
+          "offset": 46302,
           "before": "    pub(super) fn validate_scoop_test_record(\n",
           "after": "    pub(super) fn ecm_item_at(&self, owner: u64, tick: u64, visit: u64) -> Option<OwnedModule> {\n        self.ledger_at(owner, tick, visit)?\n            .fitted(ModuleSlot::UtilityEcm)\n    }\n    pub(super) fn drive_at_visit(&self, owner: u64, tick: u64, visit: u64) -> Option<DriveGrade> {\n        self.ledger_at(owner, tick, visit)?\n            .drive()\n            .map(|(_, grade)| grade)\n    }\n    pub(super) fn validate_utility_test_record(\n"
         },
         {
-          "offset": 46362,
+          "offset": 46890,
           "before": "",
           "after": "        kind: ModuleKind,\n"
         },
         {
-          "offset": 46854,
+          "offset": 47382,
           "before": "        let before = fit_at(start)?.fitted(ModuleSlot::UtilityFuelScoops);\n",
           "after": "        let slot = kind.slot();\n        let before = fit_at(start)?.fitted(slot);\n"
         },
         {
-          "offset": 46977,
+          "offset": 47505,
           "before": "        let after = after_ledger\n            .fitted(ModuleSlot::UtilityFuelScoops)\n            .ok_or(INVALID)?;\n",
           "after": "        let after = after_ledger.fitted(slot).ok_or(INVALID)?;\n"
         },
         {
-          "offset": 47667,
+          "offset": 48195,
           "before": "            + 1\n",
           "after": "            + u16::from(after_ledger.fitted(ModuleSlot::UtilityFuelScoops).is_some())\n            + u16::from(after_ledger.fitted(ModuleSlot::UtilityEcm).is_some())\n"
         },
         {
-          "offset": 48159,
+          "offset": 48687,
           "before": "            ModuleAction::Purchase {\n                kind: ModuleKind::FuelScoops,\n            } if event.xyzzy => Ok(()),\n",
           "after": "            ModuleAction::Purchase { kind: purchased } if event.xyzzy && purchased == kind => {\n                Ok(())\n            }\n"
         },
         {
-          "offset": 55393,
+          "offset": 55921,
           "before": "",
           "after": "            ModuleKind::Ecm,\n"
         },
         {
-          "offset": 62126,
+          "offset": 62654,
           "before": "",
           "after": "            )));\n        }\n        if action.purchase_kind() == Some(ModuleKind::Ecm) && !self.damage.enabled() {\n            return Err(ModuleError::Save(SaveError::InvalidState(\n                \"ECM fitting requires resource birth provenance\",\n"
         }
@@ -660,7 +685,7 @@
     },
     "flight/xyzzy.rs": {
       "beforeSHA256": "5a040ee9ef58d6b01c8ae9338988c6257c96f285fb69dafb6783cf3558cfcb29",
-      "afterSHA256": "b1da1a8c7a1bc394bde208beee290d567bfd1efcd091429b287de7a23114484c",
+      "afterSHA256": "243f584fca8a79b0b8c8c6bd379fab9bdd10e64172c237555b085e74786d6ee4",
       "hunks": [
         {
           "offset": 1063,
@@ -718,24 +743,40 @@
           "after": "            }\n            if r.action == XyzzyAction::ToggleAutoEcm && r.end_revision != r.revision {\n                return Err(INVALID);\n"
         },
         {
-          "offset": 19594,
+          "offset": 14878,
+          "before": "",
+          "after": "                    // A later store or remount must not change admission of the\n                    // original MAX command. Its first revision is the account action.\n                    || commerce.modular.ecm_fitted_at_revision(\n                        r.dock.owner().seed(),\n                        r.revision.checked_sub(1).ok_or(INVALID)?,\n                    )?\n"
+        },
+        {
+          "offset": 19963,
           "before": "",
           "after": "            automatic_ecm: self.xyzzy.automatic_ecm(),\n"
         },
         {
-          "offset": 21005,
+          "offset": 21374,
           "before": "        if action == XyzzyAction::FitFuelScoops\n            && self.fitted_fuel_scoops().is_none()\n",
           "after": "        if action == XyzzyAction::MaximumFuelStorage && self.fitted_ecm().is_some() {\n            // The existing four-tank exception reserves three other utility mounts;\n            // it does not grant permission for a fourth non-tank utility.\n            return Err(XyzzyError::UtilityFitConflict);\n        }\n        if action == XyzzyAction::FitEcm && !self.damage.enabled() {\n            return Err(XyzzyError::Save(SaveError::InvalidState(\n                \"ECM fitting requires resource birth provenance\",\n            )));\n        }\n        if ((action == XyzzyAction::FitFuelScoops && self.fitted_fuel_scoops().is_none())\n            || (action == XyzzyAction::FitEcm && self.fitted_ecm().is_none()))\n"
         },
         {
-          "offset": 28784,
+          "offset": 29153,
           "before": "        } else if review.action == XyzzyAction::FitFuelScoops {\n",
           "after": "        } else if matches!(\n            review.action,\n            XyzzyAction::FitFuelScoops | XyzzyAction::FitEcm\n        ) {\n"
         },
         {
-          "offset": 29007,
+          "offset": 29376,
           "before": "                super::modular::ModuleKind::FuelScoops,\n",
           "after": "                if review.action == XyzzyAction::FitEcm {\n                    super::ModuleKind::Ecm\n                } else {\n                    super::ModuleKind::FuelScoops\n                },\n"
+        }
+      ]
+    },
+    "flight/xyzzy/tests.rs": {
+      "beforeSHA256": "4ae7b0fa9b72498f5debfd0282d4b21dbac3e67513804f29ed684089d12ff39a",
+      "afterSHA256": "67d63f51b5eb4f0a3b9d2c0b3c8baa13a581f33f39f95452141fbbcf810095be",
+      "hunks": [
+        {
+          "offset": 1973,
+          "before": "",
+          "after": "}\n\n#[test]\nfn maximum_fuel_history_requires_ecm_stored_at_the_actual_opening_revision() {\n    use crate::flight::persistence::Commerce;\n    fn prefix(world: &World) -> Result<Terms, SaveError> {\n        let account = world.commander_account.as_ref().unwrap();\n        let commerce = Commerce {\n            account: Some(account),\n            markets: world.station_markets.as_ref(),\n            lesson: &world.navigation_trade,\n            ammunition: &world.ammunition,\n            modular: &world.modular,\n            emp: &world.emp,\n        };\n        world.xyzzy.validate(world, account, &commerce)\n    }\n\n    let mut world = World::new_commander(15608).unwrap();\n    apply(&mut world, XyzzyAction::Enter);\n    let original_scoop = world.fitted_fuel_scoops().unwrap().item;\n    module(\n        &mut world,\n        ModuleAction::Store {\n            item: original_scoop,\n        },\n    );\n    apply(&mut world, XyzzyAction::FitEcm);\n    let ecm = world.fitted_ecm().unwrap().id;\n    let fitted = world.commander_account.as_ref().unwrap().revision();\n    assert_eq!(\n        world.review_xyzzy(XyzzyAction::MaximumFuelStorage, 0),\n        Err(XyzzyError::UtilityFitConflict)\n    );\n    let before = world.save_bytes().unwrap();\n    module(&mut world, ModuleAction::Store { item: ecm });\n    let stored = world.commander_account.as_ref().unwrap().revision();\n    assert_eq!(stored, fitted + 1);\n    assert!(world.modular.ecm_fitted_at_revision(15608, fitted).unwrap());\n    assert!(!world.modular.ecm_fitted_at_revision(15608, stored).unwrap());\n    assert_ne!(world.save_bytes().unwrap(), before);\n    apply(&mut world, XyzzyAction::MaximumFuelStorage);\n    world = cold(&world);\n    assert!(world.fitted_ecm().is_none());\n    assert!(prefix(&world).is_ok());\n\n    // Use normal paid jump fuel to bring the actual test tank back into\n    // ordinary limits, then re-install the same ECM item at a later berth.\n    apply(&mut world, XyzzyAction::ToggleUnlimitedFuel);\n    for destination in [\n        SystemId::LARERIA,\n        SystemId::AVENOR,\n        SystemId::LARERIA,\n        SystemId::AVENOR,\n    ] {\n        journey(&mut world, destination);\n    }\n    let tanks: Vec<_> = world\n        .modular_equipment_snapshot()\n        .unwrap()\n        .items\n        .into_iter()\n        .filter(|item| matches!(item.slot, Some(ModuleSlot::FuelStorage(_))))\n        .collect();\n    assert_eq!(tanks.len(), 4);\n    for tank in &tanks[..3] {\n        module(&mut world, ModuleAction::Store { item: tank.id });\n    }\n    let cargo = world.equipment_snapshot().unwrap().owned.unwrap();\n    world\n        .request_equipment(\n            crate::equipment::Command::UnfitCargoBay(cargo.id),\n            world.snapshot().tick,\n        )\n        .unwrap();\n    let scoop = world.fitted_fuel_scoops().unwrap().item;\n    module(&mut world, ModuleAction::Store { item: scoop });\n    module(\n        &mut world,\n        ModuleAction::Install {\n            item: ecm,\n            replacing: None,\n        },\n    );\n    world = cold(&world);\n    assert_eq!(world.fitted_ecm().unwrap().id, ecm);\n    assert!(prefix(&world).is_ok()); // The final fit does not invalidate a legitimate MAX.\n\n    let mut forged = cold(&world);\n    let max = forged\n        .xyzzy\n        .records\n        .iter_mut()\n        .find(|r| r.action == XyzzyAction::MaximumFuelStorage)\n        .unwrap();\n    assert_eq!(max.revision, stored + 1);\n    // Shift the MAX opening across the genuine store. At the forged opening\n    // the prior fit still contains ECM, irrespective of the ending fit.\n    max.revision = stored;\n    assert!(\n        forged\n            .modular\n            .ecm_fitted_at_revision(15608, max.revision - 1)\n            .unwrap()\n    );\n    assert!(prefix(&forged).is_err());\n    let mut live = cold(&world);\n    let retained = live.save_bytes().unwrap();\n    poison_refuses(&forged, &mut live, &retained);\n"
         }
       ]
     },

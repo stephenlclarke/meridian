@@ -154,6 +154,109 @@ fn paid_ecm_and_private_cabins_share_save_custody_through_delivery() {
     );
 }
 
+#[test]
+fn passenger_replay_refuses_four_historical_mounts_hidden_by_a_later_ecm_store() {
+    fn refuses_shifted_store(world: &World, ecm: u64, boarded: bool) {
+        let bytes = world.save_bytes().unwrap();
+        let mut forged = World::from_save_bytes(&bytes).unwrap();
+        let events = &mut forged.modular.events;
+        let start = events
+            .iter()
+            .rposition(|event| event.action == ModuleAction::Store { item: ecm })
+            .unwrap();
+        let tail = &mut events[start..];
+        assert_eq!(tail.len(), if boarded { 4 } else { 3 });
+        assert!(matches!(tail[1].action, ModuleAction::Install { .. }));
+        assert_eq!(
+            tail[2].action,
+            ModuleAction::Passenger(PassengerAction::RequestReplies)
+        );
+        if boarded {
+            assert_eq!(
+                tail[3].action,
+                ModuleAction::Passenger(PassengerAction::Board)
+            );
+        }
+        // Retain all real events and increasing account revisions, but move the
+        // actual ECM store past passenger admission. Then the earlier receipt
+        // incorrectly sees both utilities fitted; the ending fit is unchanged.
+        let revisions: Vec<_> = tail.iter().map(|event| event.revision).collect();
+        tail.rotate_left(1);
+        for (event, revision) in tail.iter_mut().zip(revisions) {
+            event.revision = revision;
+        }
+        assert!(
+            forged
+                .modular
+                .ledger(&forged, forged.commander_account.as_ref().unwrap())
+                .is_err()
+        );
+        let mut live = World::from_save_bytes(&bytes).unwrap();
+        let retained = live.save_bytes().unwrap();
+        reject_changed_history(&forged, &mut live, &retained);
+    }
+
+    let mut world = World::new_commander(31011).unwrap();
+    let secret = world.review_xyzzy(crate::XyzzyAction::Enter, 0).unwrap();
+    world.prepare_xyzzy(secret, 0).unwrap().commit();
+    let scoop = world.fitted_fuel_scoops().unwrap().item;
+    act(&mut world, ModuleAction::Store { item: scoop });
+    let ecm = act(
+        &mut world,
+        ModuleAction::Purchase {
+            kind: ModuleKind::Ecm,
+        },
+    );
+    act(&mut world, buy(CabinGrade::Economy));
+    act(&mut world, buy(CabinGrade::Economy));
+    assert_eq!(
+        world
+            .modular_equipment_snapshot()
+            .unwrap()
+            .utility_mounts_used,
+        3
+    );
+    passage(&mut world, PassengerAction::RequestReplies);
+    assert_eq!(
+        world.passenger_journey_snapshot().unwrap().status,
+        PassageStatus::Accepted
+    );
+    assert_eq!(
+        review(
+            &world,
+            ModuleAction::Install {
+                item: scoop,
+                replacing: None
+            }
+        ),
+        Err(ModuleError::Capacity)
+    );
+
+    act(&mut world, ModuleAction::Store { item: ecm });
+    act(
+        &mut world,
+        ModuleAction::Install {
+            item: scoop,
+            replacing: None,
+        },
+    );
+    passage(&mut world, PassengerAction::RequestReplies);
+    assert_eq!(
+        world
+            .modular_equipment_snapshot()
+            .unwrap()
+            .utility_mounts_used,
+        3
+    );
+    refuses_shifted_store(&world, ecm, false);
+    passage(&mut world, PassengerAction::Board);
+    assert_eq!(
+        world.passenger_journey_snapshot().unwrap().status,
+        PassageStatus::Aboard
+    );
+    refuses_shifted_store(&world, ecm, true);
+}
+
 fn reject_changed_history(world: &World, live: &mut World, retained: &[u8]) {
     assert!(world.save_bytes().is_err());
     assert!(

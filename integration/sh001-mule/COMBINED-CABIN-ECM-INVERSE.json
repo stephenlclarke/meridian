@@ -139,7 +139,7 @@
     },
     "flight/modular.rs": {
       "beforeSHA256": "d12ec8e75683aa0729d56ef080510753392c314c53a62a00f8c5ce2c169cc795",
-      "afterSHA256": "ec44d8deb772ebeff694585815ed10bf0277ed94c16bb32191d1d6e96c9ae0cf",
+      "afterSHA256": "f9763f427721e0d5f91fc0e4c8055111869f087ad79b60063d4747f479e9be5b",
       "hunks": [
         {
           "offset": 360,
@@ -252,127 +252,147 @@
           "after": "                ModuleAction::Passenger(action) => return self.apply_passage(event, action),\n"
         },
         {
-          "offset": 32744,
+          "offset": 30577,
+          "before": "    pub(super) fn fuel_capacity_at_revision(\n        &self,\n        owner: u64,\n        revision: u64,\n    ) -> Result<u16, SaveError> {\n",
+          "after": "    fn ledger_at_revision(&self, owner: u64, revision: u64) -> Result<Ledger, SaveError> {\n"
+        },
+        {
+          "offset": 30968,
+          "before": "",
+          "after": "        Ok(ledger)\n    }\n    pub(super) fn fuel_capacity_at_revision(\n        &self,\n        owner: u64,\n        revision: u64,\n    ) -> Result<u16, SaveError> {\n"
+        },
+        {
+          "offset": 31175,
+          "before": "            ledger.fuel_storage_count(),\n",
+          "after": "            self.ledger_at_revision(owner, revision)?\n                .fuel_storage_count(),\n"
+        },
+        {
+          "offset": 31279,
+          "before": "",
+          "after": "    }\n    pub(super) fn ecm_fitted_at_revision(\n        &self,\n        owner: u64,\n        revision: u64,\n    ) -> Result<bool, SaveError> {\n        Ok(self\n            .ledger_at_revision(owner, revision)?\n            .fitted(ModuleSlot::UtilityEcm)\n            .is_some())\n"
+        },
+        {
+          "offset": 33187,
           "before": "",
           "after": "            } else if let ModuleAction::Passenger(action) = e.action {\n                match action {\n                    PassengerAction::RequestReplies | PassengerAction::Board => {\n                        super::AccountEffect::ObserveFuel(\n                            cabins::receipt_fuel(e.item).ok_or(INVALID)?,\n                        )\n                    }\n                    PassengerAction::Receive => super::AccountEffect::Reward(PASSAGE_REWARD_TENTHS),\n                    PassengerAction::Cancel => super::AccountEffect::Debit(0),\n                }\n            } else if self.history.tracks_revision(e.revision)\n                && matches!(\n                    e.action,\n                    ModuleAction::Store { .. } | ModuleAction::Install { .. }\n                )\n            {\n                super::AccountEffect::Debit(0)\n"
         },
         {
-          "offset": 33853,
+          "offset": 34296,
           "before": "",
           "after": "    }\n\n    pub(super) fn passenger_occupancy(&self) -> (usize, usize) {\n        let boarded = self\n            .events\n            .iter()\n            .any(|e| e.action == ModuleAction::Passenger(PassengerAction::Board));\n        let ended = self.events.iter().any(|e| {\n            matches!(\n                e.action,\n                ModuleAction::Passenger(PassengerAction::Receive | PassengerAction::Cancel)\n            )\n        });\n        (usize::from(boarded), usize::from(boarded && !ended))\n    }\n\n    pub(super) fn passenger_aboard_at(&self, revision: u64) -> bool {\n        let mut aboard = false;\n        for event in self\n            .events\n            .iter()\n            .take_while(|event| event.revision <= revision)\n        {\n            match event.action {\n                ModuleAction::Passenger(PassengerAction::Board) => aboard = true,\n                ModuleAction::Passenger(PassengerAction::Receive | PassengerAction::Cancel) => {\n                    aboard = false\n                }\n                _ => {}\n            }\n        }\n        aboard\n"
         },
         {
-          "offset": 36819,
+          "offset": 37262,
           "before": "",
           "after": "        let budget = crate::equipment::definition().map_err(|_| INVALID)?;\n"
         },
         {
-          "offset": 38741,
+          "offset": 39184,
           "before": "",
-          "after": "            if let ModuleAction::Passenger(action) = e.action {\n                world\n                    .jump_journal\n                    .validate_passenger_berth(e.dock, e.tick)?;\n                if !self.history.owns_berth(e.dock) {\n                    return Err(INVALID);\n                }\n                if matches!(\n                    action,\n                    PassengerAction::RequestReplies | PassengerAction::Board\n                ) && cabins::receipt_epoch(e.item)\n                    > world.freight_session.as_ref().ok_or(INVALID)?.epoch()\n                {\n                    return Err(INVALID);\n                }\n                if matches!(\n                    action,\n                    PassengerAction::RequestReplies | PassengerAction::Board\n                ) {\n                    let cargo = self.history.bay_fitted_at(e.revision).ok_or(INVALID)?;\n                    let mounts = u16::from(ledger.fuel_storage_count())\n                        + u16::from(ledger.fitted(ModuleSlot::UtilityFuelScoops).is_some())\n                        + cargo\n                        + world.emp.utility_mounts_at_revision(e.revision);\n                    let ordinary = mounts <= budget.utility_mounts_capacity\n                        && ledger.fitted_units() + cargo <= budget.equipment_units_capacity;\n                    if !ordinary\n                        && (action == PassengerAction::Board || ledger.awake_cabin_count() >= 2)\n                    {\n                        return Err(INVALID);\n                    }\n                }\n            }\n"
+          "after": "            if let ModuleAction::Passenger(action) = e.action {\n                world\n                    .jump_journal\n                    .validate_passenger_berth(e.dock, e.tick)?;\n                if !self.history.owns_berth(e.dock) {\n                    return Err(INVALID);\n                }\n                if matches!(\n                    action,\n                    PassengerAction::RequestReplies | PassengerAction::Board\n                ) && cabins::receipt_epoch(e.item)\n                    > world.freight_session.as_ref().ok_or(INVALID)?.epoch()\n                {\n                    return Err(INVALID);\n                }\n                if matches!(\n                    action,\n                    PassengerAction::RequestReplies | PassengerAction::Board\n                ) {\n                    let cargo = self.history.bay_fitted_at(e.revision).ok_or(INVALID)?;\n                    let mounts = u16::from(ledger.fuel_storage_count())\n                        + u16::from(ledger.fitted(ModuleSlot::UtilityFuelScoops).is_some())\n                        + u16::from(ledger.fitted(ModuleSlot::UtilityEcm).is_some())\n                        + cargo\n                        + world.emp.utility_mounts_at_revision(e.revision);\n                    let ordinary = mounts <= budget.utility_mounts_capacity\n                        && ledger.fitted_units() + cargo <= budget.equipment_units_capacity;\n                    if !ordinary\n                        && (action == PassengerAction::Board || ledger.awake_cabin_count() >= 2)\n                    {\n                        return Err(INVALID);\n                    }\n                }\n            }\n"
         },
         {
-          "offset": 41587,
+          "offset": 42115,
           "before": "",
           "after": "            }\n            let allowance = if self.passenger_aboard_at(e.revision) {\n                0\n            } else {\n                ledger.test_tank_count()\n            };\n            if ledger.fitted_units().saturating_sub(allowance) > budget.equipment_units_capacity\n                || ledger.cabin_tonnes() > crate::equipment::EXPANDED_HOLD_TONNES\n            {\n                return Err(INVALID);\n"
         },
         {
-          "offset": 43767,
+          "offset": 44295,
           "before": "        let allowance = if world.test_tank_custody_clear() {\n",
           "after": "        let allowance = if world.test_tank_custody_clear() && self.passenger_occupancy().1 == 0 {\n"
         },
         {
-          "offset": 44165,
+          "offset": 44693,
           "before": "",
           "after": "        }\n        if self.cabin_tonnes().map_err(|_| INVALID)? != ledger.cabin_tonnes() {\n            return Err(INVALID);\n        }\n        if ledger.cabin_tonnes() != 0 {\n            let projection = account\n                .service_projection(&world.freight_session.as_ref().ok_or(INVALID)?.state)\n                .map_err(|_| INVALID)?;\n            add_cabin_mass(projection, ledger.cabin_tonnes()).map_err(|_| INVALID)?;\n"
         },
         {
-          "offset": 48541,
+          "offset": 49069,
           "before": "        w.u32(\n            self.events.len() as u32\n                | if self.cargo_fit_history.is_empty() {\n                    0\n                } else {\n                    1 << 31\n                },\n        );\n",
           "after": "        let flags = (u32::from(!self.cargo_fit_history.is_empty()) << 31)\n            | (u32::from(self.history.active()) << 30);\n        w.u32(self.events.len() as u32 | flags);\n"
         },
         {
-          "offset": 49274,
+          "offset": 49802,
           "before": "",
           "after": "                ModuleAction::Passenger(action) => w.u8(match action {\n                    PassengerAction::RequestReplies => 4,\n                    PassengerAction::Board => 5,\n                    PassengerAction::Receive => 6,\n                    PassengerAction::Cancel => 7,\n                }),\n"
         },
         {
-          "offset": 49846,
+          "offset": 50374,
           "before": "",
           "after": "        self.history.encode(w);\n"
         },
         {
-          "offset": 50121,
+          "offset": 50649,
           "before": "        let count = (raw_count & !(1 << 31)) as usize;\n",
           "after": "        let count = (raw_count & 0x3fff_ffff) as usize;\n"
         },
         {
-          "offset": 51490,
+          "offset": 52018,
           "before": "",
           "after": "                4 => ModuleAction::Passenger(PassengerAction::RequestReplies),\n                5 => ModuleAction::Passenger(PassengerAction::Board),\n                6 => ModuleAction::Passenger(PassengerAction::Receive),\n                7 => ModuleAction::Passenger(PassengerAction::Cancel),\n"
         },
         {
-          "offset": 52213,
+          "offset": 52741,
           "before": "",
           "after": "        let history = if raw_count & (1 << 30) != 0 {\n            history::History::decode(r)?\n        } else {\n            history::History::default()\n        };\n        if events\n            .iter()\n            .any(|event| history::requires_history(event.action))\n            != history.active()\n        {\n            return Err(SaveError::InvalidEncoding);\n        }\n"
         },
         {
-          "offset": 52653,
+          "offset": 53181,
           "before": "",
           "after": "            history,\n"
         },
         {
-          "offset": 56204,
+          "offset": 56732,
           "before": "",
           "after": "            ModuleKind::Cabin(CabinGrade::PackedStasis),\n            ModuleKind::Cabin(CabinGrade::Economy),\n            ModuleKind::Cabin(CabinGrade::Standard),\n            ModuleKind::Cabin(CabinGrade::Luxury),\n            ModuleKind::Cabin(CabinGrade::SingleStateroom),\n            ModuleKind::Cabin(CabinGrade::DoubleStateroom),\n"
         },
         {
-          "offset": 63352,
+          "offset": 63880,
           "before": "",
           "after": "        if history::requires_history(action) && !self.modular.history.active() {\n            let mut history = history::History::default();\n            history.activate(self, account, dock)?;\n        }\n        if matches!(action, ModuleAction::Passenger(PassengerAction::Board))\n            && !self.original_service_has_capacity()\n        {\n            return Err(ModuleError::Capacity);\n        }\n        let item = match action {\n            ModuleAction::Passenger(action) => cabins::receipt_data(self, action)?,\n            _ => 0,\n        };\n"
         },
         {
-          "offset": 63996,
+          "offset": 64524,
           "before": "                item: 0,\n",
           "after": "                item,\n"
         },
         {
-          "offset": 64150,
+          "offset": 64678,
           "before": "        let allowance =\n            if was_outside_ordinary_budget && matches!(action, ModuleAction::Store { .. }) {\n                ledger.test_tank_count()\n            } else {\n                0\n            };\n",
           "after": "        let allowance = if was_outside_ordinary_budget\n            && (matches!(action, ModuleAction::Store { .. })\n                || (action == ModuleAction::Passenger(PassengerAction::RequestReplies)\n                    && ledger.awake_cabin_count() < 2))\n        {\n            ledger.test_tank_count()\n        } else {\n            0\n        };\n"
         },
         {
-          "offset": 65349,
+          "offset": 65877,
           "before": "",
           "after": "        }\n        if ledger.cabin_tonnes() != 0 {\n            let projection = account\n                .service_projection(\n                    &self\n                        .freight_session\n                        .as_ref()\n                        .ok_or(ModuleError::NoCommander)?\n                        .state,\n                )\n                .map_err(|_| ModuleError::Capacity)?;\n            let projection = add_cabin_mass(projection, ledger.cabin_tonnes())\n                .map_err(|_| ModuleError::Capacity)?;\n            self.navigation_trade\n                .reservations()\n                .apply(projection)\n                .map_err(|_| ModuleError::Capacity)?;\n"
         },
         {
-          "offset": 67159,
+          "offset": 67687,
           "before": "",
           "after": "                ModuleAction::Passenger(action) => cabins::receipt_data(self, action)?,\n"
         },
         {
-          "offset": 68834,
+          "offset": 69362,
           "before": "        let account = current\n            .prepare_module(\n",
           "after": "        let account = if let ModuleAction::Passenger(action) = review.action {\n            current.prepare_passage_action(action == PassengerAction::Receive)\n        } else {\n            current.prepare_module(\n"
         },
         {
-          "offset": 69340,
+          "offset": 69868,
           "before": "            .map_err(|_| ModuleError::SequenceExhausted)?;\n",
           "after": "        }\n        .map_err(|_| ModuleError::SequenceExhausted)?;\n"
         },
         {
-          "offset": 69451,
+          "offset": 69979,
           "before": "",
           "after": "        if history::requires_history(review.action) {\n            state.history.activate(self, current, review.dock)?;\n        }\n"
         },
         {
-          "offset": 70216,
+          "offset": 70744,
           "before": "            item,\n",
           "after": "            // Passage changes have a receipt, not an issued physical equipment item.\n            item: if matches!(review.action, ModuleAction::Passenger(_)) {\n                0\n            } else {\n                item\n            },\n"
         },
         {
-          "offset": 70472,
+          "offset": 71000,
           "before": "",
           "after": "#[cfg(test)]\nmod cabin_tests;\n"
         }
@@ -526,20 +546,20 @@
     },
     "flight/xyzzy.rs": {
       "beforeSHA256": "2e38da3c451205fa4e8efba0aac5fb4875d134da7485c2a93758c596198e0ea6",
-      "afterSHA256": "b1da1a8c7a1bc394bde208beee290d567bfd1efcd091429b287de7a23114484c",
+      "afterSHA256": "243f584fca8a79b0b8c8c6bd379fab9bdd10e64172c237555b085e74786d6ee4",
       "hunks": [
         {
           "offset": 14806,
           "before": "",
-          "after": "                    || commerce.modular.passenger_aboard_at(r.revision)\n"
+          "after": "                    || commerce.modular.passenger_aboard_at(r.revision)\n                    // A later store or remount must not change admission of the\n                    // original MAX command. Its first revision is the account action.\n                    || commerce.modular.ecm_fitted_at_revision(\n                        r.dock.owner().seed(),\n                        r.revision.checked_sub(1).ok_or(INVALID)?,\n                    )?\n"
         },
         {
-          "offset": 18567,
+          "offset": 18936,
           "before": "        self.active_freight_job().is_none() && self.navigation_trade.occupancy().1 == 0\n",
           "after": "        self.active_freight_job().is_none()\n            && self.navigation_trade.occupancy().1 == 0\n            && self.modular.passenger_occupancy().1 == 0\n"
         },
         {
-          "offset": 28106,
+          "offset": 28475,
           "before": "",
           "after": "                if account.equipment_state().revision() != previous_cargo_revision {\n                    self.modular.record_bay(&account, review.dock);\n                }\n"
         }
@@ -563,6 +583,17 @@
           "offset": 4894,
           "before": "",
           "after": "                AccountEffect::ObserveFuel(observed) => {\n                    if observed != fuel {\n                        return Err(INVALID);\n                    }\n                }\n"
+        }
+      ]
+    },
+    "flight/xyzzy/tests.rs": {
+      "beforeSHA256": "4ae7b0fa9b72498f5debfd0282d4b21dbac3e67513804f29ed684089d12ff39a",
+      "afterSHA256": "67d63f51b5eb4f0a3b9d2c0b3c8baa13a581f33f39f95452141fbbcf810095be",
+      "hunks": [
+        {
+          "offset": 1973,
+          "before": "",
+          "after": "}\n\n#[test]\nfn maximum_fuel_history_requires_ecm_stored_at_the_actual_opening_revision() {\n    use crate::flight::persistence::Commerce;\n    fn prefix(world: &World) -> Result<Terms, SaveError> {\n        let account = world.commander_account.as_ref().unwrap();\n        let commerce = Commerce {\n            account: Some(account),\n            markets: world.station_markets.as_ref(),\n            lesson: &world.navigation_trade,\n            ammunition: &world.ammunition,\n            modular: &world.modular,\n            emp: &world.emp,\n        };\n        world.xyzzy.validate(world, account, &commerce)\n    }\n\n    let mut world = World::new_commander(15608).unwrap();\n    apply(&mut world, XyzzyAction::Enter);\n    let original_scoop = world.fitted_fuel_scoops().unwrap().item;\n    module(\n        &mut world,\n        ModuleAction::Store {\n            item: original_scoop,\n        },\n    );\n    apply(&mut world, XyzzyAction::FitEcm);\n    let ecm = world.fitted_ecm().unwrap().id;\n    let fitted = world.commander_account.as_ref().unwrap().revision();\n    assert_eq!(\n        world.review_xyzzy(XyzzyAction::MaximumFuelStorage, 0),\n        Err(XyzzyError::UtilityFitConflict)\n    );\n    let before = world.save_bytes().unwrap();\n    module(&mut world, ModuleAction::Store { item: ecm });\n    let stored = world.commander_account.as_ref().unwrap().revision();\n    assert_eq!(stored, fitted + 1);\n    assert!(world.modular.ecm_fitted_at_revision(15608, fitted).unwrap());\n    assert!(!world.modular.ecm_fitted_at_revision(15608, stored).unwrap());\n    assert_ne!(world.save_bytes().unwrap(), before);\n    apply(&mut world, XyzzyAction::MaximumFuelStorage);\n    world = cold(&world);\n    assert!(world.fitted_ecm().is_none());\n    assert!(prefix(&world).is_ok());\n\n    // Use normal paid jump fuel to bring the actual test tank back into\n    // ordinary limits, then re-install the same ECM item at a later berth.\n    apply(&mut world, XyzzyAction::ToggleUnlimitedFuel);\n    for destination in [\n        SystemId::LARERIA,\n        SystemId::AVENOR,\n        SystemId::LARERIA,\n        SystemId::AVENOR,\n    ] {\n        journey(&mut world, destination);\n    }\n    let tanks: Vec<_> = world\n        .modular_equipment_snapshot()\n        .unwrap()\n        .items\n        .into_iter()\n        .filter(|item| matches!(item.slot, Some(ModuleSlot::FuelStorage(_))))\n        .collect();\n    assert_eq!(tanks.len(), 4);\n    for tank in &tanks[..3] {\n        module(&mut world, ModuleAction::Store { item: tank.id });\n    }\n    let cargo = world.equipment_snapshot().unwrap().owned.unwrap();\n    world\n        .request_equipment(\n            crate::equipment::Command::UnfitCargoBay(cargo.id),\n            world.snapshot().tick,\n        )\n        .unwrap();\n    let scoop = world.fitted_fuel_scoops().unwrap().item;\n    module(&mut world, ModuleAction::Store { item: scoop });\n    module(\n        &mut world,\n        ModuleAction::Install {\n            item: ecm,\n            replacing: None,\n        },\n    );\n    world = cold(&world);\n    assert_eq!(world.fitted_ecm().unwrap().id, ecm);\n    assert!(prefix(&world).is_ok()); // The final fit does not invalidate a legitimate MAX.\n\n    let mut forged = cold(&world);\n    let max = forged\n        .xyzzy\n        .records\n        .iter_mut()\n        .find(|r| r.action == XyzzyAction::MaximumFuelStorage)\n        .unwrap();\n    assert_eq!(max.revision, stored + 1);\n    // Shift the MAX opening across the genuine store. At the forged opening\n    // the prior fit still contains ECM, irrespective of the ending fit.\n    max.revision = stored;\n    assert!(\n        forged\n            .modular\n            .ecm_fitted_at_revision(15608, max.revision - 1)\n            .unwrap()\n    );\n    assert!(prefix(&forged).is_err());\n    let mut live = cold(&world);\n    let retained = live.save_bytes().unwrap();\n    poison_refuses(&forged, &mut live, &retained);\n"
         }
       ]
     },

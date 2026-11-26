@@ -822,11 +822,7 @@ fn validate_module_purchase(e: &Event, owner: u64, mut transaction: u32) -> Resu
 }
 
 impl State {
-    pub(super) fn fuel_capacity_at_revision(
-        &self,
-        owner: u64,
-        revision: u64,
-    ) -> Result<u16, SaveError> {
+    fn ledger_at_revision(&self, owner: u64, revision: u64) -> Result<Ledger, SaveError> {
         let mut ledger = Ledger::born(owner)?;
         let mut counters = [0; 2];
         for event in self
@@ -836,9 +832,27 @@ impl State {
         {
             ledger.replay(*event, &mut counters).map_err(|_| INVALID)?;
         }
+        Ok(ledger)
+    }
+    pub(super) fn fuel_capacity_at_revision(
+        &self,
+        owner: u64,
+        revision: u64,
+    ) -> Result<u16, SaveError> {
         Ok(crate::navigation::fuel_capacity(
-            ledger.fuel_storage_count(),
+            self.ledger_at_revision(owner, revision)?
+                .fuel_storage_count(),
         ))
+    }
+    pub(super) fn ecm_fitted_at_revision(
+        &self,
+        owner: u64,
+        revision: u64,
+    ) -> Result<bool, SaveError> {
+        Ok(self
+            .ledger_at_revision(owner, revision)?
+            .fitted(ModuleSlot::UtilityEcm)
+            .is_some())
     }
     pub(super) fn storage_count_possible_at_visit(
         &self,
@@ -1065,6 +1079,7 @@ impl State {
                     let cargo = self.history.bay_fitted_at(e.revision).ok_or(INVALID)?;
                     let mounts = u16::from(ledger.fuel_storage_count())
                         + u16::from(ledger.fitted(ModuleSlot::UtilityFuelScoops).is_some())
+                        + u16::from(ledger.fitted(ModuleSlot::UtilityEcm).is_some())
                         + cargo
                         + world.emp.utility_mounts_at_revision(e.revision);
                     let ordinary = mounts <= budget.utility_mounts_capacity
