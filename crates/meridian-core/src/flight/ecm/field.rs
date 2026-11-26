@@ -1,7 +1,7 @@
 //! Actual local standard-projectile outcomes and cold field custody. No NPC
 //! missile producer or automatic activation is represented by this history.
 use super::{EcmActivation, EcmError, INVALID, MAX_ACTIVATIONS, World};
-use crate::flight::{CombatIdentity, MissileEnd, ProjectileId, ProjectileSnapshot, missiles};
+use crate::flight::{MissileEnd, ProjectileId, ProjectileSnapshot, missiles};
 use crate::save::{Reader, SaveError, Writer};
 use std::sync::Arc;
 
@@ -305,8 +305,8 @@ impl History {
             {
                 return Err(INVALID);
             }
-            if let Some(b) = field.closed {
-                if b.tick < a.world_tick
+            if let Some(b) = field.closed
+                && (b.tick < a.world_tick
                     || b.tick > world.state.tick
                     || b.clock < a.physical_tick
                     || b.clock >= a.expires()
@@ -314,10 +314,9 @@ impl History {
                     || b.tick - a.world_tick != b.clock - a.physical_tick
                     || b.after_emission < field.after_emission
                     || b.after_emission > world.combat.emissions
-                    || world.jump_journal.system_at_visit(a.owner.visit, b.tick)? != a.owner.system
-                {
-                    return Err(INVALID);
-                }
+                    || world.jump_journal.system_at_visit(a.owner.visit, b.tick)? != a.owner.system)
+            {
+                return Err(INVALID);
             }
             previous = Some((a, field));
         }
