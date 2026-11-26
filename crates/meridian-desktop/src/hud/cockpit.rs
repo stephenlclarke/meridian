@@ -61,12 +61,12 @@ impl Cockpit {
             view: world.flight_view(),
             shield: [
                 combat.map(|c| {
-                    f32::from(c.player.front_shield_hundredths)
-                        / f32::from(meridian_core::SHIELD_CAPACITY)
+                    c.player.front_shield_hundredths as f32
+                        / c.player.shield_capacity_hundredths as f32
                 }),
                 combat.map(|c| {
-                    f32::from(c.player.rear_shield_hundredths)
-                        / f32::from(meridian_core::SHIELD_CAPACITY)
+                    c.player.rear_shield_hundredths as f32
+                        / c.player.shield_capacity_hundredths as f32
                 }),
             ],
             energy: combat.map(|c| {
@@ -74,9 +74,9 @@ impl Cockpit {
                     / f32::from(meridian_core::ENERGY_CAPACITY_HUNDREDTHS)
             }),
             heat: resources.map(|l| f32::from(l.heat_fifths) / (5.0 * 255.0)),
-            fuel: flight.navigation.map(|n| {
-                f32::from(n.fuel_units) / f32::from(meridian_core::navigation::FUEL_CAPACITY)
-            }),
+            fuel: flight
+                .navigation
+                .map(|n| f32::from(n.fuel_units) / f32::from(n.fuel_capacity_units)),
             missiles: world
                 .missile_rounds()
                 .map_or(0, |rounds| rounds.iter().flatten().count()),
@@ -574,6 +574,30 @@ mod tests {
             before
         );
     }
+    #[test]
+    fn every_test_shield_grade_uses_its_own_capacity_in_the_cockpit() {
+        let mut world = world();
+        let review = world
+            .review_xyzzy(meridian_core::XyzzyAction::Enter, 0)
+            .unwrap_or_else(|e| panic!("{e}"));
+        world
+            .prepare_xyzzy(review, 0)
+            .unwrap_or_else(|e| panic!("{e}"))
+            .commit();
+        for grade in meridian_core::ShieldGrade::ALL {
+            let action = meridian_core::XyzzyAction::FitShield(grade);
+            let review = world
+                .review_xyzzy(action, 0)
+                .unwrap_or_else(|e| panic!("{e}"));
+            world
+                .prepare_xyzzy(review, 0)
+                .unwrap_or_else(|e| panic!("{e}"))
+                .commit();
+            let c = Cockpit::capture(&world, world.snapshot()).unwrap_or_else(|e| panic!("{e}"));
+            assert_eq!(c.shield, [Some(1.0); 2], "{}", grade.name());
+        }
+    }
+
     #[test]
     fn fresh_instruments_are_world_owned_and_rendering_cannot_change_save() {
         let world = world();

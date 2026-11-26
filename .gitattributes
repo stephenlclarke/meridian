@@ -12,6 +12,18 @@ assets/fleet/sh001/visual.bin binary
 assets/fleet/sh008/** -text
 assets/fleet/sh008/visual.bin binary
 
+# Medusa artwork and receipts carry exact archive and authoring bytes.
+assets/fleet/sh171/** -text
+assets/fleet/sh171/*.gz binary
+assets/fleet/sh171/*.bin binary
+assets/fleet/sh171/source.vertices binary
+integration/sh171-medusa/*.json -text
+tools/prepare_medusa_inspection.py text eol=lf
+tools/verify_medusa_shield.py text eol=lf
+tools/prepare_medusa_stock.py text eol=lf
+crates/meridian-core/src/medusa.rs text eol=lf
+integration/sh171-medusa/LEGACY-FINITE-*.py.txt -text
+
 # Vulture Raider authoring and replay programs use exact LF bytes.
 tools/measure_vulture_raider.py text eol=lf
 tools/prepare_vulture_raider.py text eol=lf
@@ -147,6 +159,7 @@ tools/measure_saker_air.py text eol=lf
 tools/prepare_saker_geometry.py text eol=lf
 tools/prepare_saker_studio.py text eol=lf
 tools/verify_saker_geometry.py text eol=lf
+tools/hull_contact_geometry.py text eol=lf
 tools/vulture_mk_i_exact_fit.py text eol=lf
 
 # Stag Liner replay helpers have published byte hashes.

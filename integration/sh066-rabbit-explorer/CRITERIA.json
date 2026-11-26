@@ -189,6 +189,13 @@
       "scipy": "1.18.1",
       "trimesh": "5.2.1",
       "rtree": "1.4.1"
+    },
+    "originalCommit": "f657af7c063a4e8b515de14bd6816d0fec381e31",
+    "historicalReplayPins": {
+      "tools/measure_banteng_geometry.py": "4b7d8d5d972e30d93bebf7f422be71e415d6e4a9c4b622582ecf6e30a6bb9235",
+      "tools/measure_lanner_geometry.py": "cabbaf17ff7efdbcbee9a1fba67c7edafd59dceb8e97f367824a51c134479992",
+      "tools/measure_seriema_courier_geometry.py": "0992ebf43e2ac8800c4f72adf55498efcd88da4003ec9c2ab256fc797f66055e",
+      "tools/verify_eagle_cruiser_geometry.py": "c7926cb6e699ae5ffb445951ce9d4e98a64018a7ecb1db2e5e77a611d742a783"
     }
   },
   "replayPins": {
@@ -201,15 +208,15 @@
     "tools/banteng_art_mesh.py": "ef5c0f538510486238d69dc301da80026fc93326767b38c50a04756ab9890a09",
     "tools/encode_goshawk_visual.py": "9e524e9a32a237d71d212c8b5c34ecf12cde5a8e08885b1d03991b95c278f61c",
     "tools/import_goshawk_envelope_source.py": "14b530725629ee3eaa5b3fd69f01fe00fe371564a1a52cb398d3969142db977e",
-    "tools/measure_banteng_geometry.py": "4b7d8d5d972e30d93bebf7f422be71e415d6e4a9c4b622582ecf6e30a6bb9235",
+    "tools/measure_banteng_geometry.py": "9356864e227302598fcae4e833ecb706b1ed8a5e600cbb4076b7165dc1e54bea",
     "tools/measure_goshawk_surface_fit.py": "5407ef1e5fad41810aa95444ca1338fe33a91e5c9857dcb752b4e4cf2fca6d0b",
-    "tools/measure_lanner_geometry.py": "cabbaf17ff7efdbcbee9a1fba67c7edafd59dceb8e97f367824a51c134479992",
+    "tools/measure_lanner_geometry.py": "55d13a28602e6ed791adecd85ff43f3c8a7fbe118cf0977272e1747422c2408d",
     "tools/measure_rabbit_explorer.py": "697bae6dcc9d4e549f4e6702860914a8b351a1da807fc387efe042ab93ce1e10",
-    "tools/measure_seriema_courier_geometry.py": "0992ebf43e2ac8800c4f72adf55498efcd88da4003ec9c2ab256fc797f66055e",
+    "tools/measure_seriema_courier_geometry.py": "ed138de0a2f857d176a71d42f047daac5f266250c90195df3eb9202fd2c55fbf",
     "tools/prepare_eagle_cruiser_geometry.py": "a1ea3b5d72f35e1f2932da71afa3ff8a276a504f7309a1086a2b3df35988addc",
     "tools/prepare_rabbit_explorer.py": "ac0b8eaf90e7c8ec434044dad60d675a55cdbc5e1325ebb5b4c1c93b322a0dd3",
     "tools/rabbit_explorer_art_mesh.py": "9d1780fa7579ded7ce9a1c8062c68ae461fea591422afedfc86ca8de19d262d1",
-    "tools/verify_eagle_cruiser_geometry.py": "c7926cb6e699ae5ffb445951ce9d4e98a64018a7ecb1db2e5e77a611d742a783",
+    "tools/verify_eagle_cruiser_geometry.py": "cb053ee5873fee62ee456bb3776e98d29b2cbb44c7344599bc617a8579164d43",
     "tools/verify_rabbit_explorer.py": "56f1e4d14d1f45a1456a57e7e4510db54e2a3cc9c92d8e48fa0c742348b9c8cc",
     "tools/vulture_mk_i_exact_fit.py": "479b31f8714a198a82c0e2888b8d19efe46c7b4c43a576b83ab84c571ae738c6",
     "integration/sh066-rabbit-explorer/RABBIT-EXPLORER-STUDIO.json": "e6e59dc8206c8299a666aeefe391847af1ab3958db3a08add9dd10ac13383813",
@@ -219,6 +226,7 @@
     "integration/sh066-rabbit-explorer/CANDIDATE-FIT.json": "d2f4759800dd4ca899ba1074a7c5d58798066aa99e30472e87c5ae3120f10966",
     "integration/sh066-rabbit-explorer/CANDIDATE-ROUTES.json": "13a30b9778d8859fbbde9935137b28fd1db72832d74ee1c9667c1a20b8b3ce00",
     "integration/sh066-rabbit-explorer/CANDIDATE-FIDELITY.json": "57ae8fef4432a4042c044818473caa26e364a3f04371ec4f9fab8142d9a605ed",
-    "integration/sh066-rabbit-explorer/CONTACT-RESULT.json": "6a10041efdfd674f121fdfcdfccb48057307196bc07d0a4b9f6e6a8edaa4f1e2"
+    "integration/sh066-rabbit-explorer/CONTACT-RESULT.json": "6a10041efdfd674f121fdfcdfccb48057307196bc07d0a4b9f6e6a8edaa4f1e2",
+    "tools/hull_contact_geometry.py": "07606202e6a298ad375a7504991fe6fb93da6a07f9b5cc4a22167bd570b07839"
   }
 }

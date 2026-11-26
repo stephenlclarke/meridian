@@ -28,6 +28,10 @@ clearance values of 448–629 mm. Both passages alongside the full blade rail
 retain 448 mm. The independent source verifier checks four source joints in
 all three meshes, including the connection from the blade to the main body.
 
+Both fit reports use the triangles recorded for each of the 30 supports on
+the original MacBook Air. Each replay checks the points, support membership
+and triangle orientation before it recalculates the distance bounds.
+
 Developer ID–signed Hull Studio produced two byte-identical offline
 inspection exports and responses containing 1,656 detailed artwork triangles
 and the separate 512 collision triangles. The bundled native visual stream

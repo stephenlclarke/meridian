@@ -180,6 +180,62 @@ fn complete(w: &mut World, id: Id) -> super::NavigationTradeTrace {
 }
 
 #[test]
+fn abandoned_and_completed_fuel_anchors_survive_later_explicit_max_supply() {
+    use crate::XyzzyAction;
+    for (index, completed) in [false, true].into_iter().enumerate() {
+        let mut world = commander(18880 + index as u64);
+        if completed {
+            complete(&mut world, Id::Food);
+        } else {
+            plan(&mut world, Id::Food);
+            confirm(&mut world, Action::Cancel);
+        }
+        let past = snap(&world);
+        let anchor = *world
+            .navigation_trade
+            .attempts
+            .last()
+            .and_then(|a| a.terminal.as_ref())
+            .unwrap_or_else(|| panic!("terminal"));
+        let mut legacy = cold(&world);
+        let old = legacy
+            .navigation_trade
+            .attempts
+            .last_mut()
+            .unwrap_or_else(|| panic!("attempt"));
+        old.accepted_account_revision = None;
+        if let Some(terminal) = old.terminal.as_mut() {
+            terminal.account_revision = None;
+        }
+        for candidate in [&mut world, &mut legacy] {
+            let tick = candidate.snapshot().tick;
+            let review = ok(candidate.review_xyzzy(XyzzyAction::MaximumFuelStorage, tick));
+            ok(candidate.prepare_xyzzy(review, tick)).commit();
+            assert_eq!(some(candidate.snapshot().navigation).fuel_units, 410);
+            let loaded = cold(candidate);
+            assert_eq!(snap(&loaded).attempts, past.attempts);
+            let retained = loaded
+                .navigation_trade
+                .attempts
+                .last()
+                .and_then(|a| a.terminal)
+                .unwrap_or_else(|| panic!("terminal"));
+            assert_eq!(retained.fuel, anchor.fuel);
+            assert_eq!(retained.tick, anchor.tick);
+        }
+        reject(&mut world, |invalid| {
+            let terminal = invalid
+                .navigation_trade
+                .attempts
+                .last_mut()
+                .and_then(|a| a.terminal.as_mut())
+                .unwrap_or_else(|| panic!("terminal"));
+            terminal.fuel.fuel -= 1;
+        });
+    }
+}
+
+#[test]
 fn genuine_food_loss_and_mineral_profit_keep_exact_tonne_paid_fuel_and_zero_lesson_cash() {
     for (i, id, expected) in [(0, Id::Food, -98_i64), (1, Id::Minerals, 78_i64)] {
         let mut w = commander(6101 + i);

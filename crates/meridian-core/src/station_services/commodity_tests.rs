@@ -10,6 +10,7 @@ fn account() -> AccountProjection {
         revision: 0,
         credits_tenths: u32::MAX / 2,
         fuel_tenths: 130,
+        fuel_capacity_tenths: crate::navigation::FUEL_CAPACITY,
         food_tonnes: 0,
         reserved_food_tonnes: 0,
         used_tonnes: 0,

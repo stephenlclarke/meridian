@@ -121,6 +121,9 @@ impl State {
 fn validate_next(old: &Attempt, next: &Attempt) -> Result<(), SaveError> {
     let t = old.terminal.ok_or(INVALID)?;
     if t.tick > next.accepted_tick
+        || t.account_revision
+            .zip(next.accepted_account_revision)
+            .is_some_and(|(closed, accepted)| closed > accepted)
         || t.dock.sequence() > next.dock.sequence()
         || t.dock.visit() > next.dock.visit()
         || t.dock.tick() > next.dock.tick()
@@ -134,7 +137,17 @@ fn validate_next(old: &Attempt, next: &Attempt) -> Result<(), SaveError> {
 impl Attempt {
     fn validate(&self, ordinal: usize, c: &Context<'_>) -> Result<(), SaveError> {
         validate_dock(self.dock, c)?;
-        if self.accepted_tick < self.dock.tick() || self.accepted_tick > c.world.state.tick {
+        let current_revision = c.commerce.account.ok_or(INVALID)?.revision();
+        if self.accepted_tick >= 1 << 63
+            || self.accepted_tick < self.dock.tick()
+            || self.accepted_tick > c.world.state.tick
+            || self.accepted_account_revision.is_some_and(|revision| {
+                revision > current_revision
+                    || self
+                        .plan
+                        .is_some_and(|plan| plan.account_revision < revision)
+            })
+        {
             return Err(INVALID);
         }
         let Some(plan) = self.plan else {
@@ -207,7 +220,7 @@ impl Attempt {
             .sum::<u64>();
         if end.refilled_units > current.refilled_units
             || end.jump > current.jump
-            || end.fuel > 130
+            || end.fuel > crate::navigation::MAX_FUEL_CAPACITY
             || end.refilled_units.checked_sub(plan.refilled_at_plan) != Some(added)
         {
             return Err(INVALID);
@@ -216,7 +229,15 @@ impl Attempt {
             && end.jump == current.jump
             && end.fuel != current.fuel
         {
-            return Err(INVALID);
+            let terminal = self.terminal.ok_or(INVALID)?;
+            let later = c.world.xyzzy.refills_after_terminal(
+                terminal.dock,
+                terminal.tick,
+                terminal.account_revision,
+            );
+            if u64::from(end.fuel).checked_add(later) != Some(u64::from(current.fuel)) {
+                return Err(INVALID);
+            }
         }
         if let Some(buy) = self.buy {
             self.validate_fuel_continuity(buy, end)?;
@@ -289,10 +310,44 @@ impl Attempt {
             return Ok(());
         };
         validate_dock(t.dock, c)?;
-        if t.fuel.fuel > 130
+        if t.fuel.fuel > crate::navigation::MAX_FUEL_CAPACITY
             || t.fuel.jump > c.nav.jumps
             || t.fuel.refilled_units > c.commerce.markets.ok_or(INVALID)?.fuel_accounting().0
         {
+            return Err(INVALID);
+        }
+        if let Some(revision) = t.account_revision {
+            if revision > c.commerce.account.ok_or(INVALID)?.revision()
+                || self
+                    .accepted_account_revision
+                    .is_some_and(|accepted| accepted > revision)
+                || self
+                    .plan
+                    .is_some_and(|plan| plan.account_revision > revision)
+                || self.buy.is_some_and(|buy| buy.account_revision > revision)
+                || self
+                    .sale
+                    .is_some_and(|sale| sale.account_revision > revision)
+                || self
+                    .fuel
+                    .iter()
+                    .any(|fuel| fuel.account_revision > revision)
+                || self
+                    .journeys
+                    .iter()
+                    .any(|journey| journey.account_revision > revision)
+                || t.dock.visit().checked_sub(t.dock.sequence()) != Some(t.fuel.jump)
+                || c.world.xyzzy.historical_fuel(
+                    c.world,
+                    c.commerce.markets.ok_or(INVALID)?,
+                    t.dock,
+                    t.tick,
+                    revision,
+                )? != (t.fuel.refilled_units, t.fuel.fuel)
+            {
+                return Err(INVALID);
+            }
+        } else if self.accepted_account_revision.is_some() {
             return Err(INVALID);
         }
         if !same_carrier(self.dock, t.dock)
@@ -315,7 +370,17 @@ impl Attempt {
     }
     fn encode(&self, w: &mut Writer) {
         self.dock.encode_save(w);
-        w.u64(self.accepted_tick);
+        w.u64(
+            self.accepted_tick
+                | if self.accepted_account_revision.is_some() {
+                    1 << 63
+                } else {
+                    0
+                },
+        );
+        if let Some(revision) = self.accepted_account_revision {
+            w.u64(revision);
+        }
         w.option(self.plan.as_ref(), |w, p| p.encode(w));
         w.option(self.buy.as_ref(), |w, t| t.encode(w));
         w.u8(self.journeys.len() as u8);
@@ -333,13 +398,22 @@ impl Attempt {
             w.u8(match t.outcome {
                 Outcome::Complete => 0,
                 Outcome::Abandoned => 1,
-            });
+            } | if t.account_revision.is_some() { 2 } else { 0 });
             t.fuel.encode(w);
+            if let Some(revision) = t.account_revision {
+                w.u64(revision);
+            }
         });
     }
     fn decode(r: &mut Reader<'_>) -> Result<Self, SaveError> {
         let dock = DockContext::decode_save(r)?;
-        let accepted_tick = r.u64()?;
+        let raw_tick = r.u64()?;
+        let accepted_tick = raw_tick & !(1 << 63);
+        let accepted_account_revision = if raw_tick & (1 << 63) != 0 {
+            Some(r.u64()?)
+        } else {
+            None
+        };
         let plan = r.option(Plan::decode)?;
         let buy = r.option(Trade::decode)?;
         let journeys = bounded(r, Journey::decode)?;
@@ -348,21 +422,25 @@ impl Attempt {
         let terminal = r.option(|r| {
             let tick = r.u64()?;
             let dock = DockContext::decode_save(r)?;
-            let outcome = match r.u8()? {
-                0 => Outcome::Complete,
-                1 => Outcome::Abandoned,
+            let tag = r.u8()?;
+            let outcome = match tag {
+                0 | 2 => Outcome::Complete,
+                1 | 3 => Outcome::Abandoned,
                 _ => return Err(INVALID),
             };
+            let fuel = FuelAnchor::decode(r)?;
             Ok(Terminal {
                 tick,
                 dock,
                 outcome,
-                fuel: FuelAnchor::decode(r)?,
+                fuel,
+                account_revision: if tag & 2 != 0 { Some(r.u64()?) } else { None },
             })
         })?;
         Ok(Self {
             dock,
             accepted_tick,
+            accepted_account_revision,
             plan,
             buy,
             journeys,
@@ -486,7 +564,10 @@ impl Plan {
             || distance <= 0.0
             || distance > STOCK_JUMP_REACH_LY
             || distance > f64::from(self.fuel_at_plan) / 10.0
-            || self.fuel_at_plan > 130
+            || self.fuel_at_plan
+                > c.commerce
+                    .modular
+                    .fuel_capacity_at_revision(c.nav.owner, self.account_revision)?
             || self.refilled_at_plan > markets.fuel_accounting().0
             || stock_jump_fuel_cost(distance).map_err(|_| INVALID)? != self.fuel_debit
             || self.fuel_debit > self.fuel_at_plan
@@ -601,7 +682,10 @@ impl Trade {
             || self.account_revision <= plan.account_revision
             || self.account_revision > account.revision
             || self.jump_sequence > c.nav.jumps
-            || self.fuel_at_trade > 130
+            || self.fuel_at_trade
+                > c.commerce
+                    .modular
+                    .fuel_capacity_at_revision(c.nav.owner, self.account_revision)?
             || self.after.bought.saturating_add(self.after.sold) > self.transaction
             || stock_at(
                 markets,
@@ -748,7 +832,10 @@ impl Journey {
             || self.source_visit <= buy.dock.visit()
             || self.source_visit.checked_add(1) != Some(self.arrival_visit)
             || self.arrival_visit > c.nav.visit
-            || self.fuel_before > 130
+            || self.fuel_before
+                > c.commerce
+                    .modular
+                    .fuel_capacity_at_revision(c.nav.owner, self.account_revision)?
             || self.fuel_before.checked_sub(self.debit) != Some(self.fuel_after)
             || self.debit == 0
             || stock_jump_fuel_cost(distance).map_err(|_| INVALID)? != self.debit
@@ -794,6 +881,10 @@ impl Fuel {
             .ok_or(INVALID)?
             .service_projection(&c.world.freight_session.as_ref().ok_or(INVALID)?.state)
             .map_err(|_| INVALID)?;
+        let capacity = c
+            .commerce
+            .modular
+            .fuel_capacity_at_revision(c.nav.owner, self.account_revision)?;
         if self.tick < plan.confirmed_tick
             || self.tick < self.dock.tick()
             || self.tick > c.world.state.tick
@@ -803,9 +894,9 @@ impl Fuel {
             || self.account_revision > account.revision
             || self.ordinal == 0
             || self.ordinal > markets.fuel_accounting().1
-            || self.units_before >= 130
-            || self.units_after != 130
-            || self.paid != u32::from(130 - self.units_before) * 2
+            || self.units_before >= capacity
+            || self.units_after != capacity
+            || self.paid != u32::from(capacity - self.units_before) * 2
             || self.credits_before.checked_sub(self.paid) != Some(self.credits_after)
         {
             return Err(INVALID);

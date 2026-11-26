@@ -42,6 +42,7 @@ pub enum MissionError {
     Paused,
     SequenceExhausted,
     SharedCapacity,
+    TestFit,
     NavigationTrade(super::NavigationTradeError),
     Freight(g02::Error),
     Service(crate::station_services::Error),
@@ -59,6 +60,7 @@ impl fmt::Display for MissionError {
             Self::SharedCapacity => {
                 f.write_str("Original mission or active service capacity is full")
             }
+            Self::TestFit => f.write_str("Store test-only fuel tanks until the ordinary hull fit is legal before accepting custody"),
             Self::NavigationTrade(error) => write!(f, "{error}"),
             Self::Freight(error) => write!(f, "freight command refused: {error:?}"),
             Self::Service(error) => write!(f, "station service refused: {error:?}"),
@@ -278,6 +280,16 @@ impl World {
         expected_tick: u64,
     ) -> Result<g02::Event, MissionError> {
         self.station_command_admission(expected_tick)?;
+        if matches!(
+            command,
+            g02::Command::Confirm {
+                choice: g02::Choice::Accept,
+                ..
+            }
+        ) && self.test_tank_overfit()
+        {
+            return Err(MissionError::TestFit);
+        }
         if matches!(
             command,
             g02::Command::Confirm {

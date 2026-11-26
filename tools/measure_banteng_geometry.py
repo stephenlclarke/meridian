@@ -12,9 +12,13 @@ import trimesh
 
 from banteng_art_mesh import SCALE, assemble
 from measure_goshawk_surface_fit import GRID
-from measure_lanner_geometry import make_fan
+from measure_lanner_geometry import load_reference_records, validated_reference_fan
 from prepare_banteng_geometry import INTEGRATION, ORIGINAL, build
 from vulture_mk_i_exact_fit import full_upper, grid_index
+
+
+REFERENCE_FANS_SHA = "7c6f7a1c939a55aae2afa6d0b45afed830265f9bf0e757d9cfab0801180c97f5"
+REFERENCE_DIAGNOSTIC_SHA = "39b4ae6ee60347289f5556c39a7359a01ab34de4ff3b341e3f0b09a1e4867b84"
 
 
 def section(model, part):
@@ -127,6 +131,11 @@ def adaptive_upper(index, fan, target):
     return full_upper(index, fan, refined)
 
 
+def reference_records(mode, scaled, support_ids, count):
+    return load_reference_records(INTEGRATION / "REFERENCE-FANS.json", REFERENCE_FANS_SHA, REFERENCE_DIAGNOSTIC_SHA,
+                                  mode, scaled, support_ids, count, "Banteng")
+
+
 def envelope_fit(candidate_path):
     source = tomllib.loads((ORIGINAL / "resource.toml").read_text())
     parts = json.loads((INTEGRATION / "ORIGINAL-OWNERSHIP.json").read_bytes())["models"]
@@ -138,6 +147,9 @@ def envelope_fit(candidate_path):
     slots, meshes = assemble((source["design"], parts["design"]["parts"]), native)
     scaled = np.array(meshes[0]["vertices"] + meshes[1]["vertices"]) * float(SCALE)
     support_ids = np.array(meshes[0]["groups"] + meshes[1]["groups"])
+    records = reference_records("candidate" if candidate else "archive", scaled, support_ids, len(slots))
+    fans = [validated_reference_fan(record, key, scaled, np.flatnonzero(support_ids == identifier), "Banteng")
+            for (key, identifier), record in zip(slots.items(), records, strict=True)]
     targets = {"detailed": 1800, "archiveNative": 1800}
     original_native = source["nativeDesign"]
     references = {
@@ -152,9 +164,7 @@ def envelope_fit(candidate_path):
         for lod, (points, faces) in references.items()
     }
     rows = []
-    for (name, ordinal), identifier in slots.items():
-        point_ids = np.flatnonzero(support_ids == identifier)
-        fan = make_fan(scaled, point_ids)
+    for (name, ordinal), fan in zip(slots, fans, strict=True):
         rows.append({
             "part": name,
             "occurrence": ordinal,

@@ -1,4 +1,4 @@
-//! Source-authenticated Goshawk showroom presentation. Inputs grant no World authority.
+//! Source-authenticated hull showroom presentation. Inputs grant no World authority.
 use super::{
     Piece, Triangle, Vec3, VisualVertex, decode_visual, gpu, subtract, support_mesh, vector,
 };
@@ -16,6 +16,9 @@ use meridian_core::{
     mule::EnvelopeError,
 };
 
+mod medusa;
+
+pub(crate) const MEDUSA_GEOMETRY_KEY: &str = "assets/fleet/sh171/visual.bin";
 pub(crate) const GEOMETRY_KEY: &str = "assets/fleet/sh008/visual.bin";
 const VISUAL: &[u8] = include_bytes!("../../../../assets/fleet/sh008/visual.bin");
 const VERTICES: usize = 3_484 * 3;
@@ -33,12 +36,14 @@ const EMPTY_PIECE: Piece = Piece {
 pub(crate) enum Hull {
     Explorer,
     Custom,
+    Medusa,
 }
 
 pub(crate) fn hull(model: &ModelPreview) -> Option<Hull> {
     match (model.object.as_str(), model.geometry_key.as_str()) {
         ("SH008", GEOMETRY_KEY) => Some(Hull::Explorer),
         ("SH010", CUSTOM_GEOMETRY_KEY) => Some(Hull::Custom),
+        ("SH171", MEDUSA_GEOMETRY_KEY) => Some(Hull::Medusa),
         _ => None,
     }
 }
@@ -53,13 +58,16 @@ fn authenticated_visual(
     magic: &[u8; 8],
     count: usize,
 ) -> Result<Vec<VisualVertex>, &'static str> {
-    let hash = bytes.iter().fold(0xcbf2_9ce4_8422_2325_u64, |hash, byte| {
-        (hash ^ u64::from(*byte)).wrapping_mul(0x100_0000_01b3)
-    });
-    if hash != expected_hash {
-        return Err("Goshawk preview bytes changed");
+    if fnv(bytes) != expected_hash {
+        return Err("Showroom preview bytes changed");
     }
     decode_visual(bytes, magic, count)
+}
+
+fn fnv(bytes: &[u8]) -> u64 {
+    bytes.iter().fold(0xcbf2_9ce4_8422_2325_u64, |hash, byte| {
+        (hash ^ u64::from(*byte)).wrapping_mul(0x100_0000_01b3)
+    })
 }
 
 fn visual() -> Result<Vec<VisualVertex>, &'static str> {
@@ -84,6 +92,7 @@ impl Hull {
                 b"SH010VZ1",
                 CUSTOM_DETAILED_FACES * 3,
             ),
+            Self::Medusa => medusa::visual(),
         }
     }
 
@@ -91,11 +100,13 @@ impl Hull {
         match self {
             Self::Explorer => GOSHAWK_PIECES,
             Self::Custom => CUSTOM_PIECES,
+            Self::Medusa => medusa::PIECES,
         }
     }
 
     fn supports(self) -> Result<(Vec<Triangle>, Vec<Piece>), SupportError> {
         match self {
+            Self::Medusa => medusa::supports().map_err(SupportError::Render),
             Self::Explorer => {
                 let source = GoshawkHullSource::bundled().map_err(SupportError::Source)?;
                 let (triangles, pieces) = support_mesh(
@@ -202,7 +213,7 @@ impl View {
             || aspect <= 0.0
             || self.radius <= 0.0
         {
-            return Err("Invalid Goshawk showroom view".into());
+            return Err("Invalid showroom view".into());
         }
         // The original bow points +Z. The Showroom's camera looks along +Z, so start
         // bow-on and retain the existing pitch, roll and yaw controls in the preview.
@@ -271,7 +282,7 @@ impl Pass {
     ) -> Result<Self, String> {
         match hull {
             Hull::Explorer => Self::new(device, queue, format),
-            Hull::Custom => Self::construct(device, queue, format, hull),
+            Hull::Custom | Hull::Medusa => Self::construct(device, queue, format, hull),
         }
     }
 
@@ -335,7 +346,7 @@ impl Pass {
         srgb: bool,
     ) -> Result<(), String> {
         if hull(model) != Some(self.hull) {
-            return Err("Goshawk Showroom hull mismatch".into());
+            return Err("Showroom hull mismatch".into());
         }
         let [x, y, width, height] = [
             bounds.x * scale[0],
@@ -399,6 +410,24 @@ mod tests {
     #[test]
     fn goshawk_original_visual_and_all_local_supports_bind_to_the_shader() {
         check_variant(Hull::Explorer, 3484, GOSHAWK_PIECES);
+    }
+
+    #[test]
+    fn medusa_original_untextured_artwork_and_shield_bind_to_the_shader() {
+        check_variant(Hull::Medusa, medusa::DETAIL_FACES, medusa::PIECES);
+        let mut material_colours = std::collections::BTreeSet::new();
+        for vertex in ok(Hull::Medusa.visual()) {
+            assert_eq!(vertex.texture, u32::MAX);
+            material_colours.insert((vertex.color.map(f32::to_bits), vertex.emissive));
+        }
+        assert_eq!(material_colours.len(), 7);
+        assert_eq!(
+            material_colours
+                .iter()
+                .filter(|(_, emissive)| *emissive == 1)
+                .count(),
+            1
+        );
     }
 
     #[test]

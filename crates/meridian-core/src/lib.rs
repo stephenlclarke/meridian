@@ -25,6 +25,7 @@ pub mod hobby_fighter;
 pub mod hyena;
 pub mod jackal;
 pub mod lanner;
+pub mod medusa;
 pub mod mining;
 pub mod moose_clipper;
 pub mod mule;
@@ -45,6 +46,7 @@ pub mod yak;
 pub use flight::GoshawkCustomApproachSnapshot;
 pub use flight::PreparedNavigationRoute;
 pub use flight::ProfitDestination;
+pub use flight::ShieldGrade;
 pub use flight::{GoshawkApproachSnapshot, GoshawkApproachStatus};
 pub use flight::{PreparedXyzzy, XyzzyAction, XyzzyError, XyzzyReview, XyzzySnapshot};
 
