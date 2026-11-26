@@ -15,6 +15,7 @@ const MAGIC: &[u8; 8] = b"MERSAVE1";
 // A route is optional in v17. The exact legacy encoding is retained when no
 // route exists; a distinct tag separates the additive trailer from corruption.
 const ROUTE_EXTENSION: &[u8; 8] = b"MRTE0001";
+const SOLAR_EXTENSION: &[u8; 8] = b"MSOL0001";
 const CONTENT: &[u8] = concat!(
     "meridian-world/rules/17;explicit-xyzzy/account-prefix-replay-v2/a11fe169;distinct-emp/paid-defensive-local-v1/a11fe169;navigation-computer/exact-route-journal/a11fe169;lareria-main-services/station-combat-three-v1/a11fe169;rapid-lasers-energy/shared-nine-byte-resources-v1/a11fe169;mining/native-work-pending-v2;fuel-scoops/paid-utility-v1;npc-missiles/canonical-native-ray-v3;traffic/local-paid-sh025-v2;npc-player/exact-pools-journal-v1;modular-mining/front-paid-v1/a11fe169;paid-standard-missile/pylon-nine-retained-v1/a11fe169;t04/8c23ce72936e8bdfa47978f7d7d4240171babe05c2da5ac49727d2616e38d802/a11fe169/fuel-chain-v1;t01/native-main-berth-flight-v1/a11fe169;practice-attempts/a11fe169;durable-missiles/a11fe169;ordinary-impact/a11fe169;t02/4e55aeba14211b7b064088f1248602161a53c728f5447f1bd29a3f7cec6f81d7;",
     "37ca73ed1b3f3656c42baedaf8dbaa3ee8aa3798ccf23e376c3c25ceac9bd572;",
@@ -313,6 +314,10 @@ impl World {
             w.bytes.extend(ROUTE_EXTENSION);
             route.encode_save(&mut w);
         }
+        if !self.solar.is_empty() {
+            w.bytes.extend(SOLAR_EXTENSION);
+            self.solar.encode(&mut w);
+        }
         let digest = checksum(&w.bytes);
         w.u64(digest);
         if w.bytes.len() > MAX_SAVE_BYTES {
@@ -411,6 +416,7 @@ impl World {
             mining: crate::mining::State::legacy_absent(),
             mining_scope: std::sync::Arc::new(()),
             damage: super::damage::State::default(),
+            solar: super::solar::State::default(),
             station_data: Some(station_data),
             navigation_catalogue: Some(
                 OriginalNavigation::bundled().map_err(|_| SaveError::ContentMismatch)?,
@@ -446,14 +452,33 @@ impl World {
         candidate.damage = super::damage::State::decode(&mut r, version)?;
         candidate.mining = crate::mining::State::decode(&mut r)?;
         candidate.jump_journal = crate::navigation::JumpJournal::decode(&mut r)?;
+        let mut solar_present = false;
         if !r.finished() {
-            if r.fixed::<8>().map_err(|_| SaveError::InvalidEncoding)? != *ROUTE_EXTENSION {
+            let tag = r.fixed::<8>().map_err(|_| SaveError::InvalidEncoding)?;
+            if tag == *ROUTE_EXTENSION {
+                candidate.navigation_route =
+                    Some(crate::navigation::RoutePlan::decode_save(&mut r)?);
+                if !r.finished() {
+                    if r.fixed::<8>().map_err(|_| SaveError::InvalidEncoding)? != *SOLAR_EXTENSION {
+                        return Err(SaveError::InvalidEncoding);
+                    }
+                    candidate.solar = super::solar::State::decode(&mut r)?;
+                    solar_present = true;
+                }
+            } else if tag == *SOLAR_EXTENSION {
+                candidate.solar = super::solar::State::decode(&mut r)?;
+                solar_present = true;
+            } else {
                 return Err(SaveError::InvalidEncoding);
             }
-            candidate.navigation_route = Some(crate::navigation::RoutePlan::decode_save(&mut r)?);
         }
         if !r.finished() {
             return Err(SaveError::InvalidEncoding);
+        }
+        if !solar_present {
+            let mut solar = super::solar::State::default();
+            solar.initialize_legacy_origin(&candidate)?;
+            candidate.solar = solar;
         }
         candidate.validate_saved_world(
             candidate.practice,
@@ -544,6 +569,7 @@ impl World {
             self.state.tick,
             account.fuel_tenths(),
         )?;
+        self.solar.validate(self, account, commerce.modular)?;
         self.validate_saved_navigation_route()?;
         if !self.damage.enabled() {
             self.damage.validate_resources(self, nav.dock_sequence)?;
@@ -673,7 +699,17 @@ impl World {
                     .and_then(|revisions| revisions.checked_add(emp.1))
                     .ok_or(SaveError::SequenceExhausted)?,
             ),
-            secret,
+            (
+                secret,
+                (
+                    self.solar
+                        .receipts()
+                        .iter()
+                        .map(|receipt| u64::from(receipt.added))
+                        .sum(),
+                    self.solar.receipts().len() as u64,
+                ),
+            ),
         )?;
         if navigation
             .dock()
@@ -709,14 +745,14 @@ fn validate_accounting(
     fuel_spent: u64,
     penalties: u8,
     ammunition: (u32, u64),
-    secret: super::xyzzy::Terms,
+    (secret, solar): (super::xyzzy::Terms, (u64, u64)),
 ) -> Result<(), SaveError> {
     let (ammunition_paid, ammunition_revisions) = ammunition;
     let income = 7200_u128
         + u128::from(d.completed) * u128::from(crate::freight::REWARD_TENTHS)
         + u128::from(s.credited);
     let income = adjust_secret_cash(income, secret.cash_adjustment)?;
-    let fuel = 130_u128 + u128::from(s.refilled_units) + secret.fuel_supplied;
+    let fuel = 130_u128 + u128::from(s.refilled_units) + secret.fuel_supplied + u128::from(solar.0);
     let available_gross = 7200_u128
         + u128::from(d.completed) * u128::from(crate::freight::REWARD_TENTHS)
         + s.gross_credit;
@@ -738,6 +774,7 @@ fn validate_accounting(
         || u128::from(d.revision)
             != u128::from(d.freight_revision)
                 + u128::from(secret.revisions)
+                + u128::from(solar.1)
                 + u128::from(s.revision)
                 + u128::from(jumps)
                 + u128::from(d.equipment_revision)

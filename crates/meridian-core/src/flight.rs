@@ -4,6 +4,8 @@ pub use emp::{
     EmpGrades, EmpOrigin, EmpProvenance, EmpSnapshot, OwnedEmp, PreparedEmpEquipment,
 };
 mod celestial;
+mod solar;
+pub use solar::{SolarScoopStatus, SolarSnapshot};
 mod damage;
 mod goshawk_validation;
 pub use goshawk_validation::GoshawkCustomApproachSnapshot;
@@ -187,6 +189,7 @@ pub struct World {
     mining: crate::mining::State,
     mining_scope: std::sync::Arc<()>,
     damage: damage::State,
+    solar: solar::State,
     station_data: Option<OriginalStationData>,
     navigation_catalogue: Option<OriginalNavigation>,
     navigation: Option<NavigationState>,
@@ -237,6 +240,7 @@ impl World {
             mining: crate::mining::State::legacy_absent(),
             mining_scope: std::sync::Arc::new(()),
             damage: damage::State::default(),
+            solar: solar::State::default(),
             station_data: None,
             navigation_catalogue: None,
             navigation: None,
@@ -575,7 +579,7 @@ impl World {
         next.tick = next.tick.checked_add(1).ok_or(StepError::TickOverflow)?;
         next.motion_refusal = None;
         if next.mode == FlightMode::Docked {
-            return self.publish_step(next);
+            return self.publish_step(next, None);
         }
         if !(0.0..=MAX_SPEED).contains(&self.state.speed) {
             return Err(StepError::NonFiniteState);
@@ -610,7 +614,7 @@ impl World {
             stopped.tick = next.tick;
             stopped.speed = 0.0;
             stopped.motion_refusal = Some(MotionRefusal::CelestialContact);
-            return self.publish_step(stopped);
+            return self.publish_step(stopped, Some(solar::Motion::Stopped));
         }
         if let Some(data) = &self.station_data {
             let before = flight_pose(self.state.position, self.state.orientation)
@@ -627,14 +631,14 @@ impl World {
                 stopped.tick = next.tick;
                 stopped.speed = 0.0;
                 stopped.motion_refusal = Some(MotionRefusal::NpcContact);
-                return self.publish_step(stopped);
+                return self.publish_step(stopped, Some(solar::Motion::Stopped));
             }
             if !self.mining_motion_clear(before, after, angular_travel) {
                 let mut stopped = self.state;
                 stopped.tick = next.tick;
                 stopped.speed = 0.0;
                 stopped.motion_refusal = Some(MotionRefusal::AsteroidContact);
-                return self.publish_step(stopped);
+                return self.publish_step(stopped, Some(solar::Motion::Stopped));
             }
             if data.crosses_aperture(before, after) {
                 if !data.entry_clear(
@@ -649,7 +653,7 @@ impl World {
                     stopped.speed = 0.0;
                     stopped.mode = FlightMode::Flight;
                     stopped.motion_refusal = Some(MotionRefusal::EntryConditions);
-                    return self.publish_step(stopped);
+                    return self.publish_step(stopped, Some(solar::Motion::Stopped));
                 }
                 next.mode = FlightMode::Docked;
                 next.speed = 0.0;
@@ -660,12 +664,12 @@ impl World {
                     stopped.speed = 0.0;
                     stopped.mode = FlightMode::Flight;
                     stopped.motion_refusal = Some(MotionRefusal::StationContact);
-                    return self.publish_step(stopped);
+                    return self.publish_step(stopped, Some(solar::Motion::Stopped));
                 }
                 next.mode = FlightMode::Flight;
             }
         }
-        self.publish_step(next)
+        self.publish_step(next, Some(solar::Motion::Active(input)))
     }
 
     fn celestial_blocks_motion(&self, position: [f32; 3]) -> bool {
@@ -682,7 +686,11 @@ impl World {
         }
     }
 
-    fn publish_step(&mut self, mut next: Snapshot) -> Result<(), StepError> {
+    fn publish_step(
+        &mut self,
+        mut next: Snapshot,
+        motion: Option<solar::Motion>,
+    ) -> Result<(), StepError> {
         let flight_reception_start = self.flight_reception_start();
         let mut navigation = self.navigation;
         let mut mission_epoch = None;
@@ -807,6 +815,34 @@ impl World {
         prepared.traffic = emp.traffic.clone();
         prepared.pulse = emp.pulse;
         prepared.combat = emp.combat;
+        let (solar, gained_fuel) = self
+            .solar
+            .prepare(
+                self,
+                next,
+                navigation,
+                prepared.combat.physical_tick(),
+                motion,
+                prepared.pulse.alive(),
+            )
+            .map_err(|_| StepError::TickOverflow)?;
+        if solar.fatal_clock() == Some(prepared.combat.physical_tick()) {
+            prepared.pulse.damage_energy(u16::MAX);
+        }
+        let solar_account = if gained_fuel == 0 {
+            None
+        } else {
+            if planned_debit.is_some() {
+                return Err(StepError::NonFiniteState);
+            }
+            Some(
+                self.commander_account
+                    .as_ref()
+                    .ok_or(StepError::NonFiniteState)?
+                    .prepare_solar_fuel(gained_fuel)
+                    .map_err(|_| StepError::NonFiniteState)?,
+            )
+        };
         if let Some((traffic, _)) = &mut traffic {
             *traffic = prepared.traffic.clone();
         }
@@ -822,7 +858,7 @@ impl World {
             navigation,
             &prepared,
             traffic.as_ref(),
-            (&damage, &mining, &emp.state),
+            (&damage, &mining, &emp.state, &solar),
             navigation_trade.as_ref(),
         )
         .map_err(|_| StepError::TickOverflow)?;
@@ -832,6 +868,9 @@ impl World {
                 .ok_or(StepError::NonFiniteState)?
                 .debit_fuel(debit)
                 .map_err(|_| StepError::NonFiniteState)?;
+        }
+        if let Some(account) = solar_account {
+            self.commander_account = Some(account);
         }
         // The receipt and the existing navigation, dock and wallet changes publish together.
         if let Some(leg) = completed_leg {
@@ -849,6 +888,7 @@ impl World {
         self.combat = prepared.combat;
         self.pulse = prepared.pulse;
         self.damage = damage;
+        self.solar = solar;
         self.emp = emp.state;
         self.mining = mining;
         self.practice = prepared.practice;

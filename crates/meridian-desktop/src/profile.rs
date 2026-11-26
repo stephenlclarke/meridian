@@ -126,6 +126,7 @@ impl Profile {
                 }
                 meridian_core::XyzzyAction::ToggleUnlimitedFuel => "Fuel setting saved.",
                 meridian_core::XyzzyAction::FitShield(_) => "Selected shield test fit saved.",
+                meridian_core::XyzzyAction::FitFuelScoops => "Fuel Scoops-only test fit saved.",
                 meridian_core::XyzzyAction::MaximumFuelStorage => {
                     "TEST MAX: four fuel tanks fitted, filled and saved."
                 }

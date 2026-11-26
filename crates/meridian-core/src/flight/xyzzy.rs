@@ -20,6 +20,8 @@ pub enum XyzzyAction {
     FitShield(ShieldGrade),
     /// Separately labelled maximum test fit, including the original four-tank exception.
     MaximumFuelStorage,
+    /// Original explicit Fuel Scoops-only action; no other grant or refill.
+    FitFuelScoops,
 }
 impl XyzzyAction {
     fn outfit(self) -> bool {
@@ -32,10 +34,10 @@ impl XyzzyAction {
         )
     }
     fn changes_equipment(self) -> bool {
-        self.outfit() || matches!(self, Self::FitShield(_))
+        self.outfit() || matches!(self, Self::FitShield(_) | Self::FitFuelScoops)
     }
     fn refills(self, mode: bool) -> bool {
-        !matches!(self, Self::FitShield(_)) && (self.outfit() || mode)
+        !matches!(self, Self::FitShield(_) | Self::FitFuelScoops) && (self.outfit() || mode)
     }
     fn tag(self) -> u8 {
         match self {
@@ -45,6 +47,7 @@ impl XyzzyAction {
             Self::ToggleUnlimitedFuel => 3,
             Self::FitShield(grade) => 4 + grade as u8,
             Self::MaximumFuelStorage => 11,
+            Self::FitFuelScoops => 12,
         }
     }
     fn from_tag(tag: u8) -> Result<Self, SaveError> {
@@ -55,6 +58,7 @@ impl XyzzyAction {
             3 => Ok(Self::ToggleUnlimitedFuel),
             4..=10 => Ok(Self::FitShield(ShieldGrade::from_tag(tag - 4)?)),
             11 => Ok(Self::MaximumFuelStorage),
+            12 => Ok(Self::FitFuelScoops),
             _ => Err(SaveError::InvalidEncoding),
         }
     }
@@ -68,6 +72,7 @@ pub enum XyzzyError {
     Inactive,
     ActiveFuelPractice,
     ActiveContractCustody,
+    UtilityFitConflict,
     Save(SaveError),
 }
 impl core::fmt::Display for XyzzyError {
@@ -160,6 +165,16 @@ impl State {
                 && revision <= record.end_revision
         })
     }
+    pub(super) fn authorizes_scoops(&self, dock: DockContext, tick: u64, revision: u64) -> bool {
+        self.authorizes(dock, tick, revision)
+            || self.records.iter().any(|record| {
+                record.action == XyzzyAction::FitFuelScoops
+                    && record.dock == dock
+                    && record.tick == tick
+                    && revision > record.revision
+                    && revision <= record.end_revision
+            })
+    }
     pub(super) fn max_tank_intervals(
         &self,
     ) -> impl Iterator<Item = (u64, u64, DockContext, u64)> + '_ {
@@ -249,6 +264,17 @@ impl State {
         let fuel = u64::from(crate::navigation::FUEL_CAPACITY)
             .checked_add(refilled)
             .and_then(|value| value.checked_add(supplied))
+            .and_then(|value| {
+                value.checked_add(
+                    world
+                        .solar
+                        .receipts()
+                        .iter()
+                        .filter(|receipt| receipt.revision <= revision && receipt.tick <= tick)
+                        .map(|receipt| u64::from(receipt.added))
+                        .sum(),
+                )
+            })
             .and_then(|value| value.checked_sub(spent))
             .ok_or(INVALID)?;
         Ok((refilled, u16::try_from(fuel).map_err(|_| INVALID)?))
@@ -325,6 +351,13 @@ impl State {
                     r.revision,
                     r.end_revision,
                     grade,
+                )?;
+            }
+            if r.action == XyzzyAction::FitFuelScoops {
+                commerce.modular.validate_scoop_test_record(
+                    r.dock.owner().seed(),
+                    r.revision,
+                    r.end_revision,
                 )?;
             }
             if r.action == XyzzyAction::MaximumFuelStorage {
@@ -498,6 +531,14 @@ impl World {
         if action == XyzzyAction::MaximumFuelStorage && !self.test_tank_custody_clear() {
             return Err(XyzzyError::ActiveContractCustody);
         }
+        if action == XyzzyAction::FitFuelScoops
+            && self.fitted_fuel_scoops().is_none()
+            && !self
+                .xyzzy_has_free_ordinary_utility_mount()
+                .map_err(XyzzyError::Save)?
+        {
+            return Err(XyzzyError::UtilityFitConflict);
+        }
         let dock = self
             .current_dock_context()
             .filter(|_| self.state.mode == FlightMode::Docked)
@@ -657,6 +698,12 @@ impl World {
                 review.dock,
                 review.tick,
                 super::modular::ModuleKind::Shield(grade),
+            )?;
+        } else if review.action == XyzzyAction::FitFuelScoops {
+            self.grant_xyzzy_module(
+                review.dock,
+                review.tick,
+                super::modular::ModuleKind::FuelScoops,
             )?;
         }
         if max_tanks {

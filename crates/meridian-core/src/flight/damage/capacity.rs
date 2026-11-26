@@ -67,10 +67,15 @@ impl World {
         navigation: Option<NavigationState>,
         prepared: &missiles::PreparedStep,
         traffic: Option<&(traffic::State, StationMarkets)>,
-        resources: (&State, &crate::mining::State, &crate::flight::emp::State),
+        resources: (
+            &State,
+            &crate::mining::State,
+            &crate::flight::emp::State,
+            &crate::flight::solar::State,
+        ),
         trade: Option<&navigation_trade::State>,
     ) -> Result<(), SaveError> {
-        let (damage, mining, emp) = resources;
+        let (damage, mining, emp, solar) = resources;
         if self.commander_account.is_none() {
             return Ok(());
         }
@@ -90,6 +95,7 @@ impl World {
             && !missile_growth
             && !journal_grows
             && !emp.proof_grows_from(&self.emp)
+            && solar.encoded_len() <= self.solar.encoded_len()
         {
             return Ok(());
         }
@@ -119,6 +125,8 @@ impl World {
             .and_then(|n| n.checked_add(new_mining))
             .and_then(|n| n.checked_sub(size(|w| self.emp.encode(w))))
             .and_then(|n| n.checked_add(size(|w| emp.encode(w))))
+            .and_then(|n| n.checked_sub(self.solar.encoded_len()))
+            .and_then(|n| n.checked_add(solar.encoded_len()))
             .ok_or(SaveError::TooLarge)?;
         let old = size(|w| {
             if let Some(n) = self.navigation {

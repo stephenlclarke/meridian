@@ -234,17 +234,35 @@ impl Attempt {
                 terminal.dock,
                 terminal.tick,
                 terminal.account_revision,
-            );
+            ) + c
+                .world
+                .solar
+                .receipts()
+                .iter()
+                .filter(|receipt| {
+                    terminal
+                        .account_revision
+                        .map_or(receipt.tick > terminal.tick, |revision| {
+                            receipt.revision > revision
+                        })
+                })
+                .map(|receipt| u64::from(receipt.added))
+                .sum::<u64>();
             if u64::from(end.fuel).checked_add(later) != Some(u64::from(current.fuel)) {
                 return Err(INVALID);
             }
         }
         if let Some(buy) = self.buy {
-            self.validate_fuel_continuity(buy, end)?;
+            self.validate_fuel_continuity(buy, end, c)?;
         }
         Ok(())
     }
-    fn validate_fuel_continuity(&self, buy: Trade, end: FuelAnchor) -> Result<(), SaveError> {
+    fn validate_fuel_continuity(
+        &self,
+        buy: Trade,
+        end: FuelAnchor,
+        c: &Context<'_>,
+    ) -> Result<(), SaveError> {
         let mut events = Vec::new();
         for f in self.fuel.iter().filter(|f| f.transaction > buy.transaction) {
             events.push((f.account_revision, f.tick, f.units_before, f.units_after));
@@ -258,6 +276,23 @@ impl Attempt {
                 sale.tick,
                 sale.fuel_at_trade,
                 sale.fuel_at_trade,
+            ));
+        }
+        for receipt in c.world.solar.receipts().iter().filter(|receipt| {
+            receipt.revision > buy.account_revision
+                && self.terminal.is_none_or(|terminal| {
+                    terminal
+                        .account_revision
+                        .map_or(receipt.tick <= terminal.tick, |revision| {
+                            receipt.revision <= revision
+                        })
+                })
+        }) {
+            events.push((
+                receipt.revision,
+                receipt.tick,
+                receipt.before,
+                receipt.before.checked_add(receipt.added).ok_or(INVALID)?,
             ));
         }
         events.sort_unstable();

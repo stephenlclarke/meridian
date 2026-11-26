@@ -662,6 +662,7 @@ fn actual_secret_base_release_spends_once_drains_shield_and_preserves_hull_cargo
         mining: w.mining.clone(),
         mining_scope: Arc::clone(&w.mining_scope),
         damage: w.damage.clone(),
+        solar: w.solar.clone(),
         station_data: decoded.station_data,
         navigation_catalogue: decoded.navigation_catalogue,
         navigation: w.navigation,
