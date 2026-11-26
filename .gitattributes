@@ -372,3 +372,8 @@ tools/measure_magpie.py text eol=lf
 tools/prepare_magpie.py text eol=lf
 tools/rebuild_magpie.py text eol=lf
 tools/verify_magpie.py text eol=lf
+
+# Byte-pinned Hippo replay programs.
+tools/measure_hippo.py text eol=lf
+tools/prepare_hippo.py text eol=lf
+tools/verify_hippo.py text eol=lf
