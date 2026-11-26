@@ -446,13 +446,23 @@ impl World {
     }
 
     pub(super) fn advance_selected_work(&mut self) {
-        if self.targeting.selected.is_none() {
+        let work = self
+            .current_target()
+            .and_then(|(_, c)| self.automatic_work_target(c));
+        if !matches!(work.map(|w| w.id), Some(WorkTargetId::Asteroid(_))) {
+            if self.restore_auto_mining_tool().is_err() {
+                self.targeting.work_status = Some("Tool change unavailable");
+                return;
+            }
+        } else if let Err(err) = self.select_auto_mining_tool() {
+            self.targeting.work_status = Some(match err {
+                crate::mining::MiningError::ProtectedActivity => "Protected activity",
+                crate::mining::MiningError::NoCompatibleFittedTool => "Fit mining laser",
+                _ => "Tool change unavailable",
+            });
             return;
         }
-        let Some(work) = self
-            .current_target()
-            .and_then(|(_, c)| self.automatic_work_target(c))
-        else {
+        let Some(work) = work else {
             self.targeting.work_status = None;
             return;
         };
