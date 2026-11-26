@@ -22,4 +22,10 @@ This mode is an isolated test entitlement, not PLUGH fabrication, a paid stock h
 
 In flight, the active World hull identity selects the original 162,548-face artwork. The GPU retains the detailed mesh and uses a closer chase camera in the shared flight projection. Near the station, the existing first-person view remains in use. The 512-face flight contact geometry is independent, and the archived 729-piece inspection shield is not rendered in flight.
 
-Native acceptance must check the displayed SH171 identity, the actual geometry on launch and return, fit limit refusal and cold Continue. The source tests do not substitute for signed installed preview acceptance.
+## Native validation
+
+On 26 November 2026, G1 built and signed exact source `5a9243153b7d05b3d268fa9a82d30df5261a0e9a` (tree `61214e3e28f6b2830cfd5c71d52482e049f29ef3`). The Orchestrator observed the native Mac process using an isolated profile. From a docked start, B fitted the cargo expansion, L launched, W accelerated and F5 saved. The chase view showed the original crown, lobes and cyan dotted artwork. The HUD showed FLIGHT, 50.30/50.30, 0/32 t and MEDUSA PREVIEW SAVED.
+
+The exact core decoder read SH171, FLIGHT, speed 50.3, cargo expansion fitted and no ordinary commander identity or wallet. It re-encoded the 69-byte save without changing a byte; the ordinary decoder refused the save. The first process closed, and a separate cold process reopened the same isolated slot. The Orchestrator confirmed the same Medusa model, flight mode, 50.30 speed and 0/32 t hold. Both process exits preserved the save bytes. The signed build passed the post-run strict signature check.
+
+Core regressions at that exact source also passed the stock-rate launch and physical docking return, legal rear-side save and fit-limit checks. Native fit-limit refusal and physical docking return were not observed in the interactive run. Acceptance of those native cases and final packaged release qualification remain open. No real commander save was used, and this evidence grants no ordinary ownership or progression.
