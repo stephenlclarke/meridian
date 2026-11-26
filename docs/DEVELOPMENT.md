@@ -77,3 +77,22 @@ Remove obsolete ISSUE-*.md and PR-*.md handoff copies once their useful content 
 Keep earlier installed previews and real profiles unchanged. Signing/local functional delivery does not establish notarization, commercial distribution or full first-playable acceptance. [Implementation status](IMPLEMENTATION-STATUS.md) records the latest qualified scope.
 
 When a committed-main coverage gate fails, preserve its exact source, original changed-line set and raw measurements. A correction must exercise the missing behavior and recheck that original set against actual new coverage; a subsequent Previous version baseline alone is not evidence of a fix. Keep unreachability and unobserved host boundaries explicit rather than inventing gameplay states or changing assertions.
+
+### Integrating stacked changes
+
+Publish a change that overlaps an active PR when its integration base is ready.
+Keep later hulls in their existing owner worktrees. Advance the immediate successor
+after each protected merge. Independent changes can proceed in parallel.
+Record the tested commit when reusing earlier results for unchanged code.
+
+CI cancels superseded runs for the same PR. Each main push has its own run.
+For a coverage timing trial, dispatch CI twice on the same commit with
+`coverage_trial=serial` and `coverage_trial=parallel`. Each trial runs only
+the Coverage reports job. The parallel schedule uses one runner and a second
+checkout for the Python suite. Compare test counts, LCOV and Python XML covered
+lines, job time and queue time before adopting a faster schedule. Full CI
+uses the parallel schedule. In a paired trial, collection fell from 53m00s
+to 44m54s. Both runs exercised the same tests and covered the same Python
+and Rust lines. The native frame hit counts varied. The runner image revisions
+also differed. See the [serial run](https://github.com/stephenlclarke/meridian/actions/runs/45843663640)
+and [parallel run](https://github.com/stephenlclarke/meridian/actions/runs/45843658736).
