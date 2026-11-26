@@ -1,0 +1,2633 @@
+{
+  "actualNativePopulation": "UNISSUED_BY_THIS_BUDGET; neither zero people nor automation is inferred.",
+  "actualObservations": [],
+  "emptyDryReference": {
+    "centreMetres": [
+      -0.005995982737240241,
+      0.08640735998838894,
+      -2.4239566464299034
+    ],
+    "id": "finite-equivalent-empty-medusa-proposal",
+    "inertiaAboutCentreOfMassKgM2": [
+      1385523.354783143,
+      -25.12419784209598,
+      517.6920558450192,
+      -25.12419784209598,
+      2614212.2324890774,
+      -15878.051754398119,
+      517.6920558450192,
+      -15878.051754398119,
+      2569400.213187349
+    ],
+    "massKg": 40712.0
+  },
+  "engineeringSHA256": "3a251b2433d907425bf0ad1d2cff150095195b185669a8addfb6fa7443f7ac38",
+  "finiteIntrinsicHardware": [
+    {
+      "centreMetres": [
+        2.638033882271673e-05,
+        6.440707983780631,
+        -4.032008697265583
+      ],
+      "certificates": {
+        "design": {
+          "cornerWinding": [
+            1.0000000000000002,
+            1.0,
+            1.0,
+            1.0,
+            1.0,
+            1.0,
+            1.0,
+            1.0
+          ],
+          "noBoundaryContact": true
+        },
+        "nativeDesign": {
+          "cornerWinding": [
+            0.9999999999999999,
+            1.0,
+            0.9999999999999999,
+            1.0,
+            1.0000000000000002,
+            1.0,
+            1.0,
+            1.0
+          ],
+          "noBoundaryContact": true
+        }
+      },
+      "detailedComponentIndex": 7,
+      "dimensionsMetres": [
+        0.6,
+        0.6,
+        0.8
+      ],
+      "equivalentDistributionGeometry": {
+        "faces": [
+          [
+            0,
+            1,
+            3
+          ],
+          [
+            0,
+            3,
+            2
+          ],
+          [
+            4,
+            6,
+            7
+          ],
+          [
+            4,
+            7,
+            5
+          ],
+          [
+            0,
+            4,
+            5
+          ],
+          [
+            0,
+            5,
+            1
+          ],
+          [
+            2,
+            3,
+            7
+          ],
+          [
+            2,
+            7,
+            6
+          ],
+          [
+            0,
+            2,
+            6
+          ],
+          [
+            0,
+            6,
+            4
+          ],
+          [
+            1,
+            5,
+            7
+          ],
+          [
+            1,
+            7,
+            3
+          ]
+        ],
+        "materialOrBiologicalFunctionQualified": false,
+        "purpose": "Equivalent mass-distribution geometry only; never original organ or native LOD",
+        "vertices": [
+          [
+            -0.29997361966117725,
+            6.140707983780631,
+            -4.432008697265584
+          ],
+          [
+            -0.29997361966117725,
+            6.140707983780631,
+            -3.6320086972655834
+          ],
+          [
+            -0.29997361966117725,
+            6.740707983780631,
+            -4.432008697265584
+          ],
+          [
+            -0.29997361966117725,
+            6.740707983780631,
+            -3.6320086972655834
+          ],
+          [
+            0.30002638033882273,
+            6.140707983780631,
+            -4.432008697265584
+          ],
+          [
+            0.30002638033882273,
+            6.140707983780631,
+            -3.6320086972655834
+          ],
+          [
+            0.30002638033882273,
+            6.740707983780631,
+            -4.432008697265584
+          ],
+          [
+            0.30002638033882273,
+            6.740707983780631,
+            -3.6320086972655834
+          ]
+        ]
+      },
+      "id": "organ-equivalent-1",
+      "inertiaAboutCentreOfMassKgM2": [
+        75.00000000001455,
+        -2.7755575615628914e-17,
+        0.0,
+        -2.7755575615628914e-17,
+        75.00000000000364,
+        3.637978807091713e-12,
+        0.0,
+        3.637978807091713e-12,
+        54.00000000001455
+      ],
+      "massKg": 900.0,
+      "nativeComponentIndex": 7,
+      "newCentreOffsetMetres": [
+        0,
+        0,
+        0
+      ],
+      "newEngineeringDimensionBasis": "NEW_PROPOSED_UNIFORM_EQUIVALENT_ENGINEERING_DISTRIBUTION_NOT_RECOVERED_OR_MATERIAL_FUNCTION",
+      "originalAnchorMetres": [
+        2.638033882271673e-05,
+        6.440707983780631,
+        -4.032008697265583
+      ],
+      "originalHardwareAllocationIndex": 0,
+      "owningComponentName": "curved seed propulsion organ 0"
+    },
+    {
+      "centreMetres": [
+        -7.791992960117165,
+        4.532102286384882,
+        -3.9271970983968068
+      ],
+      "certificates": {
+        "design": {
+          "cornerWinding": [
+            1.0,
+            1.0,
+            1.0,
+            1.0,
+            0.9999999999999999,
+            1.0,
+            1.0,
+            1.0
+          ],
+          "noBoundaryContact": true
+        },
+        "nativeDesign": {
+          "cornerWinding": [
+            1.0,
+            1.0,
+            1.0,
+            1.0,
+            1.0000000000000002,
+            1.0,
+            0.9999999999999999,
+            1.0
+          ],
+          "noBoundaryContact": true
+        }
+      },
+      "detailedComponentIndex": 14,
+      "dimensionsMetres": [
+        0.6,
+        0.6,
+        0.8
+      ],
+      "equivalentDistributionGeometry": {
+        "faces": [
+          [
+            0,
+            1,
+            3
+          ],
+          [
+            0,
+            3,
+            2
+          ],
+          [
+            4,
+            6,
+            7
+          ],
+          [
+            4,
+            7,
+            5
+          ],
+          [
+            0,
+            4,
+            5
+          ],
+          [
+            0,
+            5,
+            1
+          ],
+          [
+            2,
+            3,
+            7
+          ],
+          [
+            2,
+            7,
+            6
+          ],
+          [
+            0,
+            2,
+            6
+          ],
+          [
+            0,
+            6,
+            4
+          ],
+          [
+            1,
+            5,
+            7
+          ],
+          [
+            1,
+            7,
+            3
+          ]
+        ],
+        "materialOrBiologicalFunctionQualified": false,
+        "purpose": "Equivalent mass-distribution geometry only; never original organ or native LOD",
+        "vertices": [
+          [
+            -8.091992960117166,
+            4.232102286384882,
+            -4.327197098396807
+          ],
+          [
+            -8.091992960117166,
+            4.232102286384882,
+            -3.527197098396807
+          ],
+          [
+            -8.091992960117166,
+            4.832102286384882,
+            -4.327197098396807
+          ],
+          [
+            -8.091992960117166,
+            4.832102286384882,
+            -3.527197098396807
+          ],
+          [
+            -7.491992960117165,
+            4.232102286384882,
+            -4.327197098396807
+          ],
+          [
+            -7.491992960117165,
+            4.232102286384882,
+            -3.527197098396807
+          ],
+          [
+            -7.491992960117165,
+            4.832102286384882,
+            -4.327197098396807
+          ],
+          [
+            -7.491992960117165,
+            4.832102286384882,
+            -3.527197098396807
+          ]
+        ]
+      },
+      "id": "organ-equivalent-2",
+      "inertiaAboutCentreOfMassKgM2": [
+        75.00000000001091,
+        0.0,
+        0.0,
+        0.0,
+        75.00000000001455,
+        0.0,
+        0.0,
+        0.0,
+        54.00000000001455
+      ],
+      "massKg": 900.0,
+      "nativeComponentIndex": 14,
+      "newCentreOffsetMetres": [
+        0,
+        0,
+        0
+      ],
+      "newEngineeringDimensionBasis": "NEW_PROPOSED_UNIFORM_EQUIVALENT_ENGINEERING_DISTRIBUTION_NOT_RECOVERED_OR_MATERIAL_FUNCTION",
+      "originalAnchorMetres": [
+        -7.791992960117165,
+        4.532102286384882,
+        -3.9271970983968068
+      ],
+      "originalHardwareAllocationIndex": 1,
+      "owningComponentName": "curved seed propulsion organ 1"
+    },
+    {
+      "centreMetres": [
+        -10.972128193786679,
+        1.670966747472334e-05,
+        -3.8290718701296793
+      ],
+      "certificates": {
+        "design": {
+          "cornerWinding": [
+            1.0000000000000002,
+            1.0000000000000002,
+            1.0000000000000002,
+            1.0,
+            1.0000000000000002,
+            1.0,
+            1.0,
+            0.9999999999999999
+          ],
+          "noBoundaryContact": true
+        },
+        "nativeDesign": {
+          "cornerWinding": [
+            1.0,
+            1.0,
+            1.0,
+            1.0,
+            1.0,
+            1.0,
+            1.0000000000000002,
+            1.0
+          ],
+          "noBoundaryContact": true
+        }
+      },
+      "detailedComponentIndex": 21,
+      "dimensionsMetres": [
+        0.6,
+        0.6,
+        0.8
+      ],
+      "equivalentDistributionGeometry": {
+        "faces": [
+          [
+            0,
+            1,
+            3
+          ],
+          [
+            0,
+            3,
+            2
+          ],
+          [
+            4,
+            6,
+            7
+          ],
+          [
+            4,
+            7,
+            5
+          ],
+          [
+            0,
+            4,
+            5
+          ],
+          [
+            0,
+            5,
+            1
+          ],
+          [
+            2,
+            3,
+            7
+          ],
+          [
+            2,
+            7,
+            6
+          ],
+          [
+            0,
+            2,
+            6
+          ],
+          [
+            0,
+            6,
+            4
+          ],
+          [
+            1,
+            5,
+            7
+          ],
+          [
+            1,
+            7,
+            3
+          ]
+        ],
+        "materialOrBiologicalFunctionQualified": false,
+        "purpose": "Equivalent mass-distribution geometry only; never original organ or native LOD",
+        "vertices": [
+          [
+            -11.27212819378668,
+            -0.29998329033252524,
+            -4.22907187012968
+          ],
+          [
+            -11.27212819378668,
+            -0.29998329033252524,
+            -3.4290718701296794
+          ],
+          [
+            -11.27212819378668,
+            0.30001670966747473,
+            -4.22907187012968
+          ],
+          [
+            -11.27212819378668,
+            0.30001670966747473,
+            -3.4290718701296794
+          ],
+          [
+            -10.672128193786678,
+            -0.29998329033252524,
+            -4.22907187012968
+          ],
+          [
+            -10.672128193786678,
+            -0.29998329033252524,
+            -3.4290718701296794
+          ],
+          [
+            -10.672128193786678,
+            0.30001670966747473,
+            -4.22907187012968
+          ],
+          [
+            -10.672128193786678,
+            0.30001670966747473,
+            -3.4290718701296794
+          ]
+        ]
+      },
+      "id": "organ-equivalent-3",
+      "inertiaAboutCentreOfMassKgM2": [
+        75.00000000002001,
+        0.0,
+        0.0,
+        0.0,
+        75.00000000001455,
+        0.0,
+        0.0,
+        0.0,
+        54.00000000001455
+      ],
+      "massKg": 900.0,
+      "nativeComponentIndex": 21,
+      "newCentreOffsetMetres": [
+        0,
+        0,
+        0
+      ],
+      "newEngineeringDimensionBasis": "NEW_PROPOSED_UNIFORM_EQUIVALENT_ENGINEERING_DISTRIBUTION_NOT_RECOVERED_OR_MATERIAL_FUNCTION",
+      "originalAnchorMetres": [
+        -10.972128193786679,
+        1.670966747472334e-05,
+        -3.8290718701296793
+      ],
+      "originalHardwareAllocationIndex": 2,
+      "owningComponentName": "curved seed propulsion organ 2"
+    },
+    {
+      "centreMetres": [
+        -7.792014469910934,
+        -4.532065304630761,
+        -3.927197098391958
+      ],
+      "certificates": {
+        "design": {
+          "cornerWinding": [
+            1.0000000000000002,
+            1.0,
+            1.0,
+            1.0,
+            0.9999999999999999,
+            1.0,
+            1.0,
+            1.0
+          ],
+          "noBoundaryContact": true
+        },
+        "nativeDesign": {
+          "cornerWinding": [
+            1.0,
+            1.0,
+            1.0,
+            1.0,
+            1.0,
+            1.0000000000000002,
+            1.0,
+            1.0
+          ],
+          "noBoundaryContact": true
+        }
+      },
+      "detailedComponentIndex": 28,
+      "dimensionsMetres": [
+        0.6,
+        0.6,
+        0.8
+      ],
+      "equivalentDistributionGeometry": {
+        "faces": [
+          [
+            0,
+            1,
+            3
+          ],
+          [
+            0,
+            3,
+            2
+          ],
+          [
+            4,
+            6,
+            7
+          ],
+          [
+            4,
+            7,
+            5
+          ],
+          [
+            0,
+            4,
+            5
+          ],
+          [
+            0,
+            5,
+            1
+          ],
+          [
+            2,
+            3,
+            7
+          ],
+          [
+            2,
+            7,
+            6
+          ],
+          [
+            0,
+            2,
+            6
+          ],
+          [
+            0,
+            6,
+            4
+          ],
+          [
+            1,
+            5,
+            7
+          ],
+          [
+            1,
+            7,
+            3
+          ]
+        ],
+        "materialOrBiologicalFunctionQualified": false,
+        "purpose": "Equivalent mass-distribution geometry only; never original organ or native LOD",
+        "vertices": [
+          [
+            -8.092014469910934,
+            -4.832065304630761,
+            -4.3271970983919585
+          ],
+          [
+            -8.092014469910934,
+            -4.832065304630761,
+            -3.5271970983919583
+          ],
+          [
+            -8.092014469910934,
+            -4.232065304630761,
+            -4.3271970983919585
+          ],
+          [
+            -8.092014469910934,
+            -4.232065304630761,
+            -3.5271970983919583
+          ],
+          [
+            -7.492014469910934,
+            -4.832065304630761,
+            -4.3271970983919585
+          ],
+          [
+            -7.492014469910934,
+            -4.832065304630761,
+            -3.5271970983919583
+          ],
+          [
+            -7.492014469910934,
+            -4.232065304630761,
+            -4.3271970983919585
+          ],
+          [
+            -7.492014469910934,
+            -4.232065304630761,
+            -3.5271970983919583
+          ]
+        ]
+      },
+      "id": "organ-equivalent-4",
+      "inertiaAboutCentreOfMassKgM2": [
+        75.00000000001455,
+        0.0,
+        0.0,
+        0.0,
+        75.00000000001455,
+        0.0,
+        0.0,
+        0.0,
+        54.000000000029104
+      ],
+      "massKg": 900.0,
+      "nativeComponentIndex": 28,
+      "newCentreOffsetMetres": [
+        0,
+        0,
+        0
+      ],
+      "newEngineeringDimensionBasis": "NEW_PROPOSED_UNIFORM_EQUIVALENT_ENGINEERING_DISTRIBUTION_NOT_RECOVERED_OR_MATERIAL_FUNCTION",
+      "originalAnchorMetres": [
+        -7.792014469910934,
+        -4.532065304630761,
+        -3.927197098391958
+      ],
+      "originalHardwareAllocationIndex": 3,
+      "owningComponentName": "curved seed propulsion organ 3"
+    },
+    {
+      "centreMetres": [
+        -2.489290976866797e-05,
+        -6.426831045297493,
+        -4.035555086207113
+      ],
+      "certificates": {
+        "design": {
+          "cornerWinding": [
+            1.0,
+            1.0,
+            1.0,
+            1.0,
+            1.0,
+            1.0,
+            1.0,
+            1.0
+          ],
+          "noBoundaryContact": true
+        },
+        "nativeDesign": {
+          "cornerWinding": [
+            1.0000000000000002,
+            1.0,
+            1.0,
+            1.0,
+            1.0,
+            1.0,
+            1.0,
+            1.0
+          ],
+          "noBoundaryContact": true
+        }
+      },
+      "detailedComponentIndex": 35,
+      "dimensionsMetres": [
+        0.6,
+        0.6,
+        0.8
+      ],
+      "equivalentDistributionGeometry": {
+        "faces": [
+          [
+            0,
+            1,
+            3
+          ],
+          [
+            0,
+            3,
+            2
+          ],
+          [
+            4,
+            6,
+            7
+          ],
+          [
+            4,
+            7,
+            5
+          ],
+          [
+            0,
+            4,
+            5
+          ],
+          [
+            0,
+            5,
+            1
+          ],
+          [
+            2,
+            3,
+            7
+          ],
+          [
+            2,
+            7,
+            6
+          ],
+          [
+            0,
+            2,
+            6
+          ],
+          [
+            0,
+            6,
+            4
+          ],
+          [
+            1,
+            5,
+            7
+          ],
+          [
+            1,
+            7,
+            3
+          ]
+        ],
+        "materialOrBiologicalFunctionQualified": false,
+        "purpose": "Equivalent mass-distribution geometry only; never original organ or native LOD",
+        "vertices": [
+          [
+            -0.30002489290976864,
+            -6.726831045297493,
+            -4.435555086207113
+          ],
+          [
+            -0.30002489290976864,
+            -6.726831045297493,
+            -3.635555086207113
+          ],
+          [
+            -0.30002489290976864,
+            -6.126831045297493,
+            -4.435555086207113
+          ],
+          [
+            -0.30002489290976864,
+            -6.126831045297493,
+            -3.635555086207113
+          ],
+          [
+            0.29997510709023134,
+            -6.726831045297493,
+            -4.435555086207113
+          ],
+          [
+            0.29997510709023134,
+            -6.726831045297493,
+            -3.635555086207113
+          ],
+          [
+            0.29997510709023134,
+            -6.126831045297493,
+            -4.435555086207113
+          ],
+          [
+            0.29997510709023134,
+            -6.126831045297493,
+            -3.635555086207113
+          ]
+        ]
+      },
+      "id": "organ-equivalent-5",
+      "inertiaAboutCentreOfMassKgM2": [
+        75.0,
+        0.0,
+        0.0,
+        0.0,
+        75.00000000000182,
+        0.0,
+        0.0,
+        0.0,
+        54.000000000007276
+      ],
+      "massKg": 900.0,
+      "nativeComponentIndex": 35,
+      "newCentreOffsetMetres": [
+        0,
+        0,
+        0
+      ],
+      "newEngineeringDimensionBasis": "NEW_PROPOSED_UNIFORM_EQUIVALENT_ENGINEERING_DISTRIBUTION_NOT_RECOVERED_OR_MATERIAL_FUNCTION",
+      "originalAnchorMetres": [
+        -2.489290976866797e-05,
+        -6.426831045297493,
+        -4.035555086207113
+      ],
+      "originalHardwareAllocationIndex": 4,
+      "owningComponentName": "curved seed propulsion organ 4"
+    },
+    {
+      "centreMetres": [
+        7.780344221066001,
+        -4.525325631023296,
+        -3.9317807360740398
+      ],
+      "certificates": {
+        "design": {
+          "cornerWinding": [
+            1.0000000000000002,
+            1.0,
+            1.0,
+            1.0,
+            1.0000000000000002,
+            1.0000000000000002,
+            1.0,
+            1.0000000000000002
+          ],
+          "noBoundaryContact": true
+        },
+        "nativeDesign": {
+          "cornerWinding": [
+            1.0,
+            1.0000000000000002,
+            1.0,
+            0.9999999999999999,
+            1.0,
+            1.0,
+            1.0,
+            1.0
+          ],
+          "noBoundaryContact": true
+        }
+      },
+      "detailedComponentIndex": 42,
+      "dimensionsMetres": [
+        0.6,
+        0.6,
+        0.8
+      ],
+      "equivalentDistributionGeometry": {
+        "faces": [
+          [
+            0,
+            1,
+            3
+          ],
+          [
+            0,
+            3,
+            2
+          ],
+          [
+            4,
+            6,
+            7
+          ],
+          [
+            4,
+            7,
+            5
+          ],
+          [
+            0,
+            4,
+            5
+          ],
+          [
+            0,
+            5,
+            1
+          ],
+          [
+            2,
+            3,
+            7
+          ],
+          [
+            2,
+            7,
+            6
+          ],
+          [
+            0,
+            2,
+            6
+          ],
+          [
+            0,
+            6,
+            4
+          ],
+          [
+            1,
+            5,
+            7
+          ],
+          [
+            1,
+            7,
+            3
+          ]
+        ],
+        "materialOrBiologicalFunctionQualified": false,
+        "purpose": "Equivalent mass-distribution geometry only; never original organ or native LOD",
+        "vertices": [
+          [
+            7.480344221066002,
+            -4.825325631023296,
+            -4.33178073607404
+          ],
+          [
+            7.480344221066002,
+            -4.825325631023296,
+            -3.53178073607404
+          ],
+          [
+            7.480344221066002,
+            -4.2253256310232965,
+            -4.33178073607404
+          ],
+          [
+            7.480344221066002,
+            -4.2253256310232965,
+            -3.53178073607404
+          ],
+          [
+            8.080344221066001,
+            -4.825325631023296,
+            -4.33178073607404
+          ],
+          [
+            8.080344221066001,
+            -4.825325631023296,
+            -3.53178073607404
+          ],
+          [
+            8.080344221066001,
+            -4.2253256310232965,
+            -4.33178073607404
+          ],
+          [
+            8.080344221066001,
+            -4.2253256310232965,
+            -3.53178073607404
+          ]
+        ]
+      },
+      "id": "organ-equivalent-6",
+      "inertiaAboutCentreOfMassKgM2": [
+        75.0,
+        0.0,
+        3.637978807091713e-12,
+        0.0,
+        75.00000000001455,
+        -1.8189894035458565e-12,
+        3.637978807091713e-12,
+        -1.8189894035458565e-12,
+        54.0
+      ],
+      "massKg": 900.0,
+      "nativeComponentIndex": 42,
+      "newCentreOffsetMetres": [
+        0,
+        0,
+        0
+      ],
+      "newEngineeringDimensionBasis": "NEW_PROPOSED_UNIFORM_EQUIVALENT_ENGINEERING_DISTRIBUTION_NOT_RECOVERED_OR_MATERIAL_FUNCTION",
+      "originalAnchorMetres": [
+        7.780344221066001,
+        -4.525325631023296,
+        -3.9317807360740398
+      ],
+      "originalHardwareAllocationIndex": 5,
+      "owningComponentName": "curved seed propulsion organ 5"
+    },
+    {
+      "centreMetres": [
+        10.959003279175858,
+        -1.579853523619881e-05,
+        -3.834334331250354
+      ],
+      "certificates": {
+        "design": {
+          "cornerWinding": [
+            1.0000000000000002,
+            1.0,
+            1.0,
+            1.0000000000000002,
+            1.0,
+            1.0,
+            1.0000000000000002,
+            1.0000000000000002
+          ],
+          "noBoundaryContact": true
+        },
+        "nativeDesign": {
+          "cornerWinding": [
+            1.0000000000000002,
+            1.0,
+            1.0000000000000002,
+            1.0,
+            1.0000000000000002,
+            1.0,
+            1.0,
+            1.0
+          ],
+          "noBoundaryContact": true
+        }
+      },
+      "detailedComponentIndex": 49,
+      "dimensionsMetres": [
+        0.6,
+        0.6,
+        0.8
+      ],
+      "equivalentDistributionGeometry": {
+        "faces": [
+          [
+            0,
+            1,
+            3
+          ],
+          [
+            0,
+            3,
+            2
+          ],
+          [
+            4,
+            6,
+            7
+          ],
+          [
+            4,
+            7,
+            5
+          ],
+          [
+            0,
+            4,
+            5
+          ],
+          [
+            0,
+            5,
+            1
+          ],
+          [
+            2,
+            3,
+            7
+          ],
+          [
+            2,
+            7,
+            6
+          ],
+          [
+            0,
+            2,
+            6
+          ],
+          [
+            0,
+            6,
+            4
+          ],
+          [
+            1,
+            5,
+            7
+          ],
+          [
+            1,
+            7,
+            3
+          ]
+        ],
+        "materialOrBiologicalFunctionQualified": false,
+        "purpose": "Equivalent mass-distribution geometry only; never original organ or native LOD",
+        "vertices": [
+          [
+            10.659003279175858,
+            -0.3000157985352362,
+            -4.234334331250354
+          ],
+          [
+            10.659003279175858,
+            -0.3000157985352362,
+            -3.434334331250354
+          ],
+          [
+            10.659003279175858,
+            0.2999842014647638,
+            -4.234334331250354
+          ],
+          [
+            10.659003279175858,
+            0.2999842014647638,
+            -3.434334331250354
+          ],
+          [
+            11.25900327917586,
+            -0.3000157985352362,
+            -4.234334331250354
+          ],
+          [
+            11.25900327917586,
+            -0.3000157985352362,
+            -3.434334331250354
+          ],
+          [
+            11.25900327917586,
+            0.2999842014647638,
+            -4.234334331250354
+          ],
+          [
+            11.25900327917586,
+            0.2999842014647638,
+            -3.434334331250354
+          ]
+        ]
+      },
+      "id": "organ-equivalent-7",
+      "inertiaAboutCentreOfMassKgM2": [
+        75.00000000000546,
+        0.0,
+        7.275957614183426e-12,
+        0.0,
+        75.00000000004366,
+        0.0,
+        7.275957614183426e-12,
+        0.0,
+        54.000000000043656
+      ],
+      "massKg": 900.0,
+      "nativeComponentIndex": 49,
+      "newCentreOffsetMetres": [
+        0,
+        0,
+        0
+      ],
+      "newEngineeringDimensionBasis": "NEW_PROPOSED_UNIFORM_EQUIVALENT_ENGINEERING_DISTRIBUTION_NOT_RECOVERED_OR_MATERIAL_FUNCTION",
+      "originalAnchorMetres": [
+        10.959003279175858,
+        -1.579853523619881e-05,
+        -3.834334331250354
+      ],
+      "originalHardwareAllocationIndex": 6,
+      "owningComponentName": "curved seed propulsion organ 6"
+    },
+    {
+      "centreMetres": [
+        7.78036454319888,
+        4.52529069120219,
+        -3.931780736050916
+      ],
+      "certificates": {
+        "design": {
+          "cornerWinding": [
+            0.9999999999999997,
+            1.0,
+            1.0000000000000002,
+            1.0,
+            1.0000000000000002,
+            1.0,
+            1.0,
+            1.0
+          ],
+          "noBoundaryContact": true
+        },
+        "nativeDesign": {
+          "cornerWinding": [
+            1.0000000000000002,
+            1.0,
+            1.0,
+            1.0,
+            1.0,
+            1.0,
+            1.0,
+            1.0
+          ],
+          "noBoundaryContact": true
+        }
+      },
+      "detailedComponentIndex": 56,
+      "dimensionsMetres": [
+        0.6,
+        0.6,
+        0.8
+      ],
+      "equivalentDistributionGeometry": {
+        "faces": [
+          [
+            0,
+            1,
+            3
+          ],
+          [
+            0,
+            3,
+            2
+          ],
+          [
+            4,
+            6,
+            7
+          ],
+          [
+            4,
+            7,
+            5
+          ],
+          [
+            0,
+            4,
+            5
+          ],
+          [
+            0,
+            5,
+            1
+          ],
+          [
+            2,
+            3,
+            7
+          ],
+          [
+            2,
+            7,
+            6
+          ],
+          [
+            0,
+            2,
+            6
+          ],
+          [
+            0,
+            6,
+            4
+          ],
+          [
+            1,
+            5,
+            7
+          ],
+          [
+            1,
+            7,
+            3
+          ]
+        ],
+        "materialOrBiologicalFunctionQualified": false,
+        "purpose": "Equivalent mass-distribution geometry only; never original organ or native LOD",
+        "vertices": [
+          [
+            7.48036454319888,
+            4.22529069120219,
+            -4.331780736050916
+          ],
+          [
+            7.48036454319888,
+            4.22529069120219,
+            -3.531780736050916
+          ],
+          [
+            7.48036454319888,
+            4.82529069120219,
+            -4.331780736050916
+          ],
+          [
+            7.48036454319888,
+            4.82529069120219,
+            -3.531780736050916
+          ],
+          [
+            8.08036454319888,
+            4.22529069120219,
+            -4.331780736050916
+          ],
+          [
+            8.08036454319888,
+            4.22529069120219,
+            -3.531780736050916
+          ],
+          [
+            8.08036454319888,
+            4.82529069120219,
+            -4.331780736050916
+          ],
+          [
+            8.08036454319888,
+            4.82529069120219,
+            -3.531780736050916
+          ]
+        ]
+      },
+      "id": "organ-equivalent-8",
+      "inertiaAboutCentreOfMassKgM2": [
+        74.99999999999272,
+        0.0,
+        0.0,
+        0.0,
+        74.9999999999709,
+        0.0,
+        0.0,
+        0.0,
+        54.0
+      ],
+      "massKg": 900.0,
+      "nativeComponentIndex": 56,
+      "newCentreOffsetMetres": [
+        0,
+        0,
+        0
+      ],
+      "newEngineeringDimensionBasis": "NEW_PROPOSED_UNIFORM_EQUIVALENT_ENGINEERING_DISTRIBUTION_NOT_RECOVERED_OR_MATERIAL_FUNCTION",
+      "originalAnchorMetres": [
+        7.78036454319888,
+        4.52529069120219,
+        -3.931780736050916
+      ],
+      "originalHardwareAllocationIndex": 7,
+      "owningComponentName": "curved seed propulsion organ 7"
+    },
+    {
+      "centreMetres": [
+        -0.019216200376120828,
+        0.3904177966240872,
+        0.6892645312339782
+      ],
+      "certificates": {
+        "design": {
+          "cornerWinding": [
+            1.0000000000000002,
+            1.0,
+            1.0,
+            1.0,
+            1.0000000000000002,
+            1.0,
+            1.0,
+            1.0
+          ],
+          "noBoundaryContact": true
+        },
+        "nativeDesign": {
+          "cornerWinding": [
+            1.0000000000000002,
+            1.0,
+            1.0,
+            1.0,
+            1.0,
+            1.0,
+            1.0,
+            1.0
+          ],
+          "noBoundaryContact": true
+        }
+      },
+      "detailedComponentIndex": 0,
+      "dimensionsMetres": [
+        1.5,
+        1.0,
+        1.8
+      ],
+      "equivalentDistributionGeometry": {
+        "faces": [
+          [
+            0,
+            1,
+            3
+          ],
+          [
+            0,
+            3,
+            2
+          ],
+          [
+            4,
+            6,
+            7
+          ],
+          [
+            4,
+            7,
+            5
+          ],
+          [
+            0,
+            4,
+            5
+          ],
+          [
+            0,
+            5,
+            1
+          ],
+          [
+            2,
+            3,
+            7
+          ],
+          [
+            2,
+            7,
+            6
+          ],
+          [
+            0,
+            2,
+            6
+          ],
+          [
+            0,
+            6,
+            4
+          ],
+          [
+            1,
+            5,
+            7
+          ],
+          [
+            1,
+            7,
+            3
+          ]
+        ],
+        "materialOrBiologicalFunctionQualified": false,
+        "purpose": "Equivalent mass-distribution geometry only; never original organ or native LOD",
+        "vertices": [
+          [
+            -0.7692162003761208,
+            -0.10958220337591279,
+            -0.21073546876602178
+          ],
+          [
+            -0.7692162003761208,
+            -0.10958220337591279,
+            1.5892645312339782
+          ],
+          [
+            -0.7692162003761208,
+            0.8904177966240872,
+            -0.21073546876602178
+          ],
+          [
+            -0.7692162003761208,
+            0.8904177966240872,
+            1.5892645312339782
+          ],
+          [
+            0.7307837996238792,
+            -0.10958220337591279,
+            -0.21073546876602178
+          ],
+          [
+            0.7307837996238792,
+            -0.10958220337591279,
+            1.5892645312339782
+          ],
+          [
+            0.7307837996238792,
+            0.8904177966240872,
+            -0.21073546876602178
+          ],
+          [
+            0.7307837996238792,
+            0.8904177966240872,
+            1.5892645312339782
+          ]
+        ]
+      },
+      "id": "power-equivalent",
+      "inertiaAboutCentreOfMassKgM2": [
+        265.00000000000006,
+        0.0,
+        0.0,
+        0.0,
+        343.125,
+        0.0,
+        0.0,
+        0.0,
+        203.125
+      ],
+      "massKg": 750.0,
+      "nativeComponentIndex": 0,
+      "newCentreOffsetMetres": [
+        0,
+        0,
+        0
+      ],
+      "newEngineeringDimensionBasis": "NEW_PROPOSED_UNIFORM_EQUIVALENT_ENGINEERING_DISTRIBUTION_NOT_RECOVERED_OR_MATERIAL_FUNCTION",
+      "originalAnchorMetres": [
+        -0.019216200376120828,
+        0.3904177966240872,
+        0.6892645312339782
+      ],
+      "originalHardwareAllocationIndex": 8,
+      "owningComponentName": "central grown seed carapace"
+    },
+    {
+      "centreMetres": [
+        -0.019216200376120828,
+        1.590417796624087,
+        0.6892645312339782
+      ],
+      "certificates": {
+        "design": {
+          "cornerWinding": [
+            1.0,
+            1.0,
+            1.0,
+            1.0,
+            1.0,
+            1.0,
+            1.0,
+            1.0
+          ],
+          "noBoundaryContact": true
+        },
+        "nativeDesign": {
+          "cornerWinding": [
+            1.0,
+            1.0,
+            1.0,
+            1.0,
+            1.0,
+            1.0,
+            1.0,
+            1.0
+          ],
+          "noBoundaryContact": true
+        }
+      },
+      "detailedComponentIndex": 0,
+      "dimensionsMetres": [
+        1.0,
+        0.4,
+        1.0
+      ],
+      "equivalentDistributionGeometry": {
+        "faces": [
+          [
+            0,
+            1,
+            3
+          ],
+          [
+            0,
+            3,
+            2
+          ],
+          [
+            4,
+            6,
+            7
+          ],
+          [
+            4,
+            7,
+            5
+          ],
+          [
+            0,
+            4,
+            5
+          ],
+          [
+            0,
+            5,
+            1
+          ],
+          [
+            2,
+            3,
+            7
+          ],
+          [
+            2,
+            7,
+            6
+          ],
+          [
+            0,
+            2,
+            6
+          ],
+          [
+            0,
+            6,
+            4
+          ],
+          [
+            1,
+            5,
+            7
+          ],
+          [
+            1,
+            7,
+            3
+          ]
+        ],
+        "materialOrBiologicalFunctionQualified": false,
+        "purpose": "Equivalent mass-distribution geometry only; never original organ or native LOD",
+        "vertices": [
+          [
+            -0.5192162003761208,
+            1.3904177966240872,
+            0.18926453123397824
+          ],
+          [
+            -0.5192162003761208,
+            1.3904177966240872,
+            1.1892645312339782
+          ],
+          [
+            -0.5192162003761208,
+            1.790417796624087,
+            0.18926453123397824
+          ],
+          [
+            -0.5192162003761208,
+            1.790417796624087,
+            1.1892645312339782
+          ],
+          [
+            0.4807837996238792,
+            1.3904177966240872,
+            0.18926453123397824
+          ],
+          [
+            0.4807837996238792,
+            1.3904177966240872,
+            1.1892645312339782
+          ],
+          [
+            0.4807837996238792,
+            1.790417796624087,
+            0.18926453123397824
+          ],
+          [
+            0.4807837996238792,
+            1.790417796624087,
+            1.1892645312339782
+          ]
+        ]
+      },
+      "id": "control-and-sensing-equivalent",
+      "inertiaAboutCentreOfMassKgM2": [
+        8.699999999999989,
+        0.0,
+        0.0,
+        0.0,
+        14.999999999999964,
+        0.0,
+        0.0,
+        0.0,
+        8.69999999999996
+      ],
+      "massKg": 90.0,
+      "nativeComponentIndex": 0,
+      "newCentreOffsetMetres": [
+        0.0,
+        1.2,
+        0.0
+      ],
+      "newEngineeringDimensionBasis": "NEW_PROPOSED_UNIFORM_EQUIVALENT_ENGINEERING_DISTRIBUTION_NOT_RECOVERED_OR_MATERIAL_FUNCTION",
+      "originalAnchorMetres": [
+        -0.019216200376120828,
+        0.3904177966240872,
+        0.6892645312339782
+      ],
+      "originalHardwareAllocationIndex": 9,
+      "owningComponentName": "central grown seed carapace"
+    },
+    {
+      "centreMetres": [
+        -0.019216200376120828,
+        0.3904177966240872,
+        3.6892645312339782
+      ],
+      "certificates": {
+        "design": {
+          "cornerWinding": [
+            1.0000000000000002,
+            1.0,
+            1.0,
+            1.0,
+            1.0,
+            1.0,
+            1.0,
+            1.0000000000000002
+          ],
+          "noBoundaryContact": true
+        },
+        "nativeDesign": {
+          "cornerWinding": [
+            1.0000000000000002,
+            1.0000000000000002,
+            1.0,
+            1.0,
+            1.0000000000000002,
+            1.0,
+            1.0,
+            1.0000000000000002
+          ],
+          "noBoundaryContact": true
+        }
+      },
+      "detailedComponentIndex": 0,
+      "dimensionsMetres": [
+        1.2,
+        0.8,
+        1.2
+      ],
+      "equivalentDistributionGeometry": {
+        "faces": [
+          [
+            0,
+            1,
+            3
+          ],
+          [
+            0,
+            3,
+            2
+          ],
+          [
+            4,
+            6,
+            7
+          ],
+          [
+            4,
+            7,
+            5
+          ],
+          [
+            0,
+            4,
+            5
+          ],
+          [
+            0,
+            5,
+            1
+          ],
+          [
+            2,
+            3,
+            7
+          ],
+          [
+            2,
+            7,
+            6
+          ],
+          [
+            0,
+            2,
+            6
+          ],
+          [
+            0,
+            6,
+            4
+          ],
+          [
+            1,
+            5,
+            7
+          ],
+          [
+            1,
+            7,
+            3
+          ]
+        ],
+        "materialOrBiologicalFunctionQualified": false,
+        "purpose": "Equivalent mass-distribution geometry only; never original organ or native LOD",
+        "vertices": [
+          [
+            -0.6192162003761208,
+            -0.009582203375912812,
+            3.089264531233978
+          ],
+          [
+            -0.6192162003761208,
+            -0.009582203375912812,
+            4.289264531233978
+          ],
+          [
+            -0.6192162003761208,
+            0.7904177966240873,
+            3.089264531233978
+          ],
+          [
+            -0.6192162003761208,
+            0.7904177966240873,
+            4.289264531233978
+          ],
+          [
+            0.5807837996238792,
+            -0.009582203375912812,
+            3.089264531233978
+          ],
+          [
+            0.5807837996238792,
+            -0.009582203375912812,
+            4.289264531233978
+          ],
+          [
+            0.5807837996238792,
+            0.7904177966240873,
+            3.089264531233978
+          ],
+          [
+            0.5807837996238792,
+            0.7904177966240873,
+            4.289264531233978
+          ]
+        ]
+      },
+      "id": "empty-fuel-transfer-equivalent",
+      "inertiaAboutCentreOfMassKgM2": [
+        31.199999999999363,
+        0.0,
+        -1.7763568394002505e-15,
+        0.0,
+        43.19999999999891,
+        0.0,
+        -1.7763568394002505e-15,
+        0.0,
+        31.199999999999996
+      ],
+      "massKg": 180.0,
+      "nativeComponentIndex": 0,
+      "newCentreOffsetMetres": [
+        0,
+        0,
+        3
+      ],
+      "newEngineeringDimensionBasis": "NEW_PROPOSED_UNIFORM_EQUIVALENT_ENGINEERING_DISTRIBUTION_NOT_RECOVERED_OR_MATERIAL_FUNCTION",
+      "originalAnchorMetres": [
+        -0.019216200376120828,
+        0.3904177966240872,
+        0.6892645312339782
+      ],
+      "originalHardwareAllocationIndex": 10,
+      "owningComponentName": "central grown seed carapace"
+    },
+    {
+      "centreMetres": [
+        -0.019216200376120828,
+        0.3904177966240872,
+        6.689264531233978
+      ],
+      "certificates": {
+        "design": {
+          "cornerWinding": [
+            1.0000000000000002,
+            1.0,
+            1.0,
+            1.0000000000000002,
+            1.0,
+            1.0000000000000002,
+            1.0000000000000002,
+            1.0000000000000002
+          ],
+          "noBoundaryContact": true
+        },
+        "nativeDesign": {
+          "cornerWinding": [
+            1.0000000000000002,
+            1.0,
+            1.0000000000000002,
+            1.0,
+            1.0,
+            1.0,
+            1.0,
+            1.0
+          ],
+          "noBoundaryContact": true
+        }
+      },
+      "detailedComponentIndex": 0,
+      "dimensionsMetres": [
+        1.2,
+        1.6,
+        1.8
+      ],
+      "equivalentDistributionGeometry": {
+        "faces": [
+          [
+            0,
+            1,
+            3
+          ],
+          [
+            0,
+            3,
+            2
+          ],
+          [
+            4,
+            6,
+            7
+          ],
+          [
+            4,
+            7,
+            5
+          ],
+          [
+            0,
+            4,
+            5
+          ],
+          [
+            0,
+            5,
+            1
+          ],
+          [
+            2,
+            3,
+            7
+          ],
+          [
+            2,
+            7,
+            6
+          ],
+          [
+            0,
+            2,
+            6
+          ],
+          [
+            0,
+            6,
+            4
+          ],
+          [
+            1,
+            5,
+            7
+          ],
+          [
+            1,
+            7,
+            3
+          ]
+        ],
+        "materialOrBiologicalFunctionQualified": false,
+        "purpose": "Equivalent mass-distribution geometry only; never original organ or native LOD",
+        "vertices": [
+          [
+            -0.6192162003761208,
+            -0.40958220337591283,
+            5.789264531233978
+          ],
+          [
+            -0.6192162003761208,
+            -0.40958220337591283,
+            7.589264531233979
+          ],
+          [
+            -0.6192162003761208,
+            1.1904177966240872,
+            5.789264531233978
+          ],
+          [
+            -0.6192162003761208,
+            1.1904177966240872,
+            7.589264531233979
+          ],
+          [
+            0.5807837996238792,
+            -0.40958220337591283,
+            5.789264531233978
+          ],
+          [
+            0.5807837996238792,
+            -0.40958220337591283,
+            7.589264531233979
+          ],
+          [
+            0.5807837996238792,
+            1.1904177966240872,
+            5.789264531233978
+          ],
+          [
+            0.5807837996238792,
+            1.1904177966240872,
+            7.589264531233979
+          ]
+        ]
+      },
+      "id": "empty-single-crew-conversion-environment-equivalent",
+      "inertiaAboutCentreOfMassKgM2": [
+        58.00000000000091,
+        0.0,
+        0.0,
+        0.0,
+        46.80000000000018,
+        0.0,
+        0.0,
+        0.0,
+        39.9999999999996
+      ],
+      "massKg": 120.0,
+      "nativeComponentIndex": 0,
+      "newCentreOffsetMetres": [
+        0,
+        0,
+        6
+      ],
+      "newEngineeringDimensionBasis": "NEW_PROPOSED_UNIFORM_EQUIVALENT_ENGINEERING_DISTRIBUTION_NOT_RECOVERED_OR_MATERIAL_FUNCTION",
+      "originalAnchorMetres": [
+        -0.019216200376120828,
+        0.3904177966240872,
+        0.6892645312339782
+      ],
+      "originalHardwareAllocationIndex": 11,
+      "owningComponentName": "central grown seed carapace"
+    },
+    {
+      "centreMetres": [
+        -0.019216200376120828,
+        -0.8095822033759128,
+        0.6892645312339782
+      ],
+      "certificates": {
+        "design": {
+          "cornerWinding": [
+            1.0,
+            1.0,
+            1.0,
+            1.0,
+            1.0,
+            0.9999999999999999,
+            1.0000000000000002,
+            1.0
+          ],
+          "noBoundaryContact": true
+        },
+        "nativeDesign": {
+          "cornerWinding": [
+            1.0,
+            1.0,
+            1.0,
+            1.0,
+            1.0000000000000002,
+            1.0,
+            1.0,
+            1.0
+          ],
+          "noBoundaryContact": true
+        }
+      },
+      "detailedComponentIndex": 0,
+      "dimensionsMetres": [
+        1.2,
+        0.4,
+        1.0
+      ],
+      "equivalentDistributionGeometry": {
+        "faces": [
+          [
+            0,
+            1,
+            3
+          ],
+          [
+            0,
+            3,
+            2
+          ],
+          [
+            4,
+            6,
+            7
+          ],
+          [
+            4,
+            7,
+            5
+          ],
+          [
+            0,
+            4,
+            5
+          ],
+          [
+            0,
+            5,
+            1
+          ],
+          [
+            2,
+            3,
+            7
+          ],
+          [
+            2,
+            7,
+            6
+          ],
+          [
+            0,
+            2,
+            6
+          ],
+          [
+            0,
+            6,
+            4
+          ],
+          [
+            1,
+            5,
+            7
+          ],
+          [
+            1,
+            7,
+            3
+          ]
+        ],
+        "materialOrBiologicalFunctionQualified": false,
+        "purpose": "Equivalent mass-distribution geometry only; never original organ or native LOD",
+        "vertices": [
+          [
+            -0.6192162003761208,
+            -1.0095822033759128,
+            0.18926453123397824
+          ],
+          [
+            -0.6192162003761208,
+            -1.0095822033759128,
+            1.1892645312339782
+          ],
+          [
+            -0.6192162003761208,
+            -0.6095822033759128,
+            0.18926453123397824
+          ],
+          [
+            -0.6192162003761208,
+            -0.6095822033759128,
+            1.1892645312339782
+          ],
+          [
+            0.5807837996238792,
+            -1.0095822033759128,
+            0.18926453123397824
+          ],
+          [
+            0.5807837996238792,
+            -1.0095822033759128,
+            1.1892645312339782
+          ],
+          [
+            0.5807837996238792,
+            -0.6095822033759128,
+            0.18926453123397824
+          ],
+          [
+            0.5807837996238792,
+            -0.6095822033759128,
+            1.1892645312339782
+          ]
+        ]
+      },
+      "id": "empty-interface-equivalent",
+      "inertiaAboutCentreOfMassKgM2": [
+        13.533333333333331,
+        0.0,
+        0.0,
+        0.0,
+        28.466666666666683,
+        0.0,
+        0.0,
+        0.0,
+        18.666666666666686
+      ],
+      "massKg": 140.0,
+      "nativeComponentIndex": 0,
+      "newCentreOffsetMetres": [
+        0.0,
+        -1.2,
+        0.0
+      ],
+      "newEngineeringDimensionBasis": "NEW_PROPOSED_UNIFORM_EQUIVALENT_ENGINEERING_DISTRIBUTION_NOT_RECOVERED_OR_MATERIAL_FUNCTION",
+      "originalAnchorMetres": [
+        -0.019216200376120828,
+        0.3904177966240872,
+        0.6892645312339782
+      ],
+      "originalHardwareAllocationIndex": 12,
+      "owningComponentName": "central grown seed carapace"
+    },
+    {
+      "centreMetres": [
+        -0.019216200376120828,
+        0.3904177966240872,
+        -2.3107354687660218
+      ],
+      "certificates": {
+        "design": {
+          "cornerWinding": [
+            1.0,
+            1.0000000000000002,
+            1.0000000000000002,
+            1.0,
+            1.0,
+            1.0,
+            1.0,
+            1.0
+          ],
+          "noBoundaryContact": true
+        },
+        "nativeDesign": {
+          "cornerWinding": [
+            1.0000000000000002,
+            1.0000000000000002,
+            1.0,
+            1.0,
+            1.0,
+            1.0,
+            1.0,
+            1.0
+          ],
+          "noBoundaryContact": true
+        }
+      },
+      "detailedComponentIndex": 0,
+      "dimensionsMetres": [
+        1.0,
+        1.0,
+        1.4
+      ],
+      "equivalentDistributionGeometry": {
+        "faces": [
+          [
+            0,
+            1,
+            3
+          ],
+          [
+            0,
+            3,
+            2
+          ],
+          [
+            4,
+            6,
+            7
+          ],
+          [
+            4,
+            7,
+            5
+          ],
+          [
+            0,
+            4,
+            5
+          ],
+          [
+            0,
+            5,
+            1
+          ],
+          [
+            2,
+            3,
+            7
+          ],
+          [
+            2,
+            7,
+            6
+          ],
+          [
+            0,
+            2,
+            6
+          ],
+          [
+            0,
+            6,
+            4
+          ],
+          [
+            1,
+            5,
+            7
+          ],
+          [
+            1,
+            7,
+            3
+          ]
+        ],
+        "materialOrBiologicalFunctionQualified": false,
+        "purpose": "Equivalent mass-distribution geometry only; never original organ or native LOD",
+        "vertices": [
+          [
+            -0.5192162003761208,
+            -0.10958220337591279,
+            -3.010735468766022
+          ],
+          [
+            -0.5192162003761208,
+            -0.10958220337591279,
+            -1.6107354687660218
+          ],
+          [
+            -0.5192162003761208,
+            0.8904177966240872,
+            -3.010735468766022
+          ],
+          [
+            -0.5192162003761208,
+            0.8904177966240872,
+            -1.6107354687660218
+          ],
+          [
+            0.4807837996238792,
+            -0.10958220337591279,
+            -3.010735468766022
+          ],
+          [
+            0.4807837996238792,
+            -0.10958220337591279,
+            -1.6107354687660218
+          ],
+          [
+            0.4807837996238792,
+            0.8904177966240872,
+            -3.010735468766022
+          ],
+          [
+            0.4807837996238792,
+            0.8904177966240872,
+            -1.6107354687660218
+          ]
+        ]
+      },
+      "id": "empty-launcher-equivalent",
+      "inertiaAboutCentreOfMassKgM2": [
+        39.46666666666658,
+        0.0,
+        0.0,
+        0.0,
+        39.46666666666658,
+        0.0,
+        0.0,
+        0.0,
+        26.666666666666686
+      ],
+      "massKg": 160.0,
+      "nativeComponentIndex": 0,
+      "newCentreOffsetMetres": [
+        0,
+        0,
+        -3
+      ],
+      "newEngineeringDimensionBasis": "NEW_PROPOSED_UNIFORM_EQUIVALENT_ENGINEERING_DISTRIBUTION_NOT_RECOVERED_OR_MATERIAL_FUNCTION",
+      "originalAnchorMetres": [
+        -0.019216200376120828,
+        0.3904177966240872,
+        0.6892645312339782
+      ],
+      "originalHardwareAllocationIndex": 13,
+      "owningComponentName": "central grown seed carapace"
+    }
+  ],
+  "generatorSHA256": "ec5c62d1333e1f4ca5dc0b308d0f37ac2590bf4d1a42b56467f84d48e5549935",
+  "id": "SH171",
+  "inputManifestSHA256": "5eb0f9dea0922aa2ae9806f2b22a18bb0084e5f784c24fc5ef326b9d80eefe9f",
+  "materialAndBiologicalFunctionQualified": false,
+  "name": "Medusa",
+  "nativeAdmissionBlocked": true,
+  "nativeFaceLimit": 512,
+  "nativeSourceTriangles": 76228,
+  "occupiedPeopleOrPaidEquipmentGranted": false,
+  "operatingAuthorityGranted": false,
+  "originalGeometrySHA256": "d093d9fb10c2319b93f807cf2b02977fa6df91c37e6735df5da33df886216e5b",
+  "originalPointAllocationReference": {
+    "centreOfMassMetres": [
+      -0.0059959827372407315,
+      0.08788112700130891,
+      -2.443115617597864
+    ],
+    "dryMassKilograms": 40712,
+    "inertiaAboutCentreOfMassKgM2": [
+      1371961.078574851,
+      -24.33098478376431,
+      507.3802860866712,
+      -24.33098478376431,
+      2600844.605121079,
+      -15828.866422752179,
+      507.3802860866712,
+      -15828.866422752179,
+      2568345.0476803943
+    ]
+  },
+  "ownershipSHA256": "0fab4ca06ec2a1224287086de2cb7be86e52e5ae60e366de78da3d2dc031f9cc",
+  "planSHA256": "6cef7eb607ec1d83d69206fc4721e515054d71965d356e7ff9e5fe8102a1fc56",
+  "preservedR3": {
+    "accommodation": {
+      "basis": "new-per-hull-design-layout-estimate; not-historical-crew-or-E01",
+      "cabinModuleEquipmentUnits": 1,
+      "cabinModuleMassTonnes": 5,
+      "holdBasis": "Cargo is usable empty hold after intrinsic crew/core structure; purchased modules consume this hold.",
+      "initialPurchasedCabins": 0,
+      "intrinsicCrewPlaces": 1,
+      "maximumPhysicalCabinModules": 4,
+      "minimumOperatingCrewIncludingCommander": 1,
+      "nativeAutonomous": false,
+      "nativeCrew": 1,
+      "playerConversionCrew": 1
+    },
+    "acquisition": {
+      "EMPBank": "Separate physical finite capacitor; pulse power, stored shots and recharge are independent paid axes.",
+      "beamRequirement": "Power and reach depend on calibrated target volume, carried mass and surface distance; unknown until physical contract exists.",
+      "controllingWorkstream": "WS-SALVAGE-01 / M08.SALVAGE.EMP-01",
+      "destructionGrantsBlueprint": false,
+      "disableAloneGrantsBlueprint": false,
+      "laserMissilePreparationMandatory": false,
+      "loan": "no-fee/no-deposit compatible real service hull, crew and tools when needed; no permanent ownership grant",
+      "method": "commander-EMP-disable; lawful-empty-authorised-section; actual-cut-and-scoop",
+      "policySource": "references/salvage/SALVAGE-ACQUISITION.json",
+      "questActorCrew": 0,
+      "receiving": "same intact lattice consumed by later PLUGH AI receiving; story/fabrication right together; paid ship optional",
+      "retry": "same unlocked cradle, new legitimate construct after actual loss; retain clues/trail; no duplicate old sample",
+      "sample": "original 50kg outer reconstruction lattice; sovereign core protected",
+      "sampleMassStatus": "researcher-proposed-balance; physical intake still required",
+      "sampleMassTonnes": 0.05
+    },
+    "fitting": {
+      "compatibleUtilities": [
+        "miningLaser",
+        "cargoScoop",
+        "salvageCutter",
+        "surveyArray",
+        "rescueReceiver",
+        "salvageBeam",
+        "auxiliaryFuelTank"
+      ],
+      "equipmentBudgetUnits": 13,
+      "externalMissilePylons": false,
+      "missileStorage": "internal-organic",
+      "passengerCabinGrades": [
+        "packedStasis",
+        "economy",
+        "standard",
+        "luxury",
+        "singleStateroom",
+        "doubleStateroom"
+      ],
+      "recommendedRoleKit": [
+        "combatLaser",
+        "ECM",
+        "EMP"
+      ],
+      "roleKitIncludedInBareHull": false,
+      "utilityMounts": 4
+    }
+  },
+  "r3SHA256": "f1e1365586a3723bed5a87f1041d086ab7a7dd3c4ce9d665c6fedce1b39eb48f",
+  "resourceSHA256": "701c1512262e64bd11b2d9ef57c7fa573cc246aa2b13015543e9792ae23d6525",
+  "roundingReserve": {
+    "centreMetres": [
+      -0.005995982737240241,
+      0.08640735998838893,
+      -2.4239566464299034
+    ],
+    "id": "reserve-at-new-com",
+    "inertiaAboutCentreOfMassKgM2": [
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      6.708500942254059e-19
+    ],
+    "massKg": 0.0017845408874563873
+  },
+  "schemaVersion": 1,
+  "sourceGeometryNotEdited": true,
+  "sourceReading": "Equivalent finite empty engineering distributions only, not resolved internal anatomy/free volume",
+  "sourceScaleExact": "5/41",
+  "status": "PROPOSED_FINITE_EQUIVALENT_DISTRIBUTIONS_NOT_NATIVE_BIOLOGICAL_OR_OPERATIONAL_QUALIFICATION",
+  "stockFuelEnergyAmmunitionServiceOrDeploymentGranted": false,
+  "stockModel": "Original area-mass lamina budget retained; not material thickness, internal anatomy, pressure or free-volume qualification",
+  "unchangedStock": {
+    "centreMetres": [
+      -0.005726404231895629,
+      0.09363690830682457,
+      -2.24970786090943
+    ],
+    "id": "unchanged-original-area-lamina-stock",
+    "inertiaAboutCentreOfMassKgM2": [
+      1192126.5100693512,
+      -31.23636393118699,
+      316.5749128632035,
+      -31.23636393118699,
+      2134849.895251652,
+      -13486.344851848517,
+      316.5749128632035,
+      -13486.344851848517,
+      1985130.4692186285
+    ],
+    "massKg": 32071.998215459113
+  }
+}
