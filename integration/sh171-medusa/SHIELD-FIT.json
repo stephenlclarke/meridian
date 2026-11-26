@@ -1,0 +1,3659 @@
+{
+  "sourceRevision": "a11fe16924d87d06021816f9037952afcbac08db",
+  "shieldSha256": "25f099509deb0b8e40bc2dafee0058920cb17f074283acf4324e884165da241c",
+  "scaleMetresPerSourceUnit": "5/41",
+  "roundingMillimetres": 20,
+  "groups": 729,
+  "allOriginalFacesShareShieldSupport": true,
+  "eachFanRadialErrorLessThanMicrometres": 1,
+  "crownSectors": 16,
+  "crownAxisClearanceLowerMillimetres": 5806,
+  "maximumOuterFitUpperMillimetres": 1394,
+  "supports": [
+    {
+      "support": "central grown seed carapace",
+      "triangles": 6912,
+      "outerFitUpperMillimetres": 332
+    },
+    {
+      "support": "central flowing surface fold 0/span-01",
+      "triangles": 154,
+      "outerFitUpperMillimetres": 482
+    },
+    {
+      "support": "central flowing surface fold 0/span-02",
+      "triangles": 170,
+      "outerFitUpperMillimetres": 500
+    },
+    {
+      "support": "central flowing surface fold 0/span-03",
+      "triangles": 164,
+      "outerFitUpperMillimetres": 459
+    },
+    {
+      "support": "central flowing surface fold 0/span-04",
+      "triangles": 170,
+      "outerFitUpperMillimetres": 495
+    },
+    {
+      "support": "central flowing surface fold 1/span-01",
+      "triangles": 154,
+      "outerFitUpperMillimetres": 482
+    },
+    {
+      "support": "central flowing surface fold 1/span-02",
+      "triangles": 170,
+      "outerFitUpperMillimetres": 500
+    },
+    {
+      "support": "central flowing surface fold 1/span-03",
+      "triangles": 164,
+      "outerFitUpperMillimetres": 460
+    },
+    {
+      "support": "central flowing surface fold 1/span-04",
+      "triangles": 170,
+      "outerFitUpperMillimetres": 495
+    },
+    {
+      "support": "central flowing surface fold 2/span-01",
+      "triangles": 158,
+      "outerFitUpperMillimetres": 472
+    },
+    {
+      "support": "central flowing surface fold 2/span-02",
+      "triangles": 180,
+      "outerFitUpperMillimetres": 500
+    },
+    {
+      "support": "central flowing surface fold 2/span-03",
+      "triangles": 186,
+      "outerFitUpperMillimetres": 500
+    },
+    {
+      "support": "central flowing surface fold 2/span-04",
+      "triangles": 172,
+      "outerFitUpperMillimetres": 497
+    },
+    {
+      "support": "central flowing surface fold 3/span-01",
+      "triangles": 158,
+      "outerFitUpperMillimetres": 472
+    },
+    {
+      "support": "central flowing surface fold 3/span-02",
+      "triangles": 178,
+      "outerFitUpperMillimetres": 500
+    },
+    {
+      "support": "central flowing surface fold 3/span-03",
+      "triangles": 180,
+      "outerFitUpperMillimetres": 500
+    },
+    {
+      "support": "central flowing surface fold 3/span-04",
+      "triangles": 172,
+      "outerFitUpperMillimetres": 497
+    },
+    {
+      "support": "central crown connected cartilage 0",
+      "triangles": 1652,
+      "outerFitUpperMillimetres": 500
+    },
+    {
+      "support": "central crown connected cartilage 1",
+      "triangles": 1652,
+      "outerFitUpperMillimetres": 500
+    },
+    {
+      "support": "curved seed propulsion organ 0/span-01",
+      "triangles": 544,
+      "outerFitUpperMillimetres": 1050
+    },
+    {
+      "support": "curved seed propulsion organ 0/span-02",
+      "triangles": 734,
+      "outerFitUpperMillimetres": 1381
+    },
+    {
+      "support": "curved seed propulsion organ 0/span-03",
+      "triangles": 730,
+      "outerFitUpperMillimetres": 1371
+    },
+    {
+      "support": "curved seed propulsion organ 0/span-04",
+      "triangles": 724,
+      "outerFitUpperMillimetres": 1120
+    },
+    {
+      "support": "propulsion organ connected stem 0/span-01",
+      "triangles": 414,
+      "outerFitUpperMillimetres": 536
+    },
+    {
+      "support": "propulsion organ connected stem 0/span-02",
+      "triangles": 484,
+      "outerFitUpperMillimetres": 643
+    },
+    {
+      "support": "propulsion organ connected stem 0/span-03",
+      "triangles": 670,
+      "outerFitUpperMillimetres": 639
+    },
+    {
+      "support": "propulsion organ connected stem 0/span-04",
+      "triangles": 486,
+      "outerFitUpperMillimetres": 561
+    },
+    {
+      "support": "propulsion organ breathing fold 0-0/span-01",
+      "triangles": 124,
+      "outerFitUpperMillimetres": 482
+    },
+    {
+      "support": "propulsion organ breathing fold 0-0/span-02",
+      "triangles": 164,
+      "outerFitUpperMillimetres": 500
+    },
+    {
+      "support": "propulsion organ breathing fold 0-0/span-03",
+      "triangles": 188,
+      "outerFitUpperMillimetres": 479
+    },
+    {
+      "support": "propulsion organ breathing fold 0-0/span-04",
+      "triangles": 174,
+      "outerFitUpperMillimetres": 477
+    },
+    {
+      "support": "propulsion organ breathing fold 0-1/span-01",
+      "triangles": 214,
+      "outerFitUpperMillimetres": 194
+    },
+    {
+      "support": "propulsion organ breathing fold 0-1/span-02",
+      "triangles": 266,
+      "outerFitUpperMillimetres": 338
+    },
+    {
+      "support": "propulsion organ breathing fold 0-1/span-03",
+      "triangles": 280,
+      "outerFitUpperMillimetres": 417
+    },
+    {
+      "support": "propulsion organ breathing fold 0-1/span-04",
+      "triangles": 176,
+      "outerFitUpperMillimetres": 493
+    },
+    {
+      "support": "propulsion organ breathing fold 0-2/span-01",
+      "triangles": 146,
+      "outerFitUpperMillimetres": 492
+    },
+    {
+      "support": "propulsion organ breathing fold 0-2/span-02",
+      "triangles": 194,
+      "outerFitUpperMillimetres": 484
+    },
+    {
+      "support": "propulsion organ breathing fold 0-2/span-03",
+      "triangles": 186,
+      "outerFitUpperMillimetres": 464
+    },
+    {
+      "support": "propulsion organ breathing fold 0-2/span-04",
+      "triangles": 170,
+      "outerFitUpperMillimetres": 460
+    },
+    {
+      "support": "inward forward gland 0",
+      "triangles": 1900,
+      "outerFitUpperMillimetres": 57
+    },
+    {
+      "support": "warm outer tendon 0",
+      "triangles": 588,
+      "outerFitUpperMillimetres": 500
+    },
+    {
+      "support": "curved seed propulsion organ 1/span-01",
+      "triangles": 424,
+      "outerFitUpperMillimetres": 1054
+    },
+    {
+      "support": "curved seed propulsion organ 1/span-02",
+      "triangles": 632,
+      "outerFitUpperMillimetres": 1382
+    },
+    {
+      "support": "curved seed propulsion organ 1/span-03",
+      "triangles": 640,
+      "outerFitUpperMillimetres": 1380
+    },
+    {
+      "support": "curved seed propulsion organ 1/span-04",
+      "triangles": 696,
+      "outerFitUpperMillimetres": 1127
+    },
+    {
+      "support": "propulsion organ connected stem 1/span-01",
+      "triangles": 406,
+      "outerFitUpperMillimetres": 539
+    },
+    {
+      "support": "propulsion organ connected stem 1/span-02",
+      "triangles": 492,
+      "outerFitUpperMillimetres": 645
+    },
+    {
+      "support": "propulsion organ connected stem 1/span-03",
+      "triangles": 688,
+      "outerFitUpperMillimetres": 643
+    },
+    {
+      "support": "propulsion organ connected stem 1/span-04",
+      "triangles": 486,
+      "outerFitUpperMillimetres": 565
+    },
+    {
+      "support": "propulsion organ breathing fold 1-0/span-01",
+      "triangles": 130,
+      "outerFitUpperMillimetres": 496
+    },
+    {
+      "support": "propulsion organ breathing fold 1-0/span-02",
+      "triangles": 174,
+      "outerFitUpperMillimetres": 491
+    },
+    {
+      "support": "propulsion organ breathing fold 1-0/span-03",
+      "triangles": 178,
+      "outerFitUpperMillimetres": 495
+    },
+    {
+      "support": "propulsion organ breathing fold 1-0/span-04",
+      "triangles": 174,
+      "outerFitUpperMillimetres": 485
+    },
+    {
+      "support": "propulsion organ breathing fold 1-1/span-01",
+      "triangles": 178,
+      "outerFitUpperMillimetres": 476
+    },
+    {
+      "support": "propulsion organ breathing fold 1-1/span-02",
+      "triangles": 230,
+      "outerFitUpperMillimetres": 497
+    },
+    {
+      "support": "propulsion organ breathing fold 1-1/span-03",
+      "triangles": 240,
+      "outerFitUpperMillimetres": 448
+    },
+    {
+      "support": "propulsion organ breathing fold 1-1/span-04",
+      "triangles": 168,
+      "outerFitUpperMillimetres": 494
+    },
+    {
+      "support": "propulsion organ breathing fold 1-2/span-01",
+      "triangles": 152,
+      "outerFitUpperMillimetres": 471
+    },
+    {
+      "support": "propulsion organ breathing fold 1-2/span-02",
+      "triangles": 200,
+      "outerFitUpperMillimetres": 492
+    },
+    {
+      "support": "propulsion organ breathing fold 1-2/span-03",
+      "triangles": 208,
+      "outerFitUpperMillimetres": 474
+    },
+    {
+      "support": "propulsion organ breathing fold 1-2/span-04",
+      "triangles": 172,
+      "outerFitUpperMillimetres": 461
+    },
+    {
+      "support": "inward forward gland 1",
+      "triangles": 1900,
+      "outerFitUpperMillimetres": 57
+    },
+    {
+      "support": "warm outer tendon 1",
+      "triangles": 590,
+      "outerFitUpperMillimetres": 497
+    },
+    {
+      "support": "curved seed propulsion organ 2/span-01",
+      "triangles": 424,
+      "outerFitUpperMillimetres": 1054
+    },
+    {
+      "support": "curved seed propulsion organ 2/span-02",
+      "triangles": 592,
+      "outerFitUpperMillimetres": 1387
+    },
+    {
+      "support": "curved seed propulsion organ 2/span-03",
+      "triangles": 608,
+      "outerFitUpperMillimetres": 1368
+    },
+    {
+      "support": "curved seed propulsion organ 2/span-04",
+      "triangles": 620,
+      "outerFitUpperMillimetres": 1120
+    },
+    {
+      "support": "propulsion organ connected stem 2/span-01",
+      "triangles": 414,
+      "outerFitUpperMillimetres": 533
+    },
+    {
+      "support": "propulsion organ connected stem 2/span-02",
+      "triangles": 492,
+      "outerFitUpperMillimetres": 640
+    },
+    {
+      "support": "propulsion organ connected stem 2/span-03",
+      "triangles": 688,
+      "outerFitUpperMillimetres": 647
+    },
+    {
+      "support": "propulsion organ connected stem 2/span-04",
+      "triangles": 494,
+      "outerFitUpperMillimetres": 558
+    },
+    {
+      "support": "propulsion organ breathing fold 2-0/span-01",
+      "triangles": 138,
+      "outerFitUpperMillimetres": 462
+    },
+    {
+      "support": "propulsion organ breathing fold 2-0/span-02",
+      "triangles": 188,
+      "outerFitUpperMillimetres": 489
+    },
+    {
+      "support": "propulsion organ breathing fold 2-0/span-03",
+      "triangles": 186,
+      "outerFitUpperMillimetres": 492
+    },
+    {
+      "support": "propulsion organ breathing fold 2-0/span-04",
+      "triangles": 168,
+      "outerFitUpperMillimetres": 491
+    },
+    {
+      "support": "propulsion organ breathing fold 2-1/span-01",
+      "triangles": 184,
+      "outerFitUpperMillimetres": 466
+    },
+    {
+      "support": "propulsion organ breathing fold 2-1/span-02",
+      "triangles": 226,
+      "outerFitUpperMillimetres": 500
+    },
+    {
+      "support": "propulsion organ breathing fold 2-1/span-03",
+      "triangles": 206,
+      "outerFitUpperMillimetres": 481
+    },
+    {
+      "support": "propulsion organ breathing fold 2-1/span-04",
+      "triangles": 166,
+      "outerFitUpperMillimetres": 497
+    },
+    {
+      "support": "propulsion organ breathing fold 2-2/span-01",
+      "triangles": 140,
+      "outerFitUpperMillimetres": 499
+    },
+    {
+      "support": "propulsion organ breathing fold 2-2/span-02",
+      "triangles": 186,
+      "outerFitUpperMillimetres": 482
+    },
+    {
+      "support": "propulsion organ breathing fold 2-2/span-03",
+      "triangles": 184,
+      "outerFitUpperMillimetres": 481
+    },
+    {
+      "support": "propulsion organ breathing fold 2-2/span-04",
+      "triangles": 170,
+      "outerFitUpperMillimetres": 463
+    },
+    {
+      "support": "inward forward gland 2",
+      "triangles": 1900,
+      "outerFitUpperMillimetres": 57
+    },
+    {
+      "support": "warm outer tendon 2",
+      "triangles": 558,
+      "outerFitUpperMillimetres": 500
+    },
+    {
+      "support": "curved seed propulsion organ 3/span-01",
+      "triangles": 424,
+      "outerFitUpperMillimetres": 1051
+    },
+    {
+      "support": "curved seed propulsion organ 3/span-02",
+      "triangles": 632,
+      "outerFitUpperMillimetres": 1382
+    },
+    {
+      "support": "curved seed propulsion organ 3/span-03",
+      "triangles": 640,
+      "outerFitUpperMillimetres": 1382
+    },
+    {
+      "support": "curved seed propulsion organ 3/span-04",
+      "triangles": 696,
+      "outerFitUpperMillimetres": 1127
+    },
+    {
+      "support": "propulsion organ connected stem 3/span-01",
+      "triangles": 406,
+      "outerFitUpperMillimetres": 538
+    },
+    {
+      "support": "propulsion organ connected stem 3/span-02",
+      "triangles": 492,
+      "outerFitUpperMillimetres": 645
+    },
+    {
+      "support": "propulsion organ connected stem 3/span-03",
+      "triangles": 688,
+      "outerFitUpperMillimetres": 643
+    },
+    {
+      "support": "propulsion organ connected stem 3/span-04",
+      "triangles": 486,
+      "outerFitUpperMillimetres": 565
+    },
+    {
+      "support": "propulsion organ breathing fold 3-0/span-01",
+      "triangles": 134,
+      "outerFitUpperMillimetres": 483
+    },
+    {
+      "support": "propulsion organ breathing fold 3-0/span-02",
+      "triangles": 184,
+      "outerFitUpperMillimetres": 493
+    },
+    {
+      "support": "propulsion organ breathing fold 3-0/span-03",
+      "triangles": 180,
+      "outerFitUpperMillimetres": 494
+    },
+    {
+      "support": "propulsion organ breathing fold 3-0/span-04",
+      "triangles": 174,
+      "outerFitUpperMillimetres": 485
+    },
+    {
+      "support": "propulsion organ breathing fold 3-1/span-01",
+      "triangles": 200,
+      "outerFitUpperMillimetres": 251
+    },
+    {
+      "support": "propulsion organ breathing fold 3-1/span-02",
+      "triangles": 268,
+      "outerFitUpperMillimetres": 342
+    },
+    {
+      "support": "propulsion organ breathing fold 3-1/span-03",
+      "triangles": 260,
+      "outerFitUpperMillimetres": 487
+    },
+    {
+      "support": "propulsion organ breathing fold 3-1/span-04",
+      "triangles": 170,
+      "outerFitUpperMillimetres": 492
+    },
+    {
+      "support": "propulsion organ breathing fold 3-2/span-01",
+      "triangles": 134,
+      "outerFitUpperMillimetres": 497
+    },
+    {
+      "support": "propulsion organ breathing fold 3-2/span-02",
+      "triangles": 178,
+      "outerFitUpperMillimetres": 490
+    },
+    {
+      "support": "propulsion organ breathing fold 3-2/span-03",
+      "triangles": 198,
+      "outerFitUpperMillimetres": 472
+    },
+    {
+      "support": "propulsion organ breathing fold 3-2/span-04",
+      "triangles": 172,
+      "outerFitUpperMillimetres": 462
+    },
+    {
+      "support": "inward forward gland 3",
+      "triangles": 1900,
+      "outerFitUpperMillimetres": 57
+    },
+    {
+      "support": "warm outer tendon 3",
+      "triangles": 590,
+      "outerFitUpperMillimetres": 497
+    },
+    {
+      "support": "curved seed propulsion organ 4/span-01",
+      "triangles": 548,
+      "outerFitUpperMillimetres": 1049
+    },
+    {
+      "support": "curved seed propulsion organ 4/span-02",
+      "triangles": 748,
+      "outerFitUpperMillimetres": 1382
+    },
+    {
+      "support": "curved seed propulsion organ 4/span-03",
+      "triangles": 748,
+      "outerFitUpperMillimetres": 1377
+    },
+    {
+      "support": "curved seed propulsion organ 4/span-04",
+      "triangles": 724,
+      "outerFitUpperMillimetres": 1120
+    },
+    {
+      "support": "propulsion organ connected stem 4/span-01",
+      "triangles": 414,
+      "outerFitUpperMillimetres": 536
+    },
+    {
+      "support": "propulsion organ connected stem 4/span-02",
+      "triangles": 484,
+      "outerFitUpperMillimetres": 643
+    },
+    {
+      "support": "propulsion organ connected stem 4/span-03",
+      "triangles": 670,
+      "outerFitUpperMillimetres": 639
+    },
+    {
+      "support": "propulsion organ connected stem 4/span-04",
+      "triangles": 486,
+      "outerFitUpperMillimetres": 561
+    },
+    {
+      "support": "propulsion organ breathing fold 4-0/span-01",
+      "triangles": 214,
+      "outerFitUpperMillimetres": 194
+    },
+    {
+      "support": "propulsion organ breathing fold 4-0/span-02",
+      "triangles": 266,
+      "outerFitUpperMillimetres": 338
+    },
+    {
+      "support": "propulsion organ breathing fold 4-0/span-03",
+      "triangles": 280,
+      "outerFitUpperMillimetres": 417
+    },
+    {
+      "support": "propulsion organ breathing fold 4-0/span-04",
+      "triangles": 176,
+      "outerFitUpperMillimetres": 493
+    },
+    {
+      "support": "propulsion organ breathing fold 4-1/span-01",
+      "triangles": 124,
+      "outerFitUpperMillimetres": 482
+    },
+    {
+      "support": "propulsion organ breathing fold 4-1/span-02",
+      "triangles": 164,
+      "outerFitUpperMillimetres": 500
+    },
+    {
+      "support": "propulsion organ breathing fold 4-1/span-03",
+      "triangles": 188,
+      "outerFitUpperMillimetres": 479
+    },
+    {
+      "support": "propulsion organ breathing fold 4-1/span-04",
+      "triangles": 174,
+      "outerFitUpperMillimetres": 477
+    },
+    {
+      "support": "propulsion organ breathing fold 4-2/span-01",
+      "triangles": 144,
+      "outerFitUpperMillimetres": 492
+    },
+    {
+      "support": "propulsion organ breathing fold 4-2/span-02",
+      "triangles": 192,
+      "outerFitUpperMillimetres": 483
+    },
+    {
+      "support": "propulsion organ breathing fold 4-2/span-03",
+      "triangles": 186,
+      "outerFitUpperMillimetres": 461
+    },
+    {
+      "support": "propulsion organ breathing fold 4-2/span-04",
+      "triangles": 170,
+      "outerFitUpperMillimetres": 460
+    },
+    {
+      "support": "inward forward gland 4",
+      "triangles": 1900,
+      "outerFitUpperMillimetres": 57
+    },
+    {
+      "support": "warm outer tendon 4",
+      "triangles": 588,
+      "outerFitUpperMillimetres": 500
+    },
+    {
+      "support": "curved seed propulsion organ 5/span-01",
+      "triangles": 426,
+      "outerFitUpperMillimetres": 1064
+    },
+    {
+      "support": "curved seed propulsion organ 5/span-02",
+      "triangles": 688,
+      "outerFitUpperMillimetres": 1380
+    },
+    {
+      "support": "curved seed propulsion organ 5/span-03",
+      "triangles": 708,
+      "outerFitUpperMillimetres": 1380
+    },
+    {
+      "support": "curved seed propulsion organ 5/span-04",
+      "triangles": 682,
+      "outerFitUpperMillimetres": 1127
+    },
+    {
+      "support": "propulsion organ connected stem 5/span-01",
+      "triangles": 406,
+      "outerFitUpperMillimetres": 539
+    },
+    {
+      "support": "propulsion organ connected stem 5/span-02",
+      "triangles": 492,
+      "outerFitUpperMillimetres": 645
+    },
+    {
+      "support": "propulsion organ connected stem 5/span-03",
+      "triangles": 688,
+      "outerFitUpperMillimetres": 643
+    },
+    {
+      "support": "propulsion organ connected stem 5/span-04",
+      "triangles": 486,
+      "outerFitUpperMillimetres": 565
+    },
+    {
+      "support": "propulsion organ breathing fold 5-0/span-01",
+      "triangles": 200,
+      "outerFitUpperMillimetres": 251
+    },
+    {
+      "support": "propulsion organ breathing fold 5-0/span-02",
+      "triangles": 268,
+      "outerFitUpperMillimetres": 342
+    },
+    {
+      "support": "propulsion organ breathing fold 5-0/span-03",
+      "triangles": 260,
+      "outerFitUpperMillimetres": 489
+    },
+    {
+      "support": "propulsion organ breathing fold 5-0/span-04",
+      "triangles": 170,
+      "outerFitUpperMillimetres": 487
+    },
+    {
+      "support": "propulsion organ breathing fold 5-1/span-01",
+      "triangles": 134,
+      "outerFitUpperMillimetres": 484
+    },
+    {
+      "support": "propulsion organ breathing fold 5-1/span-02",
+      "triangles": 184,
+      "outerFitUpperMillimetres": 499
+    },
+    {
+      "support": "propulsion organ breathing fold 5-1/span-03",
+      "triangles": 180,
+      "outerFitUpperMillimetres": 494
+    },
+    {
+      "support": "propulsion organ breathing fold 5-1/span-04",
+      "triangles": 174,
+      "outerFitUpperMillimetres": 485
+    },
+    {
+      "support": "propulsion organ breathing fold 5-2/span-01",
+      "triangles": 134,
+      "outerFitUpperMillimetres": 498
+    },
+    {
+      "support": "propulsion organ breathing fold 5-2/span-02",
+      "triangles": 178,
+      "outerFitUpperMillimetres": 490
+    },
+    {
+      "support": "propulsion organ breathing fold 5-2/span-03",
+      "triangles": 198,
+      "outerFitUpperMillimetres": 471
+    },
+    {
+      "support": "propulsion organ breathing fold 5-2/span-04",
+      "triangles": 172,
+      "outerFitUpperMillimetres": 462
+    },
+    {
+      "support": "inward forward gland 5",
+      "triangles": 1900,
+      "outerFitUpperMillimetres": 57
+    },
+    {
+      "support": "warm outer tendon 5",
+      "triangles": 590,
+      "outerFitUpperMillimetres": 497
+    },
+    {
+      "support": "curved seed propulsion organ 6/span-01",
+      "triangles": 424,
+      "outerFitUpperMillimetres": 1064
+    },
+    {
+      "support": "curved seed propulsion organ 6/span-02",
+      "triangles": 596,
+      "outerFitUpperMillimetres": 1394
+    },
+    {
+      "support": "curved seed propulsion organ 6/span-03",
+      "triangles": 608,
+      "outerFitUpperMillimetres": 1380
+    },
+    {
+      "support": "curved seed propulsion organ 6/span-04",
+      "triangles": 632,
+      "outerFitUpperMillimetres": 1112
+    },
+    {
+      "support": "propulsion organ connected stem 6/span-01",
+      "triangles": 414,
+      "outerFitUpperMillimetres": 533
+    },
+    {
+      "support": "propulsion organ connected stem 6/span-02",
+      "triangles": 492,
+      "outerFitUpperMillimetres": 640
+    },
+    {
+      "support": "propulsion organ connected stem 6/span-03",
+      "triangles": 688,
+      "outerFitUpperMillimetres": 647
+    },
+    {
+      "support": "propulsion organ connected stem 6/span-04",
+      "triangles": 494,
+      "outerFitUpperMillimetres": 558
+    },
+    {
+      "support": "propulsion organ breathing fold 6-0/span-01",
+      "triangles": 184,
+      "outerFitUpperMillimetres": 466
+    },
+    {
+      "support": "propulsion organ breathing fold 6-0/span-02",
+      "triangles": 226,
+      "outerFitUpperMillimetres": 500
+    },
+    {
+      "support": "propulsion organ breathing fold 6-0/span-03",
+      "triangles": 206,
+      "outerFitUpperMillimetres": 484
+    },
+    {
+      "support": "propulsion organ breathing fold 6-0/span-04",
+      "triangles": 166,
+      "outerFitUpperMillimetres": 498
+    },
+    {
+      "support": "propulsion organ breathing fold 6-1/span-01",
+      "triangles": 138,
+      "outerFitUpperMillimetres": 500
+    },
+    {
+      "support": "propulsion organ breathing fold 6-1/span-02",
+      "triangles": 188,
+      "outerFitUpperMillimetres": 489
+    },
+    {
+      "support": "propulsion organ breathing fold 6-1/span-03",
+      "triangles": 186,
+      "outerFitUpperMillimetres": 492
+    },
+    {
+      "support": "propulsion organ breathing fold 6-1/span-04",
+      "triangles": 168,
+      "outerFitUpperMillimetres": 491
+    },
+    {
+      "support": "propulsion organ breathing fold 6-2/span-01",
+      "triangles": 140,
+      "outerFitUpperMillimetres": 488
+    },
+    {
+      "support": "propulsion organ breathing fold 6-2/span-02",
+      "triangles": 186,
+      "outerFitUpperMillimetres": 484
+    },
+    {
+      "support": "propulsion organ breathing fold 6-2/span-03",
+      "triangles": 186,
+      "outerFitUpperMillimetres": 482
+    },
+    {
+      "support": "propulsion organ breathing fold 6-2/span-04",
+      "triangles": 168,
+      "outerFitUpperMillimetres": 464
+    },
+    {
+      "support": "inward forward gland 6",
+      "triangles": 1900,
+      "outerFitUpperMillimetres": 57
+    },
+    {
+      "support": "warm outer tendon 6",
+      "triangles": 558,
+      "outerFitUpperMillimetres": 500
+    },
+    {
+      "support": "curved seed propulsion organ 7/span-01",
+      "triangles": 426,
+      "outerFitUpperMillimetres": 1064
+    },
+    {
+      "support": "curved seed propulsion organ 7/span-02",
+      "triangles": 688,
+      "outerFitUpperMillimetres": 1380
+    },
+    {
+      "support": "curved seed propulsion organ 7/span-03",
+      "triangles": 708,
+      "outerFitUpperMillimetres": 1380
+    },
+    {
+      "support": "curved seed propulsion organ 7/span-04",
+      "triangles": 682,
+      "outerFitUpperMillimetres": 1127
+    },
+    {
+      "support": "propulsion organ connected stem 7/span-01",
+      "triangles": 406,
+      "outerFitUpperMillimetres": 538
+    },
+    {
+      "support": "propulsion organ connected stem 7/span-02",
+      "triangles": 492,
+      "outerFitUpperMillimetres": 645
+    },
+    {
+      "support": "propulsion organ connected stem 7/span-03",
+      "triangles": 688,
+      "outerFitUpperMillimetres": 643
+    },
+    {
+      "support": "propulsion organ connected stem 7/span-04",
+      "triangles": 486,
+      "outerFitUpperMillimetres": 565
+    },
+    {
+      "support": "propulsion organ breathing fold 7-0/span-01",
+      "triangles": 178,
+      "outerFitUpperMillimetres": 476
+    },
+    {
+      "support": "propulsion organ breathing fold 7-0/span-02",
+      "triangles": 230,
+      "outerFitUpperMillimetres": 497
+    },
+    {
+      "support": "propulsion organ breathing fold 7-0/span-03",
+      "triangles": 240,
+      "outerFitUpperMillimetres": 448
+    },
+    {
+      "support": "propulsion organ breathing fold 7-0/span-04",
+      "triangles": 168,
+      "outerFitUpperMillimetres": 494
+    },
+    {
+      "support": "propulsion organ breathing fold 7-1/span-01",
+      "triangles": 130,
+      "outerFitUpperMillimetres": 499
+    },
+    {
+      "support": "propulsion organ breathing fold 7-1/span-02",
+      "triangles": 174,
+      "outerFitUpperMillimetres": 494
+    },
+    {
+      "support": "propulsion organ breathing fold 7-1/span-03",
+      "triangles": 178,
+      "outerFitUpperMillimetres": 495
+    },
+    {
+      "support": "propulsion organ breathing fold 7-1/span-04",
+      "triangles": 174,
+      "outerFitUpperMillimetres": 485
+    },
+    {
+      "support": "propulsion organ breathing fold 7-2/span-01",
+      "triangles": 152,
+      "outerFitUpperMillimetres": 498
+    },
+    {
+      "support": "propulsion organ breathing fold 7-2/span-02",
+      "triangles": 200,
+      "outerFitUpperMillimetres": 492
+    },
+    {
+      "support": "propulsion organ breathing fold 7-2/span-03",
+      "triangles": 210,
+      "outerFitUpperMillimetres": 500
+    },
+    {
+      "support": "propulsion organ breathing fold 7-2/span-04",
+      "triangles": 174,
+      "outerFitUpperMillimetres": 462
+    },
+    {
+      "support": "inward forward gland 7",
+      "triangles": 1900,
+      "outerFitUpperMillimetres": 57
+    },
+    {
+      "support": "warm outer tendon 7",
+      "triangles": 590,
+      "outerFitUpperMillimetres": 497
+    },
+    {
+      "support": "continuous rounded elliptical living crown/span-01",
+      "triangles": 658,
+      "outerFitUpperMillimetres": 811
+    },
+    {
+      "support": "continuous rounded elliptical living crown/span-02",
+      "triangles": 658,
+      "outerFitUpperMillimetres": 817
+    },
+    {
+      "support": "continuous rounded elliptical living crown/span-03",
+      "triangles": 658,
+      "outerFitUpperMillimetres": 806
+    },
+    {
+      "support": "continuous rounded elliptical living crown/span-04",
+      "triangles": 658,
+      "outerFitUpperMillimetres": 812
+    },
+    {
+      "support": "continuous rounded elliptical living crown/span-05",
+      "triangles": 658,
+      "outerFitUpperMillimetres": 812
+    },
+    {
+      "support": "continuous rounded elliptical living crown/span-06",
+      "triangles": 658,
+      "outerFitUpperMillimetres": 806
+    },
+    {
+      "support": "continuous rounded elliptical living crown/span-07",
+      "triangles": 658,
+      "outerFitUpperMillimetres": 817
+    },
+    {
+      "support": "continuous rounded elliptical living crown/span-08",
+      "triangles": 658,
+      "outerFitUpperMillimetres": 811
+    },
+    {
+      "support": "continuous rounded elliptical living crown/span-09",
+      "triangles": 658,
+      "outerFitUpperMillimetres": 811
+    },
+    {
+      "support": "continuous rounded elliptical living crown/span-10",
+      "triangles": 658,
+      "outerFitUpperMillimetres": 817
+    },
+    {
+      "support": "continuous rounded elliptical living crown/span-11",
+      "triangles": 658,
+      "outerFitUpperMillimetres": 806
+    },
+    {
+      "support": "continuous rounded elliptical living crown/span-12",
+      "triangles": 658,
+      "outerFitUpperMillimetres": 812
+    },
+    {
+      "support": "continuous rounded elliptical living crown/span-13",
+      "triangles": 658,
+      "outerFitUpperMillimetres": 812
+    },
+    {
+      "support": "continuous rounded elliptical living crown/span-14",
+      "triangles": 658,
+      "outerFitUpperMillimetres": 806
+    },
+    {
+      "support": "continuous rounded elliptical living crown/span-15",
+      "triangles": 658,
+      "outerFitUpperMillimetres": 817
+    },
+    {
+      "support": "continuous rounded elliptical living crown/span-16",
+      "triangles": 658,
+      "outerFitUpperMillimetres": 811
+    },
+    {
+      "support": "inward rear glowing blob 0",
+      "triangles": 610,
+      "outerFitUpperMillimetres": 256
+    },
+    {
+      "support": "inward rear glowing blob 1",
+      "triangles": 604,
+      "outerFitUpperMillimetres": 247
+    },
+    {
+      "support": "inward rear glowing blob 2",
+      "triangles": 604,
+      "outerFitUpperMillimetres": 255
+    },
+    {
+      "support": "inward rear glowing blob 3",
+      "triangles": 604,
+      "outerFitUpperMillimetres": 256
+    },
+    {
+      "support": "inward rear glowing blob 4",
+      "triangles": 614,
+      "outerFitUpperMillimetres": 256
+    },
+    {
+      "support": "inward rear glowing blob 5",
+      "triangles": 604,
+      "outerFitUpperMillimetres": 255
+    },
+    {
+      "support": "inward rear glowing blob 6",
+      "triangles": 606,
+      "outerFitUpperMillimetres": 255
+    },
+    {
+      "support": "inward rear glowing blob 7",
+      "triangles": 604,
+      "outerFitUpperMillimetres": 255
+    },
+    {
+      "support": "appended luminous projection dot 0",
+      "triangles": 160,
+      "outerFitUpperMillimetres": 53
+    },
+    {
+      "support": "appended luminous projection dot 1",
+      "triangles": 160,
+      "outerFitUpperMillimetres": 53
+    },
+    {
+      "support": "appended luminous projection dot 2",
+      "triangles": 160,
+      "outerFitUpperMillimetres": 53
+    },
+    {
+      "support": "appended luminous projection dot 3",
+      "triangles": 160,
+      "outerFitUpperMillimetres": 52
+    },
+    {
+      "support": "appended luminous projection dot 4",
+      "triangles": 160,
+      "outerFitUpperMillimetres": 52
+    },
+    {
+      "support": "appended luminous projection dot 5",
+      "triangles": 160,
+      "outerFitUpperMillimetres": 52
+    },
+    {
+      "support": "appended luminous projection dot 6",
+      "triangles": 160,
+      "outerFitUpperMillimetres": 52
+    },
+    {
+      "support": "appended luminous projection dot 7",
+      "triangles": 160,
+      "outerFitUpperMillimetres": 52
+    },
+    {
+      "support": "appended luminous projection dot 8",
+      "triangles": 160,
+      "outerFitUpperMillimetres": 51
+    },
+    {
+      "support": "appended luminous projection dot 9",
+      "triangles": 160,
+      "outerFitUpperMillimetres": 51
+    },
+    {
+      "support": "appended luminous projection dot 10",
+      "triangles": 160,
+      "outerFitUpperMillimetres": 51
+    },
+    {
+      "support": "appended luminous projection dot 11",
+      "triangles": 160,
+      "outerFitUpperMillimetres": 51
+    },
+    {
+      "support": "appended luminous projection dot 12",
+      "triangles": 160,
+      "outerFitUpperMillimetres": 51
+    },
+    {
+      "support": "appended luminous projection dot 13",
+      "triangles": 160,
+      "outerFitUpperMillimetres": 50
+    },
+    {
+      "support": "appended luminous projection dot 14",
+      "triangles": 160,
+      "outerFitUpperMillimetres": 50
+    },
+    {
+      "support": "appended luminous projection dot 15",
+      "triangles": 160,
+      "outerFitUpperMillimetres": 50
+    },
+    {
+      "support": "appended luminous projection dot 16",
+      "triangles": 160,
+      "outerFitUpperMillimetres": 50
+    },
+    {
+      "support": "appended luminous projection dot 17",
+      "triangles": 160,
+      "outerFitUpperMillimetres": 50
+    },
+    {
+      "support": "appended luminous projection dot 18",
+      "triangles": 160,
+      "outerFitUpperMillimetres": 49
+    },
+    {
+      "support": "appended luminous projection dot 19",
+      "triangles": 160,
+      "outerFitUpperMillimetres": 49
+    },
+    {
+      "support": "appended luminous projection dot 20",
+      "triangles": 160,
+      "outerFitUpperMillimetres": 49
+    },
+    {
+      "support": "appended luminous projection dot 21",
+      "triangles": 160,
+      "outerFitUpperMillimetres": 49
+    },
+    {
+      "support": "appended luminous projection dot 22",
+      "triangles": 160,
+      "outerFitUpperMillimetres": 49
+    },
+    {
+      "support": "appended luminous projection dot 23",
+      "triangles": 160,
+      "outerFitUpperMillimetres": 48
+    },
+    {
+      "support": "appended luminous projection dot 24",
+      "triangles": 160,
+      "outerFitUpperMillimetres": 48
+    },
+    {
+      "support": "appended luminous projection dot 25",
+      "triangles": 160,
+      "outerFitUpperMillimetres": 48
+    },
+    {
+      "support": "appended luminous projection dot 26",
+      "triangles": 160,
+      "outerFitUpperMillimetres": 48
+    },
+    {
+      "support": "appended luminous projection dot 27",
+      "triangles": 160,
+      "outerFitUpperMillimetres": 48
+    },
+    {
+      "support": "appended luminous projection dot 28",
+      "triangles": 160,
+      "outerFitUpperMillimetres": 47
+    },
+    {
+      "support": "appended luminous projection dot 29",
+      "triangles": 160,
+      "outerFitUpperMillimetres": 47
+    },
+    {
+      "support": "appended luminous projection dot 30",
+      "triangles": 160,
+      "outerFitUpperMillimetres": 47
+    },
+    {
+      "support": "appended luminous projection dot 31",
+      "triangles": 160,
+      "outerFitUpperMillimetres": 46
+    },
+    {
+      "support": "appended luminous projection dot 32",
+      "triangles": 160,
+      "outerFitUpperMillimetres": 53
+    },
+    {
+      "support": "appended luminous projection dot 33",
+      "triangles": 160,
+      "outerFitUpperMillimetres": 53
+    },
+    {
+      "support": "appended luminous projection dot 34",
+      "triangles": 160,
+      "outerFitUpperMillimetres": 53
+    },
+    {
+      "support": "appended luminous projection dot 35",
+      "triangles": 160,
+      "outerFitUpperMillimetres": 52
+    },
+    {
+      "support": "appended luminous projection dot 36",
+      "triangles": 160,
+      "outerFitUpperMillimetres": 52
+    },
+    {
+      "support": "appended luminous projection dot 37",
+      "triangles": 160,
+      "outerFitUpperMillimetres": 52
+    },
+    {
+      "support": "appended luminous projection dot 38",
+      "triangles": 160,
+      "outerFitUpperMillimetres": 52
+    },
+    {
+      "support": "appended luminous projection dot 39",
+      "triangles": 160,
+      "outerFitUpperMillimetres": 52
+    },
+    {
+      "support": "appended luminous projection dot 40",
+      "triangles": 160,
+      "outerFitUpperMillimetres": 51
+    },
+    {
+      "support": "appended luminous projection dot 41",
+      "triangles": 160,
+      "outerFitUpperMillimetres": 51
+    },
+    {
+      "support": "appended luminous projection dot 42",
+      "triangles": 160,
+      "outerFitUpperMillimetres": 51
+    },
+    {
+      "support": "appended luminous projection dot 43",
+      "triangles": 160,
+      "outerFitUpperMillimetres": 51
+    },
+    {
+      "support": "appended luminous projection dot 44",
+      "triangles": 160,
+      "outerFitUpperMillimetres": 51
+    },
+    {
+      "support": "appended luminous projection dot 45",
+      "triangles": 160,
+      "outerFitUpperMillimetres": 50
+    },
+    {
+      "support": "appended luminous projection dot 46",
+      "triangles": 160,
+      "outerFitUpperMillimetres": 50
+    },
+    {
+      "support": "appended luminous projection dot 47",
+      "triangles": 160,
+      "outerFitUpperMillimetres": 50
+    },
+    {
+      "support": "appended luminous projection dot 48",
+      "triangles": 160,
+      "outerFitUpperMillimetres": 50
+    },
+    {
+      "support": "appended luminous projection dot 49",
+      "triangles": 160,
+      "outerFitUpperMillimetres": 50
+    },
+    {
+      "support": "appended luminous projection dot 50",
+      "triangles": 160,
+      "outerFitUpperMillimetres": 49
+    },
+    {
+      "support": "appended luminous projection dot 51",
+      "triangles": 160,
+      "outerFitUpperMillimetres": 49
+    },
+    {
+      "support": "appended luminous projection dot 52",
+      "triangles": 160,
+      "outerFitUpperMillimetres": 49
+    },
+    {
+      "support": "appended luminous projection dot 53",
+      "triangles": 160,
+      "outerFitUpperMillimetres": 49
+    },
+    {
+      "support": "appended luminous projection dot 54",
+      "triangles": 160,
+      "outerFitUpperMillimetres": 49
+    },
+    {
+      "support": "appended luminous projection dot 55",
+      "triangles": 160,
+      "outerFitUpperMillimetres": 49
+    },
+    {
+      "support": "appended luminous projection dot 56",
+      "triangles": 160,
+      "outerFitUpperMillimetres": 48
+    },
+    {
+      "support": "appended luminous projection dot 57",
+      "triangles": 160,
+      "outerFitUpperMillimetres": 48
+    },
+    {
+      "support": "appended luminous projection dot 58",
+      "triangles": 160,
+      "outerFitUpperMillimetres": 48
+    },
+    {
+      "support": "appended luminous projection dot 59",
+      "triangles": 160,
+      "outerFitUpperMillimetres": 48
+    },
+    {
+      "support": "appended luminous projection dot 60",
+      "triangles": 160,
+      "outerFitUpperMillimetres": 48
+    },
+    {
+      "support": "appended luminous projection dot 61",
+      "triangles": 160,
+      "outerFitUpperMillimetres": 47
+    },
+    {
+      "support": "appended luminous projection dot 62",
+      "triangles": 160,
+      "outerFitUpperMillimetres": 47
+    },
+    {
+      "support": "appended luminous projection dot 63",
+      "triangles": 160,
+      "outerFitUpperMillimetres": 47
+    },
+    {
+      "support": "appended luminous projection dot 64",
+      "triangles": 160,
+      "outerFitUpperMillimetres": 46
+    },
+    {
+      "support": "appended luminous projection dot 65",
+      "triangles": 160,
+      "outerFitUpperMillimetres": 53
+    },
+    {
+      "support": "appended luminous projection dot 66",
+      "triangles": 160,
+      "outerFitUpperMillimetres": 53
+    },
+    {
+      "support": "appended luminous projection dot 67",
+      "triangles": 160,
+      "outerFitUpperMillimetres": 53
+    },
+    {
+      "support": "appended luminous projection dot 68",
+      "triangles": 160,
+      "outerFitUpperMillimetres": 52
+    },
+    {
+      "support": "appended luminous projection dot 69",
+      "triangles": 160,
+      "outerFitUpperMillimetres": 52
+    },
+    {
+      "support": "appended luminous projection dot 70",
+      "triangles": 160,
+      "outerFitUpperMillimetres": 52
+    },
+    {
+      "support": "appended luminous projection dot 71",
+      "triangles": 160,
+      "outerFitUpperMillimetres": 52
+    },
+    {
+      "support": "appended luminous projection dot 72",
+      "triangles": 160,
+      "outerFitUpperMillimetres": 52
+    },
+    {
+      "support": "appended luminous projection dot 73",
+      "triangles": 160,
+      "outerFitUpperMillimetres": 51
+    },
+    {
+      "support": "appended luminous projection dot 74",
+      "triangles": 160,
+      "outerFitUpperMillimetres": 51
+    },
+    {
+      "support": "appended luminous projection dot 75",
+      "triangles": 160,
+      "outerFitUpperMillimetres": 51
+    },
+    {
+      "support": "appended luminous projection dot 76",
+      "triangles": 160,
+      "outerFitUpperMillimetres": 51
+    },
+    {
+      "support": "appended luminous projection dot 77",
+      "triangles": 160,
+      "outerFitUpperMillimetres": 51
+    },
+    {
+      "support": "appended luminous projection dot 78",
+      "triangles": 160,
+      "outerFitUpperMillimetres": 50
+    },
+    {
+      "support": "appended luminous projection dot 79",
+      "triangles": 160,
+      "outerFitUpperMillimetres": 50
+    },
+    {
+      "support": "appended luminous projection dot 80",
+      "triangles": 160,
+      "outerFitUpperMillimetres": 50
+    },
+    {
+      "support": "appended luminous projection dot 81",
+      "triangles": 160,
+      "outerFitUpperMillimetres": 50
+    },
+    {
+      "support": "appended luminous projection dot 82",
+      "triangles": 160,
+      "outerFitUpperMillimetres": 50
+    },
+    {
+      "support": "appended luminous projection dot 83",
+      "triangles": 160,
+      "outerFitUpperMillimetres": 50
+    },
+    {
+      "support": "appended luminous projection dot 84",
+      "triangles": 160,
+      "outerFitUpperMillimetres": 49
+    },
+    {
+      "support": "appended luminous projection dot 85",
+      "triangles": 160,
+      "outerFitUpperMillimetres": 49
+    },
+    {
+      "support": "appended luminous projection dot 86",
+      "triangles": 160,
+      "outerFitUpperMillimetres": 49
+    },
+    {
+      "support": "appended luminous projection dot 87",
+      "triangles": 160,
+      "outerFitUpperMillimetres": 49
+    },
+    {
+      "support": "appended luminous projection dot 88",
+      "triangles": 160,
+      "outerFitUpperMillimetres": 49
+    },
+    {
+      "support": "appended luminous projection dot 89",
+      "triangles": 160,
+      "outerFitUpperMillimetres": 48
+    },
+    {
+      "support": "appended luminous projection dot 90",
+      "triangles": 160,
+      "outerFitUpperMillimetres": 48
+    },
+    {
+      "support": "appended luminous projection dot 91",
+      "triangles": 160,
+      "outerFitUpperMillimetres": 48
+    },
+    {
+      "support": "appended luminous projection dot 92",
+      "triangles": 160,
+      "outerFitUpperMillimetres": 48
+    },
+    {
+      "support": "appended luminous projection dot 93",
+      "triangles": 160,
+      "outerFitUpperMillimetres": 48
+    },
+    {
+      "support": "appended luminous projection dot 94",
+      "triangles": 160,
+      "outerFitUpperMillimetres": 47
+    },
+    {
+      "support": "appended luminous projection dot 95",
+      "triangles": 160,
+      "outerFitUpperMillimetres": 47
+    },
+    {
+      "support": "appended luminous projection dot 96",
+      "triangles": 160,
+      "outerFitUpperMillimetres": 47
+    },
+    {
+      "support": "appended luminous projection dot 97",
+      "triangles": 160,
+      "outerFitUpperMillimetres": 47
+    },
+    {
+      "support": "appended luminous projection dot 98",
+      "triangles": 160,
+      "outerFitUpperMillimetres": 46
+    },
+    {
+      "support": "appended luminous projection dot 99",
+      "triangles": 160,
+      "outerFitUpperMillimetres": 53
+    },
+    {
+      "support": "appended luminous projection dot 100",
+      "triangles": 160,
+      "outerFitUpperMillimetres": 53
+    },
+    {
+      "support": "appended luminous projection dot 101",
+      "triangles": 160,
+      "outerFitUpperMillimetres": 53
+    },
+    {
+      "support": "appended luminous projection dot 102",
+      "triangles": 160,
+      "outerFitUpperMillimetres": 52
+    },
+    {
+      "support": "appended luminous projection dot 103",
+      "triangles": 160,
+      "outerFitUpperMillimetres": 52
+    },
+    {
+      "support": "appended luminous projection dot 104",
+      "triangles": 160,
+      "outerFitUpperMillimetres": 52
+    },
+    {
+      "support": "appended luminous projection dot 105",
+      "triangles": 160,
+      "outerFitUpperMillimetres": 52
+    },
+    {
+      "support": "appended luminous projection dot 106",
+      "triangles": 160,
+      "outerFitUpperMillimetres": 52
+    },
+    {
+      "support": "appended luminous projection dot 107",
+      "triangles": 160,
+      "outerFitUpperMillimetres": 51
+    },
+    {
+      "support": "appended luminous projection dot 108",
+      "triangles": 160,
+      "outerFitUpperMillimetres": 51
+    },
+    {
+      "support": "appended luminous projection dot 109",
+      "triangles": 160,
+      "outerFitUpperMillimetres": 51
+    },
+    {
+      "support": "appended luminous projection dot 110",
+      "triangles": 160,
+      "outerFitUpperMillimetres": 51
+    },
+    {
+      "support": "appended luminous projection dot 111",
+      "triangles": 160,
+      "outerFitUpperMillimetres": 51
+    },
+    {
+      "support": "appended luminous projection dot 112",
+      "triangles": 160,
+      "outerFitUpperMillimetres": 50
+    },
+    {
+      "support": "appended luminous projection dot 113",
+      "triangles": 160,
+      "outerFitUpperMillimetres": 50
+    },
+    {
+      "support": "appended luminous projection dot 114",
+      "triangles": 160,
+      "outerFitUpperMillimetres": 50
+    },
+    {
+      "support": "appended luminous projection dot 115",
+      "triangles": 160,
+      "outerFitUpperMillimetres": 50
+    },
+    {
+      "support": "appended luminous projection dot 116",
+      "triangles": 160,
+      "outerFitUpperMillimetres": 50
+    },
+    {
+      "support": "appended luminous projection dot 117",
+      "triangles": 160,
+      "outerFitUpperMillimetres": 49
+    },
+    {
+      "support": "appended luminous projection dot 118",
+      "triangles": 160,
+      "outerFitUpperMillimetres": 49
+    },
+    {
+      "support": "appended luminous projection dot 119",
+      "triangles": 160,
+      "outerFitUpperMillimetres": 49
+    },
+    {
+      "support": "appended luminous projection dot 120",
+      "triangles": 160,
+      "outerFitUpperMillimetres": 49
+    },
+    {
+      "support": "appended luminous projection dot 121",
+      "triangles": 160,
+      "outerFitUpperMillimetres": 49
+    },
+    {
+      "support": "appended luminous projection dot 122",
+      "triangles": 160,
+      "outerFitUpperMillimetres": 49
+    },
+    {
+      "support": "appended luminous projection dot 123",
+      "triangles": 160,
+      "outerFitUpperMillimetres": 48
+    },
+    {
+      "support": "appended luminous projection dot 124",
+      "triangles": 160,
+      "outerFitUpperMillimetres": 48
+    },
+    {
+      "support": "appended luminous projection dot 125",
+      "triangles": 160,
+      "outerFitUpperMillimetres": 48
+    },
+    {
+      "support": "appended luminous projection dot 126",
+      "triangles": 160,
+      "outerFitUpperMillimetres": 48
+    },
+    {
+      "support": "appended luminous projection dot 127",
+      "triangles": 160,
+      "outerFitUpperMillimetres": 48
+    },
+    {
+      "support": "appended luminous projection dot 128",
+      "triangles": 160,
+      "outerFitUpperMillimetres": 47
+    },
+    {
+      "support": "appended luminous projection dot 129",
+      "triangles": 160,
+      "outerFitUpperMillimetres": 47
+    },
+    {
+      "support": "appended luminous projection dot 130",
+      "triangles": 160,
+      "outerFitUpperMillimetres": 47
+    },
+    {
+      "support": "appended luminous projection dot 131",
+      "triangles": 160,
+      "outerFitUpperMillimetres": 46
+    },
+    {
+      "support": "appended luminous projection dot 132",
+      "triangles": 160,
+      "outerFitUpperMillimetres": 53
+    },
+    {
+      "support": "appended luminous projection dot 133",
+      "triangles": 160,
+      "outerFitUpperMillimetres": 53
+    },
+    {
+      "support": "appended luminous projection dot 134",
+      "triangles": 160,
+      "outerFitUpperMillimetres": 53
+    },
+    {
+      "support": "appended luminous projection dot 135",
+      "triangles": 160,
+      "outerFitUpperMillimetres": 52
+    },
+    {
+      "support": "appended luminous projection dot 136",
+      "triangles": 160,
+      "outerFitUpperMillimetres": 52
+    },
+    {
+      "support": "appended luminous projection dot 137",
+      "triangles": 160,
+      "outerFitUpperMillimetres": 52
+    },
+    {
+      "support": "appended luminous projection dot 138",
+      "triangles": 160,
+      "outerFitUpperMillimetres": 52
+    },
+    {
+      "support": "appended luminous projection dot 139",
+      "triangles": 160,
+      "outerFitUpperMillimetres": 52
+    },
+    {
+      "support": "appended luminous projection dot 140",
+      "triangles": 160,
+      "outerFitUpperMillimetres": 51
+    },
+    {
+      "support": "appended luminous projection dot 141",
+      "triangles": 160,
+      "outerFitUpperMillimetres": 51
+    },
+    {
+      "support": "appended luminous projection dot 142",
+      "triangles": 160,
+      "outerFitUpperMillimetres": 51
+    },
+    {
+      "support": "appended luminous projection dot 143",
+      "triangles": 160,
+      "outerFitUpperMillimetres": 51
+    },
+    {
+      "support": "appended luminous projection dot 144",
+      "triangles": 160,
+      "outerFitUpperMillimetres": 51
+    },
+    {
+      "support": "appended luminous projection dot 145",
+      "triangles": 160,
+      "outerFitUpperMillimetres": 50
+    },
+    {
+      "support": "appended luminous projection dot 146",
+      "triangles": 160,
+      "outerFitUpperMillimetres": 50
+    },
+    {
+      "support": "appended luminous projection dot 147",
+      "triangles": 160,
+      "outerFitUpperMillimetres": 50
+    },
+    {
+      "support": "appended luminous projection dot 148",
+      "triangles": 160,
+      "outerFitUpperMillimetres": 50
+    },
+    {
+      "support": "appended luminous projection dot 149",
+      "triangles": 160,
+      "outerFitUpperMillimetres": 50
+    },
+    {
+      "support": "appended luminous projection dot 150",
+      "triangles": 160,
+      "outerFitUpperMillimetres": 49
+    },
+    {
+      "support": "appended luminous projection dot 151",
+      "triangles": 160,
+      "outerFitUpperMillimetres": 49
+    },
+    {
+      "support": "appended luminous projection dot 152",
+      "triangles": 160,
+      "outerFitUpperMillimetres": 49
+    },
+    {
+      "support": "appended luminous projection dot 153",
+      "triangles": 160,
+      "outerFitUpperMillimetres": 49
+    },
+    {
+      "support": "appended luminous projection dot 154",
+      "triangles": 160,
+      "outerFitUpperMillimetres": 49
+    },
+    {
+      "support": "appended luminous projection dot 155",
+      "triangles": 160,
+      "outerFitUpperMillimetres": 48
+    },
+    {
+      "support": "appended luminous projection dot 156",
+      "triangles": 160,
+      "outerFitUpperMillimetres": 48
+    },
+    {
+      "support": "appended luminous projection dot 157",
+      "triangles": 160,
+      "outerFitUpperMillimetres": 48
+    },
+    {
+      "support": "appended luminous projection dot 158",
+      "triangles": 160,
+      "outerFitUpperMillimetres": 48
+    },
+    {
+      "support": "appended luminous projection dot 159",
+      "triangles": 160,
+      "outerFitUpperMillimetres": 48
+    },
+    {
+      "support": "appended luminous projection dot 160",
+      "triangles": 160,
+      "outerFitUpperMillimetres": 47
+    },
+    {
+      "support": "appended luminous projection dot 161",
+      "triangles": 160,
+      "outerFitUpperMillimetres": 47
+    },
+    {
+      "support": "appended luminous projection dot 162",
+      "triangles": 160,
+      "outerFitUpperMillimetres": 47
+    },
+    {
+      "support": "appended luminous projection dot 163",
+      "triangles": 160,
+      "outerFitUpperMillimetres": 46
+    },
+    {
+      "support": "appended luminous projection dot 164",
+      "triangles": 160,
+      "outerFitUpperMillimetres": 53
+    },
+    {
+      "support": "appended luminous projection dot 165",
+      "triangles": 160,
+      "outerFitUpperMillimetres": 53
+    },
+    {
+      "support": "appended luminous projection dot 166",
+      "triangles": 160,
+      "outerFitUpperMillimetres": 53
+    },
+    {
+      "support": "appended luminous projection dot 167",
+      "triangles": 160,
+      "outerFitUpperMillimetres": 52
+    },
+    {
+      "support": "appended luminous projection dot 168",
+      "triangles": 160,
+      "outerFitUpperMillimetres": 52
+    },
+    {
+      "support": "appended luminous projection dot 169",
+      "triangles": 160,
+      "outerFitUpperMillimetres": 52
+    },
+    {
+      "support": "appended luminous projection dot 170",
+      "triangles": 160,
+      "outerFitUpperMillimetres": 52
+    },
+    {
+      "support": "appended luminous projection dot 171",
+      "triangles": 160,
+      "outerFitUpperMillimetres": 52
+    },
+    {
+      "support": "appended luminous projection dot 172",
+      "triangles": 160,
+      "outerFitUpperMillimetres": 51
+    },
+    {
+      "support": "appended luminous projection dot 173",
+      "triangles": 160,
+      "outerFitUpperMillimetres": 51
+    },
+    {
+      "support": "appended luminous projection dot 174",
+      "triangles": 160,
+      "outerFitUpperMillimetres": 51
+    },
+    {
+      "support": "appended luminous projection dot 175",
+      "triangles": 160,
+      "outerFitUpperMillimetres": 51
+    },
+    {
+      "support": "appended luminous projection dot 176",
+      "triangles": 160,
+      "outerFitUpperMillimetres": 51
+    },
+    {
+      "support": "appended luminous projection dot 177",
+      "triangles": 160,
+      "outerFitUpperMillimetres": 50
+    },
+    {
+      "support": "appended luminous projection dot 178",
+      "triangles": 160,
+      "outerFitUpperMillimetres": 50
+    },
+    {
+      "support": "appended luminous projection dot 179",
+      "triangles": 160,
+      "outerFitUpperMillimetres": 50
+    },
+    {
+      "support": "appended luminous projection dot 180",
+      "triangles": 160,
+      "outerFitUpperMillimetres": 50
+    },
+    {
+      "support": "appended luminous projection dot 181",
+      "triangles": 160,
+      "outerFitUpperMillimetres": 50
+    },
+    {
+      "support": "appended luminous projection dot 182",
+      "triangles": 160,
+      "outerFitUpperMillimetres": 49
+    },
+    {
+      "support": "appended luminous projection dot 183",
+      "triangles": 160,
+      "outerFitUpperMillimetres": 49
+    },
+    {
+      "support": "appended luminous projection dot 184",
+      "triangles": 160,
+      "outerFitUpperMillimetres": 49
+    },
+    {
+      "support": "appended luminous projection dot 185",
+      "triangles": 160,
+      "outerFitUpperMillimetres": 49
+    },
+    {
+      "support": "appended luminous projection dot 186",
+      "triangles": 160,
+      "outerFitUpperMillimetres": 49
+    },
+    {
+      "support": "appended luminous projection dot 187",
+      "triangles": 160,
+      "outerFitUpperMillimetres": 49
+    },
+    {
+      "support": "appended luminous projection dot 188",
+      "triangles": 160,
+      "outerFitUpperMillimetres": 48
+    },
+    {
+      "support": "appended luminous projection dot 189",
+      "triangles": 160,
+      "outerFitUpperMillimetres": 48
+    },
+    {
+      "support": "appended luminous projection dot 190",
+      "triangles": 160,
+      "outerFitUpperMillimetres": 48
+    },
+    {
+      "support": "appended luminous projection dot 191",
+      "triangles": 160,
+      "outerFitUpperMillimetres": 48
+    },
+    {
+      "support": "appended luminous projection dot 192",
+      "triangles": 160,
+      "outerFitUpperMillimetres": 48
+    },
+    {
+      "support": "appended luminous projection dot 193",
+      "triangles": 160,
+      "outerFitUpperMillimetres": 47
+    },
+    {
+      "support": "appended luminous projection dot 194",
+      "triangles": 160,
+      "outerFitUpperMillimetres": 47
+    },
+    {
+      "support": "appended luminous projection dot 195",
+      "triangles": 160,
+      "outerFitUpperMillimetres": 47
+    },
+    {
+      "support": "appended luminous projection dot 196",
+      "triangles": 160,
+      "outerFitUpperMillimetres": 46
+    },
+    {
+      "support": "appended luminous projection dot 197",
+      "triangles": 160,
+      "outerFitUpperMillimetres": 53
+    },
+    {
+      "support": "appended luminous projection dot 198",
+      "triangles": 160,
+      "outerFitUpperMillimetres": 53
+    },
+    {
+      "support": "appended luminous projection dot 199",
+      "triangles": 160,
+      "outerFitUpperMillimetres": 53
+    },
+    {
+      "support": "appended luminous projection dot 200",
+      "triangles": 160,
+      "outerFitUpperMillimetres": 52
+    },
+    {
+      "support": "appended luminous projection dot 201",
+      "triangles": 160,
+      "outerFitUpperMillimetres": 52
+    },
+    {
+      "support": "appended luminous projection dot 202",
+      "triangles": 160,
+      "outerFitUpperMillimetres": 52
+    },
+    {
+      "support": "appended luminous projection dot 203",
+      "triangles": 160,
+      "outerFitUpperMillimetres": 52
+    },
+    {
+      "support": "appended luminous projection dot 204",
+      "triangles": 160,
+      "outerFitUpperMillimetres": 52
+    },
+    {
+      "support": "appended luminous projection dot 205",
+      "triangles": 160,
+      "outerFitUpperMillimetres": 51
+    },
+    {
+      "support": "appended luminous projection dot 206",
+      "triangles": 160,
+      "outerFitUpperMillimetres": 51
+    },
+    {
+      "support": "appended luminous projection dot 207",
+      "triangles": 160,
+      "outerFitUpperMillimetres": 51
+    },
+    {
+      "support": "appended luminous projection dot 208",
+      "triangles": 160,
+      "outerFitUpperMillimetres": 51
+    },
+    {
+      "support": "appended luminous projection dot 209",
+      "triangles": 160,
+      "outerFitUpperMillimetres": 51
+    },
+    {
+      "support": "appended luminous projection dot 210",
+      "triangles": 160,
+      "outerFitUpperMillimetres": 50
+    },
+    {
+      "support": "appended luminous projection dot 211",
+      "triangles": 160,
+      "outerFitUpperMillimetres": 50
+    },
+    {
+      "support": "appended luminous projection dot 212",
+      "triangles": 160,
+      "outerFitUpperMillimetres": 50
+    },
+    {
+      "support": "appended luminous projection dot 213",
+      "triangles": 160,
+      "outerFitUpperMillimetres": 50
+    },
+    {
+      "support": "appended luminous projection dot 214",
+      "triangles": 160,
+      "outerFitUpperMillimetres": 50
+    },
+    {
+      "support": "appended luminous projection dot 215",
+      "triangles": 160,
+      "outerFitUpperMillimetres": 50
+    },
+    {
+      "support": "appended luminous projection dot 216",
+      "triangles": 160,
+      "outerFitUpperMillimetres": 49
+    },
+    {
+      "support": "appended luminous projection dot 217",
+      "triangles": 160,
+      "outerFitUpperMillimetres": 49
+    },
+    {
+      "support": "appended luminous projection dot 218",
+      "triangles": 160,
+      "outerFitUpperMillimetres": 49
+    },
+    {
+      "support": "appended luminous projection dot 219",
+      "triangles": 160,
+      "outerFitUpperMillimetres": 49
+    },
+    {
+      "support": "appended luminous projection dot 220",
+      "triangles": 160,
+      "outerFitUpperMillimetres": 49
+    },
+    {
+      "support": "appended luminous projection dot 221",
+      "triangles": 160,
+      "outerFitUpperMillimetres": 48
+    },
+    {
+      "support": "appended luminous projection dot 222",
+      "triangles": 160,
+      "outerFitUpperMillimetres": 48
+    },
+    {
+      "support": "appended luminous projection dot 223",
+      "triangles": 160,
+      "outerFitUpperMillimetres": 48
+    },
+    {
+      "support": "appended luminous projection dot 224",
+      "triangles": 160,
+      "outerFitUpperMillimetres": 48
+    },
+    {
+      "support": "appended luminous projection dot 225",
+      "triangles": 160,
+      "outerFitUpperMillimetres": 48
+    },
+    {
+      "support": "appended luminous projection dot 226",
+      "triangles": 160,
+      "outerFitUpperMillimetres": 47
+    },
+    {
+      "support": "appended luminous projection dot 227",
+      "triangles": 160,
+      "outerFitUpperMillimetres": 47
+    },
+    {
+      "support": "appended luminous projection dot 228",
+      "triangles": 160,
+      "outerFitUpperMillimetres": 47
+    },
+    {
+      "support": "appended luminous projection dot 229",
+      "triangles": 160,
+      "outerFitUpperMillimetres": 47
+    },
+    {
+      "support": "appended luminous projection dot 230",
+      "triangles": 160,
+      "outerFitUpperMillimetres": 46
+    },
+    {
+      "support": "appended luminous projection dot 231",
+      "triangles": 160,
+      "outerFitUpperMillimetres": 53
+    },
+    {
+      "support": "appended luminous projection dot 232",
+      "triangles": 160,
+      "outerFitUpperMillimetres": 53
+    },
+    {
+      "support": "appended luminous projection dot 233",
+      "triangles": 160,
+      "outerFitUpperMillimetres": 53
+    },
+    {
+      "support": "appended luminous projection dot 234",
+      "triangles": 160,
+      "outerFitUpperMillimetres": 52
+    },
+    {
+      "support": "appended luminous projection dot 235",
+      "triangles": 160,
+      "outerFitUpperMillimetres": 52
+    },
+    {
+      "support": "appended luminous projection dot 236",
+      "triangles": 160,
+      "outerFitUpperMillimetres": 52
+    },
+    {
+      "support": "appended luminous projection dot 237",
+      "triangles": 160,
+      "outerFitUpperMillimetres": 52
+    },
+    {
+      "support": "appended luminous projection dot 238",
+      "triangles": 160,
+      "outerFitUpperMillimetres": 52
+    },
+    {
+      "support": "appended luminous projection dot 239",
+      "triangles": 160,
+      "outerFitUpperMillimetres": 51
+    },
+    {
+      "support": "appended luminous projection dot 240",
+      "triangles": 160,
+      "outerFitUpperMillimetres": 51
+    },
+    {
+      "support": "appended luminous projection dot 241",
+      "triangles": 160,
+      "outerFitUpperMillimetres": 51
+    },
+    {
+      "support": "appended luminous projection dot 242",
+      "triangles": 160,
+      "outerFitUpperMillimetres": 51
+    },
+    {
+      "support": "appended luminous projection dot 243",
+      "triangles": 160,
+      "outerFitUpperMillimetres": 51
+    },
+    {
+      "support": "appended luminous projection dot 244",
+      "triangles": 160,
+      "outerFitUpperMillimetres": 50
+    },
+    {
+      "support": "appended luminous projection dot 245",
+      "triangles": 160,
+      "outerFitUpperMillimetres": 50
+    },
+    {
+      "support": "appended luminous projection dot 246",
+      "triangles": 160,
+      "outerFitUpperMillimetres": 50
+    },
+    {
+      "support": "appended luminous projection dot 247",
+      "triangles": 160,
+      "outerFitUpperMillimetres": 50
+    },
+    {
+      "support": "appended luminous projection dot 248",
+      "triangles": 160,
+      "outerFitUpperMillimetres": 50
+    },
+    {
+      "support": "appended luminous projection dot 249",
+      "triangles": 160,
+      "outerFitUpperMillimetres": 49
+    },
+    {
+      "support": "appended luminous projection dot 250",
+      "triangles": 160,
+      "outerFitUpperMillimetres": 49
+    },
+    {
+      "support": "appended luminous projection dot 251",
+      "triangles": 160,
+      "outerFitUpperMillimetres": 49
+    },
+    {
+      "support": "appended luminous projection dot 252",
+      "triangles": 160,
+      "outerFitUpperMillimetres": 49
+    },
+    {
+      "support": "appended luminous projection dot 253",
+      "triangles": 160,
+      "outerFitUpperMillimetres": 49
+    },
+    {
+      "support": "appended luminous projection dot 254",
+      "triangles": 160,
+      "outerFitUpperMillimetres": 49
+    },
+    {
+      "support": "appended luminous projection dot 255",
+      "triangles": 160,
+      "outerFitUpperMillimetres": 48
+    },
+    {
+      "support": "appended luminous projection dot 256",
+      "triangles": 160,
+      "outerFitUpperMillimetres": 48
+    },
+    {
+      "support": "appended luminous projection dot 257",
+      "triangles": 160,
+      "outerFitUpperMillimetres": 48
+    },
+    {
+      "support": "appended luminous projection dot 258",
+      "triangles": 160,
+      "outerFitUpperMillimetres": 48
+    },
+    {
+      "support": "appended luminous projection dot 259",
+      "triangles": 160,
+      "outerFitUpperMillimetres": 48
+    },
+    {
+      "support": "appended luminous projection dot 260",
+      "triangles": 160,
+      "outerFitUpperMillimetres": 47
+    },
+    {
+      "support": "appended luminous projection dot 261",
+      "triangles": 160,
+      "outerFitUpperMillimetres": 47
+    },
+    {
+      "support": "appended luminous projection dot 262",
+      "triangles": 160,
+      "outerFitUpperMillimetres": 47
+    },
+    {
+      "support": "appended luminous projection dot 263",
+      "triangles": 160,
+      "outerFitUpperMillimetres": 46
+    },
+    {
+      "support": "appended luminous projection dot 264",
+      "triangles": 160,
+      "outerFitUpperMillimetres": 52
+    },
+    {
+      "support": "appended luminous projection dot 265",
+      "triangles": 128,
+      "outerFitUpperMillimetres": 93
+    },
+    {
+      "support": "appended luminous projection dot 266",
+      "triangles": 128,
+      "outerFitUpperMillimetres": 92
+    },
+    {
+      "support": "appended luminous projection dot 267",
+      "triangles": 128,
+      "outerFitUpperMillimetres": 86
+    },
+    {
+      "support": "appended luminous projection dot 268",
+      "triangles": 128,
+      "outerFitUpperMillimetres": 88
+    },
+    {
+      "support": "appended luminous projection dot 269",
+      "triangles": 128,
+      "outerFitUpperMillimetres": 83
+    },
+    {
+      "support": "appended luminous projection dot 270",
+      "triangles": 128,
+      "outerFitUpperMillimetres": 85
+    },
+    {
+      "support": "appended luminous projection dot 271",
+      "triangles": 128,
+      "outerFitUpperMillimetres": 83
+    },
+    {
+      "support": "appended luminous projection dot 272",
+      "triangles": 128,
+      "outerFitUpperMillimetres": 80
+    },
+    {
+      "support": "appended luminous projection dot 273",
+      "triangles": 124,
+      "outerFitUpperMillimetres": 78
+    },
+    {
+      "support": "appended luminous projection dot 274",
+      "triangles": 124,
+      "outerFitUpperMillimetres": 75
+    },
+    {
+      "support": "appended luminous projection dot 275",
+      "triangles": 124,
+      "outerFitUpperMillimetres": 72
+    },
+    {
+      "support": "appended luminous projection dot 276",
+      "triangles": 124,
+      "outerFitUpperMillimetres": 69
+    },
+    {
+      "support": "appended luminous projection dot 277",
+      "triangles": 124,
+      "outerFitUpperMillimetres": 67
+    },
+    {
+      "support": "appended luminous projection dot 278",
+      "triangles": 124,
+      "outerFitUpperMillimetres": 66
+    },
+    {
+      "support": "appended luminous projection dot 279",
+      "triangles": 124,
+      "outerFitUpperMillimetres": 61
+    },
+    {
+      "support": "appended luminous projection dot 280",
+      "triangles": 120,
+      "outerFitUpperMillimetres": 66
+    },
+    {
+      "support": "appended luminous projection dot 281",
+      "triangles": 120,
+      "outerFitUpperMillimetres": 66
+    },
+    {
+      "support": "appended luminous projection dot 282",
+      "triangles": 120,
+      "outerFitUpperMillimetres": 60
+    },
+    {
+      "support": "appended luminous projection dot 283",
+      "triangles": 124,
+      "outerFitUpperMillimetres": 60
+    },
+    {
+      "support": "appended luminous projection dot 284",
+      "triangles": 128,
+      "outerFitUpperMillimetres": 54
+    },
+    {
+      "support": "appended luminous projection dot 285",
+      "triangles": 132,
+      "outerFitUpperMillimetres": 58
+    },
+    {
+      "support": "appended luminous projection dot 286",
+      "triangles": 136,
+      "outerFitUpperMillimetres": 54
+    },
+    {
+      "support": "appended luminous projection dot 287",
+      "triangles": 136,
+      "outerFitUpperMillimetres": 53
+    },
+    {
+      "support": "appended luminous projection dot 288",
+      "triangles": 144,
+      "outerFitUpperMillimetres": 51
+    },
+    {
+      "support": "appended luminous projection dot 289",
+      "triangles": 160,
+      "outerFitUpperMillimetres": 48
+    },
+    {
+      "support": "appended luminous projection dot 290",
+      "triangles": 172,
+      "outerFitUpperMillimetres": 47
+    },
+    {
+      "support": "appended luminous projection dot 291",
+      "triangles": 132,
+      "outerFitUpperMillimetres": 90
+    },
+    {
+      "support": "appended luminous projection dot 292",
+      "triangles": 132,
+      "outerFitUpperMillimetres": 89
+    },
+    {
+      "support": "appended luminous projection dot 293",
+      "triangles": 132,
+      "outerFitUpperMillimetres": 86
+    },
+    {
+      "support": "appended luminous projection dot 294",
+      "triangles": 132,
+      "outerFitUpperMillimetres": 85
+    },
+    {
+      "support": "appended luminous projection dot 295",
+      "triangles": 132,
+      "outerFitUpperMillimetres": 85
+    },
+    {
+      "support": "appended luminous projection dot 296",
+      "triangles": 130,
+      "outerFitUpperMillimetres": 82
+    },
+    {
+      "support": "appended luminous projection dot 297",
+      "triangles": 126,
+      "outerFitUpperMillimetres": 81
+    },
+    {
+      "support": "appended luminous projection dot 298",
+      "triangles": 126,
+      "outerFitUpperMillimetres": 80
+    },
+    {
+      "support": "appended luminous projection dot 299",
+      "triangles": 124,
+      "outerFitUpperMillimetres": 77
+    },
+    {
+      "support": "appended luminous projection dot 300",
+      "triangles": 122,
+      "outerFitUpperMillimetres": 76
+    },
+    {
+      "support": "appended luminous projection dot 301",
+      "triangles": 122,
+      "outerFitUpperMillimetres": 73
+    },
+    {
+      "support": "appended luminous projection dot 302",
+      "triangles": 120,
+      "outerFitUpperMillimetres": 71
+    },
+    {
+      "support": "appended luminous projection dot 303",
+      "triangles": 120,
+      "outerFitUpperMillimetres": 68
+    },
+    {
+      "support": "appended luminous projection dot 304",
+      "triangles": 120,
+      "outerFitUpperMillimetres": 66
+    },
+    {
+      "support": "appended luminous projection dot 305",
+      "triangles": 120,
+      "outerFitUpperMillimetres": 65
+    },
+    {
+      "support": "appended luminous projection dot 306",
+      "triangles": 120,
+      "outerFitUpperMillimetres": 65
+    },
+    {
+      "support": "appended luminous projection dot 307",
+      "triangles": 120,
+      "outerFitUpperMillimetres": 66
+    },
+    {
+      "support": "appended luminous projection dot 308",
+      "triangles": 124,
+      "outerFitUpperMillimetres": 66
+    },
+    {
+      "support": "appended luminous projection dot 309",
+      "triangles": 126,
+      "outerFitUpperMillimetres": 66
+    },
+    {
+      "support": "appended luminous projection dot 310",
+      "triangles": 128,
+      "outerFitUpperMillimetres": 65
+    },
+    {
+      "support": "appended luminous projection dot 311",
+      "triangles": 134,
+      "outerFitUpperMillimetres": 60
+    },
+    {
+      "support": "appended luminous projection dot 312",
+      "triangles": 134,
+      "outerFitUpperMillimetres": 59
+    },
+    {
+      "support": "appended luminous projection dot 313",
+      "triangles": 138,
+      "outerFitUpperMillimetres": 60
+    },
+    {
+      "support": "appended luminous projection dot 314",
+      "triangles": 136,
+      "outerFitUpperMillimetres": 56
+    },
+    {
+      "support": "appended luminous projection dot 315",
+      "triangles": 138,
+      "outerFitUpperMillimetres": 58
+    },
+    {
+      "support": "appended luminous projection dot 316",
+      "triangles": 142,
+      "outerFitUpperMillimetres": 59
+    },
+    {
+      "support": "appended luminous projection dot 317",
+      "triangles": 146,
+      "outerFitUpperMillimetres": 51
+    },
+    {
+      "support": "appended luminous projection dot 318",
+      "triangles": 152,
+      "outerFitUpperMillimetres": 51
+    },
+    {
+      "support": "appended luminous projection dot 319",
+      "triangles": 158,
+      "outerFitUpperMillimetres": 51
+    },
+    {
+      "support": "appended luminous projection dot 320",
+      "triangles": 166,
+      "outerFitUpperMillimetres": 48
+    },
+    {
+      "support": "appended luminous projection dot 321",
+      "triangles": 168,
+      "outerFitUpperMillimetres": 47
+    },
+    {
+      "support": "appended luminous projection dot 322",
+      "triangles": 124,
+      "outerFitUpperMillimetres": 90
+    },
+    {
+      "support": "appended luminous projection dot 323",
+      "triangles": 124,
+      "outerFitUpperMillimetres": 89
+    },
+    {
+      "support": "appended luminous projection dot 324",
+      "triangles": 124,
+      "outerFitUpperMillimetres": 88
+    },
+    {
+      "support": "appended luminous projection dot 325",
+      "triangles": 124,
+      "outerFitUpperMillimetres": 86
+    },
+    {
+      "support": "appended luminous projection dot 326",
+      "triangles": 124,
+      "outerFitUpperMillimetres": 82
+    },
+    {
+      "support": "appended luminous projection dot 327",
+      "triangles": 124,
+      "outerFitUpperMillimetres": 80
+    },
+    {
+      "support": "appended luminous projection dot 328",
+      "triangles": 124,
+      "outerFitUpperMillimetres": 78
+    },
+    {
+      "support": "appended luminous projection dot 329",
+      "triangles": 124,
+      "outerFitUpperMillimetres": 78
+    },
+    {
+      "support": "appended luminous projection dot 330",
+      "triangles": 120,
+      "outerFitUpperMillimetres": 76
+    },
+    {
+      "support": "appended luminous projection dot 331",
+      "triangles": 120,
+      "outerFitUpperMillimetres": 73
+    },
+    {
+      "support": "appended luminous projection dot 332",
+      "triangles": 120,
+      "outerFitUpperMillimetres": 73
+    },
+    {
+      "support": "appended luminous projection dot 333",
+      "triangles": 120,
+      "outerFitUpperMillimetres": 70
+    },
+    {
+      "support": "appended luminous projection dot 334",
+      "triangles": 120,
+      "outerFitUpperMillimetres": 66
+    },
+    {
+      "support": "appended luminous projection dot 335",
+      "triangles": 120,
+      "outerFitUpperMillimetres": 65
+    },
+    {
+      "support": "appended luminous projection dot 336",
+      "triangles": 120,
+      "outerFitUpperMillimetres": 66
+    },
+    {
+      "support": "appended luminous projection dot 337",
+      "triangles": 120,
+      "outerFitUpperMillimetres": 67
+    },
+    {
+      "support": "appended luminous projection dot 338",
+      "triangles": 124,
+      "outerFitUpperMillimetres": 63
+    },
+    {
+      "support": "appended luminous projection dot 339",
+      "triangles": 124,
+      "outerFitUpperMillimetres": 66
+    },
+    {
+      "support": "appended luminous projection dot 340",
+      "triangles": 132,
+      "outerFitUpperMillimetres": 62
+    },
+    {
+      "support": "appended luminous projection dot 341",
+      "triangles": 132,
+      "outerFitUpperMillimetres": 60
+    },
+    {
+      "support": "appended luminous projection dot 342",
+      "triangles": 132,
+      "outerFitUpperMillimetres": 57
+    },
+    {
+      "support": "appended luminous projection dot 343",
+      "triangles": 132,
+      "outerFitUpperMillimetres": 57
+    },
+    {
+      "support": "appended luminous projection dot 344",
+      "triangles": 132,
+      "outerFitUpperMillimetres": 57
+    },
+    {
+      "support": "appended luminous projection dot 345",
+      "triangles": 132,
+      "outerFitUpperMillimetres": 58
+    },
+    {
+      "support": "appended luminous projection dot 346",
+      "triangles": 132,
+      "outerFitUpperMillimetres": 54
+    },
+    {
+      "support": "appended luminous projection dot 347",
+      "triangles": 136,
+      "outerFitUpperMillimetres": 53
+    },
+    {
+      "support": "appended luminous projection dot 348",
+      "triangles": 136,
+      "outerFitUpperMillimetres": 53
+    },
+    {
+      "support": "appended luminous projection dot 349",
+      "triangles": 148,
+      "outerFitUpperMillimetres": 53
+    },
+    {
+      "support": "appended luminous projection dot 350",
+      "triangles": 156,
+      "outerFitUpperMillimetres": 53
+    },
+    {
+      "support": "appended luminous projection dot 351",
+      "triangles": 156,
+      "outerFitUpperMillimetres": 49
+    },
+    {
+      "support": "appended luminous projection dot 352",
+      "triangles": 160,
+      "outerFitUpperMillimetres": 52
+    },
+    {
+      "support": "appended luminous projection dot 353",
+      "triangles": 168,
+      "outerFitUpperMillimetres": 48
+    },
+    {
+      "support": "appended luminous projection dot 354",
+      "triangles": 180,
+      "outerFitUpperMillimetres": 47
+    },
+    {
+      "support": "appended luminous projection dot 355",
+      "triangles": 184,
+      "outerFitUpperMillimetres": 46
+    },
+    {
+      "support": "appended luminous projection dot 356",
+      "triangles": 132,
+      "outerFitUpperMillimetres": 90
+    },
+    {
+      "support": "appended luminous projection dot 357",
+      "triangles": 132,
+      "outerFitUpperMillimetres": 89
+    },
+    {
+      "support": "appended luminous projection dot 358",
+      "triangles": 132,
+      "outerFitUpperMillimetres": 86
+    },
+    {
+      "support": "appended luminous projection dot 359",
+      "triangles": 132,
+      "outerFitUpperMillimetres": 85
+    },
+    {
+      "support": "appended luminous projection dot 360",
+      "triangles": 132,
+      "outerFitUpperMillimetres": 85
+    },
+    {
+      "support": "appended luminous projection dot 361",
+      "triangles": 130,
+      "outerFitUpperMillimetres": 82
+    },
+    {
+      "support": "appended luminous projection dot 362",
+      "triangles": 126,
+      "outerFitUpperMillimetres": 81
+    },
+    {
+      "support": "appended luminous projection dot 363",
+      "triangles": 126,
+      "outerFitUpperMillimetres": 80
+    },
+    {
+      "support": "appended luminous projection dot 364",
+      "triangles": 124,
+      "outerFitUpperMillimetres": 77
+    },
+    {
+      "support": "appended luminous projection dot 365",
+      "triangles": 122,
+      "outerFitUpperMillimetres": 76
+    },
+    {
+      "support": "appended luminous projection dot 366",
+      "triangles": 122,
+      "outerFitUpperMillimetres": 73
+    },
+    {
+      "support": "appended luminous projection dot 367",
+      "triangles": 120,
+      "outerFitUpperMillimetres": 70
+    },
+    {
+      "support": "appended luminous projection dot 368",
+      "triangles": 120,
+      "outerFitUpperMillimetres": 68
+    },
+    {
+      "support": "appended luminous projection dot 369",
+      "triangles": 120,
+      "outerFitUpperMillimetres": 66
+    },
+    {
+      "support": "appended luminous projection dot 370",
+      "triangles": 120,
+      "outerFitUpperMillimetres": 65
+    },
+    {
+      "support": "appended luminous projection dot 371",
+      "triangles": 120,
+      "outerFitUpperMillimetres": 65
+    },
+    {
+      "support": "appended luminous projection dot 372",
+      "triangles": 120,
+      "outerFitUpperMillimetres": 67
+    },
+    {
+      "support": "appended luminous projection dot 373",
+      "triangles": 124,
+      "outerFitUpperMillimetres": 66
+    },
+    {
+      "support": "appended luminous projection dot 374",
+      "triangles": 126,
+      "outerFitUpperMillimetres": 66
+    },
+    {
+      "support": "appended luminous projection dot 375",
+      "triangles": 128,
+      "outerFitUpperMillimetres": 65
+    },
+    {
+      "support": "appended luminous projection dot 376",
+      "triangles": 134,
+      "outerFitUpperMillimetres": 59
+    },
+    {
+      "support": "appended luminous projection dot 377",
+      "triangles": 134,
+      "outerFitUpperMillimetres": 58
+    },
+    {
+      "support": "appended luminous projection dot 378",
+      "triangles": 138,
+      "outerFitUpperMillimetres": 60
+    },
+    {
+      "support": "appended luminous projection dot 379",
+      "triangles": 136,
+      "outerFitUpperMillimetres": 56
+    },
+    {
+      "support": "appended luminous projection dot 380",
+      "triangles": 138,
+      "outerFitUpperMillimetres": 58
+    },
+    {
+      "support": "appended luminous projection dot 381",
+      "triangles": 142,
+      "outerFitUpperMillimetres": 59
+    },
+    {
+      "support": "appended luminous projection dot 382",
+      "triangles": 146,
+      "outerFitUpperMillimetres": 51
+    },
+    {
+      "support": "appended luminous projection dot 383",
+      "triangles": 152,
+      "outerFitUpperMillimetres": 51
+    },
+    {
+      "support": "appended luminous projection dot 384",
+      "triangles": 158,
+      "outerFitUpperMillimetres": 51
+    },
+    {
+      "support": "appended luminous projection dot 385",
+      "triangles": 166,
+      "outerFitUpperMillimetres": 49
+    },
+    {
+      "support": "appended luminous projection dot 386",
+      "triangles": 168,
+      "outerFitUpperMillimetres": 47
+    },
+    {
+      "support": "appended luminous projection dot 387",
+      "triangles": 128,
+      "outerFitUpperMillimetres": 89
+    },
+    {
+      "support": "appended luminous projection dot 388",
+      "triangles": 128,
+      "outerFitUpperMillimetres": 88
+    },
+    {
+      "support": "appended luminous projection dot 389",
+      "triangles": 128,
+      "outerFitUpperMillimetres": 86
+    },
+    {
+      "support": "appended luminous projection dot 390",
+      "triangles": 128,
+      "outerFitUpperMillimetres": 85
+    },
+    {
+      "support": "appended luminous projection dot 391",
+      "triangles": 128,
+      "outerFitUpperMillimetres": 83
+    },
+    {
+      "support": "appended luminous projection dot 392",
+      "triangles": 128,
+      "outerFitUpperMillimetres": 85
+    },
+    {
+      "support": "appended luminous projection dot 393",
+      "triangles": 128,
+      "outerFitUpperMillimetres": 79
+    },
+    {
+      "support": "appended luminous projection dot 394",
+      "triangles": 128,
+      "outerFitUpperMillimetres": 81
+    },
+    {
+      "support": "appended luminous projection dot 395",
+      "triangles": 128,
+      "outerFitUpperMillimetres": 76
+    },
+    {
+      "support": "appended luminous projection dot 396",
+      "triangles": 124,
+      "outerFitUpperMillimetres": 74
+    },
+    {
+      "support": "appended luminous projection dot 397",
+      "triangles": 124,
+      "outerFitUpperMillimetres": 71
+    },
+    {
+      "support": "appended luminous projection dot 398",
+      "triangles": 124,
+      "outerFitUpperMillimetres": 70
+    },
+    {
+      "support": "appended luminous projection dot 399",
+      "triangles": 124,
+      "outerFitUpperMillimetres": 70
+    },
+    {
+      "support": "appended luminous projection dot 400",
+      "triangles": 124,
+      "outerFitUpperMillimetres": 64
+    },
+    {
+      "support": "appended luminous projection dot 401",
+      "triangles": 124,
+      "outerFitUpperMillimetres": 60
+    },
+    {
+      "support": "appended luminous projection dot 402",
+      "triangles": 120,
+      "outerFitUpperMillimetres": 66
+    },
+    {
+      "support": "appended luminous projection dot 403",
+      "triangles": 120,
+      "outerFitUpperMillimetres": 66
+    },
+    {
+      "support": "appended luminous projection dot 404",
+      "triangles": 120,
+      "outerFitUpperMillimetres": 56
+    },
+    {
+      "support": "appended luminous projection dot 405",
+      "triangles": 124,
+      "outerFitUpperMillimetres": 65
+    },
+    {
+      "support": "appended luminous projection dot 406",
+      "triangles": 128,
+      "outerFitUpperMillimetres": 55
+    },
+    {
+      "support": "appended luminous projection dot 407",
+      "triangles": 132,
+      "outerFitUpperMillimetres": 55
+    },
+    {
+      "support": "appended luminous projection dot 408",
+      "triangles": 136,
+      "outerFitUpperMillimetres": 58
+    },
+    {
+      "support": "appended luminous projection dot 409",
+      "triangles": 136,
+      "outerFitUpperMillimetres": 53
+    },
+    {
+      "support": "appended luminous projection dot 410",
+      "triangles": 144,
+      "outerFitUpperMillimetres": 52
+    },
+    {
+      "support": "appended luminous projection dot 411",
+      "triangles": 160,
+      "outerFitUpperMillimetres": 48
+    },
+    {
+      "support": "appended luminous projection dot 412",
+      "triangles": 172,
+      "outerFitUpperMillimetres": 47
+    },
+    {
+      "support": "appended luminous projection dot 413",
+      "triangles": 132,
+      "outerFitUpperMillimetres": 91
+    },
+    {
+      "support": "appended luminous projection dot 414",
+      "triangles": 132,
+      "outerFitUpperMillimetres": 90
+    },
+    {
+      "support": "appended luminous projection dot 415",
+      "triangles": 132,
+      "outerFitUpperMillimetres": 86
+    },
+    {
+      "support": "appended luminous projection dot 416",
+      "triangles": 132,
+      "outerFitUpperMillimetres": 87
+    },
+    {
+      "support": "appended luminous projection dot 417",
+      "triangles": 132,
+      "outerFitUpperMillimetres": 85
+    },
+    {
+      "support": "appended luminous projection dot 418",
+      "triangles": 130,
+      "outerFitUpperMillimetres": 84
+    },
+    {
+      "support": "appended luminous projection dot 419",
+      "triangles": 126,
+      "outerFitUpperMillimetres": 82
+    },
+    {
+      "support": "appended luminous projection dot 420",
+      "triangles": 126,
+      "outerFitUpperMillimetres": 80
+    },
+    {
+      "support": "appended luminous projection dot 421",
+      "triangles": 124,
+      "outerFitUpperMillimetres": 78
+    },
+    {
+      "support": "appended luminous projection dot 422",
+      "triangles": 122,
+      "outerFitUpperMillimetres": 76
+    },
+    {
+      "support": "appended luminous projection dot 423",
+      "triangles": 122,
+      "outerFitUpperMillimetres": 73
+    },
+    {
+      "support": "appended luminous projection dot 424",
+      "triangles": 120,
+      "outerFitUpperMillimetres": 71
+    },
+    {
+      "support": "appended luminous projection dot 425",
+      "triangles": 120,
+      "outerFitUpperMillimetres": 68
+    },
+    {
+      "support": "appended luminous projection dot 426",
+      "triangles": 120,
+      "outerFitUpperMillimetres": 66
+    },
+    {
+      "support": "appended luminous projection dot 427",
+      "triangles": 120,
+      "outerFitUpperMillimetres": 65
+    },
+    {
+      "support": "appended luminous projection dot 428",
+      "triangles": 120,
+      "outerFitUpperMillimetres": 66
+    },
+    {
+      "support": "appended luminous projection dot 429",
+      "triangles": 120,
+      "outerFitUpperMillimetres": 66
+    },
+    {
+      "support": "appended luminous projection dot 430",
+      "triangles": 124,
+      "outerFitUpperMillimetres": 66
+    },
+    {
+      "support": "appended luminous projection dot 431",
+      "triangles": 126,
+      "outerFitUpperMillimetres": 66
+    },
+    {
+      "support": "appended luminous projection dot 432",
+      "triangles": 128,
+      "outerFitUpperMillimetres": 65
+    },
+    {
+      "support": "appended luminous projection dot 433",
+      "triangles": 134,
+      "outerFitUpperMillimetres": 61
+    },
+    {
+      "support": "appended luminous projection dot 434",
+      "triangles": 134,
+      "outerFitUpperMillimetres": 60
+    },
+    {
+      "support": "appended luminous projection dot 435",
+      "triangles": 138,
+      "outerFitUpperMillimetres": 60
+    },
+    {
+      "support": "appended luminous projection dot 436",
+      "triangles": 136,
+      "outerFitUpperMillimetres": 59
+    },
+    {
+      "support": "appended luminous projection dot 437",
+      "triangles": 138,
+      "outerFitUpperMillimetres": 58
+    },
+    {
+      "support": "appended luminous projection dot 438",
+      "triangles": 142,
+      "outerFitUpperMillimetres": 57
+    },
+    {
+      "support": "appended luminous projection dot 439",
+      "triangles": 146,
+      "outerFitUpperMillimetres": 56
+    },
+    {
+      "support": "appended luminous projection dot 440",
+      "triangles": 152,
+      "outerFitUpperMillimetres": 51
+    },
+    {
+      "support": "appended luminous projection dot 441",
+      "triangles": 160,
+      "outerFitUpperMillimetres": 51
+    },
+    {
+      "support": "appended luminous projection dot 442",
+      "triangles": 166,
+      "outerFitUpperMillimetres": 48
+    },
+    {
+      "support": "appended luminous projection dot 443",
+      "triangles": 168,
+      "outerFitUpperMillimetres": 47
+    },
+    {
+      "support": "appended luminous projection dot 444",
+      "triangles": 124,
+      "outerFitUpperMillimetres": 90
+    },
+    {
+      "support": "appended luminous projection dot 445",
+      "triangles": 124,
+      "outerFitUpperMillimetres": 86
+    },
+    {
+      "support": "appended luminous projection dot 446",
+      "triangles": 124,
+      "outerFitUpperMillimetres": 88
+    },
+    {
+      "support": "appended luminous projection dot 447",
+      "triangles": 124,
+      "outerFitUpperMillimetres": 84
+    },
+    {
+      "support": "appended luminous projection dot 448",
+      "triangles": 124,
+      "outerFitUpperMillimetres": 82
+    },
+    {
+      "support": "appended luminous projection dot 449",
+      "triangles": 124,
+      "outerFitUpperMillimetres": 83
+    },
+    {
+      "support": "appended luminous projection dot 450",
+      "triangles": 124,
+      "outerFitUpperMillimetres": 81
+    },
+    {
+      "support": "appended luminous projection dot 451",
+      "triangles": 124,
+      "outerFitUpperMillimetres": 76
+    },
+    {
+      "support": "appended luminous projection dot 452",
+      "triangles": 120,
+      "outerFitUpperMillimetres": 74
+    },
+    {
+      "support": "appended luminous projection dot 453",
+      "triangles": 120,
+      "outerFitUpperMillimetres": 72
+    },
+    {
+      "support": "appended luminous projection dot 454",
+      "triangles": 120,
+      "outerFitUpperMillimetres": 71
+    },
+    {
+      "support": "appended luminous projection dot 455",
+      "triangles": 120,
+      "outerFitUpperMillimetres": 70
+    },
+    {
+      "support": "appended luminous projection dot 456",
+      "triangles": 120,
+      "outerFitUpperMillimetres": 67
+    },
+    {
+      "support": "appended luminous projection dot 457",
+      "triangles": 120,
+      "outerFitUpperMillimetres": 65
+    },
+    {
+      "support": "appended luminous projection dot 458",
+      "triangles": 120,
+      "outerFitUpperMillimetres": 65
+    },
+    {
+      "support": "appended luminous projection dot 459",
+      "triangles": 120,
+      "outerFitUpperMillimetres": 67
+    },
+    {
+      "support": "appended luminous projection dot 460",
+      "triangles": 124,
+      "outerFitUpperMillimetres": 60
+    },
+    {
+      "support": "appended luminous projection dot 461",
+      "triangles": 124,
+      "outerFitUpperMillimetres": 66
+    },
+    {
+      "support": "appended luminous projection dot 462",
+      "triangles": 128,
+      "outerFitUpperMillimetres": 60
+    },
+    {
+      "support": "appended luminous projection dot 463",
+      "triangles": 132,
+      "outerFitUpperMillimetres": 60
+    },
+    {
+      "support": "appended luminous projection dot 464",
+      "triangles": 132,
+      "outerFitUpperMillimetres": 59
+    },
+    {
+      "support": "appended luminous projection dot 465",
+      "triangles": 132,
+      "outerFitUpperMillimetres": 57
+    },
+    {
+      "support": "appended luminous projection dot 466",
+      "triangles": 132,
+      "outerFitUpperMillimetres": 57
+    },
+    {
+      "support": "appended luminous projection dot 467",
+      "triangles": 132,
+      "outerFitUpperMillimetres": 57
+    },
+    {
+      "support": "appended luminous projection dot 468",
+      "triangles": 132,
+      "outerFitUpperMillimetres": 58
+    },
+    {
+      "support": "appended luminous projection dot 469",
+      "triangles": 136,
+      "outerFitUpperMillimetres": 59
+    },
+    {
+      "support": "appended luminous projection dot 470",
+      "triangles": 140,
+      "outerFitUpperMillimetres": 52
+    },
+    {
+      "support": "appended luminous projection dot 471",
+      "triangles": 152,
+      "outerFitUpperMillimetres": 51
+    },
+    {
+      "support": "appended luminous projection dot 472",
+      "triangles": 156,
+      "outerFitUpperMillimetres": 53
+    },
+    {
+      "support": "appended luminous projection dot 473",
+      "triangles": 156,
+      "outerFitUpperMillimetres": 52
+    },
+    {
+      "support": "appended luminous projection dot 474",
+      "triangles": 160,
+      "outerFitUpperMillimetres": 48
+    },
+    {
+      "support": "appended luminous projection dot 475",
+      "triangles": 168,
+      "outerFitUpperMillimetres": 48
+    },
+    {
+      "support": "appended luminous projection dot 476",
+      "triangles": 180,
+      "outerFitUpperMillimetres": 47
+    },
+    {
+      "support": "appended luminous projection dot 477",
+      "triangles": 184,
+      "outerFitUpperMillimetres": 46
+    },
+    {
+      "support": "appended luminous projection dot 478",
+      "triangles": 132,
+      "outerFitUpperMillimetres": 91
+    },
+    {
+      "support": "appended luminous projection dot 479",
+      "triangles": 132,
+      "outerFitUpperMillimetres": 90
+    },
+    {
+      "support": "appended luminous projection dot 480",
+      "triangles": 132,
+      "outerFitUpperMillimetres": 86
+    },
+    {
+      "support": "appended luminous projection dot 481",
+      "triangles": 132,
+      "outerFitUpperMillimetres": 87
+    },
+    {
+      "support": "appended luminous projection dot 482",
+      "triangles": 132,
+      "outerFitUpperMillimetres": 85
+    },
+    {
+      "support": "appended luminous projection dot 483",
+      "triangles": 130,
+      "outerFitUpperMillimetres": 84
+    },
+    {
+      "support": "appended luminous projection dot 484",
+      "triangles": 126,
+      "outerFitUpperMillimetres": 82
+    },
+    {
+      "support": "appended luminous projection dot 485",
+      "triangles": 126,
+      "outerFitUpperMillimetres": 80
+    },
+    {
+      "support": "appended luminous projection dot 486",
+      "triangles": 124,
+      "outerFitUpperMillimetres": 78
+    },
+    {
+      "support": "appended luminous projection dot 487",
+      "triangles": 122,
+      "outerFitUpperMillimetres": 76
+    },
+    {
+      "support": "appended luminous projection dot 488",
+      "triangles": 122,
+      "outerFitUpperMillimetres": 73
+    },
+    {
+      "support": "appended luminous projection dot 489",
+      "triangles": 120,
+      "outerFitUpperMillimetres": 71
+    },
+    {
+      "support": "appended luminous projection dot 490",
+      "triangles": 120,
+      "outerFitUpperMillimetres": 68
+    },
+    {
+      "support": "appended luminous projection dot 491",
+      "triangles": 120,
+      "outerFitUpperMillimetres": 66
+    },
+    {
+      "support": "appended luminous projection dot 492",
+      "triangles": 120,
+      "outerFitUpperMillimetres": 65
+    },
+    {
+      "support": "appended luminous projection dot 493",
+      "triangles": 120,
+      "outerFitUpperMillimetres": 66
+    },
+    {
+      "support": "appended luminous projection dot 494",
+      "triangles": 120,
+      "outerFitUpperMillimetres": 66
+    },
+    {
+      "support": "appended luminous projection dot 495",
+      "triangles": 124,
+      "outerFitUpperMillimetres": 66
+    },
+    {
+      "support": "appended luminous projection dot 496",
+      "triangles": 126,
+      "outerFitUpperMillimetres": 66
+    },
+    {
+      "support": "appended luminous projection dot 497",
+      "triangles": 128,
+      "outerFitUpperMillimetres": 65
+    },
+    {
+      "support": "appended luminous projection dot 498",
+      "triangles": 134,
+      "outerFitUpperMillimetres": 61
+    },
+    {
+      "support": "appended luminous projection dot 499",
+      "triangles": 134,
+      "outerFitUpperMillimetres": 60
+    },
+    {
+      "support": "appended luminous projection dot 500",
+      "triangles": 138,
+      "outerFitUpperMillimetres": 60
+    },
+    {
+      "support": "appended luminous projection dot 501",
+      "triangles": 136,
+      "outerFitUpperMillimetres": 59
+    },
+    {
+      "support": "appended luminous projection dot 502",
+      "triangles": 138,
+      "outerFitUpperMillimetres": 58
+    },
+    {
+      "support": "appended luminous projection dot 503",
+      "triangles": 142,
+      "outerFitUpperMillimetres": 57
+    },
+    {
+      "support": "appended luminous projection dot 504",
+      "triangles": 146,
+      "outerFitUpperMillimetres": 56
+    },
+    {
+      "support": "appended luminous projection dot 505",
+      "triangles": 152,
+      "outerFitUpperMillimetres": 51
+    },
+    {
+      "support": "appended luminous projection dot 506",
+      "triangles": 160,
+      "outerFitUpperMillimetres": 51
+    },
+    {
+      "support": "appended luminous projection dot 507",
+      "triangles": 166,
+      "outerFitUpperMillimetres": 49
+    },
+    {
+      "support": "appended luminous projection dot 508",
+      "triangles": 168,
+      "outerFitUpperMillimetres": 47
+    },
+    {
+      "support": "appended luminous projection dot 509",
+      "triangles": 160,
+      "outerFitUpperMillimetres": 52
+    }
+  ]
+}
