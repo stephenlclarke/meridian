@@ -364,6 +364,22 @@ impl World {
             && (self.targeting.manual || self.targeting_tier().is_none())
     }
 
+    /// The pilot can operate real fitted work equipment while using steering assistance.
+    pub fn pilot_operates_selected_tool(&self) -> bool {
+        if !self.targeting.scanner {
+            return false;
+        }
+        let Some((_, candidate)) = self.current_target() else {
+            return false;
+        };
+        let is_work = match candidate {
+            Candidate::Work(_) => true,
+            Candidate::Ship(ship) => ship.electrical_disabled,
+            Candidate::Station(..) => false,
+        };
+        is_work && self.automatic_work_target(candidate).is_none()
+    }
+
     pub fn toggle_scanner_assistance(&mut self) -> Result<bool, StepError> {
         if self.is_paused() {
             return Err(StepError::Paused);
