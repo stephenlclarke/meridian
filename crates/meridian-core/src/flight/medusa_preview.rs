@@ -7,6 +7,12 @@ use crate::save::{Reader, SAVE_VERSION, SaveError, Writer, checksum};
 const MAGIC: &[u8; 8] = b"MEDPRV01";
 const INVALID: SaveError = SaveError::InvalidState("Medusa preview hull, fit or pose");
 const MAX_SAVE: usize = 128;
+const CABIN_CAPACITY: u8 = 4;
+const HOLD_TONNES: u16 = 22;
+const EXTRA_TONNES: u16 = 10;
+const CABIN_TONNES: u16 = 5;
+const EQUIPMENT_UNITS: u16 = 13;
+const UTILITY_MOUNTS: u16 = 4;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum PlayerHullKind {
@@ -48,10 +54,15 @@ pub struct MedusaPreviewFit {
 
 impl MedusaPreviewFit {
     pub const fn cargo_capacity_tonnes(self) -> u16 {
-        22 + if self.cargo_expansion { 10 } else { 0 }
+        HOLD_TONNES
+            + if self.cargo_expansion {
+                EXTRA_TONNES
+            } else {
+                0
+            }
     }
     pub const fn cargo_used_tonnes(self) -> u16 {
-        5 * self.cabins as u16
+        CABIN_TONNES * self.cabins as u16
     }
     pub const fn equipment_used(self) -> u16 {
         self.cabins as u16 + self.cargo_expansion as u16
@@ -60,10 +71,10 @@ impl MedusaPreviewFit {
         self.cargo_expansion as u16
     }
     pub const fn valid(self) -> bool {
-        self.cabins <= 4
+        self.cabins <= CABIN_CAPACITY
             && self.cargo_used_tonnes() <= self.cargo_capacity_tonnes()
-            && self.equipment_used() <= 13
-            && self.utility_used() <= 4
+            && self.equipment_used() <= EQUIPMENT_UNITS
+            && self.utility_used() <= UTILITY_MOUNTS
     }
 }
 
@@ -177,6 +188,8 @@ impl World {
 
 fn source_fingerprint() -> u64 {
     let mut bytes = b"SH171/stock-preview/flight/v1".to_vec();
+    bytes.extend(include_bytes!("../../../../assets/legacy/sh028.physics"));
+    bytes.extend(include_bytes!("../../../../assets/legacy/sh028.port"));
     bytes.extend(include_bytes!(
         "../../../../assets/fleet/sh171/flight.physics"
     ));
@@ -186,6 +199,20 @@ fn source_fingerprint() -> u64 {
     bytes.extend(include_bytes!(
         "../../../../integration/sh171-medusa/MEDUSA-FLAGSHIP.json"
     ));
+    let (speed, acceleration, pitch, yaw, roll) = PlayerHullKind::Medusa.flight_rates();
+    for rate in [speed, acceleration, pitch, yaw, roll] {
+        bytes.extend(rate.to_le_bytes());
+    }
+    for amount in [
+        HOLD_TONNES,
+        EXTRA_TONNES,
+        CABIN_TONNES,
+        EQUIPMENT_UNITS,
+        UTILITY_MOUNTS,
+    ] {
+        bytes.extend(amount.to_le_bytes());
+    }
+    bytes.push(CABIN_CAPACITY);
     checksum(&bytes)
 }
 
@@ -236,12 +263,19 @@ fn validate_pose(station: &OriginalStationData, state: &Snapshot) -> Result<(), 
         orientation: state.orientation,
         speed: state.speed,
     };
-    if state.mode == FlightMode::Launching && station.launch_start().map_err(|_| INVALID)? != start
-    {
-        return Err(INVALID);
-    }
-    if !station.initial_flight_is_clear(start) {
-        return Err(INVALID);
+    if state.mode == FlightMode::Launching {
+        if station.launch_start().map_err(|_| INVALID)? != start
+            || !station.initial_flight_is_clear(start)
+        {
+            return Err(INVALID);
+        }
+    } else {
+        let pose = crate::station::flight_pose(start.position, start.orientation).ok_or(INVALID)?;
+        // A normal flight may lawfully pass behind the port plane while outside
+        // the aperture. Initial launch clearance is not the saved-flight gate.
+        if !station.motion_clear(pose, pose, 0.0) {
+            return Err(INVALID);
+        }
     }
     Ok(())
 }
@@ -375,5 +409,80 @@ mod tests {
             }
         }
         Err("Medusa preview did not return through SH028".into())
+    }
+
+    #[test]
+    fn medusa_preview_legal_flight_behind_port_can_save_and_continue()
+    -> Result<(), Box<dyn std::error::Error>> {
+        fn action(world: &mut World, input: FlightInput) -> Result<(), StepError> {
+            world.step(input)?;
+            assert_eq!(world.snapshot().motion_refusal, None);
+            Ok(())
+        }
+        fn turn(world: &mut World, end: f64) -> Result<(), StepError> {
+            for _ in 0..220 {
+                let q = world.snapshot().orientation;
+                let remaining = end - 2.0 * f64::from(q[1]).atan2(f64::from(q[3]));
+                if remaining <= 1e-6 {
+                    break;
+                }
+                action(
+                    world,
+                    FlightInput {
+                        yaw: (remaining / (1.12 * f64::from(super::super::FIXED_DELTA_SECONDS)))
+                            .clamp(0.0, 1.0) as f32,
+                        ..FlightInput::default()
+                    },
+                )?;
+            }
+            Ok(())
+        }
+        fn brake(world: &mut World) -> Result<(), StepError> {
+            for _ in 0..200 {
+                if world.snapshot().speed == 0.0 {
+                    break;
+                }
+                action(
+                    world,
+                    FlightInput {
+                        brake: true,
+                        ..FlightInput::default()
+                    },
+                )?;
+            }
+            assert_eq!(world.snapshot().speed, 0.0);
+            Ok(())
+        }
+        let mut world = World::new_medusa_preview()?;
+        world.request_launch(world.snapshot().tick)?;
+        brake(&mut world)?;
+        turn(&mut world, core::f64::consts::FRAC_PI_2)?;
+        for _ in 0..400 {
+            action(
+                &mut world,
+                FlightInput {
+                    throttle: 1.0,
+                    ..FlightInput::default()
+                },
+            )?;
+        }
+        brake(&mut world)?;
+        assert!(world.snapshot().position[0] > 2000.0);
+        turn(&mut world, core::f64::consts::PI)?;
+        for _ in 0..400 {
+            action(
+                &mut world,
+                FlightInput {
+                    throttle: 1.0,
+                    ..FlightInput::default()
+                },
+            )?;
+        }
+        assert!(world.snapshot().position[2] < 0.0);
+        assert_eq!(world.snapshot().mode, FlightMode::Flight);
+        let saved = world.medusa_preview_save_bytes()?;
+        let continued = World::from_medusa_preview_save(&saved)?;
+        assert_eq!(continued.snapshot(), world.snapshot());
+        Ok(())
     }
 }

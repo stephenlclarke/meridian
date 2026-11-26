@@ -4,6 +4,8 @@ The explicit SH171 flight preview uses the authenticated 512-triangle hull and 7
 
 Launch the built desktop executable with a dedicated preview option. The directory can be new or can already contain an ordinary commander; the preview uses its own file and independent exclusive lease.
 
+For the packaged follow-up, open the separate **Meridian Medusa Preview.app** on macOS or **Launch Medusa Preview.cmd** on Windows. These launchers must pass only the Medusa preview option and bind a new release-specific preview directory. They must not invoke the ordinary launcher's hard-coded profile arguments. The exact installed names and paths are recorded by the release packagers.
+
 ```sh
 meridian-desktop --medusa-preview-dir /path/to/preview-slot
 ```
@@ -13,6 +15,8 @@ The preview starts docked or continues its own existing save. L launches. W/S ad
 While docked, B fits or stores the preview cargo expansion. Brackets reduce or increase the number of fitted preview cabins. The fit is limited to four cabins, 5 t and one equipment unit per cabin, and 22 t of stock hold with a 10 t cargo expansion. The preview also checks the stock limits of 13 equipment units and four utility mounts. Fit changes publish the prospective checked save before altering the live fixture. The pilot cannot fit while launching or in flight.
 
 `medusa-preview.meridian` stores the checked SH171 flight pose, flight view, fixture fit and exact pinned content fingerprint. It cannot open as a commander save; standard commander bytes cannot open as a preview. Reload rejects malformed, over-capacity, invalid-position and corrupt files. An existing ordinary `commander.meridian` is not read or replaced by preview operations.
+
+An actual flight can pass around and behind the station port, not only in front of it. The save gate accepts any clear flight pose and requires the exact station launch pose when saved in Launching mode. The pinned content fingerprint covers the station geometry and port, Medusa collider/supports, original configuration record and fitted capacity and flight rate rules.
 
 This mode is an isolated test entitlement, not PLUGH fabrication, a paid stock hull, a maximum upgrade, or a mission actor. It has no ordinary commander identity, market, wallet, quest receipts, passengers, or service authority. It does not grant a source-unsupported intrinsic attachment or a paid upgrade. The ordinary Showroom and progression keep their existing acquisition refusals.
 
