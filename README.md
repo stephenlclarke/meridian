@@ -131,14 +131,14 @@ H or ? opens a dismissible help popup for the current screen, including station 
 | Hold U in active flight | Charge the fitted EMP for 600 accepted ticks; early release cancels |
 | I; V; X | Mission details; review all held freight deliveries; review abandonment |
 | T in flight; F1; F2; F3; F4 | Lock the selected ship for missiles; next ship/practice lock; arm/safe; launch one missile; safe/unlock |
-
-The [station trade estimate details](integration/followup-trade-detail/README.md) show the current finite commodity allocation behind the chart scan and route estimates. They do not purchase, sell or install a route.
-
-The [atomic market quantity controls](integration/followup-bulk-market/README.md) review and settle all requested native units together or refuse the entire purchase or sale. They retain the existing per-unit receipts and save format.
 | F7; F8; F10 | Review attempt closure; reception; fresh consent |
 | F6; F12; C; 0/1/2/3 | Flight lesson consent/reception; cancellation; details; view direction |
 | P; F11; F5; F9 | Pause; fullscreen; save; reload the current qualified save |
 | Escape / window close | Save before exit; failure keeps the app open |
+
+The [station trade estimate details](integration/followup-trade-detail/README.md) show the current finite commodity allocation behind the chart scan and route estimates. They do not purchase, sell or install a route.
+
+The [atomic market quantity controls](integration/followup-bulk-market/README.md) review and settle all requested native units together or refuse the entire purchase or sale. They retain the existing per-unit receipts and save format.
 
 The freight journey requires eight identified one-tonne deliveries and awards 730 CR plus the trusted clue once. Markets use finite stock and the same account as mission and equipment transactions. Invalid saves refuse without migration, repair or fallback.
 
