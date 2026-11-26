@@ -512,3 +512,9 @@ tools/measure_owlet_mk_ii.py text eol=lf
 tools/prepare_owlet_mk_ii.py text eol=lf
 tools/rebuild_owlet_mk_ii.py text eol=lf
 tools/verify_owlet_mk_ii.py text eol=lf
+
+# Byte-pinned Reindeer Freighter replay programs.
+tools/measure_reindeer_freighter.py text eol=lf
+tools/prepare_reindeer_freighter.py text eol=lf
+tools/rebuild_reindeer_freighter.py text eol=lf
+tools/verify_reindeer_freighter.py text eol=lf
