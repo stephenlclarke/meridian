@@ -29,6 +29,7 @@ pub mod elk;
 pub mod equipment;
 pub mod erne_corvette;
 pub mod falcon_mk_i;
+pub mod falcon_mk_ii;
 pub mod falconet;
 mod flight;
 pub mod freight;
