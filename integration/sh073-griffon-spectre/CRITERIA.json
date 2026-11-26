@@ -1,0 +1,194 @@
+{
+  "hull": "SH073 Griffon Spectre",
+  "scope": "Original catalogue artwork and distinct generated collision inspection",
+  "source": "assets/fleet/sh073/SOURCE-GEOMETRY.json",
+  "frozenSources": "integration/sh073-griffon-spectre/FROZEN-SOURCES.json",
+  "sourceScaleMetresPerUnit": "1200000/132799",
+  "faces": {
+    "detailedOriginal": 1644,
+    "nativeVisibleOriginal": 596,
+    "generatedInspectionCandidate": 380,
+    "collisionMaximum": 512
+  },
+  "originalAccess": {
+    "runtimeCatalogue": {
+      "playerFlyable": false,
+      "normalPurchaseEligible": false,
+      "purchasePolicy": "pendingFabrication"
+    },
+    "r3DesignContract": {
+      "playerFlyable": true,
+      "purchasePolicy": "blueprintFabrication"
+    }
+  },
+  "engineering": {
+    "sourceReference": "finite-intrinsic-empty-griffon-spectre",
+    "massKg": 28784
+  },
+  "creatorReplay": {
+    "path": "integration/sh073-griffon-spectre/CREATOR-REPLAY.json",
+    "bytes": 592,
+    "sha256": "55188ebd09024847d1578318a5f8a5082f527a2beb6d0fc03bedd98193db06b9"
+  },
+  "supportGroups": 29,
+  "minimumRouteClearanceMillimetres": 995,
+  "sourceContactCounts": {
+    "overlap": 7
+  },
+  "fitUpperMillimetres": {
+    "detailed": 1561,
+    "archiveNative": 1573,
+    "candidateNative": 1573
+  },
+  "hullStudio": {
+    "definition": "integration/sh073-griffon-spectre/GRIFFON-SPECTRE-STUDIO.json",
+    "bytes": 275157,
+    "sha256": "de86639e79d1fecffab14cdd70337cc6f81b82593f6809ad93d7cb82d5361615",
+    "supports": 29,
+    "probes": 7,
+    "loaderRevision": "27121e66ba37a29781135b56924a9d6e7f38a70a",
+    "signedInstalledExport": {
+      "status": "PASS",
+      "scope": "Signed installed Studio offline artwork and generated collision import/export",
+      "bundleIdentifier": "io.xyzzy.meridian.hullstudio",
+      "bundleVersion": "0.0.0",
+      "codeDirectoryHash": "93938bda9242ebdff508bfb9e16b3cdf83c0a200",
+      "developerIdTeam": "4MEB7MUTAV",
+      "signatureVerification": "deep strict",
+      "definition": {
+        "bytes": 275157,
+        "sha256": "de86639e79d1fecffab14cdd70337cc6f81b82593f6809ad93d7cb82d5361615"
+      },
+      "exportExitStatuses": [
+        0,
+        0
+      ],
+      "exportMatchesDefinitionExceptTrailingLf": true,
+      "valid": true,
+      "diagnostics": [],
+      "detailedTriangles": 1644,
+      "nativeTriangles": 380,
+      "supportGroups": 29,
+      "engineeringReference": "finite-intrinsic-empty-griffon-spectre",
+      "massKg": 28784,
+      "receiptFiles": {
+        "GRIFFON-SPECTRE.hull.json": {
+          "bytes": 275156,
+          "sha256": "0f95b0a34e81c1d03fd6bde464e79e7c278f69eda67b1287eb3c45c9b78742da"
+        },
+        "GRIFFON-SPECTRE-repeat.hull.json": {
+          "bytes": 275156,
+          "sha256": "0f95b0a34e81c1d03fd6bde464e79e7c278f69eda67b1287eb3c45c9b78742da"
+        },
+        "studio.stdout.json": {
+          "bytes": 74375,
+          "sha256": "3e3809db3f3f6ced202439537699d8edc79978ed53aeae7938f71edcff420945"
+        },
+        "studio-repeat.stdout.json": {
+          "bytes": 74375,
+          "sha256": "3e3809db3f3f6ced202439537699d8edc79978ed53aeae7938f71edcff420945"
+        },
+        "codesign.log": {
+          "bytes": 13038,
+          "sha256": "ed60dffe1cd27b004967f3f0d2763056c6ee295dbfd81d7cebd33090eabe338b"
+        },
+        "codesign-details.log": {
+          "bytes": 1145,
+          "sha256": "46f22bef73c8eab385775b9c33eb76171b43a06b700a46282ba7683d72e141bb"
+        }
+      },
+      "artworkProbeResults": [
+        {
+          "name": "central-dorsal",
+          "passed": true
+        },
+        {
+          "name": "above-forward-cross-bridge",
+          "passed": true
+        },
+        {
+          "name": "below-forward-cross-bridge",
+          "passed": true
+        },
+        {
+          "name": "port-inner-gate",
+          "passed": true
+        },
+        {
+          "name": "port-outside-gate",
+          "passed": true
+        },
+        {
+          "name": "starboard-inner-gate",
+          "passed": true
+        },
+        {
+          "name": "starboard-outside-gate",
+          "passed": true
+        }
+      ],
+      "triangleRoles": {
+        "detail": "original detailed visible",
+        "native": "separately generated inspection geometry"
+      }
+    }
+  },
+  "byteReplay": {
+    "commands": [
+      "python3 -B tools/prepare_griffon_spectre_geometry.py --check",
+      "python3 -B tools/verify_griffon_spectre_geometry.py | cmp - integration/sh073-griffon-spectre/CONTACT-RESULT.json",
+      "python3 -B tools/measure_griffon_spectre_geometry.py archive-fit | cmp - integration/sh073-griffon-spectre/ARCHIVE-FIT.json",
+      "python3 -B tools/measure_griffon_spectre_geometry.py candidate-fit | cmp - integration/sh073-griffon-spectre/candidate-fit.json",
+      "python3 -B tools/measure_griffon_spectre_geometry.py candidate-fidelity | cmp - integration/sh073-griffon-spectre/candidate-fidelity.json"
+    ],
+    "host": "SteveMBA",
+    "startedUtc": "2026-11-24T22:57:52Z",
+    "finishedUtc": "2026-11-24T22:58:13Z",
+    "log": {
+      "bytes": 636,
+      "sha256": "34e45f553736f483265c19932c91644960247e4485defbae50419442d35ee100"
+    },
+    "fitDependencies": {
+      "python": "3.14.3",
+      "numpy": "2.5.5",
+      "scipy": "1.18.1",
+      "trimesh": "5.2.1",
+      "rtree": "1.4.1"
+    },
+    "originalCommit": "534edb9426fa40dcb7b6483a8f093353f0f03534",
+    "historicalReplayPins": {
+      "tools/measure_banteng_geometry.py": "4b7d8d5d972e30d93bebf7f422be71e415d6e4a9c4b622582ecf6e30a6bb9235",
+      "tools/measure_lanner_geometry.py": "cabbaf17ff7efdbcbee9a1fba67c7edafd59dceb8e97f367824a51c134479992",
+      "tools/measure_seriema_courier_geometry.py": "0992ebf43e2ac8800c4f72adf55498efcd88da4003ec9c2ab256fc797f66055e",
+      "tools/verify_eagle_cruiser_geometry.py": "c7926cb6e699ae5ffb445951ce9d4e98a64018a7ecb1db2e5e77a611d742a783"
+    }
+  },
+  "replayPins": {
+    "integration/sh073-griffon-spectre/GRIFFON-SPECTRE-STUDIO.json": "de86639e79d1fecffab14cdd70337cc6f81b82593f6809ad93d7cb82d5361615",
+    "integration/sh073-griffon-spectre/FROZEN-SOURCES.json": "48e332a0f6708602583818898647428af3291c2ddbf0cb856c46b5f94ffd735b",
+    "integration/sh073-griffon-spectre/CONTACT-RESULT.json": "c3da5ba813afa7eb5f4e3ef30ccb18d4b9dd8833393dce600d66b0b7324cee5b",
+    "integration/sh073-griffon-spectre/ORIGINAL-JOINTS.json": "1ea77f05a851c11e7ede08ecb59a1b42885f1b65ba9b4e8032d927af63d8309a",
+    "integration/sh073-griffon-spectre/ARCHIVE-FIT.json": "de43441ca36b94d598868213286c206a344172470570409d0b89d1884ae5500d",
+    "integration/sh073-griffon-spectre/ARCHIVE-SUPPORT-PREFLIGHT.json": "149140c90478721b08fc065fee8c59a06e19582116bd0d34c163dd9d2ce434ab",
+    "integration/sh073-griffon-spectre/candidate-fit.json": "b254886e962c400f5f61451f8348eac480081eec3fed38bb21dbecd622f5eb53",
+    "integration/sh073-griffon-spectre/candidate-fidelity.json": "1cb6834997d9e2efb801fb041c72543930ced39ca1460c9ae2e06f2bb33e1d80",
+    "integration/sh073-griffon-spectre/candidate-support.json": "19ae356da0a9978a1f64498f4918547847c414ca0e2f25801de069995bf5b0f2",
+    "integration/sh073-griffon-spectre/CREATOR-REPLAY.json": "55188ebd09024847d1578318a5f8a5082f527a2beb6d0fc03bedd98193db06b9",
+    "tools/atomic_asset_output.py": "2d13803823645d3bdea7c855af958eb54d7ebe513ec1bcb0af34e82870164bf0",
+    "tools/banteng_art_mesh.py": "ef5c0f538510486238d69dc301da80026fc93326767b38c50a04756ab9890a09",
+    "tools/encode_goshawk_visual.py": "9e524e9a32a237d71d212c8b5c34ecf12cde5a8e08885b1d03991b95c278f61c",
+    "tools/import_goshawk_envelope_source.py": "14b530725629ee3eaa5b3fd69f01fe00fe371564a1a52cb398d3969142db977e",
+    "tools/measure_banteng_geometry.py": "9356864e227302598fcae4e833ecb706b1ed8a5e600cbb4076b7165dc1e54bea",
+    "tools/measure_goshawk_surface_fit.py": "5407ef1e5fad41810aa95444ca1338fe33a91e5c9857dcb752b4e4cf2fca6d0b",
+    "tools/measure_lanner_geometry.py": "55d13a28602e6ed791adecd85ff43f3c8a7fbe118cf0977272e1747422c2408d",
+    "tools/measure_seriema_courier_geometry.py": "ed138de0a2f857d176a71d42f047daac5f266250c90195df3eb9202fd2c55fbf",
+    "tools/prepare_eagle_cruiser_geometry.py": "a1ea3b5d72f35e1f2932da71afa3ff8a276a504f7309a1086a2b3df35988addc",
+    "tools/prepare_seriema_courier_geometry.py": "179ecc3241c6cd08ca359725b95c7dd958ce31d0a5ab7a132dfcaf344a121bf2",
+    "tools/verify_eagle_cruiser_geometry.py": "cb053ee5873fee62ee456bb3776e98d29b2cbb44c7344599bc617a8579164d43",
+    "tools/vulture_mk_i_exact_fit.py": "479b31f8714a198a82c0e2888b8d19efe46c7b4c43a576b83ab84c571ae738c6",
+    "tools/prepare_griffon_spectre_geometry.py": "a9ca9abfeefb7b3b9a0c4c714f3c1b52f7e60b3ea05ecb1cafe1bf18c0e172a3",
+    "tools/verify_griffon_spectre_geometry.py": "6d5ed2d2c8337365964c68b50dfabb85f8f9426cfdf1a9023318873281124fe8",
+    "tools/measure_griffon_spectre_geometry.py": "f3d297247f617a748842c62e9323c9136d6ae8237a4e76153ba932328a5b9810",
+    "tools/hull_contact_geometry.py": "07606202e6a298ad375a7504991fe6fb93da6a07f9b5cc4a22167bd570b07839"
+  }
+}

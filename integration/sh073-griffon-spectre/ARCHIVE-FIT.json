@@ -1,0 +1,125 @@
+{
+  "roundingMetres": 0.02,
+  "fullUpperMillimetres": {
+    "detailed": 1561,
+    "archiveNative": 1573
+  },
+  "pieces": {
+    "gate longitudinal envelope[1]": {
+      "detailed": 1277,
+      "archiveNative": 1277
+    },
+    "gate connected aft support[1]": {
+      "detailed": 1253,
+      "archiveNative": 1253
+    },
+    "gate longitudinal envelope[2]": {
+      "detailed": 1277,
+      "archiveNative": 1277
+    },
+    "gate connected aft support[2]": {
+      "detailed": 1253,
+      "archiveNative": 1253
+    },
+    "gate forward cross bridge[1]": {
+      "detailed": 1432,
+      "archiveNative": 1432
+    },
+    "aft transverse bridge[1]": {
+      "detailed": 1389,
+      "archiveNative": 1389
+    },
+    "body primary pressure envelope[1]": {
+      "detailed": 850,
+      "archiveNative": 1074
+    },
+    "body primary pressure envelope/service-well-0-0[1]": {
+      "detailed": 1457,
+      "archiveNative": 1573
+    },
+    "body primary pressure envelope/service-well-0-1[1]": {
+      "detailed": 1156,
+      "archiveNative": 1109
+    },
+    "body primary pressure envelope/service-well-0-2[1]": {
+      "detailed": 1156,
+      "archiveNative": 1263
+    },
+    "body primary pressure envelope/service-well-1-0[1]": {
+      "detailed": 1457,
+      "archiveNative": 1456
+    },
+    "body primary pressure envelope/service-well-1-1[1]": {
+      "detailed": 1156,
+      "archiveNative": 1175
+    },
+    "body primary pressure envelope/service-well-1-2[1]": {
+      "detailed": 1444,
+      "archiveNative": 1085
+    },
+    "body primary pressure envelope/service-well-2-0[1]": {
+      "detailed": 1457,
+      "archiveNative": 1573
+    },
+    "body primary pressure envelope/service-well-2-1[1]": {
+      "detailed": 1156,
+      "archiveNative": 1112
+    },
+    "body primary pressure envelope/service-well-2-2[1]": {
+      "detailed": 1156,
+      "archiveNative": 1260
+    },
+    "body primary pressure envelope/service-well-3-0[1]": {
+      "detailed": 1546,
+      "archiveNative": 1456
+    },
+    "body primary pressure envelope/service-well-3-1[1]": {
+      "detailed": 1444,
+      "archiveNative": 1011
+    },
+    "body primary pressure envelope/service-well-3-2[1]": {
+      "detailed": 1444,
+      "archiveNative": 1088
+    },
+    "body primary pressure envelope/longitudinal-service-strut-0[1]": {
+      "detailed": 183,
+      "archiveNative": 469
+    },
+    "body primary pressure envelope/longitudinal-service-strut-1[1]": {
+      "detailed": 183,
+      "archiveNative": 446
+    },
+    "cockpit glazing envelope[1]": {
+      "detailed": 613,
+      "archiveNative": 705
+    },
+    "cockpit connected structural crossmember[1]": {
+      "detailed": 201,
+      "archiveNative": 201
+    },
+    "engine_pair/negative side/connected support[1]": {
+      "detailed": 1010,
+      "archiveNative": 1010
+    },
+    "engine_pair/negative side/propulsion casing[1]": {
+      "detailed": 1561,
+      "archiveNative": 1490
+    },
+    "engine_pair/negative side/propulsion luminous recess[1]": {
+      "detailed": 1463,
+      "archiveNative": 1134
+    },
+    "engine_pair/positive side/connected support[1]": {
+      "detailed": 1010,
+      "archiveNative": 1010
+    },
+    "engine_pair/positive side/propulsion casing[1]": {
+      "detailed": 1561,
+      "archiveNative": 1490
+    },
+    "engine_pair/positive side/propulsion luminous recess[1]": {
+      "detailed": 1463,
+      "archiveNative": 1134
+    }
+  }
+}
