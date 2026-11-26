@@ -3,6 +3,7 @@ use super::{
     CommanderAccount, INVALID, Ledger, ModuleAction, ModuleError, ModuleKind, State, World,
 };
 use crate::{
+    flight::navigation_trade::{ReservationInterval, State as TradeState},
     navigation::DockContext,
     save::{Reader, SaveError, Writer},
     station_services::StationMarkets,
@@ -49,6 +50,10 @@ impl History {
         if self.active() {
             return Ok(());
         }
+        world
+            .navigation_trade
+            .reservation_intervals(world.state.tick)
+            .map_err(|_| ModuleError::PassageHistory)?;
         let freight = &world
             .freight_session
             .as_ref()
@@ -133,6 +138,18 @@ impl History {
             return Err(INVALID);
         }
         let mut previous = None;
+        let mut previous_offset = 0;
+        let current_offset = if world.damage.enabled() {
+            Some(
+                world
+                    .state
+                    .tick
+                    .checked_sub(world.combat.physical_tick())
+                    .ok_or(INVALID)?,
+            )
+        } else {
+            None
+        };
         for dock in &self.berths {
             if previous.is_some_and(|last: DockContext| {
                 last.sequence().checked_add(1) != Some(dock.sequence())
@@ -160,13 +177,10 @@ impl History {
             world
                 .jump_journal
                 .validate_passenger_berth(*dock, dock.tick())?;
-            if world.damage.enabled()
-                && world
-                    .damage
-                    .berth_clock(dock.sequence())
-                    .is_none_or(|clock| clock > dock.tick())
-            {
-                return Err(INVALID);
+            if let Some(current_offset) = current_offset {
+                let clock = world.damage.berth_clock(dock.sequence()).ok_or(INVALID)?;
+                previous_offset =
+                    berth_offset(dock.tick(), clock, previous_offset, current_offset)?;
             }
             previous = Some(*dock);
         }
@@ -231,6 +245,19 @@ impl History {
             freight: changes(r)?,
         })
     }
+}
+
+fn berth_offset(
+    world_tick: u64,
+    physical_tick: u64,
+    previous: u64,
+    current: u64,
+) -> Result<u64, SaveError> {
+    let offset = world_tick.checked_sub(physical_tick).ok_or(INVALID)?;
+    if offset < previous || offset > current {
+        return Err(INVALID);
+    }
+    Ok(offset)
 }
 
 #[derive(Clone, Copy)]
@@ -313,6 +340,7 @@ impl State {
         world: &World,
         account: &CommanderAccount,
         markets: &StationMarkets,
+        trade: &TradeState,
     ) -> Result<(), SaveError> {
         let first = self
             .events
@@ -332,6 +360,7 @@ impl State {
             return Err(INVALID);
         }
         self.history.validate_berths(world, account)?;
+        let intervals = trade.reservation_intervals(first.tick)?;
         let bay = account.equipment_state();
         let freight = &world.freight_session.as_ref().ok_or(INVALID)?.state;
         let mut changes = Vec::new();
@@ -427,27 +456,57 @@ impl State {
                 ));
             }
         }
-        changes.sort_unstable_by_key(|event| event.0);
+        // A plan changes reserved mass without changing the account revision. Join its
+        // start to the same revision as a preceding actual cargo/fit change, or add a
+        // check-only prefix if no actual mass changed at that revision.
+        let mut timeline = std::collections::BTreeMap::new();
+        for (revision, change) in changes {
+            if timeline.insert(revision, Some(change)).is_some() {
+                return Err(INVALID);
+            }
+        }
+        for interval in &intervals {
+            if interval.start > anchor.revision {
+                timeline.entry(interval.start).or_insert(None);
+            }
+        }
         let mut bay_sequence = anchor.bay_revision;
         let budget = crate::equipment::definition()
             .map_err(|_| INVALID)?
             .equipment_units_capacity;
         let mut previous = anchor.revision;
-        check_fit(cargo, cabin_mass, fitted_units, bay_sequence, budget)?;
-        for (revision, change) in changes {
+        check_prefix(
+            anchor.revision,
+            cargo,
+            cabin_mass,
+            fitted_units,
+            bay_sequence,
+            budget,
+            &intervals,
+        )?;
+        for (revision, change) in timeline {
             if revision <= previous || revision > account.revision() {
                 return Err(INVALID);
             }
             previous = revision;
             match change {
-                Change::Cargo(delta) => cargo = cargo.checked_add(delta).ok_or(INVALID)?,
-                Change::Bay(sequence) => bay_sequence = sequence,
-                Change::Fit(units, mass) => {
+                Some(Change::Cargo(delta)) => cargo = cargo.checked_add(delta).ok_or(INVALID)?,
+                Some(Change::Bay(sequence)) => bay_sequence = sequence,
+                Some(Change::Fit(units, mass)) => {
                     fitted_units = units;
                     cabin_mass = mass;
                 }
+                None => {}
             }
-            check_fit(cargo, cabin_mass, fitted_units, bay_sequence, budget)?;
+            check_prefix(
+                revision,
+                cargo,
+                cabin_mass,
+                fitted_units,
+                bay_sequence,
+                budget,
+                &intervals,
+            )?;
         }
         let projection = account.service_projection(freight).map_err(|_| INVALID)?;
         if u16::try_from(cargo).ok() != Some(projection.used_tonnes) {
@@ -514,6 +573,42 @@ fn check_fit(
     Ok(())
 }
 
+fn check_prefix(
+    revision: u64,
+    cargo: i16,
+    cabin_mass: u16,
+    units: u16,
+    bay_sequence: u64,
+    budget: u16,
+    intervals: &[ReservationInterval],
+) -> Result<(), SaveError> {
+    let raw_mass = u16::try_from(cargo)
+        .ok()
+        .and_then(|cargo| cargo.checked_add(cabin_mass))
+        .ok_or(INVALID)?;
+    let capacity = if bay_sequence % 2 == 1 {
+        crate::equipment::EXPANDED_HOLD_TONNES
+    } else {
+        crate::equipment::STANDARD_HOLD_TONNES
+    };
+    for interval in intervals
+        .iter()
+        .filter(|interval| interval.start == revision)
+    {
+        if interval.cargo_at_plan != raw_mass || interval.capacity_at_plan != capacity {
+            return Err(INVALID);
+        }
+    }
+    let reserved = intervals.iter().any(|interval| interval.contains(revision));
+    check_fit(
+        cargo.checked_add(i16::from(reserved)).ok_or(INVALID)?,
+        cabin_mass,
+        units,
+        bay_sequence,
+        budget,
+    )
+}
+
 pub(super) fn requires_history(action: ModuleAction) -> bool {
     matches!(
         action,
@@ -534,5 +629,14 @@ mod tests {
         assert_eq!(check_fit(0, 125, 25, 1, 24), Err(INVALID));
         assert_eq!(check_fit(2, 120, 24, 1, 24), Err(INVALID));
         assert_eq!(check_fit(2, 115, 23, 1, 24), Ok(()));
+    }
+
+    #[test]
+    fn accepted_berth_clock_offsets_cannot_go_backwards_or_exceed_current_bound() {
+        assert_eq!(berth_offset(100, 90, 0, 20), Ok(10));
+        assert_eq!(berth_offset(200, 185, 10, 20), Ok(15));
+        assert_eq!(berth_offset(200, 195, 10, 20), Err(INVALID));
+        assert_eq!(berth_offset(200, 179, 10, 20), Err(INVALID));
+        assert_eq!(berth_offset(200, 201, 0, 20), Err(INVALID));
     }
 }

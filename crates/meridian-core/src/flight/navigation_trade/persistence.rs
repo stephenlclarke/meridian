@@ -317,6 +317,22 @@ impl Attempt {
         if t.outcome == Outcome::Complete && !self.return_receipt_ready(t.dock) {
             return Err(INVALID);
         }
+        if let Some(revision) = t.reservation_release_revision
+            && (t.outcome != Outcome::Abandoned
+                || self.buy.is_some()
+                || self
+                    .plan
+                    .is_none_or(|plan| plan.account_revision > revision)
+                || self
+                    .fuel
+                    .iter()
+                    .any(|fuel| fuel.account_revision > revision)
+                || c.commerce
+                    .account
+                    .is_none_or(|account| account.revision() < revision))
+        {
+            return Err(INVALID);
+        }
         Ok(())
     }
     fn encode(&self, w: &mut Writer) {
@@ -336,11 +352,15 @@ impl Attempt {
         w.option(self.terminal.as_ref(), |w, t| {
             w.u64(t.tick);
             t.dock.encode_save(w);
-            w.u8(match t.outcome {
-                Outcome::Complete => 0,
-                Outcome::Abandoned => 1,
+            w.u8(match (t.outcome, t.reservation_release_revision) {
+                (Outcome::Complete, _) => 0,
+                (Outcome::Abandoned, None) => 1,
+                (Outcome::Abandoned, Some(_)) => 2,
             });
             t.fuel.encode(w);
+            if let Some(revision) = t.reservation_release_revision {
+                w.u64(revision);
+            }
         });
     }
     fn decode(r: &mut Reader<'_>) -> Result<Self, SaveError> {
@@ -354,9 +374,10 @@ impl Attempt {
         let terminal = r.option(|r| {
             let tick = r.u64()?;
             let dock = DockContext::decode_save(r)?;
-            let outcome = match r.u8()? {
+            let tag = r.u8()?;
+            let outcome = match tag {
                 0 => Outcome::Complete,
-                1 => Outcome::Abandoned,
+                1 | 2 => Outcome::Abandoned,
                 _ => return Err(INVALID),
             };
             Ok(Terminal {
@@ -364,6 +385,7 @@ impl Attempt {
                 dock,
                 outcome,
                 fuel: FuelAnchor::decode(r)?,
+                reservation_release_revision: if tag == 2 { Some(r.u64()?) } else { None },
             })
         })?;
         Ok(Self {

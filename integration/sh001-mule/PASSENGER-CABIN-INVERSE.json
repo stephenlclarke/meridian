@@ -373,14 +373,45 @@
         }
       ]
     },
+    "flight/navigation_trade.rs": {
+      "beforeSHA256": "6d2458793883e891cf31db0888fc8d0f190b6eb5f609d9b009c8e0610b730070",
+      "afterSHA256": "f01ea0ae9b1e532cf2b7a8f87779c1db0faaa8a65d3c9f03e71f419035632ff2",
+      "hunks": [
+        {
+          "offset": 6473,
+          "before": "",
+          "after": "    // A cancellation before buying releases the reserved tonne after this exact account prefix.\n    reservation_release_revision: Option<u64>,\n"
+        },
+        {
+          "offset": 6997,
+          "before": "",
+          "after": "\n#[derive(Debug, Clone, Copy)]\npub(in crate::flight) struct ReservationInterval {\n    pub start: u64,\n    pub end_exclusive: Option<u64>,\n    pub cargo_at_plan: u16,\n    pub capacity_at_plan: u16,\n}\n\nimpl ReservationInterval {\n    pub fn contains(self, revision: u64) -> bool {\n        revision >= self.start && self.end_exclusive.is_none_or(|end| revision < end)\n    }\n}\n"
+        },
+        {
+          "offset": 7382,
+          "before": "",
+          "after": "    #[cfg(test)]\n    pub(in crate::flight) fn omit_last_reservation_release_for_test(&mut self) -> bool {\n        self.attempts\n            .last_mut()\n            .and_then(|attempt| attempt.terminal.as_mut())\n            .and_then(|terminal| terminal.reservation_release_revision.take())\n            .is_some()\n    }\n    /// Plans reserve one tonne after their confirmed account prefix. Purchase transfers the\n    /// reservation into actual cargo in the same transaction; cancellation releases it only\n    /// after its recorded prefix, including any cargo or fit operation at that revision.\n    pub(in crate::flight) fn reservation_intervals(\n        &self,\n        anchor_tick: u64,\n    ) -> Result<Vec<ReservationInterval>, crate::save::SaveError> {\n        let mut intervals = Vec::new();\n        for attempt in &self.attempts {\n            let Some(plan) = attempt.plan else {\n                continue;\n            };\n            let end_exclusive = if let Some(buy) = attempt.buy {\n                Some(buy.account_revision)\n            } else if let Some(terminal) = attempt.terminal {\n                match terminal.reservation_release_revision {\n                    Some(revision) => Some(\n                        revision\n                            .checked_add(1)\n                            .ok_or(crate::save::SaveError::SequenceExhausted)?,\n                    ),\n                    None if terminal.tick < anchor_tick => continue,\n                    None => {\n                        return Err(crate::save::SaveError::InvalidState(\n                            \"unbound historical T04 reservation release\",\n                        ));\n                    }\n                }\n            } else {\n                None\n            };\n            intervals.push(ReservationInterval {\n                start: plan.account_revision,\n                end_exclusive,\n                cargo_at_plan: plan.cargo,\n                capacity_at_plan: plan.capacity,\n            });\n        }\n        Ok(intervals)\n    }\n"
+        }
+      ]
+    },
     "flight/navigation_trade/actions.rs": {
       "beforeSHA256": "36ea4de066bfb02a9ae5f0ef664bee5f7e26220c5da7f2f8fca013ffd8a9406b",
-      "afterSHA256": "c817013430efd309982e465f0b32d21bac86a54a547a99440979cc929f142877",
+      "afterSHA256": "5597fa2cba3a46a887263145fbb50ca0f3059d273fdbe49a8fd71da25704ea07",
       "hunks": [
         {
           "offset": 4352,
           "before": "        let account = self.commander_account.as_ref().ok_or(Error::NoCommander)?;\n        let p = account\n            .service_projection(\n                &self\n                    .freight_session\n                    .as_ref()\n                    .ok_or(Error::NoCommander)?\n                    .state,\n            )\n            .map_err(Error::Service)?;\n",
           "after": "        let p = self.raw_service_projection().map_err(Error::Service)?;\n"
+        },
+        {
+          "offset": 7966,
+          "before": "",
+          "after": "                let reservation_release_revision = if outcome == Outcome::Abandoned\n                    && candidate.attempts[i].plan.is_some()\n                    && candidate.attempts[i].buy.is_none()\n                {\n                    Some(\n                        self.commander_account\n                            .as_ref()\n                            .ok_or(Error::NoCommander)?\n                            .revision(),\n                    )\n                } else {\n                    None\n                };\n"
+        },
+        {
+          "offset": 8800,
+          "before": "",
+          "after": "                    reservation_release_revision,\n"
         }
       ]
     },
@@ -422,7 +453,7 @@
     },
     "flight/navigation_trade/persistence.rs": {
       "beforeSHA256": "6255bdd38bd8c58430dd87b5ac65e3692d7f0330aac6a2f1aa646793255a14f2",
-      "afterSHA256": "c885743ef6fcea6b79986e0a5413367cb3a49311f40da49d209f62b4e48583e6",
+      "afterSHA256": "7a5ee36949119cc0db95d3d3c58877f651e0d8d5530f58e5a39daeed79aeabfe",
       "hunks": [
         {
           "offset": 900,
@@ -443,45 +474,75 @@
           "offset": 1825,
           "before": "",
           "after": "            .map_err(|_| INVALID)?;\n        let cabin_tonnes = commerce.modular.cabin_tonnes().map_err(|_| INVALID)?;\n        let projection = crate::flight::modular::add_cabin_mass(projection, cabin_tonnes)\n"
+        },
+        {
+          "offset": 11548,
+          "before": "",
+          "after": "        if let Some(revision) = t.reservation_release_revision\n            && (t.outcome != Outcome::Abandoned\n                || self.buy.is_some()\n                || self\n                    .plan\n                    .is_none_or(|plan| plan.account_revision > revision)\n                || self\n                    .fuel\n                    .iter()\n                    .any(|fuel| fuel.account_revision > revision)\n                || c.commerce\n                    .account\n                    .is_none_or(|account| account.revision() < revision))\n        {\n            return Err(INVALID);\n        }\n"
+        },
+        {
+          "offset": 12776,
+          "before": "            w.u8(match t.outcome {\n                Outcome::Complete => 0,\n                Outcome::Abandoned => 1,\n",
+          "after": "            w.u8(match (t.outcome, t.reservation_release_revision) {\n                (Outcome::Complete, _) => 0,\n                (Outcome::Abandoned, None) => 1,\n                (Outcome::Abandoned, Some(_)) => 2,\n"
+        },
+        {
+          "offset": 13037,
+          "before": "",
+          "after": "            if let Some(revision) = t.reservation_release_revision {\n                w.u64(revision);\n            }\n"
+        },
+        {
+          "offset": 13677,
+          "before": "            let outcome = match r.u8()? {\n",
+          "after": "            let tag = r.u8()?;\n            let outcome = match tag {\n"
+        },
+        {
+          "offset": 13786,
+          "before": "                1 => Outcome::Abandoned,\n",
+          "after": "                1 | 2 => Outcome::Abandoned,\n"
+        },
+        {
+          "offset": 14029,
+          "before": "",
+          "after": "                reservation_release_revision: if tag == 2 { Some(r.u64()?) } else { None },\n"
         }
       ]
     },
     "flight/persistence.rs": {
       "beforeSHA256": "94e37569697a792ad63262039727a6f2cf671ae4f2b8ad3f32992fae2b446a7f",
-      "afterSHA256": "25ed577f3e0d2f6f97c496c8f56e96c822277b02e809b410a3c94b21d8298a10",
+      "afterSHA256": "9056610bafc2f0b8e222b8580b23e0384d25c6473ab06d14b328c457b0ab3822",
       "hunks": [
         {
           "offset": 26177,
           "before": "",
-          "after": "        commerce\n            .modular\n            .validate_capacity_history(self, account, markets)?;\n"
+          "after": "        commerce\n            .modular\n            .validate_capacity_history(self, account, markets, commerce.lesson)?;\n"
         },
         {
-          "offset": 26879,
+          "offset": 26896,
           "before": "",
           "after": "                    .and_then(|revisions| revisions.checked_add(modular.passenger_totals().1))\n"
         },
         {
-          "offset": 27105,
+          "offset": 27122,
           "before": "",
           "after": "                modular.passenger_totals().0,\n"
         },
         {
-          "offset": 28322,
+          "offset": 28339,
           "before": "    ammunition: (u32, u64),\n",
           "after": "    equipment_and_passage: (u32, u64, u32),\n"
         },
         {
-          "offset": 28428,
+          "offset": 28445,
           "before": "    let (ammunition_paid, ammunition_revisions) = ammunition;\n",
           "after": "    let (ammunition_paid, ammunition_revisions, passenger_reward) = equipment_and_passage;\n"
         },
         {
-          "offset": 28546,
+          "offset": 28563,
           "before": "",
           "after": "        + u128::from(passenger_reward)\n"
         },
         {
-          "offset": 28882,
+          "offset": 28899,
           "before": "",
           "after": "        + u128::from(passenger_reward)\n"
         }
@@ -585,12 +646,12 @@
     },
     "station_services/history.rs": {
       "beforeSHA256": "30de7128095189f2bf7f08d3ef0a71e74b8b1f6980a1d1a0c41167f84c581d59",
-      "afterSHA256": "cdc3150b3862da8e41cee9b5c9a57f937701e5495c09f2235376957e8fe9558e",
+      "afterSHA256": "36893cd7eb36dee7c12662e4dbe76f655c5c77b10c06f38fd19512a40b2f76a1",
       "hunks": [
         {
           "offset": 532,
           "before": "",
-          "after": "    pub(crate) fn cargo_mass_events(&self) -> Vec<(u64, i16)> {\n        self.receipts\n            .iter()\n            .filter_map(|r| {\n                let (commodity, delta) = match r.event {\n                    Event::BoughtFood { .. } => (CommodityId::Food, 1),\n                    Event::SoldFood { .. } => (CommodityId::Food, -1),\n                    Event::BoughtCommodity { commodity, .. } => (commodity, 1),\n                    Event::SoldCommodity { commodity, .. } => (commodity, -1),\n                    Event::Refuelled { .. } => return None,\n                };\n                (commodity.unit() == super::CargoUnit::Tonne).then_some((r.revision, delta))\n            })\n            .collect()\n    }\n    #[cfg(test)]\n    pub(crate) fn move_cargo_revision_for_test(&mut self, from: u64, to: u64) -> bool {\n        let Some(receipt) = self\n            .receipts\n            .iter_mut()\n            .find(|receipt| receipt.revision == from)\n        else {\n            return false;\n        };\n        receipt.revision = to;\n        true\n    }\n"
+          "after": "    pub(crate) fn cargo_mass_events(&self) -> Vec<(u64, i16)> {\n        self.receipts\n            .iter()\n            .filter_map(|r| {\n                let (commodity, delta) = match r.event {\n                    Event::BoughtFood { .. } => (CommodityId::Food, 1),\n                    Event::SoldFood { .. } => (CommodityId::Food, -1),\n                    Event::BoughtCommodity { commodity, .. } => (commodity, 1),\n                    Event::SoldCommodity { commodity, .. } => (commodity, -1),\n                    Event::Refuelled { .. } => return None,\n                };\n                (commodity.unit() == super::CargoUnit::Tonne).then_some((r.revision, delta))\n            })\n            .collect()\n    }\n    #[cfg(test)]\n    pub(crate) fn move_cargo_revision_for_test(&mut self, from: u64, to: u64) -> bool {\n        let Some(receipt) = std::sync::Arc::make_mut(&mut self.receipts)\n            .iter_mut()\n            .find(|receipt| receipt.revision == from)\n        else {\n            return false;\n        };\n        receipt.revision = to;\n        true\n    }\n"
         }
       ]
     }

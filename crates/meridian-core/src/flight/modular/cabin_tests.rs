@@ -540,3 +540,106 @@ fn legacy_unrecorded_bay_refit_is_not_fabricated_into_an_anchor() {
     );
     assert_eq!(world.save_bytes().unwrap(), before);
 }
+
+#[test]
+fn cabin_capacity_respects_t04_reservation_purchase_and_cancel_at_every_prefix() {
+    use crate::station_services::{Command as Trade, CommodityId, Error as TradeError};
+    use crate::{MissionError, NavigationTradeAction as TradeAction};
+    fn confirm(world: &mut World, action: TradeAction) {
+        let tick = world.snapshot().tick;
+        let review = world.review_navigation_trade(action, tick).unwrap();
+        world
+            .prepare_navigation_trade(review, tick)
+            .unwrap()
+            .commit();
+    }
+    let mut world = earned_world(31008);
+    world.request_refuel(world.snapshot().tick).unwrap();
+    let cabin = act(&mut world, buy(CabinGrade::PackedStasis));
+    let ordinary = Trade::BuyCommodity(CommodityId::Textiles);
+    for _ in 0..86 {
+        world
+            .request_station_service(ordinary, world.snapshot().tick)
+            .unwrap();
+    }
+    assert_eq!(world.service_snapshot().unwrap().used_tonnes, 91);
+    confirm(&mut world, TradeAction::Accept);
+    confirm(
+        &mut world,
+        TradeAction::Plan {
+            destination: SystemId::AVENOR,
+            commodity: CommodityId::Food,
+        },
+    );
+    assert_eq!(world.service_snapshot().unwrap().used_tonnes, 92);
+    assert_eq!(
+        world
+            .navigation_trade_snapshot()
+            .unwrap()
+            .reserved_capacity_tonnes,
+        1
+    );
+    assert_eq!(
+        world.request_station_service(ordinary, world.snapshot().tick),
+        Err(MissionError::Service(TradeError::HoldFull))
+    );
+    let planned = world.save_bytes().unwrap();
+    let mut bought = World::from_save_bytes(&planned).unwrap();
+    bought
+        .request_station_service(Trade::BuyFood, bought.snapshot().tick)
+        .unwrap();
+    bought = World::from_save_bytes(&bought.save_bytes().unwrap()).unwrap();
+    assert_eq!(
+        bought
+            .navigation_trade_snapshot()
+            .unwrap()
+            .reserved_capacity_tonnes,
+        0
+    );
+    assert_eq!(bought.commodity_quantity(CommodityId::Food), Some(1));
+    assert_eq!(bought.service_snapshot().unwrap().used_tonnes, 92);
+
+    world = World::from_save_bytes(&planned).unwrap();
+    act(&mut world, ModuleAction::Store { item: cabin });
+    world
+        .request_station_service(ordinary, world.snapshot().tick)
+        .unwrap();
+    confirm(&mut world, TradeAction::Cancel);
+    world = World::from_save_bytes(&world.save_bytes().unwrap()).unwrap();
+    assert_eq!(
+        world
+            .navigation_trade_snapshot()
+            .unwrap()
+            .reserved_capacity_tonnes,
+        0
+    );
+    assert_eq!(world.service_snapshot().unwrap().used_tonnes, 87);
+    let valid = world.save_bytes().unwrap();
+    let mut live = World::from_save_bytes(&valid).unwrap();
+    let retained = live.save_bytes().unwrap();
+    assert!(
+        world
+            .navigation_trade
+            .omit_last_reservation_release_for_test()
+    );
+    reject_changed_history(&world, &mut live, &retained);
+    world = World::from_save_bytes(&valid).unwrap();
+    let market_revision = world.commander_account.as_ref().unwrap().revision();
+    let store = world
+        .modular
+        .events
+        .iter_mut()
+        .find(|event| event.action == ModuleAction::Store { item: cabin })
+        .unwrap();
+    assert!(
+        world
+            .station_markets
+            .as_mut()
+            .unwrap()
+            .move_cargo_revision_for_test(market_revision, store.revision)
+    );
+    store.revision = market_revision;
+    // Actual mass would have been 92t, not 93t, but the still-reserved T04 tonne
+    // makes the reordered historical account impossible. Final 87t still fits.
+    reject_changed_history(&world, &mut live, &retained);
+}

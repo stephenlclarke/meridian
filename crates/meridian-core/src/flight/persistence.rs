@@ -650,7 +650,7 @@ impl World {
         let emp = commerce.emp.validate(self, account, commerce.modular)?;
         commerce
             .modular
-            .validate_capacity_history(self, account, markets)?;
+            .validate_capacity_history(self, account, markets, commerce.lesson)?;
         let secret = self.xyzzy.validate(self, account, commerce)?;
         validate_accounting(
             domain,

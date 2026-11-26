@@ -29,8 +29,7 @@ impl StationMarkets {
     }
     #[cfg(test)]
     pub(crate) fn move_cargo_revision_for_test(&mut self, from: u64, to: u64) -> bool {
-        let Some(receipt) = self
-            .receipts
+        let Some(receipt) = std::sync::Arc::make_mut(&mut self.receipts)
             .iter_mut()
             .find(|receipt| receipt.revision == from)
         else {

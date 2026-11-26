@@ -214,6 +214,19 @@ impl World {
                 } else {
                     Outcome::Abandoned
                 };
+                let reservation_release_revision = if outcome == Outcome::Abandoned
+                    && candidate.attempts[i].plan.is_some()
+                    && candidate.attempts[i].buy.is_none()
+                {
+                    Some(
+                        self.commander_account
+                            .as_ref()
+                            .ok_or(Error::NoCommander)?
+                            .revision(),
+                    )
+                } else {
+                    None
+                };
                 candidate.attempts[i].terminal = Some(Terminal {
                     dock: current.dock,
                     tick: current.tick,
@@ -221,6 +234,7 @@ impl World {
                     fuel: self
                         .navigation_trade_fuel_anchor()
                         .ok_or(Error::NoCommander)?,
+                    reservation_release_revision,
                 });
                 if outcome == Outcome::Complete && candidate.trace.is_none() {
                     candidate.trace = Some(i as u8);
