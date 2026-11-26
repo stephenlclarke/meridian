@@ -938,10 +938,23 @@ impl State {
             .flatten()
             .filter_map(|job| job.issue_account_revision)
     }
+    pub(crate) fn post_test_issues_have_markers(&self, first_test_dock_sequence: u64) -> bool {
+        self.data.jobs.iter().flatten().all(|job| {
+            job.issuer.arrival_sequence <= first_test_dock_sequence
+                || job.issue_account_revision.is_some()
+        })
+    }
     #[cfg(test)]
     pub(crate) fn forge_issue_revision_for_test(&mut self, revision: u64) {
         if let Some(job) = self.data.jobs.iter_mut().flatten().last() {
             job.issue_account_revision = Some(revision);
+        }
+    }
+    #[cfg(test)]
+    pub(crate) fn clear_last_custody_markers_for_test(&mut self) {
+        if let Some(job) = self.data.jobs.iter_mut().flatten().last() {
+            job.issue_account_revision = None;
+            job.abandoned_account_revision = None;
         }
     }
 

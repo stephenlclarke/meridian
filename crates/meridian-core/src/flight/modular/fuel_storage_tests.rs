@@ -433,4 +433,120 @@ fn a_closed_freight_issue_cannot_be_relabelled_into_an_earlier_hidden_test_overf
             .is_err()
     );
     assert_eq!(world.save_bytes().unwrap(), bytes);
+    let mut erased = World::from_save_bytes(&bytes).unwrap();
+    erased
+        .freight_session
+        .as_mut()
+        .unwrap()
+        .state
+        .clear_last_custody_markers_for_test();
+    assert!(
+        erased
+            .modular
+            .validate_test_custody_history(
+                &erased,
+                erased.commander_account.as_ref().unwrap(),
+                &erased.emp,
+                &erased.navigation_trade
+            )
+            .is_err()
+    );
+    assert!(erased.save_bytes().is_err());
+    assert!(
+        world
+            .restore_bytes(&erased.unchecked_test_save().unwrap())
+            .is_err()
+    );
+    assert_eq!(world.save_bytes().unwrap(), bytes);
+
+    for action in [
+        crate::NavigationTradeAction::Accept,
+        crate::NavigationTradeAction::Cancel,
+    ] {
+        let tick = world.snapshot().tick;
+        let review = world.review_navigation_trade(action, tick).unwrap();
+        world
+            .prepare_navigation_trade(review, tick)
+            .unwrap()
+            .commit();
+    }
+    let bytes = world.save_bytes().unwrap();
+    let mut erased = World::from_save_bytes(&bytes).unwrap();
+    erased
+        .navigation_trade
+        .clear_last_custody_markers_for_test();
+    assert!(
+        erased
+            .modular
+            .validate_test_custody_history(
+                &erased,
+                erased.commander_account.as_ref().unwrap(),
+                &erased.emp,
+                &erased.navigation_trade
+            )
+            .is_err()
+    );
+    assert!(erased.save_bytes().is_err());
+    assert!(
+        world
+            .restore_bytes(&erased.unchecked_test_save().unwrap())
+            .is_err()
+    );
+    assert_eq!(world.save_bytes().unwrap(), bytes);
+}
+
+#[test]
+fn proved_completed_pre_max_legacy_freight_without_issue_marker_remains_readable() {
+    let mut world = World::new_commander(18156).unwrap();
+    let review = accept_review(&mut world);
+    let tick = world.snapshot().tick;
+    let job = match world
+        .request_freight(
+            Command::Confirm {
+                review,
+                choice: Choice::Accept,
+            },
+            tick,
+        )
+        .unwrap()
+    {
+        FreightEvent::Accepted { job, .. } => job,
+        event => panic!("unexpected accept {event:?}"),
+    };
+    journey(&mut world, SystemId::RENAS);
+    let tick = world.snapshot().tick;
+    let npc = world.station_contacts()[0];
+    world.request_contact(npc, tick).unwrap();
+    let review = match world
+        .request_freight(
+            Command::ReviewReceiving {
+                actor: npc.actor(),
+                job,
+            },
+            tick,
+        )
+        .unwrap()
+    {
+        FreightEvent::Reviewed(review) => review,
+        event => panic!("unexpected receiving review {event:?}"),
+    };
+    world
+        .request_freight(
+            Command::Confirm {
+                review,
+                choice: Choice::ReceiveAll,
+            },
+            tick,
+        )
+        .unwrap();
+    world
+        .freight_session
+        .as_mut()
+        .unwrap()
+        .state
+        .clear_last_custody_markers_for_test();
+    let before = world.mission_snapshot().unwrap().freight;
+    let mut old = World::from_save_bytes(&world.save_bytes().unwrap()).unwrap();
+    secret(&mut old, XyzzyAction::MaximumFuelStorage);
+    assert_eq!(old.mission_snapshot().unwrap().freight, before);
 }

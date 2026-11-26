@@ -137,6 +137,11 @@ impl State {
         }
         let owner = world.combat_identity().ok_or(INVALID)?.owner;
         let freight = &world.freight_session.as_ref().ok_or(INVALID)?.state;
+        if !freight.post_test_issues_have_markers(first_dock.sequence())
+            || !lesson.post_test_acceptances_have_markers(first_dock.sequence(), first_tick)
+        {
+            return Err(INVALID);
+        }
         let budget = crate::equipment::definition().map_err(|_| INVALID)?;
         for revision in freight
             .known_issue_revisions()

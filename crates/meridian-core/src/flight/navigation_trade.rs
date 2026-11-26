@@ -303,6 +303,30 @@ impl State {
             .iter()
             .filter_map(|attempt| attempt.accepted_account_revision)
     }
+    pub(super) fn post_test_acceptances_have_markers(
+        &self,
+        first_dock_sequence: u64,
+        first_tick: u64,
+    ) -> bool {
+        self.attempts.iter().all(|attempt| {
+            let demonstrably_later =
+                attempt.dock.sequence() > first_dock_sequence || attempt.accepted_tick > first_tick;
+            !demonstrably_later
+                || (attempt.accepted_account_revision.is_some()
+                    && attempt
+                        .terminal
+                        .is_none_or(|terminal| terminal.account_revision.is_some()))
+        })
+    }
+    #[cfg(test)]
+    pub(super) fn clear_last_custody_markers_for_test(&mut self) {
+        if let Some(attempt) = self.attempts.last_mut() {
+            attempt.accepted_account_revision = None;
+            if let Some(terminal) = attempt.terminal.as_mut() {
+                terminal.account_revision = None;
+            }
+        }
+    }
     pub(super) fn reservations(&self) -> services::Reservations {
         let Some(a) = self.active() else {
             return services::Reservations::default();

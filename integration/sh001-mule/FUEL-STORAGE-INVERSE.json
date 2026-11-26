@@ -369,7 +369,7 @@
     },
     "flight/navigation_trade.rs": {
       "beforeSHA256": "6d2458793883e891cf31db0888fc8d0f190b6eb5f609d9b009c8e0610b730070",
-      "afterSHA256": "35324879bdaa453e6d195ab353f2cfb64e18852a46295133528731e5dd5037d6",
+      "afterSHA256": "8b524af61f17f1751e7327fea82d83389fc72b80b5c5772e7cf4b74e4fd131ee",
       "hunks": [
         {
           "offset": 1220,
@@ -389,7 +389,7 @@
         {
           "offset": 7192,
           "before": "",
-          "after": "    }\n    /// T04 consent/closure do not advance the account or simulation tick; only\n    /// a strictly interior retained tick proves a prior active interval.\n    pub(super) fn known_active_at(&self, tick: u64, revision: u64) -> bool {\n        self.attempts.iter().any(|attempt| {\n            if let Some(accepted) = attempt.accepted_account_revision {\n                accepted < revision\n                    && attempt.terminal.is_none_or(|terminal| {\n                        terminal\n                            .account_revision\n                            .map_or(terminal.tick > tick, |closed| closed >= revision)\n                    })\n            } else {\n                attempt.accepted_tick < tick\n                    && attempt.terminal.is_none_or(|terminal| terminal.tick > tick)\n            }\n        })\n    }\n    pub(super) fn known_acceptance_revisions(&self) -> impl Iterator<Item = u64> + '_ {\n        self.attempts\n            .iter()\n            .filter_map(|attempt| attempt.accepted_account_revision)\n"
+          "after": "    }\n    /// T04 consent/closure do not advance the account or simulation tick; only\n    /// a strictly interior retained tick proves a prior active interval.\n    pub(super) fn known_active_at(&self, tick: u64, revision: u64) -> bool {\n        self.attempts.iter().any(|attempt| {\n            if let Some(accepted) = attempt.accepted_account_revision {\n                accepted < revision\n                    && attempt.terminal.is_none_or(|terminal| {\n                        terminal\n                            .account_revision\n                            .map_or(terminal.tick > tick, |closed| closed >= revision)\n                    })\n            } else {\n                attempt.accepted_tick < tick\n                    && attempt.terminal.is_none_or(|terminal| terminal.tick > tick)\n            }\n        })\n    }\n    pub(super) fn known_acceptance_revisions(&self) -> impl Iterator<Item = u64> + '_ {\n        self.attempts\n            .iter()\n            .filter_map(|attempt| attempt.accepted_account_revision)\n    }\n    pub(super) fn post_test_acceptances_have_markers(\n        &self,\n        first_dock_sequence: u64,\n        first_tick: u64,\n    ) -> bool {\n        self.attempts.iter().all(|attempt| {\n            let demonstrably_later =\n                attempt.dock.sequence() > first_dock_sequence || attempt.accepted_tick > first_tick;\n            !demonstrably_later\n                || (attempt.accepted_account_revision.is_some()\n                    && attempt\n                        .terminal\n                        .is_none_or(|terminal| terminal.account_revision.is_some()))\n        })\n    }\n    #[cfg(test)]\n    pub(super) fn clear_last_custody_markers_for_test(&mut self) {\n        if let Some(attempt) = self.attempts.last_mut() {\n            attempt.accepted_account_revision = None;\n            if let Some(terminal) = attempt.terminal.as_mut() {\n                terminal.account_revision = None;\n            }\n        }\n"
         }
       ]
     },
@@ -741,7 +741,7 @@
     },
     "freight/g02.rs": {
       "beforeSHA256": "fd22d210af0582d0e78eda26338f000190fc70645439bcb1079b924c8e4338bd",
-      "afterSHA256": "f9a57cbc9455d79162944e7e92eb4af63f14a5b876c127878b4101f6cad178ee",
+      "afterSHA256": "46579e4bc58a110a3b8f61f6a6e287728e857c551baa6730cf883c26e11ed898",
       "hunks": [
         {
           "offset": 5754,
@@ -791,20 +791,20 @@
         {
           "offset": 29308,
           "before": "            .filter_map(|j| j.completion)\n            .map(|c| crate::flight::AccountEvent {\n                revision: c.account_revision,\n                effect: crate::flight::AccountEffect::Reward(REWARD_TENTHS),\n            })\n            .collect()\n",
-          "after": "            .filter_map(|job| job.issue_account_revision)\n    }\n    #[cfg(test)]\n    pub(crate) fn forge_issue_revision_for_test(&mut self, revision: u64) {\n        if let Some(job) = self.data.jobs.iter_mut().flatten().last() {\n            job.issue_account_revision = Some(revision);\n        }\n"
+          "after": "            .filter_map(|job| job.issue_account_revision)\n    }\n    pub(crate) fn post_test_issues_have_markers(&self, first_test_dock_sequence: u64) -> bool {\n        self.data.jobs.iter().flatten().all(|job| {\n            job.issuer.arrival_sequence <= first_test_dock_sequence\n                || job.issue_account_revision.is_some()\n        })\n    }\n    #[cfg(test)]\n    pub(crate) fn forge_issue_revision_for_test(&mut self, revision: u64) {\n        if let Some(job) = self.data.jobs.iter_mut().flatten().last() {\n            job.issue_account_revision = Some(revision);\n        }\n    }\n    #[cfg(test)]\n    pub(crate) fn clear_last_custody_markers_for_test(&mut self) {\n        if let Some(job) = self.data.jobs.iter_mut().flatten().last() {\n            job.issue_account_revision = None;\n            job.abandoned_account_revision = None;\n        }\n"
         },
         {
-          "offset": 36842,
+          "offset": 37401,
           "before": "",
           "after": "                            issue_account_revision: Some(plan.next_account.revision),\n                            abandoned_account_revision: None,\n"
         },
         {
-          "offset": 38478,
+          "offset": 39037,
           "before": "",
           "after": "                        updated.abandoned_account_revision = Some(plan.next_account.revision);\n"
         },
         {
-          "offset": 45787,
+          "offset": 46346,
           "before": "        || account.fuel_tenths > 130\n",
           "after": "        || account.fuel_storage_count > crate::navigation::MAX_FUEL_STORAGE_UNITS\n        || account.fuel_tenths > crate::navigation::fuel_capacity(account.fuel_storage_count)\n"
         }
