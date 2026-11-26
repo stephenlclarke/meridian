@@ -2,7 +2,7 @@
 
 Flight help now identifies N for automatic docking, Tab for ship selection and automatic alignment, Z for the fitted front laser and T for missile lock.
 
-The [automatic work candidate](AUTOMATIC-WORK.md) uses the existing targets and fitted tools for approach, mining and salvage. Tab starts automatic work; Delete or manual flight cancels it. The target panel reports the current World operation. The earned public acceptance and native observation remain unrun on the combined source.
+The [automatic work candidate](AUTOMATIC-WORK.md) uses the existing targets and fitted tools for approach, mining and salvage. Tab starts automatic work; Delete or manual flight cancels it. The target panel reports the current World operation. Dell passed the earned mining and cold Continue test at `200c0289`. The first earned salvage approach stopped on contact. Combined native acceptance remains open.
 
 The development save store explicitly unlocks on close. Dell Linux reproduced the cold-reopen failure during concurrent process startup and verified the fix while retaining exclusive access for a live owner.
 
