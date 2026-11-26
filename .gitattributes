@@ -349,3 +349,8 @@ tools/verify_ox_mk_ii.py text eol=lf
 tools/measure_cavy_racer.py text eol=lf
 tools/prepare_cavy_racer.py text eol=lf
 tools/verify_cavy_racer.py text eol=lf
+
+# Byte-pinned Wildebeest replay programs.
+tools/measure_wildebeest.py text eol=lf
+tools/prepare_wildebeest.py text eol=lf
+tools/verify_wildebeest.py text eol=lf
