@@ -1324,6 +1324,114 @@ fn disabled_native_target_with_fit(
     panic!("actual aimed paid EMP releases did not disable the real recent attacker");
 }
 
+#[test]
+fn manual_scanner_occupied_review_without_computers_requires_safe_hold_and_consent() {
+    use crate::equipment::{WorkTarget, WorkTargetId, WorkTargetRole};
+    use crate::{ModuleAction, ModuleKind, ModuleSlot, OccupiedCutError};
+    let (mut pilot, target) = disabled_native_target_with_fit(|world| {
+        let tick = world.snapshot().tick;
+        let bay = world.equipment_snapshot().unwrap().owned.unwrap();
+        world
+            .request_equipment(crate::equipment::Command::UnfitCargoBay(bay.id), tick)
+            .unwrap();
+        for slot in [
+            ModuleSlot::MiningTargeting,
+            ModuleSlot::SalvageTargeting,
+            ModuleSlot::Targeting,
+            ModuleSlot::Navigation,
+        ] {
+            if let Some(item) = world
+                .modular_equipment_snapshot()
+                .unwrap()
+                .items
+                .into_iter()
+                .find(|i| i.slot == Some(slot))
+            {
+                let review = world
+                    .review_module(ModuleAction::Store { item: item.id }, tick)
+                    .unwrap();
+                world.prepare_module(review, tick).unwrap().commit();
+            }
+        }
+        if world.fitted_fuel_scoops().is_none() {
+            let review = world
+                .review_module(ModuleAction::PurchaseFuelScoops, tick)
+                .unwrap();
+            world.prepare_module(review, tick).unwrap().commit();
+        }
+        let review = world
+            .review_module(
+                ModuleAction::Purchase {
+                    kind: ModuleKind::SalvageCutter,
+                },
+                tick,
+            )
+            .unwrap();
+        world.prepare_module(review, tick).unwrap().commit();
+    });
+    pilot
+        .request_emp_trigger(false, pilot.snapshot().tick)
+        .unwrap();
+    assert_eq!(pilot.targeting_tier(), None);
+    for _ in pilot.scanner_targets() {
+        pilot
+            .cycle_scanner_target(pilot.snapshot().tick, [1280, 720])
+            .unwrap();
+        if pilot.selected_disabled_salvage_target() == Some(target) {
+            break;
+        }
+    }
+    assert!(pilot.pilot_operates_selected_tool());
+    let opening = pilot.snapshot().tick;
+    assert!(pilot.review_occupied_cut(target, opening).is_err());
+    let review = loop {
+        let tick = pilot.snapshot().tick;
+        assert!(
+            tick < opening + 1600,
+            "hand-flown cutter never reached the surface"
+        );
+        match pilot.review_occupied_cut(target, tick) {
+            Ok(review) => break review,
+            Err(OccupiedCutError::UnsafeHold | OccupiedCutError::ContactUnavailable) => {}
+            Err(e) => panic!("unexpected manual review refusal: {e}"),
+        }
+        let position = pilot
+            .traffic_snapshot()
+            .unwrap()
+            .actors
+            .into_iter()
+            .find(|a| a.id == target)
+            .unwrap()
+            .pose
+            .position;
+        let work = WorkTarget {
+            id: WorkTargetId::Wreck(target),
+            role: WorkTargetRole::WreckTracking,
+            position,
+        };
+        let controls = pilot.work_hold_input(work, steer_to_real_point(&pilot, position));
+        pilot.step(controls).unwrap();
+        assert_eq!(pilot.snapshot().motion_refusal, None);
+    };
+    let before = pilot.save_bytes().unwrap();
+    review.cancel();
+    assert_eq!(before, pilot.save_bytes().unwrap());
+    let review = pilot
+        .review_occupied_cut(target, pilot.snapshot().tick)
+        .unwrap();
+    let hold = pilot.service_snapshot();
+    let cash = pilot.credits_tenths();
+    let contact = pilot.prepare_occupied_cut(review).unwrap().commit();
+    assert_eq!(contact.target, target);
+    let loaded = cold(&pilot);
+    assert_eq!(
+        loaded.occupied_cut_contacts().collect::<Vec<_>>(),
+        vec![contact]
+    );
+    assert_eq!(loaded.service_snapshot(), hold);
+    assert_eq!(loaded.credits_tenths(), cash);
+}
+
 fn occupied_fixture(full_mounts: bool) -> (World, crate::traffic::NpcId, u64) {
     use crate::equipment::TargetingTier;
     use crate::{ModuleAction, ModuleKind, TargetingViewport};
