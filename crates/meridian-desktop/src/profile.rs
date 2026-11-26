@@ -245,6 +245,20 @@ impl Profile {
                 }
                 meridian_core::ModuleAction::Store { .. } => "Owned module stored.",
                 meridian_core::ModuleAction::Install { .. } => "Owned module fitted.",
+                meridian_core::ModuleAction::Passenger(action) => match action {
+                    meridian_core::PassengerAction::RequestReplies => {
+                        "Mira Talen and Oren Vey have replied. Review their current passage status."
+                    }
+                    meridian_core::PassengerAction::Board => {
+                        "Both consenting original people are aboard in separate private cabins."
+                    }
+                    meridian_core::PassengerAction::Receive => {
+                        "Both original people received at Renas. 610 CR and trusted clue awarded."
+                    }
+                    meridian_core::PassengerAction::Cancel => {
+                        "Both original people released to Avenor. No payment."
+                    }
+                },
             };
             let published = self
                 .store

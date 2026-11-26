@@ -97,8 +97,10 @@ pub use flight::{
 };
 
 pub use flight::{
-    FittedFuelScoops, FittedMiningTool, FuelScoopsSnapshot, ModularEquipmentSnapshot, ModuleAction,
-    ModuleError, ModuleKind, ModuleOffer, ModuleProvenance, ModuleReview, ModuleSlot, OwnedModule,
+    CABIN_TONNES, CabinGrade, CabinStatus, FittedFuelScoops, FittedMiningTool, FuelScoopsSnapshot,
+    ModularEquipmentSnapshot, ModuleAction, ModuleError, ModuleKind, ModuleOffer, ModuleProvenance,
+    ModuleReview, ModuleSlot, OwnedModule, PASSAGE_CLUE_ID, PASSAGE_REWARD_TENTHS, PassageStatus,
+    PassageTerminalReceipt, PassengerAction, PassengerIdentity, PassengerJourneySnapshot,
     PreparedModule,
 };
 

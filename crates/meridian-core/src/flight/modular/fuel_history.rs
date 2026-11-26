@@ -15,6 +15,38 @@ pub(super) struct CargoFit {
 }
 
 impl State {
+    pub(super) fn cargo_anchor_is_proven(&self, revision: u64, equipment_revision: u64) -> bool {
+        equipment_revision <= 1
+            || self.cargo_fit_at(revision).is_some_and(|receipt| {
+                receipt.equipment_revision == equipment_revision
+                    && receipt.fitted == (equipment_revision % 2 == 1)
+            })
+    }
+    /// The independently retained test-tank and passenger cargo receipts must agree if
+    /// they cover the same refit; the first MAX entry is only a baseline, not a refit.
+    pub(super) fn validate_passenger_cargo_fit_overlap(
+        &self,
+        revision: u64,
+        equipment_revision: u64,
+        dock: DockContext,
+    ) -> Result<(), SaveError> {
+        if let Some(first) = self.cargo_fit_history.first()
+            && revision > first.account_revision
+        {
+            let receipt = self
+                .cargo_fit_history
+                .iter()
+                .find(|event| event.account_revision == revision)
+                .ok_or(INVALID)?;
+            if receipt.equipment_revision != equipment_revision
+                || receipt.dock != dock
+                || receipt.fitted != (equipment_revision % 2 == 1)
+            {
+                return Err(INVALID);
+            }
+        }
+        Ok(())
+    }
     pub(in crate::flight) fn has_test_cargo_history(&self) -> bool {
         !self.cargo_fit_history.is_empty()
     }

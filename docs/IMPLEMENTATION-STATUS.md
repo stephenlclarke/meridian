@@ -16,7 +16,11 @@ The [solar fuel source candidate](SOLAR-FUEL-SCOOPS.md) adds the original near-s
 
 ## The Unwritten Route clue journal
 
-The [ordinary clue journal](../integration/unwritten-route/README.md) reads the existing first receipts for four playable source families against the original 64-clue catalogue. Shift+J opens the journal. Later trail instructions and the paid Medusa path follow the original quest prerequisites.
+The [ordinary clue journal](../integration/unwritten-route/README.md) reads the existing first receipts for five playable source families against the original 64-clue catalogue. Shift+J opens the journal. Later trail instructions and the paid Medusa path follow the original quest prerequisites.
+
+## Passenger cabins and G04 source candidate
+
+The [six paid passenger cabin layouts](PASSENGER-CABINS.md) use actual hold and equipment capacity. The original G04 finite pair requires separate current consent, two distinct private awake cabin reservations, physical Renas reception or Avenor cancellation, and durable settlement once. The source candidate includes focused core and desktop regressions but awaits owned compilation, review, hosted and native testing. General life-support damage, hull-loss custody and other passenger contracts are open.
 
 ## Medusa Showroom inspection
 

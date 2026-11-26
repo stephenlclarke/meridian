@@ -16,7 +16,8 @@ class MuleSourceVerification(unittest.TestCase):
         shutil.copytree(verifier.ROOT / core, root / core)
         for record in (verifier.PROTECTED_CORE, verifier.FLIGHT_COMPUTER_INVERSE,
                        verifier.HYPERSPACE_DRIVE_INVERSE, verifier.STOCK_SHIELD_INVERSE,
-                       verifier.FUEL_STORAGE_INVERSE, verifier.SOLAR_SCOOPS_INVERSE):
+                       verifier.FUEL_STORAGE_INVERSE, verifier.SOLAR_SCOOPS_INVERSE,
+                       verifier.PASSENGER_CABIN_INVERSE):
             (root / record).parent.mkdir(parents=True, exist_ok=True)
             shutil.copyfile(verifier.ROOT / record, root / record)
         return root / core
@@ -30,6 +31,7 @@ class MuleSourceVerification(unittest.TestCase):
         self.assertEqual(result['protectedCoreFilesWithStockShieldChanges'], 16)
         self.assertEqual(result['protectedCoreFilesWithFuelStorageChanges'], 22)
         self.assertEqual(result['protectedCoreFilesWithSolarScoopsChanges'], 16)
+        self.assertEqual(result['protectedCoreFilesWithPassengerCabinChanges'], 19)
         self.assertEqual(result['geometryCoreTests'], 1)
         self.assertEqual(result['restoreCoreTests'], 1)
         self.assertEqual(result['totalMuleCoreTests'], 24)
@@ -102,6 +104,25 @@ class MuleSourceVerification(unittest.TestCase):
             manifest = root / verifier.STOCK_SHIELD_INVERSE
             manifest.write_bytes(manifest.read_bytes() + b'\n')
             with self.assertRaisesRegex(AssertionError, 'stock shield inverse manifest'):
+                verifier.verify_protected_core(root)
+
+    def test_passenger_cabin_inverse_is_pinned_and_each_changed_source_remains_exact(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            core = self.copy_protected_sources(root)
+            inverse = verifier.passenger_cabin_inverse(root, verifier.protected_core_pins(root))
+            self.assertEqual(len(inverse), 19)
+            for relative in inverse:
+                with self.subTest(relative=relative):
+                    source = core / relative
+                    original = source.read_bytes()
+                    source.write_bytes(original + b'\n')
+                    with self.assertRaisesRegex(AssertionError, relative):
+                        verifier.verify_protected_core(root)
+                    source.write_bytes(original)
+            manifest = root / verifier.PASSENGER_CABIN_INVERSE
+            manifest.write_bytes(manifest.read_bytes() + b'\n')
+            with self.assertRaisesRegex(AssertionError, 'passenger cabin inverse manifest'):
                 verifier.verify_protected_core(root)
 
     def test_component_triangle_may_not_use_a_neighbouring_part_vertex(self):
@@ -183,7 +204,9 @@ class MuleSourceVerification(unittest.TestCase):
             inverse = json.loads(manifest.read_bytes())
             relative = verifier.LIB_SOURCE
             protected = verifier.protected_core_pins(root)
-            current = verifier.undo_unwritten_route_publication(relative, (core / relative).read_bytes())
+            current = verifier.undo_flight_computer(relative, (core / relative).read_bytes(),
+                                                     verifier.passenger_cabin_inverse(root, protected))
+            current = verifier.undo_unwritten_route_publication(relative, current)
             current = verifier.undo_medusa_stock_publication(relative, current)
             current = verifier.undo_flight_computer(relative, current,
                                                      verifier.solar_scoops_inverse(root, protected))

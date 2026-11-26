@@ -48,9 +48,21 @@ impl World {
         command: Command,
         expected_tick: u64,
     ) -> Result<Event, MissionError> {
+        if self.modular.history_active() {
+            return self
+                .prepare_equipment(command, expected_tick)
+                .map(PreparedEquipment::commit)
+                .map_err(|error| match error {
+                    EquipmentPreparationError::Command(error) => error,
+                    EquipmentPreparationError::Save(_) => {
+                        MissionError::Equipment(equipment::Error::InvalidState)
+                    }
+                });
+        }
         let facts = self.current_service_facts(expected_tick)?;
         self.check_cargo_mount(command)?;
-        let reserved_capacity = self.navigation_trade.reservations().capacity;
+        let reserved_capacity = self.navigation_trade.reservations().capacity
+            + self.cabin_tonnes().map_err(MissionError::Service)?;
         let account = self
             .commander_account
             .as_ref()
@@ -133,18 +145,22 @@ impl World {
                 &session.state,
                 facts,
                 command,
-                self.navigation_trade.reservations().capacity,
+                self.navigation_trade.reservations().capacity
+                    + self
+                        .cabin_tonnes()
+                        .map_err(|error| command_error(MissionError::Service(error)))?,
             )
             .map_err(|error| command_error(MissionError::Equipment(error)))?;
         let mut modular = self.modular.clone();
+        let dock = self
+            .current_dock_context()
+            .ok_or_else(|| command_error(MissionError::NotDocked))?;
         if modular.has_test_cargo_history() {
-            let dock = self
-                .current_dock_context()
-                .ok_or_else(|| command_error(MissionError::NotDocked))?;
             modular
                 .record_test_cargo_fit(&account, dock, tick)
                 .map_err(EquipmentPreparationError::Save)?;
         }
+        modular.record_bay(&account, dock);
         let bytes = self
             .save_bytes_with_modules(&account, &modular)
             .map_err(EquipmentPreparationError::Save)?;

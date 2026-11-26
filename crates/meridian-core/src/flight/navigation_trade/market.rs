@@ -18,7 +18,13 @@ impl World {
         &self,
         command: Command,
     ) -> Result<(Reservations, Purpose), Error> {
-        let reservations = self.navigation_trade.reservations();
+        let cabin_capacity = self.cabin_tonnes().map_err(Error::Service)?;
+        let mut reservations = self.navigation_trade.reservations();
+        reservations.capacity += cabin_capacity;
+        let cabin_only = Reservations {
+            capacity: cabin_capacity,
+            commodity: None,
+        };
         let Some(a) = self.navigation_trade.active() else {
             return Ok((reservations, Purpose::Ordinary));
         };
@@ -49,7 +55,7 @@ impl World {
             {
                 return Err(Error::FitOrStockChanged);
             }
-            return Ok((Reservations::default(), Purpose::Buy));
+            return Ok((cabin_only, Purpose::Buy));
         }
         if !buying && a.held() {
             let dock = self.current_dock_context().ok_or(Error::BerthRequired)?;
@@ -67,7 +73,7 @@ impl World {
                 {
                     return Err(Error::CreditOverflow);
                 }
-                return Ok((Reservations::default(), Purpose::Sell));
+                return Ok((cabin_only, Purpose::Sell));
             }
         }
         Ok((reservations, Purpose::Ordinary))
@@ -75,7 +81,8 @@ impl World {
     pub(in crate::flight) fn raw_service_projection(
         &self,
     ) -> Result<services::AccountProjection, services::Error> {
-        self.commander_account
+        let projection = self
+            .commander_account
             .as_ref()
             .ok_or(services::Error::InvalidAccount)?
             .service_projection(
@@ -84,7 +91,8 @@ impl World {
                     .as_ref()
                     .ok_or(services::Error::InvalidAccount)?
                     .state,
-            )
+            )?;
+        crate::flight::modular::add_cabin_mass(projection, self.cabin_tonnes()?)
     }
     pub(in crate::flight) fn reserved_service_projection(
         &self,
@@ -211,6 +219,11 @@ impl State {
                     .state,
             )
             .map_err(Error::Service)?;
+        let after = crate::flight::modular::add_cabin_mass(
+            after,
+            world.cabin_tonnes().map_err(Error::Service)?,
+        )
+        .map_err(Error::Service)?;
         let transaction = markets.transaction_revision();
         if purpose != Purpose::Ordinary {
             let before_markets = world.station_markets.as_ref().ok_or(Error::NoCommander)?;

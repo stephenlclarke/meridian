@@ -745,6 +745,9 @@ impl World {
             )?
         };
         let emp = commerce.emp.validate(self, account, commerce.modular)?;
+        commerce
+            .modular
+            .validate_capacity_history(self, account, markets, commerce.lesson)?;
         let secret = self.xyzzy.validate(self, account, commerce)?;
         commerce.modular.validate_test_custody_history(
             self,
@@ -767,8 +770,10 @@ impl World {
                 ammunition
                     .extra_revisions
                     .checked_add(modular.revision)
+                    .and_then(|revisions| revisions.checked_add(modular.passenger_totals().1))
                     .and_then(|revisions| revisions.checked_add(emp.1))
                     .ok_or(SaveError::SequenceExhausted)?,
+                modular.passenger_totals().0,
             ),
             (
                 secret,
@@ -814,16 +819,18 @@ fn validate_accounting(
     jumps: u64,
     fuel_spent: u64,
     penalties: u8,
-    ammunition: (u32, u64),
+    equipment_and_passage: (u32, u64, u32),
     (secret, solar): (super::xyzzy::Terms, (u64, u64)),
 ) -> Result<(), SaveError> {
-    let (ammunition_paid, ammunition_revisions) = ammunition;
+    let (ammunition_paid, ammunition_revisions, passenger_reward) = equipment_and_passage;
     let income = 7200_u128
+        + u128::from(passenger_reward)
         + u128::from(d.completed) * u128::from(crate::freight::REWARD_TENTHS)
         + u128::from(s.credited);
     let income = adjust_secret_cash(income, secret.cash_adjustment)?;
     let fuel = 130_u128 + u128::from(s.refilled_units) + secret.fuel_supplied + u128::from(solar.0);
     let available_gross = 7200_u128
+        + u128::from(passenger_reward)
         + u128::from(d.completed) * u128::from(crate::freight::REWARD_TENTHS)
         + s.gross_credit;
     let available_gross = adjust_secret_cash(available_gross, secret.cash_adjustment)?;

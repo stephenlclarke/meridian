@@ -370,6 +370,7 @@ impl State {
                         .state
                         .custody_clear_at(r.revision, r.dock.sequence())
                     || commerce.lesson.known_active_at(r.tick, r.revision)
+                    || commerce.modular.passenger_aboard_at(r.revision)
                     || commerce
                         .modular
                         .fuel_capacity_at_revision(r.dock.owner().seed(), r.end_revision)?
@@ -474,7 +475,9 @@ impl PreparedXyzzy<'_> {
 }
 impl World {
     pub(super) fn test_tank_custody_clear(&self) -> bool {
-        self.active_freight_job().is_none() && self.navigation_trade.occupancy().1 == 0
+        self.active_freight_job().is_none()
+            && self.navigation_trade.occupancy().1 == 0
+            && self.modular.passenger_occupancy().1 == 0
     }
     fn xyzzy_has_free_ordinary_utility_mount(&self) -> Result<bool, SaveError> {
         let fit = self.fuel_scoops_snapshot().ok_or(INVALID)?;
@@ -689,6 +692,9 @@ impl World {
                 {
                     self.modular
                         .record_test_cargo_fit(&account, review.dock, review.tick)?;
+                }
+                if account.equipment_state().revision() != previous_cargo_revision {
+                    self.modular.record_bay(&account, review.dock);
                 }
                 self.commander_account = Some(account);
             }

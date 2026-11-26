@@ -271,6 +271,26 @@ impl JumpJournal {
         Ok(spent)
     }
 
+    /// Bind a retained passenger reception to the actual system travelled to before its berth.
+    pub(crate) fn validate_passenger_berth(
+        &self,
+        dock: DockContext,
+        tick: u64,
+    ) -> Result<(), SaveError> {
+        self.spent_at(dock, tick)?;
+        let count = usize::try_from(dock.visit().checked_sub(dock.sequence()).ok_or(INVALID)?)
+            .map_err(|_| INVALID)?;
+        let system = if count == 0 {
+            SystemId::AVENOR
+        } else {
+            self.legs.get(count - 1).ok_or(INVALID)?.destination
+        };
+        if dock.system() != system {
+            return Err(INVALID);
+        }
+        Ok(())
+    }
+
     pub(crate) fn validate(
         &self,
         nav: NavigationState,

@@ -1897,3 +1897,99 @@ fn normal_flight_opens_unwritten_route_clue_journal_without_advancing_or_jumping
     assert!(app.help.is_none());
     assert_eq!(ok(app.game.world.save_bytes()), before);
 }
+
+#[test]
+fn shift_j_shows_the_actual_earned_cabin_journey_after_cold_profile_continue() {
+    use crate::session::Action;
+    use meridian_core::{
+        CabinGrade, ModuleAction, ModuleKind, PassengerAction, XyzzyAction, navigation::SystemId,
+    };
+    use winit::keyboard::ModifiersState;
+    let directory = TestDirectory::new();
+    let mut app = app(&directory);
+    // Explicit preview test cash only; the following two cabins are actual paid items.
+    // The core G04 regression independently uses ordinarily earned funds.
+    ok(app.game.xyzzy(XyzzyAction::Enter));
+    for _ in 0..2 {
+        ok(app.game.command(Action::Module(ModuleAction::Purchase {
+            kind: ModuleKind::Cabin(CabinGrade::Economy),
+        })));
+    }
+    for action in [PassengerAction::RequestReplies, PassengerAction::Board] {
+        ok(app
+            .game
+            .command(Action::Module(ModuleAction::Passenger(action))));
+    }
+    assert!(
+        app.game
+            .world
+            .unwritten_route_clue_progress()
+            .is_some_and(|progress| progress.earned.is_empty())
+    );
+    let world = &mut app.game.world;
+    ok(world.request_launch(world.snapshot().tick));
+    ok(world.step(FlightInput::default()));
+    ok(world.request_jump(SystemId::RENAS, world.snapshot().tick));
+    let remaining = world
+        .snapshot()
+        .navigation
+        .and_then(|navigation| navigation.travel)
+        .unwrap_or_else(|| panic!("actual jump"))
+        .remaining_ticks;
+    for _ in 0..remaining {
+        ok(world.step(FlightInput::default()));
+    }
+    for _ in 0..9000 {
+        let snapshot = world.snapshot();
+        if snapshot.mode == FlightMode::Docked {
+            break;
+        }
+        let speed = if snapshot.position[2] > 2500.0 {
+            34.3
+        } else {
+            4.0
+        };
+        ok(world.step(FlightInput {
+            throttle: ((speed - snapshot.speed) / (9.1 / 60.0)).clamp(-1.0, 1.0),
+            ..FlightInput::default()
+        }));
+        assert_eq!(world.snapshot().motion_refusal, None);
+    }
+    assert_eq!(
+        world.current_dock_context().map(|dock| dock.system()),
+        Some(SystemId::RENAS)
+    );
+    ok(app.game.command(Action::Module(ModuleAction::Passenger(
+        PassengerAction::Receive,
+    ))));
+    ok(app.game.save());
+    drop(app);
+    let mut profile = open(&directory.0);
+    ok(profile.continue_saved());
+    let mut app = App::with_profile(profile);
+    let before = ok(app.game.world.save_bytes());
+    app.modifiers = ModifiersState::SHIFT;
+    assert_eq!(
+        key(
+            &mut app,
+            KeyCode::KeyJ,
+            ElementState::Pressed,
+            false,
+            Some("J")
+        ),
+        None
+    );
+    let panel = app
+        .help
+        .as_ref()
+        .unwrap_or_else(|| panic!("actual clue journal"));
+    assert_eq!(panel.title, "The Unwritten Route - Clue Journal");
+    assert_eq!(panel.lines[0], "1 of 64 distinct source clues collected");
+    assert!(
+        panel
+            .lines
+            .iter()
+            .any(|line| line == "cabin journey family trace")
+    );
+    assert_eq!(ok(app.game.world.save_bytes()), before);
+}

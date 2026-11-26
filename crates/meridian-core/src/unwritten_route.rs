@@ -39,7 +39,8 @@ impl ClueProgress {
 
 impl World {
     pub fn unwritten_route_clue_progress(&self) -> Option<ClueProgress> {
-        self.commander_id()?;
+        let owner = self.commander_id()?.seed();
+        let hull = self.player_ship_id()?.ordinal();
         let receipts = [
             self.mission_snapshot()
                 .and_then(|snapshot| snapshot.freight.clue)
@@ -58,6 +59,16 @@ impl World {
                 .and_then(|snapshot| snapshot.trace)
                 .and_then(|trace| {
                     BaseClue::from_receipt(trace.source_id, trace.clue_id, trace.receipt_id)
+                }),
+            self.passenger_journey_snapshot()
+                .and_then(|snapshot| snapshot.clue)
+                .filter(|receipt| receipt.owner == owner && receipt.hull == hull)
+                .and_then(|receipt| {
+                    BaseClue::from_receipt(
+                        "l337.contract/cabin-journey",
+                        "cabin-journey-family-trace",
+                        receipt.clue_id()?,
+                    )
                 }),
         ];
         // Only the owning reducers can mark a source pair as earned.

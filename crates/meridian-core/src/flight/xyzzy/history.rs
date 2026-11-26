@@ -11,6 +11,7 @@ pub(crate) struct AccountEvent {
 pub(crate) enum AccountEffect {
     Debit(u32),
     Reward(u32),
+    ObserveFuel(u16),
     Sale { bid: u32, credited: u32 },
     Refill { units: u16, paid: u32 },
     TankFit { count: u8, paid: u32 },
@@ -64,6 +65,11 @@ impl State {
             commerce
                 .modular
                 .account_events(world.combat_identity().ok_or(INVALID)?.owner)?,
+        );
+        events.extend(
+            commerce.modular.extra_capacity_account_events(
+                &world.freight_session.as_ref().ok_or(INVALID)?.state,
+            ),
         );
         events.extend(commerce.emp.account_events()?);
         events.extend(commerce.ammunition.account_events());
@@ -127,6 +133,11 @@ impl State {
             match event.effect {
                 AccountEffect::Debit(paid) => cash = cash.checked_sub(paid).ok_or(INVALID)?,
                 AccountEffect::Reward(credit) => cash = cash.checked_add(credit).ok_or(INVALID)?,
+                AccountEffect::ObserveFuel(observed) => {
+                    if observed != fuel {
+                        return Err(INVALID);
+                    }
+                }
                 AccountEffect::Sale { bid, credited } => {
                     let after = cash.saturating_add(bid);
                     if after - cash != credited {

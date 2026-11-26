@@ -11,6 +11,7 @@ The stock-shield development candidate adds seven independently testable shield 
 The [fuel storage development candidate](docs/FUEL-STORAGE.md) adds four separately owned repeatable units, actual paid refuelling and capacity changes. SH025 has three shared normal utility mounts; the explicitly labelled four-tank test maximum uses a guarded exception. Owned validation is pending.
 
 The [solar fuel development candidate](docs/SOLAR-FUEL-SCOOPS.md) adds actual near-sun fuel collection with fitted scoops, independent cabin-temperature danger and retained collection receipts. Physical cargo and ore intake remain separate. Owned validation is pending.
+The passenger-cabin development candidate offers all six original paid cabin layouts, with real five-tonne fit costs and separate Avenor-to-Renas G04 passenger consent, boarding and reception. See [passenger cabins and G04 controls](docs/PASSENGER-CABINS.md). Owned validation is pending.
 
 ## Goshawk Explorer in the Ship Showroom
 
