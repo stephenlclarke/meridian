@@ -149,7 +149,7 @@ fn moving_authored_shard_has_outward_faces_and_once_only_lower_forward_intake() 
         physical_tick: 97,
         pose,
         speed: 0.0,
-        automatic: true,
+        full_aperture: true,
     };
     let collected = ok(state.prepare_collection(receipt));
     assert!(collected.pending_ore(98).is_empty());

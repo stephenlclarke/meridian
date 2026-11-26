@@ -75,7 +75,7 @@ impl World {
         let Some(ore) = target else {
             return "Mining complete";
         };
-        match self.collect_mined_ore(self.state.tick, Some(ore.id), true) {
+        match self.collect_mined_ore(self.state.tick, Some(ore.id)) {
             Ok(()) if self.mining_collection_target(id).is_none() => "Mining complete",
             Ok(()) => "Ore collected",
             Err(MiningError::NoScoops) => "Fit fuel scoops",
@@ -94,11 +94,11 @@ impl World {
         if !self.pilot_operates_selected_tool() {
             return Err(MiningError::NoEligibleOreBody);
         }
-        self.collect_mined_ore(self.state.tick, Some(id), true)
+        self.collect_mined_ore(self.state.tick, Some(id))
     }
 
     pub fn request_collect_mined_ore(&mut self, tick: u64) -> Result<(), MiningError> {
-        self.collect_mined_ore(tick, None, false)
+        self.collect_mined_ore(tick, None)
     }
 
     pub(super) fn prepare_mining_intake_account(
@@ -127,12 +127,7 @@ impl World {
             })
     }
 
-    fn collect_mined_ore(
-        &mut self,
-        tick: u64,
-        selected: Option<OreId>,
-        automatic: bool,
-    ) -> Result<(), MiningError> {
+    fn collect_mined_ore(&mut self, tick: u64, selected: Option<OreId>) -> Result<(), MiningError> {
         if tick != self.state.tick {
             return Err(MiningError::StaleCommand);
         }
@@ -176,7 +171,7 @@ impl World {
             .pending_ore(self.combat.physical_tick())
             .into_iter()
             .filter(|ore| selected.is_none_or(|id| ore.id == id))
-            .find(|ore| ore.scoop_admissible(pose, self.state.speed, automatic))
+            .find(|ore| ore.scoop_admissible(pose, self.state.speed, selected.is_some()))
             .ok_or(MiningError::NoEligibleOreBody)?;
         let account = self.prepare_mining_intake_account(ore.commodity)?;
         let receipt = Collection {
@@ -188,7 +183,7 @@ impl World {
             physical_tick: self.combat.physical_tick(),
             pose,
             speed: self.state.speed,
-            automatic,
+            full_aperture: selected.is_some(),
         };
         let mining = self.mining.prepare_collection(receipt)?;
         let mut before = Writer::new();

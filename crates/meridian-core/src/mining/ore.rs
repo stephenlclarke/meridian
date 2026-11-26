@@ -33,7 +33,7 @@ pub struct OreSnapshot {
     pub released_physical_tick: u64,
 }
 impl OreSnapshot {
-    /// World vertices shared by the Meridian fragment mesh and automatic scoop checks.
+    /// World vertices shared by the Meridian fragment mesh and full-aperture scoop checks.
     pub fn vertices(self) -> [Vec3; 6] {
         [
             Vec3::new(7.0, 1.0, -2.0),
@@ -45,7 +45,7 @@ impl OreSnapshot {
         ]
         .map(|offset| add(self.position, offset))
     }
-    pub(crate) fn scoop_admissible(self, pose: RigidPose, speed: f32, automatic: bool) -> bool {
+    pub(crate) fn scoop_admissible(self, pose: RigidPose, speed: f32, full_aperture: bool) -> bool {
         let displacement = |p: Vec3| {
             Vec3::new(
                 p.x - pose.position.x,
@@ -64,7 +64,7 @@ impl OreSnapshot {
         {
             return false;
         }
-        if !automatic {
+        if !full_aperture {
             return true;
         }
         let ship_speed = f64::from(speed * crate::station::DISTANCE_PER_SPEED_UNIT);
@@ -89,7 +89,7 @@ pub(crate) struct Collection {
     pub(crate) physical_tick: u64,
     pub(crate) pose: RigidPose,
     pub(crate) speed: f32,
-    pub(crate) automatic: bool,
+    pub(crate) full_aperture: bool,
 }
 impl State {
     pub(crate) fn pending_count(&self) -> usize {
@@ -220,7 +220,7 @@ impl State {
                         || old.world_tick > receipt.world_tick
                         || old.physical_tick > receipt.physical_tick
                 })
-                || !ore.scoop_admissible(receipt.pose, receipt.speed, receipt.automatic)
+                || !ore.scoop_admissible(receipt.pose, receipt.speed, receipt.full_aperture)
             {
                 return Err(INVALID);
             }
@@ -246,7 +246,7 @@ impl State {
             }
             super::persistence::rigid(w, c.pose);
             w.f32(c.speed);
-            w.bool(c.automatic);
+            w.bool(c.full_aperture);
         }
     }
     pub(crate) fn decode_collections(&mut self, r: &mut Reader<'_>) -> Result<(), SaveError> {
@@ -275,7 +275,7 @@ impl State {
                 physical_tick: r.u64()?,
                 pose: super::persistence::read_rigid(r)?,
                 speed: r.f32()?,
-                automatic: r.bool()?,
+                full_aperture: r.bool()?,
             });
         }
         self.collected = Arc::new(receipts);
