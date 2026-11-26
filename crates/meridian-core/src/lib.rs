@@ -79,6 +79,7 @@ pub mod oryx_voyager;
 pub mod osprey_patrol;
 pub mod osprey_scout;
 pub mod osprey_strike;
+pub mod osprey_support;
 pub mod owlet_mk_ii;
 pub mod ox;
 pub mod ox_mk_ii;
