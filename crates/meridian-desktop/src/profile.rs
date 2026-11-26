@@ -125,6 +125,7 @@ impl Profile {
                     "Outfit refitted, refilled and saved."
                 }
                 meridian_core::XyzzyAction::ToggleUnlimitedFuel => "Fuel setting saved.",
+                meridian_core::XyzzyAction::FitShield(_) => "Selected shield test fit saved.",
             }
             .into(),
         )

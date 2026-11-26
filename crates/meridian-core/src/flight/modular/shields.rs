@@ -4,6 +4,11 @@ use crate::flight::{ShieldGrade, combat};
 use crate::freight::g02::CommanderAccount;
 use crate::save::SaveError;
 
+pub(in crate::flight) enum ResourceFitChange {
+    Energy(u16),
+    Shield(ShieldGrade),
+}
+
 impl Ledger {
     pub(in crate::flight) fn shield_grade(&self) -> Option<ShieldGrade> {
         match self.fitted(ModuleSlot::Shield)?.kind {
@@ -14,26 +19,39 @@ impl Ledger {
 }
 
 impl State {
-    pub(in crate::flight) fn shield_changes(
+    pub(in crate::flight) fn resource_fit_changes(
         &self,
         world: &World,
-    ) -> Result<Vec<(u64, ShieldGrade)>, SaveError> {
+    ) -> Result<Vec<(u64, ResourceFitChange)>, SaveError> {
         let owner = world.combat_identity().ok_or(INVALID)?.owner;
         let mut ledger = Ledger::born(owner)?;
         let mut changes = Vec::new();
         let mut counters = [0; 2];
         let mut grade = ShieldGrade::Basic;
+        let mut rate = 7;
         for event in &self.events {
             ledger.replay(*event, &mut counters).map_err(|_| INVALID)?;
             let next = ledger.shield_grade().ok_or(INVALID)?;
-            if next != grade {
-                let clock = world
-                    .damage
-                    .berth_clock(event.dock.sequence())
-                    .ok_or(INVALID)?;
-                changes.push((clock, next));
-                grade = next;
+            let next_rate = ledger
+                .fitted(ModuleSlot::Energy)
+                .and_then(|item| item.kind.energy_recharge_multiplier())
+                .unwrap_or(1)
+                * 7;
+            if next == grade && next_rate == rate {
+                continue;
             }
+            let clock = world
+                .damage
+                .berth_clock(event.dock.sequence())
+                .ok_or(INVALID)?;
+            if next != grade {
+                changes.push((clock, ResourceFitChange::Shield(next)));
+            }
+            if next_rate != rate {
+                changes.push((clock, ResourceFitChange::Energy(next_rate)));
+            }
+            grade = next;
+            rate = next_rate;
         }
         Ok(changes)
     }

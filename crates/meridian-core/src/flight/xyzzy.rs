@@ -86,7 +86,7 @@ pub struct XyzzySnapshot {
     pub cash_granted_once: bool,
     pub cash_tenths: u32,
     pub jump_limit_ly: f64,
-    /// Full original outfit needs missing shield, drive, targeting and utility owners.
+    /// Full original outfit still needs broader targeting, utility and hull owners.
     pub full_legacy_outfit_available: bool,
 }
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -183,6 +183,14 @@ impl State {
                 || (!r.action.refills(r.unlimited_fuel) && r.fuel_added != 0)
             {
                 return Err(INVALID);
+            }
+            if let XyzzyAction::FitShield(grade) = r.action {
+                commerce.modular.validate_shield_test_record(
+                    r.dock.owner().seed(),
+                    r.revision,
+                    r.end_revision,
+                    grade,
+                )?;
             }
             if let Some(p) = previous
                 && p.unlimited_fuel
@@ -401,6 +409,7 @@ impl World {
                 super::modular::ModuleKind::MiningTargeting,
                 super::modular::ModuleKind::SalvageTargeting,
                 super::modular::ModuleKind::Drive(crate::navigation::DriveGrade::Advanced),
+                super::modular::ModuleKind::Shield(ShieldGrade::Elite),
             ] {
                 self.grant_xyzzy_module(review.dock, review.tick, kind)?;
             }
@@ -417,6 +426,12 @@ impl World {
             self.commander_account = Some(account);
             // The present supported mutation boundary is docked: ordinary docking already reset
             // energy/shields. Do not clear heat/cooldown or erase retained combat/mining evidence.
+        } else if let XyzzyAction::FitShield(grade) = review.action {
+            self.grant_xyzzy_module(
+                review.dock,
+                review.tick,
+                super::modular::ModuleKind::Shield(grade),
+            )?;
         }
         let revision = self.commander_account.as_ref().ok_or(INVALID)?.revision();
         self.xyzzy.records.last_mut().ok_or(INVALID)?.end_revision = revision;

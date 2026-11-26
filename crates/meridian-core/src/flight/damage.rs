@@ -295,21 +295,20 @@ impl State {
                 },
             ));
         }
-        for (sequence, (clock, rate)) in
-            world.modular.energy_changes(world)?.into_iter().enumerate()
+        for (sequence, (clock, change)) in world
+            .modular
+            .resource_fit_changes(world)?
+            .into_iter()
+            .enumerate()
         {
             if clock > end {
                 return Err(INVALID);
             }
-            events.push((clock, 0, sequence as u64 + 1, Effect::Recharge(rate)));
-        }
-        for (sequence, (clock, grade)) in
-            world.modular.shield_changes(world)?.into_iter().enumerate()
-        {
-            if clock > end {
-                return Err(INVALID);
-            }
-            events.push((clock, 0, sequence as u64 + 1, Effect::ShieldFit(grade)));
+            let effect = match change {
+                super::modular::ResourceFitChange::Energy(rate) => Effect::Recharge(rate),
+                super::modular::ResourceFitChange::Shield(grade) => Effect::ShieldFit(grade),
+            };
+            events.push((clock, 0, sequence as u64 + 1, effect));
         }
         for (sequence, (clock, contact)) in world.emp.resource_effects().into_iter().enumerate() {
             if clock > end {

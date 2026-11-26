@@ -362,13 +362,14 @@ fn original_laser_and_energy_profile_values_do_not_confer_owned_hardware() {
     }
     let world = ok(World::new_commander(14501));
     let fit = some(world.modular_equipment_snapshot());
-    assert_eq!(fit.items.len(), 4);
+    assert_eq!(fit.items.len(), 5);
     assert!(fit.items.iter().all(|module| matches!(
         module.kind,
         ModuleKind::PulseLaser
             | ModuleKind::BasicEnergySystem
             | ModuleKind::BasicNavigation
             | ModuleKind::Drive(crate::navigation::DriveGrade::Basic)
+            | ModuleKind::Shield(crate::ShieldGrade::Basic)
     )));
     assert_eq!(world.damage, State::fresh());
 }

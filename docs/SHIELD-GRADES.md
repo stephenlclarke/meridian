@@ -20,6 +20,8 @@ The original PLUGH commodity/equipment operation supplies a special 13,500 CR ba
 
 The original catalogue, fitting, ownership and source evidence use immutable L337 revision `a11fe16924d87d06021816f9037952afcbac08db`. See [full equipment reconciliation](EQUIPMENT-PLAYABLE.md) for exact source pins, including `EquipmentPurchaseProgression.swift`, `EquipmentModuleTemplates.swift`, `ShieldBooster.swift`, `InventoryInteraction.swift`, `EquipmentMutations.swift`, `ScriptEquipmentProjection.swift` and `Plugh.swift`. This candidate uses no imported player save.
 
+The [stock shield inverse](../integration/sh001-mule/STOCK-SHIELD-INVERSE.json) reverses only the 16 deliberate changes to pre-existing protected source files. It preserves the earlier drive inverse and all 115 historical source checks. The independent Python regressions refuse edits to each changed file and the pinned inverse itself.
+
 ## Resource and save criteria
 
 - Store the previous module on replacement; operating with an empty shield slot is not an admitted player fit. Keep the same owned IDs and provenance on later refit.

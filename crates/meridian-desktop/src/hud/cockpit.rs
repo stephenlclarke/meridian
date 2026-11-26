@@ -575,6 +575,30 @@ mod tests {
         );
     }
     #[test]
+    fn every_test_shield_grade_uses_its_own_capacity_in_the_cockpit() {
+        let mut world = world();
+        let review = world
+            .review_xyzzy(meridian_core::XyzzyAction::Enter, 0)
+            .unwrap_or_else(|e| panic!("{e}"));
+        world
+            .prepare_xyzzy(review, 0)
+            .unwrap_or_else(|e| panic!("{e}"))
+            .commit();
+        for grade in meridian_core::ShieldGrade::ALL {
+            let action = meridian_core::XyzzyAction::FitShield(grade);
+            let review = world
+                .review_xyzzy(action, 0)
+                .unwrap_or_else(|e| panic!("{e}"));
+            world
+                .prepare_xyzzy(review, 0)
+                .unwrap_or_else(|e| panic!("{e}"))
+                .commit();
+            let c = Cockpit::capture(&world, world.snapshot()).unwrap_or_else(|e| panic!("{e}"));
+            assert_eq!(c.shield, [Some(1.0); 2], "{}", grade.name());
+        }
+    }
+
+    #[test]
     fn fresh_instruments_are_world_owned_and_rendering_cannot_change_save() {
         let world = world();
         let before = world.save_bytes().unwrap_or_else(|error| panic!("{error}"));

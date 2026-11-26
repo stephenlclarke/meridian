@@ -569,6 +569,11 @@ impl World {
             ),
         )?;
         let modular = commerce.modular.ledger(self, account)?;
+        if modular.shield_grade() != Some(self.combat.shields().grade()) {
+            return Err(SaveError::InvalidState(
+                "shield banks do not match the fitted module",
+            ));
+        }
         let fitted_drive = modular
             .drive()
             .ok_or(SaveError::InvalidState("missing fitted drive"))?;

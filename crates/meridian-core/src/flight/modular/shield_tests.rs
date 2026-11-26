@@ -218,6 +218,16 @@ fn each_explicit_shield_test_grade_is_durable_not_paid_and_maximum_remains_elite
     secret(&mut world, XyzzyAction::MaximumSupportedHardware);
     assert_eq!(fitted(&world), elite);
     assert_eq!(world.modular_equipment_snapshot().unwrap().items, inventory);
+    secret(&mut world, XyzzyAction::ToggleUnlimitedFuel);
+    journey(&mut world, SystemId::RENAS);
+    let current_fuel = world.snapshot().navigation.unwrap().fuel_units;
+    assert_eq!(current_fuel, 96);
+    secret(&mut world, XyzzyAction::FitShield(ShieldGrade::Basic));
+    assert_eq!(
+        world.snapshot().navigation.unwrap().fuel_units,
+        current_fuel
+    );
+    assert_eq!(world.credits_tenths(), cash);
 }
 
 #[test]

@@ -1,0 +1,611 @@
+{
+  "base": "0a7155698901f1b77846aeafbfcc000a42c62707",
+  "files": {
+    "flight.rs": {
+      "beforeSHA256": "e6e6c585b045173882ce7ef34687f9e002bd570efd87099b51dcbbf484d797fb",
+      "afterSHA256": "71b2a3e50951c5a032d99df633f51196a06d619ba0af25e978b6e4be4445aa4a",
+      "hunks": [
+        {
+          "offset": 2316,
+          "before": "",
+          "after": "mod shield;\n"
+        },
+        {
+          "offset": 2471,
+          "before": "",
+          "after": "pub use shield::ShieldGrade;\n"
+        }
+      ]
+    },
+    "flight/combat.rs": {
+      "beforeSHA256": "d11aa779db3dc3e035da1b4f0251ecf769f12aa67872b5901ea1d008ca865c90",
+      "afterSHA256": "2c331f63998c055cca4db3b36f9e310f49cf5a1d8276a8f1e4cf22fba61ee758",
+      "hunks": [
+        {
+          "offset": 83,
+          "before": "",
+          "after": "pub use super::shield::SHIELD_CAPACITY;\nuse super::shield::{ShieldGrade, ShieldPools};\n"
+        },
+        {
+          "offset": 366,
+          "before": "pub const SHIELD_CAPACITY: u16 = 30_000;\nconst SHIELD_RECHARGE: u16 = 3;\n",
+          "after": ""
+        },
+        {
+          "offset": 3837,
+          "before": "    pub front_shield_hundredths: u16,\n    pub rear_shield_hundredths: u16,\n",
+          "after": "    pub front_shield_hundredths: u32,\n    pub rear_shield_hundredths: u32,\n    pub shield_capacity_hundredths: u32,\n    pub shield_grade: ShieldGrade,\n"
+        },
+        {
+          "offset": 4467,
+          "before": "    front: u16,\n    rear: u16,\n",
+          "after": "    shields: ShieldPools,\n"
+        },
+        {
+          "offset": 4770,
+          "before": "            front: SHIELD_CAPACITY,\n            rear: SHIELD_CAPACITY,\n",
+          "after": "            shields: ShieldPools::default(),\n"
+        },
+        {
+          "offset": 5769,
+          "before": "    pub(super) fn shields(self) -> [u16; 2] {\n        [self.front, self.rear]\n",
+          "after": "    pub(super) fn shields(self) -> ShieldPools {\n        self.shields\n    }\n    pub(super) fn refit_shields(&mut self, grade: ShieldGrade) {\n        self.shields.refit(grade);\n"
+        },
+        {
+          "offset": 6208,
+          "before": "        let shield = if front {\n            &mut self.front\n        } else {\n            &mut self.rear\n        };\n        let absorbed = (*shield).min(damage);\n        *shield -= absorbed;\n",
+          "after": "        let absorbed = self.shields.absorb(front, damage);\n"
+        },
+        {
+          "offset": 6483,
+          "before": "        let shield = if front {\n            &mut self.front\n        } else {\n            &mut self.rear\n        };\n        let absorbed = (*shield).min(power);\n        *shield -= absorbed;\n        absorbed\n",
+          "after": "        self.shields.absorb(front, power)\n"
+        },
+        {
+          "offset": 9290,
+          "before": "            self.front = SHIELD_CAPACITY;\n            self.rear = SHIELD_CAPACITY;\n",
+          "after": "            self.shields.fill();\n"
+        },
+        {
+          "offset": 9340,
+          "before": "            self.front = (self.front + SHIELD_RECHARGE).min(SHIELD_CAPACITY);\n            self.rear = (self.rear + SHIELD_RECHARGE).min(SHIELD_CAPACITY);\n",
+          "after": "            self.shields.advance(1);\n"
+        },
+        {
+          "offset": 10589,
+          "before": "        w.u16(self.front);\n        w.u16(self.rear);\n",
+          "after": "        self.shields.encode(w);\n"
+        },
+        {
+          "offset": 11171,
+          "before": "            front: r.u16()?,\n            rear: r.u16()?,\n",
+          "after": "            shields: ShieldPools::decode(r)?,\n"
+        },
+        {
+          "offset": 11771,
+          "before": "            || self.front > SHIELD_CAPACITY\n            || self.rear > SHIELD_CAPACITY\n            || ((self.front != SHIELD_CAPACITY || self.rear != SHIELD_CAPACITY)\n",
+          "after": "            || !self.shields.valid()\n            || (!self.shields.is_full()\n"
+        },
+        {
+          "offset": 15891,
+          "before": "                front_shield_hundredths: self.combat.front,\n                rear_shield_hundredths: self.combat.rear,\n",
+          "after": "                front_shield_hundredths: self.combat.shields.amounts()[0],\n                rear_shield_hundredths: self.combat.shields.amounts()[1],\n                shield_capacity_hundredths: self.combat.shields.capacity(),\n                shield_grade: self.combat.shields.grade(),\n"
+        }
+      ]
+    },
+    "flight/combat/tests.rs": {
+      "beforeSHA256": "4c67a319614b1119828ec414d42a1772c28d2c09bf387a31564c0e6792720d2e",
+      "afterSHA256": "2eb4ab003573d3f4540bd0958e8ee2bf69fa7ce12ab26590974c0683d6421c7c",
+      "hunks": [
+        {
+          "offset": 19971,
+          "before": "    prefix.u16(world.combat.front);\n    prefix.u16(world.combat.rear);\n",
+          "after": "    world.combat.shields.encode(&mut prefix);\n"
+        }
+      ]
+    },
+    "flight/damage.rs": {
+      "beforeSHA256": "d0c4d292fcd96902fc5ad882309edf25a828e091e115e59d8a21cd7b0c5cdca3",
+      "afterSHA256": "45040a25302931b577c971cf17cd474470da07732bcd36e95391ec012de82cc6",
+      "hunks": [
+        {
+          "offset": 89,
+          "before": "",
+          "after": "use super::shield::{ShieldGrade, ShieldPools};\n"
+        },
+        {
+          "offset": 10582,
+          "before": "        for (sequence, (clock, rate)) in\n            world.modular.energy_changes(world)?.into_iter().enumerate()\n",
+          "after": "        for (sequence, (clock, change)) in world\n            .modular\n            .resource_fit_changes(world)?\n            .into_iter()\n            .enumerate()\n"
+        },
+        {
+          "offset": 10834,
+          "before": "            events.push((clock, 0, sequence as u64 + 1, Effect::Recharge(rate)));\n",
+          "after": "            let effect = match change {\n                super::modular::ResourceFitChange::Energy(rate) => Effect::Recharge(rate),\n                super::modular::ResourceFitChange::Shield(grade) => Effect::ShieldFit(grade),\n            };\n            events.push((clock, 0, sequence as u64 + 1, effect));\n"
+        },
+        {
+          "offset": 15615,
+          "before": "",
+          "after": "    ShieldFit(ShieldGrade),\n"
+        },
+        {
+          "offset": 15891,
+          "before": "    shields: [u16; 2],\n",
+          "after": "    shields: ShieldPools,\n"
+        },
+        {
+          "offset": 16110,
+          "before": "        shields: [30000; 2],\n",
+          "after": "        shields: ShieldPools::default(),\n"
+        },
+        {
+          "offset": 16437,
+          "before": "                pools.shields = [30000; 2];\n",
+          "after": "                pools.shields.fill();\n"
+        },
+        {
+          "offset": 16489,
+          "before": "",
+          "after": "            Effect::ShieldFit(grade) => pools.shields.refit(grade),\n"
+        },
+        {
+          "offset": 17222,
+          "before": "                    let shield = &mut pools.shields[usize::from(!front)];\n                    let absorbed = (*shield).min(power);\n",
+          "after": "                    let absorbed = pools.shields.absorb(front, power);\n"
+        },
+        {
+          "offset": 17406,
+          "before": "                    *shield -= absorbed;\n",
+          "after": ""
+        },
+        {
+          "offset": 17600,
+          "before": "                let shield = &mut pools.shields[usize::from(!front)];\n                let absorbed = (*shield).min(damage);\n                *shield -= absorbed;\n",
+          "after": "                let absorbed = pools.shields.absorb(front, damage);\n"
+        },
+        {
+          "offset": 18013,
+          "before": "    for shield in &mut pools.shields {\n        *shield = u64::from(*shield)\n            .saturating_add(elapsed.saturating_mul(3))\n            .min(30000) as u16;\n    }\n",
+          "after": "    pools.shields.advance(elapsed);\n"
+        }
+      ]
+    },
+    "flight/damage/rapid_energy_tests.rs": {
+      "beforeSHA256": "6964c5266a8d1f0bf5baa6faed89c2874b54de89c59801ce087bce45b0a58bc7",
+      "afterSHA256": "f45308b123a0e3c98bfedc44a27f8e387e380b71e365984cd3c7771a21d05bd9",
+      "hunks": [
+        {
+          "offset": 12067,
+          "before": "    assert_eq!(fit.items.len(), 4);\n",
+          "after": "    assert_eq!(fit.items.len(), 5);\n"
+        },
+        {
+          "offset": 12363,
+          "before": "",
+          "after": "            | ModuleKind::Shield(crate::ShieldGrade::Basic)\n"
+        },
+        {
+          "offset": 13632,
+          "before": "    assert_eq!(pools.shields, [18, 30000]);\n",
+          "after": "    assert_eq!(pools.shields.amounts(), [18, 30000]);\n"
+        }
+      ]
+    },
+    "flight/damage/tests.rs": {
+      "beforeSHA256": "1272ba18ba22995d12106ce67f8e6c9c2c34bb1ca43a48ce2116609a1f2af316",
+      "afterSHA256": "d3d9a2de6aab314abab43875b3c77fbc8e4429b0880e6e1bc9ce057336f1a9d1",
+      "hunks": [
+        {
+          "offset": 101,
+          "before": "",
+          "after": "\n#[test]\nfn wide_shield_grade_changes_replay_with_damage_recharge_and_berth_without_reset() {\n    let effects = [\n        (0, 0, 1, Effect::ShieldFit(ShieldGrade::AdvancedII)),\n        (\n            1,\n            1,\n            1,\n            Effect::Hit {\n                front: true,\n                damage: 16_000,\n            },\n        ),\n        (\n            1,\n            2,\n            0,\n            Effect::Hit {\n                front: false,\n                damage: 1_500,\n            },\n        ),\n        (11, 0, 1, Effect::ShieldFit(ShieldGrade::Elite)),\n        (\n            12,\n            2,\n            1,\n            Effect::Hit {\n                front: true,\n                damage: 1_500,\n            },\n        ),\n    ];\n    let state = ok(replay(&effects, 12));\n    assert_eq!(state.shields.grade(), ShieldGrade::Elite);\n    // At 11 the old banks are 191030/205530 of 207000. Scale by exactly 4/3,\n    // round to nearest hundredth, then add one recharge tick and damage the front.\n    assert_eq!(state.shields.amounts(), [253_210, 274_043]);\n    assert_eq!(state.pulse, PulseResources::default());\n    let mut docked = effects.to_vec();\n    docked.push((13, 0, 0, Effect::Berth));\n    let state = ok(replay(&docked, 13));\n    assert_eq!(state.shields.amounts(), [276_000; 2]);\n    assert_eq!(state.shields.grade(), ShieldGrade::Elite);\n}\n"
+        },
+        {
+          "offset": 3644,
+          "before": "    assert_eq!(\n        actual,\n        Pools {\n            pulse: expected,\n            shields: [0, 30000]\n        }\n    );\n",
+          "after": "    assert_eq!(actual.pulse, expected);\n    assert_eq!(actual.shields.amounts(), [0, 30000]);\n    assert_eq!(actual.shields.grade(), ShieldGrade::Basic);\n"
+        },
+        {
+          "offset": 4594,
+          "before": "    assert_eq!(actual.shields, [30000; 2]);\n",
+          "after": "    assert_eq!(actual.shields.amounts(), [30000; 2]);\n"
+        }
+      ]
+    },
+    "flight/missiles/persistence.rs": {
+      "beforeSHA256": "fa8e4ba57f33751b30286ea640c3d66901f1a4ab4e7413fb3480a958ffbe6b88",
+      "afterSHA256": "db367137c9aff9025f2c962edb8708695be2bf4c56d96ebc932bf9c5da3feb40",
+      "hunks": [
+        {
+          "offset": 32631,
+          "before": "        let mut shields = [30_000_u16; 2];\n",
+          "after": "        let mut shields = super::super::shield::ShieldPools::default();\n"
+        },
+        {
+          "offset": 33166,
+          "before": "                    for shield in &mut shields {\n                        *shield = u64::from(*shield)\n                            .saturating_add(elapsed.saturating_mul(3))\n                            .min(30_000) as u16;\n                    }\n                    let side = usize::from(!front);\n                    shields[side] = shields[side].saturating_sub(16_000);\n",
+          "after": "                    shields.advance(elapsed);\n                    shields.absorb(front, 16_000);\n"
+        },
+        {
+          "offset": 33501,
+          "before": "            for shield in &mut shields {\n                *shield = u64::from(*shield)\n                    .saturating_add(elapsed.saturating_mul(3))\n                    .min(30_000) as u16;\n            }\n",
+          "after": "            shields.advance(elapsed);\n"
+        },
+        {
+          "offset": 33549,
+          "before": "        let condition = world.combat_snapshot().ok_or(INVALID)?.player;\n        if [\n            condition.front_shield_hundredths,\n            condition.rear_shield_hundredths,\n        ] != shields\n        {\n",
+          "after": "        if world.combat.shields() != shields {\n"
+        }
+      ]
+    },
+    "flight/modular.rs": {
+      "beforeSHA256": "ba9dbe7ef97f83a7ff3cae8d54b25bc7e2420ec0fdd91df3536f0ecadb460e51",
+      "afterSHA256": "3cb9e48d28ce7b144161bc3f31e1432d625b5c6d65933291e52784ef9916de70",
+      "hunks": [
+        {
+          "offset": 98,
+          "before": "use super::{FlightMode, World};\n",
+          "after": "use super::{FlightMode, ShieldGrade, World};\n"
+        },
+        {
+          "offset": 372,
+          "before": "",
+          "after": "mod shields;\npub(super) use shields::ResourceFitChange;\n"
+        },
+        {
+          "offset": 1104,
+          "before": "",
+          "after": "    Shield(ShieldGrade),\n"
+        },
+        {
+          "offset": 1792,
+          "before": "",
+          "after": "            Self::Shield(_) => \"shields\",\n"
+        },
+        {
+          "offset": 2721,
+          "before": "",
+          "after": "            Self::Shield(grade) => grade.node(),\n"
+        },
+        {
+          "offset": 3386,
+          "before": "",
+          "after": "            Self::Shield(grade) => grade.name(),\n"
+        },
+        {
+          "offset": 5359,
+          "before": "",
+          "after": "            Self::Shield(_) => ModuleSlot::Shield,\n"
+        },
+        {
+          "offset": 6524,
+          "before": "",
+          "after": "                | Self::Shield(_)\n"
+        },
+        {
+          "offset": 7069,
+          "before": "",
+          "after": "            Self::Shield(grade) => grade.equipment_units(),\n"
+        },
+        {
+          "offset": 8446,
+          "before": "",
+          "after": "            Self::Shield(grade) => grade.ordinary_offer(),\n"
+        },
+        {
+          "offset": 9336,
+          "before": "",
+          "after": "            Self::Shield(grade) => grade.predecessor().map(Self::Shield),\n"
+        },
+        {
+          "offset": 10525,
+          "before": "",
+          "after": "            Self::Shield(grade) => 24 + grade as u8,\n"
+        },
+        {
+          "offset": 11578,
+          "before": "",
+          "after": "            24..=30 => Ok(Self::Shield(ShieldGrade::from_tag(tag - 24)?)),\n"
+        },
+        {
+          "offset": 11924,
+          "before": "",
+          "after": "    Shield,\n"
+        },
+        {
+          "offset": 14464,
+          "before": "",
+          "after": "    ShieldRequired,\n"
+        },
+        {
+          "offset": 15337,
+          "before": "",
+          "after": "    combat: super::combat::State,\n"
+        },
+        {
+          "offset": 15844,
+          "before": "",
+          "after": "        self.world.combat = self.combat;\n"
+        },
+        {
+          "offset": 17772,
+          "before": "",
+          "after": "                    provenance: ModuleProvenance::StandardBirth,\n                },\n                OwnedModule {\n                    id: owner.checked_add(3).ok_or(INVALID)?,\n                    kind: ModuleKind::Shield(ShieldGrade::Basic),\n                    slot: Some(ModuleSlot::Shield),\n"
+        },
+        {
+          "offset": 23239,
+          "before": "",
+          "after": "                    }\n                    if i.slot == Some(ModuleSlot::Shield) {\n                        return Err(ModuleError::ShieldRequired);\n"
+        },
+        {
+          "offset": 28398,
+          "before": "                if !e\n",
+          "after": "                let kind = e\n"
+        },
+        {
+          "offset": 28492,
+          "before": "                    .is_some_and(ModuleKind::xyzzy_supported)\n                    || !world.xyzzy.authorizes(e.dock, e.tick, e.revision)\n                {\n",
+          "after": "                    .filter(|kind| kind.xyzzy_supported())\n                    .ok_or(INVALID)?;\n                let authorized = match kind {\n                    ModuleKind::Shield(grade) => world\n                        .xyzzy\n                        .authorizes_shield(grade, e.dock, e.tick, e.revision),\n                    _ => world.xyzzy.authorizes(e.dock, e.tick, e.revision),\n                };\n                if !authorized {\n"
+        },
+        {
+          "offset": 30684,
+          "before": "",
+          "after": "            (3, ModuleSlot::Shield, super::StarterComponent::BasicShield),\n"
+        },
+        {
+          "offset": 37820,
+          "before": "",
+          "after": "            ModuleKind::Shield(ShieldGrade::BasicII),\n            ModuleKind::Shield(ShieldGrade::Intermediate),\n            ModuleKind::Shield(ShieldGrade::IntermediateII),\n            ModuleKind::Shield(ShieldGrade::Advanced),\n"
+        },
+        {
+          "offset": 43244,
+          "before": "        let changes_energy = action\n",
+          "after": "        let resource_slot = |slot| matches!(slot, ModuleSlot::Energy | ModuleSlot::Shield);\n        let changes_resources = action\n"
+        },
+        {
+          "offset": 43404,
+          "before": "            .is_some_and(|kind| kind.slot() == ModuleSlot::Energy)\n",
+          "after": "            .is_some_and(|kind| resource_slot(kind.slot()))\n"
+        },
+        {
+          "offset": 43760,
+          "before": "                    .any(|i| i.id == item && i.kind.slot() == ModuleSlot::Energy),\n",
+          "after": "                    .any(|i| i.id == item && resource_slot(i.kind.slot())),\n"
+        },
+        {
+          "offset": 43879,
+          "before": "        if changes_energy && !self.damage.enabled() {\n",
+          "after": "        if changes_resources && !self.damage.enabled() {\n"
+        },
+        {
+          "offset": 44002,
+          "before": "                \"energy fitting requires resource birth provenance\",\n",
+          "after": "                \"energy or shield fitting requires resource birth provenance\",\n"
+        },
+        {
+          "offset": 48644,
+          "before": "",
+          "after": "        let shield_fitted = ledger\n            .fitted(ModuleSlot::Shield)\n            .is_some_and(|item| item.id == owner + 3);\n        let shield_grade = ledger.shield_grade().ok_or(ModuleError::ShieldRequired)?;\n"
+        },
+        {
+          "offset": 49067,
+          "before": "",
+          "after": "                shield_fitted,\n"
+        },
+        {
+          "offset": 49251,
+          "before": "        let bytes = self\n            .save_bytes_with_modules(&account, &state)\n            .map_err(ModuleError::Save)?;\n",
+          "after": "        let mut combat = self.combat;\n        let (account, state, bytes) = if shield_grade != combat.shields().grade() {\n            combat.refit_shields(shield_grade);\n            self.shield_fit_save(account, state, combat)\n                .map_err(ModuleError::Save)?\n        } else {\n            let bytes = self\n                .save_bytes_with_modules(&account, &state)\n                .map_err(ModuleError::Save)?;\n            (account, state, bytes)\n        };\n"
+        },
+        {
+          "offset": 49814,
+          "before": "",
+          "after": "            combat,\n"
+        },
+        {
+          "offset": 49969,
+          "before": "",
+          "after": "mod shield_tests;\n#[cfg(test)]\n"
+        },
+        {
+          "offset": 50025,
+          "before": "    pub(super) fn energy_changes(&self, world: &World) -> Result<Vec<(u64, u16)>, SaveError> {\n        let owner = world.combat_identity().ok_or(INVALID)?.owner;\n        let mut ledger = Ledger::born(owner)?;\n        let mut changes = Vec::new();\n        let mut counters = [0; 2];\n        let mut before = 7;\n        for event in &self.events {\n            ledger.replay(*event, &mut counters).map_err(|_| INVALID)?;\n            let rate = ledger\n                .fitted(ModuleSlot::Energy)\n                .and_then(|i| i.kind.energy_recharge_multiplier())\n                .unwrap_or(1)\n                * 7;\n            if rate != before {\n                let clock = world\n                    .damage\n                    .berth_clock(event.dock.sequence())\n                    .ok_or(INVALID)?;\n                changes.push((clock, rate));\n            }\n            before = rate;\n        }\n        Ok(changes)\n    }\n",
+          "after": ""
+        },
+        {
+          "offset": 53590,
+          "before": "",
+          "after": "                born_fitted(ModuleSlot::Shield, 3),\n"
+        },
+        {
+          "offset": 53692,
+          "before": "",
+          "after": "        if let ModuleKind::Shield(grade) = kind {\n            if !self.damage.enabled() {\n                return Err(INVALID);\n            }\n            self.combat.refit_shields(grade);\n        }\n"
+        }
+      ]
+    },
+    "flight/modular/tests.rs": {
+      "beforeSHA256": "2e6fbf979a289166b89b1c657d24df6857ca78931fd1caf47099aef0e9a410e0",
+      "afterSHA256": "4b82329e06fbaa2505e863bf68130dc9b9d050af6131c5c66b4b2699f81c425e",
+      "hunks": [
+        {
+          "offset": 6628,
+          "before": "    assert_eq!(after.items.len(), 5);\n",
+          "after": "    assert_eq!(after.items.len(), 6);\n"
+        },
+        {
+          "offset": 7079,
+          "before": "    assert_eq!(after.items[4].slot, Some(ModuleSlot::FrontLaser));\n    assert_eq!(after.items[4].kind, ModuleKind::MiningLaser);\n",
+          "after": "    assert_eq!(after.items[5].slot, Some(ModuleSlot::FrontLaser));\n    assert_eq!(after.items[5].kind, ModuleKind::MiningLaser);\n"
+        },
+        {
+          "offset": 7221,
+          "before": "        matches!(after.items[4].provenance, ModuleProvenance::Paid { transaction: 1, dock, paid_tenths: 33_000, .. } if dock == berth)\n",
+          "after": "        matches!(after.items[5].provenance, ModuleProvenance::Paid { transaction: 1, dock, paid_tenths: 33_000, .. } if dock == berth)\n"
+        },
+        {
+          "offset": 10345,
+          "before": "    assert_eq!(snap(&w).items.len(), 5);\n",
+          "after": "    assert_eq!(snap(&w).items.len(), 6);\n"
+        },
+        {
+          "offset": 10509,
+          "before": "        snap(&w).items[4].provenance,\n",
+          "after": "        snap(&w).items[5].provenance,\n"
+        }
+      ]
+    },
+    "flight/modular/xyzzy_tests.rs": {
+      "beforeSHA256": "c364ae5f9d8b1259d1e541d62786073609d8ee5b5693e7ef0993866173933e90",
+      "afterSHA256": "7efdbef489c0309cd6982f9204f1c8c3ab52eb33bf71816dfff880ecda83ab35",
+      "hunks": [
+        {
+          "offset": 1177,
+          "before": "",
+          "after": "\n#[test]\nfn a_specific_shield_test_grant_cannot_issue_a_different_grade() {\n    let mut w = active(15311);\n    let action = crate::XyzzyAction::FitShield(crate::ShieldGrade::AdvancedII);\n    let review = w.review_xyzzy(action, 0).unwrap();\n    w.prepare_xyzzy(review, 0).unwrap().commit();\n    let valid = w.save_bytes().unwrap();\n    let mut live = World::from_save_bytes(&valid).unwrap();\n    let before = live.save_bytes().unwrap();\n    w.modular.events.last_mut().unwrap().action = ModuleAction::Purchase {\n        kind: ModuleKind::Shield(crate::ShieldGrade::Intermediate),\n    };\n    refuses(&w, &mut live, &before);\n}\n"
+        }
+      ]
+    },
+    "flight/persistence.rs": {
+      "beforeSHA256": "35567a7eabd9dda3f09430dd6e2591b7f30fa1e0f3b948bb0846a383f967d2a3",
+      "afterSHA256": "94e37569697a792ad63262039727a6f2cf671ae4f2b8ad3f32992fae2b446a7f",
+      "hunks": [
+        {
+          "offset": 23025,
+          "before": "",
+          "after": "        if modular.shield_grade() != Some(self.combat.shields().grade()) {\n            return Err(SaveError::InvalidState(\n                \"shield banks do not match the fitted module\",\n            ));\n        }\n"
+        }
+      ]
+    },
+    "flight/xyzzy.rs": {
+      "beforeSHA256": "8d2043b2f46d48369a646c6b6928a1120d530f1584daaaf69739f6799eec9b36",
+      "afterSHA256": "0c2016a2dfbb7446df0879d752506c4e3718b81e3d0e674ee254e250d03e04a3",
+      "hunks": [
+        {
+          "offset": 107,
+          "before": "use super::{FlightMode, World};\n",
+          "after": "use super::{FlightMode, ShieldGrade, World};\n"
+        },
+        {
+          "offset": 733,
+          "before": "",
+          "after": "    /// Meridian disposable-preview test access, separate from the original maximum outfit.\n    FitShield(ShieldGrade),\n"
+        },
+        {
+          "offset": 904,
+          "before": "        self != Self::ToggleUnlimitedFuel\n",
+          "after": "        matches!(\n            self,\n            Self::Enter | Self::MaximumSupportedHardware | Self::RestoreStarter\n        )\n    }\n    fn changes_equipment(self) -> bool {\n        self.outfit() || matches!(self, Self::FitShield(_))\n    }\n    fn refills(self, mode: bool) -> bool {\n        !matches!(self, Self::FitShield(_)) && (self.outfit() || mode)\n"
+        },
+        {
+          "offset": 1471,
+          "before": "",
+          "after": "            Self::FitShield(grade) => 4 + grade as u8,\n"
+        },
+        {
+          "offset": 1794,
+          "before": "",
+          "after": "            4..=10 => Ok(Self::FitShield(ShieldGrade::from_tag(tag - 4)?)),\n"
+        },
+        {
+          "offset": 2793,
+          "before": "    /// Full original outfit needs missing shield, drive, targeting and utility owners.\n",
+          "after": "    /// Full original outfit still needs broader targeting, utility and hull owners.\n"
+        },
+        {
+          "offset": 4002,
+          "before": "",
+          "after": "    pub(super) fn authorizes_shield(\n        &self,\n        grade: ShieldGrade,\n        dock: DockContext,\n        tick: u64,\n        revision: u64,\n    ) -> bool {\n        self.records.iter().any(|record| {\n            (record.action == XyzzyAction::FitShield(grade)\n                || (record.action.outfit() && grade == ShieldGrade::Elite))\n                && record.dock == dock\n                && record.tick == tick\n                && revision > record.revision\n                && revision <= record.end_revision\n        })\n    }\n"
+        },
+        {
+          "offset": 6102,
+          "before": "                || (!r.action.outfit() && !r.unlimited_fuel && r.fuel_added != 0)\n",
+          "after": "                || (!r.action.refills(r.unlimited_fuel) && r.fuel_added != 0)\n"
+        },
+        {
+          "offset": 6231,
+          "before": "",
+          "after": "            }\n            if let XyzzyAction::FitShield(grade) = r.action {\n                commerce.modular.validate_shield_test_record(\n                    r.dock.owner().seed(),\n                    r.revision,\n                    r.end_revision,\n                    grade,\n                )?;\n"
+        },
+        {
+          "offset": 11324,
+          "before": "            && (action.outfit() || !self.xyzzy.unlimited_fuel())\n",
+          "after": "            && (action.changes_equipment() || !self.xyzzy.unlimited_fuel())\n"
+        },
+        {
+          "offset": 13236,
+          "before": "        let refill = review.action.outfit() || mode;\n",
+          "after": "        let refill = review.action.refills(mode);\n"
+        },
+        {
+          "offset": 14762,
+          "before": "",
+          "after": "                super::modular::ModuleKind::Shield(ShieldGrade::Elite),\n"
+        },
+        {
+          "offset": 15626,
+          "before": "",
+          "after": "        } else if let XyzzyAction::FitShield(grade) = review.action {\n            self.grant_xyzzy_module(\n                review.dock,\n                review.tick,\n                super::modular::ModuleKind::Shield(grade),\n            )?;\n"
+        }
+      ]
+    },
+    "flight/xyzzy/history.rs": {
+      "beforeSHA256": "8a9e43df95a53c40715e8d4f8e75ee4e0e2d70b77352fb9d09f1a20f859be473",
+      "afterSHA256": "6c47eac07a06d568e1b73b27ea171b66c00666c49ce12e10b39f531a0c93b4d0",
+      "hunks": [
+        {
+          "offset": 896,
+          "before": "        let refill = r.action.outfit() || r.unlimited_fuel;\n",
+          "after": "        let refill = r.action.refills(r.unlimited_fuel);\n"
+        }
+      ]
+    },
+    "flight/xyzzy/tests.rs": {
+      "beforeSHA256": "1d367a46d6e67723f1d67a4ac64882295be03e5e8d511168fab3cb2c1f436322",
+      "afterSHA256": "4ae7b0fa9b72498f5debfd0282d4b21dbac3e67513804f29ed684089d12ff39a",
+      "hunks": [
+        {
+          "offset": 4609,
+          "before": "        assert_eq!(w.modular_equipment_snapshot().unwrap().items.len(), 4);\n",
+          "after": "        assert_eq!(w.modular_equipment_snapshot().unwrap().items.len(), 5);\n"
+        },
+        {
+          "offset": 4999,
+          "before": "",
+          "after": "}\n\n#[test]\nfn a_shield_test_record_cannot_relabel_a_real_selected_grade_or_claim_other_receipts() {\n    let mut w = World::new_commander(14211).unwrap();\n    apply(&mut w, XyzzyAction::Enter);\n    apply(\n        &mut w,\n        XyzzyAction::FitShield(crate::ShieldGrade::AdvancedII),\n    );\n    let bytes = w.save_bytes().unwrap();\n    let mut live = World::from_save_bytes(&bytes).unwrap();\n    let before = live.save_bytes().unwrap();\n    w.xyzzy.records.last_mut().unwrap().action =\n        XyzzyAction::FitShield(crate::ShieldGrade::Intermediate);\n    poison_refuses(&w, &mut live, &before);\n    let mut w = World::from_save_bytes(&bytes).unwrap();\n    let record = w.xyzzy.records.last_mut().unwrap();\n    record.end_revision = record.revision;\n    poison_refuses(&w, &mut live, &before);\n"
+        }
+      ]
+    },
+    "freight/g02.rs": {
+      "beforeSHA256": "08c7434c201e4c9107cf3a19f804d984932ad3281b6188b23254e15c681d7f08",
+      "afterSHA256": "fd22d210af0582d0e78eda26338f000190fc70645439bcb1079b924c8e4338bd",
+      "hunks": [
+        {
+          "offset": 6215,
+          "before": "        matches!(index, 1..=4) && self.modular_revision > 0 && item.fitted_hull.is_none()\n",
+          "after": "        matches!(index, 0..=4) && self.modular_revision > 0 && item.fitted_hull.is_none()\n"
+        },
+        {
+          "offset": 8986,
+          "before": "",
+          "after": "        shield_fitted: bool,\n"
+        },
+        {
+          "offset": 10389,
+          "before": "",
+          "after": "        let shield = data\n            .fit\n            .as_mut()\n            .and_then(|fit| fit.items[0].as_mut())\n            .ok_or(Error::MissingEquipment)?;\n        shield.fitted_hull = shield_fitted.then_some(data.hull);\n"
+        }
+      ]
+    },
+    "lib.rs": {
+      "beforeSHA256": "142fb87b9ed928e1707e9e9a460dcdfc055af21dce8613b441cc5a42dbc56e80",
+      "afterSHA256": "a578db3ab899eb88202cfed8f26fa895bc824d57c6a016065283ec4ee7d078ad",
+      "hunks": [
+        {
+          "offset": 923,
+          "before": "",
+          "after": "pub use flight::ShieldGrade;\n"
+        }
+      ]
+    }
+  }
+}
