@@ -225,7 +225,7 @@ struct AccountData {
 impl AccountData {
     fn allows_stored_starter(&self, index: usize, item: OwnedStarterItem) -> bool {
         // The World separately requires the fit to match its retained modular ledger.
-        matches!(index, 1 | 2 | 3 | 4) && self.modular_revision > 0 && item.fitted_hull.is_none()
+        matches!(index, 1..=4) && self.modular_revision > 0 && item.fitted_hull.is_none()
     }
 }
 
