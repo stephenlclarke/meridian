@@ -139,7 +139,7 @@ class MuleSourceVerification(unittest.TestCase):
             for publication in (
                 b'pub mod stag_liner;\n\n', b'pub mod saker;\n', b'pub mod eagle_cruiser;\n',
                 b'pub mod harpy_assault;\n', b'pub mod erne_corvette;\n', b'pub mod harpy_dropship;\n',
-                b'pub mod harpy_gunship;\n', b'pub mod lanner;\n', b'pub mod hyena;\n', b'pub mod yak;\n', b'pub mod jackal;\n', b'pub mod banteng;\n', b'pub mod caracal_scout;\n', b'pub mod hobby_fighter;\n', b'pub mod condor;\n', b'pub mod aplomado_interceptor;\n', b'pub mod falconet;\n', b'pub mod muskox;\n', b'pub mod barbary;\n', b'pub mod wombat;\n', b'pub mod saiga;\n', b'pub mod moose_clipper;\n', b'pub mod seriema_courier;\n', b'pub mod arna_cutter;\n', b'pub mod vulture_raider;\n',
+                b'pub mod harpy_gunship;\n', b'pub mod lanner;\n', b'pub mod hyena;\n', b'pub mod yak;\n', b'pub mod jackal;\n', b'pub mod banteng;\n', b'pub mod caracal_scout;\n', b'pub mod hobby_fighter;\n', b'pub mod condor;\n', b'pub mod aplomado_interceptor;\n', b'pub mod falconet;\n', b'pub mod muskox;\n', b'pub mod barbary;\n', b'pub mod wombat;\n', b'pub mod saiga;\n', b'pub mod moose_clipper;\n', b'pub mod seriema_courier;\n', b'pub mod arna_cutter;\n', b'pub mod vulture_raider;\n', b'pub mod medusa;\n',
             ):
                 for altered in (original.replace(publication, b''), original + publication):
                     with self.subTest(publication=publication):
@@ -148,7 +148,7 @@ class MuleSourceVerification(unittest.TestCase):
                             verifier.verify_protected_core(root)
             for declaration in (
                 b'pub mod saker;\n', b'pub mod eagle_cruiser;\n', b'pub mod harpy_assault;\n', b'pub mod erne_corvette;\n', b'pub mod harpy_dropship;\n',
-                b'pub mod harpy_gunship;\n', b'pub mod lanner;\n', b'pub mod hyena;\n', b'pub mod yak;\n', b'pub mod jackal;\n', b'pub mod banteng;\n', b'pub mod caracal_scout;\n', b'pub mod hobby_fighter;\n', b'pub mod condor;\n', b'pub mod aplomado_interceptor;\n', b'pub mod falconet;\n', b'pub mod muskox;\n', b'pub mod barbary;\n', b'pub mod wombat;\n', b'pub mod saiga;\n', b'pub mod moose_clipper;\n', b'pub mod seriema_courier;\n', b'pub mod arna_cutter;\n', b'pub mod vulture_raider;\n',
+                b'pub mod harpy_gunship;\n', b'pub mod lanner;\n', b'pub mod hyena;\n', b'pub mod yak;\n', b'pub mod jackal;\n', b'pub mod banteng;\n', b'pub mod caracal_scout;\n', b'pub mod hobby_fighter;\n', b'pub mod condor;\n', b'pub mod aplomado_interceptor;\n', b'pub mod falconet;\n', b'pub mod muskox;\n', b'pub mod barbary;\n', b'pub mod wombat;\n', b'pub mod saiga;\n', b'pub mod moose_clipper;\n', b'pub mod seriema_courier;\n', b'pub mod arna_cutter;\n', b'pub mod vulture_raider;\n', b'pub mod medusa;\n',
             ):
                 source.write_bytes(original.replace(declaration, b'') + declaration)
                 with self.assertRaisesRegex(AssertionError, 'lib.rs'):
@@ -165,6 +165,7 @@ class MuleSourceVerification(unittest.TestCase):
             protected = verifier.protected_core_pins(root)
             current = verifier.undo_vulture_raider_publication(relative, (core / relative).read_bytes())
             current = verifier.undo_arna_cutter_publication(relative, current)
+            current = verifier.undo_medusa_stock_publication(relative, current)
             current = verifier.undo_flight_computer(relative, current,
                                                      verifier.fuel_storage_inverse(root, protected))
             current = verifier.undo_flight_computer(relative, current,

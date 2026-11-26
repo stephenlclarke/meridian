@@ -14,6 +14,8 @@ The [fuel storage source candidate](FUEL-STORAGE.md) implements four separately 
 
 ## Medusa Showroom inspection
 
+The empty stock reference exposes 40,712 kg in the Showroom. The MacBook Air replayed the original 14 finite distributions and passed all six source tests. The live preview and exact-head compiler validation remain pending for this addition. Flight, exchange and PLUGH fabrication remain unavailable.
+
 SH171 is available for catalogue inspection with the original detailed artwork and seven materials. The archived native mesh has 76,228 faces and stays outside the 512-face flight gate. The source-bound shield uses 729 local supports and keeps the crown opening clear in its own geometry. See the [Medusa inspection record](../integration/sh171-medusa/README.md) for the measured bounds and the remaining flight, player and PLUGH fabrication work.
 
 ## Station chart best-profit scan source candidate

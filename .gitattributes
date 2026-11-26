@@ -14,6 +14,9 @@ assets/fleet/sh171/source.vertices binary
 integration/sh171-medusa/*.json -text
 tools/prepare_medusa_inspection.py text eol=lf
 tools/verify_medusa_shield.py text eol=lf
+tools/prepare_medusa_stock.py text eol=lf
+crates/meridian-core/src/medusa.rs text eol=lf
+integration/sh171-medusa/LEGACY-FINITE-*.py.txt -text
 
 # Vulture Raider authoring and replay programs use exact LF bytes.
 tools/measure_vulture_raider.py text eol=lf
