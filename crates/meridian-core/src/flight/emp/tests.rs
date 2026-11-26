@@ -678,6 +678,7 @@ fn actual_secret_base_release_spends_once_drains_shield_and_preserves_hull_cargo
         modular: w.modular.clone(),
         xyzzy: w.xyzzy.clone(),
         emp: w.emp.clone(),
+        ecm: w.ecm.clone(),
         navigation_trade: w.navigation_trade.clone(),
         flight_reception: w.flight_reception.clone(),
         practice: w.practice,

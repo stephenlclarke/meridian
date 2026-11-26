@@ -66,10 +66,15 @@
     },
     "flight/emp/tests.rs": {
       "beforeSHA256": "e34a283b8bb06bb15ae093478afafd45980119e51e053d728a76485422def96e",
-      "afterSHA256": "246283c54ba953298e36bb5a9c108bb62ec5389d34f1ac06e732a6bbf6d1e3f9",
+      "afterSHA256": "f7e7972bf7e8ac2fedfa52245b154043e7ba21808d9d9e52306641b8d7924bc1",
       "hunks": [
         {
-          "offset": 40768,
+          "offset": 24919,
+          "before": "",
+          "after": "        ecm: w.ecm.clone(),\n"
+        },
+        {
+          "offset": 40796,
           "before": "",
           "after": "\n#[test]\nfn real_manual_ecm_cancels_an_unfinished_emp_without_a_discharge_and_cold_retains_field() {\n    let mut w = World::new_commander(12001).unwrap();\n    secret(&mut w);\n    let scoop = w.fitted_fuel_scoops().unwrap();\n    let tick = w.snapshot().tick;\n    let review = w\n        .review_module(crate::ModuleAction::Store { item: scoop.item }, tick)\n        .unwrap();\n    w.prepare_module(review, tick).unwrap().commit();\n    let review = w.review_xyzzy(XyzzyAction::FitEcm, tick).unwrap();\n    w.prepare_xyzzy(review, tick).unwrap().commit();\n    let (mut w, target) = defender(w);\n    start_charge(&mut w, target);\n    let tick = w.snapshot().tick;\n    let before = w.flight_resources_snapshot().unwrap();\n    let activation = w.request_ecm(tick).unwrap();\n    let after = w.flight_resources_snapshot().unwrap();\n    assert_eq!(after.energy_hundredths, before.energy_hundredths - 2200);\n    assert_eq!(\n        w.emp.charge.as_ref().unwrap().phase,\n        EmpChargePhase::Cancelled\n    );\n    assert_eq!(\n        w.emp.charge.as_ref().unwrap().ended_at,\n        Some(activation.physical_tick)\n    );\n    assert_eq!(w.emp.meter.bank_spent, 0);\n    assert!(w.emp.pulses.is_empty());\n    assert_eq!(w.request_emp_trigger(true, tick), Err(EmpError::Resources));\n    let mut loaded = cold(&w);\n    assert_eq!(loaded.ecm_snapshot(), w.ecm_snapshot());\n    loaded.emp.charge.as_mut().unwrap().phase = EmpChargePhase::Charging;\n    loaded.emp.charge.as_mut().unwrap().ended_at = None;\n    assert!(loaded.save_bytes().is_err());\n}\n"
         }
@@ -292,7 +297,7 @@
     },
     "flight/xyzzy.rs": {
       "beforeSHA256": "8415a0cc0e089914b528a7c9bb910fb5f2caccae3d109490f5e5aba7195c8140",
-      "afterSHA256": "7a793e726ce975c44b132b2caecbe36c36a92a037d42ac4a3049a6df8b0ec057",
+      "afterSHA256": "2e38da3c451205fa4e8efba0aac5fb4875d134da7485c2a93758c596198e0ea6",
       "hunks": [
         {
           "offset": 1063,
@@ -327,45 +332,45 @@
         {
           "offset": 4573,
           "before": "",
-          "after": "    }\n    pub(super) fn automatic_ecm(&self) -> bool {\n        self.active()\n            && self\n                .records\n                .iter()\n                .filter(|record| record.action == XyzzyAction::ToggleAutoEcm)\n                .count()\n                % 2\n                == 0\n"
+          "after": "    }\n    pub(super) fn automatic_ecm(&self) -> bool {\n        self.active()\n            && self\n                .records\n                .iter()\n                .filter(|record| record.action == XyzzyAction::ToggleAutoEcm)\n                .count()\n                .is_multiple_of(2)\n"
         },
         {
-          "offset": 6593,
+          "offset": 6587,
           "before": "",
           "after": "    }\n    pub(super) fn authorizes_ecm(&self, dock: DockContext, tick: u64, revision: u64) -> bool {\n        self.records.iter().any(|record| {\n            record.action == XyzzyAction::FitEcm\n                && record.dock == dock\n                && record.tick == tick\n                && revision > record.revision\n                && revision <= record.end_revision\n        })\n"
         },
         {
-          "offset": 13672,
+          "offset": 13666,
           "before": "            if r.action == XyzzyAction::FitFuelScoops {\n                commerce.modular.validate_scoop_test_record(\n",
           "after": "            if matches!(r.action, XyzzyAction::FitFuelScoops | XyzzyAction::FitEcm) {\n                commerce.modular.validate_utility_test_record(\n"
         },
         {
-          "offset": 13995,
+          "offset": 13989,
           "before": "",
           "after": "                    if r.action == XyzzyAction::FitEcm {\n                        super::ModuleKind::Ecm\n                    } else {\n                        super::ModuleKind::FuelScoops\n                    },\n"
         },
         {
-          "offset": 14225,
+          "offset": 14219,
           "before": "",
           "after": "            }\n            if r.action == XyzzyAction::ToggleAutoEcm && r.end_revision != r.revision {\n                return Err(INVALID);\n"
         },
         {
-          "offset": 19459,
+          "offset": 19453,
           "before": "",
           "after": "            automatic_ecm: self.xyzzy.automatic_ecm(),\n"
         },
         {
-          "offset": 20870,
+          "offset": 20864,
           "before": "        if action == XyzzyAction::FitFuelScoops\n            && self.fitted_fuel_scoops().is_none()\n",
           "after": "        if action == XyzzyAction::MaximumFuelStorage && self.fitted_ecm().is_some() {\n            // The existing four-tank exception reserves three other utility mounts;\n            // it does not grant permission for a fourth non-tank utility.\n            return Err(XyzzyError::UtilityFitConflict);\n        }\n        if action == XyzzyAction::FitEcm && !self.damage.enabled() {\n            return Err(XyzzyError::Save(SaveError::InvalidState(\n                \"ECM fitting requires resource birth provenance\",\n            )));\n        }\n        if ((action == XyzzyAction::FitFuelScoops && self.fitted_fuel_scoops().is_none())\n            || (action == XyzzyAction::FitEcm && self.fitted_ecm().is_none()))\n"
         },
         {
-          "offset": 28478,
+          "offset": 28472,
           "before": "        } else if review.action == XyzzyAction::FitFuelScoops {\n",
           "after": "        } else if matches!(\n            review.action,\n            XyzzyAction::FitFuelScoops | XyzzyAction::FitEcm\n        ) {\n"
         },
         {
-          "offset": 28701,
+          "offset": 28695,
           "before": "                super::modular::ModuleKind::FuelScoops,\n",
           "after": "                if review.action == XyzzyAction::FitEcm {\n                    super::ModuleKind::Ecm\n                } else {\n                    super::ModuleKind::FuelScoops\n                },\n"
         }

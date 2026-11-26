@@ -152,8 +152,7 @@ impl State {
                 .iter()
                 .filter(|record| record.action == XyzzyAction::ToggleAutoEcm)
                 .count()
-                % 2
-                == 0
+                .is_multiple_of(2)
     }
     pub(super) fn authorizes(&self, dock: DockContext, tick: u64, revision: u64) -> bool {
         self.records.iter().any(|r| {
