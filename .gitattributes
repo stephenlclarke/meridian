@@ -495,3 +495,8 @@ tools/verify_kestrel.py text eol=lf
 tools/measure_merlin.py text eol=lf
 tools/prepare_merlin.py text eol=lf
 tools/verify_merlin.py text eol=lf
+
+# Byte-pinned Hawk replay programs.
+tools/measure_hawk.py text eol=lf
+tools/prepare_hawk.py text eol=lf
+tools/verify_hawk.py text eol=lf
