@@ -18,6 +18,8 @@ Jump admission, countdown and arrival use actual owned fit; the existing reach, 
 
 The v17 record layout stays the same. The two low bits of the existing completed-leg grade byte remain the navigation-computer grade; the upper bits encode the drive grade, with Basic encoded as zero. Old Basic-only records are byte-identical. Unknown drive tags refuse. Older XYZZY saves retain their historical fit until an explicit new outfit, and the existing paid-base fixture is used unmodified. The earlier reader cannot accept new non-Basic records or new module tags; only forward Continue of existing v17 saves is intended here.
 
+The [exact drive inverse](../integration/sh001-mule/HYPERSPACE-DRIVE-INVERSE.json) reverses only the 12 deliberately changed historical protected files to the immutable pre-drive source. The existing Mule checker still verifies all 115 original protected files and every prior inverse; extra edits to an approved file or the new manifest are rejected.
+
 The existing explicit XYZZY maximum action now grants/refits the actual Advanced drive. It preserves a compatible held paid Advanced item, does not create paid history for a grant, never invents a paid Intermediate device and does not repeat a grant when already fitted. No other secret capability becomes available in this increment.
 
 Authored new tests: source offers, cash/technology refusal, earned Intermediate purchase and failed writer rollback, paid replacement/refit, real five-second and one-second travel, cold pending and completed Continue, fitted predecessor and duplicate refusal, exact grade mass-lock boundary and mismatched pending item, forged faster historical drive, secret grants and reuse of a previously paid Advanced drive, and the desktop projection. The Advanced paid test uses the genuine checked-in legacy XYZZY cash fixture, distinct from the normally earned Intermediate test. Native input and process restart still require an owned preview lane.
@@ -29,12 +31,12 @@ Authored new tests: source offers, cash/technology refusal, earned Intermediate 
 | Family and original grades | Acquisition and fit | Gameplay / Continue | XYZZY / remaining |
 | --- | --- | --- | --- |
 | Drive: Basic, Intermediate, Advanced | Born / paid / paid; this candidate | Actual timed travel and historical fit | Advanced; candidate |
-| Shield: Basic, Basic II (Pulse), Intermediate (Mining), Intermediate II (Beam), Advanced (Military), Advanced II (Capital), Elite | Basic born; four successive shop grades; Capital is Elite-rank reward, Elite acquisition-only by default | Open: capacity ratios 1/1.5/1.8/2/2.3/6.9/9.2, recharge 1x; widen banks, preserve fractions and replay damage | Elite; open; never substitute legacy booster ratios for these stock grades |
+| Shield: Basic, Basic II (Pulse), Intermediate (Mining), Intermediate II (Beam), Advanced (Military), Advanced II (Capital), Elite | Basic born; four successive shop grades; Capital is Elite-rank reward or paid PLUGH-only listing, Elite acquisition-only by default | Open: capacity ratios 1/1.5/1.8/2/2.3/6.9/9.2, recharge 1x; widen banks, preserve fractions and replay damage | Elite; open; never substitute legacy booster ratios for these stock grades |
 | Energy: Basic, Intermediate (Extra), Advanced (Naval), Elite | Born; three ordered shop grades | Ready: recharge 1/2/3/4x, capacity 1x; higher-grade shop TLs constrain admission | Elite grant; more playable stations needed to reach paid Naval TL17 |
 | Navigation: Basic, Intermediate (Advanced saved key), Advanced (Military saved key) | Born / two paid grades | Ready: 7/14/21 LY module reach with hull floor, actual fit and route history | Advanced; full original world/station scope remains |
 | Targeting: Basic, Advanced, Docking, Identification, Pirate, Military | Six paid grades and stored identities | Partial: docking and work/target controller exist; verify each tier's distinct source effect and native controls | Military; original automatic options remain open |
 | Mining and Salvage Targeting | Two independent paid modules require fitted core | Partial: rock hold, ore/wreck guidance; no positive complete salvage or ore intake | Both granted; custody and work closure open |
-| Lasers: Pulse, Beam, Mining, Military, Naval | Pulse born; four repeatable shop/held definitions except Naval acquisition-only | Partial: real front paths; other facings and dedicated native Mining utility open | Naval front; not all supported native facings |
+| Lasers: Pulse, Beam, Mining, Military, Naval | Pulse born; four repeatable ordinary shop/held definitions; Naval reward or paid PLUGH-only listing | Partial: real front paths; other facings and dedicated native Mining utility open | Naval front; not all supported native facings |
 | Ammunition: Standard Missile, Alien Seeker Missile | Standard paid and finite nine pylons on SH025; Alien Seeker requires recovered research then repeat procurement | Standard ready; alien round, salvage variants and compatible hull pylon count open | Finite standard refill only; no virtual infinite inventory |
 | Large Cargo Bay | Paid unique hull-bound expansion | Ready: actual SH025 92→127 t; full-hold removal refuses | Actual item granted; other hull expansion and unlimited cargo open |
 | Fuel Scoops | Paid unique fitted utility | Partial: real fit; original eligible physical intake source and collection not qualified | Actual fit and maximum grant; independent action and physical intake open |
@@ -75,6 +77,7 @@ Revision `a11fe16924d87d06021816f9037952afcbac08db`, tree `68fec574df12ddf74acb1
 | EquipmentMutations.swift | `a1d0bece73e7d6370f4cab8fc952d2e25a3d20dfceb89ce8fab189c4b65941d5` |
 | ScriptEquipmentProjection.swift | `a1c3ffad9881c7d02f5a6cd31e6a51015b5c7735f43781f54850197e9313dac1` |
 | Game.swift | `e5b4e30c835d460aa7ca6f77364db0aaeaf877bb9d73bacc162e9111b26e2e17` |
+| Plugh.swift | `2c43ae0738fa93375eb51a4859e11bc33e7bf9e7496ff432f140e813baa6b8b` |
 | EquipmentModuleTemplates.swift | `387f5623bc0a390864b29ca5f2662c52bd091c54b024f8761bf8b098610a566f` |
 | ShieldBooster.swift | `a7a91bc9d94a4f8e805192752a0ee69e2e9f5fb4117b48941dc68ad4bc2ec528` |
 | AlienModuleDefinition.swift | `e0f98ac9a2e792c8d7083f18398b5a9a14a083506754eebac6e3033aad4264e9` |
