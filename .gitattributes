@@ -584,3 +584,9 @@ tools/measure_secretarybird.py text eol=lf
 tools/prepare_secretarybird.py text eol=lf
 tools/rebuild_secretarybird.py text eol=lf
 tools/verify_secretarybird.py text eol=lf
+
+# Byte-pinned Camel Rescue replay programs.
+tools/measure_camel_rescue.py text eol=lf
+tools/prepare_camel_rescue.py text eol=lf
+tools/rebuild_camel_rescue.py text eol=lf
+tools/verify_camel_rescue.py text eol=lf

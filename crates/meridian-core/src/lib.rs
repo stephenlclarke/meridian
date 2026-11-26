@@ -16,6 +16,7 @@ pub mod baza_fighter;
 pub mod baza_mk_ii;
 pub mod boar_transport;
 pub mod buzzard_mk_ii;
+pub mod camel_rescue;
 pub mod carabao_freighter;
 pub mod carabao_highliner;
 pub mod caracal_scout;
