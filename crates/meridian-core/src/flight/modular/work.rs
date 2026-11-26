@@ -126,6 +126,61 @@ impl World {
         }
     }
 
+    /// A disabled ship can coast at its last velocity. Fly behind it, matching its
+    /// velocity so that it remains in front of the cutter at the working distance.
+    pub(in crate::flight) fn moving_work_course(
+        &self,
+        target: WorkTarget,
+        player: crate::docking::RigidPose,
+    ) -> Option<(Vec3, f64, f64)> {
+        let WorkTargetId::Wreck(id) = target.id else {
+            return None;
+        };
+        let ship = self.traffic_snapshot()?.actors.into_iter().find(|actor| {
+            actor.id == id
+                && actor.electrical_disabled
+                && actor.phase != NpcPhase::Destroyed
+                && actor.speed_units > 0.0
+        })?;
+        let separation = self.work_standoff(target)?;
+        let scale = f64::from(crate::flight::DISTANCE_PER_SPEED_UNIT);
+        let forward = ship.pose.orientation.z;
+        let speed = ship.speed_units * scale;
+        let error = difference(
+            difference(ship.pose.position, player.position),
+            Vec3::new(
+                forward.x * separation,
+                forward.y * separation,
+                forward.z * separation,
+            ),
+        );
+        let distance = error.dot(error).sqrt();
+        let acceleration = f64::from(crate::flight::ACCELERATION) * scale;
+        let gain = if distance > 0.0 {
+            (acceleration / distance).sqrt().min(0.75)
+        } else {
+            0.75
+        };
+        let velocity = Vec3::new(
+            forward.x * speed + error.x * gain,
+            forward.y * speed + error.y * gain,
+            forward.z * speed + error.z * gain,
+        );
+        let look_at = Vec3::new(
+            player.position.x + velocity.x,
+            player.position.y + velocity.y,
+            player.position.z + velocity.z,
+        );
+        let desired_speed = velocity.dot(velocity).sqrt() / scale;
+        let player_speed = f64::from(self.state.speed) * scale;
+        let relative = Vec3::new(
+            player.orientation.z.x * player_speed - forward.x * speed,
+            player.orientation.z.y * player_speed - forward.y * speed,
+            player.orientation.z.z * player_speed - forward.z * speed,
+        );
+        Some((look_at, desired_speed, relative.dot(relative).sqrt()))
+    }
+
     pub(in crate::flight) fn work_hold_input(
         &self,
         target: WorkTarget,
@@ -163,6 +218,16 @@ impl World {
         // Match the original intake speed gate as we enter the fragment envelope.
         let desired = if collecting && distance < 150.0 {
             desired.min(8.0 / units)
+        } else {
+            desired
+        };
+        let desired = if let Some((point, speed, _)) = self.moving_work_course(target, player) {
+            let direction = difference(point, player.position);
+            if direction.dot(player.orientation.z) >= direction.dot(direction).sqrt() * 0.98 {
+                speed
+            } else {
+                0.0
+            }
         } else {
             desired
         };

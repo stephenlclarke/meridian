@@ -456,8 +456,13 @@ impl World {
         let vector = offset(work.position, pose.position);
         let range = vector.dot(vector).sqrt();
         // Recheck the accepted pose and live target after both have moved this tick.
+        let at_work_speed = self
+            .moving_work_course(work, pose)
+            .map_or(self.state.speed <= 0.1, |(_, _, relative_speed)| {
+                relative_speed <= 1.0
+            });
         let holding = (range - standoff).abs() <= 0.5
-            && self.state.speed <= 0.1
+            && at_work_speed
             && vector.dot(pose.orientation.z) >= range * 0.999;
         self.targeting.work_status = Some(if !holding {
             "Approaching work target"
@@ -505,6 +510,10 @@ impl World {
                 // then turn back towards the target for cutting or mining.
                 aim = offset(player.position, delta);
             }
+        }
+        if let Some((point, _, _)) = work.and_then(|target| self.moving_work_course(target, player))
+        {
+            aim = point;
         }
         let [bearing, mut elevation] = target_bearing(player, aim);
         if collecting {
