@@ -41,10 +41,19 @@ LOCALIZATION_MODES = FIT_ONLY_MODES + (
 FIDELITY_MODES = FIT_ONLY_MODES + ((('--fidelity',), 'CANDIDATE-FIDELITY.json'),)
 CANDIDATE_MODES = FIDELITY_MODES + LOCALIZATION_MODES[1:]
 
-# These authored hulls publish different evidence from the historical fit and
-# original-difference pair. Require their full profile even if a criteria
-# command, receipt, or source binding is removed.
+COLLISION_MODES = MODES + ((('--collision',), 'COLLISION-FIT.json'),)
+COLLAR_MODES = MODES + ((('--collar-options',), 'COLLAR-OPTIONS.json'),)
+RING_MODES = MODES + ((('--ring-options',), 'RING-OPTIONS.json'),)
+
+# These hulls publish alternate or additional evidence alongside the historical
+# fit and original-difference convention. Require the full committed profile
+# even if a criteria command, receipt, or source binding is removed.
 AUTHORED_MODES = {
+    'sh055-condor': COLLISION_MODES,
+    'sh068-badger': COLLAR_MODES,
+    'sh074-dzo': COLLAR_MODES,
+    'sh075-dzo-mk-ii': COLLAR_MODES,
+    'sh078-oryx-voyager': RING_MODES,
     'sh086-alpaca': SHIELD_MODES,
     'sh087-elk': FIT_ONLY_MODES,
     'sh088-springbok-starliner': ARC_MODES,
@@ -303,6 +312,32 @@ class ReplayHarnessTests(unittest.TestCase):
                          [self.command, command.replace(difference.name, 'OTHER.json')]):
             with self.subTest(commands=commands):
                 result, launch = self.probe(commands=commands, authored_modes=modes)
+                self.assertEqual(len(result.failures), 1)
+                launch.assert_not_called()
+
+    def test_extended_legacy_profiles_require_the_pair_and_each_extra_receipt(self):
+        for profile in (COLLISION_MODES, COLLAR_MODES, RING_MODES):
+            with self.subTest(profile=profile):
+                commands = []
+                with patch.object(sys.modules[__name__], 'ROOT', self.root):
+                    for flags, name in profile:
+                        path = self.folder / name
+                        path.write_bytes(self.expected)
+                        self.criteria['replayPins'][path.relative_to(self.root).as_posix()] = (
+                            hashlib.sha256(self.expected).hexdigest())
+                        commands.append(receipt_command(self.folder, self.script, flags, name))
+                modes = {self.folder.name: profile}
+                result, launch = self.probe(commands=commands, authored_modes=modes)
+                self.assertTrue(result.wasSuccessful(), result.failures)
+                self.assertCountEqual([call.args[1] for call in launch.call_args_list],
+                                      [flags for flags, _ in profile])
+                for missing in range(len(commands)):
+                    incomplete = commands[:missing] + commands[missing + 1:]
+                    result, launch = self.probe(commands=incomplete, authored_modes=modes)
+                    self.assertEqual(len(result.failures), 1)
+                    launch.assert_not_called()
+                unknown = commands[-1].replace(profile[-1][0][0], '--unknown')
+                result, launch = self.probe(commands=[*commands, unknown], authored_modes=modes)
                 self.assertEqual(len(result.failures), 1)
                 launch.assert_not_called()
 

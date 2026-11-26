@@ -1,5 +1,11 @@
 # GitHub preview releases
 
+## Scanner Preview 11
+
+[Download Scanner Preview 11 for macOS arm64 or Windows x64](https://github.com/stephenlclarke/meridian/releases/tag/v0.11.0-preview.1). Published 26 November 2026 from protected main `ea72afdd2db452be73e4b60b7a197a56eab8c263`. All four public downloads passed verification. The Mac app is Developer ID signed, notarised and stapled. On Windows, extract the whole archive and open **Launch Meridian.cmd**. The unsigned executable requires the Microsoft Visual C++ x64 runtime. On the locked Dell it opened a Vulkan window and exited normally. Interactive Windows rendering remains unverified.
+
+Use **Tab** to select a scanner contact, **F** to switch assistance, **N** to start or cancel auto-docking and **T** to lock the selected ship for missiles. Press **H** for the controls available with your equipment. Medusa is available for inspection in the station Showroom in this release.
+
 ## Published Preview 10
 
 [Download Preview 10 for macOS arm64 or Windows x64](https://github.com/stephenlclarke/meridian/releases/tag/v0.10.0-preview.1). Released 19 November 2026 at 02:37 UTC from protected commit `201e9f9f1ecfd73a20ba27dcebc00f70ac3457fe`. All four public downloads passed verification. The macOS archive contains the original notarized app built at `f3cf5b8` and a corrected guide alongside it. The unsigned Windows executable was built at `993035e` and requires the Microsoft Visual C++ x64 runtime.
