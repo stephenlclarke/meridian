@@ -109,8 +109,12 @@ impl State {
         let receipt = &mut self.contacts[0];
         // Keep the other validation envelope satisfied; the mutation must
         // fail precisely because it disagrees with measured motion.
-        let pose = super::flight_pose(receipt.position, receipt.orientation).unwrap();
-        let body = receipt.scene.target(receipt.contact.target).unwrap();
+        let Some(pose) = super::flight_pose(receipt.position, receipt.orientation) else {
+            panic!("the recorded cutter contact requires a valid ship pose");
+        };
+        let Some(body) = receipt.scene.target(receipt.contact.target) else {
+            panic!("the recorded encounter must contain the selected ship");
+        };
         assert!(working_hold(pose, receipt.speed, body.pose, speed, radius));
         assert_ne!(receipt.target_speed, speed);
         receipt.target_speed = speed;
