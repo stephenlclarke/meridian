@@ -572,3 +572,9 @@ tools/measure_wolf_cutter.py text eol=lf
 tools/prepare_wolf_cutter.py text eol=lf
 tools/rebuild_wolf_cutter.py text eol=lf
 tools/verify_wolf_cutter.py text eol=lf
+
+# Byte-pinned Lammergeier replay programs.
+tools/measure_lammergeier.py text eol=lf
+tools/prepare_lammergeier.py text eol=lf
+tools/rebuild_lammergeier.py text eol=lf
+tools/verify_lammergeier.py text eol=lf
