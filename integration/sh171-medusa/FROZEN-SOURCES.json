@@ -1,0 +1,54 @@
+{
+  "revision": "a11fe16924d87d06021816f9037952afcbac08db",
+  "tree": "68fec574df12ddf74acb14747e0dd6839f478642",
+  "paths": {
+    "resource.toml": {
+      "path": "Sources/L337Core/Resources/Ships/SH171.toml",
+      "blob": "5166d2c6f53db85d36c30c1693851340b60efc7a",
+      "bytes": 22221124,
+      "sha256": "701c1512262e64bd11b2d9ef57c7fa573cc246aa2b13015543e9792ae23d6525"
+    },
+    "native-export.json": {
+      "path": "Sources/L337Core/Resources/OriginalFleetShowroomModels/SH171.json",
+      "blob": "75be88ef29b461e899f79b886311241b97a0c1e3",
+      "bytes": 6845725,
+      "sha256": "fca6afbaba0fd4f1f3b41dd0fc587c80d06724ab84440cdff1b6620b89431f8c"
+    },
+    "engineering.json": {
+      "path": "Sources/L337Core/Resources/OriginalFleetPhysical/SH171.json",
+      "blob": "485ddacc385c0cdf02651175fc7624fb00b16a65",
+      "bytes": 431492,
+      "sha256": "3a251b2433d907425bf0ad1d2cff150095195b185669a8addfb6fa7443f7ac38"
+    },
+    "contract.toml": {
+      "path": "docs/fleet-design-v2/ships/SH171.toml",
+      "blob": "f9d5756894aaf572fe5c74e9b4da6fd6457cf18b",
+      "bytes": 5397,
+      "sha256": "f1e1365586a3723bed5a87f1041d086ab7a7dd3c4ce9d665c6fedce1b39eb48f"
+    },
+    "original-ownership.json": {
+      "path": "docs/milestones/fleet-physical/distinct-creator-ownership-records/SH171.json",
+      "blob": "a0a9b60b6bebb9c97e8055d6dbfe51f1fc53e8ef",
+      "bytes": 649334,
+      "sha256": "0fab4ca06ec2a1224287086de2cb7be86e52e5ae60e366de78da3d2dc031f9cc"
+    },
+    "finite-proposal.md": {
+      "path": "docs/milestones/fleet-physical/medusa-finite-proposal/README.md",
+      "blob": "3ab53bc0d100453db996218c96dc565cc31387ab",
+      "bytes": 3324,
+      "sha256": "102496071e5ce179d4b29c3a09db3c2bfe86c4e5c5a9e1a45d61a83c73d2bf23"
+    },
+    "MEDUSA-FLAGSHIP.json": {
+      "path": "docs/fleet-design-v2/references/salvage/MEDUSA-FLAGSHIP.json",
+      "blob": "76b09acb48801e7c5724a838e082423a8d4e6114",
+      "bytes": 6892,
+      "sha256": "0e2e6639721f77392cdc5566a0df3b9eb41b038d61564d7753b7f64d760b8771"
+    },
+    "LICENSE": {
+      "path": "LICENSE",
+      "blob": "b27f022cea044295412849dec93512dad638f08e",
+      "bytes": 1071,
+      "sha256": "033b7058d73f22c3c6b8a5825eb866ca2d67088f3ee94dd5f3e46da59d624766"
+    }
+  }
+}

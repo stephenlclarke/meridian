@@ -12,6 +12,10 @@ The [seven shield grades](SHIELD-GRADES.md) use the source-defined bank capaciti
 
 The [fuel storage source candidate](FUEL-STORAGE.md) implements four separately owned and paid physical units, up to three fitted normally on SH025, actual tank capacity and paid refuel, refusal to store occupied capacity, and an explicit four-tank XYZZY exception with current freight and trade custody guards. Gameplay replay, account/route persistence and native acceptance require owned validation.
 
+## Medusa Showroom inspection
+
+SH171 is available for catalogue inspection with the original detailed artwork and seven materials. The archived native mesh has 76,228 faces and stays outside the 512-face flight gate. The source-bound shield uses 729 local supports and keeps the crown opening clear in its own geometry. See the [Medusa inspection record](../integration/sh171-medusa/README.md) for the measured bounds and the remaining flight, player and PLUGH fabrication work.
+
 ## Station chart best-profit scan source candidate
 
 The station Galaxy chart now offers a read-only P toggle for up to five positive, directly reachable trade estimates, with an explicit empty state. The scan uses current in-game stocks and quotes, unreserved cargo, wallet, fitted jump range and fuel. It adapts `Sources/EliteCore/ProfitScan.swift` from immutable Elite source `34790e313c0d6cf8be84fe74aaf8f2f228cd3b3f` to the admitted Meridian markets; unsupported markets and speculative multi-leg refuelling do not count. The toggle is session-local and local flight P remains pause. Authored core and desktop regressions cover finite trade bounds, reserved cargo, range/fuel exclusions, stable ranking, read-only saves and the chart input path. Compiler, CI and native qualification are pending.
