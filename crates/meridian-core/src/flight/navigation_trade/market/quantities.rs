@@ -151,13 +151,16 @@ mod tests {
         }
         let saved = bulk.save_bytes().unwrap();
         assert_eq!(saved, singles.save_bytes().unwrap());
+        // Cold decoding rebinds the session review epoch for either trade path.
+        let continued = World::from_save_bytes(&saved).unwrap();
+        let control = World::from_save_bytes(&singles.save_bytes().unwrap()).unwrap();
         assert_eq!(
-            World::from_save_bytes(&saved)
-                .unwrap()
-                .save_bytes()
-                .unwrap(),
-            saved
+            continued.save_bytes().unwrap(),
+            control.save_bytes().unwrap()
         );
+        assert_eq!(continued.commodity_quantity(CommodityId::Food), Some(6));
+        assert_eq!(continued.credits_tenths(), bulk.credits_tenths());
+        assert_eq!(continued.service_snapshot(), bulk.service_snapshot());
     }
 
     #[test]
