@@ -1688,7 +1688,14 @@ mod tests {
         drop(profile);
         let mut cold = open(&directory.0);
         ok(cold.continue_saved());
-        assert_eq!(ok(cold.world.save_bytes()), saved);
+        // Continue uses the same cold session review rebind as direct decoding.
+        let decoded = ok(World::from_save_bytes(&saved));
+        assert_eq!(ok(cold.world.save_bytes()), ok(decoded.save_bytes()));
+        assert_eq!(cold.world.commodity_quantity(CommodityId::Food), Some(11));
+        assert_eq!(
+            ok(std::fs::read(directory.0.join("commander.meridian"))),
+            saved
+        );
     }
 
     #[test]
