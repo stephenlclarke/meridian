@@ -883,8 +883,7 @@ impl World {
         validate_accounting(
             domain,
             services,
-            nav.jumps,
-            nav.fuel_spent,
+            nav,
             self.combat.penalties(),
             intakes.len() as u64,
             (
@@ -942,8 +941,7 @@ fn read_practice(
 fn validate_accounting(
     d: SavedDomainSummary,
     s: SavedServiceSummary,
-    jumps: u64,
-    fuel_spent: u64,
+    nav: crate::navigation::SavedNavigationSummary,
     penalties: u8,
     intake_revisions: u64,
     equipment_and_passage: (u32, u64, u32),
@@ -969,8 +967,8 @@ fn validate_accounting(
     let paid = u128::from(s.paid) + u128::from(d.equipment_paid) + u128::from(ammunition_paid);
     if income < paid
         || income - paid != u128::from(d.credits)
-        || fuel < u128::from(fuel_spent)
-        || fuel - u128::from(fuel_spent) != u128::from(d.fuel)
+        || fuel < u128::from(nav.fuel_spent)
+        || fuel - u128::from(nav.fuel_spent) != u128::from(d.fuel)
         || u64::from(d.food) != s.food
         || d.other_commodities != s.other_commodities
         || !combat::legal_reachable(d.legal, s.possible_legal_bits, penalties)
@@ -981,7 +979,7 @@ fn validate_accounting(
                 + u128::from(solar.1)
                 + u128::from(intake_revisions)
                 + u128::from(s.revision)
-                + u128::from(jumps)
+                + u128::from(nav.jumps)
                 + u128::from(d.equipment_revision)
                 + u128::from(d.consumed_missiles)
                 + u128::from(

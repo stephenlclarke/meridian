@@ -1043,16 +1043,16 @@ impl State {
                     PassengerAction::Receive => super::AccountEffect::Reward(PASSAGE_REWARD_TENTHS),
                     PassengerAction::Cancel => super::AccountEffect::Debit(0),
                 }
-            } else if matches!(e.action, ModuleAction::FlightSalvageExchange { .. }) {
-                super::AccountEffect::Debit(0)
-            } else if self.history.tracks_revision(e.revision)
+            } else if matches!(
+                e.action,
+                ModuleAction::FlightSalvageExchange { .. }
+                    | ModuleAction::FlightLaserExchange { .. }
+            ) || (self.history.tracks_revision(e.revision)
                 && matches!(
                     e.action,
                     ModuleAction::Store { .. } | ModuleAction::Install { .. }
-                )
+                ))
             {
-                super::AccountEffect::Debit(0)
-            } else if matches!(e.action, ModuleAction::FlightLaserExchange { .. }) {
                 super::AccountEffect::Debit(0)
             } else {
                 continue;
