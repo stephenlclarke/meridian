@@ -578,3 +578,9 @@ tools/measure_lammergeier.py text eol=lf
 tools/prepare_lammergeier.py text eol=lf
 tools/rebuild_lammergeier.py text eol=lf
 tools/verify_lammergeier.py text eol=lf
+
+# Byte-pinned Secretarybird replay programs.
+tools/measure_secretarybird.py text eol=lf
+tools/prepare_secretarybird.py text eol=lf
+tools/rebuild_secretarybird.py text eol=lf
+tools/verify_secretarybird.py text eol=lf
