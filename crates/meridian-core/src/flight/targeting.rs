@@ -275,7 +275,7 @@ impl World {
 
     fn scanner_candidates(&self, origin: CombatIdentity) -> Vec<Candidate> {
         let mut contacts = self.targeting_candidates(origin, true);
-        for work in self.available_work_contacts() {
+        for work in self.available_work_contacts(false) {
             if matches!(work.id, WorkTargetId::Wreck(id) if contacts.iter().any(|c| c.identity() == TargetIdentity::Ship(id)))
             {
                 continue;
@@ -381,6 +381,20 @@ impl World {
         is_work && self.automatic_work_target(candidate).is_none()
     }
 
+    fn mark_released_fragment(&mut self) {
+        let Some(TargetIdentity::Work(WorkTargetId::Asteroid(id))) = self.targeting.selected else {
+            return;
+        };
+        if self
+            .mining
+            .body(usize::from(id.ordinal()))
+            .is_some_and(|rock| rock.id == id && rock.remaining_energy <= 0.0)
+            && let Some(fragment) = self.mining_collection_target(id)
+        {
+            self.targeting.selected = Some(TargetIdentity::Work(WorkTargetId::Ore(fragment.id)));
+        }
+    }
+
     pub fn toggle_scanner_assistance(&mut self) -> Result<bool, StepError> {
         if self.is_paused() {
             return Err(StepError::Paused);
@@ -388,6 +402,9 @@ impl World {
         self.targeting_origin().ok_or(StepError::InvalidMode)?;
         self.targeting.manual = !(self.targeting.manual || self.targeting.pilot_override);
         self.targeting.pilot_override = false;
+        if self.targeting.manual {
+            self.mark_released_fragment();
+        }
         self.auto_docking = None;
         self.targeting.work_status = None;
         self.targeting.wreck_avoidance = None;
@@ -501,6 +518,7 @@ impl World {
 
     pub(super) fn take_manual_control(&mut self) {
         if self.targeting.scanner && self.targeting.selected.is_some() {
+            self.mark_released_fragment();
             self.targeting.pilot_override = true;
             self.targeting.work_status = None;
             self.targeting.wreck_avoidance = None;
@@ -545,6 +563,17 @@ impl World {
         }
         let fitted = self.targeting_tier();
         if self.targeting.scanner {
+            if let TargetIdentity::Work(WorkTargetId::Asteroid(id)) = selected {
+                // Only a previously acquired automated mining job can follow ore after
+                // its parent disappears. A fresh scanner pass lists the fragment itself.
+                let retain_source =
+                    !self.manual_scanner_target() && self.work_targeting_fit().mining;
+                return self
+                    .available_work_contacts(retain_source)
+                    .into_iter()
+                    .find(|work| work.id == WorkTargetId::Asteroid(id))
+                    .map(|work| (fitted, Candidate::Work(work)));
+            }
             return self
                 .scanner_candidates(origin)
                 .into_iter()

@@ -33,7 +33,7 @@ impl World {
         if !fit.mining && !fit.salvage {
             return Vec::new();
         }
-        self.available_work_contacts()
+        self.available_work_contacts(true)
             .into_iter()
             .filter(|work| match work.id {
                 WorkTargetId::Wreck(_) => fit.salvage,
@@ -42,7 +42,10 @@ impl World {
             .collect()
     }
 
-    pub(in crate::flight) fn available_work_contacts(&self) -> Vec<WorkTarget> {
+    pub(in crate::flight) fn available_work_contacts(
+        &self,
+        include_released_sources: bool,
+    ) -> Vec<WorkTarget> {
         if self.state.mode != crate::FlightMode::Flight
             || self.emp.electrical_disabled()
             || self
@@ -70,7 +73,8 @@ impl World {
                     .into_iter()
                     .filter(|body| {
                         (body.remaining_energy > 0.0 && body.remaining_units > 0)
-                            || pending.iter().any(|ore| ore.id.asteroid() == body.id)
+                            || include_released_sources
+                                && pending.iter().any(|ore| ore.id.asteroid() == body.id)
                     })
                     .map(|body| WorkTarget {
                         id: WorkTargetId::Asteroid(body.id),
