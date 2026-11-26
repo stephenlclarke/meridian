@@ -2,6 +2,20 @@
 
 The development save store explicitly unlocks on close. Dell Linux reproduced the cold-reopen failure during concurrent process startup and verified the fix while retaining exclusive access for a live owner.
 
+## Ordinary hyperspace drive source candidate
+
+The station Equipment screen exposes the born Basic drive and the two original paid upgrades. Their actual countdowns are 10, 5 and 1 second, and the existing station mass-lock thresholds are 600, 480 and 360. Purchases, refitting, saved pending jumps, historical completed legs and the explicit XYZZY top-grade grant use the same owned equipment ledger. The [equipment implementation and testing ledger](EQUIPMENT-PLAYABLE.md) reconciles remaining original grades and Medusa design constraints. Authored source and regression coverage await the owning compiler, whole-slice review, CI and native preview.
+
+## Stock shield source candidate
+
+The [seven shield grades](SHIELD-GRADES.md) use the source-defined bank capacities from 300 to 2,760 and unchanged recharge. Four successive shop grades are payable through the existing account; Advanced II retains its unavailable Elite-rank and PLUGH-only acquisition paths, and Elite remains acquisition-only with explicit maximum test access. A separate XYZZY grade selector exercises each real fit without cash, fuel or unrelated equipment changes. The wider bank codec, historical fit/damage replay, actual incoming hit, HUD and paid/refit/Continue regressions await owned execution; no native preview claim follows from authored source.
+
+The [fuel storage source candidate](FUEL-STORAGE.md) implements four separately owned and paid physical units, up to three fitted normally on SH025, actual tank capacity and paid refuel, refusal to store occupied capacity, and an explicit four-tank XYZZY exception with current freight and trade custody guards. Gameplay replay, account/route persistence and native acceptance require owned validation.
+
+## Medusa Showroom inspection
+
+SH171 is available for catalogue inspection with the original detailed artwork and seven materials. The archived native mesh has 76,228 faces and stays outside the 512-face flight gate. The source-bound shield uses 729 local supports and keeps the crown opening clear in its own geometry. See the [Medusa inspection record](../integration/sh171-medusa/README.md) for the measured bounds and the remaining flight, player and PLUGH fabrication work.
+
 ## Station chart best-profit scan source candidate
 
 The station Galaxy chart now offers a read-only P toggle for up to five positive, directly reachable trade estimates, with an explicit empty state. The scan uses current in-game stocks and quotes, unreserved cargo, wallet, fitted jump range and fuel. It adapts `Sources/EliteCore/ProfitScan.swift` from immutable Elite source `34790e313c0d6cf8be84fe74aaf8f2f228cd3b3f` to the admitted Meridian markets; unsupported markets and speculative multi-leg refuelling do not count. The toggle is session-local and local flight P remains pause. Authored core and desktop regressions cover finite trade bounds, reserved cargo, range/fuel exclusions, stable ranking, read-only saves and the chart input path. Compiler, CI and native qualification are pending.
@@ -105,6 +119,34 @@ Condor retains its original 4,504-face detailed and 244-face native metre meshes
 ## Aplomado Interceptor catalogue source
 
 Aplomado Interceptor retains the original 2,340-face detailed and 120-face native metre meshes. Signed Studio evidence covers offline artwork. Independent source replay verifies 23 local groups, seven guarded routes, and five joints in both source meshes. [Aplomado Interceptor source and evidence](APLOMADO-INTERCEPTOR-SOURCE.md)
+
+## Falconet catalogue source
+
+Falconet retains the original 3,108-face detailed and 184-face native metre meshes. Signed Studio evidence covers offline artwork. Independent source replay verifies 25 local groups, seven guarded routes and seven joints in both source meshes. [Falconet source and evidence](FALCONET-SOURCE.md)
+
+## Muskox catalogue source
+
+Muskox retains the original 4,224-face detailed and 244-face native metre meshes. Signed Studio evidence covers offline artwork. Independent source replay verifies 25 local groups, six joints and seven guarded routes, including four narrow bay clearances of 143–144 mm. [Muskox source and evidence](MUSKOX-SOURCE.md)
+
+## Barbary catalogue source
+
+Barbary retains the original 3,852-face detailed and 192-face native metre meshes. Signed Studio evidence covers offline artwork. Independent source replay verifies 22 local groups, eight joints and seven guarded routes. [Barbary source and evidence](BARBARY-SOURCE.md)
+
+## Wombat catalogue source
+
+Wombat retains the original 3,544-face detailed and 1,024-face native meshes with exact relative calibration. A separately identified 496-face inspection candidate retains all seven exact guarded routes, including five through the rectangular frame and centre slit. Signed Studio evidence covers offline artwork. [Wombat source and evidence](WOMBAT-SOURCE.md)
+
+## Saiga catalogue source
+
+Saiga retains its original 5,776-face detailed and 1,720-face native meshes with the archived 20 m/unit calibration. Its separate 512-face appearance candidate preserves both collar holes. The bundled collision verifier retains all seven guarded routes using overlapping collar sectors. [Saiga source and evidence](SAIGA-SOURCE.md)
+
+## Moose Clipper catalogue source
+
+Moose Clipper retains the original 3,468-face detailed and 192-face native metre meshes. Signed Studio evidence covers offline artwork. Independent source replay verifies 24 local supports, six joints and seven guarded routes, including the detailed/native stand-off witness. [Moose Clipper source and evidence](MOOSE-CLIPPER-SOURCE.md)
+
+## Seriema Courier catalogue source
+
+Seriema Courier retains its 1,656-face detailed and 608-face native visible meshes. The separately archived 512-face collision source has seven numerically verified guarded routes. The recorded creator run produced 464 faces. [Seriema Courier source and evidence](SERIEMA-COURIER-SOURCE.md)
 
 ## Goshawk Mk II Custom candidate
 

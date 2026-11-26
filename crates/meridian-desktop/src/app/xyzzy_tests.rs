@@ -157,6 +157,140 @@ fn actual_secret_menu_publishes_clarke_real_outfit_and_visible_provenance_then_c
 }
 
 #[test]
+fn disposable_preview_selects_each_stock_shield_without_replacing_maximum_other_equipment() {
+    use meridian_core::ShieldGrade;
+    let directory = TestDirectory::new();
+    let mut app = app(&directory);
+    activate(&mut app);
+    let cash = app.game.world.credits_tenths();
+    let fuel = app.game.world.snapshot().navigation;
+    let ammo = app.game.world.ammunition_snapshot();
+    let other_modules = |world: &World| {
+        world
+            .modular_equipment_snapshot()
+            .unwrap_or_else(|| panic!("modules"))
+            .items
+            .into_iter()
+            .filter(|item| item.kind.slot() != meridian_core::ModuleSlot::Shield)
+            .collect::<Vec<_>>()
+    };
+    let original = other_modules(&app.game.world);
+    menu(&mut app);
+    press(&mut app, KeyCode::ArrowUp);
+    press(&mut app, KeyCode::ArrowUp);
+    for grade in ShieldGrade::ALL {
+        assert_eq!(
+            app.xyzzy.as_ref().map(crate::xyzzy::Menu::action),
+            Some(XyzzyAction::FitShield(grade))
+        );
+        press(&mut app, KeyCode::Enter);
+        // A reviewing row cannot change the grade until cancellation or publication.
+        press(&mut app, KeyCode::ArrowRight);
+        assert_eq!(
+            app.xyzzy.as_ref().map(crate::xyzzy::Menu::action),
+            Some(XyzzyAction::FitShield(grade))
+        );
+        press(&mut app, KeyCode::Enter);
+        let player = app
+            .game
+            .world
+            .combat_snapshot()
+            .unwrap_or_else(|| panic!("combat"))
+            .player;
+        assert_eq!(
+            (
+                player.shield_grade,
+                player.front_shield_hundredths,
+                player.rear_shield_hundredths
+            ),
+            (grade, grade.capacity(), grade.capacity())
+        );
+        assert_eq!(app.game.world.credits_tenths(), cash);
+        assert_eq!(app.game.world.snapshot().navigation, fuel);
+        assert_eq!(app.game.world.ammunition_snapshot(), ammo);
+        assert_eq!(other_modules(&app.game.world), original);
+        let saved = ok(fs::read(directory.0.join("commander.meridian")));
+        assert_eq!(
+            ok(World::from_save_bytes(&saved)).combat_snapshot(),
+            app.game.world.combat_snapshot()
+        );
+        press(&mut app, KeyCode::ArrowRight);
+    }
+    press(&mut app, KeyCode::ArrowDown); // pass the explicit four-tank test row
+    press(&mut app, KeyCode::ArrowDown); // wrap to ordinary activation / maximum
+    press(&mut app, KeyCode::Enter);
+    press(&mut app, KeyCode::Enter);
+    assert_eq!(
+        app.game
+            .world
+            .combat_snapshot()
+            .unwrap_or_else(|| panic!("combat"))
+            .player
+            .shield_grade,
+        ShieldGrade::Elite
+    );
+}
+
+#[test]
+fn actual_max_tank_row_is_explicit_and_publishes_four_distinct_items_to_disk() {
+    let directory = TestDirectory::new();
+    let mut app = app(&directory);
+    menu(&mut app);
+    press(&mut app, KeyCode::ArrowUp);
+    assert_eq!(
+        app.xyzzy.as_ref().map(crate::xyzzy::Menu::action),
+        Some(XyzzyAction::MaximumFuelStorage)
+    );
+    let panel = app
+        .xyzzy
+        .as_ref()
+        .unwrap_or_else(|| panic!("menu"))
+        .panel(&app.game.world, None);
+    assert!(panel.lines.iter().any(|line| line.contains("TEST MAX")));
+    press(&mut app, KeyCode::Enter);
+    assert_eq!(
+        app.game
+            .world
+            .snapshot()
+            .navigation
+            .map(|n| n.fuel_capacity_units),
+        Some(130)
+    );
+    press(&mut app, KeyCode::Enter);
+    let fuel = app
+        .game
+        .world
+        .snapshot()
+        .navigation
+        .unwrap_or_else(|| panic!("fuel"));
+    assert_eq!((fuel.fuel_units, fuel.fuel_capacity_units), (410, 410));
+    let snapshot = app
+        .game
+        .world
+        .modular_equipment_snapshot()
+        .unwrap_or_else(|| panic!("equipment"));
+    let tanks = snapshot
+        .items
+        .iter()
+        .filter(|item| item.kind == ModuleKind::FuelStorage)
+        .collect::<Vec<_>>();
+    assert_eq!(tanks.len(), 4);
+    assert!(tanks.iter().all(
+        |item| item.slot.is_some() && matches!(item.provenance, ModuleProvenance::XYZzy { .. })
+    ));
+    let bytes = ok(fs::read(directory.0.join("commander.meridian")));
+    let cold = ok(World::from_save_bytes(&bytes));
+    assert_eq!(cold.snapshot().navigation, Some(fuel));
+    assert_eq!(cold.modular_equipment_snapshot(), Some(snapshot));
+    press(&mut app, KeyCode::Enter);
+    press(&mut app, KeyCode::Enter);
+    assert_eq!(
+        app.game.world.modular_equipment_snapshot(),
+        cold.modular_equipment_snapshot()
+    );
+}
+
+#[test]
 fn failed_actual_profile_publication_retains_world_saved_bytes_and_secret_review() {
     let directory = TestDirectory::new();
     let mut app = app(&directory);
@@ -226,7 +360,7 @@ fn activate_refit_and_toggle_fuel_without_leaving_the_menu() {
     assert!(app.xyzzy.as_ref().is_some_and(|menu| !menu.reviewing));
     let items = app.game.world.ammunition_snapshot();
     let modules = app.game.world.modular_equipment_snapshot();
-    for steps in [1, 1, 2] {
+    for steps in [1, 1, 4] {
         for _ in 0..steps {
             press(&mut app, KeyCode::ArrowDown);
         }
@@ -237,7 +371,9 @@ fn activate_refit_and_toggle_fuel_without_leaving_the_menu() {
         assert_eq!(app.game.world.modular_equipment_snapshot(), modules);
     }
     assert!(app.xyzzy.as_ref().is_some_and(|menu| !menu.reviewing));
-    // Up wraps from activation to the fourth action, fuel mode.
+    // Up wraps through explicit tank and shield testing rows to the fuel action.
+    press(&mut app, KeyCode::ArrowUp);
+    press(&mut app, KeyCode::ArrowUp);
     press(&mut app, KeyCode::ArrowUp);
     press(&mut app, KeyCode::Enter);
     press(&mut app, KeyCode::ArrowDown);

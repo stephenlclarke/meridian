@@ -4,6 +4,7 @@
 
 pub mod aplomado_interceptor;
 pub mod banteng;
+pub mod barbary;
 pub mod caracal_scout;
 pub mod celestial;
 pub mod condor;
@@ -11,6 +12,7 @@ pub mod docking;
 pub mod eagle_cruiser;
 pub mod equipment;
 pub mod erne_corvette;
+pub mod falconet;
 mod flight;
 pub mod freight;
 pub mod goshawk;
@@ -23,18 +25,24 @@ pub mod hyena;
 pub mod jackal;
 pub mod lanner;
 pub mod mining;
+pub mod moose_clipper;
 pub mod mule;
+pub mod muskox;
 pub mod navigation;
+pub mod saiga;
 pub mod saker;
 pub mod save;
+pub mod seriema_courier;
 pub mod station;
 pub mod station_services;
 pub mod traffic;
+pub mod wombat;
 pub mod yak;
 
 pub use flight::GoshawkCustomApproachSnapshot;
 pub use flight::PreparedNavigationRoute;
 pub use flight::ProfitDestination;
+pub use flight::ShieldGrade;
 pub use flight::{GoshawkApproachSnapshot, GoshawkApproachStatus};
 pub use flight::{PreparedXyzzy, XyzzyAction, XyzzyError, XyzzyReview, XyzzySnapshot};
 

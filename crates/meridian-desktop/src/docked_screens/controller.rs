@@ -679,6 +679,10 @@ impl DockedScreens {
             Key::Confirm => self.commerce(!self.sell, c),
             Key::Buy => self.commerce(true, c),
             Key::Sell => self.commerce(false, c),
+            Key::Refuel => match super::market_refuel_admission(c.world) {
+                Ok(()) => Outcome::Request(Request::RefuelMarket),
+                Err(reason) => Outcome::Refused(reason.into()),
+            },
             _ => Outcome::Ignored,
         }
     }

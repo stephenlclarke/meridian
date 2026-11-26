@@ -4,11 +4,19 @@ In the development build, closing a profile releases its save lock immediately s
 
 Preview 10 opens on Commander Details. Press H or ? for the current screen’s controls and station navigation. Its docked exterior and flight HUD leave the view above the instruments clear at rest. [Download Preview 10 for macOS arm64 or Windows x64](https://github.com/stephenlclarke/meridian/releases/tag/v0.10.0-preview.1) · [Preview guide](docs/PREVIEW-RELEASES.md)
 
+The ordinary-drive development candidate adds the Basic, Intermediate and Advanced hyperspace drive slot to Equipment. Paid upgrades change the actual jump countdown and station mass lock; explicit XYZZY maximum fitting uses the Advanced drive. The [equipment implementation and testing ledger](docs/EQUIPMENT-PLAYABLE.md) records all catalogue grades, remaining gameplay paths and Medusa compatibility constraints. This candidate is not part of Preview 10 and awaits owned validation.
+
+The stock-shield development candidate adds seven independently testable shield grades, an actual finite bank capacity for each grade, four ordinary paid upgrades and a dedicated XYZZY test selector. It preserves the original maximum outfit and the distinct unresolved Elite-rank and PLUGH-only acquisition paths. [Shield source, fitting and test controls](docs/SHIELD-GRADES.md). Owned validation is pending.
+
+The [fuel storage development candidate](docs/FUEL-STORAGE.md) adds four separately owned repeatable units, actual paid refuelling and capacity changes. SH025 has three shared normal utility mounts; the explicitly labelled four-tank test maximum uses a guarded exception. Owned validation is pending.
+
 ## Goshawk Explorer in the Ship Showroom
 
 In Preview 10, press 3 at a station and search for Goshawk Explorer. Compare shows the Peregrine Mk V beside the Goshawk for a new commander. Press C for a single-ship view. Mac testing verified the original dark green hull, silver cross-member, open wishbone and refusal of an unavailable exchange. Preview 9 predates this ship. [Goshawk geometry and Showroom controls](docs/GOSHAWK-GAMEPLAY-ENVELOPE.md)
 
 The development source also provides a separate Goshawk Mk II Custom Showroom and collision candidate. Its original detailed appearance, four lower mounts and SH028 fit evidence are in the [SH010 hull guide](docs/GOSHAWK-MK-II-CUSTOM.md). Owned native validation is pending.
+
+Medusa (SH171) can be inspected in the station Showroom. The source package preserves both original meshes and the inspection shield. [Medusa inspection and flight limits](integration/sh171-medusa/README.md)
 
 ## Internal Mule docking validation
 
@@ -137,6 +145,13 @@ The workspace pins Rust and dependencies in [rust-toolchain.toml](rust-toolchain
 - [Hobby Fighter source envelope and Hull Studio definition](docs/HOBBY-FIGHTER-SOURCE.md)
 - [Condor source envelope and Hull Studio definition](docs/CONDOR-SOURCE.md)
 - [Aplomado Interceptor source envelope and Hull Studio definition](docs/APLOMADO-INTERCEPTOR-SOURCE.md)
+- [Falconet source envelope and Hull Studio definition](docs/FALCONET-SOURCE.md)
+- [Muskox source envelope and Hull Studio definition](docs/MUSKOX-SOURCE.md)
+- [Barbary source envelope and Hull Studio definition](docs/BARBARY-SOURCE.md)
+- [Wombat source envelope and Hull Studio definition](docs/WOMBAT-SOURCE.md)
+- [Saiga source envelope and Hull Studio definition](docs/SAIGA-SOURCE.md)
+- [Moose Clipper source envelope and Hull Studio definition](docs/MOOSE-CLIPPER-SOURCE.md)
+- [Seriema Courier source envelope and Hull Studio definition](docs/SERIEMA-COURIER-SOURCE.md)
 - [Stag Liner source envelope and Hull Studio definition](docs/STAG-LINER-GAMEPLAY-ENVELOPE.md)
 - [Architecture](docs/ARCHITECTURE.md) and [core API](crates/meridian-core/README.md)
 - [First playable criteria](docs/FIRST-PLAYABLE.md) and [source-grounded roadmap](docs/LEGACY-MILESTONES.md)
