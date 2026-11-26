@@ -1,3 +1,8 @@
+# Tamaraw source preparation and replay use exact LF bytes.
+tools/measure_tamaraw.py text eol=lf
+tools/prepare_tamaraw.py text eol=lf
+tools/verify_tamaraw.py text eol=lf
+
 # Hog source preparation and replay use exact LF bytes.
 tools/measure_hog.py text eol=lf
 tools/prepare_hog.py text eol=lf
