@@ -1,0 +1,12 @@
+{
+  "schema": 1,
+  "id": "sh143-aardvark-miner",
+  "undoBefore": [
+    "sh142-buzzard-mk-ii"
+  ],
+  "undoAfter": [],
+  "kind": "declaration",
+  "module": "aardvark_miner",
+  "before": "#![forbid(unsafe_code)]\n\n",
+  "after": "pub mod alpaca;\n"
+}

@@ -2,6 +2,7 @@
 
 #![forbid(unsafe_code)]
 
+pub mod aardvark_miner;
 pub mod alpaca;
 pub mod anoa;
 pub mod antelope;
