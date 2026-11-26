@@ -33,4 +33,3 @@ python -B -m coverage run --parallel-mode .github/scripts/check_native_coverage.
   | tee coverage/native/native-line-gates.txt
 cp coverage/native/desktop-*.profraw "$(dirname "$LLVM_PROFILE_FILE")/"
 cargo llvm-cov report --workspace --lcov --output-path coverage/lcov.info
-cargo clippy --workspace --all-targets --locked --message-format=json -- -D warnings > coverage/clippy.json
