@@ -251,6 +251,7 @@ impl Renderer {
             + mesh::PRACTICE_VERTEX_COUNT
             + mesh::MISSILE_VERTEX_COUNT
             + asteroid_render::VERTEX_COUNT
+            + asteroid_render::ORE_VERTEX_COUNT
             + asteroid_render::BEAM_VERTEX_COUNT
             + mesh::traffic::vertex_capacity(ship.len())
                 .ok_or("Traffic vertex capacity overflow")?;
