@@ -1,3 +1,8 @@
+# Carabao Freighter source preparation and replay use exact LF bytes.
+tools/measure_carabao_freighter.py text eol=lf
+tools/prepare_carabao_freighter.py text eol=lf
+tools/verify_carabao_freighter.py text eol=lf
+
 # Oryx Voyager source preparation and replay use exact LF bytes.
 tools/measure_oryx_voyager.py text eol=lf
 tools/prepare_oryx_voyager.py text eol=lf
