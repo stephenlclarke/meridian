@@ -2,6 +2,7 @@ mod audio;
 mod emp;
 mod mule_presentation;
 mod mule_validation;
+mod occupied_cut;
 mod target_computer;
 use std::{
     collections::{HashSet, hash_map::RandomState},
@@ -75,7 +76,7 @@ fn step_frame(
         {
             *pulse = None;
             *mining = None;
-        } else if fire_held {
+        } else if fire_held && occupied_cut::ready_target(world).is_none() {
             if let Ok(tool) = world.mining_tool_authority() {
                 if let Ok(shot) = world.request_mining(tool, state.tick) {
                     *mining = Some(asteroid_render::MiningVisual {
@@ -155,6 +156,7 @@ struct App {
     keys: HashSet<KeyCode>,
     paused: bool,
     help: Option<crate::help::Panel>,
+    occupied_cut: Option<meridian_core::OccupiedCutReview>,
     xyzzy: Option<crate::xyzzy::Menu>,
     focused: bool,
     docked: Option<Docked>,
@@ -220,6 +222,7 @@ impl App {
             keys: HashSet::new(),
             paused: internal,
             help: None,
+            occupied_cut: None,
             xyzzy: None,
             focused: true,
             docked: None,
@@ -297,7 +300,7 @@ impl App {
     }
 
     fn modal_open(&self) -> bool {
-        self.help.is_some() || self.xyzzy.is_some()
+        self.help.is_some() || self.xyzzy.is_some() || self.occupied_cut.is_some()
     }
 
     fn request_redraw(&self) {
@@ -458,6 +461,11 @@ impl App {
     }
 
     fn reset_input(&mut self) {
+        if (!self.focused || self.occluded)
+            && self.cancel_occupied_cut("Occupied contact cancelled on focus loss")
+        {
+            return;
+        }
         self.clear_held_input();
         if player_destroyed(&self.game.world) {
             // Terminal state is evidence. Focus, occlusion, menus and pause keys
@@ -979,6 +987,9 @@ impl App {
     }
 
     fn advance_frame(&mut self, active: bool, ticks: usize) -> FrameAdvance {
+        if self.close_stale_occupied_cut() || (active && self.maybe_open_occupied_cut()) {
+            return FrameAdvance::Continue(None);
+        }
         let result = if active && !self.modal_open() && self.game.is_internal_validation() {
             self.pulse = None;
             self.mining = None;
@@ -1074,12 +1085,15 @@ impl App {
         }
         if state == ElementState::Released {
             self.keys.remove(&code);
-            if code == KeyCode::KeyU {
+            if code == KeyCode::KeyU && self.occupied_cut.is_none() {
                 self.cancel_emp_input();
             }
             return None;
         }
         if !self.focused || self.occluded {
+            return None;
+        }
+        if self.route_occupied_cut(code, repeat) {
             return None;
         }
         if self.route_audio_toggle(code, repeat) {
@@ -1416,11 +1430,13 @@ impl App {
             .xyzzy
             .as_ref()
             .map(|menu| menu.panel(&self.game.world, self.notice.text.as_deref()));
+        let occupied_panel = self.occupied_cut_panel();
         let title = self.frame_title(active, snapshot.mode);
         let terminal_visible = self.terminal_cockpit_visible();
         let retry_inactive = (terminal_visible && !self.occluded)
             || self.help.is_some()
             || self.xyzzy.is_some()
+            || occupied_panel.is_some()
             || docked_frame
                 .as_ref()
                 .is_some_and(|frame| frame.screen.is_none());
@@ -1471,7 +1487,10 @@ impl App {
                 HudScene {
                     lines: &hud_lines,
                     cockpit: cockpit.as_ref(),
-                    help: self.help.as_ref().or(xyzzy_panel.as_ref()),
+                    help: occupied_panel
+                        .as_ref()
+                        .or(self.help.as_ref())
+                        .or(xyzzy_panel.as_ref()),
                 },
             );
             if let (Some(started), Some(timing)) = (draw_started, &mut self.validation_timing) {

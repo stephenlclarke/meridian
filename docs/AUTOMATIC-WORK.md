@@ -10,6 +10,14 @@ The core and the separate matching targeting module must be fitted. Mining needs
 
 The original rock lock remains through depletion and its resulting ore acquisition. No second Tab, extra Z press or caller-supplied cargo award is part of that operation. Automatic intake must use the real released ore and scoop aperture. The intended local aperture is (0, -45, 55), the manual centre distance is strictly below 85 units and automatic relative speed must not exceed 15 units. These are acceptance constraints, not observations from a running build.
 
+## Occupied cutter contact
+
+When an actual disabled occupied ship reaches the accepted work hold and World exposes the current confirmation authority, a distinct warning opens for that exact target. This applies to both Ships/All selection and the Salvage filter. It does not open for ordinary healthy tracking or lawful external wreck recovery.
+
+The modal stops accepted simulation ticks and clears held flight inputs. It shows the original target identity, occupied/claimed warning, attributed contact and the absence of verified detachable material. This does not grant permission from the crew. Enter confirms one reviewed contact through the normal atomic commander writer. Escape, target loss or loss of focus cancels the review and releases the original selection. A refused write or completed contact also releases the selection. A new warning needs a new deliberate selection; neither held Enter nor the next simulation tick repeats the contact.
+
+The host consumes ordinary steering, fire, EMP, route, pause, help, Save and Quit inputs while the warning is open. The validated receipt is separate from any cargo or ship acquisition. An unlawful contact is explicitly described as such; no reward, people, intact cargo or hull entitlement is inferred. The authored native acceptance must verify the actual warning, frozen tick and unchanged pre-confirmation receipt, Escape with no new receipt, stale/focus cancellation, explicit saved confirmation, failed-write rollback, cold continuation and no repeat. These observations remain unrun.
+
 ## Earned public acceptance: mining
 
 Use a fresh isolated standard commander. Do not use XYZZY, injected balances, generated test cargo, a private state setter or prepositioned ships. The existing finite public market sequence funds the normal equipment purchase:
