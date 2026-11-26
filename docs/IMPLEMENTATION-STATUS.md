@@ -264,6 +264,10 @@ Springbok Starliner preserves 2,672 detailed and 912 native original faces. A se
 
 Antelope preserves 2,672 detailed and 912 native original faces. A separate 504-face inspection candidate retains both caps, the open bow gap, and 14 measured original overlaps. [Antelope source and evidence](ANTELOPE-SOURCE.md)
 
+## Gopher catalogue source
+
+Gopher preserves its original 4,696 detailed and 212 native faces. Both meshes retain the roll frame, the bore assembly and nine measured joints. Four inspection routes pass through the frame openings. [Gopher source and evidence](GOPHER-SOURCE.md)
+
 ## Goshawk Mk II Custom candidate
 
 SH010 has its own original detailed preview, authenticated engineering record and 73 rounded collision supports. Independent source projection checks cover its open forward channel, both original station fit controls and a strict SH028 lip-contact witness. The Rust controlled World, core fit, shader and minimum Showroom regressions are authored and await the owned platform runs. No additional ordinary ship placement, acquisition or native acceptance follows from this source update. [SH010 geometry and acceptance criteria](GOSHAWK-MK-II-CUSTOM.md)

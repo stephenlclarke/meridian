@@ -1,0 +1,137 @@
+{
+  "nominalPaddingMetres": 0.02,
+  "minimumRefinementTargetsMillimetres": {
+    "detailed": 3000,
+    "native": 3950
+  },
+  "fullUpperMillimetres": {
+    "detailed": 2952,
+    "native": 2221
+  },
+  "pieces": {
+    "pressure-hull": {
+      "detailed": 862,
+      "native": 1324
+    },
+    "roll-frame-span-1": {
+      "detailed": 2952,
+      "native": 1293
+    },
+    "roll-frame-span-2": {
+      "detailed": 2602,
+      "native": 1526
+    },
+    "roll-frame-span-3": {
+      "detailed": 2619,
+      "native": 1293
+    },
+    "roll-frame-span-4": {
+      "detailed": 2952,
+      "native": 1293
+    },
+    "roll-frame-span-5": {
+      "detailed": 2952,
+      "native": 1293
+    },
+    "roll-frame-span-6": {
+      "detailed": 2602,
+      "native": 1526
+    },
+    "roll-frame-span-7": {
+      "detailed": 2602,
+      "native": 1526
+    },
+    "roll-frame-span-8": {
+      "detailed": 2951,
+      "native": 1293
+    },
+    "bore-shaft": {
+      "detailed": 1416,
+      "native": 1416
+    },
+    "bore-head": {
+      "detailed": 2221,
+      "native": 2221
+    },
+    "port-frame-stay": {
+      "detailed": 1008,
+      "native": 1008
+    },
+    "port-nozzle": {
+      "detailed": 2027,
+      "native": 2027
+    },
+    "starboard-frame-stay": {
+      "detailed": 1008,
+      "native": 1008
+    },
+    "starboard-nozzle": {
+      "detailed": 2027,
+      "native": 2027
+    },
+    "canopy": {
+      "detailed": 369,
+      "native": 986
+    },
+    "canopy-ridge": {
+      "detailed": 339,
+      "native": 1838
+    },
+    "port-service-pipe": {
+      "detailed": 260,
+      "native": 2048
+    },
+    "port-instrument-housing": {
+      "detailed": 668,
+      "native": 1799
+    },
+    "port-louvre-1": {
+      "detailed": 243,
+      "native": 405
+    },
+    "port-louvre-2": {
+      "detailed": 243,
+      "native": 433
+    },
+    "port-louvre-3": {
+      "detailed": 243,
+      "native": 509
+    },
+    "port-louvre-4": {
+      "detailed": 243,
+      "native": 584
+    },
+    "port-louvre-5": {
+      "detailed": 243,
+      "native": 659
+    },
+    "starboard-service-pipe": {
+      "detailed": 260,
+      "native": 2214
+    },
+    "starboard-instrument-housing": {
+      "detailed": 668,
+      "native": 1821
+    },
+    "starboard-louvre-1": {
+      "detailed": 243,
+      "native": 358
+    },
+    "starboard-louvre-2": {
+      "detailed": 243,
+      "native": 433
+    },
+    "starboard-louvre-3": {
+      "detailed": 243,
+      "native": 509
+    },
+    "starboard-louvre-4": {
+      "detailed": 243,
+      "native": 584
+    },
+    "starboard-louvre-5": {
+      "detailed": 243,
+      "native": 659
+    }
+  }
+}
