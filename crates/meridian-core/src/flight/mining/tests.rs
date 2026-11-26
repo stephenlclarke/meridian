@@ -121,7 +121,10 @@ fn paid_scoops_take_one_physical_fragment_once_and_sell_it_after_cold_continue()
         let horizontal =
             (ore.position.x - player.position.x).hypot(ore.position.z - player.position.z);
         let speed = world.snapshot().speed;
-        if horizontal < 65.0 && speed == 0.0 {
+        // The source never stops moving. Waiting for both exact zero ship speed and a
+        // moving projected standoff can chase it forever while it climbs beyond the aperture.
+        // Brake as soon as the real player is inside the standoff at a low closing speed.
+        if horizontal < 70.0 && speed <= 0.7 {
             break;
         }
         let desired = ((2.0 * 9.1 * (horizontal - 58.0).max(0.0) / 18.0).sqrt() as f32).min(30.0);
@@ -132,7 +135,22 @@ fn paid_scoops_take_one_physical_fragment_once_and_sell_it_after_cold_continue()
         assert_eq!(world.snapshot().motion_refusal, None);
     }
     stop(&mut world);
+    let ore = some(world.mining_collection_target(shot.contact.asteroid));
+    let player = some(flight_pose(
+        world.snapshot().position,
+        world.snapshot().orientation,
+    ));
+    let delta = crate::docking::Vec3::new(
+        ore.position.x - player.position.x,
+        ore.position.y - player.position.y,
+        ore.position.z - player.position.z,
+    );
+    assert!(
+        delta.dot(delta).sqrt() < 85.0,
+        "public approach failed to enter aperture range: player={player:?} ore={ore:?} delta={delta:?}"
+    );
     let mut collected = false;
+    let mut pitch_ticks = 0;
     for _ in 0..100 {
         let tick = world.snapshot().tick;
         match world.request_collect_mined_ore(tick) {
@@ -147,10 +165,13 @@ fn paid_scoops_take_one_physical_fragment_once_and_sell_it_after_cold_continue()
             pitch: 1.0,
             ..FlightInput::default()
         }));
+        pitch_ticks += 1;
     }
     assert!(
         collected,
-        "physical controls never reached the lower-forward fragment"
+        "physical controls never reached the lower-forward fragment: final player={:?} ore={:?}",
+        flight_pose(world.snapshot().position, world.snapshot().orientation),
+        world.mining_collection_target(shot.contact.asteroid)
     );
     assert_eq!(world.credits_tenths(), cash);
     assert_eq!(world.commodity_quantity(shot.commodity), Some(1));
@@ -166,19 +187,11 @@ fn paid_scoops_take_one_physical_fragment_once_and_sell_it_after_cold_continue()
     assert_eq!(ok(loaded.save_bytes()), before);
     // Route away from the empty source with public controls before a normal station sale.
     // Returning the pitch to horizontal avoids a vertical drift on the dock helper.
-    let current = some(flight_pose(
-        loaded.snapshot().position,
-        loaded.snapshot().orientation,
-    ));
-    let pitch = current.orientation.z.y.asin();
-    let ticks = (pitch.abs() / (0.7 / 60.0)).ceil() as u16;
-    if ticks != 0 {
-        for _ in 0..ticks {
-            ok(loaded.step(FlightInput {
-                pitch: -(pitch / (0.7 / 60.0) / f64::from(ticks)) as f32,
-                ..FlightInput::default()
-            }));
-        }
+    for _ in 0..pitch_ticks {
+        ok(loaded.step(FlightInput {
+            pitch: -1.0,
+            ..FlightInput::default()
+        }));
     }
     fly_axis(&mut loaded, 0, 0.0, 10.0);
     dock(&mut loaded);
