@@ -125,23 +125,31 @@ impl State {
     pub(super) fn prepare_departure(
         &self,
         owner: CombatIdentity,
-        fitted: bool,
-        destination: SystemId,
-        tick: u64,
-        clock: u64,
-        spool: u32,
+        start: Option<crate::navigation::EcmJumpStart>,
     ) -> Result<Self, SaveError> {
         let mut next = self.clone();
-        if fitted {
-            let before = self
-                .activations
-                .last()
-                .filter(|a| a.owner == owner && a.world_tick == tick && a.physical_tick == clock)
-                .map(|a| a.sequence);
-            next.local
-                .begin_departure(owner, destination, tick, clock, spool, before)?;
+        if let Some(start) = start {
+            next.local.begin_departure(
+                owner,
+                start.destination,
+                start.tick,
+                start.clock,
+                start.spool,
+                start.before_activation,
+            )?;
         }
         Ok(next)
+    }
+    pub(super) fn preceding_activation(
+        &self,
+        owner: CombatIdentity,
+        tick: u64,
+        clock: u64,
+    ) -> Option<u16> {
+        self.activations
+            .last()
+            .filter(|a| a.owner == owner && a.world_tick == tick && a.physical_tick == clock)
+            .map(|a| a.sequence)
     }
     pub(super) fn prepare_step(
         &self,
@@ -305,8 +313,9 @@ impl World {
         &self,
         candidate: &State,
         navigation: Option<super::NavigationState>,
+        journal_growth: usize,
     ) -> Result<(), SaveError> {
-        if *candidate == self.ecm {
+        if *candidate == self.ecm && journal_growth == 0 {
             return Ok(());
         }
         let navigation_size = |navigation: Option<super::NavigationState>| {
@@ -322,6 +331,7 @@ impl World {
             .and_then(|n| n.checked_add(candidate.encoded_len()))
             .and_then(|n| n.checked_sub(navigation_size(self.navigation)))
             .and_then(|n| n.checked_add(navigation_size(navigation)))
+            .and_then(|n| n.checked_add(journal_growth))
             .ok_or(SaveError::TooLarge)?;
         if size > crate::save::MAX_SAVE_BYTES {
             return Err(SaveError::TooLarge);

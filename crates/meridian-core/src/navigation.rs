@@ -5,7 +5,9 @@ mod persistence;
 mod route;
 use core::fmt;
 pub use journal::NavigationGrade;
-pub(crate) use journal::{CompletedJump, JumpJournal, JumpTiming, NavigationFitChange};
+pub(crate) use journal::{
+    CompletedJump, EcmJumpStart, JumpJournal, JumpTiming, NavigationFitChange,
+};
 pub(crate) use persistence::SavedNavigationSummary;
 pub use route::{
     ROUTE_SYSTEMS, RouteAlternative, RouteError, RoutePlan, RoutePreference, RouteProgress,

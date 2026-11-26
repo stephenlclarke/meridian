@@ -3,7 +3,7 @@
   "files": {
     "flight.rs": {
       "beforeSHA256": "bbd2e1876d1c689c0f3381916fc0cfd8bd91de04f992414899d58a1399be7ff1",
-      "afterSHA256": "96db8e8ae02b26db761e52b428d0a31d93b3278f3ada5da16f4d0fd7aed93489",
+      "afterSHA256": "c95aebe87d3313fb1ab9a0d9d29c1561929d3b5f5759c3675a45d6b3be52c00c",
       "hunks": [
         {
           "offset": 219,
@@ -23,40 +23,40 @@
         {
           "offset": 16262,
           "before": "",
-          "after": "        let ecm = self\n            .ecm\n            .prepare_departure(\n                self.combat_identity().ok_or(NavigationError::WrongMode)?,\n                ledger.fitted(ModuleSlot::UtilityEcm).is_some(),\n                target,\n                self.state.tick,\n                self.combat.physical_tick(),\n                drive.1.spool_ticks(),\n            )\n            .map_err(|_| NavigationError::SequenceExhausted)?;\n        self.check_ecm_command_capacity(&ecm, Some(navigation))\n            .map_err(|_| NavigationError::SequenceExhausted)?;\n"
+          "after": "        let owner = self.combat_identity().ok_or(NavigationError::WrongMode)?;\n        let tick = self.state.tick;\n        let clock = self.combat.physical_tick();\n        let ecm_start = ledger.fitted(ModuleSlot::UtilityEcm).is_some().then(|| {\n            crate::navigation::EcmJumpStart {\n                source: owner.system,\n                destination: target,\n                visit: owner.visit,\n                tick,\n                clock,\n                spool: drive.1.spool_ticks(),\n                before_activation: self.ecm.preceding_activation(owner, tick, clock),\n            }\n        });\n        let journal_growth = if ecm_start.is_some() {\n            self.jump_journal\n                .ecm_start_growth()\n                .ok_or(NavigationError::SequenceExhausted)?\n        } else {\n            0\n        };\n        let ecm = self\n            .ecm\n            .prepare_departure(owner, ecm_start)\n            .map_err(|_| NavigationError::SequenceExhausted)?;\n        self.check_ecm_command_capacity(&ecm, Some(navigation), journal_growth)\n            .map_err(|_| NavigationError::SequenceExhausted)?;\n        if let Some(start) = ecm_start {\n            self.jump_journal.append_ecm_start(start);\n        }\n"
         },
         {
-          "offset": 16863,
+          "offset": 17535,
           "before": "",
           "after": "        self.ecm = ecm;\n"
         },
         {
-          "offset": 21198,
+          "offset": 21870,
           "before": "",
-          "after": "        let ecm = self\n            .ecm\n            .prepare_launch(self, navigation)\n            .map_err(|_| StepError::TickOverflow)?;\n        self.check_ecm_command_capacity(&ecm, navigation)\n            .map_err(|_| StepError::TickOverflow)?;\n"
+          "after": "        let ecm = self\n            .ecm\n            .prepare_launch(self, navigation)\n            .map_err(|_| StepError::TickOverflow)?;\n        self.check_ecm_command_capacity(&ecm, navigation, 0)\n            .map_err(|_| StepError::TickOverflow)?;\n"
         },
         {
-          "offset": 21631,
+          "offset": 22306,
           "before": "",
           "after": "        self.ecm = ecm;\n"
         },
         {
-          "offset": 34322,
+          "offset": 34997,
           "before": "        let damage =\n            self.damage\n                .step(self.state.mode, next.mode, prepared.combat.physical_tick())?;\n",
           "after": "        let cancelled_ecm_jump = entry\n            && self\n                .navigation\n                .is_some_and(|n| n.snapshot(0).travel.is_some())\n            && self.fitted_ecm().is_some();\n        let ecm_launch_admitted = self.state.mode == FlightMode::Launching\n            && next.mode == FlightMode::Flight\n            && self.fitted_ecm().is_some();\n        let damage = self.damage.step(\n            self.state.mode,\n            next.mode,\n            prepared.combat.physical_tick(),\n            cancelled_ecm_jump,\n            ecm_launch_admitted,\n        )?;\n"
         },
         {
-          "offset": 36715,
+          "offset": 37390,
           "before": "",
           "after": "        let ecm = self\n            .ecm\n            .prepare_step(\n                self,\n                next,\n                navigation,\n                prepared.combat.physical_tick(),\n                motion,\n            )\n            .map_err(|_| StepError::TickOverflow)?;\n"
         },
         {
-          "offset": 37342,
+          "offset": 38017,
           "before": "            (&damage, &mining, &emp.state),\n",
           "after": "            (&damage, &mining, &emp.state, &ecm),\n"
         },
         {
-          "offset": 38594,
+          "offset": 39269,
           "before": "",
           "after": "        self.ecm = ecm;\n"
         }
@@ -561,15 +561,15 @@
     },
     "navigation.rs": {
       "beforeSHA256": "11745ab22969f49368642386fa9ad2707c0a8506504ec98e503dc12434d2f2ed",
-      "afterSHA256": "53f013558686f096613b18aa1db236247525febda2075b8d1d9329a968562361",
+      "afterSHA256": "779554fcb85b68374e2034b24281b471242b42096610cb0e7357e06f62eb514d",
       "hunks": [
         {
           "offset": 266,
           "before": "pub(crate) use journal::{CompletedJump, JumpJournal, NavigationFitChange};\n",
-          "after": "pub(crate) use journal::{CompletedJump, JumpJournal, JumpTiming, NavigationFitChange};\n"
+          "after": "pub(crate) use journal::{\n    CompletedJump, EcmJumpStart, JumpJournal, JumpTiming, NavigationFitChange,\n};\n"
         },
         {
-          "offset": 16083,
+          "offset": 16104,
           "before": "",
           "after": "    }\n    pub(crate) fn pending_timing(\n        self,\n        tick: u64,\n        clock: u64,\n        drive: DriveGrade,\n    ) -> Result<Option<JumpTiming>, crate::save::SaveError> {\n        let Some(pending) = self.pending else {\n            return Ok(None);\n        };\n        let invalid = crate::save::SaveError::InvalidState(\"pending jump timing\");\n        let remaining = u64::from(pending.remaining_ticks);\n        let duration = u64::from(drive.spool_ticks());\n        if remaining == 0 || remaining > duration {\n            return Err(invalid);\n        }\n        let arrival_tick = tick.checked_add(remaining).ok_or(invalid)?;\n        let arrival_clock = clock.checked_add(remaining).ok_or(invalid)?;\n        Ok(Some(JumpTiming {\n            source: pending.source,\n            destination: pending.destination,\n            visit: pending.source_visit,\n            departure_tick: arrival_tick.checked_sub(duration).ok_or(invalid)?,\n            departure_clock: arrival_clock.checked_sub(duration).ok_or(invalid)?,\n            arrival_tick,\n            arrival_clock,\n            spool: drive.spool_ticks(),\n        }))\n"
         }
@@ -577,17 +577,67 @@
     },
     "navigation/journal.rs": {
       "beforeSHA256": "4f060d7555500a9ebfee92f6c0e329a0bc7d8f01a8689fcd3efae7611de138bb",
-      "afterSHA256": "e5baae4f1f4257a18f683646065810a74beeec242366f48662129a722fea9a10",
+      "afterSHA256": "3cdba7e822cfff8483865eb751e39ad91adb3806d6cfcd34ac11ec1ba43cc5a0",
       "hunks": [
         {
           "offset": 2801,
           "before": "",
-          "after": "#[derive(Debug, Clone, Copy, PartialEq, Eq)]\npub(crate) struct JumpTiming {\n    pub(crate) source: SystemId,\n    pub(crate) destination: SystemId,\n    pub(crate) visit: u64,\n    pub(crate) departure_tick: u64,\n    pub(crate) departure_clock: u64,\n    pub(crate) arrival_tick: u64,\n    pub(crate) arrival_clock: u64,\n    pub(crate) spool: u32,\n}\n"
+          "after": "#[derive(Debug, Clone, Copy, PartialEq, Eq)]\npub(crate) struct JumpTiming {\n    pub(crate) source: SystemId,\n    pub(crate) destination: SystemId,\n    pub(crate) visit: u64,\n    pub(crate) departure_tick: u64,\n    pub(crate) departure_clock: u64,\n    pub(crate) arrival_tick: u64,\n    pub(crate) arrival_clock: u64,\n    pub(crate) spool: u32,\n}\n/// Navigation seals this at its actual accepted command, independently of\n/// the local ECM visit history. It remains even when a physical berth cancels\n/// the spool, so a later receipt cannot move the original departure clock.\n#[derive(Debug, Clone, Copy, PartialEq, Eq)]\npub(crate) struct EcmJumpStart {\n    pub(crate) source: SystemId,\n    pub(crate) destination: SystemId,\n    pub(crate) visit: u64,\n    pub(crate) tick: u64,\n    pub(crate) clock: u64,\n    pub(crate) spool: u32,\n    pub(crate) before_activation: Option<u16>,\n}\nimpl EcmJumpStart {\n    const ENCODED_SIZE: usize = 36;\n    fn encode(self, w: &mut Writer) {\n        write_system(w, self.source);\n        write_system(w, self.destination);\n        w.u64(self.visit);\n        w.u64(self.tick);\n        w.u64(self.clock);\n        w.u32(self.spool);\n        w.u16(self.before_activation.unwrap_or(0));\n    }\n    fn decode(r: &mut Reader<'_>) -> Result<Self, SaveError> {\n        Ok(Self {\n            source: read_system(r)?,\n            destination: read_system(r)?,\n            visit: r.u64()?,\n            tick: r.u64()?,\n            clock: r.u64()?,\n            spool: r.u32()?,\n            before_activation: match r.u16()? {\n                0 => None,\n                n => Some(n),\n            },\n        })\n    }\n    fn matches(self, timing: JumpTiming) -> bool {\n        self.source == timing.source\n            && self.destination == timing.destination\n            && self.visit == timing.visit\n            && self.tick == timing.departure_tick\n            && self.clock == timing.departure_clock\n            && self.spool == timing.spool\n    }\n}\n"
         },
         {
-          "offset": 5210,
+          "offset": 6559,
           "before": "",
-          "after": "    }\n    pub(crate) fn completed_timing(&self, visit: u64) -> Result<Option<JumpTiming>, SaveError> {\n        let Some(leg) = self.legs.iter().find(|leg| leg.source_visit == visit) else {\n            return Ok(None);\n        };\n        let spool = leg.drive.spool_ticks();\n        Ok(Some(JumpTiming {\n            source: leg.source,\n            destination: leg.destination,\n            visit,\n            departure_tick: leg\n                .arrival_tick\n                .checked_sub(u64::from(spool))\n                .ok_or(INVALID)?,\n            departure_clock: leg\n                .physical_tick\n                .checked_sub(u64::from(spool))\n                .ok_or(INVALID)?,\n            arrival_tick: leg.arrival_tick,\n            arrival_clock: leg.physical_tick,\n            spool,\n        }))\n"
+          "after": "    ecm_starts: Vec<EcmJumpStart>,\n"
+        },
+        {
+          "offset": 6689,
+          "before": "",
+          "after": "    const MAX_ECM_STARTS: usize = MAX_SAVE_BYTES / EcmJumpStart::ENCODED_SIZE;\n    const ECM_START_FLAG: u16 = 1 << 15;\n"
+        },
+        {
+          "offset": 6994,
+          "before": "",
+          "after": "    pub(crate) fn ecm_starts(&self) -> impl Iterator<Item = EcmJumpStart> + '_ {\n        self.ecm_starts.iter().copied()\n    }\n    pub(crate) fn ecm_start_growth(&self) -> Option<usize> {\n        (self.ecm_starts.len() < Self::MAX_ECM_STARTS)\n            .then_some(EcmJumpStart::ENCODED_SIZE + if self.ecm_starts.is_empty() { 2 } else { 0 })\n    }\n    pub(crate) fn append_ecm_start(&mut self, start: EcmJumpStart) {\n        self.ecm_starts.push(start);\n    }\n    pub(crate) fn completed_timing(&self, visit: u64) -> Result<Option<JumpTiming>, SaveError> {\n        let Some(leg) = self.legs.iter().find(|leg| leg.source_visit == visit) else {\n            return Ok(None);\n        };\n        let spool = leg.drive.spool_ticks();\n        Ok(Some(JumpTiming {\n            source: leg.source,\n            destination: leg.destination,\n            visit,\n            departure_tick: leg\n                .arrival_tick\n                .checked_sub(u64::from(spool))\n                .ok_or(INVALID)?,\n            departure_clock: leg\n                .physical_tick\n                .checked_sub(u64::from(spool))\n                .ok_or(INVALID)?,\n            arrival_tick: leg.arrival_tick,\n            arrival_clock: leg.physical_tick,\n            spool,\n        }))\n    }\n"
+        },
+        {
+          "offset": 8310,
+          "before": "        w.u16(self.legs.len() as u16);\n",
+          "after": "        w.u16(\n            self.legs.len() as u16\n                | if self.ecm_starts.is_empty() {\n                    0\n                } else {\n                    Self::ECM_START_FLAG\n                },\n        );\n"
+        },
+        {
+          "offset": 8597,
+          "before": "",
+          "after": "        if !self.ecm_starts.is_empty() {\n            w.u16(self.ecm_starts.len() as u16);\n            for start in &self.ecm_starts {\n                start.encode(w);\n            }\n        }\n"
+        },
+        {
+          "offset": 8868,
+          "before": "        let count = usize::from(r.u16()?);\n",
+          "after": "        let tagged = r.u16()?;\n        let count = usize::from(tagged & !Self::ECM_START_FLAG);\n"
+        },
+        {
+          "offset": 9178,
+          "before": "        Ok(Self { legs })\n",
+          "after": "        let ecm_starts = if tagged & Self::ECM_START_FLAG != 0 {\n            let count = usize::from(r.u16()?);\n            if count == 0 || count > Self::MAX_ECM_STARTS {\n                return Err(INVALID);\n            }\n            (0..count)\n                .map(|_| EcmJumpStart::decode(r))\n                .collect::<Result<Vec<_>, _>>()?\n        } else {\n            Vec::new()\n        };\n        Ok(Self { legs, ecm_starts })\n"
+        },
+        {
+          "offset": 18565,
+          "before": "",
+          "after": "        self.validate_ecm_starts(nav, catalogue, tick, physical_end, fitted_drive)?;\n        Ok(())\n    }\n    fn validate_ecm_starts(\n        &self,\n        nav: NavigationState,\n        catalogue: &OriginalNavigation,\n        tick: u64,\n        physical_end: u64,\n        drive: DriveGrade,\n    ) -> Result<(), SaveError> {\n        if self.ecm_starts.is_empty() {\n            return Ok(());\n        }\n        let pending = nav.pending_timing(tick, physical_end, drive)?;\n        let mut previous: Option<EcmJumpStart> = None;\n        for start in self.ecm_starts() {\n            if start.visit < 2\n                || start.visit > nav.visit\n                || start.tick > tick\n                || start.clock > physical_end\n                || start.clock > start.tick\n                || start.tick - start.clock > tick.checked_sub(physical_end).ok_or(INVALID)?\n                || start.source == start.destination\n                || self.system_at_visit(start.visit, start.tick)? != start.source\n                || catalogue\n                    .distance_ly(start.source, start.destination)\n                    .is_err()\n                || ![\n                    DriveGrade::Basic,\n                    DriveGrade::Intermediate,\n                    DriveGrade::Advanced,\n                ]\n                .into_iter()\n                .any(|grade| grade.spool_ticks() == start.spool)\n                || previous.is_some_and(|p| {\n                    p.visit >= start.visit\n                        || p.tick >= start.tick\n                        || p.clock >= start.clock\n                        || p.tick - p.clock > start.tick - start.clock\n                        || p.before_activation\n                            .zip(start.before_activation)\n                            .is_some_and(|(a, b)| a >= b)\n                })\n            {\n                return Err(INVALID);\n            }\n            if let Some(timing) = self.completed_timing(start.visit)? {\n                if !start.matches(timing) {\n                    return Err(INVALID);\n                }\n            } else if start.visit == nav.visit\n                && nav.dock.is_none()\n                && pending.is_none_or(|timing| !start.matches(timing))\n            {\n                return Err(INVALID);\n            }\n            previous = Some(start);\n        }\n"
+        },
+        {
+          "offset": 20962,
+          "before": "",
+          "after": "\n    #[test]\n    fn optional_ecm_start_codec_preserves_legacy_empty_journal_and_fixed_receipt_width() {\n        let mut journal = JumpJournal::default();\n        let mut writer = Writer::new();\n        journal.encode(&mut writer);\n        assert_eq!(writer.bytes, [0, 0]);\n        let start = EcmJumpStart {\n            source: SystemId::AVENOR,\n            destination: SystemId::RENAS,\n            visit: 2,\n            tick: 31,\n            clock: 29,\n            spool: 600,\n            before_activation: Some(1),\n        };\n        assert_eq!(journal.ecm_start_growth(), Some(38));\n        journal.append_ecm_start(start);\n        let mut writer = Writer::new();\n        journal.encode(&mut writer);\n        assert_eq!(writer.bytes.len(), 40);\n        let mut reader = Reader::new(&writer.bytes);\n        let cold = JumpJournal::decode(&mut reader).unwrap_or_else(|e| panic!(\"{e:?}\"));\n        assert!(reader.finished());\n        assert_eq!(cold.ecm_starts().collect::<Vec<_>>(), [start]);\n        assert_eq!(cold.ecm_start_growth(), Some(36));\n        assert!(JumpJournal::decode(&mut Reader::new(&[0, 128, 0, 0])).is_err());\n    }\n"
+        },
+        {
+          "offset": 22880,
+          "before": "        let journal = JumpJournal { legs: vec![leg] };\n",
+          "after": "        let journal = JumpJournal {\n            legs: vec![leg],\n            ..JumpJournal::default()\n        };\n"
+        },
+        {
+          "offset": 26400,
+          "before": "",
+          "after": "            ..JumpJournal::default()\n"
         }
       ]
     }

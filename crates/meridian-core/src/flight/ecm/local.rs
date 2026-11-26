@@ -327,6 +327,7 @@ impl Local {
         let end = world.combat.physical_tick();
         let mut cancelled_berths = world.damage.cancelled_ecm_berths();
         let mut launch_clocks = world.damage.ecm_launch_clocks();
+        let mut navigation_starts = world.jump_journal.ecm_starts();
         let mut previous: Option<&Visit> = None;
         for v in self.visits.iter() {
             if v.owner.owner != current.owner
@@ -452,6 +453,22 @@ impl Local {
                 return Err(INVALID);
             }
             if let Some(d) = v.departure {
+                // Do not infer the actual command order from the activation or
+                // the local copy of the departure. Navigation sealed this on
+                // admission even when docking later cancelled the spool.
+                if navigation_starts.next()
+                    != Some(crate::navigation::EcmJumpStart {
+                        source: v.owner.system,
+                        destination: d.destination,
+                        visit: v.owner.visit,
+                        tick: d.tick,
+                        clock: d.clock,
+                        spool: d.spool,
+                        before_activation: d.before_jump,
+                    })
+                {
+                    return Err(INVALID);
+                }
                 let same_clock = activations
                     .iter()
                     .find(|a| {
@@ -507,6 +524,7 @@ impl Local {
         }
         if cancelled_berths.next().is_some()
             || launch_clocks.next().is_some()
+            || navigation_starts.next().is_some()
             || previous.is_some_and(|p| matches!(p.closure, Some(Closure::Jump { .. })))
         {
             return Err(INVALID);
@@ -821,6 +839,15 @@ mod tests {
         forge(&mut same, old, item, depart, clock);
         same.pulse = same.pulse.prepare_ecm_discharge().unwrap();
         refused_with_balanced_resources(&same);
+        let mut combined_order = cold(&pending);
+        forge(&mut combined_order, old, item, depart, clock);
+        combined_order.pulse = combined_order.pulse.prepare_ecm_discharge().unwrap();
+        Arc::make_mut(&mut combined_order.ecm.local.visits)[0]
+            .departure
+            .as_mut()
+            .unwrap()
+            .before_jump = Some(1);
+        refused_with_balanced_resources(&combined_order); // Actual navigation start had no preceding activation.
         pending.step(FlightInput::default()).unwrap();
         let mut during = cold(&pending);
         forge(&mut during, old, item, depart + 1, clock + 1);
@@ -908,6 +935,15 @@ mod tests {
         let mut forged = cold(&world);
         forge(&mut forged, owner, item, depart + 1, clock + 1);
         refused_with_balanced_resources(&forged); // berth restores the same full pools.
+        let mut shifted = cold(&world);
+        forge(&mut shifted, owner, item, depart + 1, clock + 1);
+        let departure = Arc::make_mut(&mut shifted.ecm.local.visits)[0]
+            .departure
+            .as_mut()
+            .unwrap();
+        departure.tick += 2;
+        departure.clock += 2;
+        refused_with_balanced_resources(&shifted); // Actual canceled start cannot be shifted beyond forged ECM.
         let mut erased = cold(&world);
         let visit = &mut Arc::make_mut(&mut erased.ecm.local.visits)[0];
         visit.departure = None;

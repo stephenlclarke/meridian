@@ -428,19 +428,36 @@ impl World {
         if !self.jump_journal.has_room() {
             return Err(NavigationError::SequenceExhausted);
         }
+        let owner = self.combat_identity().ok_or(NavigationError::WrongMode)?;
+        let tick = self.state.tick;
+        let clock = self.combat.physical_tick();
+        let ecm_start = ledger.fitted(ModuleSlot::UtilityEcm).is_some().then(|| {
+            crate::navigation::EcmJumpStart {
+                source: owner.system,
+                destination: target,
+                visit: owner.visit,
+                tick,
+                clock,
+                spool: drive.1.spool_ticks(),
+                before_activation: self.ecm.preceding_activation(owner, tick, clock),
+            }
+        });
+        let journal_growth = if ecm_start.is_some() {
+            self.jump_journal
+                .ecm_start_growth()
+                .ok_or(NavigationError::SequenceExhausted)?
+        } else {
+            0
+        };
         let ecm = self
             .ecm
-            .prepare_departure(
-                self.combat_identity().ok_or(NavigationError::WrongMode)?,
-                ledger.fitted(ModuleSlot::UtilityEcm).is_some(),
-                target,
-                self.state.tick,
-                self.combat.physical_tick(),
-                drive.1.spool_ticks(),
-            )
+            .prepare_departure(owner, ecm_start)
             .map_err(|_| NavigationError::SequenceExhausted)?;
-        self.check_ecm_command_capacity(&ecm, Some(navigation))
+        self.check_ecm_command_capacity(&ecm, Some(navigation), journal_growth)
             .map_err(|_| NavigationError::SequenceExhausted)?;
+        if let Some(start) = ecm_start {
+            self.jump_journal.append_ecm_start(start);
+        }
         self.navigation = Some(navigation);
         self.ecm = ecm;
         self.cancel_route_on_manual_jump(origin, target);
@@ -545,7 +562,7 @@ impl World {
             .ecm
             .prepare_launch(self, navigation)
             .map_err(|_| StepError::TickOverflow)?;
-        self.check_ecm_command_capacity(&ecm, navigation)
+        self.check_ecm_command_capacity(&ecm, navigation, 0)
             .map_err(|_| StepError::TickOverflow)?;
         if let Some(account) = &mut self.commander_account {
             account.record_departure_legality();
