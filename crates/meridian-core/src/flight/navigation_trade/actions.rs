@@ -205,6 +205,12 @@ impl World {
             Action::Accept => candidate.attempts.push(Attempt {
                 dock: current.dock,
                 accepted_tick: current.tick,
+                accepted_account_revision: Some(
+                    self.commander_account
+                        .as_ref()
+                        .ok_or(Error::NoCommander)?
+                        .revision(),
+                ),
                 plan: None,
                 buy: None,
                 journeys: Vec::new(),
@@ -233,6 +239,12 @@ impl World {
                     fuel: self
                         .navigation_trade_fuel_anchor()
                         .ok_or(Error::NoCommander)?,
+                    account_revision: Some(
+                        self.commander_account
+                            .as_ref()
+                            .ok_or(Error::NoCommander)?
+                            .revision(),
+                    ),
                 });
                 if outcome == Outcome::Complete && candidate.trace.is_none() {
                     candidate.trace = Some(i as u8);

@@ -53,15 +53,23 @@ impl World {
         let reserved_capacity = self.navigation_trade.reservations().capacity;
         let account = self
             .commander_account
-            .as_mut()
+            .as_ref()
             .ok_or(MissionError::NoCommander)?;
         let session = self
             .freight_session
             .as_ref()
             .ok_or(MissionError::NoCommander)?;
-        account
-            .execute_equipment(&session.state, facts, command, reserved_capacity)
-            .map_err(MissionError::Equipment)
+        let (account, event) = account
+            .prepare_equipment(&session.state, facts, command, reserved_capacity)
+            .map_err(MissionError::Equipment)?;
+        if self.modular.has_test_cargo_history() {
+            let dock = self.current_dock_context().ok_or(MissionError::NotDocked)?;
+            self.modular
+                .record_test_cargo_fit(&account, dock, expected_tick)
+                .map_err(|_| MissionError::SequenceExhausted)?;
+        }
+        self.commander_account = Some(account);
+        Ok(event)
     }
 }
 
@@ -72,6 +80,7 @@ pub(super) mod tests;
 pub struct PreparedEquipment<'a> {
     world: &'a mut World,
     account: crate::freight::g02::CommanderAccount,
+    modular: super::modular::State,
     event: Event,
     bytes: Vec<u8>,
 }
@@ -98,6 +107,7 @@ impl PreparedEquipment<'_> {
     }
     pub fn commit(self) -> Event {
         self.world.commander_account = Some(self.account);
+        self.world.modular = self.modular;
         self.event
     }
 }
@@ -126,12 +136,22 @@ impl World {
                 self.navigation_trade.reservations().capacity,
             )
             .map_err(|error| command_error(MissionError::Equipment(error)))?;
+        let mut modular = self.modular.clone();
+        if modular.has_test_cargo_history() {
+            let dock = self
+                .current_dock_context()
+                .ok_or_else(|| command_error(MissionError::NotDocked))?;
+            modular
+                .record_test_cargo_fit(&account, dock, tick)
+                .map_err(EquipmentPreparationError::Save)?;
+        }
         let bytes = self
-            .save_bytes_with_modules(&account, &self.modular)
+            .save_bytes_with_modules(&account, &modular)
             .map_err(EquipmentPreparationError::Save)?;
         Ok(PreparedEquipment {
             world: self,
             account,
+            modular,
             event,
             bytes,
         })

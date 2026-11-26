@@ -255,11 +255,13 @@ struct Terminal {
     dock: DockContext,
     outcome: NavigationTradeOutcome,
     fuel: FuelAnchor,
+    account_revision: Option<u64>,
 }
 #[derive(Debug, Clone, PartialEq)]
 struct Attempt {
     dock: DockContext,
     accepted_tick: u64,
+    accepted_account_revision: Option<u64>,
     plan: Option<Plan>,
     buy: Option<Trade>,
     journeys: Vec<Journey>,
@@ -281,11 +283,25 @@ impl State {
     }
     /// T04 consent/closure do not advance the account or simulation tick; only
     /// a strictly interior retained tick proves a prior active interval.
-    pub(super) fn known_active_at_tick(&self, tick: u64) -> bool {
+    pub(super) fn known_active_at(&self, tick: u64, revision: u64) -> bool {
         self.attempts.iter().any(|attempt| {
-            attempt.accepted_tick < tick
-                && attempt.terminal.is_none_or(|terminal| terminal.tick > tick)
+            if let Some(accepted) = attempt.accepted_account_revision {
+                accepted < revision
+                    && attempt.terminal.is_none_or(|terminal| {
+                        terminal
+                            .account_revision
+                            .map_or(terminal.tick > tick, |closed| closed >= revision)
+                    })
+            } else {
+                attempt.accepted_tick < tick
+                    && attempt.terminal.is_none_or(|terminal| terminal.tick > tick)
+            }
         })
+    }
+    pub(super) fn known_acceptance_revisions(&self) -> impl Iterator<Item = u64> + '_ {
+        self.attempts
+            .iter()
+            .filter_map(|attempt| attempt.accepted_account_revision)
     }
     pub(super) fn reservations(&self) -> services::Reservations {
         let Some(a) = self.active() else {

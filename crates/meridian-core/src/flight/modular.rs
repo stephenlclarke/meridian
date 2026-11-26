@@ -7,6 +7,7 @@ use crate::{
     save::{Reader, SaveError, Writer},
 };
 use core::fmt;
+mod fuel_history;
 mod scoops;
 mod shields;
 pub(super) use shields::ResourceFitChange;
@@ -421,6 +422,7 @@ struct Event {
 #[derive(Debug, Clone, PartialEq, Eq, Default)]
 pub(super) struct State {
     events: Vec<Event>,
+    cargo_fit_history: Vec<fuel_history::CargoFit>,
 }
 pub struct PreparedModule<'a> {
     world: &'a mut World,
@@ -833,6 +835,7 @@ impl State {
                 effect,
             });
         }
+        events.extend(self.cargo_account_events());
         Ok(events)
     }
 
@@ -1041,7 +1044,14 @@ impl State {
             .find(|i| i.id == item)
     }
     pub(super) fn encode(&self, w: &mut Writer) {
-        w.u32(self.events.len() as u32);
+        w.u32(
+            self.events.len() as u32
+                | if self.cargo_fit_history.is_empty() {
+                    0
+                } else {
+                    1 << 31
+                },
+        );
         for e in &self.events {
             match e.action {
                 ModuleAction::PurchaseMiningLaser => w.u8(0),
@@ -1062,12 +1072,16 @@ impl State {
             w.u64(e.revision);
             w.bool(e.xyzzy);
         }
+        if !self.cargo_fit_history.is_empty() {
+            self.encode_cargo_history(w);
+        }
     }
     pub(super) fn decode(r: &mut Reader<'_>, version: u16) -> Result<Self, SaveError> {
         if version != crate::save::SAVE_VERSION {
             return Err(SaveError::UnsupportedVersion);
         }
-        let count = r.u32()? as usize;
+        let raw_count = r.u32()?;
+        let count = (raw_count & !(1 << 31)) as usize;
         if count > crate::save::MAX_SAVE_BYTES / 64 {
             return Err(SaveError::TooLarge);
         }
@@ -1112,7 +1126,15 @@ impl State {
                 revision,
             });
         }
-        Ok(Self { events })
+        let cargo_fit_history = if raw_count & (1 << 31) != 0 {
+            Self::decode_cargo_history(r)?
+        } else {
+            Vec::new()
+        };
+        Ok(Self {
+            events,
+            cargo_fit_history,
+        })
     }
 }
 impl World {

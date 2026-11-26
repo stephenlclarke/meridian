@@ -168,6 +168,7 @@ impl Menu {
                 "Test shield fits only that grade, without a paid or earned receipt",
                 "TEST MAX fits 4 tanks beyond normal SH025 mounts; no active custody",
                 "Store test tanks to meet ordinary fitting limits before contracts",
+                "Limited outfits keep fitted tanks; optional utilities use free mounts",
                 "After confirmation you can choose another action here",
                 "Fuel mode is accounted separately; paid transactions still charge",
                 "Missiles and cargo remain finite; full original parity is incomplete",

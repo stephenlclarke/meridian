@@ -292,3 +292,145 @@ fn packed_account_fuel_rejects_foreign_count_bits_and_preserves_stock_bytes() {
     assert!(unpack_fuel(5 << 9).is_err());
     assert!(unpack_fuel(1 << 15).is_err());
 }
+
+#[test]
+fn ordinary_paid_tank_then_limited_outfit_keeps_tank_and_real_mount_budget() {
+    let mut world = earned_world(18154);
+    transact(&mut world, BUY);
+    let paid = tank_items(&world);
+    let old_fuel = fuel(&world).0;
+    assert!(old_fuel <= 200);
+    for action in [
+        XyzzyAction::Enter,
+        XyzzyAction::MaximumSupportedHardware,
+        XyzzyAction::RestoreStarter,
+    ] {
+        secret(&mut world, action);
+        assert_eq!(tank_items(&world), paid);
+        assert_eq!(fuel(&world), (200, 200));
+        let snapshot = world.modular_equipment_snapshot().unwrap();
+        assert_eq!(
+            (
+                snapshot.utility_mounts_used,
+                snapshot.utility_mounts_capacity
+            ),
+            (3, 3)
+        );
+        assert!(!world.test_tank_overfit());
+        assert!(world.fitted_fuel_scoops().is_some());
+        assert!(world.owned_emp().is_some_and(|item| item.fitted));
+        assert!(world.equipment_snapshot().unwrap().owned.is_none());
+        assert_eq!(
+            world.credits_tenths(),
+            Some(super::super::STARTING_CREDITS_TENTHS)
+        );
+    }
+}
+
+#[test]
+fn a_closed_freight_issue_cannot_be_relabelled_into_an_earlier_hidden_test_overfit() {
+    let mut world = World::new_commander(18155).unwrap();
+    secret(&mut world, XyzzyAction::MaximumFuelStorage);
+    secret(&mut world, XyzzyAction::ToggleUnlimitedFuel);
+    for destination in [
+        SystemId::LARERIA,
+        SystemId::AVENOR,
+        SystemId::LARERIA,
+        SystemId::AVENOR,
+    ] {
+        journey(&mut world, destination);
+    }
+    let tanks = tank_items(&world);
+    for item in &tanks[..3] {
+        transact(&mut world, ModuleAction::Store { item: item.id });
+    }
+    assert_eq!(fuel(&world).1, 200);
+    assert!(world.test_tank_overfit()); // Cargo, scoop, EMP and remaining tank = 4/3.
+    let specialist = world
+        .modular_equipment_snapshot()
+        .unwrap()
+        .items
+        .into_iter()
+        .find(|item| item.kind == ModuleKind::SalvageTargeting)
+        .unwrap();
+    transact(
+        &mut world,
+        ModuleAction::Store {
+            item: specialist.id,
+        },
+    );
+    let hidden_revision = world.commander_account.as_ref().unwrap().revision();
+    let cargo = world.equipment_snapshot().unwrap().owned.unwrap();
+    world
+        .request_equipment(
+            crate::equipment::Command::UnfitCargoBay(cargo.id),
+            world.snapshot().tick,
+        )
+        .unwrap();
+    assert!(!world.test_tank_overfit());
+    world.request_refuel(world.snapshot().tick).unwrap();
+    let tick = world.snapshot().tick;
+    let review = accept_review(&mut world);
+    let job = match world
+        .request_freight(
+            Command::Confirm {
+                review,
+                choice: Choice::Accept,
+            },
+            tick,
+        )
+        .unwrap()
+    {
+        FreightEvent::Accepted { job, .. } => job,
+        event => panic!("unexpected accept {event:?}"),
+    };
+    let review = match world
+        .request_freight(
+            Command::ReviewAbandonment {
+                actor: world.station_contacts()[0].actor(),
+                job,
+            },
+            tick,
+        )
+        .unwrap()
+    {
+        FreightEvent::Reviewed(review) => review,
+        event => panic!("unexpected abandon {event:?}"),
+    };
+    world
+        .request_freight(
+            Command::Confirm {
+                review,
+                choice: Choice::Abandon,
+            },
+            tick,
+        )
+        .unwrap();
+    assert!(!world.test_tank_overfit());
+    let bytes = world.save_bytes().unwrap();
+    let mut invalid = World::from_save_bytes(&bytes).unwrap();
+    invalid
+        .freight_session
+        .as_mut()
+        .unwrap()
+        .state
+        .forge_issue_revision_for_test(hidden_revision);
+    assert!(
+        invalid
+            .modular
+            .validate_test_custody_history(
+                &invalid,
+                invalid.commander_account.as_ref().unwrap(),
+                &invalid.emp,
+                &invalid.navigation_trade
+            )
+            .is_err()
+    );
+    assert!(invalid.save_bytes().is_err());
+    assert!(
+        world
+            .restore_bytes(&invalid.unchecked_test_save().unwrap())
+            .is_err()
+    );
+    assert_eq!(world.save_bytes().unwrap(), bytes);
+}

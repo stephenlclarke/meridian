@@ -931,6 +931,19 @@ impl State {
                     .is_some_and(|close| close < revision)
         })
     }
+    pub(crate) fn known_issue_revisions(&self) -> impl Iterator<Item = u64> + '_ {
+        self.data
+            .jobs
+            .iter()
+            .flatten()
+            .filter_map(|job| job.issue_account_revision)
+    }
+    #[cfg(test)]
+    pub(crate) fn forge_issue_revision_for_test(&mut self, revision: u64) {
+        if let Some(job) = self.data.jobs.iter_mut().flatten().last() {
+            job.issue_account_revision = Some(revision);
+        }
+    }
 
     pub(crate) fn new_commander(owner: u64) -> Self {
         Self {
