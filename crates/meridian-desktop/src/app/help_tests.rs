@@ -180,6 +180,12 @@ fn question_help_preserves_literal_h_search_through_focus_and_occlusion() {
     app.menu_input(ui::Input::Key(ui::Key::Search));
     // Text routing follows current controller state even before its next paint.
     assert_eq!(press(&mut app, KeyCode::KeyH, Some("h")), None);
+    // A composing keyboard can report a physical key before it supplies printable text.
+    app.modifiers = winit::keyboard::ModifiersState::SHIFT;
+    assert_eq!(press(&mut app, KeyCode::Digit3, None), None);
+    assert_eq!(press(&mut app, KeyCode::Digit3, Some("#")), None);
+    assert!(app.game.session.help_review().is_none());
+    app.modifiers = winit::keyboard::ModifiersState::empty();
     let search = paint(&mut app);
     assert!(search.search_active);
     assert!(app.help.is_none());

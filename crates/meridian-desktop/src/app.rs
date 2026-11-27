@@ -1218,6 +1218,9 @@ impl App {
             .as_mut()
             .filter(|menu| menu.active(&self.game.world))
         {
+            if !self.commander_open && menu.search_active() {
+                return true;
+            }
             if menu.review_pending() {
                 menu.feedback("Confirm or cancel the current station review first".into());
                 self.request_redraw();
@@ -1330,9 +1333,7 @@ impl App {
             self.menu_input(ui::Input::Text(text.to_string()));
             return None;
         }
-        if !(self.menu_active() && self.docked.as_ref().is_some_and(Docked::search_active))
-            && self.route_training_shortcut(code, repeat)
-        {
+        if self.route_training_shortcut(code, repeat) {
             return None;
         }
         if self.commander_open {
