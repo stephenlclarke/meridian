@@ -85,12 +85,24 @@ pub(in crate::flight) fn check_naval_local_sortie(paid: &World) {
 }
 
 fn check_local_launch(bytes: &[u8], growth: usize) {
+    let mut stored = World::decode_saved_world(bytes).unwrap();
+    assert_eq!(stored.save_bytes().unwrap(), bytes);
     let mut world = World::from_save_bytes(bytes).unwrap();
-    assert_eq!(world.save_bytes().unwrap(), bytes);
+    let live_before_launch = world.save_bytes().unwrap();
+    let session = stored.freight_session.as_mut().unwrap();
+    let (epoch, review_sequence) = session.continue_floor();
+    session.invalidate_after_continue((0, 0)).unwrap();
+    assert_eq!(
+        world.freight_session.as_ref().unwrap().continue_floor(),
+        (epoch + 1, review_sequence + 1)
+    );
+    // The two review counters and their resulting checksum explain the entire
+    // difference between the unchanged disk image and this continued commander.
+    assert_eq!(stored.save_bytes().unwrap(), live_before_launch);
     let mut opening = Writer::new();
     world.modular.encode(&mut opening);
     assert!(world.request_launch(world.snapshot().tick + 1).is_err());
-    assert_eq!(world.save_bytes().unwrap(), bytes);
+    assert_eq!(world.save_bytes().unwrap(), live_before_launch);
     for _ in 0..9 {
         world.step(crate::FlightInput::default()).unwrap();
     }
