@@ -1446,7 +1446,23 @@ mod tests {
         let work_count = world.mining.work_count();
         let fit = world.modular_equipment_snapshot().unwrap();
         let speed = world.snapshot().speed;
-        let before = world.snapshot().orientation;
+        let angle_to_rock = |world: &World| {
+            let state = world.snapshot();
+            let pose = super::super::flight_pose(state.position, state.orientation).unwrap();
+            let direction = pose
+                .orientation
+                .inverse_coordinates(offset(rock.position, pose.position));
+            direction
+                .x
+                .hypot(direction.y)
+                .atan2(direction.z)
+                .to_degrees()
+        };
+        let initial_angle = angle_to_rock(&world);
+        assert!(
+            initial_angle > 1.0,
+            "rock must start off-axis: {initial_angle}°"
+        );
         for _ in 0..12 {
             world.step(FlightInput::default()).unwrap();
             assert_eq!(
@@ -1457,7 +1473,11 @@ mod tests {
             assert!(world.pilot_operates_selected_tool());
             assert_eq!(world.automatic_work_status(), None);
         }
-        assert_ne!(world.snapshot().orientation, before);
+        let final_angle = angle_to_rock(&world);
+        assert!(
+            final_angle < initial_angle,
+            "angle to rock: {initial_angle}° -> {final_angle}°"
+        );
         assert_eq!(world.snapshot().speed, speed);
         assert_eq!(world.mining.work_count(), work_count);
         assert_eq!(world.modular_equipment_snapshot().unwrap().items, fit.items);
