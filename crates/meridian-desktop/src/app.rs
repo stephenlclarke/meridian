@@ -443,7 +443,10 @@ impl App {
         let toggle = question || (code == KeyCode::KeyH && !searching);
         let journal = code == KeyCode::KeyJ && self.modifiers.shift_key() && !searching;
         if let Some(panel) = &self.help {
-            if !repeat && code == KeyCode::KeyI && panel.title == crate::help::FLIGHT_CONTROLS {
+            if !repeat
+                && code == KeyCode::KeyI
+                && panel.title.starts_with(crate::help::FLIGHT_CONTROLS)
+            {
                 self.help = Some(crate::help::Panel::flight_status(&self.game.world));
                 self.request_redraw();
                 return true;
@@ -1501,10 +1504,10 @@ impl App {
             self.pulse
                 .filter(|_| frame_refusal.is_none())
                 .map(|shot| match shot.contact {
-                    PulseContact::AsteroidBlocked { .. } => "Rock obstructs Pulse: no ore yielded",
+                    PulseContact::AsteroidBlocked { .. } => "Laser blocked by rock",
                     PulseContact::Npc { .. } => "NPC hull struck",
-                    PulseContact::Clear => "Pulse fired",
-                    PulseContact::Projectile { .. } => "Pulse intercepted missile",
+                    PulseContact::Clear => "Laser fired",
+                    PulseContact::Projectile { .. } => "Laser intercepted missile",
                     PulseContact::StationBlocked { .. } => {
                         "Station struck | legal incident recorded"
                     }

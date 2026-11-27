@@ -4,7 +4,7 @@ use crate::{
     storage::{SaveCommit, Store},
 };
 use meridian_core::{
-    FlightMode, World,
+    World,
     save::{MAX_SAVE_FILE_BYTES, MAX_SOLAR_HISTORY_BYTES},
 };
 use std::{io, path::PathBuf};

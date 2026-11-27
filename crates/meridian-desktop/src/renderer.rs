@@ -380,7 +380,20 @@ impl Renderer {
     }
 
     pub fn scanner_viewport(&self) -> [u32; 2] {
-        [self.size.width.max(1), self.size.height.max(1)]
+        let size = self.size;
+        if self.is_zero_sized() {
+            return [1, 1];
+        }
+        let logical = size.to_logical::<f64>(self.window.scale_factor());
+        let height = logical.height.round().max(1.) as u32;
+        let fraction =
+            hud::cockpit::flight_height(logical.width.round() as u32, height) / height as f32;
+        [
+            size.width,
+            (size.height as f32 * fraction)
+                .round()
+                .clamp(1., size.height as f32) as u32,
+        ]
     }
 
     fn prepare_hud_frame(
@@ -877,19 +890,12 @@ impl Renderer {
             self.recover_surface(recovery)
         });
         let Some((frame, reconfigure)) = Self::prepare_acquired_frame(acquired, || {
-            let flight_height = if cockpit.is_some() {
-                let logical = self.size.to_logical::<f64>(self.window.scale_factor());
-                let fraction = hud::cockpit::flight_height(
-                    logical.width.round() as u32,
-                    logical.height.round() as u32,
-                ) / logical.height.round().max(1.0) as f32;
-                (self.size.height as f32 * fraction)
-                    .round()
-                    .clamp(1.0, self.size.height as f32) as u32
+            let flight_size = if cockpit.is_some() {
+                let [width, height] = self.scanner_viewport();
+                PhysicalSize::new(width, height)
             } else {
-                self.size.height
+                self.size
             };
-            let flight_size = PhysicalSize::new(self.size.width, flight_height);
             if self.flight_size != flight_size {
                 self.flight_size = flight_size;
                 self.pending_projection.resize(flight_size);
