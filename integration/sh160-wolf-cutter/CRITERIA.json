@@ -190,7 +190,7 @@
     }
   },
   "replayPins": {
-    "tools/fleet_hull_measurement.py": "2292d26dd1f4fee134b854c952aeed227632a34a09248ed549e8a891d708d4d6",
+    "tools/fleet_hull_measurement.py": "3570747d9f650efc7d0e4f88352e9fd32e42ab394f4669100223fbac0c1be6b7",
     "tools/directed_hull_fit.py": "dbd5d45e5052453646b752695815d6cb53c6ccb2c3ad6694451a4c7e19fa8bf7",
     "integration/sh160-wolf-cutter/WOLF-CUTTER-STUDIO.json": "8bb404e86f4efac5eb7202399649de38b8363f9640d745936788fc53fcc14d70",
     "integration/sh160-wolf-cutter/FROZEN-SOURCES.json": "fd8ac9a0afcddb2271e5bd48b8702dfcc48fa46623c5a522531351c6b7b383ba",

@@ -190,7 +190,7 @@
     }
   },
   "replayPins": {
-    "tools/fleet_hull_measurement.py": "2292d26dd1f4fee134b854c952aeed227632a34a09248ed549e8a891d708d4d6",
+    "tools/fleet_hull_measurement.py": "3570747d9f650efc7d0e4f88352e9fd32e42ab394f4669100223fbac0c1be6b7",
     "tools/directed_hull_fit.py": "dbd5d45e5052453646b752695815d6cb53c6ccb2c3ad6694451a4c7e19fa8bf7",
     "integration/sh166-camel-rescue/CAMEL-RESCUE-STUDIO.json": "9cd9959a555996eaa35f2821652e2a7bcc1afc951e99bf3c5bd9c04b9e3b22b7",
     "integration/sh166-camel-rescue/FROZEN-SOURCES.json": "4b6810f8ef33781b0c2e6caaee24685d31cb6e68675a9e4d2ead9bbe3deb4b0c",

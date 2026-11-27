@@ -190,7 +190,7 @@
     }
   },
   "replayPins": {
-    "tools/fleet_hull_measurement.py": "2292d26dd1f4fee134b854c952aeed227632a34a09248ed549e8a891d708d4d6",
+    "tools/fleet_hull_measurement.py": "3570747d9f650efc7d0e4f88352e9fd32e42ab394f4669100223fbac0c1be6b7",
     "tools/directed_hull_fit.py": "dbd5d45e5052453646b752695815d6cb53c6ccb2c3ad6694451a4c7e19fa8bf7",
     "integration/sh163-lammergeier/LAMMERGEIER-STUDIO.json": "2ea8dc1c8466cc4fed79fdbc935d62312f862edf50c92ff3b5ad2baee8b9bc7d",
     "integration/sh163-lammergeier/FROZEN-SOURCES.json": "b9cd52221f094c1ce15dbc65a450589c2125f6e893d423c79dff0621668e0481",

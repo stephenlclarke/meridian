@@ -187,7 +187,7 @@
     }
   },
   "replayPins": {
-    "tools/fleet_hull_measurement.py": "2292d26dd1f4fee134b854c952aeed227632a34a09248ed549e8a891d708d4d6",
+    "tools/fleet_hull_measurement.py": "3570747d9f650efc7d0e4f88352e9fd32e42ab394f4669100223fbac0c1be6b7",
     "tools/directed_hull_fit.py": "dbd5d45e5052453646b752695815d6cb53c6ccb2c3ad6694451a4c7e19fa8bf7",
     "integration/sh136-falcon-mk-i/FALCON-MK-I-STUDIO.json": "61bbffa97974d3ffe271fd5ea2fe48ed04949cd7eca0311301bea5b7da1d98b5",
     "integration/sh136-falcon-mk-i/FROZEN-SOURCES.json": "622af851e690293933530ce77d25c49cc4a946e8aae3acdd67bff0e15b764ef2",

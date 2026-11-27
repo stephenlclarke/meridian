@@ -221,7 +221,7 @@
     ]
   },
   "replayPins": {
-    "tools/fleet_hull_measurement.py": "2292d26dd1f4fee134b854c952aeed227632a34a09248ed549e8a891d708d4d6",
+    "tools/fleet_hull_measurement.py": "3570747d9f650efc7d0e4f88352e9fd32e42ab394f4669100223fbac0c1be6b7",
     "tools/directed_hull_fit.py": "dbd5d45e5052453646b752695815d6cb53c6ccb2c3ad6694451a4c7e19fa8bf7",
     "integration/sh155-osprey-support/OSPREY-SUPPORT-STUDIO.json": "167943248e70c01efed9a6c7a0df17af8f5bd4591dd7d5ce901eecd24bc42cd2",
     "integration/sh155-osprey-support/FROZEN-SOURCES.json": "20799814617f88272949803472128d2c212347a531eaecd344f97550d9246705",

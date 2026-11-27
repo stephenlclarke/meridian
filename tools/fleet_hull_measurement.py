@@ -36,9 +36,9 @@ class HullMeasurement:
             offset = len(vertices)
             vertices.extend(model["vertices"])
             meshes[lod] = trimesh.Trimesh(model["vertices"], model["faces"], process=False)
-            for index, slots in enumerate(membership):
+            for vertex_index, slots in enumerate(membership, start=offset):
                 for slot in slots:
-                    groups[names[slot]].append(offset + index)
+                    groups[names[slot]].append(vertex_index)
         return np.array(vertices), meshes, {name: np.array(ids) for name, ids in groups.items()}
 
     def fit(self, vertices, meshes, groups):

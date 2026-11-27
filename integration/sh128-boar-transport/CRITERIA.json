@@ -187,7 +187,7 @@
     }
   },
   "replayPins": {
-    "tools/fleet_hull_measurement.py": "2292d26dd1f4fee134b854c952aeed227632a34a09248ed549e8a891d708d4d6",
+    "tools/fleet_hull_measurement.py": "3570747d9f650efc7d0e4f88352e9fd32e42ab394f4669100223fbac0c1be6b7",
     "tools/directed_hull_fit.py": "dbd5d45e5052453646b752695815d6cb53c6ccb2c3ad6694451a4c7e19fa8bf7",
     "integration/sh128-boar-transport/BOAR-TRANSPORT-STUDIO.json": "4915495c526d762ae444128a1c0a452d147292127cf16578a79e0ee4f8b643ed",
     "integration/sh128-boar-transport/FROZEN-SOURCES.json": "70639baa55e866ad462b51e56dc9318b6c6524c95883f09119d744bf3ba3c61e",

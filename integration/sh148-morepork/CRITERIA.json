@@ -190,7 +190,7 @@
     }
   },
   "replayPins": {
-    "tools/fleet_hull_measurement.py": "2292d26dd1f4fee134b854c952aeed227632a34a09248ed549e8a891d708d4d6",
+    "tools/fleet_hull_measurement.py": "3570747d9f650efc7d0e4f88352e9fd32e42ab394f4669100223fbac0c1be6b7",
     "tools/directed_hull_fit.py": "dbd5d45e5052453646b752695815d6cb53c6ccb2c3ad6694451a4c7e19fa8bf7",
     "integration/sh148-morepork/MOREPORK-STUDIO.json": "57c086404c550dce49649fbef645abc1d75e38c9b23d71ffc41010b10fd9cf50",
     "integration/sh148-morepork/FROZEN-SOURCES.json": "27aa2955cc9c7e0898e9173311c4774954b3b25267de71dcd4f1ac50068f956e",
