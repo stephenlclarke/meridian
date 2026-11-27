@@ -1298,9 +1298,9 @@ fn equipment(s: &DockedScreens, c: &Context<'_>, f: &mut Frame) {
         );
         return;
     };
-    let passage_service = matches!(
+    let contract_service = matches!(
         panel.selected_slot.as_str(),
-        "passenger-service" | "sealed-dispatch"
+        "passenger-service" | "sealed-dispatch" | "bonded-freight"
     );
     let mut lines = vec![
         row.group.clone(),
@@ -1324,8 +1324,8 @@ fn equipment(s: &DockedScreens, c: &Context<'_>, f: &mut Frame) {
             _ => "Crew information unavailable".into(),
         },
     ];
-    if passage_service {
-        // Passage is a separate confirmed action, never a purchase or a free item grant.
+    if contract_service {
+        // Service rows show the contract terms and use the review button.
         lines.remove(3);
         lines.remove(2);
     }
@@ -1396,7 +1396,7 @@ fn equipment(s: &DockedScreens, c: &Context<'_>, f: &mut Frame) {
         (
             if s.options {
                 "Review option"
-            } else if passage_service {
+            } else if contract_service {
                 "Review"
             } else {
                 "Buy"
