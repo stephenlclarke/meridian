@@ -1,5 +1,7 @@
 # Meridian
 
+The Aelavia development branch adds a TL17 stop for the paid Naval Energy Unit. Fit Fuel Scoops at a trading station before leaving for Aelavia. [Equipment and flight instructions](docs/EQUIPMENT-PLAYABLE.md#naval-energy-unit-at-aelavia).
+
 [Download Scanner Preview 11 for macOS arm64 or Windows x64](https://github.com/stephenlclarke/meridian/releases/tag/v0.11.0-preview.1). Start on Commander Details and press **H** or **?** for help. In flight, **Tab** cycles through scanner contacts from nearest to farthest. **F** switches between manual and assisted flight. At a station, press **3**, select Search and enter **Medusa** to inspect SH171. [Preview guide](docs/PREVIEW-RELEASES.md)
 
 The Fleet, Medusa and Hull Studio preview adds 115 station Showroom models and a dedicated flyable Medusa. Open **Meridian Medusa Preview** and press **L** to launch with a separate commander save. The Apple silicon Fleet and Medusa apps require macOS 14 or later. The packaged Hull Studio requires macOS 27 or later. [Preview installation and controls](docs/PREVIEW-RELEASES.md#fleet-medusa-and-hull-studio) · [Published previews](https://github.com/stephenlclarke/meridian/releases)

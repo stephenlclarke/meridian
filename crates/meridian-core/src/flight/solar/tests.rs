@@ -965,3 +965,123 @@ fn fitted_partially_charged_emp_keeps_actual_final_transfer_when_solar_heat_kill
     assert_eq!(cold.emp_snapshot(), Some(emp));
     assert_eq!(cold.combat_snapshot(), world.combat_snapshot());
 }
+
+#[test]
+fn aelavia_naval_purchase_recharges_in_flight_and_scoops_fuel_for_return() {
+    use crate::navigation::SystemId;
+    let mut world = earned_world(18296);
+    module(&mut world, ModuleKind::FuelStorage);
+    module(&mut world, ModuleKind::FuelStorage);
+    module(&mut world, ModuleKind::FuelScoops);
+    // Disposable funding and advanced navigation. Keep the three paid utility items.
+    secret(&mut world, XyzzyAction::Enter);
+    secret(&mut world, XyzzyAction::ToggleUnlimitedFuel);
+    assert!(!world.xyzzy_snapshot().unwrap().unlimited_fuel);
+    module(&mut world, ModuleKind::ExtraEnergyUnit);
+    journey(&mut world, SystemId::LARERIA);
+    let naval = ModuleAction::Purchase {
+        kind: ModuleKind::NavalEnergyUnit,
+    };
+    assert_eq!(
+        world.review_module(naval, world.snapshot().tick),
+        Err(crate::ModuleError::TechnologyUnavailable)
+    );
+    world.request_refuel(world.snapshot().tick).unwrap();
+    let route = world
+        .route_alternatives(SystemId::AELAVIA)
+        .unwrap()
+        .remove(0);
+    assert_eq!(
+        route.plan.systems(),
+        &[SystemId::LARERIA, SystemId::AELAVIA]
+    );
+    assert!((route.distance_ly - 20.55).abs() < 0.01);
+    journey(&mut world, SystemId::AELAVIA);
+    let berth = world.current_dock_context().unwrap();
+    assert_eq!(berth.system(), SystemId::AELAVIA);
+    assert_eq!(fuel(&world), 270 - route.fuel_units);
+    assert!(world.request_refuel(world.snapshot().tick).is_err());
+    let offers = world.module_offers();
+    assert_eq!(offers.len(), 1);
+    assert_eq!(
+        (
+            offers[0].kind,
+            offers[0].technology,
+            offers[0].price_tenths,
+            offers[0].available
+        ),
+        (ModuleKind::NavalEnergyUnit, 17, 196_000, true)
+    );
+    let cash = world.credits_tenths().unwrap();
+    let id = module(&mut world, ModuleKind::NavalEnergyUnit);
+    assert_eq!(world.credits_tenths(), Some(cash - 196_000));
+    let mut world = World::from_save_bytes(&world.save_bytes().unwrap()).unwrap();
+    assert!(world.modular_equipment_snapshot().unwrap().items.iter().any(|i|
+        i.id == id && i.slot == Some(crate::ModuleSlot::Energy)
+        && matches!(i.provenance, ModuleProvenance::Paid { dock, paid_tenths: 196_000, .. } if dock == berth)
+    ));
+    solar_approach(&mut world);
+    world
+        .request_fire_front_laser(world.snapshot().tick)
+        .unwrap();
+    let energy = world.flight_resources_snapshot().unwrap().energy_hundredths;
+    world.step(FlightInput::default()).unwrap();
+    let recovered = world.flight_resources_snapshot().unwrap();
+    assert_eq!(
+        (
+            recovered.energy_capacity_hundredths,
+            recovered.energy_hundredths - energy
+        ),
+        (38_000, 21)
+    );
+
+    // One or more passes through the outer corona. Turn out before thermal saturation.
+    for _ in 0..4 {
+        let sun = world.celestial_snapshot().unwrap().sun;
+        aim_3d(&mut world, sun.position);
+        for _ in 0..2500 {
+            if fuel(&world) >= 207 || ratio(&world) < 2.2 {
+                break;
+            }
+            cruise(&mut world, 8.0);
+        }
+        if fuel(&world) >= 207 {
+            break;
+        }
+        let pos =
+            crate::station::flight_pose(world.snapshot().position, world.snapshot().orientation)
+                .unwrap()
+                .position;
+        aim_3d(
+            &mut world,
+            Vec3::new(
+                2.0 * pos.x - sun.position.x,
+                2.0 * pos.y - sun.position.y,
+                2.0 * pos.z - sun.position.z,
+            ),
+        );
+        for _ in 0..1500 {
+            if ratio(&world) > 3.2 {
+                break;
+            }
+            cruise(&mut world, 8.0);
+        }
+    }
+    assert!(fuel(&world) >= 207);
+    assert_eq!(world.credits_tenths(), Some(cash - 196_000));
+    world
+        .request_jump(SystemId::LARERIA, world.snapshot().tick)
+        .unwrap();
+    while world.snapshot().navigation.unwrap().travel.is_some() {
+        world.step(FlightInput::default()).unwrap();
+    }
+    let cold = World::from_save_bytes(&world.save_bytes().unwrap()).unwrap();
+    assert_eq!(
+        cold.snapshot().navigation.unwrap().system,
+        SystemId::LARERIA
+    );
+    assert_eq!(
+        cold.flight_resources_snapshot(),
+        world.flight_resources_snapshot()
+    );
+}

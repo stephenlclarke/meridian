@@ -2,7 +2,7 @@
 use super::{App, KeyCode};
 use crate::help::Panel;
 use meridian_core::World;
-use meridian_core::navigation::{OriginalNavigation, RoutePlan};
+use meridian_core::navigation::{OriginalNavigation, RoutePlan, SystemId};
 
 struct Choice {
     plan: RoutePlan,
@@ -68,6 +68,9 @@ impl Planner {
             choice.plan.grade().label(),
             choice.distance_ly
         ));
+        if choice.plan.destination() == SystemId::AELAVIA {
+            lines.push("TL17 Naval Energy Unit | Fit Fuel Scoops for the return".into());
+        }
         lines.push(choice.preferences.clone());
         Panel {
             title: "Flight navigation".into(),

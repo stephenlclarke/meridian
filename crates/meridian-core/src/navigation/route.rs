@@ -1,4 +1,4 @@
-//! Route planning over G01 stations with implemented travel, docking and refuelling.
+//! Route planning over G01 stations with implemented travel and docking.
 use super::{
     NavigationError, NavigationGrade, OriginalNavigation, PlayerShipId, SystemId,
     persistence::{read_system, write_system},
@@ -7,7 +7,12 @@ use super::{
 use crate::save::{Reader, SaveError, Writer};
 use crate::station_services::CommodityId;
 
-pub const ROUTE_SYSTEMS: [SystemId; 3] = [SystemId::AVENOR, SystemId::LARERIA, SystemId::RENAS];
+pub const ROUTE_SYSTEMS: [SystemId; 4] = [
+    SystemId::AVENOR,
+    SystemId::LARERIA,
+    SystemId::RENAS,
+    SystemId::AELAVIA,
+];
 const INVALID: SaveError = SaveError::InvalidState("navigation computer plan");
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -126,7 +131,8 @@ impl RoutePlan {
         let (origin_fuel, origin_storage_count) = super::unpack_fuel(reader.u16()?)?;
         let stop = reader.u8()?;
         let count = usize::from(reader.u8()?);
-        if !(2..=ROUTE_SYSTEMS.len()).contains(&count) || usize::from(stop) >= count {
+        // Plans contain a direct leg or one intermediate stop.
+        if !(2..=3).contains(&count) || usize::from(stop) >= count {
             return Err(INVALID);
         }
         let mut systems = Vec::with_capacity(count);
@@ -217,7 +223,7 @@ pub(crate) fn route_station_index(system: SystemId) -> Option<usize> {
 }
 
 // Frozen L337 OriginalWorlds/catalogue.json at a11fe169, sorted like ROUTE_SYSTEMS.
-const HOSTILITY: [f64; ROUTE_SYSTEMS.len()] = [0.0, 0.1, 0.2];
+const HOSTILITY: [f64; ROUTE_SYSTEMS.len()] = [0.0, 0.1, 0.2, 0.4];
 
 pub(crate) fn route_hop(
     catalogue: &OriginalNavigation,
@@ -237,6 +243,10 @@ pub(crate) fn route_feasible(
 ) -> bool {
     grade != NavigationGrade::Empty
         && path.windows(2).enumerate().all(|(index, hop)| {
+            // Future legs assume a station refill. Aelavia has a solar source only.
+            if index > 0 && hop[0] == SystemId::AELAVIA {
+                return false;
+            }
             let fuel = if index == 0 {
                 first_fuel
             } else {

@@ -305,28 +305,30 @@ fn route_estimates_share_cash_and_limit_market_capacity_and_non_tonne_room() {
     destination[textiles].bid_tenths = 40;
 
     cargo.credits_tenths = 0;
-    let empty_wallet = estimate_route_economy(cargo, &[Some(origin), Some(destination), None]);
+    let empty_wallet =
+        estimate_route_economy(cargo, &[Some(origin), Some(destination), None, None]);
     assert_eq!(empty_wallet.trade[0][1], 0);
-    assert_eq!(empty_wallet.sale, [0, 40, 0]);
+    assert_eq!(empty_wallet.sale, [0, 40, 0, 0]);
 
     cargo.credits_tenths = 25;
-    let limited = estimate_route_economy(cargo, &[Some(origin), Some(destination), None]);
+    let limited = estimate_route_economy(cargo, &[Some(origin), Some(destination), None, None]);
     assert_eq!(limited.trade[0][1], 30);
     assert_eq!(limited.sale[1], 40);
     assert_eq!(limited.trade[1][1], 0);
 
     cargo.credits_tenths = 100;
-    let non_tonne_room = estimate_route_economy(cargo, &[Some(origin), Some(destination), None]);
+    let non_tonne_room =
+        estimate_route_economy(cargo, &[Some(origin), Some(destination), None, None]);
     assert_eq!(non_tonne_room.trade[0][1], 30);
 
     destination[gold].stock = MAX_MARKET_QUANTITY - 1;
     let full_after_own_sale =
-        estimate_route_economy(cargo, &[Some(origin), Some(destination), None]);
+        estimate_route_economy(cargo, &[Some(origin), Some(destination), None, None]);
     assert_eq!(full_after_own_sale.trade[0][1], 20);
     assert_eq!(full_after_own_sale.sale[1], 40);
 
     cargo.credits_tenths = u32::MAX - 5;
-    let saturated = estimate_route_economy(cargo, &[Some(origin), Some(destination), None]);
+    let saturated = estimate_route_economy(cargo, &[Some(origin), Some(destination), None, None]);
     assert_eq!(saturated.trade[0][1], 0);
     assert_eq!(saturated.sale[1], 5);
 }

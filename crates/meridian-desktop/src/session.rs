@@ -742,6 +742,7 @@ impl Session {
                 SystemId::AVENOR => "AVENOR",
                 SystemId::RENAS => "RENAS",
                 SystemId::LARERIA => "LARERIA",
+                SystemId::AELAVIA => "AELAVIA",
                 _ => "UNKNOWN SYSTEM",
             })
             .unwrap_or("NO COMMANDER");

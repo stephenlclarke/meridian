@@ -1,0 +1,88 @@
+{
+  "base": "c6ee283a9afd0f8fb98347a41e6c199036a8d254",
+  "files": {
+    "flight/ammunition.rs": {
+      "beforeSHA256": "fa936a3746563a7a2ce733a4e29c0cfb2d8140190c2fdb0e6f083df2ec3cc07f",
+      "afterSHA256": "abd6cb1666a797b078ba62dfba0a23e9caf2ba6b97ee06032d607049884c4696",
+      "hunks": [
+        {
+          "offset": 19139,
+          "before": "",
+          "after": "    if super::services::service_site(dock.system()).is_none() {\n        return Err(INVALID);\n    }\n    validate_physical_berth_event(world, account, dock, tick, revision, previous)\n}\n\npub(super) fn validate_physical_berth_event(\n    world: &World,\n    account: &CommanderAccount,\n    dock: DockContext,\n    tick: u64,\n    revision: u64,\n    previous: Option<(u64, u64, u64)>,\n) -> Result<(), SaveError> {\n"
+        },
+        {
+          "offset": 19985,
+          "before": "        || super::services::service_site(dock.system()).is_none()\n",
+          "after": ""
+        }
+      ]
+    },
+    "flight/modular.rs": {
+      "beforeSHA256": "271c8afc708a475b106eac5999f64a757fe83de5e0814f6477a9bed90b948133",
+      "afterSHA256": "2f5a60f33bc6367816774b1f9d40ac03263ff87ba0d5cd30ad92f05c3cdf5c3c",
+      "hunks": [
+        {
+          "offset": 222,
+          "before": "    navigation::{DockContext, DriveGrade, NavigationFitChange, NavigationGrade},\n",
+          "after": "    navigation::{DockContext, DriveGrade, NavigationFitChange, NavigationGrade, SystemId},\n"
+        },
+        {
+          "offset": 34172,
+          "before": "",
+          "after": "// OriginalWorlds/catalogue.json at a11fe169 lists G01-S235 at TL17.\nfn module_shop_technology(system: SystemId, kind: ModuleKind) -> Option<u8> {\n    if system == SystemId::AELAVIA {\n        return (kind == ModuleKind::NavalEnergyUnit).then_some(17);\n    }\n    let site = super::services::service_site(system)?;\n    Some(crate::equipment::definition().ok()?.offer(site).technology)\n}\n\nfn aelavia_naval_purchase(system: SystemId, action: ModuleAction) -> bool {\n    system == SystemId::AELAVIA && action.purchase_kind() == Some(ModuleKind::NavalEnergyUnit)\n}\n\n"
+        },
+        {
+          "offset": 34967,
+          "before": "            let site = super::services::service_site(e.dock.system()).ok_or(INVALID)?;\n            if crate::equipment::definition()\n                .map_err(|_| INVALID)?\n                .offer(site)\n                .technology\n                < required\n            {\n",
+          "after": "            if module_shop_technology(e.dock.system(), kind).ok_or(INVALID)? < required {\n"
+        },
+        {
+          "offset": 43023,
+          "before": "            super::ammunition::validate_berth_event(\n",
+          "after": "            let validate_berth = if !e.xyzzy && aelavia_naval_purchase(e.dock.system(), e.action) {\n                if world\n                    .jump_journal\n                    .system_at_visit(e.dock.visit(), e.dock.tick())?\n                    != e.dock.system()\n                {\n                    return Err(INVALID);\n                }\n                super::ammunition::validate_physical_berth_event\n            } else {\n                super::ammunition::validate_berth_event\n            };\n            validate_berth(\n"
+        },
+        {
+          "offset": 69080,
+          "before": "        let Some(site) = self\n            .current_dock_context()\n            .and_then(|d| super::services::service_site(d.system()))\n        else {\n",
+          "after": "        let Some(dock) = self.current_dock_context() else {\n"
+        },
+        {
+          "offset": 69182,
+          "before": "        let Ok(base) = crate::equipment::definition() else {\n            return Vec::new();\n        };\n        let technology = base.offer(site).technology;\n",
+          "after": ""
+        },
+        {
+          "offset": 70834,
+          "before": "",
+          "after": "            let technology = module_shop_technology(dock.system(), kind)?;\n"
+        },
+        {
+          "offset": 75707,
+          "before": "        let facts = self\n            .current_service_facts(tick)\n",
+          "after": "        self.station_command_admission(tick)\n"
+        },
+        {
+          "offset": 76038,
+          "before": "",
+          "after": "        {\n            return Err(ModuleError::BerthRequired);\n        }\n        if super::services::service_site(dock.system()).is_none()\n            && !aelavia_naval_purchase(dock.system(), action)\n"
+        },
+        {
+          "offset": 77836,
+          "before": "            let technology = crate::equipment::definition()\n                .map_err(|_| ModuleError::BerthRequired)?\n                .offer(facts.site)\n                .technology;\n",
+          "after": "            let technology =\n                module_shop_technology(dock.system(), kind).ok_or(ModuleError::BerthRequired)?;\n"
+        }
+      ]
+    },
+    "navigation.rs": {
+      "beforeSHA256": "e8dd0982a09f199a2c730d9e16f122da94e0be6326ef7b9747ab0ebadbf41e3a",
+      "afterSHA256": "d69b800dc5ea64120fb8360913d5cd3e33aa2c75f0ba0304d2e80b167d74a611",
+      "hunks": [
+        {
+          "offset": 3151,
+          "before": "",
+          "after": "    pub const AELAVIA: Self = Self {\n        galaxy: 0,\n        system: 235,\n    };\n"
+        }
+      ]
+    }
+  }
+}

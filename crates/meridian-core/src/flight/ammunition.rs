@@ -588,6 +588,20 @@ pub(super) fn validate_berth_event(
     revision: u64,
     previous: Option<(u64, u64, u64)>,
 ) -> Result<(), SaveError> {
+    if super::services::service_site(dock.system()).is_none() {
+        return Err(INVALID);
+    }
+    validate_physical_berth_event(world, account, dock, tick, revision, previous)
+}
+
+pub(super) fn validate_physical_berth_event(
+    world: &World,
+    account: &CommanderAccount,
+    dock: DockContext,
+    tick: u64,
+    revision: u64,
+    previous: Option<(u64, u64, u64)>,
+) -> Result<(), SaveError> {
     let owner = world.combat_identity().ok_or(INVALID)?;
     let nav = world.navigation.ok_or(INVALID)?.validate_save(
         world.navigation_catalogue.as_ref().ok_or(INVALID)?,
@@ -598,7 +612,6 @@ pub(super) fn validate_berth_event(
     if dock.ship().owner() != dock.owner()
         || dock.owner().seed() != owner.owner
         || dock.ship().ordinal() != world.combat_identity().ok_or(INVALID)?.hull
-        || super::services::service_site(dock.system()).is_none()
         || dock.sequence() == 0
         || dock.sequence() > nav.dock_sequence
         || dock.visit() < dock.sequence()

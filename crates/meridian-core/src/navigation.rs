@@ -88,6 +88,10 @@ pub struct SystemId {
     pub system: u16,
 }
 impl SystemId {
+    pub const AELAVIA: Self = Self {
+        galaxy: 0,
+        system: 235,
+    };
     pub const LARERIA: Self = Self {
         galaxy: 0,
         system: 91,

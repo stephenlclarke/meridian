@@ -1,0 +1,13 @@
+{
+  "schema": 1,
+  "id": "aelavia-naval-energy",
+  "undoBefore": [
+    "followup-trade-detail"
+  ],
+  "undoAfter": [],
+  "kind": "inverse",
+  "manifest": "integration/aelavia-naval-energy/PROTECTED-CORE-INVERSE.json",
+  "sha256": "fc6d60f1dc9264c0d52ec4c03472bfe40b9044d72ee99f3111317e8d37d3aa4f",
+  "base": "c6ee283a9afd0f8fb98347a41e6c199036a8d254",
+  "label": "Aelavia Naval Energy Unit"
+}
