@@ -896,10 +896,10 @@ impl World {
                 ammunition
                     .extra_revisions
                     .checked_add(modular.revision)
-                    .and_then(|revisions| revisions.checked_add(modular.passenger_totals().1))
+                    .and_then(|revisions| revisions.checked_add(modular.contract_totals().1))
                     .and_then(|revisions| revisions.checked_add(emp.1))
                     .ok_or(SaveError::SequenceExhausted)?,
-                modular.passenger_totals().0,
+                modular.contract_totals().0,
             ),
             (
                 secret,

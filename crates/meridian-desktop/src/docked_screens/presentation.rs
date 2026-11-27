@@ -1298,7 +1298,10 @@ fn equipment(s: &DockedScreens, c: &Context<'_>, f: &mut Frame) {
         );
         return;
     };
-    let passage_service = panel.selected_slot == "passenger-service";
+    let passage_service = matches!(
+        panel.selected_slot.as_str(),
+        "passenger-service" | "sealed-dispatch"
+    );
     let mut lines = vec![
         row.group.clone(),
         row.name.clone(),

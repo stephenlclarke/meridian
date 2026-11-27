@@ -297,7 +297,7 @@ impl State {
     /// The World only keeps admitted events. This inexpensive projection avoids full account,
     /// station and navigation validation every time flight or trading reads the remaining hold.
     /// Candidate saves separately reconcile the complete ledger before publication.
-    pub(in crate::flight) fn cabin_tonnes(&self) -> Result<u16, services::Error> {
+    pub(in crate::flight) fn contract_hold_tonnes(&self) -> Result<u16, services::Error> {
         let mut fitted = std::collections::BTreeMap::new();
         for event in &self.events {
             match event.action {
@@ -322,6 +322,7 @@ impl State {
         u16::try_from(fitted.values().filter(|value| **value).count())
             .ok()
             .and_then(|count| count.checked_mul(CABIN_TONNES))
+            .and_then(|mass| mass.checked_add(self.dispatch_occupancy().1 as u16))
             .ok_or(services::Error::InvalidAccount)
     }
 }
@@ -382,12 +383,13 @@ pub(super) fn fitted_cabin(item: &OwnedModule) -> Option<CabinGrade> {
 }
 
 impl Ledger {
-    pub(in crate::flight) fn cabin_tonnes(&self) -> u16 {
+    pub(in crate::flight) fn contract_hold_tonnes(&self) -> u16 {
         self.items.iter().filter_map(fitted_cabin).count() as u16 * CABIN_TONNES
+            + u16::from(self.dispatch.active().is_some())
     }
 }
 
-pub(in crate::flight) fn add_cabin_mass(
+pub(in crate::flight) fn add_contract_hold_mass(
     projection: AccountProjection,
     tonnes: u16,
 ) -> Result<AccountProjection, services::Error> {
@@ -399,8 +401,8 @@ pub(in crate::flight) fn add_cabin_mass(
 }
 
 impl World {
-    pub(in crate::flight) fn cabin_tonnes(&self) -> Result<u16, services::Error> {
-        self.modular.cabin_tonnes()
+    pub(in crate::flight) fn contract_hold_tonnes(&self) -> Result<u16, services::Error> {
+        self.modular.contract_hold_tonnes()
     }
 
     pub fn passenger_journey_snapshot(&self) -> Option<PassengerJourneySnapshot> {

@@ -888,7 +888,7 @@ impl World {
         let Some(identity) = self.combat_identity() else {
             return "Salvage unavailable";
         };
-        let Ok(cabins) = self.cabin_tonnes() else {
+        let Ok(cabins) = self.contract_hold_tonnes() else {
             return "Hold unavailable";
         };
         let mut reservations = self.navigation_trade.reservations();

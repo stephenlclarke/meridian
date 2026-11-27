@@ -263,7 +263,7 @@ impl World {
     pub(super) fn original_service_occupancy(&self) -> (usize, usize) {
         let (records, active) = self.flight_reception.occupancy();
         let (t04_records, t04_active) = self.navigation_trade.occupancy();
-        let (passenger_records, passenger_active) = self.modular.passenger_occupancy();
+        let (passenger_records, passenger_active) = self.modular.contract_occupancy();
         let practice_count = self.practice_history.len() + usize::from(self.practice.is_some());
         (
             records

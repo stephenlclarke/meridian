@@ -58,7 +58,7 @@ impl State {
     ) -> Result<(), SaveError> {
         let (own_records, own_active) = self.occupancy();
         let (t04_records, t04_active) = world.navigation_trade.occupancy();
-        let (passenger_records, passenger_active) = world.modular.passenger_occupancy();
+        let (passenger_records, passenger_active) = world.modular.contract_occupancy();
         let records = own_records
             + passenger_records
             + t04_records

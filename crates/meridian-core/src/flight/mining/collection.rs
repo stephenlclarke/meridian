@@ -117,7 +117,10 @@ impl World {
         let mut reservations = self.navigation_trade.reservations();
         reservations.capacity = reservations
             .capacity
-            .checked_add(self.cabin_tonnes().map_err(|_| MiningError::InvalidState)?)
+            .checked_add(
+                self.contract_hold_tonnes()
+                    .map_err(|_| MiningError::InvalidState)?,
+            )
             .ok_or(MiningError::HoldFull)?;
         account
             .prepare_cargo_intake(freight, commodity, reservations)

@@ -253,7 +253,7 @@ impl World {
     ) -> (usize, usize) {
         let (t01_records, t01_active) = self.flight_reception.occupancy();
         let (t04_records, t04_active) = self.navigation_trade.occupancy();
-        let (passenger_records, passenger_active) = self.modular.passenger_occupancy();
+        let (passenger_records, passenger_active) = self.modular.contract_occupancy();
         let records = self
             .freight_session
             .as_ref()

@@ -1,4 +1,5 @@
 //! Host menu state is ephemeral. Only Profile's prepared commands can change the game.
+mod dispatch;
 use crate::{
     authored_hull::AuthoredHulls, docked_screens as ui, profile::Profile, session::Action,
 };
@@ -141,6 +142,7 @@ struct Anchor {
     equipment: Option<equipment::Snapshot>,
     ammunition: Option<meridian_core::AmmunitionSnapshot>,
     modules: Option<meridian_core::ModularEquipmentSnapshot>,
+    dispatch: Option<meridian_core::DispatchRecord>,
     passage: Option<meridian_core::PassengerJourneySnapshot>,
     emp: Option<meridian_core::EmpSnapshot>,
     services: Option<meridian_core::ServiceSnapshot>,
@@ -156,6 +158,7 @@ impl Anchor {
             equipment: world.equipment_snapshot(),
             ammunition: world.ammunition_snapshot(),
             modules: world.modular_equipment_snapshot(),
+            dispatch: world.dispatch_records().pop(),
             passage: world.passenger_journey_snapshot(),
             emp: world.emp_snapshot(),
             services: world.service_snapshot(),
@@ -574,7 +577,11 @@ impl Docked {
                 .unwrap_or_else(|| "This fitting action is unavailable".into()));
         }
         let action = equipment_action(world, &node, instance, &slot, operation)?;
-        let details = if slot == "passenger-service" {
+        let details = if slot == dispatch::BOARD {
+            let mut details = vec![row.name.clone()];
+            details.extend(row.readout.clone());
+            details
+        } else if slot == "passenger-service" {
             let mut details = vec![row.name.clone()];
             details.extend(row.readout.clone());
             details.push("Confirm publishes the complete passage action".into());
@@ -592,7 +599,9 @@ impl Docked {
         self.review(
             world,
             Intent::Change(action),
-            if slot == "passenger-service" {
+            if slot == dispatch::BOARD {
+                dispatch::TITLE
+            } else if slot == "passenger-service" {
                 "Passenger service review"
             } else {
                 "Equipment review"
@@ -636,6 +645,14 @@ fn equipment_action(
     operation: ui::EquipmentOperation,
 ) -> Result<Action, String> {
     use ui::EquipmentOperation::{Buy, Fit, Store};
+    if slot == dispatch::BOARD {
+        if operation != Buy || instance.is_some() {
+            return Err("Select a dispatch board action".into());
+        }
+        return dispatch::action(node)
+            .map(|action| Action::Module(ModuleAction::Dispatch(action)))
+            .ok_or_else(|| "Unknown dispatch action".into());
+    }
     if slot == "passenger-service" {
         if operation != Buy || instance.is_some() {
             return Err("Select a passenger service action".into());
@@ -1277,6 +1294,21 @@ fn equipment_panel(
             }),
         available: true,
     });
+    slots.push(ui::EquipmentSlot {
+        id: dispatch::BOARD.into(),
+        label: dispatch::TITLE.into(),
+        fitted: if world
+            .dispatch_records()
+            .last()
+            .is_some_and(|record| record.terminal.is_none())
+        {
+            "Record aboard"
+        } else {
+            "Contract board"
+        }
+        .into(),
+        available: true,
+    });
     append_pylon_slots(&mut slots, &ammo);
     for (id, label, slot) in [
         ("targeting", "Targeting computer", ModuleSlot::Targeting),
@@ -1362,6 +1394,8 @@ fn equipment_panel(
         if slot == ModuleSlot::Shield {
             rows.extend(shield_acquisition_rows());
         }
+    } else if selected == dispatch::BOARD {
+        rows = dispatch::rows(world);
     } else if selected == "passenger-service" {
         rows = passenger_service_rows(world)?;
     } else if selected == ui::emp::SLOT {
@@ -1962,6 +1996,104 @@ mod tests {
     }
 
     #[test]
+    fn sealed_dispatch_cold_child() {
+        let Some(path) = std::env::var_os("MERIDIAN_G01_TEST_SLOT") else {
+            return;
+        };
+        let mut profile = open(std::path::Path::new(&path));
+        ok(profile.continue_saved());
+        let records = profile.world.dispatch_records();
+        assert_eq!(records.len(), 1);
+        assert_eq!(records[0].offer.fee_tenths, 4100);
+        let received = records[0].terminal.is_some();
+        assert_eq!(
+            profile.world.credits_tenths(),
+            Some(if received { 11300 } else { 7200 })
+        );
+        assert_eq!(
+            profile.world.service_snapshot().unwrap().used_tonnes,
+            u16::from(!received)
+        );
+        assert_eq!(
+            profile
+                .world
+                .unwritten_route_clue_progress()
+                .unwrap()
+                .earned
+                .len(),
+            usize::from(received)
+        );
+    }
+
+    #[test]
+    fn sealed_dispatch_board_flies_ordinary_route_and_cold_continues_original_record() {
+        fn board(menu: &mut Docked, profile: &mut Profile) {
+            ok(menu.open(&profile.world, ui::Screen::Equipment));
+            let count = ok(equipment_panel(&profile.world, "cargo", "")).slots.len();
+            for _ in 0..count {
+                if menu.slot == dispatch::BOARD {
+                    return;
+                }
+                present(menu, profile);
+                ok(menu.input(profile, ui::Input::Key(ui::Key::NextSlot)));
+            }
+            panic!("dispatch board not reachable");
+        }
+        fn enter(menu: &mut Docked, profile: &mut Profile) {
+            present(menu, profile);
+            ok(menu.input(profile, ui::Input::Key(ui::Key::Confirm)));
+        }
+        fn reopen(profile: Profile, directory: &TestDirectory) -> Profile {
+            let expected = profile.world.dispatch_records();
+            drop(profile);
+            let status = ok(std::process::Command::new(ok(std::env::current_exe()))
+                .args(["--exact", "docked::tests::sealed_dispatch_cold_child"])
+                .env("MERIDIAN_G01_TEST_SLOT", &directory.0)
+                .status());
+            assert!(status.success());
+            let mut continued = open(&directory.0);
+            ok(continued.continue_saved());
+            assert_eq!(continued.world.dispatch_records(), expected);
+            continued
+        }
+        let (directory, mut profile, mut menu) = start();
+        board(&mut menu, &mut profile);
+        let before = ok(profile.world.save_bytes());
+        enter(&mut menu, &mut profile);
+        assert!(
+            menu.pending
+                .as_ref()
+                .unwrap()
+                .view
+                .details
+                .iter()
+                .any(|d| d.contains("Avenor > Renas") && d.contains("410 CR"))
+        );
+        present(&mut menu, &profile);
+        ok(menu.input(&mut profile, ui::Input::Key(ui::Key::Back)));
+        assert_eq!(ok(profile.world.save_bytes()), before);
+        enter(&mut menu, &mut profile);
+        enter(&mut menu, &mut profile);
+        let mut profile = reopen(profile, &directory);
+        crate::profile::tests::travel(&mut profile);
+        let mut menu = ok(Docked::new(&profile.world));
+        board(&mut menu, &mut profile);
+        enter(&mut menu, &mut profile);
+        assert!(
+            menu.pending
+                .as_ref()
+                .unwrap()
+                .view
+                .details
+                .iter()
+                .any(|line| line.contains("hand over original"))
+        );
+        enter(&mut menu, &mut profile);
+        let profile = reopen(profile, &directory);
+        assert_eq!(profile.world.credits_tenths(), Some(11300));
+    }
+
+    #[test]
     fn cabin_offers_and_separate_g04_review_use_real_demands_and_persist_refusal() {
         let (directory, mut profile, mut menu) = start();
         let panel = ok(equipment_panel(&profile.world, "passenger-cabins", ""));
@@ -2295,6 +2427,7 @@ mod tests {
                 ui::emp::SLOT,
                 "passenger-cabins",
                 "passenger-service",
+                "sealed-dispatch",
                 "pylon-0",
                 "pylon-1",
                 "pylon-2",

@@ -479,14 +479,17 @@ impl State {
                     });
             if event.revision <= anchor.revision {
                 fitted_units = units;
-                cabin_mass = ledger.cabin_tonnes();
+                cabin_mass = ledger.contract_hold_tonnes();
             } else {
                 if !matches!(event.action, ModuleAction::FlightLaserExchange { .. })
                     && !self.history.owns_berth(event.dock)
                 {
                     return Err(INVALID);
                 }
-                changes.push((event.revision, Change::Fit(units, ledger.cabin_tonnes())));
+                changes.push((
+                    event.revision,
+                    Change::Fit(units, ledger.contract_hold_tonnes()),
+                ));
             }
         }
         // A plan changes reserved mass without changing the account revision. Join its
@@ -648,6 +651,7 @@ pub(super) fn requires_history(action: ModuleAction) -> bool {
         ModuleAction::Purchase {
             kind: ModuleKind::Cabin(_)
         } | ModuleAction::Passenger(_)
+            | ModuleAction::Dispatch(_)
     )
 }
 

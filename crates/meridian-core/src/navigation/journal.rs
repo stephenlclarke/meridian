@@ -316,6 +316,31 @@ impl JumpJournal {
                 .all(|(leg, hop)| leg.source == hop[0] && leg.destination == hop[1])
     }
 
+    pub(crate) fn flown_dispatch(
+        &self,
+        from: DockContext,
+        to: DockContext,
+        path: &[SystemId],
+    ) -> bool {
+        let cut = |d: DockContext| usize::try_from(d.visit().checked_sub(d.sequence())?).ok();
+        let (Some(start), Some(end)) = (cut(from), cut(to)) else {
+            return false;
+        };
+        let Some(legs) = self.legs.get(start..end) else {
+            return false;
+        };
+        let mut edges = path.windows(2).peekable();
+        for leg in legs {
+            if edges
+                .peek()
+                .is_some_and(|edge| edge[0] == leg.source && edge[1] == leg.destination)
+            {
+                edges.next();
+            }
+        }
+        edges.next().is_none() && path.last() == Some(&to.system())
+    }
+
     pub(crate) fn emp_arrival_clocks(&self) -> Vec<u64> {
         self.legs.iter().map(|leg| leg.physical_tick).collect()
     }

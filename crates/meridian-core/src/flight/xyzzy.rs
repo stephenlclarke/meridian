@@ -523,7 +523,7 @@ impl World {
     pub(super) fn test_tank_custody_clear(&self) -> bool {
         self.active_freight_job().is_none()
             && self.navigation_trade.occupancy().1 == 0
-            && self.modular.passenger_occupancy().1 == 0
+            && self.modular.contract_occupancy().1 == 0
     }
     fn xyzzy_has_free_ordinary_utility_mount(&self) -> Result<bool, SaveError> {
         let fit = self.fuel_scoops_snapshot().ok_or(INVALID)?;

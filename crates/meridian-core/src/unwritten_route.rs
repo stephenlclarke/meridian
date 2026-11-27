@@ -42,6 +42,19 @@ impl World {
         let owner = self.commander_id()?.seed();
         let hull = self.player_ship_id()?.ordinal();
         let receipts = [
+            self.dispatch_records()
+                .iter()
+                .find(|r| {
+                    r.issuer.owner().seed() == owner
+                        && r.issuer.ship().ordinal() == hull
+                        && matches!(r.terminal, Some((crate::DispatchAction::Receive, _)))
+                })
+                .map(|_| {
+                    BaseClue::new(
+                        "l337.contract/sealed-dispatch",
+                        "sealed-dispatch-family-trace",
+                    )
+                }),
             self.mission_snapshot()
                 .and_then(|snapshot| snapshot.freight.clue)
                 .map(|award| BaseClue::new(award.source_id(), award.clue_id())),
