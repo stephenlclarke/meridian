@@ -1356,13 +1356,11 @@ mod tests {
     fn paid_identification_work_readout_follows_the_fitted_item_across_continue() {
         fn rock_fields(world: &mut World) -> Vec<(&'static str, String)> {
             let tick = world.snapshot().tick;
+            let rock = world.mining_belt_snapshot().unwrap().bodies[0].id;
             for _ in 0..world.scanner_targets().len() {
                 assert!(world.cycle_scanner_target(tick, [1280, 720]).unwrap());
                 let target = world.targeting_snapshot().unwrap();
-                if matches!(
-                    target.identity,
-                    TargetIdentity::Work(WorkTargetId::Asteroid(_))
-                ) {
+                if target.identity == TargetIdentity::Work(WorkTargetId::Asteroid(rock)) {
                     return target.fields;
                 }
             }
@@ -1410,6 +1408,27 @@ mod tests {
         assert_eq!(
             rock_fields(&mut restored),
             vec![("Type", "rock".into()), ("Custody", "abandoned".into())]
+        );
+        let rock = restored.mining_belt_snapshot().unwrap().bodies[0].id;
+        for _ in 0..12000 {
+            restored.step(FlightInput::default()).unwrap();
+            if let Some(ore) = restored.mining_collection_target(rock) {
+                let readout = restored.targeting_snapshot().unwrap();
+                assert_eq!(
+                    readout.identity,
+                    TargetIdentity::Work(WorkTargetId::Asteroid(rock))
+                );
+                assert_eq!(readout.tracked_fragment, Some(ore.id));
+                assert_eq!(
+                    readout.fields,
+                    vec![("Type", "cargo".into()), ("Custody", "abandoned".into())]
+                );
+                return;
+            }
+        }
+        panic!(
+            "no released ore from the selected rock: {:?}",
+            restored.automatic_work_status()
         );
     }
 
