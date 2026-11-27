@@ -1,6 +1,7 @@
 mod audio;
 mod emp;
 mod manual_work;
+pub(crate) use manual_work::FlightTrigger;
 mod mule_presentation;
 mod mule_validation;
 mod occupied_cut;
@@ -78,11 +79,7 @@ fn step_frame(
         {
             *pulse = None;
             *mining = None;
-        } else if fire_held
-            && (world.selected_laser_view() != FlightView::Front
-                || (!world.pilot_operates_selected_tool()
-                    && occupied_cut::ready_target(world).is_none()))
-        {
+        } else if fire_held && FlightTrigger::current(world) == FlightTrigger::MountedLaser {
             if world.selected_laser_view() == FlightView::Front
                 && let Ok(tool) = world.mining_tool_authority()
             {
