@@ -656,26 +656,25 @@ fn actual_missile_notice_and_restored_airborne_session_do_not_replay() {
     assert_eq!(recording.borrow().sounds, [Launch, Ping]);
 }
 
+fn open_flight_route_binding(app: &mut App) {
+    use winit::keyboard::ModifiersState;
+    app.modifiers = ModifiersState::SHIFT;
+    let routed = key(app, KeyCode::KeyR, ElementState::Pressed, false, Some("R"));
+    app.game_key(routed.unwrap_or_else(|| panic!("flight route key")));
+    app.modifiers = ModifiersState::empty();
+}
+
 #[test]
 fn flight_route_preview_cancel_and_saved_selection_use_the_fitted_computer() {
     use meridian_core::navigation::SystemId;
-    use winit::keyboard::ModifiersState;
     let directory = TestDirectory::new();
     let mut app = app(&directory);
     launched(&mut app);
+    ok(app.game.save());
     let before = ok(app.game.world.save_bytes());
     let slot = directory.0.join("commander.meridian");
     let before_disk = ok(std::fs::read(&slot));
-    app.modifiers = ModifiersState::SHIFT;
-    let routed = key(
-        &mut app,
-        KeyCode::KeyR,
-        ElementState::Pressed,
-        false,
-        Some("R"),
-    );
-    app.game_key(routed.unwrap_or_else(|| panic!("flight route key")));
-    app.modifiers = ModifiersState::empty();
+    open_flight_route_binding(&mut app);
     let menu = app
         .flight_routes
         .as_ref()
@@ -705,7 +704,7 @@ fn flight_route_preview_cancel_and_saved_selection_use_the_fitted_computer() {
     assert!(app.flight_routes.is_none());
     assert_eq!(ok(app.game.world.save_bytes()), before);
     assert_eq!(ok(std::fs::read(&slot)), before_disk);
-    app.open_flight_routes();
+    open_flight_route_binding(&mut app);
     assert_eq!(
         key(
             &mut app,
@@ -731,6 +730,73 @@ fn flight_route_preview_cancel_and_saved_selection_use_the_fitted_computer() {
     let mut profile = open(&directory.0);
     ok(profile.continue_saved());
     assert_eq!(profile.world.active_route_progress(), Some(route));
+}
+
+#[test]
+fn flight_route_preview_cancel_preserves_the_saved_route_to_renas() {
+    use meridian_core::navigation::SystemId;
+    let directory = TestDirectory::new();
+    let mut profile = open(&directory.0);
+    assert!(ok(profile.new_commander(98019)));
+    let original = ok(profile.world.route_alternatives(SystemId::RENAS))
+        .into_iter()
+        .find(|route| route.plan.systems() == [SystemId::AVENOR, SystemId::RENAS])
+        .unwrap_or_else(|| panic!("direct route to Renas"))
+        .plan;
+    ok(profile.navigation_route(Some(&original)));
+    let mut app = App::with_profile(profile);
+    launched(&mut app);
+    ok(app.game.save());
+    let path = directory.0.join("commander.meridian");
+    let before = ok(std::fs::read(&path));
+    let expected = app
+        .game
+        .world
+        .active_route_progress()
+        .unwrap_or_else(|| panic!("original route"));
+    assert_eq!(expected.plan, original);
+
+    open_flight_route_binding(&mut app);
+    let preview = app
+        .flight_routes
+        .as_ref()
+        .unwrap_or_else(|| panic!("route planner"))
+        .panel();
+    assert!(
+        preview
+            .lines
+            .iter()
+            .any(|line| line == "> Avenor > Renas > Lareria")
+    );
+    assert_eq!(
+        key(
+            &mut app,
+            KeyCode::Escape,
+            ElementState::Pressed,
+            false,
+            None
+        ),
+        None
+    );
+    assert!(app.flight_routes.is_none());
+    assert_eq!(
+        app.game.world.active_route_progress(),
+        Some(expected.clone())
+    );
+    assert_eq!(ok(std::fs::read(&path)), before);
+    drop(app);
+    let mut cold = open(&directory.0);
+    ok(cold.continue_saved());
+    let restored = cold
+        .world
+        .active_route_progress()
+        .unwrap_or_else(|| panic!("cold route"));
+    assert_eq!(restored, expected);
+    assert_eq!(restored.plan.destination(), SystemId::RENAS);
+    assert_eq!(
+        restored.plan.systems(),
+        &[SystemId::AVENOR, SystemId::RENAS]
+    );
 }
 
 #[test]
