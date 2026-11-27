@@ -28,7 +28,11 @@ fn activate(app: &mut App) {
     menu(app);
     assert_eq!(press(app, KeyCode::Enter), None);
     assert_eq!(press(app, KeyCode::Enter), None);
-    assert!(app.xyzzy.as_ref().is_some_and(|menu| !menu.reviewing));
+    assert!(
+        app.xyzzy.as_ref().is_some_and(|menu| !menu.reviewing),
+        "XYZZY result: {:?}",
+        app.notice.text
+    );
     press(app, KeyCode::Escape);
     assert_eq!(app.game.world.commander_name(), Some("CLARKE"));
 }
@@ -47,7 +51,11 @@ fn secret_menu_requires_explicit_chord_and_confirmation_and_cancel_never_grants(
     assert!(app.xyzzy.as_ref().is_some_and(|menu| menu.reviewing));
     assert_eq!(ok(app.game.world.save_bytes()), before);
     press(&mut app, KeyCode::Escape);
-    assert!(app.xyzzy.as_ref().is_some_and(|menu| !menu.reviewing));
+    assert!(
+        app.xyzzy.as_ref().is_some_and(|menu| !menu.reviewing),
+        "XYZZY result: {:?}",
+        app.notice.text
+    );
     press(&mut app, KeyCode::KeyB);
     assert!(app.xyzzy.is_none());
     assert_eq!(ok(app.game.world.save_bytes()), before);
@@ -536,7 +544,11 @@ fn activate_refit_and_toggle_fuel_without_leaving_the_menu() {
     menu(&mut app);
     press(&mut app, KeyCode::Enter);
     press(&mut app, KeyCode::Enter);
-    assert!(app.xyzzy.as_ref().is_some_and(|menu| !menu.reviewing));
+    assert!(
+        app.xyzzy.as_ref().is_some_and(|menu| !menu.reviewing),
+        "XYZZY result: {:?}",
+        app.notice.text
+    );
     let items = app.game.world.ammunition_snapshot();
     let modules = app.game.world.modular_equipment_snapshot();
     for steps in [1, 1, 7] {
@@ -549,7 +561,11 @@ fn activate_refit_and_toggle_fuel_without_leaving_the_menu() {
         assert_eq!(app.game.world.ammunition_snapshot(), items);
         assert_eq!(app.game.world.modular_equipment_snapshot(), modules);
     }
-    assert!(app.xyzzy.as_ref().is_some_and(|menu| !menu.reviewing));
+    assert!(
+        app.xyzzy.as_ref().is_some_and(|menu| !menu.reviewing),
+        "XYZZY result: {:?}",
+        app.notice.text
+    );
     // Wrap through the testing rows to the fuel action.
     for _ in 0..6 {
         press(&mut app, KeyCode::ArrowUp);
@@ -708,7 +724,11 @@ fn testing_menu_h_help_wins_over_hidden_galaxy_and_showroom_search_without_losin
         assert!(app.help.is_none());
         assert!(app.xyzzy.as_ref().is_some_and(|menu| menu.reviewing));
         press(&mut app, KeyCode::Escape);
-        assert!(app.xyzzy.as_ref().is_some_and(|menu| !menu.reviewing));
+        assert!(
+            app.xyzzy.as_ref().is_some_and(|menu| !menu.reviewing),
+            "XYZZY result: {:?}",
+            app.notice.text
+        );
         press(&mut app, KeyCode::Escape);
         assert!(app.xyzzy.is_none());
         assert!(app.docked.as_ref().is_some_and(Docked::search_active));

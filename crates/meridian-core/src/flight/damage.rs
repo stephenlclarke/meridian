@@ -402,6 +402,10 @@ impl State {
             }
             events.push((clock, 4, 0, Effect::SolarFatal));
         }
+        if let Some((dock, _, _)) = world.xyzzy_medusa_issue() {
+            let clock = self.berth_clock(dock.sequence()).ok_or(INVALID)?;
+            events.push((clock, 0, u64::MAX, Effect::MedusaIssue));
+        }
         events.sort_by_key(|&(clock, phase, sequence, _)| (clock, phase, sequence));
         Ok(events)
     }
@@ -548,6 +552,7 @@ fn validate_exclusive_laser_targets(
 
 #[derive(Debug, Clone, Copy)]
 enum Effect {
+    MedusaIssue,
     Berth,
     ShieldFit(ShieldGrade),
     Laser(super::OrdinaryWeapon),
@@ -571,12 +576,22 @@ fn replay(events: &[ResourceEvent], end: u64) -> Result<Pools, SaveError> {
     };
     let mut clock = 0;
     let mut recharge = 7;
+    let mut capacity = super::weapons::ENERGY_CAPACITY_HUNDREDTHS;
     for &(at, phase, _, effect) in events {
-        advance_with_rate(&mut pools, at.checked_sub(clock).ok_or(INVALID)?, recharge);
+        advance_with_rate(
+            &mut pools,
+            at.checked_sub(clock).ok_or(INVALID)?,
+            recharge,
+            capacity,
+        );
         match effect {
             Effect::Berth => {
-                pools.pulse.replay_berth();
+                pools.pulse.replay_berth(capacity);
                 pools.shields.fill();
+            }
+            Effect::MedusaIssue => {
+                capacity = super::weapons::MEDUSA_ENERGY;
+                pools.pulse.replay_berth(capacity);
             }
             Effect::ShieldFit(grade) => pools.shields.refit(grade),
             Effect::Laser(weapon) => {
@@ -620,11 +635,18 @@ fn replay(events: &[ResourceEvent], end: u64) -> Result<Pools, SaveError> {
         }
         clock = at;
     }
-    advance_with_rate(&mut pools, end.checked_sub(clock).ok_or(INVALID)?, recharge);
+    advance_with_rate(
+        &mut pools,
+        end.checked_sub(clock).ok_or(INVALID)?,
+        recharge,
+        capacity,
+    );
     Ok(pools)
 }
-fn advance_with_rate(pools: &mut Pools, elapsed: u64, recharge: u16) {
-    pools.pulse.replay_advance_with_rate(elapsed, recharge);
+fn advance_with_rate(pools: &mut Pools, elapsed: u64, recharge: u16, capacity: u16) {
+    pools
+        .pulse
+        .replay_advance_with_rate(elapsed, recharge, capacity);
     pools.shields.advance(elapsed);
 }
 
@@ -633,7 +655,12 @@ mod tests;
 
 #[cfg(test)]
 fn advance(pools: &mut Pools, elapsed: u64) {
-    advance_with_rate(pools, elapsed, 7);
+    advance_with_rate(
+        pools,
+        elapsed,
+        7,
+        super::weapons::ENERGY_CAPACITY_HUNDREDTHS,
+    );
 }
 
 #[cfg(test)]

@@ -6,6 +6,7 @@ use core::fmt;
 
 pub const PULSE_RANGE: f64 = 6000.0;
 pub const PULSE_COOLDOWN_TICKS: u8 = 18;
+pub(super) const MEDUSA_ENERGY: u16 = 41_000;
 pub const ENERGY_CAPACITY_HUNDREDTHS: u16 = 38_000;
 const ENERGY_COST_HUNDREDTHS: u16 = 100;
 pub(super) const ENERGY_RECHARGE_HUNDREDTHS: u16 = 7;
@@ -128,30 +129,36 @@ impl Default for PulseResources {
 impl PulseResources {
     #[cfg(test)]
     pub(super) fn replay_advance(&mut self, elapsed: u64) {
-        self.replay_advance_with_rate(elapsed, 7);
+        self.replay_advance_with_rate(elapsed, 7, ENERGY_CAPACITY_HUNDREDTHS);
     }
-    pub(super) fn replay_advance_with_rate(&mut self, elapsed: u64, recharge: u16) {
+    pub(super) fn replay_advance_with_rate(&mut self, elapsed: u64, recharge: u16, capacity: u16) {
         self.energy = u64::from(self.energy)
             .saturating_add(elapsed.saturating_mul(u64::from(recharge)))
-            .min(38000) as u16;
+            .min(u64::from(capacity)) as u16;
         self.heat = u64::from(self.heat).saturating_sub(elapsed) as u16;
         self.cooldown = u64::from(self.cooldown).saturating_sub(elapsed) as u8;
     }
-    pub(super) fn replay_berth(&mut self) {
-        self.energy = 38000;
+    pub(super) fn replay_berth(&mut self, capacity: u16) {
+        self.energy = capacity;
         self.heat = 0;
     }
-    pub(super) fn advance(&mut self, opening: FlightMode, next: FlightMode, recharge: u16) {
+    pub(super) fn advance(
+        &mut self,
+        opening: FlightMode,
+        next: FlightMode,
+        recharge: u16,
+        capacity: u16,
+    ) {
         if opening == FlightMode::Docked {
             return;
         }
         self.cooldown = self.cooldown.saturating_sub(1);
         if next == FlightMode::Docked {
             // Source docking resets energy and heat, retaining laser cooldown.
-            self.energy = ENERGY_CAPACITY_HUNDREDTHS;
+            self.energy = capacity;
             self.heat = 0;
         } else {
-            self.energy = (self.energy + recharge).min(ENERGY_CAPACITY_HUNDREDTHS);
+            self.energy = (self.energy + recharge).min(capacity);
             self.heat = self.heat.saturating_sub(1);
         }
     }
@@ -454,10 +461,17 @@ impl World {
             .map(|(item, _)| item)
     }
 
+    pub(super) fn energy_capacity(&self) -> u16 {
+        if self.xyzzy_medusa_active() {
+            MEDUSA_ENERGY
+        } else {
+            ENERGY_CAPACITY_HUNDREDTHS
+        }
+    }
     pub fn flight_resources_snapshot(&self) -> Option<FlightResourcesSnapshot> {
         self.commander_account.as_ref()?;
         Some(FlightResourcesSnapshot {
-            energy_capacity_hundredths: ENERGY_CAPACITY_HUNDREDTHS,
+            energy_capacity_hundredths: self.energy_capacity(),
             energy_recharge_hundredths_per_tick: self.energy_recharge_hundredths(),
             energy_hundredths: self.pulse.energy,
             heat_fifths: self.pulse.heat,

@@ -729,9 +729,12 @@ impl World {
         let account = current
             .prepare_xyzzy(first, refill && !max_tanks, mode)
             .map_err(|_| INVALID)?;
+        let first_medusa =
+            review.action == XyzzyAction::ActivateMedusa && !self.xyzzy_medusa_active();
         self.xyzzy.records.push(record);
         self.commander_account = Some(account);
-        if review.action == XyzzyAction::ActivateMedusa {
+        if first_medusa {
+            self.pulse.replay_berth(super::weapons::MEDUSA_ENERGY);
             let station = super::OriginalStationData::medusa_bundled()
                 .map_err(|_| SaveError::ContentMismatch)?;
             self.state.station = Some(station.station_pose());

@@ -629,6 +629,7 @@ impl World {
             self.state.mode,
             next.mode,
             self.energy_recharge_hundredths(),
+            self.energy_capacity(),
         );
         if self.state.mode != FlightMode::Docked {
             prepared.missiles.cooldown = prepared.missiles.cooldown.saturating_sub(1);
