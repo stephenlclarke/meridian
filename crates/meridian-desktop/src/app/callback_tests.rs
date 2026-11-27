@@ -687,6 +687,17 @@ fn flight_mining_shortcut_and_audio_chord_have_distinct_effects() {
     ));
     assert_eq!(app.audio_help_line(), sound);
 
+    let salvage = key(
+        &mut app,
+        KeyCode::KeyV,
+        ElementState::Pressed,
+        false,
+        Some("V"),
+    );
+    app.game_key(salvage.unwrap_or_else(|| panic!("flight salvage shortcut")));
+    assert_eq!(app.notice.text.as_deref(), Some("No recoverable wrecks"));
+    assert_eq!(app.game.world.targeting_snapshot(), Some(selected.clone()));
+
     app.modifiers = ModifiersState::CONTROL | ModifiersState::SHIFT;
     assert_eq!(
         key(

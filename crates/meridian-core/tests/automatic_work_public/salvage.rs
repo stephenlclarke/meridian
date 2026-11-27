@@ -367,13 +367,16 @@ fn check_paid_wreck_recovery(mut world: World) {
     let law = world.legal_value();
     let fitted = some(world.modular_equipment_snapshot()).items;
     let target = WorkTargetId::Wreck(manifest.source);
-    salvage_filter(&mut world);
-    assert!(select_wreck(&mut world, target));
+    let tick = world.snapshot().tick;
+    let viewport = [1280, 720];
+    assert!(ok(world.cycle_salvage_contact(tick, viewport)));
+    assert!(ok(world.cycle_salvage_contact(tick, viewport)));
+    assert_eq!(world.commodity_quantity(manifest.commodity), Some(held));
     assert_eq!(
         some(world.targeting_snapshot()).identity,
         TargetIdentity::Work(target)
     );
-    assert!(world.automatic_work_status().is_some());
+    assert!(world.automatic_work_status().is_none());
     let mut recovered = 0u64;
     let mut previous_recovery = None;
     let mut first_recovery_pose = None;
@@ -455,6 +458,11 @@ fn check_paid_wreck_recovery(mut world: World) {
         Some(held + recovered)
     );
     assert!(!cold.auto_salvage_eligible(manifest.source));
+    let tick = cold.snapshot().tick;
+    assert!(ok(cold.cycle_scanner_target(tick, viewport)));
+    let selected = cold.targeting_snapshot();
+    assert!(!ok(cold.cycle_salvage_contact(tick, viewport)));
+    assert_eq!(cold.targeting_snapshot(), selected);
 }
 
 #[test]
@@ -485,6 +493,11 @@ fn manual_scanner_recovers_finite_wreck_cargo_without_targeting_modules() {
             break;
         }
     }
+    let selected = pilot.targeting_snapshot();
+    assert!(!ok(
+        pilot.cycle_salvage_contact(pilot.snapshot().tick, [1280, 720])
+    ));
+    assert_eq!(pilot.targeting_snapshot(), selected);
     assert!(pilot.pilot_operates_selected_tool());
     assert_eq!(pilot.request_manual_wreck_recovery(), "Hold for recovery");
     let initial = some(pilot.commodity_quantity(manifest.commodity));
