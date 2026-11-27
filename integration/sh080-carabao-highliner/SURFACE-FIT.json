@@ -1,0 +1,153 @@
+{
+  "nominalPaddingMetres": 0.02,
+  "minimumRefinementTargetsMillimetres": {
+    "detailed": 3200,
+    "native": 4400
+  },
+  "fullUpperMillimetres": {
+    "detailed": 3136,
+    "native": 4390
+  },
+  "pieces": {
+    "keel": {
+      "detailed": 2018,
+      "native": 4015
+    },
+    "port-bay-1": {
+      "detailed": 2120,
+      "native": 4219
+    },
+    "port-bay-2": {
+      "detailed": 2120,
+      "native": 4219
+    },
+    "port-bay-3": {
+      "detailed": 2120,
+      "native": 4219
+    },
+    "port-bay-4": {
+      "detailed": 2120,
+      "native": 4219
+    },
+    "port-rail": {
+      "detailed": 3136,
+      "native": 4390
+    },
+    "port-engine": {
+      "detailed": 2850,
+      "native": 4021
+    },
+    "starboard-bay-1": {
+      "detailed": 2120,
+      "native": 4219
+    },
+    "starboard-bay-2": {
+      "detailed": 2120,
+      "native": 4219
+    },
+    "starboard-bay-3": {
+      "detailed": 2120,
+      "native": 4219
+    },
+    "starboard-bay-4": {
+      "detailed": 2120,
+      "native": 4219
+    },
+    "starboard-rail": {
+      "detailed": 3136,
+      "native": 4390
+    },
+    "starboard-engine": {
+      "detailed": 2850,
+      "native": 4021
+    },
+    "aft-cross-tie": {
+      "detailed": 3009,
+      "native": 3009
+    },
+    "forward-cross-tie": {
+      "detailed": 3009,
+      "native": 3009
+    },
+    "dorsal-cabin": {
+      "detailed": 2442,
+      "native": 4229
+    },
+    "passenger-spine": {
+      "detailed": 1967,
+      "native": 3794
+    },
+    "port-spine-rail": {
+      "detailed": 1718,
+      "native": 3294
+    },
+    "starboard-spine-rail": {
+      "detailed": 1718,
+      "native": 3294
+    },
+    "dorsal-canopy": {
+      "detailed": 486,
+      "native": 1393
+    },
+    "dorsal-cap": {
+      "detailed": 340,
+      "native": 2198
+    },
+    "port-service-pipe": {
+      "detailed": 260,
+      "native": 3967
+    },
+    "port-instrument-housing": {
+      "detailed": 668,
+      "native": 1093
+    },
+    "port-louvre-1": {
+      "detailed": 249,
+      "native": 1421
+    },
+    "port-louvre-2": {
+      "detailed": 249,
+      "native": 1383
+    },
+    "port-louvre-3": {
+      "detailed": 249,
+      "native": 1356
+    },
+    "port-louvre-4": {
+      "detailed": 249,
+      "native": 1341
+    },
+    "port-louvre-5": {
+      "detailed": 249,
+      "native": 1337
+    },
+    "starboard-service-pipe": {
+      "detailed": 260,
+      "native": 3967
+    },
+    "starboard-instrument-housing": {
+      "detailed": 668,
+      "native": 1093
+    },
+    "starboard-louvre-1": {
+      "detailed": 249,
+      "native": 1325
+    },
+    "starboard-louvre-2": {
+      "detailed": 249,
+      "native": 1322
+    },
+    "starboard-louvre-3": {
+      "detailed": 249,
+      "native": 1320
+    },
+    "starboard-louvre-4": {
+      "detailed": 249,
+      "native": 1317
+    },
+    "starboard-louvre-5": {
+      "detailed": 249,
+      "native": 1314
+    }
+  }
+}

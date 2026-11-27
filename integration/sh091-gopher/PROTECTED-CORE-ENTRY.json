@@ -1,0 +1,12 @@
+{
+  "schema": 1,
+  "id": "sh091-gopher",
+  "undoBefore": [
+    "sh089-antelope"
+  ],
+  "undoAfter": [],
+  "kind": "declaration",
+  "module": "gopher",
+  "before": "pub mod freight;\n",
+  "after": "pub mod goshawk;\n"
+}

@@ -1,0 +1,77 @@
+{
+  "nominalPaddingMetres": 0.02,
+  "minimumRefinementTargetsMillimetres": {
+    "detailed": 2600,
+    "native": 3300
+  },
+  "fullUpperMillimetres": {
+    "detailed": 2598,
+    "native": 3297
+  },
+  "pieces": {
+    "lower-platform": {
+      "detailed": 1838,
+      "native": 1838
+    },
+    "lower-service-well": {
+      "detailed": 2554,
+      "native": 3187
+    },
+    "middle-platform": {
+      "detailed": 1838,
+      "native": 1838
+    },
+    "middle-service-well": {
+      "detailed": 2554,
+      "native": 3187
+    },
+    "upper-platform": {
+      "detailed": 1838,
+      "native": 1838
+    },
+    "upper-service-well": {
+      "detailed": 2598,
+      "native": 3187
+    },
+    "port-stack-brace": {
+      "detailed": 2060,
+      "native": 2060
+    },
+    "starboard-stack-brace": {
+      "detailed": 2060,
+      "native": 2060
+    },
+    "cockpit-glazing": {
+      "detailed": 2141,
+      "native": 2562
+    },
+    "cockpit-crossmember": {
+      "detailed": 836,
+      "native": 836
+    },
+    "port-engine-support": {
+      "detailed": 2043,
+      "native": 3042
+    },
+    "port-engine-casing": {
+      "detailed": 2583,
+      "native": 3297
+    },
+    "port-engine-recess": {
+      "detailed": 2596,
+      "native": 3264
+    },
+    "starboard-engine-support": {
+      "detailed": 2241,
+      "native": 2241
+    },
+    "starboard-engine-casing": {
+      "detailed": 2583,
+      "native": 3297
+    },
+    "starboard-engine-recess": {
+      "detailed": 2596,
+      "native": 3264
+    }
+  }
+}

@@ -1,0 +1,9 @@
+{
+  "closedLoopVolumeCubicMetres": {
+    "detailed": 1315.370035,
+    "archivedNative": 1229.532363,
+    "candidateNative": 856.992087
+  },
+  "originalToCandidateUpperMillimetres": 1120,
+  "candidateToOriginalUpperMillimetres": 1248
+}

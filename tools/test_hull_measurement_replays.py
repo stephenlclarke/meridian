@@ -30,6 +30,93 @@ RABBIT_MODES = (
     (('candidate-fit',), 'CANDIDATE-FIT.json'),
     (('candidate-fidelity',), 'CANDIDATE-FIDELITY.json'),
 )
+FIT_ONLY_MODES = (((), 'SURFACE-FIT.json'),)
+LOD_MODES = FIT_ONLY_MODES + ((('--difference',), 'LOD-DIFFERENCE.json'),)
+SHIELD_MODES = FIT_ONLY_MODES + ((('--shield',), 'SHIELD-PROFILE.json'),)
+ARC_MODES = FIT_ONLY_MODES + ((('--arc',), 'ARC-PROFILE.json'),)
+LOCALIZATION_MODES = FIT_ONLY_MODES + (
+    (('--directions',), 'CANDIDATE-FIT-LOCALIZATION.json'),
+    (('--reference-directions',), 'REFERENCE-FIT-LOCALIZATION.json'),
+)
+FIDELITY_MODES = FIT_ONLY_MODES + ((('--fidelity',), 'CANDIDATE-FIDELITY.json'),)
+CANDIDATE_MODES = FIDELITY_MODES + LOCALIZATION_MODES[1:]
+
+COLLISION_MODES = MODES + ((('--collision',), 'COLLISION-FIT.json'),)
+COLLAR_MODES = MODES + ((('--collar-options',), 'COLLAR-OPTIONS.json'),)
+RING_MODES = MODES + ((('--ring-options',), 'RING-OPTIONS.json'),)
+
+# These hulls publish alternate or additional evidence alongside the historical
+# fit and original-difference convention. Require the full committed profile
+# even if a criteria command, receipt, or source binding is removed.
+AUTHORED_MODES = {
+    'sh055-condor': COLLISION_MODES,
+    'sh068-badger': COLLAR_MODES,
+    'sh074-dzo': COLLAR_MODES,
+    'sh075-dzo-mk-ii': COLLAR_MODES,
+    'sh078-oryx-voyager': RING_MODES,
+    'sh086-alpaca': SHIELD_MODES,
+    'sh087-elk': FIT_ONLY_MODES,
+    'sh088-springbok-starliner': ARC_MODES,
+    'sh089-antelope': ARC_MODES,
+    'sh090-elephant': LOCALIZATION_MODES,
+    'sh092-aurochs': FIT_ONLY_MODES,
+    'sh093-giraffe-liner': LOD_MODES,
+    'sh094-shikra': FIDELITY_MODES,
+    'sh095-shikra-interdictor': FIDELITY_MODES,
+    'sh096-wisent': LOCALIZATION_MODES,
+    'sh097-wisent-mk-ii': LOCALIZATION_MODES,
+    'sh098-anoa': LOCALIZATION_MODES,
+    'sh099-ox': LOD_MODES,
+    'sh100-ox-mk-ii': LOD_MODES,
+    'sh101-cavy-racer': LOD_MODES,
+    'sh104-wildebeest': LOD_MODES,
+    'sh105-tapir-shuttle': CANDIDATE_MODES,
+    'sh106-tapir-mk-ii': CANDIDATE_MODES,
+    'sh107-magpie': CANDIDATE_MODES,
+    'sh109-hippo': LOD_MODES,
+    'sh110-leopard-fighter': LOD_MODES,
+    'sh111-puma': LOD_MODES,
+    'sh126-mangalica': LOD_MODES,
+    'sh127-gaur-trader': CANDIDATE_MODES,
+    'sh128-boar-transport': CANDIDATE_MODES,
+    'sh129-warthog-escort': LOD_MODES,
+    'sh130-marmot-prospector': LOD_MODES,
+    'sh131-warthog-light': LOD_MODES,
+    'sh132-warthog-freighter': LOD_MODES,
+    'sh133-warthog-tanker': LOD_MODES,
+    'sh134-warthog-heavy': LOD_MODES,
+    'sh135-javelina': LOD_MODES,
+    'sh136-falcon-mk-i': CANDIDATE_MODES,
+    'sh137-falcon-mk-ii': CANDIDATE_MODES,
+    'sh138-falcon-mk-iii': CANDIDATE_MODES,
+    'sh139-falcon-mk-iv': CANDIDATE_MODES,
+    'sh140-chimango': LOD_MODES,
+    'sh142-buzzard-mk-ii': CANDIDATE_MODES,
+    'sh143-aardvark-miner': CANDIDATE_MODES,
+    'sh144-razorback': LOD_MODES,
+    'sh145-kestrel': LOD_MODES,
+    'sh146-merlin': LOD_MODES,
+    'sh147-hawk': LOD_MODES,
+    'sh148-morepork': CANDIDATE_MODES,
+    'sh149-owlet-mk-ii': CANDIDATE_MODES,
+    'sh150-reindeer-freighter': CANDIDATE_MODES,
+    'sh151-lynx-escort': CANDIDATE_MODES,
+    'sh152-osprey-scout': CANDIDATE_MODES,
+    'sh153-osprey-strike': CANDIDATE_MODES,
+    'sh154-osprey-patrol': CANDIDATE_MODES,
+    'sh155-osprey-support': CANDIDATE_MODES,
+    'sh157-wolf-scout': CANDIDATE_MODES,
+    'sh158-wolf-mk-i': CANDIDATE_MODES,
+    'sh159-wolf-mk-ii': CANDIDATE_MODES,
+    'sh160-wolf-cutter': CANDIDATE_MODES,
+    'sh163-lammergeier': CANDIDATE_MODES,
+    'sh165-secretarybird': CANDIDATE_MODES,
+    'sh166-camel-rescue': CANDIDATE_MODES,
+    'sh167-secretarybird-survey': CANDIDATE_MODES,
+    'sh168-armadillo-miner': CANDIDATE_MODES,
+    'sh169-caracara-mk-i': CANDIDATE_MODES,
+    'sh170-caracara-mk-ii': CANDIDATE_MODES,
+}
 MAX_REPLAY_WORKERS = 4
 
 
@@ -108,7 +195,8 @@ class HullMeasurementReplays(unittest.TestCase):
     def assert_replays(self, suffix, required, modes, hull_modes=None):
         hull_modes = {} if hull_modes is None else hull_modes
         cases = list(measurement_cases(suffix, modes))
-        self.assertTrue(required <= {folder.name for folder, _ in cases})
+        missing = required - {folder.name for folder, _ in cases}
+        self.assertFalse(missing, f'Missing measurement hulls: {sorted(missing)}')
         jobs = []
         for folder, script in cases:
             criteria = json.loads((folder / 'CRITERIA.json').read_bytes())
@@ -117,12 +205,21 @@ class HullMeasurementReplays(unittest.TestCase):
                 self.assertTrue(script.is_file(), f'Missing pinned measurement CLI: {script_name}')
                 self.assertEqual(hashlib.sha256(script.read_bytes()).hexdigest(),
                                  criteria['replayPins'][script_name])
-                for flags, receipt in hull_modes.get(folder.name, modes):
+                commands = criteria['byteReplay']['commands']
+                selected_modes = hull_modes.get(folder.name, modes)
+                if not suffix and folder.name in AUTHORED_MODES:
+                    # The script's full command inventory must match its authored profile.
+                    declared = [command for command in commands
+                                if command.split()[:3] == ['python3', '-B', script_name]]
+                    self.assertCountEqual(declared, [
+                        receipt_command(folder, script, flags, receipt) for flags, receipt in selected_modes
+                    ])
+                for flags, receipt in selected_modes:
                     path = folder / receipt
                     name = path.relative_to(ROOT).as_posix()
                     command = receipt_command(folder, script, flags, receipt)
                     with self.subTest(hull=folder.name, receipt=receipt):
-                        self.assertIn(command, criteria['byteReplay']['commands'])
+                        self.assertIn(command, commands)
                         expected = path.read_bytes()
                         self.assertEqual(hashlib.sha256(expected).hexdigest(), criteria['replayPins'][name])
                         jobs.append((folder.name, script, flags, receipt, expected))
@@ -144,8 +241,8 @@ class HullMeasurementReplays(unittest.TestCase):
                         self.assertEqual(actual, expected)
 
     def test_frozen_fit_and_difference_are_recomputed_byte_for_byte(self):
-        self.assert_replays('', REQUIRED, MODES,
-                            {RABBIT_EXPLORER: RABBIT_MODES})
+        self.assert_replays('', REQUIRED | AUTHORED_MODES.keys(), MODES,
+                            {RABBIT_EXPLORER: RABBIT_MODES, **AUTHORED_MODES})
 
     def test_archive_candidate_and_fidelity_are_recomputed_byte_for_byte(self):
         # The three-mode geometry convention qualifies both a frozen archive
@@ -174,15 +271,16 @@ class ReplayHarnessTests(unittest.TestCase):
             'byteReplay': {'commands': [self.command]},
         }
 
-    def probe(self, *, source=None, receipt=None, command=None, output=None, error=None):
+    def probe(self, *, source=None, receipt=None, commands=None, authored_modes=None, output=None, error=None):
         self.script.write_bytes(self.source if source is None else source)
         self.receipt.write_bytes(self.expected if receipt is None else receipt)
-        criteria = dict(self.criteria, byteReplay={'commands': [self.command if command is None else command]})
+        criteria = dict(self.criteria, byteReplay={'commands': [self.command] if commands is None else commands})
         (self.folder / 'CRITERIA.json').write_text(json.dumps(criteria))
         module = sys.modules[__name__]
         result = unittest.TestResult()
         with (patch.object(module, 'ROOT', self.root), patch.object(module, 'REQUIRED', {self.folder.name}),
-              patch.object(module, 'MODES', (((), 'SURFACE-FIT.json'),)),
+              patch.object(module, 'AUTHORED_MODES', authored_modes or {}),
+              patch.object(module, 'MODES', FIT_ONLY_MODES),
               patch.object(module, 'active_coverage', return_value=None),
               patch.object(module, 'replay', return_value=self.expected if output is None else output,
                            side_effect=error) as launch):
@@ -190,10 +288,56 @@ class ReplayHarnessTests(unittest.TestCase):
         return result, launch
 
     def test_changed_script_report_or_command_is_refused_before_dispatch(self):
-        for change in ({'source': b'changed'}, {'receipt': b'changed'}, {'command': 'changed'}):
+        for change in ({'source': b'changed'}, {'receipt': b'changed'}, {'commands': ['changed']}):
             with self.subTest(change=change):
                 result, launch = self.probe(**change)
                 self.assertFalse(result.wasSuccessful())
+                self.assertEqual(len(result.failures), 1)
+                launch.assert_not_called()
+
+    def test_authored_profile_requires_and_dispatches_each_pinned_mode(self):
+        modes = {self.folder.name: LOD_MODES}
+        difference = self.folder / 'LOD-DIFFERENCE.json'
+        difference.write_bytes(self.expected)
+        self.criteria['replayPins'][difference.relative_to(self.root).as_posix()] = (
+            hashlib.sha256(self.expected).hexdigest())
+        command = self.command.replace('.py |', '.py --difference |').replace(
+            'SURFACE-FIT.json', difference.name)
+        unrelated = 'python3 -B tools/prepare_example.py --check'
+        result, launch = self.probe(commands=[unrelated, self.command, command], authored_modes=modes)
+        self.assertTrue(result.wasSuccessful(), result.failures)
+        self.assertCountEqual([call.args[1] for call in launch.call_args_list], [(), ('--difference',)])
+        for commands in ([self.command], [self.command, command, command],
+                         [self.command, command, command.replace('--difference', '--unknown')],
+                         [self.command, command.replace(difference.name, 'OTHER.json')]):
+            with self.subTest(commands=commands):
+                result, launch = self.probe(commands=commands, authored_modes=modes)
+                self.assertEqual(len(result.failures), 1)
+                launch.assert_not_called()
+
+    def test_extended_legacy_profiles_require_the_pair_and_each_extra_receipt(self):
+        for profile in (COLLISION_MODES, COLLAR_MODES, RING_MODES):
+            with self.subTest(profile=profile):
+                commands = []
+                with patch.object(sys.modules[__name__], 'ROOT', self.root):
+                    for flags, name in profile:
+                        path = self.folder / name
+                        path.write_bytes(self.expected)
+                        self.criteria['replayPins'][path.relative_to(self.root).as_posix()] = (
+                            hashlib.sha256(self.expected).hexdigest())
+                        commands.append(receipt_command(self.folder, self.script, flags, name))
+                modes = {self.folder.name: profile}
+                result, launch = self.probe(commands=commands, authored_modes=modes)
+                self.assertTrue(result.wasSuccessful(), result.failures)
+                self.assertCountEqual([call.args[1] for call in launch.call_args_list],
+                                      [flags for flags, _ in profile])
+                for missing in range(len(commands)):
+                    incomplete = commands[:missing] + commands[missing + 1:]
+                    result, launch = self.probe(commands=incomplete, authored_modes=modes)
+                    self.assertEqual(len(result.failures), 1)
+                    launch.assert_not_called()
+                unknown = commands[-1].replace(profile[-1][0][0], '--unknown')
+                result, launch = self.probe(commands=[*commands, unknown], authored_modes=modes)
                 self.assertEqual(len(result.failures), 1)
                 launch.assert_not_called()
 
@@ -216,6 +360,7 @@ class ReplayHarnessTests(unittest.TestCase):
                 with (self.subTest(suffix=suffix, pins=pins),
                       patch.object(module, 'ROOT', self.root), patch.object(module, 'REQUIRED', set()),
                       patch.object(module, 'GEOMETRY_REQUIRED', set()),
+                      patch.object(module, 'AUTHORED_MODES', {}),
                       patch.object(module, 'MODES', ((flags, receipt),)),
                       patch.object(module, 'GEOMETRY_MODES', ((flags, receipt),)),
                       patch.object(module, 'active_coverage', return_value=None),

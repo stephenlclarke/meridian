@@ -1,0 +1,12 @@
+{
+  "schema": 1,
+  "id": "sh168-armadillo-miner",
+  "undoBefore": [
+    "sh167-secretarybird-survey"
+  ],
+  "undoAfter": [],
+  "kind": "declaration",
+  "module": "armadillo_miner",
+  "before": "pub mod aplomado_interceptor;\n",
+  "after": "pub mod arna_cutter;\n"
+}

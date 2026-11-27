@@ -1,0 +1,224 @@
+{
+  "hull": "SH163 Lammergeier",
+  "scope": "Original catalogue inspection and geometry queries",
+  "source": "assets/fleet/sh163/SOURCE-GEOMETRY.json",
+  "frozenSources": "integration/sh163-lammergeier/FROZEN-SOURCES.json",
+  "sourceScaleMetresPerUnit": "300/43",
+  "faces": {
+    "detailed": 1668,
+    "archivedNative": 620,
+    "candidateNative": 512,
+    "candidateMaximum": 512
+  },
+  "originalAccess": {
+    "runtimeCatalogue": {
+      "playerFlyable": false,
+      "normalPurchaseEligible": false,
+      "purchasePolicy": "pendingFabrication"
+    },
+    "r3DesignContract": {
+      "playerFlyable": true,
+      "purchasePolicy": "blueprintFabrication"
+    }
+  },
+  "engineering": {
+    "sourceReference": "finite-intrinsic-empty-lammergeier",
+    "massKg": 17513
+  },
+  "supportGroups": 67,
+  "candidateComponentInventory": {
+    "originalPartsRepresented": 21,
+    "unalteredNativeParts": 11,
+    "recessedWells": 4,
+    "partsUsingSelectedOriginalVertices": 6,
+    "sampledArcSections": 0,
+    "arcSeamVertices": 0
+  },
+  "minimumRouteClearanceMillimetres": 578,
+  "sourceContactCounts": {
+    "overlap": 20,
+    "unchangedNativeParts": 11
+  },
+  "candidateRebuild": "tools/rebuild_lammergeier.py",
+  "fitUpperMillimetres": {
+    "detailed": 2443,
+    "archivedNative": 2443,
+    "candidateNative": 4372
+  },
+  "continuousCandidateFitMillimetres": {
+    "archiveToCandidate": {
+      "lowerFloor": 544,
+      "upperCeiling": 556
+    },
+    "candidateToArchive": {
+      "lowerFloor": 223,
+      "upperCeiling": 249
+    },
+    "detailedToCandidate": {
+      "lowerFloor": 659,
+      "upperCeiling": 685
+    },
+    "candidateToDetailed": {
+      "lowerFloor": 525,
+      "upperCeiling": 549
+    }
+  },
+  "hullStudio": {
+    "definition": "integration/sh163-lammergeier/LAMMERGEIER-STUDIO.json",
+    "bytes": 276737,
+    "sha256": "2ea8dc1c8466cc4fed79fdbc935d62312f862edf50c92ff3b5ad2baee8b9bc7d",
+    "supports": 67,
+    "probes": 7,
+    "detail": "1,668 original detailed faces",
+    "native": "512 separate candidate faces",
+    "loaderRevision": "27121e66ba37a29781135b56924a9d6e7f38a70a",
+    "signedInstalledExport": {
+      "status": "PASS",
+      "scope": "Signed installed Studio offline original artwork import/export",
+      "bundleIdentifier": "io.xyzzy.meridian.hullstudio",
+      "bundleVersion": "0.0.0",
+      "codeDirectoryHash": "93938bda9242ebdff508bfb9e16b3cdf83c0a200",
+      "developerIdTeam": "4MEB7MUTAV",
+      "signatureVerification": "deep strict",
+      "definition": {
+        "bytes": 276737,
+        "sha256": "2ea8dc1c8466cc4fed79fdbc935d62312f862edf50c92ff3b5ad2baee8b9bc7d"
+      },
+      "exportExitStatuses": [
+        0,
+        0
+      ],
+      "exportMatchesDefinitionExceptTrailingLf": true,
+      "valid": true,
+      "diagnostics": [],
+      "detailedTriangles": 1668,
+      "nativeTriangles": 512,
+      "supportGroups": 67,
+      "engineeringReference": "finite-intrinsic-empty-lammergeier",
+      "massKg": 17513,
+      "receiptFiles": {
+        "lammergeier.hull.json": {
+          "bytes": 276736,
+          "sha256": "c8bf2255d00b3f1d28bcd6fc99997a311b994368808d5be3938ca8f44ec74b9d"
+        },
+        "lammergeier-repeat.hull.json": {
+          "bytes": 276736,
+          "sha256": "c8bf2255d00b3f1d28bcd6fc99997a311b994368808d5be3938ca8f44ec74b9d"
+        },
+        "studio.stdout.json": {
+          "bytes": 77985,
+          "sha256": "0caf1843b6bff4838531fd05470623043f609428bd8fe0a54cf589a2301a9502"
+        },
+        "studio-repeat.stdout.json": {
+          "bytes": 77985,
+          "sha256": "0caf1843b6bff4838531fd05470623043f609428bd8fe0a54cf589a2301a9502"
+        },
+        "codesign.log": {
+          "bytes": 13038,
+          "sha256": "757277414e0cede1c2b6babe02a631603363074b4352f254fd1e2d7e3b6472df"
+        },
+        "codesign-identity.log": {
+          "bytes": 988,
+          "sha256": "f6d772f29f9e72421e98a6d7243102b92b77b5995acbe6cda7ddb3bbfc3b1706"
+        }
+      },
+      "artworkProbeResults": [
+        {
+          "name": "dorsal",
+          "passed": true
+        },
+        {
+          "name": "ventral",
+          "passed": true
+        },
+        {
+          "name": "port-outboard",
+          "passed": true
+        },
+        {
+          "name": "starboard-outboard",
+          "passed": true
+        },
+        {
+          "name": "between-aft-drives",
+          "passed": true
+        },
+        {
+          "name": "above-port-wing",
+          "passed": true
+        },
+        {
+          "name": "above-starboard-wing",
+          "passed": true
+        }
+      ],
+      "triangleRoles": {
+        "detail": "original detailed visible",
+        "native": "derived native inspection candidate"
+      }
+    }
+  },
+  "byteReplay": {
+    "commands": [
+      "python3 -B tools/prepare_lammergeier.py --check",
+      "python3 -B tools/rebuild_lammergeier.py",
+      "python3 -B tools/verify_lammergeier.py | cmp - integration/sh163-lammergeier/CONTACT-RESULT.json",
+      "python3 -B tools/measure_lammergeier.py | cmp - integration/sh163-lammergeier/SURFACE-FIT.json",
+      "python3 -B tools/measure_lammergeier.py --fidelity | cmp - integration/sh163-lammergeier/CANDIDATE-FIDELITY.json",
+      "python3 -B tools/measure_lammergeier.py --directions | cmp - integration/sh163-lammergeier/CANDIDATE-FIT-LOCALIZATION.json",
+      "python3 -B tools/measure_lammergeier.py --reference-directions | cmp - integration/sh163-lammergeier/REFERENCE-FIT-LOCALIZATION.json"
+    ],
+    "host": "SteveMBA",
+    "startedUtc": "2026-11-25T08:39:41Z",
+    "finishedUtc": "2026-11-25T08:40:01Z",
+    "log": {
+      "bytes": 720,
+      "sha256": "f53348b852e3872a81c31e179a4b85aefdb5a835149065b403676f1f24daff87"
+    },
+    "fitDependencies": {
+      "python": "3.14.3",
+      "numpy": "2.5.5",
+      "scipy": "1.18.1",
+      "trimesh": "5.2.1",
+      "rtree": "1.4.1"
+    },
+    "originalCommit": "401ac0add3a9f27b6322bba2cdb79b30f27dc83c",
+    "historicalReplayPins": {
+      "tools/measure_banteng_geometry.py": "4b7d8d5d972e30d93bebf7f422be71e415d6e4a9c4b622582ecf6e30a6bb9235",
+      "tools/measure_lanner_geometry.py": "cabbaf17ff7efdbcbee9a1fba67c7edafd59dceb8e97f367824a51c134479992",
+      "tools/verify_eagle_cruiser_geometry.py": "c7926cb6e699ae5ffb445951ce9d4e98a64018a7ecb1db2e5e77a611d742a783"
+    }
+  },
+  "replayPins": {
+    "integration/sh163-lammergeier/LAMMERGEIER-STUDIO.json": "2ea8dc1c8466cc4fed79fdbc935d62312f862edf50c92ff3b5ad2baee8b9bc7d",
+    "integration/sh163-lammergeier/FROZEN-SOURCES.json": "b9cd52221f094c1ce15dbc65a450589c2125f6e893d423c79dff0621668e0481",
+    "integration/sh163-lammergeier/CONTACT-CANDIDATE.json": "71a7f907ebb684b8e4e3b1ad1e27d139ac43c8e8d84f49ab7da87a122513ca57",
+    "integration/sh163-lammergeier/CONTACT-RESULT.json": "0ec43f0a7f577790402f0cf88bbb8e0c2484f3d4aab69303e8c344ac7bb47307",
+    "integration/sh163-lammergeier/ORIGINAL-OWNERSHIP.json": "330ae598330573af4a103b054d55d8c3a0206c2a532f4c1fa399ecebf980865e",
+    "integration/sh163-lammergeier/RETAINED-OVERLAPS.json": "13f62aa9a15008319ea5a4ff4cd5aac8814b95830f4c1fc60d6956a7ef32424b",
+    "integration/sh163-lammergeier/CANDIDATE-FIDELITY.json": "e025906d373e77adea4bb0e4b2b80bc6ff4a406fc823999d6113af0531f3de83",
+    "integration/sh163-lammergeier/SUPPORT-FAN.json": "434dd9a10ff16325fb19ae3ab1911268c3eec0cf4e8631026be74f962c3b7222",
+    "integration/sh163-lammergeier/SURFACE-FIT.json": "410106b2e55c648315be65ad50b7501363f45952ec806d72c39ee46fc94b96da",
+    "integration/sh163-lammergeier/ARCHIVED-OVERLAPS.json": "0b75fbd3c12a15776f9b6ad5aac0c89461a85caca248d040b6cd676e8439d1bd",
+    "integration/sh163-lammergeier/CANDIDATE-TOPOLOGY-SURVEY.json": "b2e1047d692769be2978df61a3b7bd7c9af621483845580db40067ea6855d163",
+    "integration/sh163-lammergeier/CANDIDATE-FIT-LOCALIZATION.json": "cf66640fecf7f9d13c1bfa193226e345c20473ce01772fd1b43c838ac5bac5f7",
+    "integration/sh163-lammergeier/REFERENCE-FIT-LOCALIZATION.json": "3db25fc613b457b2244370836bd613253d31727e9ed7e76c4adf1d6c0f74cec0",
+    "tools/atomic_asset_output.py": "2d13803823645d3bdea7c855af958eb54d7ebe513ec1bcb0af34e82870164bf0",
+    "tools/banteng_art_mesh.py": "ef5c0f538510486238d69dc301da80026fc93326767b38c50a04756ab9890a09",
+    "tools/encode_goshawk_visual.py": "9e524e9a32a237d71d212c8b5c34ecf12cde5a8e08885b1d03991b95c278f61c",
+    "tools/import_goshawk_envelope_source.py": "14b530725629ee3eaa5b3fd69f01fe00fe371564a1a52cb398d3969142db977e",
+    "tools/measure_banteng_geometry.py": "9356864e227302598fcae4e833ecb706b1ed8a5e600cbb4076b7165dc1e54bea",
+    "tools/measure_goshawk_surface_fit.py": "5407ef1e5fad41810aa95444ca1338fe33a91e5c9857dcb752b4e4cf2fca6d0b",
+    "tools/measure_lanner_geometry.py": "55d13a28602e6ed791adecd85ff43f3c8a7fbe118cf0977272e1747422c2408d",
+    "tools/measure_lammergeier.py": "af33cbd85c5c46ae1e802d08c0f871d4e4139271ba51fb46ff9389490ea7fff7",
+    "tools/prepare_eagle_cruiser_geometry.py": "a1ea3b5d72f35e1f2932da71afa3ff8a276a504f7309a1086a2b3df35988addc",
+    "tools/prepare_lammergeier.py": "bdad66bd363c85c4190be5124f9aabf58af2dd7f32543af26bcf5fe4d7c4b48c",
+    "tools/verify_eagle_cruiser_geometry.py": "cb053ee5873fee62ee456bb3776e98d29b2cbb44c7344599bc617a8579164d43",
+    "tools/rebuild_lammergeier.py": "ba5a16088258506e26cfbd90c33d6aa0c63d527b9ac58ec9c4236436cdb69563",
+    "tools/verify_lammergeier.py": "0616fa48449c1bc8de6058459efd9a2d8907c147296eeaf1c800cb847b5c039a",
+    "tools/vulture_mk_i_exact_fit.py": "479b31f8714a198a82c0e2888b8d19efe46c7b4c43a576b83ab84c571ae738c6",
+    "assets/fleet/sh163/GENERATED-COLLISION.json": "e938192ca88b97d15f60f770946954d0bcf4ba728783ae39a5803f5ac10db026",
+    "assets/fleet/sh163/SOURCE-GEOMETRY.json": "07fc7f05ea3d102143fcf17e4e88703f4ec2874e3a4662e2c77867b17a3d89d8",
+    "tools/hull_contact_geometry.py": "07606202e6a298ad375a7504991fe6fb93da6a07f9b5cc4a22167bd570b07839"
+  }
+}

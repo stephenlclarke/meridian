@@ -38,6 +38,73 @@ fn funded_avenor(seed: u64) -> World {
     world
 }
 
+#[test]
+fn bulk_trade_respects_paid_cabin_mass_and_remaining_hold() {
+    use crate::station_services::{CargoUnit, CommodityId, CommodityTrade, TradeSide};
+    let mut world = funded_avenor(61105);
+    act(&mut world, buy(CabinGrade::Economy));
+    let initial = world.service_snapshot().unwrap();
+    assert_eq!(initial.used_tonnes, 5);
+    loop {
+        let service = world.service_snapshot().unwrap();
+        let free = u64::from(service.hold_capacity_tonnes - service.used_tonnes);
+        if free == 0 {
+            break;
+        }
+        let cash = u64::from(world.credits_tenths().unwrap());
+        let (commodity, quantity, _) = CommodityId::ALL
+            .into_iter()
+            .filter(|id| id.unit() == CargoUnit::Tonne && id.departure_legal_weight() == 0)
+            .filter_map(|id| {
+                let quote = world.commodity_quote(id)?;
+                let quantity = free.min(quote.stock).min(
+                    cash.checked_div(u64::from(quote.ask_tenths))
+                        .unwrap_or(u64::MAX),
+                );
+                (quantity > 0).then_some((id, quantity, quote.ask_tenths))
+            })
+            .min_by_key(|(_, _, price)| *price)
+            .unwrap();
+        world
+            .request_commodity_trade(
+                CommodityTrade {
+                    side: TradeSide::Buy,
+                    commodity,
+                    quantity,
+                },
+                world.snapshot().tick,
+            )
+            .unwrap();
+    }
+    let before = world.save_bytes().unwrap();
+    let commodity = CommodityId::ALL
+        .into_iter()
+        .find(|id| {
+            id.unit() == CargoUnit::Tonne
+                && id.departure_legal_weight() == 0
+                && world.commodity_quote(*id).is_some_and(|q| q.stock > 0)
+        })
+        .unwrap();
+    assert_eq!(
+        world.request_commodity_trade(
+            CommodityTrade {
+                side: TradeSide::Buy,
+                commodity,
+                quantity: 1
+            },
+            world.snapshot().tick
+        ),
+        Err(crate::MissionError::Service(
+            crate::station_services::Error::HoldFull
+        ))
+    );
+    assert_eq!(world.save_bytes().unwrap(), before);
+    assert_eq!(
+        World::from_save_bytes(&before).unwrap().service_snapshot(),
+        world.service_snapshot()
+    );
+}
+
 fn journey_with_arrival(world: &mut World, target: SystemId) -> u64 {
     use crate::{FlightInput, FlightMode};
     if world.snapshot().mode == FlightMode::Docked {

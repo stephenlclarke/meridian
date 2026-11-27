@@ -1,0 +1,18 @@
+{
+  "testsPassed": 2,
+  "scope": "Pinned isolated SH071/SH072/SH073 geometry-only candidate and frozen family tests",
+  "candidate": {
+    "vertices": 228,
+    "triangles": 380,
+    "parts": 19,
+    "fixedParts": 13,
+    "bytes": 147997,
+    "sha256": "a162f31e9aa3d9de48018b235589f411dc50570c59bddb861e53f346c6ec96b1"
+  },
+  "testLog": {
+    "bytes": 510,
+    "sha256": "5cc0277b213e8b92ea4dcb3529d42cb0e6d4f58393b9e180f92b75f283bbb82f"
+  },
+  "recipe": "integration/sh071-griffon/LEGACY-CANDIDATE-RECIPE.py.txt",
+  "frozenTests": "integration/sh071-griffon/LEGACY-CANDIDATE-TESTS.py.txt"
+}

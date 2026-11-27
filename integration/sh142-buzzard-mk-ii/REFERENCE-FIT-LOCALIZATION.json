@@ -1,0 +1,107 @@
+{
+  "detailedToArchive": {
+    "directedMaximumMillimetres": {
+      "lowerFloor": 846,
+      "upperCeiling": 869
+    },
+    "sourceWitness": {
+      "face": 2876,
+      "part": [
+        27,
+        "body primary pressure envelope/service-well-2-0"
+      ],
+      "pointMetres": [
+        -2.484599018003273,
+        -3.5848281505728314,
+        -11.258788870703764
+      ],
+      "exactPointMetres": [
+        "-349676225363895/140737488355328",
+        "-4036157680776767/1125899906842624",
+        "-3169067335171535/281474976710656"
+      ],
+      "squaredDistanceMetres": "54738129914231793909146521255132832136840195241413219477626213/76435633041287546277764744066488287801202098446025333170765824"
+    },
+    "nearestTarget": {
+      "faces": [
+        790,
+        793
+      ],
+      "parts": [
+        [
+          2,
+          "body primary pressure envelope"
+        ],
+        [
+          2,
+          "body primary pressure envelope"
+        ]
+      ],
+      "oneTriangleBoxMetres": [
+        [
+          -1.8709590834697216,
+          -0.9728936170212765
+        ],
+        [
+          -3.4369885433715215,
+          -2.454991816693944
+        ],
+        [
+          -14.906710310965629,
+          -10.136563011456628
+        ]
+      ]
+    },
+    "refinedPatches": 156
+  },
+  "archiveToDetailed": {
+    "directedMaximumMillimetres": {
+      "lowerFloor": 640,
+      "upperCeiling": 663
+    },
+    "sourceWitness": {
+      "face": 932,
+      "part": [
+        5,
+        "body primary pressure envelope/service-well-2-0"
+      ],
+      "pointMetres": [
+        -2.468219312602291,
+        -3.5731227495908344,
+        -5.436726677577742
+      ],
+      "exactPointMetres": [
+        "-2778967894126085/1125899906842624",
+        "-4022978570901581/1125899906842624",
+        "-1530302514953397/281474976710656"
+      ],
+      "squaredDistanceMetres": "4486314187218258379660769939946630954168512077660816538965636957950188685491035334067393129/10940944757724019209237739646674062749803036195171818185763862799932433529821421763123216384"
+    },
+    "nearestTarget": {
+      "faces": [
+        2400
+      ],
+      "parts": [
+        [
+          2,
+          "body primary pressure envelope"
+        ]
+      ],
+      "oneTriangleBoxMetres": [
+        [
+          -2.0867823240589196,
+          -1.7399901800327333
+        ],
+        [
+          -3.4369885433715215,
+          -2.9633126022913254
+        ],
+        [
+          -10.136563011456628,
+          6.558952536824877
+        ]
+      ]
+    },
+    "refinedPatches": 923
+  }
+}

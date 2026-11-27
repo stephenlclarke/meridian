@@ -1,0 +1,179 @@
+{
+  "hull": "SH070 Baza Mk II",
+  "scope": "Original catalogue inspection and geometry queries",
+  "source": "assets/fleet/sh070/SOURCE-GEOMETRY.json",
+  "frozenSources": "integration/sh070-baza-mk-ii/FROZEN-SOURCES.json",
+  "sourceScaleMetresPerUnit": "1",
+  "faces": {
+    "detailed": 2364,
+    "native": 176,
+    "nativeMaximum": 512
+  },
+  "originalAccess": {
+    "runtimeCatalogue": {
+      "playerFlyable": false,
+      "normalPurchaseEligible": false,
+      "purchasePolicy": "pendingFabrication"
+    },
+    "r3DesignContract": {
+      "playerFlyable": true,
+      "purchasePolicy": "blueprintFabrication"
+    }
+  },
+  "engineering": {
+    "sourceReference": "finite-intrinsic-empty-baza-mk-ii",
+    "massKg": 33139
+  },
+  "supportGroups": 25,
+  "minimumRouteClearanceMillimetres": 793,
+  "sourceContactCounts": {
+    "overlap": 7
+  },
+  "fitUpperMillimetres": {
+    "detailed": 1983,
+    "native": 2817
+  },
+  "hullStudio": {
+    "definition": "integration/sh070-baza-mk-ii/BAZA-MK-II-STUDIO.json",
+    "bytes": 302002,
+    "sha256": "715dbb46876e0cc79dc21cd4f4acead0f4985a027b71e991e207b0d38d96a7ba",
+    "supports": 25,
+    "probes": 7,
+    "loaderRevision": "27121e66ba37a29781135b56924a9d6e7f38a70a",
+    "signedInstalledExport": {
+      "status": "PASS",
+      "scope": "Signed installed Studio offline artwork import and export",
+      "bundleIdentifier": "io.xyzzy.meridian.hullstudio",
+      "bundleVersion": "0.0.0",
+      "codeDirectoryHash": "93938bda9242ebdff508bfb9e16b3cdf83c0a200",
+      "developerIdTeam": "4MEB7MUTAV",
+      "signatureVerification": "deep strict",
+      "definition": {
+        "bytes": 302002,
+        "sha256": "715dbb46876e0cc79dc21cd4f4acead0f4985a027b71e991e207b0d38d96a7ba"
+      },
+      "exportExitStatuses": [
+        0,
+        0
+      ],
+      "exportMatchesDefinitionExceptTrailingLf": true,
+      "valid": true,
+      "diagnostics": [],
+      "detailedTriangles": 2364,
+      "nativeTriangles": 176,
+      "supportGroups": 25,
+      "engineeringReference": "finite-intrinsic-empty-baza-mk-ii",
+      "massKg": 33139,
+      "receiptFiles": {
+        "BAZA-MK-II.hull.json": {
+          "bytes": 302001,
+          "sha256": "34c857918f5e76d33d0bf8d6606fd43dca9cf064cf9c6dbd681724d50bf0fe76"
+        },
+        "BAZA-MK-II-repeat.hull.json": {
+          "bytes": 302001,
+          "sha256": "34c857918f5e76d33d0bf8d6606fd43dca9cf064cf9c6dbd681724d50bf0fe76"
+        },
+        "studio.stdout.json": {
+          "bytes": 42898,
+          "sha256": "8b924bba9aec3f08cc0a01ac052d66afa0c934dbb4c4fa431a33a385fe56f80c"
+        },
+        "studio-repeat.stdout.json": {
+          "bytes": 42898,
+          "sha256": "8b924bba9aec3f08cc0a01ac052d66afa0c934dbb4c4fa431a33a385fe56f80c"
+        },
+        "codesign.log": {
+          "bytes": 13038,
+          "sha256": "3d6edcc019454b4ed2ff7a4a5b08390e870c0c0c6a019cb4c90b044fda152eef"
+        },
+        "codesign-details.log": {
+          "bytes": 1145,
+          "sha256": "46f22bef73c8eab385775b9c33eb76171b43a06b700a46282ba7683d72e141bb"
+        }
+      },
+      "artworkProbeResults": [
+        {
+          "name": "central-dorsal",
+          "passed": true
+        },
+        {
+          "name": "port-outside-wing",
+          "passed": true
+        },
+        {
+          "name": "port-above-upper-strip",
+          "passed": true
+        },
+        {
+          "name": "port-outside-engine",
+          "passed": true
+        },
+        {
+          "name": "starboard-outside-wing",
+          "passed": true
+        },
+        {
+          "name": "starboard-above-upper-strip",
+          "passed": true
+        },
+        {
+          "name": "starboard-outside-engine",
+          "passed": true
+        }
+      ]
+    }
+  },
+  "byteReplay": {
+    "commands": [
+      "python3 -B tools/prepare_baza_mk_ii.py --check",
+      "python3 -B tools/verify_baza_mk_ii.py | cmp - integration/sh070-baza-mk-ii/CONTACT-RESULT.json",
+      "python3 -B tools/measure_baza_mk_ii.py --difference | cmp - integration/sh070-baza-mk-ii/ORIGINAL-DIFFERENCE.json",
+      "python3 -B tools/measure_baza_mk_ii.py | cmp - integration/sh070-baza-mk-ii/SURFACE-FIT.json"
+    ],
+    "host": "SteveMBA",
+    "startedUtc": "2026-11-24T22:41:39Z",
+    "finishedUtc": "2026-11-24T22:41:45Z",
+    "log": {
+      "bytes": 503,
+      "sha256": "9bb775ea945974c0be4da12292500ec4ccd1de975be4398ca38e06c41443dc13"
+    },
+    "fitDependencies": {
+      "python": "3.14.3",
+      "numpy": "2.5.5",
+      "scipy": "1.18.1",
+      "trimesh": "5.2.1",
+      "rtree": "1.4.1"
+    },
+    "originalCommit": "3877015454635f49d5fcf49e9b6aeb85c19b751c",
+    "historicalReplayPins": {
+      "tools/measure_banteng_geometry.py": "4b7d8d5d972e30d93bebf7f422be71e415d6e4a9c4b622582ecf6e30a6bb9235",
+      "tools/verify_eagle_cruiser_geometry.py": "c7926cb6e699ae5ffb445951ce9d4e98a64018a7ecb1db2e5e77a611d742a783"
+    }
+  },
+  "replayPins": {
+    "integration/sh070-baza-mk-ii/BAZA-MK-II-STUDIO.json": "715dbb46876e0cc79dc21cd4f4acead0f4985a027b71e991e207b0d38d96a7ba",
+    "integration/sh070-baza-mk-ii/FROZEN-SOURCES.json": "021f832c1a26eeaf4cf4cced4b17123ff31ebe3fbedfbcde3d6fb6d5f784bc1a",
+    "integration/sh070-baza-mk-ii/CONTACT-CANDIDATE.json": "0eb5100cdf23b9a407f062e48391ba6e822e6b63db8e508a3f8a5141b294217f",
+    "integration/sh070-baza-mk-ii/CONTACT-RESULT.json": "83d5e2bc1bdbee3dae07918a7da050dd5a9853e2d62e6dc737f359a5ffaed170",
+    "integration/sh070-baza-mk-ii/ORIGINAL-DIFFERENCE.json": "acec66e83768cddaa71d390440cd008590c6c82cddb8012746441a40c770ba41",
+    "integration/sh070-baza-mk-ii/ORIGINAL-JOINTS.json": "e242956773c2ccddd9adb3d0eb30ad2a5c0ea8e0738e768481c28e4e359daa88",
+    "integration/sh070-baza-mk-ii/SUPPORT-FAN.json": "604c7ec88ed87691bd6e280402676ab5066cb816820b662f9cb9f3768bc37429",
+    "integration/sh070-baza-mk-ii/SURFACE-FIT.json": "ca689646ff2490fb173b153562048772bf037b5e14740260fbd42ac4bc284516",
+    "tools/atomic_asset_output.py": "2d13803823645d3bdea7c855af958eb54d7ebe513ec1bcb0af34e82870164bf0",
+    "tools/banteng_art_mesh.py": "ef5c0f538510486238d69dc301da80026fc93326767b38c50a04756ab9890a09",
+    "tools/encode_goshawk_visual.py": "9e524e9a32a237d71d212c8b5c34ecf12cde5a8e08885b1d03991b95c278f61c",
+    "tools/import_goshawk_envelope_source.py": "14b530725629ee3eaa5b3fd69f01fe00fe371564a1a52cb398d3969142db977e",
+    "tools/measure_banteng_geometry.py": "9356864e227302598fcae4e833ecb706b1ed8a5e600cbb4076b7165dc1e54bea",
+    "tools/measure_goshawk_surface_fit.py": "5407ef1e5fad41810aa95444ca1338fe33a91e5c9857dcb752b4e4cf2fca6d0b",
+    "tools/prepare_eagle_cruiser_geometry.py": "a1ea3b5d72f35e1f2932da71afa3ff8a276a504f7309a1086a2b3df35988addc",
+    "tools/verify_eagle_cruiser_geometry.py": "cb053ee5873fee62ee456bb3776e98d29b2cbb44c7344599bc617a8579164d43",
+    "tools/vulture_mk_i_exact_fit.py": "479b31f8714a198a82c0e2888b8d19efe46c7b4c43a576b83ab84c571ae738c6",
+    "tools/measure_baza_mk_ii.py": "e23046a321c38cc8c2fa2153b43796b25add540db3293b487d7f02446e872c47",
+    "tools/prepare_baza_mk_ii.py": "30744fc9484cca67ae46f0732e94139bbc719e603f8dfa4dfd7610502ac97536",
+    "tools/verify_baza_mk_ii.py": "25fd79d4110f650cdb250a755e3fa9cf7f9da686ad3f09046830a0bff8997983",
+    "tools/hull_contact_geometry.py": "07606202e6a298ad375a7504991fe6fb93da6a07f9b5cc4a22167bd570b07839"
+  },
+  "originalWingToUpperStripGapMillimetres": {
+    "port": 150,
+    "starboard": 150
+  }
+}

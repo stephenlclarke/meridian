@@ -16,6 +16,7 @@ pub enum Action {
     Emp(meridian_core::EmpEquipmentAction),
     CargoEquipment(meridian_core::equipment::Command),
     StationService(meridian_core::station_services::Command),
+    CommodityTrade(meridian_core::station_services::CommodityTrade),
     Ammunition(meridian_core::AmmunitionAction),
     ReviewTradeLesson,
     PlanTradeLesson,
@@ -299,7 +300,8 @@ impl Session {
             | Action::Ammunition(_)
             | Action::Module(_)
             | Action::CargoEquipment(_)
-            | Action::StationService(_) => {
+            | Action::StationService(_)
+            | Action::CommodityTrade(_) => {
                 Err("Equipment changes require the durable profile path".into())
             }
             Action::ReviewTradeLesson | Action::PlanTradeLesson | Action::CancelTradeLesson => {

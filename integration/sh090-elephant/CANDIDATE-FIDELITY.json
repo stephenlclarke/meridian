@@ -1,0 +1,79 @@
+{
+  "unchangedParts": 19,
+  "resampledParts": [
+    {
+      "index": 0,
+      "name": "body primary pressure envelope",
+      "candidateToArchivedUpperMm": 1749,
+      "archivedToCandidateUpperMm": 1916
+    },
+    {
+      "index": 5,
+      "name": "pods explicit member 0",
+      "candidateToArchivedUpperMm": 1723,
+      "archivedToCandidateUpperMm": 1891
+    },
+    {
+      "index": 10,
+      "name": "pods explicit member 1",
+      "candidateToArchivedUpperMm": 1979,
+      "archivedToCandidateUpperMm": 2230
+    },
+    {
+      "index": 15,
+      "name": "pods explicit member 2",
+      "candidateToArchivedUpperMm": 1747,
+      "archivedToCandidateUpperMm": 1976
+    },
+    {
+      "index": 20,
+      "name": "cockpit glazing envelope",
+      "candidateToArchivedUpperMm": 1989,
+      "archivedToCandidateUpperMm": 1600
+    },
+    {
+      "index": 23,
+      "name": "engine_pair/negative side/propulsion casing",
+      "candidateToArchivedUpperMm": 1491,
+      "archivedToCandidateUpperMm": 1740
+    },
+    {
+      "index": 24,
+      "name": "engine_pair/negative side/propulsion luminous recess",
+      "candidateToArchivedUpperMm": 976,
+      "archivedToCandidateUpperMm": 976
+    },
+    {
+      "index": 26,
+      "name": "engine_pair/positive side/propulsion casing",
+      "candidateToArchivedUpperMm": 1491,
+      "archivedToCandidateUpperMm": 1995
+    },
+    {
+      "index": 27,
+      "name": "engine_pair/positive side/propulsion luminous recess",
+      "candidateToArchivedUpperMm": 946,
+      "archivedToCandidateUpperMm": 1123
+    }
+  ],
+  "silhouetteOffsetsMm": {
+    "detailed": {
+      "xy": 323,
+      "xz": 982,
+      "yz": 580
+    },
+    "archivedNative": {
+      "xy": 323,
+      "xz": 982,
+      "yz": 580
+    }
+  },
+  "wholeSurfaceUpperMm": {
+    "archivedNativeToCandidateNative": 2235,
+    "candidateNativeToArchivedNative": 1989,
+    "detailedToCandidateNative": 2999,
+    "candidateNativeToDetailed": 2000,
+    "detailedToArchivedNative": 2237,
+    "archivedNativeToDetailed": 1499
+  }
+}

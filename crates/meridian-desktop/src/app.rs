@@ -9,6 +9,7 @@ use std::{
     collections::{HashSet, hash_map::RandomState},
     error::Error,
     hash::{BuildHasher, Hasher},
+    io::Write,
     sync::Arc,
     time::Instant,
 };
@@ -29,7 +30,7 @@ use crate::clock::FixedClock;
 use crate::profile::Profile;
 use crate::renderer::{HudScene, Presentation, Renderer, SceneEffects, StationScene};
 use crate::session::Action;
-use crate::{asteroid_render, docked::Docked, docked_screens as ui};
+use crate::{asteroid_render, authored_hull::AuthoredHulls, docked::Docked, docked_screens as ui};
 
 // Ephemeral profile IDs are allocated by the host, never by the deterministic core.
 fn fresh_profile_seed() -> u64 {
@@ -103,6 +104,30 @@ struct PreparedPresentation {
     docked_frame: Option<ui::Frame>,
 }
 
+/// Acknowledge only the actual requested, authenticated preview after a successful presentation.
+fn take_studio_ready(
+    pending: &mut Option<String>,
+    authored: &AuthoredHulls,
+    frame: Option<&ui::Frame>,
+    presented: &Result<Presentation, String>,
+) -> bool {
+    let Some(id) = pending.as_ref() else {
+        return false;
+    };
+    if !matches!(presented, Ok(Presentation::Presented))
+        || !frame.is_some_and(|frame| {
+            frame.screen == Some(ui::Screen::Showroom)
+                && frame.models.last().is_some_and(|model| {
+                    model.object.as_str() == id.as_str() && authored.visual_for(model).is_some()
+                })
+        })
+    {
+        return false;
+    }
+    *pending = None;
+    true
+}
+
 // This shell owns the World synchronously. No gameplay mutation occurs in renderer code.
 // Retain the frame-wide contact even when a later catch-up tick is clear.
 #[derive(Debug, PartialEq, Eq)]
@@ -149,6 +174,8 @@ impl Notice {
 
 struct App {
     game: Profile,
+    authored_hulls: Arc<AuthoredHulls>,
+    studio_ready: Option<String>,
     audio: Option<DesktopAudio>,
     validation_view: FlightView,
     target_details: Option<bool>,
@@ -190,18 +217,32 @@ impl App {
         let view = launch.camera_view();
         let mut app = match launch {
             mule_validation::Launch::Profile(directory) => {
-                let (game, notice) = Profile::open_startup(directory, fresh_profile_seed())?;
-                let mut app = Self::with_profile(game);
-                app.commander_open = true;
-                app.paused = app
-                    .game
-                    .world
-                    .mission_snapshot()
-                    .is_some_and(|mission| mission.paused);
-                if let Some(notice) = notice {
-                    app.notice.set(notice);
-                } else if player_destroyed(&app.game.world) {
-                    app.notice.set(DESTROYED_NOTICE.into());
+                Self::open_profile(directory, Arc::default())?
+            }
+            mule_validation::Launch::Authored {
+                directory,
+                packages,
+                open_showroom,
+            } => {
+                // Reject every invalid/conflicting input before opening a profile or its save.
+                let authored = Arc::new(AuthoredHulls::load(&packages)?);
+                let mut app = Self::open_profile(directory, authored)?;
+                if open_showroom {
+                    if !app.has_berth() {
+                        return Err("--open-authored-showroom requires a docked commander".into());
+                    }
+                    let mut menu = app.new_docked_menu()?;
+                    menu.open_authored_showroom(&app.game.world)?;
+                    app.docked = Some(menu);
+                    app.studio_ready = Some(
+                        app.authored_hulls
+                            .inspection_record()
+                            .ok_or("Missing isolated authored hull for Studio readiness")?
+                            .id
+                            .clone(),
+                    );
+                    // Initial presentation only; never simulate a key or change World state.
+                    app.commander_open = false;
                 }
                 app
             }
@@ -211,10 +252,38 @@ impl App {
         Ok(app)
     }
 
+    fn open_profile(
+        directory: std::path::PathBuf,
+        authored_hulls: Arc<AuthoredHulls>,
+    ) -> Result<Self, Box<dyn Error>> {
+        let (game, notice) = Profile::open_startup(directory, fresh_profile_seed())?;
+        let mut app = Self::with_profile(game);
+        app.authored_hulls = authored_hulls;
+        app.commander_open = true;
+        app.paused = app
+            .game
+            .world
+            .mission_snapshot()
+            .is_some_and(|mission| mission.paused);
+        if let Some(notice) = notice {
+            app.notice.set(notice);
+        } else if player_destroyed(&app.game.world) {
+            app.notice.set(DESTROYED_NOTICE.into());
+        } else if let Some(first) = app.authored_hulls.records().next() {
+            app.notice.set(format!(
+                "Local hull loaded. At a station press 3, search {}.",
+                first.id
+            ));
+        }
+        Ok(app)
+    }
+
     fn with_profile(game: Profile) -> Self {
         let internal = game.is_internal_validation();
         Self {
             game,
+            authored_hulls: Arc::default(),
+            studio_ready: None,
             audio: None,
             validation_view: FlightView::Front,
             target_details: None,
@@ -533,6 +602,11 @@ impl App {
             }
             return;
         }
+        if self.game.is_medusa_preview() {
+            self.medusa_preview_key(code, event_loop);
+            self.request_redraw();
+            return;
+        }
         if code == KeyCode::Digit0 && !self.commander_open && self.has_berth() {
             self.show_station_commander();
             self.request_redraw();
@@ -590,6 +664,54 @@ impl App {
 
     fn has_berth(&self) -> bool {
         self.game.playing() && self.game.world.current_dock_context().is_some()
+    }
+
+    fn medusa_preview_key(&mut self, code: KeyCode, event_loop: &ActiveEventLoop) {
+        use KeyCode::*;
+        match code {
+            Escape => self.request_quit(event_loop),
+            F5 => self.save_profile(),
+            F9 => match self.game.continue_saved() {
+                Ok(()) => {
+                    self.reset_input();
+                    self.notice.set("Medusa preview continued".into());
+                }
+                Err(error) => self
+                    .notice
+                    .set(format!("Preview Continue refused: {error}")),
+            },
+            KeyP => {
+                self.paused = !self.paused;
+                self.reset_input();
+            }
+            KeyL | Digit0 | Digit1 | Digit2 | Digit3 => {
+                let action = match code {
+                    KeyL => Action::Launch,
+                    Digit0 => Action::SetFlightView(FlightView::Front),
+                    Digit1 => Action::SetFlightView(FlightView::Rear),
+                    Digit2 => Action::SetFlightView(FlightView::Left),
+                    _ => Action::SetFlightView(FlightView::Right),
+                };
+                self.notice
+                    .set(self.game.command(action).unwrap_or_else(|error| error));
+            }
+            KeyB | BracketLeft | BracketRight => {
+                let Some(mut fit) = self.game.world.medusa_preview_fit() else {
+                    return;
+                };
+                match code {
+                    KeyB => fit.cargo_expansion = !fit.cargo_expansion,
+                    BracketLeft => fit.cabins = fit.cabins.saturating_sub(1),
+                    _ => fit.cabins = fit.cabins.saturating_add(1),
+                }
+                self.notice.set(
+                    self.game
+                        .medusa_preview_fit(fit)
+                        .unwrap_or_else(|error| error),
+                );
+            }
+            _ => {}
+        }
     }
 
     fn show_station_commander(&mut self) {
@@ -696,7 +818,7 @@ impl App {
         } else {
             ui::Screen::System
         };
-        self.docked = match Docked::new(&self.game.world) {
+        self.docked = match self.new_docked_menu() {
             Ok(mut menu) => {
                 if self.game.world.current_dock_context().is_some()
                     && let Err(error) = menu.open(&self.game.world, screen)
@@ -788,6 +910,13 @@ impl App {
                 .as_ref()
                 .is_some_and(|menu| menu.active(&self.game.world))
     }
+    fn new_docked_menu(&self) -> Result<Docked, String> {
+        if self.authored_hulls.is_empty() {
+            Docked::new(&self.game.world)
+        } else {
+            Docked::with_authored(&self.game.world, self.authored_hulls.clone())
+        }
+    }
     fn menu_input(&mut self, input: ui::Input) {
         if self.modal_open() {
             return;
@@ -814,7 +943,7 @@ impl App {
             _ => return false,
         };
         if self.docked.is_none() {
-            match Docked::new(&self.game.world) {
+            match self.new_docked_menu() {
                 Ok(menu) => self.docked = Some(menu),
                 Err(error) => {
                     self.notice.set(error);
@@ -1087,6 +1216,31 @@ impl App {
                 ))
             .then_some(code);
         }
+        if self.game.is_medusa_preview() {
+            if state == ElementState::Released {
+                self.keys.remove(&code);
+                return None;
+            }
+            if !self.focused || self.occluded || repeat {
+                return None;
+            }
+            let held = matches!(
+                code,
+                KeyCode::ArrowUp
+                    | KeyCode::ArrowDown
+                    | KeyCode::KeyA
+                    | KeyCode::KeyD
+                    | KeyCode::KeyQ
+                    | KeyCode::KeyE
+                    | KeyCode::KeyW
+                    | KeyCode::KeyS
+                    | KeyCode::Space
+            );
+            if held {
+                self.keys.insert(code);
+            }
+            return Some(code);
+        }
         if state == ElementState::Released {
             self.keys.remove(&code);
             if code == KeyCode::KeyU && self.occupied_cut.is_none() {
@@ -1314,6 +1468,8 @@ impl App {
         let modal_open = self.modal_open();
         let commander = if self.game.is_internal_validation() {
             "Meridian INTERNAL MULE VALIDATION / NO SAVE"
+        } else if self.game.is_medusa_preview() {
+            "Meridian SH171 MEDUSA / ISOLATED PREVIEW"
         } else if self
             .game
             .world
@@ -1335,8 +1491,13 @@ impl App {
                 FlightMode::Flight => "FLIGHT",
             }
         };
+        let inspection = self
+            .authored_hulls
+            .inspection_record()
+            .map(|ship| format!(" | {} [{}]", ship.name, ship.id))
+            .unwrap_or_default();
         format!(
-            "{commander} | {mode} | {} | H / ? Help",
+            "{commander}{inspection} | {mode} | {} | H / ? Help",
             if player_destroyed(&self.game.world) {
                 "STOPPED"
             } else if modal_open {
@@ -1382,18 +1543,21 @@ impl App {
         }
 
         let traffic = self.game.world.traffic_snapshot();
-        let cockpit =
-            if self.game.playing() && !self.commander_open && !self.game.is_internal_validation() {
-                match crate::hud::cockpit::Cockpit::capture(&self.game.world, snapshot) {
-                    Ok(cockpit) => Some(cockpit),
-                    Err(error) => {
-                        self.fail(event_loop, error);
-                        return;
-                    }
+        let cockpit = if self.game.playing()
+            && !self.commander_open
+            && !self.game.is_internal_validation()
+            && !self.game.is_medusa_preview()
+        {
+            match crate::hud::cockpit::Cockpit::capture(&self.game.world, snapshot) {
+                Ok(cockpit) => Some(cockpit),
+                Err(error) => {
+                    self.fail(event_loop, error);
+                    return;
                 }
-            } else {
-                None
-            };
+            }
+        } else {
+            None
+        };
         self.missile_bodies.clear();
         self.missile_bodies.extend(
             self.game
@@ -1460,6 +1624,7 @@ impl App {
             );
             let practice = self.game.world.practice_snapshot();
             let targeting = Self::target_readout(&self.game.world);
+            renderer.set_player_hull(self.game.world.player_hull_kind());
             renderer.set_flight_view(if self.game.is_internal_validation() {
                 self.validation_view
             } else {
@@ -1497,6 +1662,15 @@ impl App {
             if let (Some(started), Some(timing)) = (draw_started, &mut self.validation_timing) {
                 timing.observe(&presented, started.elapsed());
             }
+            let studio_ready = self.help.is_none()
+                && self.xyzzy.is_none()
+                && self.occupied_cut.is_none()
+                && take_studio_ready(
+                    &mut self.studio_ready,
+                    &self.authored_hulls,
+                    docked_frame.as_ref(),
+                    &presented,
+                );
             match Self::complete_presentation(
                 presented,
                 &mut self.docked,
@@ -1505,7 +1679,20 @@ impl App {
                 retry_inactive,
                 || renderer.window.request_redraw(),
             ) {
-                Ok(skipped) => self.record_terminal_presentation(skipped),
+                Ok(skipped) => {
+                    self.record_terminal_presentation(skipped);
+                    if studio_ready && !skipped {
+                        let mut stdout = std::io::stdout().lock();
+                        if let Err(error) = writeln!(stdout, "MERIDIAN_HULL_STUDIO_READY")
+                            .and_then(|()| stdout.flush())
+                        {
+                            self.fail(
+                                event_loop,
+                                format!("Studio readiness output failed: {error}"),
+                            );
+                        }
+                    }
+                }
                 Err(error) => self.fail(event_loop, error),
             }
         }
@@ -1532,12 +1719,16 @@ impl ApplicationHandler for App {
             Ok(window) => Arc::new(window),
             Err(error) => return self.fail(event_loop, error),
         };
-        match pollster::block_on(Renderer::new(window, event_loop.owned_display_handle())) {
+        match pollster::block_on(Renderer::new(
+            window,
+            event_loop.owned_display_handle(),
+            self.authored_hulls.clone(),
+        )) {
             Ok(renderer) => self.renderer = Some(renderer),
             Err(error) => self.fail(event_loop, error),
         }
         self.last_frame = Instant::now();
-        if self.commander_open {
+        if self.commander_open || self.menu_active() {
             self.request_redraw();
         }
     }
@@ -1633,8 +1824,8 @@ impl ApplicationHandler for App {
 }
 
 pub fn run() -> Result<(), Box<dyn Error>> {
-    let event_loop = EventLoop::new()?;
     let mut app = App::new()?;
+    let event_loop = EventLoop::new()?;
     event_loop.run_app(&mut app)?;
     if let Some(error) = app.error {
         return Err(std::io::Error::other(error).into());
@@ -1753,5 +1944,7 @@ mod help_tests;
 #[cfg(test)]
 mod xyzzy_tests;
 
+#[cfg(test)]
+mod authored_hull_tests;
 #[cfg(test)]
 mod emp_tests;

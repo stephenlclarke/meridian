@@ -1,0 +1,9 @@
+{
+  "openArcVolumeCubicMetres": {
+    "detailed": 1040.255306,
+    "archivedNative": 972.431397,
+    "candidateNative": 669.26717
+  },
+  "originalToCandidateUpperMillimetres": 1417,
+  "candidateToOriginalUpperMillimetres": 1245
+}

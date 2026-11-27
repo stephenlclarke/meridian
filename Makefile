@@ -36,3 +36,8 @@ preview-plan:
 
 preview-release:
 	python3 -B tools/preview_release.py --commit "$(PREVIEW_COMMIT)" --package "$(PREVIEW_PACKAGE)"
+
+.PHONY: hull-studio
+hull-studio:
+	cargo build --release --locked -p meridian-hull-tool
+	python3 -B tools/hull_studio/studio.py

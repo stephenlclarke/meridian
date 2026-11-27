@@ -1,0 +1,190 @@
+{
+  "hull": "SH093 Giraffe Liner",
+  "scope": "Original catalogue inspection and geometry queries",
+  "source": "assets/fleet/sh093/SOURCE-GEOMETRY.json",
+  "frozenSources": "integration/sh093-giraffe-liner/FROZEN-SOURCES.json",
+  "sourceMetresPerUnit": 1,
+  "faces": {
+    "detailed": 3492,
+    "native": 216,
+    "nativeMaximum": 512
+  },
+  "originalAccess": {
+    "runtimeCatalogue": {
+      "playerFlyable": false,
+      "normalPurchaseEligible": false,
+      "purchasePolicy": "pendingFabrication"
+    },
+    "r3DesignContract": {
+      "playerFlyable": true,
+      "purchasePolicy": "blueprintFabrication"
+    }
+  },
+  "engineering": {
+    "sourceReference": "finite-intrinsic-empty-giraffe-liner",
+    "massKg": 72102
+  },
+  "supportGroups": 26,
+  "minimumRouteClearanceMillimetres": 729,
+  "sourceContactCounts": {
+    "design": 36,
+    "nativeDesign": 3
+  },
+  "nativeDriveCapLateralGapsMillimetres": {
+    "port": 551,
+    "starboard": 551
+  },
+  "fitUpperMillimetres": {
+    "detailed": 2381,
+    "native": 3539
+  },
+  "hullStudio": {
+    "definition": "integration/sh093-giraffe-liner/GIRAFFE-LINER-STUDIO.json",
+    "bytes": 452095,
+    "sha256": "8e2a6263219017d7edb4003c7af808a0107cec0361c8caae03980688495b0d16",
+    "supports": 26,
+    "probes": 7,
+    "detail": "3,492 original detailed faces",
+    "native": "216 original native faces",
+    "loaderRevision": "27121e66ba37a29781135b56924a9d6e7f38a70a",
+    "signedInstalledExport": {
+      "status": "PASS",
+      "scope": "Signed installed Studio offline original artwork import/export",
+      "bundleIdentifier": "io.xyzzy.meridian.hullstudio",
+      "bundleVersion": "0.0.0",
+      "codeDirectoryHash": "93938bda9242ebdff508bfb9e16b3cdf83c0a200",
+      "developerIdTeam": "4MEB7MUTAV",
+      "signatureVerification": "deep strict",
+      "definition": {
+        "bytes": 452095,
+        "sha256": "8e2a6263219017d7edb4003c7af808a0107cec0361c8caae03980688495b0d16"
+      },
+      "exportExitStatuses": [
+        0,
+        0
+      ],
+      "exportMatchesDefinitionExceptTrailingLf": true,
+      "valid": true,
+      "diagnostics": [],
+      "detailedTriangles": 3492,
+      "nativeTriangles": 216,
+      "supportGroups": 26,
+      "engineeringReference": "finite-intrinsic-empty-giraffe-liner",
+      "massKg": 72102,
+      "receiptFiles": {
+        "giraffe-liner.hull.json": {
+          "bytes": 452094,
+          "sha256": "a7d720ee30ab59cdff5d7d115256ad125c14f0ad7e18b6e853fbc4a6b876db4c"
+        },
+        "giraffe-liner-repeat.hull.json": {
+          "bytes": 452094,
+          "sha256": "a7d720ee30ab59cdff5d7d115256ad125c14f0ad7e18b6e853fbc4a6b876db4c"
+        },
+        "studio.stdout.json": {
+          "bytes": 61509,
+          "sha256": "a4e6f44d67c977a2f4a2e9ec5cc021d36d083b78d7f99511cde659efc0959b00"
+        },
+        "studio-repeat.stdout.json": {
+          "bytes": 61509,
+          "sha256": "a4e6f44d67c977a2f4a2e9ec5cc021d36d083b78d7f99511cde659efc0959b00"
+        },
+        "codesign.log": {
+          "bytes": 13038,
+          "sha256": "69f4ea0c0fb6e2e7b3e127befc0ca65e16282fb52edf8610635bd3f1b5a0ebd7"
+        },
+        "codesign-identity.log": {
+          "bytes": 988,
+          "sha256": "f6d772f29f9e72421e98a6d7243102b92b77b5995acbe6cda7ddb3bbfc3b1706"
+        }
+      },
+      "artworkProbeResults": [
+        {
+          "name": "dorsal",
+          "passed": true
+        },
+        {
+          "name": "ventral",
+          "passed": true
+        },
+        {
+          "name": "between-aft-drives",
+          "passed": true
+        },
+        {
+          "name": "between-observation-galleries",
+          "passed": true
+        },
+        {
+          "name": "port-outboard",
+          "passed": true
+        },
+        {
+          "name": "starboard-outboard",
+          "passed": true
+        },
+        {
+          "name": "forward-above-bow",
+          "passed": true
+        }
+      ],
+      "triangleRoles": {
+        "detail": "original detailed visible",
+        "native": "original native visible"
+      }
+    }
+  },
+  "byteReplay": {
+    "commands": [
+      "python3 -B tools/prepare_giraffe_liner.py --check",
+      "python3 -B tools/verify_giraffe_liner.py | cmp - integration/sh093-giraffe-liner/CONTACT-RESULT.json",
+      "python3 -B tools/measure_giraffe_liner.py | cmp - integration/sh093-giraffe-liner/SURFACE-FIT.json",
+      "python3 -B tools/measure_giraffe_liner.py --difference | cmp - integration/sh093-giraffe-liner/LOD-DIFFERENCE.json"
+    ],
+    "host": "SteveMBA",
+    "startedUtc": "2026-11-25T03:14:58Z",
+    "finishedUtc": "2026-11-25T03:15:08Z",
+    "log": {
+      "bytes": 440,
+      "sha256": "1426e7e928d8c27fbd6ddbd86c49d8f4febf30013a55125a403533c1fba78596"
+    },
+    "fitDependencies": {
+      "python": "3.14.3",
+      "numpy": "2.5.5",
+      "scipy": "1.18.1",
+      "trimesh": "5.2.1",
+      "rtree": "1.4.1"
+    },
+    "originalCommit": "bacc55e9e054dc73f8c13542ad1e89e5a945a865",
+    "historicalReplayPins": {
+      "tools/measure_banteng_geometry.py": "4b7d8d5d972e30d93bebf7f422be71e415d6e4a9c4b622582ecf6e30a6bb9235",
+      "tools/measure_lanner_geometry.py": "cabbaf17ff7efdbcbee9a1fba67c7edafd59dceb8e97f367824a51c134479992",
+      "tools/verify_eagle_cruiser_geometry.py": "c7926cb6e699ae5ffb445951ce9d4e98a64018a7ecb1db2e5e77a611d742a783"
+    }
+  },
+  "replayPins": {
+    "integration/sh093-giraffe-liner/GIRAFFE-LINER-STUDIO.json": "8e2a6263219017d7edb4003c7af808a0107cec0361c8caae03980688495b0d16",
+    "integration/sh093-giraffe-liner/FROZEN-SOURCES.json": "0d56999eccb5a58958f2c7b55ee68b55cd5e5c124e696ed7639ad367b135137b",
+    "integration/sh093-giraffe-liner/CONTACT-CANDIDATE.json": "514455d35430648dcbcce4be4042ce4f5c746f23fe0301adaa4d39a424e88e3e",
+    "integration/sh093-giraffe-liner/CONTACT-RESULT.json": "2eb8020551fc04c3f6409148d1341a016f5fc242ebcf4358e40af3ef058eac95",
+    "integration/sh093-giraffe-liner/ORIGINAL-OVERLAPS.json": "622eca4417dc07e9dc37c9151a57c1d107fd868a86b08c47f0cb9cff502c1ce4",
+    "integration/sh093-giraffe-liner/ORIGINAL-SEPARATIONS.json": "88cc362641aa35b01e8f24e64fd585dd766acf9587f9fca0a16213b43cccc962",
+    "integration/sh093-giraffe-liner/LOD-DIFFERENCE.json": "9fae82f4395f7cfd2f77d09efde142a61384d7503c54f762b926775aad7084a7",
+    "integration/sh093-giraffe-liner/SUPPORT-FAN.json": "bf0db25cdfad87ed300de63ac03956ed459a9534c468bab86d25e75df7a00cbd",
+    "integration/sh093-giraffe-liner/SURFACE-FIT.json": "161872bd628766db44b69247800d9d418c26c2dec68df26c335055cdc42612a6",
+    "tools/atomic_asset_output.py": "2d13803823645d3bdea7c855af958eb54d7ebe513ec1bcb0af34e82870164bf0",
+    "tools/banteng_art_mesh.py": "ef5c0f538510486238d69dc301da80026fc93326767b38c50a04756ab9890a09",
+    "tools/encode_goshawk_visual.py": "9e524e9a32a237d71d212c8b5c34ecf12cde5a8e08885b1d03991b95c278f61c",
+    "tools/import_goshawk_envelope_source.py": "14b530725629ee3eaa5b3fd69f01fe00fe371564a1a52cb398d3969142db977e",
+    "tools/measure_banteng_geometry.py": "9356864e227302598fcae4e833ecb706b1ed8a5e600cbb4076b7165dc1e54bea",
+    "tools/measure_goshawk_surface_fit.py": "5407ef1e5fad41810aa95444ca1338fe33a91e5c9857dcb752b4e4cf2fca6d0b",
+    "tools/measure_lanner_geometry.py": "55d13a28602e6ed791adecd85ff43f3c8a7fbe118cf0977272e1747422c2408d",
+    "tools/measure_giraffe_liner.py": "895e536b42f28726127cfb9c7cec663738e8e0d7cc4a706418cc5cc0f5a2faab",
+    "tools/prepare_eagle_cruiser_geometry.py": "a1ea3b5d72f35e1f2932da71afa3ff8a276a504f7309a1086a2b3df35988addc",
+    "tools/prepare_giraffe_liner.py": "3a5af2c711da4d99fcc3aa76c1747ef16126a97026c7f3f115fe136fa8c5e577",
+    "tools/verify_eagle_cruiser_geometry.py": "cb053ee5873fee62ee456bb3776e98d29b2cbb44c7344599bc617a8579164d43",
+    "tools/verify_giraffe_liner.py": "1f55769f2e4d8867ba9b8bb867a996691426a4ffdd16d358a97fb5c80dc8e55b",
+    "tools/vulture_mk_i_exact_fit.py": "479b31f8714a198a82c0e2888b8d19efe46c7b4c43a576b83ab84c571ae738c6",
+    "assets/fleet/sh093/SOURCE-GEOMETRY.json": "373e2889a8ef773159d01d61a0a17d61172882046749c2f306e45ebb95c463a4",
+    "tools/hull_contact_geometry.py": "07606202e6a298ad375a7504991fe6fb93da6a07f9b5cc4a22167bd570b07839"
+  }
+}

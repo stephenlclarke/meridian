@@ -1,0 +1,326 @@
+[
+  {
+    "name": "canopy-to-dorsal-hull",
+    "pointMetres": [
+      -1.2000000000000002,
+      10.27,
+      11.5
+    ],
+    "originalFaces": {
+      "detailed": {
+        "dorsal-canopy": {
+          "faceRange": [
+            8472,
+            9432
+          ],
+          "hitCountsAboveBelow": [
+            1,
+            1
+          ]
+        },
+        "dorsal-hull": {
+          "faceRange": [
+            7704,
+            8088
+          ],
+          "hitCountsAboveBelow": [
+            1,
+            1
+          ]
+        }
+      },
+      "native": {
+        "dorsal-canopy": {
+          "faceRange": [
+            440,
+            448
+          ],
+          "hitCountsAboveBelow": [
+            1,
+            1
+          ]
+        },
+        "dorsal-hull": {
+          "faceRange": [
+            376,
+            408
+          ],
+          "hitCountsAboveBelow": [
+            1,
+            1
+          ]
+        }
+      }
+    }
+  },
+  {
+    "name": "port-aft-bridge-to-collar",
+    "pointMetres": [
+      -9.73,
+      5.985399999999999,
+      -14.7
+    ],
+    "originalFaces": {
+      "detailed": {
+        "aft-cross-bridge": {
+          "faceRange": [
+            7680,
+            7692
+          ],
+          "hitCountsAboveBelow": [
+            1,
+            1
+          ]
+        },
+        "port-aft-collar": {
+          "faceRange": [
+            384,
+            1920
+          ],
+          "hitCountsAboveBelow": [
+            1,
+            3
+          ]
+        }
+      },
+      "native": {
+        "aft-cross-bridge": {
+          "faceRange": [
+            352,
+            364
+          ],
+          "hitCountsAboveBelow": [
+            1,
+            1
+          ]
+        },
+        "port-aft-collar": {
+          "faceRange": [
+            32,
+            96
+          ],
+          "hitCountsAboveBelow": [
+            1,
+            3
+          ]
+        }
+      }
+    }
+  },
+  {
+    "name": "port-forward-bridge-to-collar",
+    "pointMetres": [
+      -9.73,
+      5.985399999999999,
+      13.3
+    ],
+    "originalFaces": {
+      "detailed": {
+        "forward-cross-bridge": {
+          "faceRange": [
+            7692,
+            7704
+          ],
+          "hitCountsAboveBelow": [
+            1,
+            1
+          ]
+        },
+        "port-forward-collar": {
+          "faceRange": [
+            1920,
+            3456
+          ],
+          "hitCountsAboveBelow": [
+            1,
+            3
+          ]
+        }
+      },
+      "native": {
+        "forward-cross-bridge": {
+          "faceRange": [
+            364,
+            376
+          ],
+          "hitCountsAboveBelow": [
+            1,
+            1
+          ]
+        },
+        "port-forward-collar": {
+          "faceRange": [
+            96,
+            160
+          ],
+          "hitCountsAboveBelow": [
+            1,
+            3
+          ]
+        }
+      }
+    }
+  },
+  {
+    "name": "starboard-aft-bridge-to-collar",
+    "pointMetres": [
+      6.090000000000001,
+      5.985399999999999,
+      -14.7
+    ],
+    "originalFaces": {
+      "detailed": {
+        "aft-cross-bridge": {
+          "faceRange": [
+            7680,
+            7692
+          ],
+          "hitCountsAboveBelow": [
+            1,
+            1
+          ]
+        },
+        "starboard-aft-collar": {
+          "faceRange": [
+            4224,
+            5760
+          ],
+          "hitCountsAboveBelow": [
+            1,
+            3
+          ]
+        }
+      },
+      "native": {
+        "aft-cross-bridge": {
+          "faceRange": [
+            352,
+            364
+          ],
+          "hitCountsAboveBelow": [
+            1,
+            1
+          ]
+        },
+        "starboard-aft-collar": {
+          "faceRange": [
+            208,
+            272
+          ],
+          "hitCountsAboveBelow": [
+            1,
+            3
+          ]
+        }
+      }
+    }
+  },
+  {
+    "name": "starboard-forward-bridge-to-collar",
+    "pointMetres": [
+      6.090000000000001,
+      5.985399999999999,
+      13.3
+    ],
+    "originalFaces": {
+      "detailed": {
+        "forward-cross-bridge": {
+          "faceRange": [
+            7692,
+            7704
+          ],
+          "hitCountsAboveBelow": [
+            1,
+            1
+          ]
+        },
+        "starboard-forward-collar": {
+          "faceRange": [
+            5760,
+            7296
+          ],
+          "hitCountsAboveBelow": [
+            1,
+            3
+          ]
+        }
+      },
+      "native": {
+        "forward-cross-bridge": {
+          "faceRange": [
+            364,
+            376
+          ],
+          "hitCountsAboveBelow": [
+            1,
+            1
+          ]
+        },
+        "starboard-forward-collar": {
+          "faceRange": [
+            272,
+            336
+          ],
+          "hitCountsAboveBelow": [
+            1,
+            3
+          ]
+        }
+      }
+    }
+  },
+  {
+    "name": "dorsal-hull-to-aft-section",
+    "pointMetres": [
+      -1.2000000000000002,
+      9.0,
+      -6.7
+    ],
+    "originalFaces": {
+      "detailed": {
+        "dorsal-hull": {
+          "faceRange": [
+            7704,
+            8088
+          ],
+          "hitCountsAboveBelow": [
+            1,
+            1
+          ]
+        },
+        "aft-dorsal-hull": {
+          "faceRange": [
+            8088,
+            8472
+          ],
+          "hitCountsAboveBelow": [
+            1,
+            1
+          ]
+        }
+      },
+      "native": {
+        "dorsal-hull": {
+          "faceRange": [
+            376,
+            408
+          ],
+          "hitCountsAboveBelow": [
+            1,
+            1
+          ]
+        },
+        "aft-dorsal-hull": {
+          "faceRange": [
+            408,
+            440
+          ],
+          "hitCountsAboveBelow": [
+            1,
+            1
+          ]
+        }
+      }
+    }
+  }
+]

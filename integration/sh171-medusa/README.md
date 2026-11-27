@@ -34,6 +34,6 @@ The original builder and tests retain the 30 CPU-second and 512 MiB limits. The 
 
 ## Outstanding integration
 
-- Flight needs a separately qualified low-detail mesh within 512 faces and a hull admission path that uses the finite-dry reference.
-- Player control and purchase need explicit admission, crew and equipment checks, and save/continue qualification.
+- The [flight geometry adapter](../sh171-medusa-flight/README.md) uses the separate 512-face proxy and original SH028 port. The [isolated Medusa player preview](../sh171-medusa-preview/README.md) passed native Mac launch, flight and cold Continue with an expanded hold. Native physical docking return and fit-limit refusal remain unobserved.
+- Ordinary player ownership and purchase still need explicit admission, crew and equipment checks, and ordinary save/continue qualification. The isolated preview does not grant these.
 - The PLUGH fabrication quest, mission encounter, EMP disable, Salvage Beam lattice recovery and transfer of fabrication rights remain separate gameplay work.

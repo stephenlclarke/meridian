@@ -1,0 +1,12 @@
+{
+  "schema": 1,
+  "id": "sh126-mangalica",
+  "undoBefore": [
+    "sh111-puma"
+  ],
+  "undoAfter": [],
+  "kind": "declaration",
+  "module": "mangalica",
+  "before": "pub mod magpie;\n",
+  "after": "pub mod medusa;\n"
+}

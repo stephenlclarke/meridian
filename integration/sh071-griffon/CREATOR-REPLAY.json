@@ -1,0 +1,26 @@
+{
+  "familyRecipe": {
+    "testsPassed": 2,
+    "scope": "Pinned isolated SH071/SH072/SH073 geometry-only candidate and frozen family tests",
+    "candidate": {
+      "vertices": 228,
+      "triangles": 380,
+      "parts": 19,
+      "sha256": "8a3de7662f37cc8ad7938b8e2ece2a09073932a206cfba95c47ca4a634e9625b",
+      "bytes": 146960
+    },
+    "testLog": {
+      "sha256": "5cc0277b213e8b92ea4dcb3529d42cb0e6d4f58393b9e180f92b75f283bbb82f",
+      "bytes": 510
+    },
+    "reproducesArchivedCollision": false
+  },
+  "archivedCollision": {
+    "vertices": 294,
+    "triangles": 512,
+    "parts": 19,
+    "bytes": 68400,
+    "sha256": "58422ae55aed68fad39c2a510afecae5b3d0a6c5568941a4639ec648a5109fb4",
+    "facetReplayStatus": "not established from the frozen tree inputs"
+  }
+}

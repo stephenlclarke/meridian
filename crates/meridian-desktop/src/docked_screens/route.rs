@@ -3,7 +3,7 @@ use super::{
     Context, Control, Frame, Ink, Line, Outcome, Rect, Request,
     controller::DockedScreens,
     money,
-    presentation::{button, label},
+    presentation::{button, export_line, label, paragraphs},
 };
 use meridian_core::navigation::{
     RouteAlternative, RoutePlan, RouteProgress, RouteStatus, SystemId,
@@ -13,6 +13,8 @@ use meridian_core::navigation::{
 pub(super) struct RouteChooser {
     pub(super) candidates: Vec<RouteAlternative>,
     pub(super) selected: usize,
+    pub(super) trade_detail: bool,
+    pub(super) detail_scroll: usize,
 }
 impl RouteChooser {
     pub(super) fn choose(&mut self, index: usize) -> Outcome {
@@ -20,6 +22,7 @@ impl RouteChooser {
             return Outcome::Ignored;
         }
         self.selected = index;
+        self.detail_scroll = 0;
         Outcome::Updated
     }
 
@@ -29,6 +32,27 @@ impl RouteChooser {
             .map_or(Outcome::Ignored, |route| {
                 Outcome::Request(Request::SetNavigationRoute(route.plan.clone()))
             })
+    }
+
+    pub(super) fn toggle_trade_detail(&mut self) -> Outcome {
+        if self.candidates.get(self.selected).is_none() {
+            return Outcome::Ignored;
+        }
+        self.trade_detail = !self.trade_detail;
+        self.detail_scroll = 0;
+        Outcome::Updated
+    }
+
+    pub(super) fn scroll_details(&mut self, amount: i32, context: &Context<'_>) -> Outcome {
+        let Some(route) = self.candidates.get(self.selected) else {
+            return Outcome::Ignored;
+        };
+        self.detail_scroll = super::moved(
+            self.detail_scroll,
+            amount,
+            trade_detail_rows(context, route).len(),
+        );
+        Outcome::Updated
     }
 }
 
@@ -61,6 +85,12 @@ pub(super) fn project(s: &DockedScreens, context: &Context<'_>, frame: &mut Fram
     let (list, plot) = frame.viewport.panes();
     let active = context.world.active_route_progress();
     let selected = chooser.candidates.get(chooser.selected);
+    if chooser.trade_detail
+        && let Some(route) = selected
+    {
+        project_trade_detail(frame, context, chooser, route);
+        return;
+    }
     let heading = selected.map_or_else(
         || "Active route".into(),
         |route| {
@@ -170,6 +200,21 @@ pub(super) fn project(s: &DockedScreens, context: &Context<'_>, frame: &mut Fram
             !context.paused,
             Some("Resume before setting a route"),
         );
+        if actions.width >= 400.0 || active.is_none() {
+            button(
+                frame,
+                "D Trade details",
+                Rect::new(
+                    actions.x + actions.width - 120.0,
+                    actions.y,
+                    120.0,
+                    actions.height,
+                ),
+                Control::Key(super::Key::Details),
+                true,
+                None,
+            );
+        }
     }
     if let Some(route) = active {
         button(
@@ -191,6 +236,60 @@ pub(super) fn project(s: &DockedScreens, context: &Context<'_>, frame: &mut Fram
             );
         }
     }
+}
+
+fn trade_detail_rows(context: &Context<'_>, route: &RouteAlternative) -> Vec<String> {
+    let mut rows = vec![
+        "Current quotes when planned. Reopen to update.".into(),
+        "Each leg is estimated independently; no purchase or sale.".into(),
+    ];
+    for leg in &route.trade_legs {
+        rows.push(format!(
+            "{} > {} | exports est. {} CR",
+            world_name(context, leg.from),
+            world_name(context, leg.to),
+            money(leg.profit_tenths)
+        ));
+        if leg.exports.is_empty() {
+            rows.push("No affordable extra exports".into());
+        }
+        rows.extend(leg.exports.iter().map(export_line));
+    }
+    rows
+}
+
+fn project_trade_detail(
+    frame: &mut Frame,
+    context: &Context<'_>,
+    chooser: &RouteChooser,
+    route: &RouteAlternative,
+) {
+    let body = frame.viewport.body();
+    let rows = trade_detail_rows(context, route);
+    let offset = chooser.detail_scroll.min(rows.len().saturating_sub(1));
+    label(
+        frame,
+        format!("Trade details {}/{} | PgUp/PgDn", offset + 1, rows.len()),
+        body.x,
+        body.y,
+        Ink::Yellow,
+        body,
+    );
+    let area = Rect::new(
+        body.x,
+        body.y + 20.0,
+        body.width,
+        (body.height - 43.0).max(0.0),
+    );
+    paragraphs(frame, &rows[offset..], area, 0);
+    button(
+        frame,
+        "Back to route",
+        Rect::new(body.x, body.y + body.height - 22.0, 116.0, 22.0),
+        Control::Key(super::Key::Details),
+        true,
+        None,
+    );
 }
 
 fn plot_course(frame: &mut Frame, context: &Context<'_>, area: Rect, plan: &RoutePlan) {

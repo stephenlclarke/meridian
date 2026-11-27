@@ -1,0 +1,153 @@
+{
+  "componentCount": 14,
+  "surfaceTriangles": 908,
+  "interiorOverlaps": [
+    {
+      "parts": [
+        1,
+        8
+      ],
+      "pointMetres": [
+        -5.9359965,
+        1.5087103,
+        -20.9654883
+      ],
+      "hitCountsAboveBelow": [
+        [
+          1,
+          1
+        ],
+        [
+          1,
+          1
+        ]
+      ]
+    },
+    {
+      "parts": [
+        1,
+        11
+      ],
+      "pointMetres": [
+        3.8342793,
+        2.0099996,
+        -20.3691417
+      ],
+      "hitCountsAboveBelow": [
+        [
+          1,
+          1
+        ],
+        [
+          1,
+          1
+        ]
+      ]
+    },
+    {
+      "parts": [
+        2,
+        11
+      ],
+      "pointMetres": [
+        8.5942773,
+        2.2134451,
+        -22.3974168
+      ],
+      "hitCountsAboveBelow": [
+        [
+          1,
+          1
+        ],
+        [
+          1,
+          1
+        ]
+      ]
+    },
+    {
+      "parts": [
+        3,
+        8
+      ],
+      "pointMetres": [
+        -7.6108172,
+        2.8103663,
+        -22.6431983
+      ],
+      "hitCountsAboveBelow": [
+        [
+          1,
+          1
+        ],
+        [
+          1,
+          1
+        ]
+      ]
+    },
+    {
+      "parts": [
+        6,
+        7
+      ],
+      "pointMetres": [
+        6.4684039,
+        12.9942602,
+        17.1778121
+      ],
+      "hitCountsAboveBelow": [
+        [
+          1,
+          1
+        ],
+        [
+          1,
+          1
+        ]
+      ]
+    },
+    {
+      "parts": [
+        8,
+        9
+      ],
+      "pointMetres": [
+        -17.9673325,
+        -0.3627865,
+        -31.5045812
+      ],
+      "hitCountsAboveBelow": [
+        [
+          1,
+          1
+        ],
+        [
+          1,
+          1
+        ]
+      ]
+    },
+    {
+      "parts": [
+        11,
+        12
+      ],
+      "pointMetres": [
+        22.0447001,
+        1.3985207,
+        -31.5440085
+      ],
+      "hitCountsAboveBelow": [
+        [
+          1,
+          1
+        ],
+        [
+          1,
+          1
+        ]
+      ]
+    }
+  ]
+}

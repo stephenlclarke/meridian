@@ -1,0 +1,196 @@
+{
+  "hull": "SH130 Marmot Prospector",
+  "scope": "Original catalogue inspection and geometry queries",
+  "source": "assets/fleet/sh130/SOURCE-GEOMETRY.json",
+  "frozenSources": "integration/sh130-marmot-prospector/FROZEN-SOURCES.json",
+  "sourceMetresPerUnit": 1,
+  "faces": {
+    "detailed": 8484,
+    "native": 448,
+    "nativeMaximum": 512
+  },
+  "originalAccess": {
+    "runtimeCatalogue": {
+      "playerFlyable": false,
+      "normalPurchaseEligible": false,
+      "purchasePolicy": "pendingFabrication"
+    },
+    "r3DesignContract": {
+      "playerFlyable": true,
+      "purchasePolicy": "blueprintFabrication"
+    }
+  },
+  "engineering": {
+    "sourceReference": "finite-intrinsic-empty-marmot-prospector",
+    "massKg": 92530
+  },
+  "supportGroups": 52,
+  "minimumRouteClearanceMillimetres": 879,
+  "sourceContactCounts": {
+    "design": 30,
+    "nativeDesign": 10
+  },
+  "sharedOverlapCount": 10,
+  "detailedOnlyOverlapCount": 20,
+  "collars": {
+    "originalPerMesh": 3,
+    "dualMembershipVertices": 384,
+    "axisClearanceMillimetres": {
+      "port": 1678,
+      "central": 1678,
+      "starboard": 1678
+    }
+  },
+  "fitUpperMillimetres": {
+    "detailed": 2446,
+    "native": 3950
+  },
+  "hullStudio": {
+    "definition": "integration/sh130-marmot-prospector/MARMOT-PROSPECTOR-STUDIO.json",
+    "bytes": 1167085,
+    "sha256": "8830e544c691faba6d68cad4f3d8ad24222377cee6d7b54f0008f2a79b2f2a4b",
+    "supports": 52,
+    "probes": 7,
+    "detail": "8484 original detailed faces",
+    "native": "448 original native faces",
+    "loaderRevision": "27121e66ba37a29781135b56924a9d6e7f38a70a",
+    "signedInstalledExport": {
+      "status": "PASS",
+      "scope": "Signed installed Studio offline original artwork import/export",
+      "bundleIdentifier": "io.xyzzy.meridian.hullstudio",
+      "bundleVersion": "0.0.0",
+      "codeDirectoryHash": "93938bda9242ebdff508bfb9e16b3cdf83c0a200",
+      "developerIdTeam": "4MEB7MUTAV",
+      "signatureVerification": "deep strict",
+      "definition": {
+        "bytes": 1167085,
+        "sha256": "8830e544c691faba6d68cad4f3d8ad24222377cee6d7b54f0008f2a79b2f2a4b"
+      },
+      "exportExitStatuses": [
+        0,
+        0
+      ],
+      "exportMatchesDefinitionExceptTrailingLf": true,
+      "valid": true,
+      "diagnostics": [],
+      "detailedTriangles": 8484,
+      "nativeTriangles": 448,
+      "supportGroups": 52,
+      "engineeringReference": "finite-intrinsic-empty-marmot-prospector",
+      "massKg": 92530,
+      "receiptFiles": {
+        "marmot-prospector.hull.json": {
+          "bytes": 1167084,
+          "sha256": "4cd247a2cfe6da850cf3cf1a4558232d2df64cb81cc5187f9a6290699b606d62"
+        },
+        "marmot-prospector-repeat.hull.json": {
+          "bytes": 1167084,
+          "sha256": "4cd247a2cfe6da850cf3cf1a4558232d2df64cb81cc5187f9a6290699b606d62"
+        },
+        "studio.stdout.json": {
+          "bytes": 158131,
+          "sha256": "b26009249ccecac36eec33206fc7619c43ab7c8dd7c130d5009ca26eb73c1e28"
+        },
+        "studio-repeat.stdout.json": {
+          "bytes": 158131,
+          "sha256": "b26009249ccecac36eec33206fc7619c43ab7c8dd7c130d5009ca26eb73c1e28"
+        },
+        "codesign.log": {
+          "bytes": 13038,
+          "sha256": "7214576ffaf75d1c6e07af38efb36a72307dd2c2fa0b9d7912024f83e942b2dc"
+        },
+        "codesign-identity.log": {
+          "bytes": 988,
+          "sha256": "f6d772f29f9e72421e98a6d7243102b92b77b5995acbe6cda7ddb3bbfc3b1706"
+        }
+      },
+      "artworkProbeResults": [
+        {
+          "name": "dorsal",
+          "passed": true
+        },
+        {
+          "name": "ventral",
+          "passed": true
+        },
+        {
+          "name": "port-outboard",
+          "passed": true
+        },
+        {
+          "name": "starboard-outboard",
+          "passed": true
+        },
+        {
+          "name": "between-aft-drives",
+          "passed": true
+        },
+        {
+          "name": "between-port-and-central-collars",
+          "passed": true
+        },
+        {
+          "name": "between-central-and-starboard-collars",
+          "passed": true
+        }
+      ],
+      "triangleRoles": {
+        "detail": "original detailed visible",
+        "native": "original native visible"
+      }
+    }
+  },
+  "byteReplay": {
+    "commands": [
+      "python3 -B tools/prepare_marmot_prospector.py --check",
+      "python3 -B tools/verify_marmot_prospector.py | cmp - integration/sh130-marmot-prospector/CONTACT-RESULT.json",
+      "python3 -B tools/measure_marmot_prospector.py | cmp - integration/sh130-marmot-prospector/SURFACE-FIT.json",
+      "python3 -B tools/measure_marmot_prospector.py --difference | cmp - integration/sh130-marmot-prospector/LOD-DIFFERENCE.json"
+    ],
+    "host": "SteveMBA",
+    "startedUtc": "2026-11-25T05:49:58Z",
+    "finishedUtc": "2026-11-25T05:50:28Z",
+    "log": {
+      "bytes": 456,
+      "sha256": "4698a21da1bd8d91f4785206fac852fac77a0f2ab165d13f8c58bd5066fdf402"
+    },
+    "fitDependencies": {
+      "python": "3.14.3",
+      "numpy": "2.5.5",
+      "scipy": "1.18.1",
+      "trimesh": "5.2.1",
+      "rtree": "1.4.1"
+    },
+    "originalCommit": "fdf45c193c057dedb341a796330f687c28c89b98",
+    "historicalReplayPins": {
+      "tools/measure_banteng_geometry.py": "4b7d8d5d972e30d93bebf7f422be71e415d6e4a9c4b622582ecf6e30a6bb9235",
+      "tools/measure_lanner_geometry.py": "cabbaf17ff7efdbcbee9a1fba67c7edafd59dceb8e97f367824a51c134479992",
+      "tools/verify_eagle_cruiser_geometry.py": "c7926cb6e699ae5ffb445951ce9d4e98a64018a7ecb1db2e5e77a611d742a783"
+    }
+  },
+  "replayPins": {
+    "assets/fleet/sh130/SOURCE-GEOMETRY.json": "ad09a72a0014c35863e66eb54191d34a5795486e38d51a107ca1606d4c5d06c3",
+    "integration/sh130-marmot-prospector/MARMOT-PROSPECTOR-STUDIO.json": "8830e544c691faba6d68cad4f3d8ad24222377cee6d7b54f0008f2a79b2f2a4b",
+    "integration/sh130-marmot-prospector/FROZEN-SOURCES.json": "5780b270b752ba93118622253aefadd1c6268c1add063096876c7a8c7508a489",
+    "integration/sh130-marmot-prospector/CONTACT-CANDIDATE.json": "5551f65ea69ecdcf5f16b9c4b9ead70854d107acef399c8fa4844c8e3a79473f",
+    "integration/sh130-marmot-prospector/CONTACT-RESULT.json": "b317bd82fabdb7f0bbbf9947382aa5cbd6c1c12d0e3ec33b632303e46ece54f7",
+    "integration/sh130-marmot-prospector/ORIGINAL-OVERLAPS.json": "4261cc4cb6cc56d27048998cd49041ba47325f3c35331f64b2c6f780e8addd42",
+    "integration/sh130-marmot-prospector/LOD-DIFFERENCE.json": "af274fe1408b6f3a57477f71415e98ea816c82311ee084ef599713134895a200",
+    "integration/sh130-marmot-prospector/SUPPORT-FAN.json": "6383d6bb84cefe8fe8327b528538efd49a0136cefd8b69dc4211d1da07f25fbe",
+    "integration/sh130-marmot-prospector/SURFACE-FIT.json": "5fae38d0ecbc50bfd381d1be8f97a3bb3a5516719a1622ff5a154e8a1ee1c8ed",
+    "tools/atomic_asset_output.py": "2d13803823645d3bdea7c855af958eb54d7ebe513ec1bcb0af34e82870164bf0",
+    "tools/banteng_art_mesh.py": "ef5c0f538510486238d69dc301da80026fc93326767b38c50a04756ab9890a09",
+    "tools/encode_goshawk_visual.py": "9e524e9a32a237d71d212c8b5c34ecf12cde5a8e08885b1d03991b95c278f61c",
+    "tools/import_goshawk_envelope_source.py": "14b530725629ee3eaa5b3fd69f01fe00fe371564a1a52cb398d3969142db977e",
+    "tools/measure_banteng_geometry.py": "9356864e227302598fcae4e833ecb706b1ed8a5e600cbb4076b7165dc1e54bea",
+    "tools/measure_goshawk_surface_fit.py": "5407ef1e5fad41810aa95444ca1338fe33a91e5c9857dcb752b4e4cf2fca6d0b",
+    "tools/measure_lanner_geometry.py": "55d13a28602e6ed791adecd85ff43f3c8a7fbe118cf0977272e1747422c2408d",
+    "tools/measure_marmot_prospector.py": "32497a30bd054251f6fc4b5043155b079a836910a19c522f0b25960af50721ac",
+    "tools/prepare_eagle_cruiser_geometry.py": "a1ea3b5d72f35e1f2932da71afa3ff8a276a504f7309a1086a2b3df35988addc",
+    "tools/prepare_marmot_prospector.py": "13096c9a7566610416eb58fa17bb1e463390c63afdb221b7dcb6c52570d78379",
+    "tools/verify_eagle_cruiser_geometry.py": "cb053ee5873fee62ee456bb3776e98d29b2cbb44c7344599bc617a8579164d43",
+    "tools/verify_marmot_prospector.py": "195b15b0184a5a321a6167872c5a6a9f67a28f1440d9f00d8780857d1fb42deb",
+    "tools/vulture_mk_i_exact_fit.py": "479b31f8714a198a82c0e2888b8d19efe46c7b4c43a576b83ab84c571ae738c6",
+    "tools/hull_contact_geometry.py": "07606202e6a298ad375a7504991fe6fb93da6a07f9b5cc4a22167bd570b07839"
+  }
+}

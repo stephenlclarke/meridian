@@ -1,0 +1,350 @@
+{
+  "nominalPaddingMetres": 0.02,
+  "minimumRefinementTargetsMillimetres": {
+    "detailed": 2800,
+    "archivedNative": 3800,
+    "candidateNative": 4400
+  },
+  "fullUpperMillimetres": {
+    "detailed": 2443,
+    "archivedNative": 2443,
+    "candidateNative": 4372
+  },
+  "pieces": {
+    "body primary pressure envelope": {
+      "detailed": 1176,
+      "archivedNative": 1097,
+      "candidateNative": 4372
+    },
+    "body primary pressure envelope/service-well-0-0": {
+      "detailed": 2421,
+      "archivedNative": 2421,
+      "candidateNative": 2421
+    },
+    "body primary pressure envelope/service-well-0-0/recess-service-strut-0": {
+      "detailed": 131,
+      "archivedNative": 381,
+      "candidateNative": 381
+    },
+    "body primary pressure envelope/service-well-0-0/recess-service-strut-1": {
+      "detailed": 131,
+      "archivedNative": 385,
+      "candidateNative": 385
+    },
+    "body primary pressure envelope/service-well-0-0/recess-service-strut-2": {
+      "detailed": 131,
+      "archivedNative": 389,
+      "candidateNative": 389
+    },
+    "body primary pressure envelope/service-well-0-1": {
+      "detailed": 1703,
+      "archivedNative": 993,
+      "candidateNative": 993
+    },
+    "body primary pressure envelope/service-well-0-1/recess-service-strut-0": {
+      "detailed": 131,
+      "archivedNative": 676,
+      "candidateNative": 676
+    },
+    "body primary pressure envelope/service-well-0-1/recess-service-strut-1": {
+      "detailed": 131,
+      "archivedNative": 699,
+      "candidateNative": 699
+    },
+    "body primary pressure envelope/service-well-0-1/recess-service-strut-2": {
+      "detailed": 131,
+      "archivedNative": 693,
+      "candidateNative": 693
+    },
+    "body primary pressure envelope/service-well-0-2": {
+      "detailed": 1703,
+      "archivedNative": 605,
+      "candidateNative": 605
+    },
+    "body primary pressure envelope/service-well-0-2/recess-service-strut-0": {
+      "detailed": 131,
+      "archivedNative": 377,
+      "candidateNative": 377
+    },
+    "body primary pressure envelope/service-well-0-2/recess-service-strut-1": {
+      "detailed": 131,
+      "archivedNative": 381,
+      "candidateNative": 381
+    },
+    "body primary pressure envelope/service-well-0-2/recess-service-strut-2": {
+      "detailed": 131,
+      "archivedNative": 385,
+      "candidateNative": 385
+    },
+    "body primary pressure envelope/service-well-1-0": {
+      "detailed": 2421,
+      "archivedNative": 2421,
+      "candidateNative": 2421
+    },
+    "body primary pressure envelope/service-well-1-0/recess-service-strut-0": {
+      "detailed": 125,
+      "archivedNative": 381,
+      "candidateNative": 381
+    },
+    "body primary pressure envelope/service-well-1-0/recess-service-strut-1": {
+      "detailed": 125,
+      "archivedNative": 385,
+      "candidateNative": 384
+    },
+    "body primary pressure envelope/service-well-1-0/recess-service-strut-2": {
+      "detailed": 125,
+      "archivedNative": 388,
+      "candidateNative": 388
+    },
+    "body primary pressure envelope/service-well-1-1": {
+      "detailed": 1703,
+      "archivedNative": 1143,
+      "candidateNative": 1084
+    },
+    "body primary pressure envelope/service-well-1-1/recess-service-strut-0": {
+      "detailed": 131,
+      "archivedNative": 462,
+      "candidateNative": 673
+    },
+    "body primary pressure envelope/service-well-1-1/recess-service-strut-1": {
+      "detailed": 131,
+      "archivedNative": 483,
+      "candidateNative": 704
+    },
+    "body primary pressure envelope/service-well-1-1/recess-service-strut-2": {
+      "detailed": 125,
+      "archivedNative": 505,
+      "candidateNative": 727
+    },
+    "body primary pressure envelope/service-well-1-2": {
+      "detailed": 1703,
+      "archivedNative": 1083,
+      "candidateNative": 604
+    },
+    "body primary pressure envelope/service-well-1-2/recess-service-strut-0": {
+      "detailed": 131,
+      "archivedNative": 414,
+      "candidateNative": 377
+    },
+    "body primary pressure envelope/service-well-1-2/recess-service-strut-1": {
+      "detailed": 131,
+      "archivedNative": 398,
+      "candidateNative": 381
+    },
+    "body primary pressure envelope/service-well-1-2/recess-service-strut-2": {
+      "detailed": 131,
+      "archivedNative": 385,
+      "candidateNative": 384
+    },
+    "body primary pressure envelope/service-well-2-0": {
+      "detailed": 2421,
+      "archivedNative": 2421,
+      "candidateNative": 1298
+    },
+    "body primary pressure envelope/service-well-2-0/recess-service-strut-0": {
+      "detailed": 131,
+      "archivedNative": 382,
+      "candidateNative": 382
+    },
+    "body primary pressure envelope/service-well-2-0/recess-service-strut-1": {
+      "detailed": 131,
+      "archivedNative": 386,
+      "candidateNative": 386
+    },
+    "body primary pressure envelope/service-well-2-0/recess-service-strut-2": {
+      "detailed": 131,
+      "archivedNative": 389,
+      "candidateNative": 389
+    },
+    "body primary pressure envelope/service-well-2-1": {
+      "detailed": 1703,
+      "archivedNative": 1805,
+      "candidateNative": 1805
+    },
+    "body primary pressure envelope/service-well-2-1/recess-service-strut-0": {
+      "detailed": 131,
+      "archivedNative": 672,
+      "candidateNative": 672
+    },
+    "body primary pressure envelope/service-well-2-1/recess-service-strut-1": {
+      "detailed": 131,
+      "archivedNative": 702,
+      "candidateNative": 702
+    },
+    "body primary pressure envelope/service-well-2-1/recess-service-strut-2": {
+      "detailed": 131,
+      "archivedNative": 696,
+      "candidateNative": 696
+    },
+    "body primary pressure envelope/service-well-2-2": {
+      "detailed": 1703,
+      "archivedNative": 607,
+      "candidateNative": 607
+    },
+    "body primary pressure envelope/service-well-2-2/recess-service-strut-0": {
+      "detailed": 131,
+      "archivedNative": 378,
+      "candidateNative": 378
+    },
+    "body primary pressure envelope/service-well-2-2/recess-service-strut-1": {
+      "detailed": 131,
+      "archivedNative": 382,
+      "candidateNative": 382
+    },
+    "body primary pressure envelope/service-well-2-2/recess-service-strut-2": {
+      "detailed": 131,
+      "archivedNative": 385,
+      "candidateNative": 385
+    },
+    "body primary pressure envelope/service-well-3-0": {
+      "detailed": 2421,
+      "archivedNative": 2421,
+      "candidateNative": 2421
+    },
+    "body primary pressure envelope/service-well-3-0/recess-service-strut-0": {
+      "detailed": 131,
+      "archivedNative": 380,
+      "candidateNative": 380
+    },
+    "body primary pressure envelope/service-well-3-0/recess-service-strut-1": {
+      "detailed": 131,
+      "archivedNative": 384,
+      "candidateNative": 384
+    },
+    "body primary pressure envelope/service-well-3-0/recess-service-strut-2": {
+      "detailed": 131,
+      "archivedNative": 388,
+      "candidateNative": 388
+    },
+    "body primary pressure envelope/service-well-3-1": {
+      "detailed": 1703,
+      "archivedNative": 1805,
+      "candidateNative": 1805
+    },
+    "body primary pressure envelope/service-well-3-1/recess-service-strut-0": {
+      "detailed": 125,
+      "archivedNative": 464,
+      "candidateNative": 664
+    },
+    "body primary pressure envelope/service-well-3-1/recess-service-strut-1": {
+      "detailed": 125,
+      "archivedNative": 485,
+      "candidateNative": 694
+    },
+    "body primary pressure envelope/service-well-3-1/recess-service-strut-2": {
+      "detailed": 125,
+      "archivedNative": 693,
+      "candidateNative": 724
+    },
+    "body primary pressure envelope/service-well-3-2": {
+      "detailed": 1703,
+      "archivedNative": 1086,
+      "candidateNative": 602
+    },
+    "body primary pressure envelope/service-well-3-2/recess-service-strut-0": {
+      "detailed": 125,
+      "archivedNative": 413,
+      "candidateNative": 376
+    },
+    "body primary pressure envelope/service-well-3-2/recess-service-strut-1": {
+      "detailed": 125,
+      "archivedNative": 397,
+      "candidateNative": 380
+    },
+    "body primary pressure envelope/service-well-3-2/recess-service-strut-2": {
+      "detailed": 125,
+      "archivedNative": 384,
+      "candidateNative": 384
+    },
+    "body primary pressure envelope/longitudinal-service-strut-0": {
+      "detailed": 146,
+      "archivedNative": 356,
+      "candidateNative": 356
+    },
+    "body primary pressure envelope/longitudinal-service-strut-1": {
+      "detailed": 146,
+      "archivedNative": 357,
+      "candidateNative": 357
+    },
+    "sawback blade (1)": {
+      "detailed": 2054,
+      "archivedNative": 2054,
+      "candidateNative": 2054
+    },
+    "sawback blade (2)": {
+      "detailed": 2054,
+      "archivedNative": 2054,
+      "candidateNative": 2054
+    },
+    "sawback blade (3)": {
+      "detailed": 2054,
+      "archivedNative": 2054,
+      "candidateNative": 2054
+    },
+    "sawback blade (4)": {
+      "detailed": 2443,
+      "archivedNative": 2443,
+      "candidateNative": 2443
+    },
+    "sawback blade (5)": {
+      "detailed": 916,
+      "archivedNative": 916,
+      "candidateNative": 916
+    },
+    "sawback blade (6)": {
+      "detailed": 916,
+      "archivedNative": 916,
+      "candidateNative": 916
+    },
+    "sawback blade (7)": {
+      "detailed": 916,
+      "archivedNative": 916,
+      "candidateNative": 916
+    },
+    "sawback blade (8)": {
+      "detailed": 916,
+      "archivedNative": 916,
+      "candidateNative": 916
+    },
+    "cockpit glazing envelope": {
+      "detailed": 384,
+      "archivedNative": 394,
+      "candidateNative": 439
+    },
+    "cockpit connected structural crossmember": {
+      "detailed": 160,
+      "archivedNative": 160,
+      "candidateNative": 160
+    },
+    "engine_pair/negative side/connected support": {
+      "detailed": 783,
+      "archivedNative": 783,
+      "candidateNative": 783
+    },
+    "engine_pair/negative side/propulsion casing": {
+      "detailed": 2060,
+      "archivedNative": 1971,
+      "candidateNative": 1503
+    },
+    "engine_pair/negative side/propulsion luminous recess": {
+      "detailed": 843,
+      "archivedNative": 1058,
+      "candidateNative": 577
+    },
+    "engine_pair/positive side/connected support": {
+      "detailed": 783,
+      "archivedNative": 783,
+      "candidateNative": 783
+    },
+    "engine_pair/positive side/propulsion casing": {
+      "detailed": 2060,
+      "archivedNative": 1971,
+      "candidateNative": 1971
+    },
+    "engine_pair/positive side/propulsion luminous recess": {
+      "detailed": 843,
+      "archivedNative": 1058,
+      "candidateNative": 1336
+    }
+  }
+}

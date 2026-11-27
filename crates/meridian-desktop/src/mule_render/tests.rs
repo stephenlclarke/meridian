@@ -396,6 +396,7 @@ fn controlled_observer_reframes_real_station_and_scene_without_an_extra_player_h
         pose: station_pose,
         port,
         docked: true,
+        player_hull: meridian_core::PlayerHullKind::Peregrine,
     };
     let observer = pose(20.0, 40.0, -100.0);
     let mut output = Vec::new();

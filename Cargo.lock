@@ -926,6 +926,10 @@ dependencies = [
 [[package]]
 name = "meridian-core"
 version = "0.1.0"
+dependencies = [
+ "serde",
+ "serde_json",
+]
 
 [[package]]
 name = "meridian-desktop"
@@ -937,6 +941,14 @@ dependencies = [
  "rodio",
  "wgpu",
  "winit",
+]
+
+[[package]]
+name = "meridian-hull-tool"
+version = "0.1.0"
+dependencies = [
+ "meridian-core",
+ "serde_json",
 ]
 
 [[package]]

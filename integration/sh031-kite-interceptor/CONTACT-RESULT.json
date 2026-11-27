@@ -1,0 +1,174 @@
+{
+  "clearanceMillimetres": {
+    "left-bow-channel": 979,
+    "left-inboard-blade-channel": 448,
+    "left-outboard-blade-channel": 548,
+    "right-bow-channel": 979,
+    "right-inboard-blade-channel": 448,
+    "right-outboard-blade-channel": 548
+  },
+  "alignedMillimetres": 44278,
+  "offsetStartMillimetres": 979,
+  "sourceLipWitness": {
+    "fraction": 0.5,
+    "pointMetres": [
+      69.4,
+      0.0,
+      136.32
+    ],
+    "barycentrics": [
+      0.3599999999999978,
+      0.14000000000000218,
+      0.5
+    ]
+  },
+  "sourceSolidContactsMetres": [
+    [
+      0.864,
+      0.0,
+      -19.5
+    ],
+    [
+      -3.65,
+      -6.5,
+      -14.5
+    ],
+    [
+      2.35,
+      -6.5,
+      -14.5
+    ]
+  ],
+  "originalJoints": [
+    {
+      "name": "fuselage-to-glazing",
+      "pointMetres": [
+        0.07,
+        1.6,
+        7.87
+      ],
+      "sourceFaceHitCountsAboveBelow": [
+        [
+          1,
+          1
+        ],
+        [
+          1,
+          1
+        ],
+        [
+          1,
+          1
+        ],
+        [
+          1,
+          1
+        ]
+      ]
+    },
+    {
+      "name": "left-blade-to-fuselage",
+      "pointMetres": [
+        -2.36,
+        0.13,
+        -6.13
+      ],
+      "sourceFaceHitCountsAboveBelow": [
+        [
+          1,
+          1
+        ],
+        [
+          1,
+          1
+        ],
+        [
+          1,
+          1
+        ],
+        [
+          1,
+          1
+        ]
+      ]
+    },
+    {
+      "name": "right-blade-to-fuselage",
+      "pointMetres": [
+        2.36,
+        0.13,
+        -6.13
+      ],
+      "sourceFaceHitCountsAboveBelow": [
+        [
+          1,
+          1
+        ],
+        [
+          1,
+          1
+        ],
+        [
+          1,
+          1
+        ],
+        [
+          1,
+          1
+        ]
+      ]
+    },
+    {
+      "name": "left-blade-to-nacelle",
+      "pointMetres": [
+        -3.62,
+        -2.01,
+        -12.19
+      ],
+      "sourceFaceHitCountsAboveBelow": [
+        [
+          1,
+          1
+        ],
+        [
+          1,
+          1
+        ],
+        [
+          1,
+          1
+        ],
+        [
+          1,
+          1
+        ]
+      ]
+    },
+    {
+      "name": "right-blade-to-nacelle",
+      "pointMetres": [
+        3.62,
+        -2.01,
+        -12.19
+      ],
+      "sourceFaceHitCountsAboveBelow": [
+        [
+          1,
+          1
+        ],
+        [
+          1,
+          1
+        ],
+        [
+          1,
+          1
+        ],
+        [
+          1,
+          1
+        ]
+      ]
+    }
+  ]
+}

@@ -1,0 +1,10 @@
+{
+  "continuousUpperMillimetres": {
+    "detailedToArchivedNative": 1742,
+    "archivedNativeToDetailed": 1456,
+    "detailedToCandidateNative": 1746,
+    "candidateNativeToDetailed": 1490,
+    "archivedNativeToCandidateNative": 1243,
+    "candidateNativeToArchivedNative": 994
+  }
+}

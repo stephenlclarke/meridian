@@ -7,6 +7,9 @@ use crate::navigation::NavigationState;
 use crate::station_services::{self as services, Command, Event, Reservations, StationMarkets};
 use crate::{MissionError, StepError};
 
+mod quantities;
+pub use quantities::PreparedCommodityTrade;
+
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub(super) enum Purpose {
     Ordinary,

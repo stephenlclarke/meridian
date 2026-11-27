@@ -1,0 +1,4 @@
+LEGACY-*.txt -text
+
+# These records are verified against exact Git blob bytes.
+*.json text eol=lf

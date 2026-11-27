@@ -1,0 +1,83 @@
+{
+  "id": "SH031",
+  "name": "Kite Interceptor",
+  "legacyRevision": "a11fe16924d87d06021816f9037952afcbac08db",
+  "sourceUnits": "metres",
+  "metresPerSourceUnit": 1,
+  "detail": {
+    "vertices": 1612,
+    "faces": 3108,
+    "components": 29,
+    "bounds": [
+      [
+        -6.67,
+        -6.5,
+        -19.5
+      ],
+      [
+        6.67,
+        6.5,
+        19.5
+      ]
+    ]
+  },
+  "native": {
+    "vertices": 96,
+    "faces": 160,
+    "components": 8,
+    "bounds": [
+      [
+        -6.67,
+        -6.5,
+        -19.5
+      ],
+      [
+        6.67,
+        6.5,
+        19.5
+      ]
+    ],
+    "faceLimit": 512,
+    "approvedSourcePath": "fleet-completion-20261019/batch-02-native-lod/SH031-design.toml",
+    "approvedSourceSha256": "099246e4cea539c64042a0749ba1873e3fdbe2dfba92c53bc7370c03719dea56"
+  },
+  "shapePieces": 25,
+  "textures": [
+    "l337-patrol-diffuse",
+    "l337-strike-diffuse",
+    "l337-service-details"
+  ],
+  "unmappedMaterialSlot": 4294967295,
+  "pins": {
+    "resource.toml": "13e4d6b94a801c84dd89b9f4af9c8ba21151a33782b7e9a98c03ef503302772f",
+    "native-export.json": "861c137f8b8881a5569ce518175de5e11397fcfefaf7d59e25cfab295693deff",
+    "contract.toml": "cedbde09b76675e9fb3f6022d9c78330524be816ec3d3878f600c0b5244fc8b0",
+    "LICENSE": "033b7058d73f22c3c6b8a5825eb866ca2d67088f3ee94dd5f3e46da59d624766"
+  },
+  "outputs": {
+    "source.vertices": {
+      "bytes": 41008,
+      "sha256": "ea8db70eb928619631eb5487235f04accebae08816b97eaa1ddb4d3f7e5dc78c"
+    },
+    "source-triangles.bin": {
+      "bytes": 39216,
+      "sha256": "74fc14a2a1ce66b0a9d5883bd9b99230f2d5794d38f87b4404ce9a60c89bbe14"
+    },
+    "source-piece-membership.bin": {
+      "bytes": 1708,
+      "sha256": "4bc89893d0fcc62f51032fa10e4257836656ede2759d9b301187df226a5f6842"
+    },
+    "PIECES.json": {
+      "bytes": 607,
+      "sha256": "032e37700d107290a684660ebe93bfcd5b9457aa5adc184528753dd1f52e9657"
+    },
+    "visual.bin": {
+      "bytes": 522160,
+      "sha256": "4fcae58eee6b677d8f82754231af7debd871bd22546d90cea649640283c7294e"
+    },
+    "native-visual.bin": {
+      "bytes": 26896,
+      "sha256": "cad0ebaeeea25c8238f72038ac443dd800c5e48e45ccc50c411d6bff2bb33db2"
+    }
+  }
+}

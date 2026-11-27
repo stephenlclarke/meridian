@@ -21,6 +21,7 @@ pub enum SaveCommit {
 
 pub struct Store {
     directory: PathBuf,
+    save_name: &'static str,
     // An OS lease survives for this Store's lifetime and releases on process exit, including crashes.
     lease: File,
 }
@@ -54,21 +55,37 @@ impl Drop for PendingFile {
 
 impl Store {
     pub fn open(directory: PathBuf) -> io::Result<Self> {
+        Self::open_named(directory, SAVE_NAME, "session.lock")
+    }
+
+    pub fn open_medusa_preview(directory: PathBuf) -> io::Result<Self> {
+        Self::open_named(directory, "medusa-preview.meridian", "medusa-preview.lock")
+    }
+
+    fn open_named(
+        directory: PathBuf,
+        save_name: &'static str,
+        lock_name: &str,
+    ) -> io::Result<Self> {
         fs::create_dir_all(&directory)?;
         let lease = private_options()
             .create(true)
             .truncate(false)
-            .open(directory.join("session.lock"))?;
+            .open(directory.join(lock_name))?;
         lease.try_lock().map_err(|error| {
             io::Error::other(format!(
                 "Cannot acquire this save's exclusive session lease: {error}"
             ))
         })?;
-        Ok(Self { directory, lease })
+        Ok(Self {
+            directory,
+            save_name,
+            lease,
+        })
     }
 
     pub fn load(&self, max_bytes: usize) -> io::Result<Option<Vec<u8>>> {
-        let path = self.directory.join(SAVE_NAME);
+        let path = self.directory.join(self.save_name);
         let file = match File::open(path) {
             Ok(file) => file,
             Err(error) if error.kind() == io::ErrorKind::NotFound => return Ok(None),
@@ -114,7 +131,7 @@ impl Store {
         let staged = write(&mut file).and_then(|()| file.sync_all());
         drop(file);
         staged?;
-        fs::rename(&pending.0, self.directory.join(SAVE_NAME))?;
+        fs::rename(&pending.0, self.directory.join(self.save_name))?;
         // The staging pathname no longer exists. Drop cannot touch the published destination.
         drop(pending);
         Ok(sync_directory(&self.directory))

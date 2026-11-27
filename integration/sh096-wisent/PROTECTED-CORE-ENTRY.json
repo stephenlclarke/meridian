@@ -1,0 +1,12 @@
+{
+  "schema": 1,
+  "id": "sh096-wisent",
+  "undoBefore": [
+    "sh095-shikra-interdictor"
+  ],
+  "undoAfter": [],
+  "kind": "declaration",
+  "module": "wisent",
+  "before": "pub mod vulture_raider;\n",
+  "after": "pub mod wombat;\n"
+}
