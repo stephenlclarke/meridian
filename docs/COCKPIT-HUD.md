@@ -8,9 +8,9 @@ The layout uses the frozen L337 cockpit as a style reference: a yellow separator
 
 The cockpit camera sits at the pilot’s position in all four views. The scanner and gauges sit below the flight scene. The selected target keeps its own cyan marker. The isolated Medusa inspection preview still has an exterior view.
 
-The sight marks the centre of the flight scene. Pulse has single arms, Beam has parallel bars, Military has chevrons and Naval has crossbars. Mining has an open diamond, the salvage cutter has hooked jaws and the scoop has stepped corners. The scoop symbol identifies the active collection tool. Ore still enters through the physical lower aperture. Looking away from the active mount clears its sight.
+The sight marks the centre of the flight scene and follows the action bound to **Z**. During automatic work it continues to identify the pilot’s mounted laser. The target readout reports the automatic operation. Pulse has single arms, Beam has parallel bars, Military has chevrons and Naval has crossbars. Mining has an open diamond, the salvage cutter has hooked jaws and the scoop has stepped corners. The scoop symbol identifies the active collection tool. Ore still enters through the physical lower aperture. Looking away from the active mount clears its sight.
 
-Press **H**, then **I**, to inspect flight status, including EMP, test fuel settings, manual assistance, practice, docking, jump countdown and current rock contact when available. **Escape** closes the card. Input feedback and pilot-opened reviews remain visible when needed.
+Press **H**, then **I**, to inspect flight status, including the fitted or empty laser mount, EMP, test fuel settings, manual assistance, practice, docking, jump countdown and current rock contact when available. **Escape** closes the card. Input feedback and pilot-opened reviews remain visible when needed.
 
 ## Published scope
 
