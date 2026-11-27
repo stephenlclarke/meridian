@@ -643,3 +643,10 @@ integration/sh072-griffon-mk-ii/CANDIDATE-FIT-SUPPORT-FANS.json text eol=lf
 integration/sh073-griffon-spectre/CANDIDATE-FIT-SUPPORT-FANS.json text eol=lf
 integration/sh072-griffon-mk-ii/ARCHIVE-FIT-SUPPORT-FANS.json text eol=lf
 integration/sh073-griffon-spectre/ARCHIVE-FIT-SUPPORT-FANS.json text eol=lf
+
+# The Explorer certificates authenticate these source bytes.
+tools/measure_panther_explorer.py text eol=lf
+tools/measure_panther_explorer_air.py text eol=lf
+tools/prepare_panther_explorer_geometry.py text eol=lf
+tools/prepare_panther_explorer_studio.py text eol=lf
+tools/verify_panther_explorer_geometry.py text eol=lf

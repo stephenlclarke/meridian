@@ -204,6 +204,17 @@ impl OriginalStationData {
         ) && self.goshawk_motion_clear(source, start, end, angular_travel)
     }
 
+    /// Qualifies explicit SH032 motion against the original SH028 source triangles.
+    pub fn panther_explorer_motion_clear(
+        &self,
+        source: &crate::panther_explorer::PantherExplorerHullSource,
+        start: RigidPose,
+        end: RigidPose,
+        angular_travel: f64,
+    ) -> bool {
+        self.rounded_station_motion_clear(source.pieces(), start, end, angular_travel)
+    }
+
     pub(crate) fn goshawk_entry_conditions(
         &self,
         source: &GoshawkHullSource,

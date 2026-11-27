@@ -111,3 +111,7 @@ see it in the disposable game session. The Studio export command refuses
 schema 2. The standalone game accepts schema 2 only through
 `--inspect-hull-package`. Schema 1 retains the 512-face native limit and
 excludes archived inspection packages from the flight export.
+
+## Panther Explorer stock inspection
+
+Search for **SH032** or **Panther Explorer** in the station Showroom. The forest-ivory Explorer has a panoramic cabin, glazed side windows and two low drive sleds. The original native mesh has 352 faces. The [Explorer geometry record](PANTHER-EXPLORER-GAMEPLAY-ENVELOPE.md) gives the arch and station clearance measurements.

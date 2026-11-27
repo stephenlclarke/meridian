@@ -1,0 +1,13 @@
+{
+  "schema": 1,
+  "id": "sh032-panther-explorer",
+  "undoBefore": [
+    "sh171-medusa-preview",
+    "sh170-caracara-mk-ii"
+  ],
+  "undoAfter": [],
+  "kind": "declaration",
+  "module": "panther_explorer",
+  "before": "pub mod ox_mk_ii;\n",
+  "after": "pub mod peregrine_mk3;\n"
+}
