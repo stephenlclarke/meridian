@@ -1,8 +1,6 @@
 //! Pilot sight in the same viewport and facing as the projected flight geometry.
 use super::{Vertex, flight_height, line};
-use meridian_core::{
-    FlightMode, FlightView, OrdinaryWeapon, Snapshot, World, equipment::WorkTargetId,
-};
+use meridian_core::{FlightMode, OrdinaryWeapon, Snapshot, World, equipment::WorkTargetId};
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub(super) enum Sight {
@@ -24,32 +22,20 @@ impl Sight {
         {
             return None;
         }
-        if world.flight_view() == FlightView::Front
-            && let Some(work) = world.selected_work_target()
-        {
-            let manual = world.pilot_operates_selected_tool();
-            let specialist = world.work_targeting_fit();
-            match work.id {
-                WorkTargetId::Wreck(_) if manual || specialist.salvage => {
-                    return world.fitted_salvage_cutter().map(|_| Self::Cutter);
-                }
-                WorkTargetId::Ore(_) if manual || specialist.mining => {
-                    return world.fitted_fuel_scoops().map(|_| Self::Scoop);
-                }
-                WorkTargetId::Asteroid(_) if manual || specialist.mining => {
-                    if !manual
-                        && world
-                            .targeting_snapshot()
-                            .is_some_and(|t| t.tracked_fragment.is_some())
-                    {
-                        return world.fitted_fuel_scoops().map(|_| Self::Scoop);
-                    }
-                    return world.fitted_mining_tool().map(|_| Self::Mining);
-                }
-                _ => {}
+        use crate::app::FlightTrigger;
+        match FlightTrigger::current(world) {
+            FlightTrigger::MountedLaser => Self::laser(world.selected_laser_snapshot()?.weapon),
+            FlightTrigger::Manual(WorkTargetId::Wreck(_)) => {
+                world.fitted_salvage_cutter().map(|_| Self::Cutter)
             }
+            FlightTrigger::Manual(WorkTargetId::Ore(_)) => {
+                world.fitted_fuel_scoops().map(|_| Self::Scoop)
+            }
+            FlightTrigger::Manual(WorkTargetId::Asteroid(_)) => {
+                world.fitted_mining_tool().map(|_| Self::Mining)
+            }
+            FlightTrigger::OccupiedReview => None,
         }
-        Self::laser(world.selected_laser_snapshot()?.weapon)
     }
 
     fn laser(weapon: OrdinaryWeapon) -> Option<Self> {
@@ -99,8 +85,33 @@ impl Sight {
 #[cfg(test)]
 mod tests {
     use super::*;
+    use meridian_core::FlightView;
     fn ok<T, E: std::fmt::Debug>(value: Result<T, E>) -> T {
         value.unwrap_or_else(|error| panic!("{error:?}"))
+    }
+
+    #[test]
+    fn empty_front_mount_clears_the_sight_and_is_named_on_the_status_card() {
+        let mut world = ok(World::new_commander(7413));
+        let fit = world
+            .front_laser_snapshot()
+            .unwrap_or_else(|| panic!("starter laser"));
+        let review = ok(world.review_module(
+            meridian_core::ModuleAction::Store {
+                item: fit.fitted_item_id,
+            },
+            0,
+        ));
+        ok(world.prepare_module(review, 0)).commit();
+        ok(world.request_launch(0));
+        ok(world.step(Default::default()));
+        assert_eq!(Sight::capture(&world, world.snapshot()), None);
+        assert!(
+            crate::help::Panel::flight_status(&world)
+                .lines
+                .iter()
+                .any(|line| line == "FRONT LASER MOUNT EMPTY")
+        );
     }
 
     #[test]
@@ -125,6 +136,18 @@ mod tests {
         for _ in 0..count {
             ok(salvage.cycle_scanner_target(salvage.snapshot().tick, [640, 240]));
             if salvage.selected_disabled_salvage_target().is_some() {
+                assert!(!salvage.pilot_operates_selected_tool());
+                assert_eq!(
+                    Sight::capture(&salvage, salvage.snapshot()),
+                    Sight::laser(
+                        salvage
+                            .selected_laser_snapshot()
+                            .unwrap_or_else(|| panic!("fitted laser"))
+                            .weapon
+                    )
+                );
+                ok(salvage.toggle_scanner_assistance());
+                assert!(salvage.pilot_operates_selected_tool());
                 assert_eq!(
                     Sight::capture(&salvage, salvage.snapshot()),
                     Some(Sight::Cutter)

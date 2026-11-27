@@ -625,12 +625,13 @@ impl Session {
                 flight.tick
             ));
         }
-        if let Some(fit) = world.selected_laser_snapshot() {
-            lines.push(format!(
-                "{} {} LASER",
-                crate::flight_lesson::view_name(world.selected_laser_view()),
-                fit.weapon.label()
-            ));
+        let mount = crate::flight_lesson::view_name(world.selected_laser_view());
+        lines.push(world.selected_laser_snapshot().map_or_else(
+            || format!("{mount} LASER MOUNT EMPTY"),
+            |fit| format!("{mount} {} LASER", fit.weapon.label()),
+        ));
+        if let Some(work) = world.automatic_work_status() {
+            lines.push(format!("AUTOMATIC WORK | {work}"));
         }
         if let Some(phase) = world.auto_docking_status() {
             lines.push(format!("AUTO DOCK | {phase} | N Cancel"));
@@ -1169,19 +1170,14 @@ mod tests {
     #[test]
     fn missile_controls_cycle_actual_locks_consume_a_round_and_continue_state() {
         fn assert_visible(session: &Session, world: &World) {
-            let lines = session.lines(world, true, None);
-            let budget = crate::hud::line_budget(640, 360);
+            assert!(session.lines(world, true, None).is_empty());
+            let panel = crate::help::Panel::flight_status(world);
             assert!(
-                lines.len() <= budget,
-                "Flight HUD has {} rows, budget {budget}",
-                lines.len()
+                panel
+                    .lines
+                    .iter()
+                    .any(|line| line.contains("PRACTICE BEACONS"))
             );
-            let visible = lines
-                .into_iter()
-                .take(budget)
-                .collect::<Vec<_>>()
-                .join("\n");
-            assert!(visible.contains("PRACTICE BEACONS"));
             let cockpit = crate::hud::cockpit::Cockpit::capture(world, world.snapshot())
                 .unwrap_or_else(|e| panic!("{e}"));
             let state = world
