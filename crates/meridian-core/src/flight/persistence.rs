@@ -945,18 +945,18 @@ fn validate_accounting(
     nav: crate::navigation::SavedNavigationSummary,
     penalties: u8,
     intake_revisions: u64,
-    equipment_and_passage: (u32, u64, u32),
+    equipment_and_contracts: (u32, u64, u32),
     (secret, solar): (super::xyzzy::Terms, (u64, u64)),
 ) -> Result<(), SaveError> {
-    let (ammunition_paid, ammunition_revisions, passenger_reward) = equipment_and_passage;
+    let (ammunition_paid, ammunition_revisions, station_contract_reward) = equipment_and_contracts;
     let income = 7200_u128
-        + u128::from(passenger_reward)
+        + u128::from(station_contract_reward)
         + u128::from(d.completed) * u128::from(crate::freight::REWARD_TENTHS)
         + u128::from(s.credited);
     let income = adjust_secret_cash(income, secret.cash_adjustment)?;
     let fuel = 130_u128 + u128::from(s.refilled_units) + secret.fuel_supplied + u128::from(solar.0);
     let available_gross = 7200_u128
-        + u128::from(passenger_reward)
+        + u128::from(station_contract_reward)
         + u128::from(d.completed) * u128::from(crate::freight::REWARD_TENTHS)
         + s.gross_credit;
     let available_gross = adjust_secret_cash(available_gross, secret.cash_adjustment)?;

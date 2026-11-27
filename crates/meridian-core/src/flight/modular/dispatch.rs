@@ -30,6 +30,7 @@ pub struct DispatchRecord {
     pub issue_revision: u64,
     pub offer: DispatchOffer,
     pub terminal: Option<(DispatchAction, DockContext)>,
+    pub lost_with_carrier: bool,
 }
 
 #[derive(Default)]
@@ -148,6 +149,7 @@ impl Ledger {
                     issue_revision: event.revision,
                     offer,
                     terminal: None,
+                    lost_with_carrier: false,
                 });
             }
             DispatchAction::Receive | DispatchAction::Abandon => {
@@ -216,10 +218,19 @@ impl World {
         if self.modular.dispatch_occupancy().0 == 0 {
             return Vec::new();
         }
-        self.commander_account
+        let mut records = self
+            .commander_account
             .as_ref()
             .and_then(|account| self.modular.ledger(self, account).ok())
-            .map_or_else(Vec::new, |ledger| ledger.dispatch.records)
+            .map_or_else(Vec::new, |ledger| ledger.dispatch.records);
+        if self
+            .combat_snapshot()
+            .is_some_and(|combat| combat.player.destroyed)
+            && let Some(record) = records.last_mut().filter(|r| r.terminal.is_none())
+        {
+            record.lost_with_carrier = true;
+        }
+        records
     }
 }
 
@@ -323,6 +334,27 @@ mod tests {
                 )
                 .is_err()
         );
+    }
+
+    #[test]
+    fn sealed_dispatch_second_delivery_pays_its_own_fee_and_keeps_one_clue() {
+        let mut world = World::new_commander(41003).unwrap();
+        for _ in 0..2 {
+            let offer = world.dispatch_offers().remove(0);
+            let before = world.credits_tenths().unwrap();
+            confirm(&mut world, DispatchAction::Collect(offer.row));
+            for &stop in &offer.path[1..] {
+                journey(&mut world, stop);
+            }
+            confirm(&mut world, DispatchAction::Receive);
+            assert_eq!(world.credits_tenths(), Some(before + offer.fee_tenths));
+            world = cold(&world);
+            assert_eq!(
+                world.unwritten_route_clue_progress().unwrap().earned.len(),
+                1
+            );
+        }
+        assert_eq!(world.dispatch_records().len(), 2);
     }
 
     #[test]

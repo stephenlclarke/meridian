@@ -26,7 +26,9 @@ fn name(system: SystemId) -> &'static str {
 }
 pub(super) fn rows(world: &World) -> Vec<ui::EquipmentRow> {
     let records = world.dispatch_records();
-    let held = records.last().filter(|r| r.terminal.is_none());
+    let held = records
+        .last()
+        .filter(|r| r.terminal.is_none() && !r.lost_with_carrier);
     let offers = world.dispatch_offers();
     let mut rows = Vec::new();
     for (node, action) in ACTIONS {
@@ -67,6 +69,20 @@ pub(super) fn rows(world: &World) -> Vec<ui::EquipmentRow> {
                 "Original record {} | sender {}",
                 record.issue_revision,
                 name(record.issuer.system())
+            ));
+        }
+        if let Some(previous) = records.iter().rev().find(|r| r.terminal.is_some()) {
+            let paid = if previous
+                .terminal
+                .is_some_and(|(action, _)| action == DispatchAction::Receive)
+            {
+                previous.offer.fee_tenths / 10
+            } else {
+                0
+            };
+            row.readout.push(format!(
+                "Last record {} closed | {} CR paid",
+                previous.issue_revision, paid
             ));
         }
         let review = world.review_module(ModuleAction::Dispatch(action), world.snapshot().tick);

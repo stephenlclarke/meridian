@@ -337,19 +337,7 @@ fn real_unfitted_approach_overheats_and_destroys_without_granting_fuel() {
         .request_missile_arm(true, world.snapshot().tick)
         .unwrap();
     assert!(world.missile_snapshot().unwrap().armed);
-    let mut seen = false;
-    for _ in 0..1500 {
-        if world.combat_snapshot().unwrap().player.destroyed {
-            break;
-        }
-        if ratio(&world) > 1.95 {
-            cruise(&mut world, 34.3);
-        } else {
-            cruise(&mut world, 0.0);
-        }
-        seen |= world.solar_snapshot().unwrap().status == SolarScoopStatus::NoScoops;
-    }
-    assert!(seen);
+    overheat_unfitted_ship(&mut world);
     assert_eq!(fuel(&world), before);
     assert_eq!(world.solar_snapshot().unwrap().cabin_temperature, 1.0);
     assert!(world.combat_snapshot().unwrap().player.destroyed);
@@ -362,6 +350,57 @@ fn real_unfitted_approach_overheats_and_destroys_without_granting_fuel() {
     let cold = World::from_save_bytes(&world.save_bytes().unwrap()).unwrap();
     assert_eq!(cold.solar_snapshot(), world.solar_snapshot());
     assert_eq!(cold.combat_snapshot(), world.combat_snapshot());
+}
+
+fn overheat_unfitted_ship(world: &mut World) {
+    let mut seen = false;
+    for _ in 0..1500 {
+        if world.combat_snapshot().unwrap().player.destroyed {
+            break;
+        }
+        if ratio(world) > 1.95 {
+            cruise(world, 34.3);
+        } else {
+            cruise(world, 0.0);
+        }
+        seen |= world.solar_snapshot().unwrap().status == SolarScoopStatus::NoScoops;
+    }
+    assert!(seen);
+}
+
+#[test]
+fn sealed_dispatch_fatal_solar_loss_survives_cold_without_payment_or_clue() {
+    use crate::freight::DispatchAction;
+    let mut world = World::new_commander(18293).unwrap();
+    let cash = world.credits_tenths();
+    let tick = world.snapshot().tick;
+    let review = world
+        .review_module(ModuleAction::Dispatch(DispatchAction::Collect(1)), tick)
+        .unwrap();
+    world.prepare_module(review, tick).unwrap().commit();
+    let record = world.dispatch_records().pop().unwrap();
+    solar_approach(&mut world);
+    overheat_unfitted_ship(&mut world);
+    let cold = World::from_save_bytes(&world.save_bytes().unwrap()).unwrap();
+    assert!(cold.combat_snapshot().unwrap().player.destroyed);
+    let lost = cold.dispatch_records().pop().unwrap();
+    assert_eq!(lost.issue_revision, record.issue_revision);
+    assert!(lost.lost_with_carrier);
+    assert!(lost.terminal.is_none());
+    assert_eq!(cold.credits_tenths(), cash);
+    assert!(
+        cold.unwritten_route_clue_progress()
+            .unwrap()
+            .earned
+            .is_empty()
+    );
+    assert!(
+        cold.review_module(
+            ModuleAction::Dispatch(DispatchAction::Receive),
+            cold.snapshot().tick
+        )
+        .is_err()
+    );
 }
 
 fn outward_target(world: &World) -> Vec3 {

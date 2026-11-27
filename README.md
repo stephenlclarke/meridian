@@ -142,6 +142,8 @@ The [atomic market quantity controls](integration/followup-bulk-market/README.md
 
 The freight journey requires eight identified one-tonne deliveries and awards 730 CR plus the trusted clue once. Markets use finite stock and the same account as mission and equipment transactions. Invalid saves refuse without migration, repair or fallback.
 
+At a main orbital, press **5** and select **G01 sealed dispatch board** to collect a one-tonne record. Fly the quoted route and hand it to the destination receiving officer for the displayed fee and the first dispatch clue. [Sealed Dispatch controls](docs/SEALED-DISPATCH.md)
+
 ## Build and contribute
 
 The workspace pins Rust and dependencies in [rust-toolchain.toml](rust-toolchain.toml) and [Cargo.lock](Cargo.lock). Use `make ci` for documentation, formatting, importers, compilation, tests and strict Clippy. `make run` starts the desktop app in an owned graphics session. G1 owns Mac compilation/native validation; Dell owns Linux/native Windows validation; MBA retains its existing fleet work.

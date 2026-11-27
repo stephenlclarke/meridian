@@ -1,0 +1,72 @@
+{
+  "revision": "a11fe16924d87d06021816f9037952afcbac08db",
+  "tree": "68fec574df12ddf74acb14747e0dd6839f478642",
+  "files": [
+    {
+      "path": "docs/meridian/missions/gameplay/G01-SEALED-DISPATCH.md",
+      "gitBlob": "63fcc85f2dd73068a43cddadf8eee562fceeb30b",
+      "bytes": 8026,
+      "sha256": "28481088a5fd458ff6a9e8ee175d3772f08f6471320065ca049b12e1033e3da9"
+    },
+    {
+      "path": "Sources/L337Core/OriginalSealedDispatch.swift",
+      "gitBlob": "a999dee48b23cd19393e5759aa8e0ed55f9ba67f",
+      "bytes": 2588,
+      "sha256": "0bf551bca2382c02a6c0c3277d9e2c7a53031b7fec3e9b7e6c55f913dbf425ed"
+    },
+    {
+      "path": "Sources/L337Core/NativeOriginalSealedDispatchOrigin.swift",
+      "gitBlob": "10d69347349550e1af8543aec10da48bfa154238",
+      "bytes": 13695,
+      "sha256": "19126763ce6a7045bfde2fc852bd8bf3bae55be831f53dfe60c725c236761db7"
+    },
+    {
+      "path": "Sources/L337Core/ScriptContractCore.swift",
+      "gitBlob": "5fac9f61fbbbefde3929e95e077cb646f40703f5",
+      "bytes": 31258,
+      "sha256": "1218a1fd871d6ada67584744877d0c6f0d625f34874fa0e31e4061d98b1b32ba"
+    },
+    {
+      "path": "Sources/L337Core/OriginalContractOfferPolicy.swift",
+      "gitBlob": "642097372ae81734ec187eb95552c6f8d9ace6fa",
+      "bytes": 5215,
+      "sha256": "08a4460d25a5fc06e1e6281bf6b85189de88d3b02acc26fe8a61f1c209fdcfd1"
+    },
+    {
+      "path": "Sources/L337Core/ScriptCourierGeneration.swift",
+      "gitBlob": "cc86a71fb1c4ed3c5c6f6c8a96249177b9a99659",
+      "bytes": 6462,
+      "sha256": "e32b611f3efb18955d51e46c8859885fcbaa4b796de67dddf307f19bc84aaf90"
+    },
+    {
+      "path": "Sources/L337Core/ScriptCourierState.swift",
+      "gitBlob": "0d4f6432da3a3c7ac2bc1edd3d2139eefd0a2a99",
+      "bytes": 13347,
+      "sha256": "4fc55a82261cf982f64d339263a23efe8bb412b2c2690cec2d6e6e67066d3129"
+    },
+    {
+      "path": "Sources/L337Core/ScriptCourier.swift",
+      "gitBlob": "d6fc9f271087b62d24d5621721b7ae7c4fc279d6",
+      "bytes": 24165,
+      "sha256": "423f1065a3feea19b65d7d001a7edfbfd1fd91baa3ce56cb262f5a0e0664f5bb"
+    },
+    {
+      "path": "Sources/L337Core/ScriptBaseClueCatalog.swift",
+      "gitBlob": "c3b82735611964becfd1a60457f7170a6391cc43",
+      "bytes": 13702,
+      "sha256": "e910323278e77a75eefd36bacd51368d9ecbde77c25936c91c7f1ca5bc9b1de5"
+    },
+    {
+      "path": "Sources/L337Core/Resources/ScriptPacks/l337-sealed-dispatch/manifest.toml",
+      "gitBlob": "986af6e9e4ca8680661f4b7e2596bc513115c889",
+      "bytes": 2021,
+      "sha256": "a3f16e1166361eee11593c935d3636befe6d2e51f3e018c8c005bd01c48c61be"
+    },
+    {
+      "path": "Sources/L337Core/Resources/ScriptPacks/l337-sealed-dispatch/scripts/main.lua",
+      "gitBlob": "c4cb0e157454a31be0b78c8e95d93d9d767f9f60",
+      "bytes": 2298,
+      "sha256": "3464531c1891c3fca2fc05cb5f20375f2f54cddb266d5f3176b8d3efaac8b3bd"
+    }
+  ]
+}

@@ -477,6 +477,10 @@ pub enum ModuleError {
 }
 impl fmt::Display for ModuleError {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        if *self == Self::DispatchUnavailable {
+            return f
+                .write_str("This sealed dispatch is unavailable for the current ship or berth");
+        }
         write!(f, "Equipment refused: {self:?}")
     }
 }

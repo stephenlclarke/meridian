@@ -2088,6 +2088,22 @@ mod tests {
                 .iter()
                 .any(|line| line.contains("hand over original"))
         );
+        ok(profile.save());
+        let before = ok(profile.world.save_bytes());
+        let slot = directory.0.join("commander.meridian");
+        let backup = directory.0.join("dispatch-writer-backup");
+        ok(std::fs::rename(&slot, &backup));
+        ok(std::fs::create_dir(&slot));
+        present(&mut menu, &profile);
+        assert!(
+            menu.input(&mut profile, ui::Input::Key(ui::Key::Confirm))
+                .is_err()
+        );
+        assert_eq!(ok(std::fs::read(&backup)), before);
+        assert_eq!(ok(profile.world.save_bytes()), before);
+        ok(std::fs::remove_dir(&slot));
+        ok(std::fs::rename(&backup, &slot));
+        enter(&mut menu, &mut profile);
         enter(&mut menu, &mut profile);
         let profile = reopen(profile, &directory);
         assert_eq!(profile.world.credits_tenths(), Some(11300));

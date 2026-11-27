@@ -24,9 +24,9 @@ impl State {
         t01: (usize, usize),
         t02: (usize, usize),
     ) -> Result<(), SaveError> {
-        let (passenger_records, passenger_active) = commerce.modular.contract_occupancy();
+        let (contract_records, contract_active) = commerce.modular.contract_occupancy();
         let records = self.attempts.len()
-            + passenger_records
+            + contract_records
             + t01.0
             + t02.0
             + world
@@ -34,7 +34,7 @@ impl State {
                 .as_ref()
                 .map_or(0, |s| s.state.retained_mission_records());
         let active = usize::from(self.active().is_some())
-            + passenger_active
+            + contract_active
             + t01.1
             + t02.1
             + usize::from(world.active_freight_job().is_some());

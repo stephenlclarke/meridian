@@ -22,7 +22,11 @@ The [solar fuel source candidate](SOLAR-FUEL-SCOOPS.md) adds the original near-s
 
 ## The Unwritten Route clue journal
 
-The [ordinary clue journal](../integration/unwritten-route/README.md) reads the existing first receipts for five playable source families against the original 64-clue catalogue. Shift+J opens the journal. Later trail instructions and the paid Medusa path follow the original quest prerequisites.
+The [ordinary clue journal](../integration/unwritten-route/README.md) reads the existing first receipts for the implemented source families against the original 64-clue catalogue. Shift+J opens the journal. Later trail instructions and the paid Medusa path follow the original quest prerequisites.
+
+## G01 sealed dispatch candidate
+
+The [contract board](SEALED-DISPATCH.md) issues a one-tonne original at Avenor, Renas or Lareria. The destination officer checks the actual flown legs and current berth. The first successful delivery earns a journal clue. Issuance, delivery and abandonment each use the existing save-before-commit station transaction.
 
 ## Passenger cabins and G04 source candidate
 
