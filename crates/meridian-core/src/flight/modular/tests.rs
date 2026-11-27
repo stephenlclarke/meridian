@@ -644,3 +644,85 @@ fn repeatable_beam_and_military_policy_counts_stored_examples_toward_the_four_it
         assert_eq!(ledger.items.len(), 4);
     }
 }
+
+#[test]
+fn station_laser_mounts_keep_born_property_and_reject_unsupported_fits_atomically() {
+    use FlightView::{Front, Left, Rear, Right};
+
+    let mut w = funded(31817);
+    let tick = w.snapshot().tick;
+    let pulse = w.fitted_laser_item(Front).unwrap();
+    let purchase = ModuleAction::PurchaseLaser {
+        kind: ModuleKind::PulseLaser,
+        facing: Left,
+    };
+    let original = w.save_bytes().unwrap();
+    assert_eq!(w.review_module(purchase, tick), Err(ModuleError::Capacity));
+    assert_eq!(w.save_bytes().unwrap(), original);
+
+    let issue = w
+        .review_xyzzy(crate::XyzzyAction::ActivateMedusa, tick)
+        .unwrap();
+    w.prepare_xyzzy(issue, tick).unwrap().commit();
+    let [front, left, right, rear] =
+        [Front, Left, Right, Rear].map(|v| w.fitted_laser_item(v).unwrap());
+    let wallet = w.credits_tenths();
+    let wrong = ModuleAction::InstallLaser {
+        item: pulse.id,
+        replacing: Some(front.id),
+        facing: Left,
+    };
+    let original = w.save_bytes().unwrap();
+    assert_eq!(
+        w.review_module(wrong, tick),
+        Err(ModuleError::StaleOccupant)
+    );
+    let wrong_kind = ModuleAction::PurchaseLaser {
+        kind: ModuleKind::FuelStorage,
+        facing: Left,
+    };
+    assert_eq!(
+        w.review_module(wrong_kind, tick),
+        Err(ModuleError::Capacity)
+    );
+    let replace = ModuleAction::InstallLaser {
+        item: pulse.id,
+        replacing: Some(left.id),
+        facing: Left,
+    };
+    let review = w.review_module(replace, tick).unwrap();
+    assert_eq!(
+        w.prepare_module(review, tick)
+            .unwrap()
+            .publish_with(|_| Err(())),
+        Err(())
+    );
+    assert_eq!(w.save_bytes().unwrap(), original);
+
+    apply(&mut w, replace);
+    let mut w = cold(&w);
+    assert_eq!(
+        [Front, Right, Rear].map(|v| w.fitted_laser_item(v).unwrap()),
+        [front, right, rear]
+    );
+    assert_eq!(
+        w.fitted_laser_item(Left).unwrap(),
+        OwnedModule {
+            slot: Some(ModuleSlot::LeftLaser),
+            ..pulse
+        }
+    );
+    assert!(snap(&w).items.contains(&OwnedModule { slot: None, ..left }));
+    assert_eq!(w.credits_tenths(), wallet);
+    apply(&mut w, ModuleAction::Store { item: pulse.id });
+    apply(
+        &mut w,
+        ModuleAction::InstallLaser {
+            item: left.id,
+            replacing: None,
+            facing: Left,
+        },
+    );
+    assert_eq!(cold(&w).fitted_laser_item(Left), Some(left));
+    assert_eq!(w.credits_tenths(), wallet);
+}

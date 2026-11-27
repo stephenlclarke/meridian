@@ -125,9 +125,10 @@ impl Panel {
     ) -> Self {
         let mut panel = Self::flight(weapon, review);
         if facing != meridian_core::FlightView::Front {
-            panel.lines[1] = format!(
-                "Z Fire {} Naval Laser",
-                crate::flight_lesson::view_name(facing)
+            let mount = crate::flight_lesson::view_name(facing);
+            panel.lines[1] = weapon.map_or_else(
+                || format!("Z: no laser fitted to {mount}"),
+                |name| format!("Z Fire {mount} {name}"),
             );
         }
         panel
@@ -256,7 +257,7 @@ impl Panel {
             Screen::Equipment => (
                 "Equipment",
                 &[
-                    "] Next slot | Up / Down Select owned item or offer",
+                    "] Next slot or laser mount | Up / Down Select owned item or offer",
                     "G / Enter Review purchase | Y Review fit | U Review store",
                     "D Details | O Options",
                     "EMP slot: G reviews base/grade; Y fits; U stores; no free charge",
@@ -433,6 +434,19 @@ mod tests {
                 .iter()
                 .any(|line| line.contains("exchange is unavailable"))
         );
+    }
+
+    #[test]
+    fn flight_help_names_the_laser_on_the_selected_mount() {
+        use meridian_core::FlightView;
+        for (weapon, expected) in [
+            (Some("Beam Laser"), "Z Fire LEFT Beam Laser"),
+            (Some("Naval Laser"), "Z Fire LEFT Naval Laser"),
+            (None, "Z: no laser fitted to LEFT"),
+        ] {
+            let panel = Panel::flight_facing(weapon, None, FlightView::Left);
+            assert_eq!(panel.lines[1], expected);
+        }
     }
 
     #[test]

@@ -770,11 +770,7 @@ impl World {
             .combat_identity()
             .ok_or(ModuleError::NoCommander)?
             .owner;
-        let born = |slot, offset| {
-            ledger
-                .fitted(slot)
-                .is_some_and(|item| item.id == owner + offset)
-        };
+        let born = |slot, offset| ledger.item_is_fitted(owner + offset, slot);
         let mut account = before_module
             .prepare_module(
                 0,

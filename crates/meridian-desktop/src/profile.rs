@@ -343,6 +343,9 @@ impl Profile {
                 | meridian_core::ModuleAction::FlightLaserExchange { .. } => {
                     "Automatic equipment action."
                 }
+                meridian_core::ModuleAction::PurchaseLaser { .. } => {
+                    "Laser purchased and fitted to the selected mount."
+                }
                 meridian_core::ModuleAction::Purchase { .. } => {
                     "Owned module purchased and fitted."
                 }
@@ -353,6 +356,9 @@ impl Profile {
                     "Temporary salvage fit is controlled by the selected lawful recovery."
                 }
                 meridian_core::ModuleAction::Store { .. } => "Owned module stored.",
+                meridian_core::ModuleAction::InstallLaser { .. } => {
+                    "Owned laser fitted to the selected mount."
+                }
                 meridian_core::ModuleAction::Install { .. } => "Owned module fitted.",
                 meridian_core::ModuleAction::Passenger(action) => match action {
                     meridian_core::PassengerAction::RequestReplies => {

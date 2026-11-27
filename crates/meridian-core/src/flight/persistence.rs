@@ -612,6 +612,9 @@ impl World {
             pulse: weapons::PulseResources::default(),
             combat: combat::State::default(),
         };
+        candidate
+            .modular
+            .bind_mount_issue(candidate.xyzzy_medusa_issue());
         candidate.combat = combat::State::decode(&mut r, version)?;
         let ordinary_hit = r.option(|r| combat::OrdinaryImpact::decode_version(r, version))?;
         match (candidate.practice.as_mut(), ordinary_hit) {

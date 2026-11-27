@@ -4,7 +4,7 @@
 
 The Fleet, Medusa and Hull Studio preview adds 115 station Showroom models and a dedicated flyable Medusa. Open **Meridian Medusa Preview** and press **L** to launch with a separate commander save. The Apple silicon Fleet and Medusa apps require macOS 14 or later. The packaged Hull Studio requires macOS 27 or later. [Preview installation and controls](docs/PREVIEW-RELEASES.md#fleet-medusa-and-hull-studio) · [Published previews](https://github.com/stephenlclarke/meridian/releases)
 
-The ordinary Fleet XYZZY Medusa candidate carries four laser facings. Use **0–3** to select the view and **Z** to fire its installed laser. [Fleet Medusa laser controls](docs/FLEET-MEDUSA-LASERS.md)
+In the Fleet development build, open **5 Equipment** at a station to buy, store or refit the XYZZY Medusa’s front, aft, port and starboard lasers independently. Use **0–3** to select a view and **Z** to fire its fitted class. [Fleet Medusa laser controls](docs/FLEET-MEDUSA-LASERS.md)
 
 The development cockpit shows the pilot’s view above the scanner. Its centre sight identifies the active laser or work tool by shape and colour. Press **H**, then **I**, for flight status. [Cockpit instruments](docs/COCKPIT-HUD.md)
 

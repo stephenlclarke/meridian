@@ -36,7 +36,7 @@ impl fmt::Display for FireError {
             Self::Paused => "World is paused",
             Self::NoCommander => "An owned commander profile is required",
             Self::NotInFlight => "The front Pulse Laser requires active flight",
-            Self::NoFittedFrontLaser => "No owned compatible front laser is fitted",
+            Self::NoFittedFrontLaser => "No compatible laser is fitted to this mount",
             Self::NoCompatibleMiningTool => "Fit a paid compatible mining laser",
             Self::NoFittedFrontPulseLaser => "No owned front Pulse Laser is fitted",
             Self::CoolingDown => "Pulse Laser is cooling down",
@@ -525,14 +525,7 @@ impl World {
         Some((item.id, weapon))
     }
     pub fn front_laser_snapshot(&self) -> Option<FrontLaserSnapshot> {
-        let (fitted_item_id, weapon) = self.fitted_front_laser()?;
-        Some(FrontLaserSnapshot {
-            fitted_item_id,
-            weapon,
-            damage_hundredths: weapon.damage_hundredths(),
-            range: 6000,
-            cooldown_ticks_per_shot: weapon.cooldown_ticks(),
-        })
+        self.laser_mount_snapshot(super::FlightView::Front)
     }
 
     pub fn pulse_laser_snapshot(&self) -> Option<PulseLaserSnapshot> {
