@@ -671,14 +671,26 @@ impl Renderer {
         if let Some(station) = station {
             mesh::append_missiles(snapshot, station, missiles, &mut self.frame)?;
         }
+        let beam_view = if self.player_hull == meridian_core::PlayerHullKind::Medusa {
+            self.flight_view
+        } else {
+            meridian_core::FlightView::Front
+        };
         if let (Some(station), Some(traffic)) = (station, traffic) {
-            mesh::traffic::append(snapshot, station, &self.ship, traffic, &mut self.frame)?;
+            mesh::traffic::append(
+                snapshot,
+                station,
+                &self.ship,
+                traffic,
+                beam_view,
+                &mut self.frame,
+            )?;
         }
         if let (Some(station), Some(shot)) = (station, pulse)
             && !traffic
                 .is_some_and(|scene| mesh::traffic::contains_pulse(scene, snapshot.tick, shot))
         {
-            mesh::append_pulse(snapshot, station, shot, &mut self.frame)?;
+            mesh::append_pulse(snapshot, station, shot, beam_view, &mut self.frame)?;
         }
         if let (Some(station), Some(mining)) = (station, mining) {
             let sun = celestial.and_then(|scene| scene.sun.map(|sun| sun.position));

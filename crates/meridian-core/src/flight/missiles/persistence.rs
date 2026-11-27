@@ -1429,7 +1429,7 @@ impl State {
             || emission <= p.origin.emission
             || shot.tick != p.last_tick
             || world
-                .front_weapon_at_tick(shot.fitted_item_id, shot.tick, emission)
+                .laser_weapon_at_tick(shot.fitted_item_id, shot.tick, emission)
                 .is_none()
             || id != p.origin.projectile
             || !valid_vector(shot.origin)

@@ -5,7 +5,9 @@ use meridian_core::{equipment::WorkTargetId, mining::MiningError};
 impl App {
     pub(super) fn use_manual_tool(&mut self) -> bool {
         let world = &mut self.game.world;
-        if !world.pilot_operates_selected_tool() {
+        if world.selected_laser_view() != meridian_core::FlightView::Front
+            || !world.pilot_operates_selected_tool()
+        {
             return false;
         }
         if let Some(target) = world.selected_disabled_salvage_target() {

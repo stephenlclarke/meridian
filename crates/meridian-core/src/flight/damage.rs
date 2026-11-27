@@ -15,6 +15,7 @@ enum Kind {
     EcmLocalFlight,
     Pulse,
     Laser(super::OrdinaryWeapon),
+    IntegralLaser(super::FlightView),
     Mining(u8),
 }
 impl Kind {
@@ -78,10 +79,26 @@ impl State {
         self.append(clock, Kind::Laser(weapon))
             .map_err(|()| FireError::SequenceExhausted)
     }
+    pub(super) fn facing_laser(
+        &self,
+        clock: u64,
+        weapon: super::OrdinaryWeapon,
+        facing: super::FlightView,
+    ) -> Result<Self, FireError> {
+        if facing == super::FlightView::Front {
+            return self.laser(clock, weapon);
+        }
+        if !self.enabled || weapon != super::OrdinaryWeapon::FrontNavalLaser {
+            return Err(FireError::InvalidGeometry);
+        }
+        self.append(clock, Kind::IntegralLaser(facing))
+            .map_err(|()| FireError::SequenceExhausted)
+    }
     pub(super) fn has_rapid_spend(&self) -> bool {
-        self.events
-            .iter()
-            .any(|event| matches!(event.kind, Kind::Laser(weapon) if weapon.cooldown_ticks() == 6))
+        self.events.iter().any(|event| {
+            matches!(event.kind, Kind::IntegralLaser(_))
+                || matches!(event.kind, Kind::Laser(weapon) if weapon.cooldown_ticks() == 6)
+        })
     }
     pub(super) fn quiet_since(&self, tick: u64, anchor: u64, physical: u64) -> bool {
         let Some(elapsed) = tick.checked_sub(anchor) else {
@@ -164,6 +181,7 @@ impl State {
                 Kind::EcmLocalFlight => 8,
                 Kind::Pulse => 1,
                 Kind::Laser(weapon) => weapon.tag() + 1,
+                Kind::IntegralLaser(view) => view.integral_tag(64),
                 Kind::Mining(body) => 32 + body,
             });
         }
@@ -184,6 +202,9 @@ impl State {
                 8 if version >= 17 => Kind::EcmLocalFlight,
                 tag @ 3..=6 if version >= 16 => {
                     Kind::Laser(super::OrdinaryWeapon::from_tag(tag - 1)?)
+                }
+                tag @ 64..=66 if version >= 17 => {
+                    Kind::IntegralLaser(super::medusa_lasers::INTEGRAL[usize::from(tag - 64)])
                 }
                 tag @ 32..=43 if version >= 16 => Kind::Mining(tag - 32),
                 _ => return Err(INVALID),
@@ -244,6 +265,21 @@ impl State {
                     }
                     mining_count += 1;
                     Effect::Mining
+                }
+                Kind::IntegralLaser(facing) => {
+                    let (dock, _, _) = world.xyzzy_medusa_issue().ok_or(INVALID)?;
+                    if event.clock <= self.berth_clock(dock.sequence()).ok_or(INVALID)? {
+                        return Err(INVALID);
+                    }
+                    let item = world.integral_laser(facing).ok_or(INVALID)?;
+                    let weapon = super::OrdinaryWeapon::FrontNavalLaser;
+                    lasers.push(LaserSpend {
+                        emission: next_emission,
+                        clock: event.clock,
+                        weapon,
+                        item,
+                    });
+                    Effect::Laser(weapon)
                 }
                 kind => {
                     let weapon = match kind {
@@ -500,6 +536,39 @@ fn validate_laser_receipts(
         ordinary.clone(),
         player_beams.clone().map(|(_, _, emission)| emission),
     )?;
+    let mut practice_emissions = std::collections::BTreeSet::new();
+    for (tick, facing, emission) in world
+        .practice
+        .iter()
+        .chain(&world.practice_history)
+        .flat_map(|p| p.integral_hits())
+    {
+        let shot = spend(emission)?;
+        if world.integral_view_at(shot.item, tick) != Some(facing)
+            || shot.clock > tick
+            || end.checked_sub(shot.clock).ok_or(INVALID)?
+                > world.state.tick.checked_sub(tick).ok_or(INVALID)?
+            || !practice_emissions.insert(emission)
+            || ordinary.clone().any(|hit| hit.emission == emission)
+            || player_beams.clone().any(|(_, _, e)| e == emission)
+            || world
+                .missiles
+                .laser_interceptions()
+                .any(|(e, _)| e == emission)
+        {
+            return Err(INVALID);
+        }
+    }
+    for (emission, receipt) in world.missiles.laser_interceptions() {
+        let shot = spend(emission)?;
+        if shot.item != receipt.fitted_item_id
+            || shot.clock > receipt.tick
+            || end.checked_sub(shot.clock).ok_or(INVALID)?
+                > world.state.tick.checked_sub(receipt.tick).ok_or(INVALID)?
+        {
+            return Err(INVALID);
+        }
+    }
     for hit in ordinary {
         if hit.weapon.is_laser() {
             let shot = spend(hit.emission)?;

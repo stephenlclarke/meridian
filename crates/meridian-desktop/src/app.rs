@@ -79,10 +79,13 @@ fn step_frame(
             *pulse = None;
             *mining = None;
         } else if fire_held
-            && !world.pilot_operates_selected_tool()
-            && occupied_cut::ready_target(world).is_none()
+            && (world.selected_laser_view() != FlightView::Front
+                || (!world.pilot_operates_selected_tool()
+                    && occupied_cut::ready_target(world).is_none()))
         {
-            if let Ok(tool) = world.mining_tool_authority() {
+            if world.selected_laser_view() == FlightView::Front
+                && let Ok(tool) = world.mining_tool_authority()
+            {
                 if let Ok(shot) = world.request_mining(tool, state.tick) {
                     *mining = Some(asteroid_render::MiningVisual {
                         opening: state,
@@ -90,7 +93,7 @@ fn step_frame(
                     });
                     accepted_discharge();
                 }
-            } else if let Ok(shot) = world.request_fire_front_laser(state.tick) {
+            } else if let Ok(shot) = world.request_fire_selected_laser(state.tick) {
                 *pulse = Some(shot);
                 accepted_discharge();
             }
@@ -429,7 +432,15 @@ impl App {
                         .find(|item| item.slot == Some(meridian_core::ModuleSlot::FrontLaser))
                 })
                 .map(|item| item.kind.name());
-            crate::help::Panel::flight(weapon, review)
+            crate::help::Panel::flight_facing(
+                if self.game.world.selected_laser_view() == FlightView::Front {
+                    weapon
+                } else {
+                    Some("Naval Laser")
+                },
+                review,
+                self.game.world.selected_laser_view(),
+            )
         }
     }
 

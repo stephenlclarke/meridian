@@ -90,6 +90,7 @@ pub use practice::{
 mod profit_scan;
 mod services;
 pub use profit_scan::{ProfitDestination, ProfitDetail};
+mod medusa_lasers;
 mod weapons;
 pub use mission::{MissionError, MissionSnapshot, StationNpc};
 pub use services::ServiceSnapshot;

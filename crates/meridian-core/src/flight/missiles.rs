@@ -226,6 +226,9 @@ impl Default for State {
     }
 }
 impl State {
+    pub(super) fn laser_interceptions(&self) -> impl Iterator<Item = (u64, &super::PulseShot)> {
+        self.beams.iter().flatten().map(|b| (b.emission, &b.shot))
+    }
     pub(super) fn resource_emissions(&self) -> impl Iterator<Item = (u64, u64)> + '_ {
         self.projectiles
             .iter()

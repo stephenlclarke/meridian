@@ -387,6 +387,13 @@ impl World {
         &self,
         pose: crate::docking::RigidPose,
     ) -> Result<(Option<super::practice::Practice>, PulseContact, f64), FireError> {
+        self.pulse_scene_facing(pose, super::FlightView::Front)
+    }
+    pub(super) fn pulse_scene_facing(
+        &self,
+        pose: crate::docking::RigidPose,
+        facing: super::FlightView,
+    ) -> Result<(Option<super::practice::Practice>, PulseContact, f64), FireError> {
         let station = self.state.station.ok_or(FireError::InvalidGeometry)?;
         let distance = self
             .station_data
@@ -407,9 +414,16 @@ impl World {
             .filter(|(_, d)| solid.is_none_or(|wall| *d < wall));
         let cap = projectile.map_or(PULSE_RANGE, |(_, d)| d);
         let mut practice = self.practice;
-        let hit = practice
-            .as_mut()
-            .and_then(|p| p.contact_limited(self.state, pose, cap, solid));
+        let hit = practice.as_mut().and_then(|p| {
+            p.contact_limited(
+                self.state,
+                pose,
+                cap,
+                solid,
+                facing,
+                self.combat.emissions.checked_add(1)?,
+            )
+        });
         if let Some((id, distance, first_hit)) = hit {
             return Ok((
                 practice,
@@ -538,10 +552,27 @@ impl World {
     pub fn request_fire_front_laser(&mut self, expected_tick: u64) -> Result<PulseShot, FireError> {
         self.request_front_discharge(expected_tick, false)
     }
+    pub fn request_fire_selected_laser(
+        &mut self,
+        expected_tick: u64,
+    ) -> Result<PulseShot, FireError> {
+        self.request_discharge(expected_tick, false, self.selected_laser_view())
+    }
     fn request_front_discharge(
         &mut self,
         expected_tick: u64,
         pulse_only: bool,
+    ) -> Result<PulseShot, FireError> {
+        if self.selected_laser_view() != super::FlightView::Front {
+            return Err(FireError::StaleCommand);
+        }
+        self.request_discharge(expected_tick, pulse_only, super::FlightView::Front)
+    }
+    fn request_discharge(
+        &mut self,
+        expected_tick: u64,
+        pulse_only: bool,
+        facing: super::FlightView,
     ) -> Result<PulseShot, FireError> {
         if expected_tick != self.state.tick {
             return Err(FireError::StaleCommand);
@@ -558,7 +589,7 @@ impl World {
         if self.emp.input_blocked() {
             return Err(FireError::InsufficientEnergy);
         }
-        let (fitted_item_id, weapon) = self.fitted_front_laser().ok_or(if pulse_only {
+        let (fitted_item_id, weapon) = self.selected_fit().ok_or(if pulse_only {
             FireError::NoFittedFrontPulseLaser
         } else {
             FireError::NoFittedFrontLaser
@@ -569,9 +600,10 @@ impl World {
         self.pulse.prepare_laser_discharge(weapon)?;
         let pose = flight_pose(self.state.position, self.state.orientation)
             .ok_or(FireError::InvalidGeometry)?;
+        let pose = facing.laser_ray(pose);
         let origin = pose.position;
         let direction = pose.orientation.z;
-        let (mut practice, contact, end_distance) = self.pulse_scene(pose)?;
+        let (mut practice, contact, end_distance) = self.pulse_scene_facing(pose, facing)?;
         let end = Vec3::new(
             origin.x + direction.x * end_distance,
             origin.y + direction.y * end_distance,
