@@ -120,22 +120,17 @@ class TestVultureMkISources(unittest.TestCase):
                 runpy.run_path(proof.__file__, run_name='__main__')
             self.assertEqual(out.buffer.getvalue(), (proof.INTEGRATION / 'CONTACT-RESULT.json').read_bytes())
 
-    def test_fit_and_difference_emit_utf8_lf_with_crlf_text_stdout(self):
-        for options, generator, file in (
-            ([], 'audit', 'DETERMINISTIC-SURFACE-FIT.json'),
-            (['--difference'], 'original_difference', 'DETERMINISTIC-ORIGINAL-DIFFERENCE.json'),
+    def test_real_fit_and_difference_reproduce_frozen_reports_with_crlf_text_stdout(self):
+        for options, filename in (
+            ([], 'DETERMINISTIC-SURFACE-FIT.json'),
+            (['--difference'], 'DETERMINISTIC-ORIGINAL-DIFFERENCE.json'),
         ):
-            with self.subTest(file=file):
-                expected = (proof.INTEGRATION / file).read_bytes()
-                with TextIOWrapper(BytesIO(), encoding='ascii', newline='\r\n') as out:
-                    with (
-                        contextlib.redirect_stdout(out),
-                        mock.patch.object(sys, 'argv', [measure.__file__, *options]),
-                        mock.patch.object(measure, generator, return_value=json.loads(expected)) as produce,
-                    ):
+            with self.subTest(filename=filename):
+                expected = (proof.INTEGRATION / filename).read_bytes()
+                with TextIOWrapper(BytesIO(), encoding='ascii', newline='\r\n') as output:
+                    with contextlib.redirect_stdout(output), mock.patch.object(sys, 'argv', [measure.__file__, *options]):
                         measure.main()
-                    produce.assert_called_once_with()
-                    self.assertEqual(out.buffer.getvalue(), expected)
+                    self.assertEqual(output.buffer.getvalue(), expected)
 
     def test_hull_studio_retains_source_ordered_meshes_and_witness_probes(self):
         source = tomllib.loads((vulture_mk_i.ASSETS / 'resource.toml').read_text())
