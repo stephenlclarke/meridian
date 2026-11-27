@@ -84,6 +84,16 @@ impl App {
         self.request_redraw();
     }
 
+    pub(super) fn toggle_orientation_only(&mut self) {
+        let message = match self.game.world.toggle_orientation_only() {
+            Ok(true) => "When assisted: face contact only",
+            Ok(false) => "When assisted: use fitted approach and work functions",
+            Err(message) => message,
+        };
+        self.notice.set(message.into());
+        self.request_redraw();
+    }
+
     pub(super) fn toggle_computer_assistance(&mut self) {
         let result = self.game.world.toggle_scanner_assistance();
         self.notice.set(match result {
@@ -221,6 +231,13 @@ mod tests {
             .unwrap_or_else(|| panic!("manual target"));
         assert_eq!(first.identity, expected[0].0);
         assert_eq!(first.tier, None);
+        app.modifiers = winit::keyboard::ModifiersState::SHIFT;
+        app.game_key(KeyCode::KeyF);
+        assert_eq!(
+            app.notice.text.as_deref(),
+            Some("Fit a targeting core for orientation assistance")
+        );
+        app.modifiers = winit::keyboard::ModifiersState::empty();
         assert!(app.game.world.manual_scanner_target());
         assert_eq!(app.game.world.flight_view(), FlightView::Rear);
         app.game_key(KeyCode::KeyF);
@@ -293,6 +310,16 @@ mod tests {
             .unwrap_or_else(|| panic!("assisted target"));
         assert_eq!(first.identity, expected[0].0);
         assert!(first.tier.is_some());
+        app.modifiers = winit::keyboard::ModifiersState::SHIFT;
+        app.game_key(KeyCode::KeyF);
+        let facing = app
+            .game
+            .world
+            .targeting_snapshot()
+            .unwrap_or_else(|| panic!("target"));
+        assert_eq!(facing.identity, first.identity);
+        assert_eq!(facing.guidance, "Orientation only");
+        app.modifiers = winit::keyboard::ModifiersState::empty();
         assert!(!app.game.world.manual_scanner_target());
         app.game_key(KeyCode::KeyF);
         assert!(app.game.world.manual_scanner_target());

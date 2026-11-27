@@ -123,7 +123,7 @@ impl Panel {
                 "F3 Launch missile | F4 Safe/clear target | K E.C.M. (22 energy) | Y Energy",
                 "J Jump | Shift+J Clue Journal | Shift+R Routes | Hold U 10 seconds: EMP",
                 "F6 Flight lesson | F12 Cancel | C Lesson details | F7 Close run | F8 Reception",
-                "Tab Next scanner target (no core: mark) | F Manual/assist | Delete Release",
+                "Tab Next scanner target | F Manual/assist | Shift+F Face only | Delete Release",
                 "Shift+M Rock/ore | Shift+V Wreck cargo | Fit core + matching targeting module",
                 "Basic aligns | Advanced approaches | Docking+nav docks | Specialists auto-work",
                 "I Mission details | Shift+I Target details | Occupied: Enter/Escape",

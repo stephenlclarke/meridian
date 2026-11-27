@@ -16,7 +16,7 @@ The [solar fuel development candidate](docs/SOLAR-FUEL-SCOOPS.md) adds actual ne
 
 The passenger-cabin development candidate offers all six original paid cabin layouts, with real five-tonne fit costs and separate Avenor-to-Renas G04 passenger consent, boarding and reception. See [passenger cabins and G04 controls](docs/PASSENGER-CABINS.md). Owned validation is pending.
 
-In the scanner development build, press **Tab** to mark the nearest contact. Press again to move through the others by distance. **F** switches between hand flight and the assistance your equipment provides. You can aim and fire at ships, fly a docking approach, mine or salvage by hand. [Flight controls and required equipment](docs/AUTOMATIC-WORK.md)
+In the scanner development build, press **Tab** to mark the nearest contact. Press again to move through the others by distance. **F** switches between hand flight and the assistance your equipment provides. With a core fitted, **Shift+F** switches between full assistance and facing the marked contact only. In face-only mode, you control speed, tools and docking. You can aim and fire at ships, fly a docking approach, mine or salvage by hand. [Flight controls and required equipment](docs/AUTOMATIC-WORK.md)
 
 ## Goshawk Explorer in the Ship Showroom
 

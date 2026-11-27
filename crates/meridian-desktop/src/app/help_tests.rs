@@ -247,7 +247,8 @@ fn flight_help_lists_the_computer_keys_and_consumes_them_while_open() {
     let text = help.lines.join("\n");
     for binding in [
         "N Start or cancel auto-docking",
-        "Tab Next scanner target (no core: mark)",
+        "Tab Next scanner target",
+        "Shift+F Face only",
         "Shift+M Rock/ore | Shift+V Wreck cargo | Fit core + matching targeting module",
         "F Manual/assist",
         "Basic aligns | Advanced approaches | Docking+nav docks | Specialists auto-work",
