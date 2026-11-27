@@ -437,7 +437,7 @@ function selectTab(name) {
 for (const [id, key, numeric] of fields) $(id).addEventListener('input', event => editParameter(key, numeric ? inputNumber(event.target.value) : event.target.value));
 $('definition-form').addEventListener('submit', event => event.preventDefault());
 $('import-button').addEventListener('click', () => $('import-file').click());
-$('import-file').addEventListener('change', event => { importFile(event.target.files?.[0]); event.target.value = ''; });
+$('import-file').addEventListener('change', event => { void importFile(event.target.files?.[0]); event.target.value = ''; });
 $('save-button').addEventListener('click', saveDefinition);
 $('build-button').addEventListener('click', buildDefinition);
 $('export-button').addEventListener('click', exportPackage);
@@ -474,5 +474,6 @@ for (const tab of ['inspect', 'help']) {
 $('inspect-select').addEventListener('change', () => renderInspect(currentBuild()));
 
 render();
-discoverCapabilities();
-loadExample(true);
+// These independent jobs handle their own failures and update the UI.
+void discoverCapabilities();
+void loadExample(true);

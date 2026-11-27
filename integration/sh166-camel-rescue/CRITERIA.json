@@ -210,7 +210,7 @@
     "tools/measure_banteng_geometry.py": "9356864e227302598fcae4e833ecb706b1ed8a5e600cbb4076b7165dc1e54bea",
     "tools/measure_goshawk_surface_fit.py": "5407ef1e5fad41810aa95444ca1338fe33a91e5c9857dcb752b4e4cf2fca6d0b",
     "tools/measure_lanner_geometry.py": "55d13a28602e6ed791adecd85ff43f3c8a7fbe118cf0977272e1747422c2408d",
-    "tools/measure_camel_rescue.py": "94fc8a31efdd12ca39e587337cd5063554021df6f5d29d75abd4780df2930cfe",
+    "tools/measure_camel_rescue.py": "198e2ffd5e76b2e44150acafc86353ffeb8e0bbd93630df6ad71d6987a051394",
     "tools/prepare_eagle_cruiser_geometry.py": "a1ea3b5d72f35e1f2932da71afa3ff8a276a504f7309a1086a2b3df35988addc",
     "tools/prepare_camel_rescue.py": "6b9fb0b6a98a85a79758a3a4d1ed8e353ddb20277af658646541038a479fdae5",
     "tools/verify_eagle_cruiser_geometry.py": "cb053ee5873fee62ee456bb3776e98d29b2cbb44c7344599bc617a8579164d43",
