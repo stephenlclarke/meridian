@@ -1119,6 +1119,9 @@ pub(crate) mod tests {
         assert_eq!(reopened.world.solar_snapshot(), restored.solar_snapshot());
     }
     pub(crate) fn travel(profile: &mut Profile) {
+        travel_default(profile, SystemId::RENAS);
+    }
+    pub(crate) fn travel_default(profile: &mut Profile, expected: SystemId) {
         action(profile, Action::Launch);
         profile
             .world
@@ -1155,7 +1158,7 @@ pub(crate) mod tests {
         );
         assert_eq!(
             profile.world.snapshot().navigation.map(|n| n.system),
-            Some(SystemId::RENAS)
+            Some(expected)
         );
     }
     #[test]

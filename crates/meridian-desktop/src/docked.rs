@@ -2088,6 +2088,9 @@ mod tests {
             profile
         }
         let (dir, mut profile, mut menu) = start();
+        // Two paid jumps leave enough fuel to issue and deliver H0, but not to book a new route at Renas.
+        crate::profile::tests::travel(&mut profile);
+        crate::profile::tests::travel_default(&mut profile, SystemId::AVENOR);
         board(&mut menu, &mut profile);
         let before = ok(profile.world.save_bytes());
         key(&mut menu, &mut profile, ui::Key::Confirm);
@@ -2133,7 +2136,12 @@ mod tests {
         for _ in 0..2 {
             key(&mut menu, &mut profile, ui::Key::Confirm);
         }
-        let _profile = reopen(profile, &dir, 0);
+        let mut profile = reopen(profile, &dir, 0);
+        assert!(profile.world.bonded_offers().is_empty());
+        let mut menu = ok(Docked::new(&profile.world));
+        board(&mut menu, &mut profile);
+        assert_visible_feedback(&mut menu, &profile, "No TOREN offer available");
+        assert_visible_feedback(&mut menu, &profile, "575 CR fee and 75 CR bond returned");
     }
 
     #[test]
