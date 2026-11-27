@@ -293,6 +293,70 @@ mod tests {
     }
 
     #[test]
+    fn bonded_freight_requires_the_bond_and_three_free_tonnes() {
+        let mut poor = ok(World::new_commander(41005));
+        for _ in 0..9 {
+            confirm(&mut poor, BondedAction::Accept(0));
+            confirm(&mut poor, BondedAction::Abandon);
+        }
+        let poor = cold(&poor);
+        assert_eq!(poor.credits_tenths(), Some(450));
+        let accept = ModuleAction::Bonded(BondedAction::Accept(0));
+        assert_eq!(
+            poor.review_module(accept, poor.snapshot().tick),
+            Err(ModuleError::InsufficientCredits)
+        );
+        let mut loaded = crate::flight::equipment::tests::earned_world(41006);
+        ok(loaded.request_refuel(loaded.snapshot().tick));
+        journey(&mut loaded, SystemId::AVENOR);
+        for _ in 0..90 {
+            ok(loaded.request_station_service(
+                crate::station_services::Command::BuyFood,
+                loaded.snapshot().tick,
+            ));
+        }
+        let loaded = cold(&loaded);
+        assert_eq!(loaded.service_snapshot().map(|s| s.used_tonnes), Some(90));
+        assert!(loaded.credits_tenths().is_some_and(|cash| cash >= BOND));
+        assert_eq!(
+            loaded.review_module(accept, loaded.snapshot().tick),
+            Err(ModuleError::Capacity)
+        );
+        assert!(loaded.bonded_records().is_empty());
+    }
+
+    #[test]
+    fn bonded_freight_two_jobs_use_distinct_originals_and_one_clue() {
+        let mut world = ok(World::new_commander(41007));
+        for _ in 0..2 {
+            let offer = world.bonded_offers().remove(0);
+            let cash = world
+                .credits_tenths()
+                .unwrap_or_else(|| panic!("missing account"));
+            confirm(&mut world, BondedAction::Accept(offer.tier));
+            for &stop in &offer.path[1..] {
+                journey(&mut world, stop);
+            }
+            confirm(&mut world, BondedAction::ReceiveAll);
+            assert_eq!(world.credits_tenths(), Some(cash + offer.fee_tenths));
+            world = cold(&world);
+            ok(world.request_refuel(world.snapshot().tick));
+        }
+        let records = world.bonded_records();
+        assert_eq!(records.len(), 2);
+        assert_ne!(records[0].issue_revision, records[1].issue_revision);
+        assert!(records.iter().all(BondedRecord::complete));
+        assert_eq!(
+            world.unwritten_route_clue_progress().map(|p| p
+                .earned
+                .iter()
+                .filter(|c| c.clue_id == "bonded-freight-family-trace")
+                .count()),
+            Some(1)
+        );
+    }
+
+    #[test]
     fn bonded_freight_earlier_workshop_cannot_authorise_a_partial_lot() {
         let mut world = ok(World::new_commander(41004));
         journey(&mut world, SystemId::RENAS);

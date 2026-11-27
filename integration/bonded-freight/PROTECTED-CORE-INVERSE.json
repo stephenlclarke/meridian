@@ -14,12 +14,17 @@
     },
     "flight/mission.rs": {
       "beforeSHA256": "8a27c24221dbac7ba45953cc81b57507f1a78784c650a46594d9377ac9bbc5f3",
-      "afterSHA256": "6b9304cbcfa3ef589c8eafac39920d2a3199cd6ce01c2c7a7148eec3ba90d42c",
+      "afterSHA256": "fb4385efec3b26d95c5fc8de5758d716119db272421a446f64195e402a05e525",
       "hunks": [
         {
           "offset": 10086,
           "before": "        ) && !self.original_service_has_capacity()\n",
           "after": "        ) && (!self.original_service_has_capacity() || self.modular.bonded_occupancy().1 != 0)\n"
+        },
+        {
+          "offset": 12961,
+          "before": "",
+          "after": "    }\n    #[test]\n    fn bonded_freight_and_consented_freight_share_the_original_exclusive_group() {\n        use crate::{ModuleAction, freight::BondedAction};\n        let mut world = World::new_commander(41009).unwrap();\n        let action = ModuleAction::Bonded(BondedAction::Accept(0));\n        let tick = world.snapshot().tick;\n        let bonded = world.review_module(action, tick).unwrap();\n        world.prepare_module(bonded, tick).unwrap().commit();\n        let npc = world.station_contacts()[0];\n        world.request_contact(npc, tick).unwrap();\n        let offer = reviewed(&mut world, Command::ReviewOffer { actor: npc.actor() });\n        assert_eq!(\n            command(\n                &mut world,\n                Command::Confirm {\n                    review: offer,\n                    choice: Choice::Accept\n                }\n            ),\n            Err(MissionError::SharedCapacity)\n        );\n        assert_eq!(world.credits_tenths(), Some(6450));\n        let mut world = World::new_commander(41010).unwrap();\n        accept(&mut world);\n        assert!(world.bonded_offers().is_empty());\n        assert!(world.review_module(action, world.snapshot().tick).is_err());\n        assert!(world.bonded_records().is_empty());\n"
         }
       ]
     },

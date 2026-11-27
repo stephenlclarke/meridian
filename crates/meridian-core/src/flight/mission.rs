@@ -378,6 +378,34 @@ mod tests {
             event => panic!("expected allocation, got {event:?}"),
         }
     }
+    #[test]
+    fn bonded_freight_and_consented_freight_share_the_original_exclusive_group() {
+        use crate::{ModuleAction, freight::BondedAction};
+        let mut world = World::new_commander(41009).unwrap();
+        let action = ModuleAction::Bonded(BondedAction::Accept(0));
+        let tick = world.snapshot().tick;
+        let bonded = world.review_module(action, tick).unwrap();
+        world.prepare_module(bonded, tick).unwrap().commit();
+        let npc = world.station_contacts()[0];
+        world.request_contact(npc, tick).unwrap();
+        let offer = reviewed(&mut world, Command::ReviewOffer { actor: npc.actor() });
+        assert_eq!(
+            command(
+                &mut world,
+                Command::Confirm {
+                    review: offer,
+                    choice: Choice::Accept
+                }
+            ),
+            Err(MissionError::SharedCapacity)
+        );
+        assert_eq!(world.credits_tenths(), Some(6450));
+        let mut world = World::new_commander(41010).unwrap();
+        accept(&mut world);
+        assert!(world.bonded_offers().is_empty());
+        assert!(world.review_module(action, world.snapshot().tick).is_err());
+        assert!(world.bonded_records().is_empty());
+    }
     fn fingerprint(
         world: &World,
     ) -> (

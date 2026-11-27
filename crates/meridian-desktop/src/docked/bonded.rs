@@ -88,16 +88,6 @@ pub(super) fn rows(world: &World) -> Vec<ui::EquipmentRow> {
             row.readout
                 .push("Accept: 3 t free hold and 75 CR bond. No deadline.".into());
         }
-        if let Some(previous) = records.last().filter(|r| r.remaining() == 0) {
-            row.readout.push(if previous.complete() {
-                format!(
-                    "Last delivery: {} CR fee and 75 CR bond returned.",
-                    previous.offer.fee_tenths / 10
-                )
-            } else {
-                "Last consignment closed. Bond forfeited.".into()
-            });
-        }
         let review = world.review_module(ModuleAction::Bonded(action), world.snapshot().tick);
         row.can_buy = review.is_ok();
         row.refusal = review.err().map(|e| e.to_string());
@@ -108,6 +98,19 @@ pub(super) fn rows(world: &World) -> Vec<ui::EquipmentRow> {
         row.refusal =
             Some("Check the active freight consignment, fitted range and available fuel.".into());
         rows.push(row);
+    }
+    if let Some(previous) = records.last().filter(|r| r.remaining() == 0) {
+        let settlement = if previous.complete() {
+            format!(
+                "Last delivery: {} CR fee and 75 CR bond returned.",
+                previous.offer.fee_tenths / 10
+            )
+        } else {
+            "Last consignment closed. Bond forfeited.".into()
+        };
+        for row in &mut rows {
+            row.readout.push(settlement.clone());
+        }
     }
     rows
 }
