@@ -573,3 +573,6 @@ mod tests {
         Ok(())
     }
 }
+
+#[cfg(test)]
+mod newt_tests;

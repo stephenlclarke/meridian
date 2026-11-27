@@ -643,3 +643,11 @@ integration/sh072-griffon-mk-ii/CANDIDATE-FIT-SUPPORT-FANS.json text eol=lf
 integration/sh073-griffon-spectre/CANDIDATE-FIT-SUPPORT-FANS.json text eol=lf
 integration/sh072-griffon-mk-ii/ARCHIVE-FIT-SUPPORT-FANS.json text eol=lf
 integration/sh073-griffon-spectre/ARCHIVE-FIT-SUPPORT-FANS.json text eol=lf
+
+# Newt source records and validator receipts have published byte hashes.
+assets/fleet/sh040/** -text
+integration/sh040-newt-escape-pod/*.json text eol=lf
+tools/measure_newt_escape_pod.py text eol=lf
+tools/measure_newt_escape_pod_fit.py text eol=lf
+tools/prepare_newt_escape_pod_studio.py text eol=lf
+tools/verify_newt_escape_pod.py text eol=lf

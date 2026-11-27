@@ -49,6 +49,7 @@ RING_MODES = MODES + ((('--ring-options',), 'RING-OPTIONS.json'),)
 # fit and original-difference convention. Require the full committed profile
 # even if a criteria command, receipt, or source binding is removed.
 AUTHORED_MODES = {
+    'sh040-newt-escape-pod': (((), 'CERTIFIED-FIT.json'),),
     'sh055-condor': COLLISION_MODES,
     'sh068-badger': COLLAR_MODES,
     'sh074-dzo': COLLAR_MODES,

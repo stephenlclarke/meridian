@@ -776,7 +776,7 @@ fn showroom(s: &DockedScreens, c: &Context<'_>, f: &mut Frame) {
     search(s, f);
     let (list, side) = f.viewport.panes();
     let details = if s.detail { f.viewport.body() } else { side };
-    let rows = c.catalogue.search_ships(&s.query);
+    let rows = c.catalogue.search_showroom(&s.query);
     let selected = rows.iter().position(|o| o.id == s.ship);
     let count = f.viewport.rows(list, 0.0);
     let offset = start(selected.unwrap_or(0), count, rows.len());
@@ -802,13 +802,13 @@ fn showroom(s: &DockedScreens, c: &Context<'_>, f: &mut Frame) {
         );
     }
     if rows.is_empty() {
-        label(f, "No matching ship", list.x, list.y, Ink::Orange, list);
+        label(f, "No matching hull", list.x, list.y, Ink::Orange, list);
         return;
     }
     let Some(ship) = selected.and_then(|i| rows.get(i)) else {
         label(
             f,
-            "Select a matching ship",
+            "Select a matching hull",
             details.x,
             details.y,
             Ink::Orange,
@@ -851,7 +851,7 @@ fn showroom(s: &DockedScreens, c: &Context<'_>, f: &mut Frame) {
         (details.y + details.height - model.y - model.height - 64.0).max(0.0),
     );
     paragraphs(f, &lines, content, s.scroll);
-    let offer = c.exchanges.iter().find(|o| o.object == ship.id);
+    let offer = c.exchange_offer(ship.id);
     let enabled = offer.is_some_and(|o| o.refusal.is_none()) && !c.paused;
     button(
         f,
@@ -984,6 +984,12 @@ fn showroom_specifications(
                 meridian_core::medusa::STOCK_EMPTY_DRY.dry_mass_kilograms
             ),
             "Stock figures exclude paid upgrades.".into(),
+        ]
+    } else if ship.id == "SH040" {
+        vec![
+            "Cryostasis capsule. Inspection only.".into(),
+            "Dry mass: 248 kg".into(),
+            "Unavailable for purchase.".into(),
         ]
     } else {
         vec![

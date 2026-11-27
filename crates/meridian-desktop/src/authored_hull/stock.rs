@@ -77,6 +77,16 @@ const DESCRIPTORS: &[StockDescriptor] = &[
         fnv: STAG_FNV,
         export_fnv: Some(STAG_EXPORT_FNV),
     },
+    StockDescriptor {
+        model: AvailableModel {
+            object: "SH040",
+            geometry_key: "integration/sh040-newt-escape-pod/NEWT-STUDIO.json",
+        },
+        name: "Newt Escape Pod",
+        package: include_bytes!("../../../../integration/sh040-newt-escape-pod/NEWT-STUDIO.json"),
+        fnv: 0x1d4b_3fc5_f278_e6db,
+        export_fnv: Some(0x25ca_64a6_69e6_6233),
+    },
     stock_package!(
         "SH042",
         "Saker",
@@ -815,7 +825,7 @@ mod tests {
     #[test]
     fn every_stock_descriptor_authenticates_its_own_source_and_real_preview() {
         let catalogue = ok(crate::docked_screens::Catalogue::bundled());
-        assert_eq!(STOCK_MODELS.len(), 109);
+        assert_eq!(STOCK_MODELS.len(), 110);
         for held in [
             "SH082", "SH102", "SH103", "SH108", "SH112", "SH113", "SH114", "SH115", "SH116",
             "SH117", "SH118", "SH119", "SH120", "SH121", "SH122", "SH123", "SH124", "SH125",
@@ -956,6 +966,33 @@ mod tests {
         let mut changed = KITE_PACKAGE.to_vec();
         changed[0] ^= 1;
         assert!(load_stock(descriptor("SH031"), &changed).is_err());
+    }
+
+    #[test]
+    fn stock_newt_preserves_the_two_glass_triangles_and_original_opaque_materials() {
+        let entry = descriptor("SH040");
+        let export = ok(authenticated_package_bytes(entry, entry.package));
+        assert_eq!(export.len(), 17_869);
+        let package = ok(HullPackage::from_json(export));
+        let visual = ok(load_stock(entry, entry.package));
+        assert_eq!(visual.bytes().len(), 416 * 3 * 56);
+        for (face, bytes) in visual.bytes().chunks_exact(3 * 56).enumerate() {
+            let material = &package.materials[package.face_materials[face]];
+            let glass = (38..40).contains(&face);
+            assert_eq!(material.alpha, if glass { 64 } else { 255 });
+            for corner in bytes.chunks_exact(56) {
+                let [r, g, b] = material.rgb;
+                for (channel, value) in [r, g, b, material.alpha].into_iter().enumerate() {
+                    let start = 24 + 4 * channel;
+                    assert_eq!(
+                        corner[start..start + 4],
+                        (f32::from(value) / 255.0).to_le_bytes()
+                    );
+                }
+                assert_eq!(corner[48..52], u32::MAX.to_le_bytes());
+            }
+        }
+        assert_stock_and_local("SH040", entry.model.geometry_key);
     }
 
     #[test]

@@ -111,3 +111,7 @@ see it in the disposable game session. The Studio export command refuses
 schema 2. The standalone game accepts schema 2 only through
 `--inspect-hull-package`. Schema 1 retains the 512-face native limit and
 excludes archived inspection packages from the flight export.
+
+## Newt Escape Pod
+
+The [Newt capsule](../integration/sh040-newt-escape-pod/README.md) can be selected by name or SH040 in the station Showroom. Its original native shell and internal detailed artwork form one rounded support. The capsule is permanently unavailable for purchase.
