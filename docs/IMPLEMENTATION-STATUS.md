@@ -6,6 +6,8 @@ The scanner development branch adds distance-ordered Tab selection and manual de
 
 The [automatic work candidate](AUTOMATIC-WORK.md) uses the existing targets and fitted tools for approach, mining and salvage. Tab starts work with the required equipment. Delete clears the selection. Manual steering takes over while keeping the scanner mark. The target panel reports the current World operation. Dell passed the earned mining and cold Continue test at `200c0289`. The corrected earned salvage approach on Dell at `63fb125c` recovered all nine cargo units and preserved them through Continue. Combined native acceptance remains open.
 
+The navigation development branch lets pilots plot and save a route in flight with **Shift+R**. The paid Intermediate computer can plot the direct Avenor–Lareria leg with enough fuel. [Flight route controls](EQUIPMENT-PLAYABLE.md#plot-a-route-in-flight)
+
 On the equipment development branch, **Y** shows the fitted SH025 energy system and its effective recharge rate in flight. [Energy in flight](EQUIPMENT-PLAYABLE.md#energy-in-flight)
 
 The equipment development branch adds **Shift+M** for rocks and ore and **Shift+V** for wrecks with recoverable cargo. Each shortcut requires its matching targeting module and a fitted core. [Equipment controls](EQUIPMENT-PLAYABLE.md#salvage-contact-selection)

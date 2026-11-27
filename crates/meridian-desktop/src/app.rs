@@ -1,5 +1,6 @@
 mod audio;
 mod emp;
+mod flight_routes;
 mod manual_work;
 mod mule_presentation;
 mod mule_validation;
@@ -189,6 +190,7 @@ struct App {
     paused: bool,
     help: Option<crate::help::Panel>,
     occupied_cut: Option<meridian_core::OccupiedCutReview>,
+    flight_routes: Option<flight_routes::Planner>,
     xyzzy: Option<crate::xyzzy::Menu>,
     focused: bool,
     docked: Option<Docked>,
@@ -297,6 +299,7 @@ impl App {
             paused: internal,
             help: None,
             occupied_cut: None,
+            flight_routes: None,
             xyzzy: None,
             focused: true,
             docked: None,
@@ -374,7 +377,10 @@ impl App {
     }
 
     fn modal_open(&self) -> bool {
-        self.help.is_some() || self.xyzzy.is_some() || self.occupied_cut.is_some()
+        self.help.is_some()
+            || self.xyzzy.is_some()
+            || self.occupied_cut.is_some()
+            || self.flight_routes.is_some()
     }
 
     fn request_redraw(&self) {
@@ -1035,6 +1041,9 @@ impl App {
         if in_flight {
             match code {
                 KeyCode::KeyY if self.modifiers.is_empty() => return self.show_energy_status(),
+                KeyCode::KeyR if self.modifiers == ModifiersState::SHIFT => {
+                    return self.open_flight_routes();
+                }
                 KeyCode::Tab => return self.cycle_computer_target(ScannerCycle::All),
                 KeyCode::KeyM if self.modifiers == ModifiersState::SHIFT => {
                     return self.cycle_computer_target(ScannerCycle::Mining);
@@ -1284,6 +1293,9 @@ impl App {
             return None;
         }
         if self.route_occupied_cut(code, repeat) {
+            return None;
+        }
+        if self.flight_route_key(code, repeat) {
             return None;
         }
         if self.route_audio_toggle(code, repeat) {
@@ -1628,12 +1640,17 @@ impl App {
             .as_ref()
             .map(|menu| menu.panel(&self.game.world, self.notice.text.as_deref()));
         let occupied_panel = self.occupied_cut_panel();
+        let route_panel = self
+            .flight_routes
+            .as_ref()
+            .map(flight_routes::Planner::panel);
         let title = self.frame_title(active, snapshot.mode);
         let terminal_visible = self.terminal_cockpit_visible();
         let retry_inactive = (terminal_visible && !self.occluded)
             || self.help.is_some()
             || self.xyzzy.is_some()
             || occupied_panel.is_some()
+            || route_panel.is_some()
             || docked_frame
                 .as_ref()
                 .is_some_and(|frame| frame.screen.is_none());
@@ -1687,6 +1704,7 @@ impl App {
                     cockpit: cockpit.as_ref(),
                     help: occupied_panel
                         .as_ref()
+                        .or(route_panel.as_ref())
                         .or(self.help.as_ref())
                         .or(xyzzy_panel.as_ref()),
                 },

@@ -330,3 +330,67 @@ fn route_estimates_share_cash_and_limit_market_capacity_and_non_tonne_room() {
     assert_eq!(saturated.trade[0][1], 0);
     assert_eq!(saturated.sale[1], 5);
 }
+
+#[test]
+fn airborne_paid_intermediate_route_reaches_lareria_and_requires_physical_docking() {
+    use crate::flight::equipment::tests::earned_world;
+    use crate::flight::practice::tests::launch;
+    use crate::navigation::BASIC_SPOOL_TICKS;
+    use crate::{ModuleAction, ModuleKind};
+    let mut airborne = earned_world(15804);
+    airborne.request_refuel(airborne.snapshot().tick).unwrap();
+    journey(&mut airborne, SystemId::AVENOR);
+    airborne.request_refuel(airborne.snapshot().tick).unwrap();
+    let cash = airborne.credits_tenths().unwrap();
+    let tick = airborne.snapshot().tick;
+    let offer = airborne
+        .review_module(
+            ModuleAction::Purchase {
+                kind: ModuleKind::IntermediateNavigation,
+            },
+            tick,
+        )
+        .unwrap();
+    airborne.prepare_module(offer, tick).unwrap().commit();
+    assert_eq!(airborne.credits_tenths(), Some(cash - 30_000));
+    launch(&mut airborne);
+    let before_preview = airborne.save_bytes().unwrap();
+    let direct = airborne
+        .flight_route_alternatives()
+        .unwrap()
+        .into_iter()
+        .find(|choice| choice.plan.systems() == [SystemId::AVENOR, SystemId::LARERIA])
+        .unwrap()
+        .plan;
+    assert_eq!(airborne.save_bytes().unwrap(), before_preview);
+    airborne
+        .set_navigation_route(&direct, airborne.snapshot().tick)
+        .unwrap();
+    let mut airborne = World::from_save_bytes(&airborne.save_bytes().unwrap()).unwrap();
+    let next = airborne
+        .active_route_progress()
+        .unwrap()
+        .next_system
+        .unwrap();
+    assert_eq!(next, SystemId::LARERIA);
+    airborne
+        .request_jump(next, airborne.snapshot().tick)
+        .unwrap();
+    assert_eq!(
+        airborne.flight_route_alternatives(),
+        Err(crate::navigation::RouteError::FlightUnavailable)
+    );
+    for _ in 0..BASIC_SPOOL_TICKS {
+        airborne.step(FlightInput::default()).unwrap();
+    }
+    let airborne = World::from_save_bytes(&airborne.save_bytes().unwrap()).unwrap();
+    let arrival = airborne.snapshot().navigation.unwrap();
+    assert_eq!(
+        (arrival.system, arrival.fuel_units),
+        (SystemId::LARERIA, 31)
+    );
+    assert_eq!(
+        airborne.flight_route_alternatives(),
+        Err(crate::navigation::RouteError::DockRequired)
+    );
+}
