@@ -1,0 +1,13 @@
+{
+  "schema": 1,
+  "id": "fleet-medusa-lasers",
+  "undoBefore": [
+    "fleet-xyzzy-medusa"
+  ],
+  "undoAfter": [],
+  "kind": "inverse",
+  "manifest": "integration/fleet-medusa-lasers/PROTECTED-CORE-INVERSE.json",
+  "sha256": "ef0ef77eced9383cd7378706a03d9bfe4e2b7f26a327e3da3e96476ae23d8bb9",
+  "base": "6627d363c712e7c4a0e888387d2dba524f49bd42",
+  "label": "Ordinary Fleet Medusa four-facing laser controls and replay"
+}

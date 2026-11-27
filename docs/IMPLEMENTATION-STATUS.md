@@ -8,6 +8,8 @@ The [automatic work candidate](AUTOMATIC-WORK.md) uses the existing targets and 
 
 The development save store explicitly unlocks on close. Dell Linux reproduced the cold-reopen failure during concurrent process startup and verified the fix while retaining exclusive access for a live owner.
 
+The Fleet XYZZY development change issues an SH171 Medusa to the ordinary commander slot through the testing menu. It includes a five-position missile rack, an expanded 32 t hold, fitted systems, and a test issue tied to the berth and account revision that survives Continue. [Equipment and acceptance scope](EQUIPMENT-PLAYABLE.md#fleet-xyzzy-medusa)
+
 ## Fleet Medusa four-facing laser candidate
 
 The ordinary XYZZY-issued SH171 uses the actual front fit and three integral Naval Lasers for port, starboard and aft. Fire follows the selected view. All mounts share the ship's weapon resources. Focused tests cover the original issue, repeat issue, cold Continue and Peregrine behaviour. Platform and native acceptance are tracked separately. [Controls and integration](FLEET-MEDUSA-LASERS.md)

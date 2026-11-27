@@ -1,0 +1,249 @@
+{
+  "base": "6627d363c712e7c4a0e888387d2dba524f49bd42",
+  "files": {
+    "flight.rs": {
+      "beforeSHA256": "3078e5fe6c53e70cd31ec517f7f2ae71c7a3dcb8bf60c101541a8158756c5308",
+      "afterSHA256": "abb0b55ddbf5336fccb757514e3e6fceba26519bde173bf243abfec7604bb4d3",
+      "hunks": [
+        {
+          "offset": 3831,
+          "before": "",
+          "after": "mod medusa_lasers;\n"
+        }
+      ]
+    },
+    "flight/combat.rs": {
+      "beforeSHA256": "576fc790566b20a9d683c98290e95e0b8a5dc384fef86c145dfe1a7f7aa38aa4",
+      "afterSHA256": "c14b9d98dd9b31b9208ef1a54f748fa0eed950c0e374c2ac445d45d7a4eb4aa9",
+      "hunks": [
+        {
+          "offset": 16329,
+          "before": "        let fitted = self\n            .fitted_front_laser()\n            .ok_or(FireError::NoFittedFrontLaser)?;\n",
+          "after": "        let fitted = self.selected_fit().ok_or(FireError::NoFittedFrontLaser)?;\n"
+        },
+        {
+          "offset": 16605,
+          "before": "",
+          "after": "        let facing = self.selected_laser_view();\n        let pose = facing.laser_ray(pose);\n"
+        },
+        {
+          "offset": 17034,
+          "before": "        let (_, expected, distance) = self.pulse_scene(pose)?;\n",
+          "after": "        let (_, expected, distance) = self.pulse_scene_facing(pose, facing)?;\n"
+        },
+        {
+          "offset": 19418,
+          "before": "            damage: self.damage.laser(self.combat.physical_tick(), fitted.1)?,\n",
+          "after": "            damage: self\n                .damage\n                .facing_laser(self.combat.physical_tick(), fitted.1, facing)?,\n"
+        },
+        {
+          "offset": 20961,
+          "before": "            || world.fitted_front_laser() != Some((self.item, self.weapon))\n",
+          "after": "            || world.selected_fit() != Some((self.item, self.weapon))\n"
+        },
+        {
+          "offset": 25101,
+          "before": "        let pose = flight_pose(self.position, self.orientation).ok_or(invalid)?;\n",
+          "after": "        let body = flight_pose(self.position, self.orientation).ok_or(invalid)?;\n        let facing = world\n            .integral_view_at(self.item, self.tick)\n            .unwrap_or(super::FlightView::Front);\n        let pose = facing.laser_ray(body);\n"
+        },
+        {
+          "offset": 26114,
+          "before": "            || world.owned_front_laser_at(self.item, self.tick, self.attacker) != Some(self.weapon)\n",
+          "after": "            || (if facing == super::FlightView::Front {\n                world.owned_front_laser_at(self.item, self.tick, self.attacker)\n            } else {\n                world\n                    .xyzzy_medusa_issue()\n                    .filter(|(dock, _, _)| dock.visit() < self.attacker.visit)\n                    .map(|_| OrdinaryWeapon::FrontNavalLaser)\n            }) != Some(self.weapon)\n"
+        }
+      ]
+    },
+    "flight/damage.rs": {
+      "beforeSHA256": "1262d48a5c4456cbe6f88b688344ee9097d47e4c2e173d7267d1078e9677f950",
+      "afterSHA256": "30f1569cbeb5ca6566e43c76f4b38f740f3d178a3f1179a3cb61a3449304a56e",
+      "hunks": [
+        {
+          "offset": 725,
+          "before": "",
+          "after": "    IntegralLaser(super::FlightView),\n"
+        },
+        {
+          "offset": 2423,
+          "before": "",
+          "after": "    pub(super) fn facing_laser(\n        &self,\n        clock: u64,\n        weapon: super::OrdinaryWeapon,\n        facing: super::FlightView,\n    ) -> Result<Self, FireError> {\n        if facing == super::FlightView::Front {\n            return self.laser(clock, weapon);\n        }\n        if !self.enabled || weapon != super::OrdinaryWeapon::FrontNavalLaser {\n            return Err(FireError::InvalidGeometry);\n        }\n        self.append(clock, Kind::IntegralLaser(facing))\n            .map_err(|()| FireError::SequenceExhausted)\n    }\n"
+        },
+        {
+          "offset": 3013,
+          "before": "        self.events\n            .iter()\n            .any(|event| matches!(event.kind, Kind::Laser(weapon) if weapon.cooldown_ticks() == 6))\n",
+          "after": "        self.events.iter().any(|event| {\n            matches!(event.kind, Kind::IntegralLaser(_))\n                || matches!(event.kind, Kind::Laser(weapon) if weapon.cooldown_ticks() == 6)\n        })\n"
+        },
+        {
+          "offset": 6151,
+          "before": "",
+          "after": "                Kind::IntegralLaser(view) => view.integral_tag(64),\n"
+        },
+        {
+          "offset": 7008,
+          "before": "",
+          "after": "                }\n                tag @ 64..=66 if version >= 17 => {\n                    Kind::IntegralLaser(super::medusa_lasers::INTEGRAL[usize::from(tag - 64)])\n"
+        },
+        {
+          "offset": 9503,
+          "before": "",
+          "after": "                }\n                Kind::IntegralLaser(facing) => {\n                    let (dock, _, _) = world.xyzzy_medusa_issue().ok_or(INVALID)?;\n                    if event.clock <= self.berth_clock(dock.sequence()).ok_or(INVALID)? {\n                        return Err(INVALID);\n                    }\n                    let item = world.integral_laser(facing).ok_or(INVALID)?;\n                    let weapon = super::OrdinaryWeapon::FrontNavalLaser;\n                    lasers.push(LaserSpend {\n                        emission: next_emission,\n                        clock: event.clock,\n                        weapon,\n                        item,\n                    });\n                    Effect::Laser(weapon)\n"
+        },
+        {
+          "offset": 19929,
+          "before": "",
+          "after": "    let mut practice_emissions = std::collections::BTreeSet::new();\n    for (tick, facing, emission) in world\n        .practice\n        .iter()\n        .chain(&world.practice_history)\n        .flat_map(|p| p.integral_hits())\n    {\n        let shot = spend(emission)?;\n        if world.integral_view_at(shot.item, tick) != Some(facing)\n            || shot.clock > tick\n            || end.checked_sub(shot.clock).ok_or(INVALID)?\n                > world.state.tick.checked_sub(tick).ok_or(INVALID)?\n            || !practice_emissions.insert(emission)\n            || ordinary.clone().any(|hit| hit.emission == emission)\n            || player_beams.clone().any(|(_, _, e)| e == emission)\n            || world\n                .missiles\n                .laser_interceptions()\n                .any(|(e, _)| e == emission)\n        {\n            return Err(INVALID);\n        }\n    }\n    for (emission, receipt) in world.missiles.laser_interceptions() {\n        let shot = spend(emission)?;\n        if shot.item != receipt.fitted_item_id\n            || shot.clock > receipt.tick\n            || end.checked_sub(shot.clock).ok_or(INVALID)?\n                > world.state.tick.checked_sub(receipt.tick).ok_or(INVALID)?\n        {\n            return Err(INVALID);\n        }\n    }\n"
+        }
+      ]
+    },
+    "flight/missiles.rs": {
+      "beforeSHA256": "99789575f98bfb9fb1c969ecb676317aeddcdb6d1cc16d6f729e862c5a90e4a8",
+      "afterSHA256": "7644022abc69a14323bdade0e666c0330075f3b7616e6d0b1f1028fc26fb2fe8",
+      "hunks": [
+        {
+          "offset": 6640,
+          "before": "",
+          "after": "    pub(super) fn laser_interceptions(&self) -> impl Iterator<Item = (u64, &super::PulseShot)> {\n        self.beams.iter().flatten().map(|b| (b.emission, &b.shot))\n    }\n"
+        }
+      ]
+    },
+    "flight/missiles/persistence.rs": {
+      "beforeSHA256": "d9260201f99fb981fc27d8358ca9169e6a7899ffc654fe938ceb0aa8f686b8e5",
+      "afterSHA256": "3eb4d23f8d743ce068f8592e81c61af01f687b173bd3499419d66377320a3031",
+      "hunks": [
+        {
+          "offset": 52374,
+          "before": "                .front_weapon_at_tick(shot.fitted_item_id, shot.tick, emission)\n",
+          "after": "                .laser_weapon_at_tick(shot.fitted_item_id, shot.tick, emission)\n"
+        }
+      ]
+    },
+    "flight/practice.rs": {
+      "beforeSHA256": "17cc020bba555468a8fb1e80f2e448f168a2536c135d410d6a091a888aa8d663",
+      "afterSHA256": "50fa7692dac817f02ff75607d88b05ca1ffad84992ff6ccfb4602a7ead8038ef",
+      "hunks": [
+        {
+          "offset": 4426,
+          "before": "",
+          "after": "    integral: Option<(super::FlightView, u64)>,\n"
+        },
+        {
+          "offset": 7600,
+          "before": "",
+          "after": "    pub(super) fn integral_hits(&self) -> impl Iterator<Item = (u64, super::FlightView, u64)> + '_ {\n        self.range\n            .iter()\n            .flat_map(|r| r.hits.iter().flatten())\n            .filter_map(|h| h.integral.map(|(f, e)| (h.tick, f, e)))\n    }\n"
+        },
+        {
+          "offset": 8028,
+          "before": "",
+          "after": "        facing: super::FlightView,\n        emission: u64,\n"
+        },
+        {
+          "offset": 8627,
+          "before": "",
+          "after": "                integral: (facing != super::FlightView::Front).then_some((facing, emission)),\n"
+        },
+        {
+          "offset": 13328,
+          "before": "",
+          "after": "                integral: None,\n"
+        }
+      ]
+    },
+    "flight/practice/persistence.rs": {
+      "beforeSHA256": "45c6424be571ca542347a8a3c27e2809b1dfe12a5212a3c3b04973e55d3bc09d",
+      "afterSHA256": "960610a5ca69da7d5d8c02648e169f0a439ffd761b323196357d2f1e7c6823fe",
+      "hunks": [
+        {
+          "offset": 997,
+          "before": "                        w.option(hit.missile.as_ref(), |w, origin| origin.encode(w));\n",
+          "after": "                        if let Some((facing, emission)) = hit.integral {\n                            w.u8(facing.integral_tag(2));\n                            w.u64(emission);\n                        } else {\n                            w.option(hit.missile.as_ref(), |w, origin| origin.encode(w));\n                        }\n"
+        },
+        {
+          "offset": 2556,
+          "before": "",
+          "after": "                            let tick = r.u64()?;\n                            let firing_pose = RecordedPose::decode(r)?;\n                            let source = if version >= 8 { r.u8()? } else { 0 };\n                            let (missile, integral) = match source {\n                                0 => (None, None),\n                                1 => (Some(super::super::MissileOrigin::decode(r)?), None),\n                                tag @ 2..=4 if version >= 17 => (\n                                    None,\n                                    Some((\n                                        super::super::medusa_lasers::INTEGRAL[usize::from(tag - 2)],\n                                        r.u64()?,\n                                    )),\n                                ),\n                                _ => return Err(INVALID),\n                            };\n"
+        },
+        {
+          "offset": 3478,
+          "before": "                                tick: r.u64()?,\n                                firing_pose: RecordedPose::decode(r)?,\n                                missile: if version >= 8 {\n                                    r.option(super::super::MissileOrigin::decode)?\n                                } else {\n                                    None\n                                },\n",
+          "after": "                                tick,\n                                firing_pose,\n                                missile,\n                                integral,\n"
+        },
+        {
+          "offset": 6001,
+          "before": "                let minimum = u64::from(world.front_cadence_at_tick(latest_hit).ok_or(INVALID)?)\n                    .saturating_sub(elapsed);\n",
+          "after": "                let minimum =\n                    u64::from(range.laser_cadence(latest_hit, world)?).saturating_sub(elapsed);\n"
+        },
+        {
+          "offset": 8787,
+          "before": "",
+          "after": "    fn laser_cadence(&self, tick: u64, world: &super::super::World) -> Result<u8, SaveError> {\n        if self\n            .hits\n            .iter()\n            .flatten()\n            .any(|h| h.tick == tick && h.integral.is_some())\n        {\n            Ok(super::super::OrdinaryWeapon::FrontNavalLaser.cooldown_ticks())\n        } else {\n            world.front_cadence_at_tick(tick).ok_or(INVALID)\n        }\n    }\n"
+        },
+        {
+          "offset": 10152,
+          "before": "",
+          "after": "            let pose = hit.integral.map_or(pose, |(f, _)| f.laser_ray(pose));\n"
+        },
+        {
+          "offset": 10928,
+          "before": "                if tick - prior < u64::from(world.front_cadence_at_tick(prior).ok_or(INVALID)?) {\n",
+          "after": "                if tick - prior < u64::from(self.laser_cadence(prior, world)?) {\n"
+        }
+      ]
+    },
+    "flight/traffic.rs": {
+      "beforeSHA256": "dbc2d0baaea33c2b95deb87abad343c7b7a2f85c7e03b4043f3accbddd480af8",
+      "afterSHA256": "88338d822819e13458ca1f1f03d0b52ed1ec037dc763832a1925f5145549b81b",
+      "hunks": [
+        {
+          "offset": 853,
+          "before": "                    if self.front_weapon_at_tick(item, shot.world_tick, emission)\n",
+          "after": "                    if self.laser_weapon_at_tick(item, shot.world_tick, emission)\n"
+        },
+        {
+          "offset": 12097,
+          "before": "                    weapon: self\n                        .fitted_front_laser()\n                        .ok_or(FireError::NoFittedFrontLaser)?\n                        .1,\n",
+          "after": "                    weapon: self.selected_fit().ok_or(FireError::NoFittedFrontLaser)?.1,\n"
+        }
+      ]
+    },
+    "flight/weapons.rs": {
+      "beforeSHA256": "67949709ed2f71b8b3ca20476593bf5caab8c6e83365278c621ec2b8f2c363fc",
+      "afterSHA256": "5362aeba46c704471a8f4d15ee539b4997d60df00aa65fa65cd4e873a6be99d0",
+      "hunks": [
+        {
+          "offset": 14622,
+          "before": "",
+          "after": "        self.pulse_scene_facing(pose, super::FlightView::Front)\n    }\n    pub(super) fn pulse_scene_facing(\n        &self,\n        pose: crate::docking::RigidPose,\n        facing: super::FlightView,\n    ) -> Result<(Option<super::practice::Practice>, PulseContact, f64), FireError> {\n"
+        },
+        {
+          "offset": 15948,
+          "before": "        let hit = practice\n            .as_mut()\n            .and_then(|p| p.contact_limited(self.state, pose, cap, solid));\n",
+          "after": "        let hit = practice.as_mut().and_then(|p| {\n            p.contact_limited(\n                self.state,\n                pose,\n                cap,\n                solid,\n                facing,\n                self.combat.emissions.checked_add(1)?,\n            )\n        });\n"
+        },
+        {
+          "offset": 20816,
+          "before": "",
+          "after": "    pub fn request_fire_selected_laser(\n        &mut self,\n        expected_tick: u64,\n    ) -> Result<PulseShot, FireError> {\n        self.request_discharge(expected_tick, false, self.selected_laser_view())\n    }\n"
+        },
+        {
+          "offset": 21135,
+          "before": "",
+          "after": "    ) -> Result<PulseShot, FireError> {\n        if self.selected_laser_view() != super::FlightView::Front {\n            return Err(FireError::StaleCommand);\n        }\n        self.request_discharge(expected_tick, pulse_only, super::FlightView::Front)\n    }\n    fn request_discharge(\n        &mut self,\n        expected_tick: u64,\n        pulse_only: bool,\n        facing: super::FlightView,\n"
+        },
+        {
+          "offset": 22070,
+          "before": "        let (fitted_item_id, weapon) = self.fitted_front_laser().ok_or(if pulse_only {\n",
+          "after": "        let (fitted_item_id, weapon) = self.selected_fit().ok_or(if pulse_only {\n"
+        },
+        {
+          "offset": 22594,
+          "before": "",
+          "after": "        let pose = facing.laser_ray(pose);\n"
+        },
+        {
+          "offset": 22717,
+          "before": "        let (mut practice, contact, end_distance) = self.pulse_scene(pose)?;\n",
+          "after": "        let (mut practice, contact, end_distance) = self.pulse_scene_facing(pose, facing)?;\n"
+        }
+      ]
+    }
+  }
+}

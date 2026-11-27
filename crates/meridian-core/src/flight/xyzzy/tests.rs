@@ -955,3 +955,35 @@ fn medusa_upgrades_a_saved_clarke_once_and_retains_paid_gear_and_excess_rounds()
         41000
     );
 }
+
+#[test]
+fn medusa_refuses_an_oversize_manifest_before_mutating_the_commander() {
+    let mut world = World::new_commander(14402).unwrap();
+    apply(&mut world, XyzzyAction::Enter);
+    for _ in 0..33 {
+        world
+            .request_station_service(crate::station_services::Command::BuyFood, 0)
+            .unwrap();
+    }
+    let before = world.save_bytes().unwrap();
+    assert_eq!(
+        world.review_xyzzy(XyzzyAction::ActivateMedusa, 0),
+        Err(XyzzyError::MedusaHoldFull)
+    );
+    assert_eq!(world.save_bytes().unwrap(), before);
+    world
+        .request_station_service(crate::station_services::Command::SellFood, 0)
+        .unwrap();
+    apply(&mut world, XyzzyAction::ActivateMedusa);
+    let fit = world.equipment_snapshot().unwrap();
+    assert_eq!((fit.used_tonnes, fit.hold_capacity_tonnes), (32, 32));
+    assert!(
+        world
+            .request_equipment(
+                crate::equipment::Command::UnfitCargoBay(fit.owned.unwrap().id),
+                0
+            )
+            .is_err()
+    );
+    assert_eq!(cold(&world).equipment_snapshot().unwrap(), fit);
+}
