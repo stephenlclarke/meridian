@@ -1,0 +1,691 @@
+{
+  "base": "a2959bd36951917066caec5279684de5f0fba659",
+  "files": {
+    "equipment/content.rs": {
+      "beforeSHA256": "bde7c56569f1a6fc9740942b3f2c19589f8ef19a5e46bb770f5aa2797760cd49",
+      "afterSHA256": "2336a41b6cbe200ddad2e2196df2e8f72a435bb49706db42553b4e2e81847f65",
+      "hunks": [
+        {
+          "offset": 1113,
+          "before": "",
+          "after": "    pub(crate) fn for_player(mut self, medusa: bool) -> Self {\n        if medusa {\n            self.hull = \"SH171\";\n            self.base_hold_tonnes = 22;\n            self.extra_hold_tonnes = 10;\n            self.utility_mounts_capacity = 4;\n            self.equipment_units_capacity = 13;\n        }\n        self\n    }\n\n"
+        }
+      ]
+    },
+    "flight.rs": {
+      "beforeSHA256": "e36fd880c0177c3b03c913871e213eac66159eb19abc303c65805efa35a899b2",
+      "afterSHA256": "abb0b55ddbf5336fccb757514e3e6fceba26519bde173bf243abfec7604bb4d3",
+      "hunks": [
+        {
+          "offset": 3831,
+          "before": "",
+          "after": "mod medusa_lasers;\n"
+        },
+        {
+          "offset": 25653,
+          "before": "        let hull = if self.medusa_preview_fit.is_some() {\n            PlayerHullKind::Medusa\n        } else {\n            PlayerHullKind::Peregrine\n        };\n",
+          "after": "        let hull = self.player_hull_kind();\n"
+        }
+      ]
+    },
+    "flight/ammunition.rs": {
+      "beforeSHA256": "fa936a3746563a7a2ce733a4e29c0cfb2d8140190c2fdb0e6f083df2ec3cc07f",
+      "afterSHA256": "6cb27ecbbb4c2436249f961dd957a870ee9ba4b1f680c39f7e44bd4fd98b1509",
+      "hunks": [
+        {
+          "offset": 3874,
+          "before": "",
+          "after": "        capacity: usize,\n"
+        },
+        {
+          "offset": 4243,
+          "before": "                let pylon = self\n                    .rounds()\n",
+          "after": "                let pylon = self.rounds()[..capacity]\n"
+        },
+        {
+          "offset": 5378,
+          "before": "                if usize::from(pylon) >= PYLONS {\n",
+          "after": "                if usize::from(pylon) >= capacity {\n"
+        },
+        {
+          "offset": 10388,
+          "before": "                .apply(e.action, e.item, (!e.xyzzy).then_some(purchases))\n",
+          "after": "                .apply(\n                    e.action,\n                    e.item,\n                    (!e.xyzzy).then_some(purchases),\n                    world.missile_capacity_at(e.revision),\n                )\n"
+        },
+        {
+          "offset": 14747,
+          "before": "            capacity: PYLONS as u8,\n",
+          "after": "            capacity: self.missile_capacity_at(u64::MAX) as u8,\n"
+        },
+        {
+          "offset": 16435,
+          "before": "        ledger.apply(action, 0, Some(0))?;\n",
+          "after": "        ledger.apply(action, 0, Some(0), self.missile_capacity_at(u64::MAX))?;\n"
+        },
+        {
+          "offset": 20810,
+          "before": "",
+          "after": "    fn missile_capacity_at(&self, revision: u64) -> usize {\n        if self.xyzzy.medusa_at(revision) {\n            5\n        } else {\n            PYLONS\n        }\n    }\n"
+        },
+        {
+          "offset": 21273,
+          "before": "            let Some(pylon) = ledger.rounds().iter().position(Option::is_none) else {\n",
+          "after": "            let capacity = self.missile_capacity_at(u64::MAX);\n            let rounds = ledger.rounds();\n            if let Some(round) = rounds[capacity..].iter().flatten().next() {\n                let account = current\n                    .prepare_ammunition(0, None, false)\n                    .map_err(|_| INVALID)?;\n                self.ammunition.events.push(Event {\n                    xyzzy: false,\n                    action: AmmunitionAction::Store { item: round.item },\n                    dock,\n                    tick,\n                    revision: account.revision(),\n                    item: round.item,\n                });\n                self.commander_account = Some(account);\n                continue;\n            }\n            let Some(pylon) = rounds[..capacity].iter().position(Option::is_none) else {\n"
+        }
+      ]
+    },
+    "flight/combat.rs": {
+      "beforeSHA256": "b34743521b5bbdf8f4664e6497ed8d5fb50e76e4ad447449ee5922a710ba8aa1",
+      "afterSHA256": "64c394c6da3683ab817ea1ce7796f2a441a45a15e287f59221f6fd1a8c8c267c",
+      "hunks": [
+        {
+          "offset": 16257,
+          "before": "        let fitted = self\n            .fitted_front_laser()\n            .ok_or(FireError::NoFittedFrontLaser)?;\n",
+          "after": "        let fitted = self.selected_fit().ok_or(FireError::NoFittedFrontLaser)?;\n"
+        },
+        {
+          "offset": 16533,
+          "before": "",
+          "after": "        let facing = self.selected_laser_view();\n        let pose = facing.laser_ray(pose);\n"
+        },
+        {
+          "offset": 16962,
+          "before": "        let (_, expected, distance) = self.pulse_scene(pose)?;\n",
+          "after": "        let (_, expected, distance) = self.pulse_scene_facing(pose, facing)?;\n"
+        },
+        {
+          "offset": 19346,
+          "before": "            damage: self.damage.laser(self.combat.physical_tick(), fitted.1)?,\n",
+          "after": "            damage: self\n                .damage\n                .facing_laser(self.combat.physical_tick(), fitted.1, facing)?,\n"
+        },
+        {
+          "offset": 20889,
+          "before": "            || world.fitted_front_laser() != Some((self.item, self.weapon))\n",
+          "after": "            || world.selected_fit() != Some((self.item, self.weapon))\n"
+        },
+        {
+          "offset": 25029,
+          "before": "        let pose = flight_pose(self.position, self.orientation).ok_or(invalid)?;\n",
+          "after": "        let body = flight_pose(self.position, self.orientation).ok_or(invalid)?;\n        let facing = world\n            .integral_view_at(self.item, self.tick)\n            .unwrap_or(super::FlightView::Front);\n        let pose = facing.laser_ray(body);\n"
+        },
+        {
+          "offset": 26042,
+          "before": "            || world.owned_front_laser_at(self.item, self.tick, self.attacker) != Some(self.weapon)\n",
+          "after": "            || (if facing == super::FlightView::Front {\n                world.owned_front_laser_at(self.item, self.tick, self.attacker)\n            } else {\n                world\n                    .xyzzy_medusa_issue()\n                    .filter(|(dock, _, _)| dock.visit() < self.attacker.visit)\n                    .map(|_| OrdinaryWeapon::FrontNavalLaser)\n            }) != Some(self.weapon)\n"
+        }
+      ]
+    },
+    "flight/damage.rs": {
+      "beforeSHA256": "9b3aa8b3803a55aa39e5fa15f7b211a7f5cf325cac80f7b5cf9b3bbaafe43614",
+      "afterSHA256": "0f6cc5532340646ab00d55aae7298bf660bdcdbf56bc06a5bac2f236ac08204d",
+      "hunks": [
+        {
+          "offset": 725,
+          "before": "",
+          "after": "    IntegralLaser(super::FlightView),\n"
+        },
+        {
+          "offset": 2423,
+          "before": "",
+          "after": "    pub(super) fn facing_laser(\n        &self,\n        clock: u64,\n        weapon: super::OrdinaryWeapon,\n        facing: super::FlightView,\n    ) -> Result<Self, FireError> {\n        if facing == super::FlightView::Front {\n            return self.laser(clock, weapon);\n        }\n        if !self.enabled || weapon != super::OrdinaryWeapon::FrontNavalLaser {\n            return Err(FireError::InvalidGeometry);\n        }\n        self.append(clock, Kind::IntegralLaser(facing))\n            .map_err(|()| FireError::SequenceExhausted)\n    }\n"
+        },
+        {
+          "offset": 3013,
+          "before": "        self.events\n            .iter()\n            .any(|event| matches!(event.kind, Kind::Laser(weapon) if weapon.cooldown_ticks() == 6))\n",
+          "after": "        self.events.iter().any(|event| {\n            matches!(event.kind, Kind::IntegralLaser(_))\n                || matches!(event.kind, Kind::Laser(weapon) if weapon.cooldown_ticks() == 6)\n        })\n"
+        },
+        {
+          "offset": 6151,
+          "before": "",
+          "after": "                Kind::IntegralLaser(view) => view.integral_tag(64),\n"
+        },
+        {
+          "offset": 7008,
+          "before": "",
+          "after": "                }\n                tag @ 64..=66 if version >= 17 => {\n                    Kind::IntegralLaser(super::medusa_lasers::INTEGRAL[usize::from(tag - 64)])\n"
+        },
+        {
+          "offset": 9503,
+          "before": "",
+          "after": "                }\n                Kind::IntegralLaser(facing) => {\n                    let (dock, _, _) = world.xyzzy_medusa_issue().ok_or(INVALID)?;\n                    if event.clock <= self.berth_clock(dock.sequence()).ok_or(INVALID)? {\n                        return Err(INVALID);\n                    }\n                    let item = world.integral_laser(facing).ok_or(INVALID)?;\n                    let weapon = super::OrdinaryWeapon::FrontNavalLaser;\n                    lasers.push(LaserSpend {\n                        emission: next_emission,\n                        clock: event.clock,\n                        weapon,\n                        item,\n                    });\n                    Effect::Laser(weapon)\n"
+        },
+        {
+          "offset": 16515,
+          "before": "",
+          "after": "        if let Some((dock, _, _)) = world.xyzzy_medusa_issue() {\n            let clock = self.berth_clock(dock.sequence()).ok_or(INVALID)?;\n            events.push((clock, 0, u64::MAX, Effect::MedusaIssue));\n        }\n"
+        },
+        {
+          "offset": 19929,
+          "before": "",
+          "after": "    let mut practice_emissions = std::collections::BTreeSet::new();\n    for (tick, facing, emission) in world\n        .practice\n        .iter()\n        .chain(&world.practice_history)\n        .flat_map(|p| p.integral_hits())\n    {\n        let shot = spend(emission)?;\n        if world.integral_view_at(shot.item, tick) != Some(facing)\n            || shot.clock > tick\n            || end.checked_sub(shot.clock).ok_or(INVALID)?\n                > world.state.tick.checked_sub(tick).ok_or(INVALID)?\n            || !practice_emissions.insert(emission)\n            || ordinary.clone().any(|hit| hit.emission == emission)\n            || player_beams.clone().any(|(_, _, e)| e == emission)\n            || world\n                .missiles\n                .laser_interceptions()\n                .any(|(e, _)| e == emission)\n        {\n            return Err(INVALID);\n        }\n    }\n    for (emission, receipt) in world.missiles.laser_interceptions() {\n        let shot = spend(emission)?;\n        if shot.item != receipt.fitted_item_id\n            || shot.clock > receipt.tick\n            || end.checked_sub(shot.clock).ok_or(INVALID)?\n                > world.state.tick.checked_sub(receipt.tick).ok_or(INVALID)?\n        {\n            return Err(INVALID);\n        }\n    }\n"
+        },
+        {
+          "offset": 22772,
+          "before": "",
+          "after": "    MedusaIssue,\n"
+        },
+        {
+          "offset": 23417,
+          "before": "",
+          "after": "    let mut capacity = super::weapons::ENERGY_CAPACITY_HUNDREDTHS;\n"
+        },
+        {
+          "offset": 23528,
+          "before": "        advance_with_rate(&mut pools, at.checked_sub(clock).ok_or(INVALID)?, recharge);\n",
+          "after": "        advance_with_rate(\n            &mut pools,\n            at.checked_sub(clock).ok_or(INVALID)?,\n            recharge,\n            capacity,\n        );\n"
+        },
+        {
+          "offset": 23739,
+          "before": "                pools.pulse.replay_berth();\n",
+          "after": "                pools.pulse.replay_berth(capacity);\n"
+        },
+        {
+          "offset": 23829,
+          "before": "",
+          "after": "            }\n            Effect::MedusaIssue => {\n                capacity = super::weapons::MEDUSA_ENERGY;\n                pools.pulse.replay_berth(capacity);\n"
+        },
+        {
+          "offset": 25630,
+          "before": "    advance_with_rate(&mut pools, end.checked_sub(clock).ok_or(INVALID)?, recharge);\n",
+          "after": "    advance_with_rate(\n        &mut pools,\n        end.checked_sub(clock).ok_or(INVALID)?,\n        recharge,\n        capacity,\n    );\n"
+        },
+        {
+          "offset": 25780,
+          "before": "fn advance_with_rate(pools: &mut Pools, elapsed: u64, recharge: u16) {\n    pools.pulse.replay_advance_with_rate(elapsed, recharge);\n",
+          "after": "fn advance_with_rate(pools: &mut Pools, elapsed: u64, recharge: u16, capacity: u16) {\n    pools\n        .pulse\n        .replay_advance_with_rate(elapsed, recharge, capacity);\n"
+        },
+        {
+          "offset": 26078,
+          "before": "    advance_with_rate(pools, elapsed, 7);\n",
+          "after": "    advance_with_rate(\n        pools,\n        elapsed,\n        7,\n        super::weapons::ENERGY_CAPACITY_HUNDREDTHS,\n    );\n"
+        }
+      ]
+    },
+    "flight/damage/tests.rs": {
+      "beforeSHA256": "d3d9a2de6aab314abab43875b3c77fbc8e4429b0880e6e1bc9ce057336f1a9d1",
+      "afterSHA256": "ca86706fd71247aa9ffbd1f159af937a3efa072e12b6cad8e1549e8fd1dd5c9c",
+      "hunks": [
+        {
+          "offset": 4754,
+          "before": "    expected.replay_berth();\n",
+          "after": "    expected.replay_berth(crate::ENERGY_CAPACITY_HUNDREDTHS);\n"
+        }
+      ]
+    },
+    "flight/emp/equipment.rs": {
+      "beforeSHA256": "f9926ff582004339a8055d523dcf13b0401efe138e3ba61af74beadcdcb4e450",
+      "afterSHA256": "3c6741b5b698da92ae81a583c7170765c1e75e714c6e73185776f88efa6061f8",
+      "hunks": [
+        {
+          "offset": 3816,
+          "before": "        let definition = crate::equipment::definition().map_err(|_| EmpError::BerthRequired)?;\n",
+          "after": "        let definition = account\n            .equipment_definition()\n            .map_err(|_| EmpError::BerthRequired)?;\n"
+        }
+      ]
+    },
+    "flight/emp/validation.rs": {
+      "beforeSHA256": "023730d48acca990555e97f3890022d65743661b674631ec8f8a9de2354d89f6",
+      "afterSHA256": "579e116512aa0d79a3d2547fe4870b9a28ea8a5396d9be09dfaa1996bc46736b",
+      "hunks": [
+        {
+          "offset": 15721,
+          "before": "                crate::equipment::definition()\n",
+          "after": "                account\n                    .equipment_definition()\n"
+        }
+      ]
+    },
+    "flight/equipment.rs": {
+      "beforeSHA256": "1d7aa717ee2bf796159db5341023241eab1107ee77495c247be032d57bff341a",
+      "afterSHA256": "08e2b081f075fc5940d2a138e2e5c61282012e50bd0ea545dfc05166d7010c50",
+      "hunks": [
+        {
+          "offset": 1481,
+          "before": "        let definition = equipment::definition().ok()?;\n",
+          "after": "        let definition = account.equipment_definition().ok()?;\n"
+        }
+      ]
+    },
+    "flight/missiles.rs": {
+      "beforeSHA256": "c704fc62602fbdbd21dbe1cb205ae0e9ba490b879804a6483777cf19acdd99a9",
+      "afterSHA256": "a7a1ffe49015cea7e68d1f804251c4ed913b1700c94d3f32dcab39c5fccb8ab8",
+      "hunks": [
+        {
+          "offset": 6640,
+          "before": "",
+          "after": "    pub(super) fn laser_interceptions(&self) -> impl Iterator<Item = (u64, &super::PulseShot)> {\n        self.beams.iter().flatten().map(|b| (b.emission, &b.shot))\n    }\n"
+        },
+        {
+          "offset": 21574,
+          "before": "",
+          "after": "            self.energy_capacity(),\n"
+        }
+      ]
+    },
+    "flight/missiles/persistence.rs": {
+      "beforeSHA256": "492d9bd87244d79317fe79d8f74fa83755f0685250b659a6b8161ba42b122f7f",
+      "afterSHA256": "2d04787d41d82e3d3ad8a9be01a8196635e68005adc9bdc180398e6bd5bba711",
+      "hunks": [
+        {
+          "offset": 52367,
+          "before": "                .front_weapon_at_tick(shot.fitted_item_id, shot.tick, emission)\n",
+          "after": "                .laser_weapon_at_tick(shot.fitted_item_id, shot.tick, emission)\n"
+        }
+      ]
+    },
+    "flight/modular.rs": {
+      "beforeSHA256": "271c8afc708a475b106eac5999f64a757fe83de5e0814f6477a9bed90b948133",
+      "afterSHA256": "856b575877b06678e0c2f75760ad04538c3af21d4309a59804fb68f00f84ecb0",
+      "hunks": [
+        {
+          "offset": 23851,
+          "before": "        let definition = crate::equipment::definition().map_err(|_| ModuleError::BerthRequired)?;\n",
+          "after": "        let definition = account\n            .equipment_definition()\n            .map_err(|_| ModuleError::BerthRequired)?;\n"
+        },
+        {
+          "offset": 42552,
+          "before": "        let budget = crate::equipment::definition().map_err(|_| INVALID)?;\n",
+          "after": "        let stock = crate::equipment::definition().map_err(|_| INVALID)?;\n"
+        },
+        {
+          "offset": 42658,
+          "before": "",
+          "after": "            let budget = stock.for_player(world.xyzzy.medusa_at(e.revision));\n"
+        },
+        {
+          "offset": 49814,
+          "before": "                    let budget = crate::equipment::definition().map_err(|_| INVALID)?;\n",
+          "after": ""
+        },
+        {
+          "offset": 67501,
+          "before": "        let definition = crate::equipment::definition().ok()?;\n",
+          "after": "        let definition = account.equipment_definition().ok()?;\n"
+        },
+        {
+          "offset": 94605,
+          "before": "            let definition = crate::equipment::definition().map_err(|_| INVALID)?;\n",
+          "after": "            let definition = current.equipment_definition().map_err(|_| INVALID)?;\n"
+        }
+      ]
+    },
+    "flight/modular/scoops.rs": {
+      "beforeSHA256": "8c114b556cf50accdc4cf23ab978a61971c25c7b90bf3b20e396eab4137d2ffa",
+      "afterSHA256": "29cee46a0abe4a904f8b585a2a90cd9fdedd06d8c90a67ae71086badd6800d94",
+      "hunks": [
+        {
+          "offset": 1694,
+          "before": "    if definition.hull != \"SH025\"\n",
+          "after": "    if !matches!(definition.hull, \"SH025\" | \"SH171\")\n"
+        },
+        {
+          "offset": 2884,
+          "before": "        crate::equipment::definition().map_err(|_| ModuleError::BerthRequired)?,\n",
+          "after": "        account\n            .equipment_definition()\n            .map_err(|_| ModuleError::BerthRequired)?,\n"
+        },
+        {
+          "offset": 3278,
+          "before": "        let definition = crate::equipment::definition().ok()?;\n",
+          "after": "        let definition = account.equipment_definition().ok()?;\n"
+        }
+      ]
+    },
+    "flight/persistence.rs": {
+      "beforeSHA256": "4628ba0f08a5dde7da89774d797598ce12b27c55fb69b4d51c821aae554bcf1a",
+      "afterSHA256": "8a98164376cce74c877f47b2e61921d6644afaac8f3ae61cfe67d990119ad34c",
+      "hunks": [
+        {
+          "offset": 21133,
+          "before": "        let station_data =\n            OriginalStationData::bundled().map_err(|_| SaveError::ContentMismatch)?;\n",
+          "after": ""
+        },
+        {
+          "offset": 21188,
+          "before": "        state.station = Some(station_data.station_pose());\n",
+          "after": ""
+        },
+        {
+          "offset": 21252,
+          "before": "        let commander_account = CommanderAccount::decode_save(&mut r, version)?;\n",
+          "after": "        let mut commander_account = CommanderAccount::decode_save(&mut r, version)?;\n"
+        },
+        {
+          "offset": 21540,
+          "before": "",
+          "after": "        let medusa = xyzzy.medusa_at(u64::MAX);\n        commander_account.set_medusa(medusa);\n        let station_data = if medusa {\n            OriginalStationData::medusa_bundled()\n        } else {\n            OriginalStationData::bundled()\n        }\n        .map_err(|_| SaveError::ContentMismatch)?;\n        state.station = Some(station_data.station_pose());\n"
+        },
+        {
+          "offset": 29491,
+          "before": "        validate_flight(&self.state)?;\n",
+          "after": "        validate_flight_speed(&self.state, self.player_hull_kind().flight_rates().0)?;\n"
+        },
+        {
+          "offset": 41977,
+          "before": "",
+          "after": "    validate_flight_speed(s, MAX_SPEED)\n}\npub(super) fn validate_flight_speed(s: &Snapshot, max_speed: f32) -> Result<(), SaveError> {\n"
+        },
+        {
+          "offset": 42232,
+          "before": "            * f64::from(MAX_SPEED * DISTANCE_PER_SPEED_UNIT * FIXED_DELTA_SECONDS)\n",
+          "after": "            * f64::from(max_speed * DISTANCE_PER_SPEED_UNIT * FIXED_DELTA_SECONDS)\n"
+        },
+        {
+          "offset": 42362,
+          "before": "        || !(0.0..=MAX_SPEED).contains(&s.speed)\n",
+          "after": "        || !(0.0..=max_speed).contains(&s.speed)\n"
+        }
+      ]
+    },
+    "flight/practice.rs": {
+      "beforeSHA256": "17cc020bba555468a8fb1e80f2e448f168a2536c135d410d6a091a888aa8d663",
+      "afterSHA256": "50fa7692dac817f02ff75607d88b05ca1ffad84992ff6ccfb4602a7ead8038ef",
+      "hunks": [
+        {
+          "offset": 4426,
+          "before": "",
+          "after": "    integral: Option<(super::FlightView, u64)>,\n"
+        },
+        {
+          "offset": 7600,
+          "before": "",
+          "after": "    pub(super) fn integral_hits(&self) -> impl Iterator<Item = (u64, super::FlightView, u64)> + '_ {\n        self.range\n            .iter()\n            .flat_map(|r| r.hits.iter().flatten())\n            .filter_map(|h| h.integral.map(|(f, e)| (h.tick, f, e)))\n    }\n"
+        },
+        {
+          "offset": 8028,
+          "before": "",
+          "after": "        facing: super::FlightView,\n        emission: u64,\n"
+        },
+        {
+          "offset": 8627,
+          "before": "",
+          "after": "                integral: (facing != super::FlightView::Front).then_some((facing, emission)),\n"
+        },
+        {
+          "offset": 13328,
+          "before": "",
+          "after": "                integral: None,\n"
+        }
+      ]
+    },
+    "flight/practice/persistence.rs": {
+      "beforeSHA256": "45c6424be571ca542347a8a3c27e2809b1dfe12a5212a3c3b04973e55d3bc09d",
+      "afterSHA256": "960610a5ca69da7d5d8c02648e169f0a439ffd761b323196357d2f1e7c6823fe",
+      "hunks": [
+        {
+          "offset": 997,
+          "before": "                        w.option(hit.missile.as_ref(), |w, origin| origin.encode(w));\n",
+          "after": "                        if let Some((facing, emission)) = hit.integral {\n                            w.u8(facing.integral_tag(2));\n                            w.u64(emission);\n                        } else {\n                            w.option(hit.missile.as_ref(), |w, origin| origin.encode(w));\n                        }\n"
+        },
+        {
+          "offset": 2556,
+          "before": "",
+          "after": "                            let tick = r.u64()?;\n                            let firing_pose = RecordedPose::decode(r)?;\n                            let source = if version >= 8 { r.u8()? } else { 0 };\n                            let (missile, integral) = match source {\n                                0 => (None, None),\n                                1 => (Some(super::super::MissileOrigin::decode(r)?), None),\n                                tag @ 2..=4 if version >= 17 => (\n                                    None,\n                                    Some((\n                                        super::super::medusa_lasers::INTEGRAL[usize::from(tag - 2)],\n                                        r.u64()?,\n                                    )),\n                                ),\n                                _ => return Err(INVALID),\n                            };\n"
+        },
+        {
+          "offset": 3478,
+          "before": "                                tick: r.u64()?,\n                                firing_pose: RecordedPose::decode(r)?,\n                                missile: if version >= 8 {\n                                    r.option(super::super::MissileOrigin::decode)?\n                                } else {\n                                    None\n                                },\n",
+          "after": "                                tick,\n                                firing_pose,\n                                missile,\n                                integral,\n"
+        },
+        {
+          "offset": 6001,
+          "before": "                let minimum = u64::from(world.front_cadence_at_tick(latest_hit).ok_or(INVALID)?)\n                    .saturating_sub(elapsed);\n",
+          "after": "                let minimum =\n                    u64::from(range.laser_cadence(latest_hit, world)?).saturating_sub(elapsed);\n"
+        },
+        {
+          "offset": 8787,
+          "before": "",
+          "after": "    fn laser_cadence(&self, tick: u64, world: &super::super::World) -> Result<u8, SaveError> {\n        if self\n            .hits\n            .iter()\n            .flatten()\n            .any(|h| h.tick == tick && h.integral.is_some())\n        {\n            Ok(super::super::OrdinaryWeapon::FrontNavalLaser.cooldown_ticks())\n        } else {\n            world.front_cadence_at_tick(tick).ok_or(INVALID)\n        }\n    }\n"
+        },
+        {
+          "offset": 10152,
+          "before": "",
+          "after": "            let pose = hit.integral.map_or(pose, |(f, _)| f.laser_ray(pose));\n"
+        },
+        {
+          "offset": 10928,
+          "before": "                if tick - prior < u64::from(world.front_cadence_at_tick(prior).ok_or(INVALID)?) {\n",
+          "after": "                if tick - prior < u64::from(self.laser_cadence(prior, world)?) {\n"
+        }
+      ]
+    },
+    "flight/traffic.rs": {
+      "beforeSHA256": "dbc2d0baaea33c2b95deb87abad343c7b7a2f85c7e03b4043f3accbddd480af8",
+      "afterSHA256": "88338d822819e13458ca1f1f03d0b52ed1ec037dc763832a1925f5145549b81b",
+      "hunks": [
+        {
+          "offset": 853,
+          "before": "                    if self.front_weapon_at_tick(item, shot.world_tick, emission)\n",
+          "after": "                    if self.laser_weapon_at_tick(item, shot.world_tick, emission)\n"
+        },
+        {
+          "offset": 12097,
+          "before": "                    weapon: self\n                        .fitted_front_laser()\n                        .ok_or(FireError::NoFittedFrontLaser)?\n                        .1,\n",
+          "after": "                    weapon: self.selected_fit().ok_or(FireError::NoFittedFrontLaser)?.1,\n"
+        }
+      ]
+    },
+    "flight/weapons.rs": {
+      "beforeSHA256": "635d6d624283c410b5fbcbf24cbe92be1c24abbeccf46649f3537f081077bb65",
+      "afterSHA256": "561915c3ab837d18047900571503d92b56593fd5e7bb0f5f97e9a2f3b452eb69",
+      "hunks": [
+        {
+          "offset": 281,
+          "before": "",
+          "after": "pub(super) const MEDUSA_ENERGY: u16 = 41_000;\n"
+        },
+        {
+          "offset": 4054,
+          "before": "        self.replay_advance_with_rate(elapsed, 7);\n",
+          "after": "        self.replay_advance_with_rate(elapsed, 7, ENERGY_CAPACITY_HUNDREDTHS);\n"
+        },
+        {
+          "offset": 4139,
+          "before": "    pub(super) fn replay_advance_with_rate(&mut self, elapsed: u64, recharge: u16) {\n",
+          "after": "    pub(super) fn replay_advance_with_rate(&mut self, elapsed: u64, recharge: u16, capacity: u16) {\n"
+        },
+        {
+          "offset": 4357,
+          "before": "            .min(38000) as u16;\n",
+          "after": "            .min(u64::from(capacity)) as u16;\n"
+        },
+        {
+          "offset": 4562,
+          "before": "    pub(super) fn replay_berth(&mut self) {\n        self.energy = 38000;\n",
+          "after": "    pub(super) fn replay_berth(&mut self, capacity: u16) {\n        self.energy = capacity;\n"
+        },
+        {
+          "offset": 4682,
+          "before": "    pub(super) fn advance(&mut self, opening: FlightMode, next: FlightMode, recharge: u16) {\n",
+          "after": "    pub(super) fn advance(\n        &mut self,\n        opening: FlightMode,\n        next: FlightMode,\n        recharge: u16,\n        capacity: u16,\n    ) {\n"
+        },
+        {
+          "offset": 5087,
+          "before": "            self.energy = ENERGY_CAPACITY_HUNDREDTHS;\n",
+          "after": "            self.energy = capacity;\n"
+        },
+        {
+          "offset": 5167,
+          "before": "            self.energy = (self.energy + recharge).min(ENERGY_CAPACITY_HUNDREDTHS);\n",
+          "after": "            self.energy = (self.energy + recharge).min(capacity);\n"
+        },
+        {
+          "offset": 13922,
+          "before": "",
+          "after": "        self.pulse_scene_facing(pose, super::FlightView::Front)\n    }\n    pub(super) fn pulse_scene_facing(\n        &self,\n        pose: crate::docking::RigidPose,\n        facing: super::FlightView,\n    ) -> Result<(Option<super::practice::Practice>, PulseContact, f64), FireError> {\n"
+        },
+        {
+          "offset": 15248,
+          "before": "        let hit = practice\n            .as_mut()\n            .and_then(|p| p.contact_limited(self.state, pose, cap, solid));\n",
+          "after": "        let hit = practice.as_mut().and_then(|p| {\n            p.contact_limited(\n                self.state,\n                pose,\n                cap,\n                solid,\n                facing,\n                self.combat.emissions.checked_add(1)?,\n            )\n        });\n"
+        },
+        {
+          "offset": 17736,
+          "before": "",
+          "after": "    pub(super) fn energy_capacity(&self) -> u16 {\n        if self.xyzzy_medusa_active() {\n            MEDUSA_ENERGY\n        } else {\n            ENERGY_CAPACITY_HUNDREDTHS\n        }\n    }\n"
+        },
+        {
+          "offset": 18086,
+          "before": "            energy_capacity_hundredths: ENERGY_CAPACITY_HUNDREDTHS,\n",
+          "after": "            energy_capacity_hundredths: self.energy_capacity(),\n"
+        },
+        {
+          "offset": 19827,
+          "before": "",
+          "after": "    pub fn request_fire_selected_laser(\n        &mut self,\n        expected_tick: u64,\n    ) -> Result<PulseShot, FireError> {\n        self.request_discharge(expected_tick, false, self.selected_laser_view())\n    }\n"
+        },
+        {
+          "offset": 20146,
+          "before": "",
+          "after": "    ) -> Result<PulseShot, FireError> {\n        if self.selected_laser_view() != super::FlightView::Front {\n            return Err(FireError::StaleCommand);\n        }\n        self.request_discharge(expected_tick, pulse_only, super::FlightView::Front)\n    }\n    fn request_discharge(\n        &mut self,\n        expected_tick: u64,\n        pulse_only: bool,\n        facing: super::FlightView,\n"
+        },
+        {
+          "offset": 21081,
+          "before": "        let (fitted_item_id, weapon) = self.fitted_front_laser().ok_or(if pulse_only {\n",
+          "after": "        let (fitted_item_id, weapon) = self.selected_fit().ok_or(if pulse_only {\n"
+        },
+        {
+          "offset": 21605,
+          "before": "",
+          "after": "        let pose = facing.laser_ray(pose);\n"
+        },
+        {
+          "offset": 21728,
+          "before": "        let (mut practice, contact, end_distance) = self.pulse_scene(pose)?;\n",
+          "after": "        let (mut practice, contact, end_distance) = self.pulse_scene_facing(pose, facing)?;\n"
+        }
+      ]
+    },
+    "flight/xyzzy.rs": {
+      "beforeSHA256": "04ca9973164108e94a06339fb7977c2b8869db1dc98d9df01ad501e0d1ffc08b",
+      "afterSHA256": "c67ece5c81e4a33a69785904a4cd1ae301387a8daba68015159fe4808e3f7dcd",
+      "hunks": [
+        {
+          "offset": 658,
+          "before": "",
+          "after": "    /// Issue the normal Fleet commander a test Medusa. Old Enter receipts keep their original hull.\n    ActivateMedusa,\n"
+        },
+        {
+          "offset": 1326,
+          "before": "",
+          "after": "                | Self::ActivateMedusa\n"
+        },
+        {
+          "offset": 2003,
+          "before": "",
+          "after": "            Self::ActivateMedusa => 15,\n"
+        },
+        {
+          "offset": 2508,
+          "before": "",
+          "after": "            15 => Ok(Self::ActivateMedusa),\n"
+        },
+        {
+          "offset": 3142,
+          "before": "",
+          "after": "    MedusaHoldFull,\n"
+        },
+        {
+          "offset": 4736,
+          "before": "",
+          "after": "    pub(super) fn medusa_at(&self, revision: u64) -> bool {\n        self.records\n            .iter()\n            .any(|r| r.action == XyzzyAction::ActivateMedusa && r.revision <= revision)\n    }\n"
+        },
+        {
+          "offset": 7190,
+          "before": "            record.action == XyzzyAction::FitEcm\n                && record.dock == dock\n",
+          "after": "            matches!(\n                record.action,\n                XyzzyAction::FitEcm | XyzzyAction::ActivateMedusa\n            ) && record.dock == dock\n"
+        },
+        {
+          "offset": 13262,
+          "before": "                    XyzzyAction::Enter | XyzzyAction::MaximumFuelStorage\n",
+          "after": "                    XyzzyAction::Enter\n                        | XyzzyAction::ActivateMedusa\n                        | XyzzyAction::MaximumFuelStorage\n"
+        },
+        {
+          "offset": 19482,
+          "before": "",
+          "after": "    /// First issue within the validated XYZZY ledger. Subsequent refits retain its identity.\n    pub fn xyzzy_medusa_issue(&self) -> Option<(DockContext, u64, u64)> {\n        self.xyzzy\n            .records\n            .iter()\n            .find(|r| r.action == XyzzyAction::ActivateMedusa)\n            .map(|r| (r.dock, r.tick, r.revision))\n    }\n    pub fn xyzzy_medusa_active(&self) -> bool {\n        self.xyzzy.medusa_at(u64::MAX)\n    }\n"
+        },
+        {
+          "offset": 20770,
+          "before": "            label: if self.xyzzy.active() {\n",
+          "after": "            label: if self.xyzzy_medusa_active() {\n                \"XYZZY / COMMANDER CLARKE / SH171 MEDUSA\"\n            } else if self.xyzzy.active() {\n"
+        },
+        {
+          "offset": 21927,
+          "before": "        if !matches!(action, XyzzyAction::Enter | XyzzyAction::MaximumFuelStorage)\n            && !self.xyzzy.active()\n",
+          "after": "        if !matches!(\n            action,\n            XyzzyAction::Enter | XyzzyAction::ActivateMedusa | XyzzyAction::MaximumFuelStorage\n        ) && !self.xyzzy.active()\n"
+        },
+        {
+          "offset": 22412,
+          "before": "",
+          "after": "        }\n        if action == XyzzyAction::ActivateMedusa\n            && self\n                .reserved_service_projection()\n                .map_err(|_| XyzzyError::ActiveContractCustody)?\n                .used_tonnes\n                > 32\n        {\n            return Err(XyzzyError::MedusaHoldFull);\n"
+        },
+        {
+          "offset": 27188,
+          "before": "",
+          "after": "        let first_medusa =\n            review.action == XyzzyAction::ActivateMedusa && !self.xyzzy_medusa_active();\n"
+        },
+        {
+          "offset": 27393,
+          "before": "",
+          "after": "        if first_medusa {\n            self.pulse.replay_berth(super::weapons::MEDUSA_ENERGY);\n            let station = super::OriginalStationData::medusa_bundled()\n                .map_err(|_| SaveError::ContentMismatch)?;\n            self.state.station = Some(station.station_pose());\n            self.station_data = Some(station);\n            self.commander_account\n                .as_mut()\n                .ok_or(INVALID)?\n                .set_medusa(true);\n        }\n"
+        },
+        {
+          "offset": 30872,
+          "before": "",
+          "after": "            if review.action == XyzzyAction::ActivateMedusa\n                && self.damage.enabled()\n                && (self.fitted_ecm().is_some() || self.xyzzy_has_free_ordinary_utility_mount()?)\n            {\n                self.grant_xyzzy_module(review.dock, review.tick, super::ModuleKind::Ecm)?;\n            }\n"
+        }
+      ]
+    },
+    "freight/g02.rs": {
+      "beforeSHA256": "a273becd4a69e7ad3a9fbfd89efd61490a614715fa4be8dc47141ca4c81ea6c2",
+      "afterSHA256": "caeebea14cdd76d9447279c6842111958f5db1f56df4030ad541a033d73739c9",
+      "hunks": [
+        {
+          "offset": 5588,
+          "before": "",
+          "after": "    // Reconstructed from the ordinary account\u2019s XYZZY issue record.\n    medusa: bool,\n"
+        },
+        {
+          "offset": 6161,
+          "before": "",
+          "after": "    fn hold_capacity(&self) -> u16 {\n        if self.medusa {\n            if self.equipment.owned().is_some_and(|item| item.fitted) {\n                32\n            } else {\n                22\n            }\n        } else {\n            self.equipment.capacity()\n        }\n    }\n\n"
+        },
+        {
+          "offset": 7582,
+          "before": "",
+          "after": "                medusa: false,\n"
+        },
+        {
+          "offset": 15629,
+          "before": "",
+          "after": "    pub(crate) fn equipment_definition(\n        &self,\n    ) -> Result<crate::equipment::Definition, crate::equipment::Error> {\n        Ok(crate::equipment::definition()?.for_player(self.data.medusa))\n    }\n    pub(crate) fn set_medusa(&mut self, medusa: bool) {\n        self.data.medusa = medusa;\n    }\n"
+        },
+        {
+          "offset": 15981,
+          "before": "        self.data.equipment.capacity()\n",
+          "after": "        self.data.hold_capacity()\n"
+        },
+        {
+          "offset": 53369,
+          "before": "        || occupied_tonnes(data, account) > u128::from(account.equipment.capacity())\n",
+          "after": "        || occupied_tonnes(data, account) > u128::from(account.hold_capacity())\n"
+        },
+        {
+          "offset": 55659,
+          "before": "    if occupied_tonnes(data, account) + 8 > u128::from(account.equipment.capacity()) {\n",
+          "after": "    if occupied_tonnes(data, account) + 8 > u128::from(account.hold_capacity()) {\n"
+        }
+      ]
+    },
+    "freight/g02/persistence.rs": {
+      "beforeSHA256": "b1a068c6c9a1c463766a459372b100e1e12ebef2fc34ed9500729a15c7b19489",
+      "afterSHA256": "b9f2d7d8ab7f0efabae6b1b719282b729eebe30cde31def228c2ec04e3a17fa8",
+      "hunks": [
+        {
+          "offset": 6132,
+          "before": "",
+          "after": "                medusa: false,\n"
+        }
+      ]
+    }
+  }
+}
