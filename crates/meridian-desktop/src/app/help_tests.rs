@@ -128,6 +128,47 @@ fn every_station_help_retains_its_screen_selection_and_all_navigation_bindings()
 }
 
 #[test]
+fn market_trade_lesson_keeps_the_selected_goods_through_review_and_continue() {
+    let directory = TestDirectory::new();
+    let mut app = app(&directory);
+    station(&mut app, ui::Screen::Trading);
+    app.menu_input(ui::Input::Key(ui::Key::Next));
+    paint(&mut app);
+    app.menu_input(ui::Input::Key(ui::Key::Buy));
+    let before = ok(app.game.world.save_bytes());
+    assert_eq!(press(&mut app, KeyCode::Digit7, Some("7")), None);
+    assert!(app.docked.as_ref().is_some_and(Docked::review_pending));
+    assert_eq!(ok(app.game.world.save_bytes()), before);
+    app.menu_input(ui::Input::Key(ui::Key::Back));
+    assert_eq!(press(&mut app, KeyCode::Digit7, Some("7")), None);
+    assert!(!app.menu_active());
+    app.game_key(KeyCode::KeyR);
+    app.game_key(KeyCode::Enter);
+    app.game_key(KeyCode::Digit7);
+    app.game_key(KeyCode::KeyR);
+    let plan = app
+        .game
+        .session
+        .pending_trade
+        .and_then(|review| review.plan())
+        .unwrap_or_else(|| panic!("missing selected trade plan"));
+    assert_eq!(
+        plan.commodity,
+        meridian_core::station_services::CommodityId::Furs
+    );
+    app.game_key(KeyCode::Enter);
+    ok(app.game.continue_saved());
+    app.game_key(KeyCode::KeyG);
+    let state = app
+        .game
+        .world
+        .navigation_trade_snapshot()
+        .unwrap_or_else(|| panic!("missing trade lesson"));
+    assert!(state.attempts[0].held_tonne.is_some());
+    assert_eq!(app.game.world.commodity_quantity(plan.commodity), Some(1));
+}
+
+#[test]
 fn help_above_a_real_purchase_review_cannot_confirm_cancel_save_or_spend() {
     let directory = TestDirectory::new();
     let mut app = app(&directory);

@@ -252,6 +252,15 @@ impl Docked {
     pub(crate) fn review_pending(&self) -> bool {
         self.pending.is_some()
     }
+    pub(crate) fn open_market_lesson(&mut self, profile: &mut Profile) -> Result<String, String> {
+        if self.review_pending() {
+            return Err("Confirm or cancel the current market review first.".into());
+        }
+        let message =
+            profile.command(Action::MarketTradeLesson(self.screens.selected_commodity()))?;
+        self.close();
+        Ok(message)
+    }
     pub fn close(&mut self) {
         self.open = false;
         self.pending = None;

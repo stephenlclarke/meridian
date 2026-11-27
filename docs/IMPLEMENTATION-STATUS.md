@@ -22,6 +22,8 @@ The [solar fuel source candidate](SOLAR-FUEL-SCOOPS.md) adds the original near-s
 
 ## The Unwritten Route clue journal
 
+The post-preview [Navigation and Trade candidate](NAVIGATION-TRADE.md) connects the station market selection to the original T04 lesson. The goal reads the active plan, original purchase, sale and return from the commander. The Windows gameplay test results for this change are pending.
+
 The [ordinary clue journal](../integration/unwritten-route/README.md) reads the existing first receipts for five playable source families against the original 64-clue catalogue. Shift+J opens the journal. Later trail instructions and the paid Medusa path follow the original quest prerequisites.
 
 ## Passenger cabins and G04 source candidate

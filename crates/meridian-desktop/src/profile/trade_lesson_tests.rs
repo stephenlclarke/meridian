@@ -201,25 +201,38 @@ fn actual_food_trip_cold_held_sold_complete_and_reception_error_keep_one_trace_w
     let d = Directory::new();
     let mut p = d.profile();
     let initial = some(p.world.credits_tenths());
-    planned(&mut p);
+    let goal = |p: &mut Profile, text: &str| {
+        action(p, Action::TradeLessonDetails);
+        assert!(p.lines(true, None).join(" ").contains(text));
+    };
+    goal(&mut p, "press R to review trade practice");
+    review(&mut p, Action::Review);
+    goal(&mut p, "R reviews the plan for Food");
+    review(&mut p, Action::Review);
+    goal(&mut p, "buy one tonne");
     action(&mut p, Action::BuySelected);
     p = cold(p, &d);
     let held = some(p.world.navigation_trade_snapshot()).attempts[0].held_tonne;
-    assert!(p.command(Action::ReviewTradeLesson).is_err());
+    goal(&mut p, "Deliver the original tonne of Food to RENAS");
+    assert!(p.command(Action::Review).is_err());
     journey(&mut p);
     action(&mut p, Action::Refuel);
+    goal(&mut p, "sell the original tonne here");
     action(&mut p, Action::SellSelected);
     p = cold(p, &d);
+    goal(&mut p, "Return to AVENOR main orbital");
     assert_eq!(
         some(some(p.world.navigation_trade_snapshot()).attempts[0].sale).tonne,
         some(held)
     );
     journey(&mut p);
     let cash = p.world.credits_tenths();
-    action(&mut p, Action::ReviewTradeLesson);
+    goal(&mut p, "Press R for the debrief");
+    action(&mut p, Action::Review);
     failed_write(&mut p, &d, Action::Confirm);
     assert_eq!(some(p.world.navigation_trade_snapshot()).trace, None);
-    review(&mut p, Action::ReviewTradeLesson);
+    goal(&mut p, "Press R for the debrief");
+    review(&mut p, Action::Review);
     assert_eq!(p.world.credits_tenths(), cash);
     let complete = some(p.world.navigation_trade_snapshot());
     let trace = some(complete.trace);
@@ -268,7 +281,7 @@ fn selected_commodity_plan_and_stale_reviews_are_visible_and_never_silently_repa
         .command(Action::Confirm)
         .err()
         .unwrap_or_else(|| panic!("invalidated plan committed"));
-    assert!(error.contains("trade: 4/5/6"));
+    assert!(error.contains("trade: 7 then R"));
     assert!(error.contains("freight: R"));
     assert_eq!(bytes(&p), before);
     assert_eq!(ok(fs::read(d.0.join("commander.meridian"))), saved);

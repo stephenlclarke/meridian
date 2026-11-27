@@ -127,7 +127,7 @@ impl Panel {
                 "Basic aligns | Advanced approaches | Docking+nav docks | Specialists auto-work",
                 "I Mission details | Shift+I Target details | Occupied: Enter/Escape",
                 "Hold U 10 seconds: EMP | Release U cancels unfinished charge",
-                "F10 Practice review at Avenor | 4 Trade review | 5 Plan | 6 Cancel | 7 Details",
+                "F10 Practice at Avenor | 7 Trade goal | At berth: R from goal to review",
                 "F5 Save | F9 Reload | F11 Fullscreen | Escape Save/Quit",
             ],
         );
@@ -164,7 +164,7 @@ impl Panel {
                 "Enter Confirm review | B Cancel review",
                 "F6 Flight lesson | F12 Cancel | C Lesson details",
                 "F7 Close practice | F8 Reception | F10 Practice review",
-                "6 Cancel trade lesson | 7 Trade lesson details",
+                "7 Trade goal | R from goal to review | 6 Review cancellation",
                 "F5 Save | F9 Reload | P Pause | F11 Fullscreen | Escape Save/Quit",
             ],
         );
@@ -213,6 +213,7 @@ impl Panel {
                     "G Buy | Shift+G Sell | Enter Review current trade mode",
                     "Left / Right Quantity -/+1 | Shift+Left / Right -/+10",
                     "F Refuel actual tank at the displayed price",
+                    "7 Trade lesson for selected goods | R from goal to review",
                     "Trade confirmation uses the current price and native unit",
                 ],
             ),

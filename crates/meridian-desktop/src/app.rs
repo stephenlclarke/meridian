@@ -1273,6 +1273,22 @@ impl App {
             self.menu_input(ui::Input::Text(text.to_string()));
             return None;
         }
+        if code == KeyCode::Digit7
+            && self.menu_active()
+            && let Some(menu) = self
+                .docked
+                .as_mut()
+                .filter(|menu| menu.screen() == ui::Screen::Trading)
+        {
+            if !repeat {
+                match menu.open_market_lesson(&mut self.game) {
+                    Ok(message) => self.notice.set(message),
+                    Err(error) => menu.feedback(error),
+                }
+                self.request_redraw();
+            }
+            return None;
+        }
         if code == KeyCode::KeyP
             && self.menu_active()
             && self

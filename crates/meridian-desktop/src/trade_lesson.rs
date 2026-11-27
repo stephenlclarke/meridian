@@ -1,5 +1,8 @@
 //! Presentation of opaque T04 reviews and immutable World snapshots.
-use meridian_core::{NavigationTradeAction, NavigationTradeReview, World, navigation::SystemId};
+use meridian_core::{
+    NavigationTradeAction, NavigationTradeReview, NavigationTradeSnapshot, World,
+    navigation::SystemId, station_services::CommodityId,
+};
 
 fn system_name(id: SystemId) -> &'static str {
     match id {
@@ -21,7 +24,7 @@ pub fn review_title(action: NavigationTradeAction) -> &'static str {
 pub fn append_review(review: NavigationTradeReview, lines: &mut Vec<String>) {
     let terms = match review.action() {
         NavigationTradeAction::Accept => {
-            "Consent to ordinary navigation and trade. This does not buy cargo or choose a plan. After confirmation, use [ / ] to select a legal tonne commodity, then 5 reviews its direct route and current fit, stock, price, hold and fuel. No lesson fee or cash reward."
+            "Accept trade practice at this berth. Then open 7, select a legal tonne commodity with [ / ] and press R to review the route, stock, price, hold and fuel. No lesson fee or cash reward."
         }
         NavigationTradeAction::Plan { .. } => {
             "Confirm this selected direct route and one tonne of this commodity using the current owned fit and stock. Reserve one hold tonne without buying it. G makes the ordinary purchase; travel, sell the same original tonne at the destination and return here. Trade may lose money."
@@ -59,13 +62,54 @@ pub fn append_review(review: NavigationTradeReview, lines: &mut Vec<String>) {
     lines.push("ENTER CONFIRM AND SAVE | B BACK | 7 DETAILS".into());
 }
 
-pub fn append_details(world: &World, lines: &mut Vec<String>) {
-    lines
-        .push("TRADE LESSON | 4 CONSENT / RECEIVE | 5 PLAN SELECTED | 6 CANCEL | 7 DETAILS".into());
-    lines.push("[ / ] SELECT COMMODITY | G BUY | SHIFT+G SELL | J DIRECT TRAVEL | F REFUEL".into());
+fn objective(
+    state: &NavigationTradeSnapshot,
+    berth: Option<SystemId>,
+    selected: CommodityId,
+) -> String {
+    let Some(attempt) = state
+        .attempts
+        .last()
+        .filter(|attempt| Some(attempt.id) == state.active)
+    else {
+        return "At Avenor or Renas main orbital, press R to review trade practice.".into();
+    };
+    let issuer = attempt.issuing_dock.system();
+    let home = system_name(issuer);
+    let name = |id: CommodityId| id.definition().map_or("UNAVAILABLE", |d| d.name);
+    if state.ready {
+        return "Press R for the debrief. Enter confirms the trade and saves.".into();
+    }
+    let Some(plan) = attempt.plan else {
+        return format!(
+            "At {home}, select a legal tonne with [ / ]. R reviews the plan for {}.",
+            name(selected)
+        );
+    };
+    let goods = name(plan.commodity);
+    if attempt.buy.is_none() {
+        return format!("At {home}, select {goods} and buy one tonne with G.");
+    }
+    if attempt.sale.is_some() {
+        return format!("Return to {home} main orbital for the trade debrief.");
+    }
+    if berth == Some(plan.destination) {
+        format!("Select {goods} and use Shift+G to sell the original tonne here.")
+    } else {
+        format!(
+            "Deliver the original tonne of {goods} to {} main orbital.",
+            system_name(plan.destination)
+        )
+    }
+}
+
+pub fn append_details(world: &World, selected: CommodityId, lines: &mut Vec<String>) {
     let Some(state) = world.navigation_trade_snapshot() else {
         return;
     };
+    let berth = world.current_dock_context().map(|dock| dock.system());
+    crate::session::append_paragraph(lines, &objective(&state, berth, selected));
+    lines.push("7 TRADE GOAL | R REVIEW | 6 REVIEW CANCELLATION | F REFUEL".into());
     lines.push(format!(
         "RECORDS {} | ACTIVE SERVICES {} | RESERVED HOLD {}T",
         state.retained_mission_records, state.active_services, state.reserved_capacity_tonnes
@@ -89,8 +133,6 @@ pub fn append_details(world: &World, lines: &mut Vec<String>) {
                 plan.price_tenths / 10,
                 plan.price_tenths % 10
             ));
-        } else {
-            lines.push("NO PLAN CONFIRMED | SELECT WITH [ / ] THEN 5 REVIEWS".into());
         }
         lines.push(format!(
             "ORIGINAL PURCHASE {} | HELD {} | SELECTED SALE {}",
@@ -111,14 +153,6 @@ pub fn append_details(world: &World, lines: &mut Vec<String>) {
             ));
         }
     }
-    lines.push(
-        if state.ready {
-            "4 REVIEW RECEPTION AT THE ISSUING BERTH"
-        } else {
-            "COMPLETE THE ACTUAL PLAN, ORIGINAL SALE AND RETURN BEFORE RECEPTION"
-        }
-        .into(),
-    );
     lines.push(
         if state.trace.is_some() {
             "NAVIGATION TRADE FAMILY TRACE RETAINED ONCE"

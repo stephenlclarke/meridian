@@ -22,6 +22,7 @@ pub enum Action {
     PlanTradeLesson,
     CancelTradeLesson,
     TradeLessonDetails,
+    MarketTradeLesson(CommodityId),
     ReviewFlightLesson,
     CancelFlightLesson,
     FlightLessonDetails,
@@ -99,7 +100,16 @@ impl Session {
     pub fn from_world(world: &World) -> Self {
         Self {
             job: world.active_freight_job(),
-            pending: None,
+            selected_commodity: world
+                .navigation_trade_snapshot()
+                .and_then(|state| {
+                    state
+                        .attempts
+                        .last()
+                        .filter(|a| Some(a.id) == state.active)?
+                        .plan
+                })
+                .map_or(CommodityId::Food, |plan| plan.commodity),
             ..Self::default()
         }
     }
@@ -160,6 +170,23 @@ impl Session {
     }
 
     fn review_command(&mut self, world: &mut World, action: Action) -> Result<String, String> {
+        if self.show_trade_lesson && matches!(action, Action::Review) {
+            let needs_plan = world.navigation_trade_snapshot().is_some_and(|state| {
+                state.attempts.last().is_some_and(|attempt| {
+                    Some(attempt.id) == state.active && attempt.plan.is_none()
+                })
+            });
+            let result = self.review_trade_lesson(
+                world,
+                if needs_plan {
+                    Action::PlanTradeLesson
+                } else {
+                    Action::ReviewTradeLesson
+                },
+            );
+            self.show_trade_lesson = result.is_err();
+            return result;
+        }
         self.invalidate();
         let npc = world
             .mission_snapshot()
@@ -263,7 +290,7 @@ impl Session {
                 .review_navigation_trade(kind, world.snapshot().tick)
                 .map_err(|e| e.to_string())?,
         );
-        Ok("Trade lesson review. Enter confirms and saves; B cancels. 5 reviews the selected commodity plan.".into())
+        Ok("Trade lesson review. Enter confirms and saves. B goes back.".into())
     }
 
     // Profile publishes these ordinary transactions before committing World. Session-only
@@ -307,10 +334,13 @@ impl Session {
             Action::ReviewTradeLesson | Action::PlanTradeLesson | Action::CancelTradeLesson => {
                 self.review_trade_lesson(world, action)
             }
-            Action::TradeLessonDetails => {
+            Action::TradeLessonDetails | Action::MarketTradeLesson(_) => {
                 self.invalidate();
+                if let Action::MarketTradeLesson(id) = action {
+                    self.selected_commodity = id;
+                }
                 self.show_trade_lesson = true;
-                Ok("Trade lesson details. 4 consent/reception; 5 plan; 6 cancel.".into())
+                Ok("Navigation and trade lesson. R reviews the next station action.".into())
             }
             Action::ReviewFlightLesson | Action::CancelFlightLesson => {
                 self.review_flight_lesson(world, action)
@@ -392,7 +422,7 @@ impl Session {
                 let (review, choice) = self
                     .pending
                     .take()
-                    .ok_or("Open a fresh review (trade: 4/5/6; freight: R; other lessons: their review key)")?;
+                    .ok_or("Open a fresh review (trade: 7 then R; freight: R; other lessons: their review key)")?;
                 self.freight(world, Command::Confirm { review, choice })
             }
             Action::Back => {
@@ -429,6 +459,7 @@ impl Session {
                 .into())
             }
             Action::PreviousCommodity | Action::NextCommodity => {
+                let lesson = self.show_trade_lesson;
                 self.invalidate();
                 let order = CommodityId::display_order().map_err(crate::market::content_error)?;
                 let index = order
@@ -441,7 +472,8 @@ impl Session {
                     order.len() - 1
                 };
                 self.selected_commodity = order[(index + offset) % order.len()];
-                self.market_open = true;
+                self.show_trade_lesson = lesson;
+                self.market_open = !lesson;
                 Ok(
                     "Commodity selected; G buys one native unit, Shift+G sells one native unit."
                         .into(),
@@ -601,7 +633,7 @@ impl Session {
         if self.equipment_open {
             "K BUY AND FIT | U STORE OWNED BAY | Y REFIT OWNED BAY | O CLOSE | 7 TRADE LESSON"
         } else if self.market_open {
-            "[ PREVIOUS | ] NEXT | G BUY 1 UNIT | SHIFT+G SELL 1 UNIT | M CLOSE MARKET | F REFUEL | 5 PLAN"
+            "[ PREVIOUS | ] NEXT | G BUY 1 UNIT | SHIFT+G SELL 1 UNIT | F REFUEL | 7 TRADE LESSON"
         } else {
             "L LAUNCH | J JUMP | T CONTACT | R REVIEW | V RECEIVE ALL | X ABANDON | ENTER CONFIRM | 7 TRADE"
         }
@@ -767,7 +799,7 @@ impl Session {
             return lines;
         }
         if self.show_trade_lesson {
-            crate::trade_lesson::append_details(world, &mut lines);
+            crate::trade_lesson::append_details(world, self.selected_commodity, &mut lines);
             return lines;
         }
         if self.append_flight_lesson_panel(world, &mut lines) {
