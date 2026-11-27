@@ -241,7 +241,7 @@ fn views_details_and_other_commands_invalidate_reviews_without_granting_consent(
         assert!(lines.len() <= crate::hud::line_budget(640, 360));
         let text = lines.join("\n");
         assert!(text.contains(crate::flight_lesson::view_name(view)));
-        assert!(text.contains("F12 REVIEW CANCELLATION"));
+        assert!(text.contains("Shift+2 REVIEW CANCELLATION"));
     }
     action(&mut p, Action::ReviewFlightLesson);
     action(&mut p, Action::Confirm);
@@ -340,10 +340,10 @@ fn normal_docked_launch_and_all_flight_views_keep_critical_rows_visible_at_minim
             for control in [
                 "I Mission details",
                 "C Lesson details",
-                "F6 Flight lesson",
-                "F12 Cancel",
-                "F5 Save",
-                "F9 Reload",
+                "Shift+1 Flight lesson",
+                "Shift+2 Cancel",
+                "Ctrl+S Save",
+                "Ctrl+R Reload",
                 "Escape Save/Quit",
             ] {
                 assert!(text.contains(control), "Missing help control {control}");

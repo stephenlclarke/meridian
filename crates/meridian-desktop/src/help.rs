@@ -86,7 +86,7 @@ impl Panel {
             &[
                 "C Continue current save | N New commander",
                 "N again confirms a replacement | Escape Quit",
-                "F11 Fullscreen",
+                "Ctrl+Enter Fullscreen",
             ],
         )
     }
@@ -96,13 +96,16 @@ impl Panel {
             "Commander details",
             &[
                 "Shift+J Clue Journal",
-                "F5 Save | F9 Reload | F11 Fullscreen | Escape Save/Quit",
+                "Ctrl+S Save | Ctrl+R Reload | Ctrl+Enter Fullscreen | Escape Save/Quit",
             ],
         );
         if has_berth {
             panel
                 .lines
                 .insert(0, "L Launch | 0 Commander details".into());
+            panel.lines.push(
+                "Shift+1/2 Lesson review/cancel | Shift+3/4/5 Gunnery review/receive/close".into(),
+            );
             panel.lines.insert(
                 1,
                 "1 Galaxy | 2 System | 3 Showroom | 4 Market | 5 Equipment".into(),
@@ -133,16 +136,16 @@ impl Panel {
             &[
                 "W/S Accelerate/slow | Space Brake to zero | Arrows Pitch | A/D Yaw | Q/E Roll",
                 "N Start or cancel auto-docking | 0 Front | 1 Rear | 2 Left | 3 Right view",
-                "T Lock selected ship for missiles | F1 Next missile target | F2 Arm / safe",
-                "F3 Launch missile | F4 Safe/clear target | K E.C.M. (22 energy)",
+                "T Lock selected ship for missiles | 8 Next missile target | 9 Arm / safe",
+                "= Launch missile | - Safe/clear target | K E.C.M. (22 energy)",
                 "J Jump | Shift+J Clue Journal | P Pause / resume",
-                "F6 Flight lesson | F12 Cancel | C Lesson details | F7 Close run | F8 Reception",
+                "Shift+1 Lesson | Shift+2 Cancel | C Details | Shift+5 Close | Shift+4 Receive",
                 "Tab Next scanner target (no core: mark) | F Manual/assist | Delete Release",
                 "Basic aligns | Advanced approaches | Docking+nav docks | Specialists auto-work",
                 "I Mission details | Shift+I Target details | Occupied: Enter/Escape",
                 "Hold U 10 seconds: EMP | Release U cancels unfinished charge",
-                "F10 Practice review at Avenor | 4 Trade review | 5 Plan | 6 Cancel | 7 Details",
-                "F5 Save | F9 Reload | F11 Fullscreen | Escape Save/Quit",
+                "Shift+3 Gunnery review | 4 Trade review | 5 Plan | 6 Cancel | 7 Details",
+                "Ctrl+S Save | Ctrl+R Reload | Ctrl+Enter Fullscreen | Escape Save/Quit",
             ],
         );
         panel.lines.insert(
@@ -176,10 +179,10 @@ impl Panel {
                 "T Select crew | R Review interaction | I Mission details",
                 "V Review deliveries | X Review abandonment",
                 "Enter Confirm review | B Cancel review",
-                "F6 Flight lesson | F12 Cancel | C Lesson details",
-                "F7 Close practice | F8 Reception | F10 Practice review",
+                "Shift+1 Flight lesson | Shift+2 Cancel | C Lesson details",
+                "Shift+5 Close practice | Shift+4 Reception | Shift+3 Practice review",
                 "6 Cancel trade lesson | 7 Trade lesson details",
-                "F5 Save | F9 Reload | P Pause | F11 Fullscreen | Escape Save/Quit",
+                "Ctrl+S Save | Ctrl+R Reload | P Pause | Ctrl+Enter Fullscreen | Esc Quit",
             ],
         );
         panel.navigation();

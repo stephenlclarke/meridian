@@ -318,7 +318,7 @@ impl Session {
             Action::FlightLessonDetails => {
                 self.invalidate();
                 self.show_flight_lesson = true;
-                Ok("Flight lesson details. F6 reviews; F12 reviews cancellation.".into())
+                Ok("Flight lesson details. Shift+1 reviews; Shift+2 reviews cancellation.".into())
             }
             Action::ToggleAutoDocking => world
                 .toggle_auto_docking()
@@ -840,17 +840,17 @@ fn append_missile_panel(world: &World, mode: FlightMode, lines: &mut Vec<String>
 fn practice_terms(selection: PracticeSelection) -> &'static str {
     match selection {
         PracticeSelection::Consent(_) => {
-            "Hit the three uncrewed beacons with the fitted front Pulse Laser. Stop firing for three uninterrupted seconds in flight, then dock at Avenor and review reception with F8. No fee or cash reward."
+            "Hit the three uncrewed beacons with the fitted front Pulse Laser. Stop firing for three uninterrupted seconds in flight, then dock at Avenor and review reception with Shift+4. No fee or cash reward."
         }
         PracticeSelection::Reception(_) => {
             "Confirm reception at the Avenor main berth. The first Safe Gunnery Family Trace stays recorded once. No cash reward."
         }
         PracticeSelection::Closure(review) => match review.outcome() {
             PracticeOutcome::Failed => {
-                "Close this failed attempt. Its ordinary hit and all weapon history stay recorded. No reward, refund or ammunition refill. F10 can review a fresh attempt after closure. B cancels."
+                "Close this failed attempt. Its ordinary hit and all weapon history stay recorded. No reward, refund or ammunition refill. Shift+3 can review a fresh attempt after closure. B cancels."
             }
             _ => {
-                "Abandon this incomplete attempt. Its history stays recorded. No reward, refund or ammunition refill. F10 can review a fresh attempt after closure. B cancels."
+                "Abandon this incomplete attempt. Its history stays recorded. No reward, refund or ammunition refill. Shift+3 can review a fresh attempt after closure. B cancels."
             }
         },
     }
@@ -872,21 +872,21 @@ fn practice_line(world: &World) -> Option<String> {
             PracticeOutcome::Abandoned => "ABANDONED",
         };
         let next = if world.review_practice(snapshot.tick).is_ok() {
-            "F10 REVIEW NEW ATTEMPT"
+            "Shift+3 REVIEW NEW ATTEMPT"
         } else {
             "NEW REVIEW REQUIRES AVAILABLE AVENOR OFFER"
         };
         format!("PRACTICE {result} | {next}")
     } else {
         let close = if world.review_practice_closure(snapshot.tick).is_ok() {
-            " | F7 REVIEW CLOSURE"
+            " | Shift+5 REVIEW CLOSURE"
         } else {
             ""
         };
         let state = match practice.status {
             PracticeStatus::Unaccepted => {
                 if world.review_practice(snapshot.tick).is_ok() {
-                    "F10 REVIEW AVENOR PRACTICE".into()
+                    "Shift+3 REVIEW AVENOR PRACTICE".into()
                 } else {
                     "PRACTICE REVIEW REQUIRES AVENOR BERTH".into()
                 }
@@ -907,7 +907,7 @@ fn practice_line(world: &World) -> Option<String> {
             },
             PracticeStatus::Retired => {
                 if world.review_practice_reception(snapshot.tick).is_ok() {
-                    "F8 REVIEW PRACTICE RECEPTION".into()
+                    "Shift+4 REVIEW PRACTICE RECEPTION".into()
                 } else if reception.is_some_and(|state| state.ready) {
                     "DOCK AT AVENOR FOR PRACTICE RECEPTION".into()
                 } else {
@@ -1007,7 +1007,7 @@ fn missile_command(world: &mut World, action: Action) -> Result<String, String> 
             world
                 .request_fire_missile(tick)
                 .map_err(|e| e.to_string())?;
-            Ok("Missile launched; F5 saves the owned round and projectile state".into())
+            Ok("Missile launched; Ctrl+S saves the owned round and projectile state".into())
         }
         Action::ClearMissile => {
             world

@@ -10,7 +10,7 @@ For the packaged follow-up, open the separate **Meridian Medusa Preview.app** on
 meridian-desktop --medusa-preview-dir /path/to/preview-slot
 ```
 
-The preview starts docked or continues its own existing save. L launches. W/S adjust throttle, A/D yaw, up/down arrows pitch, Q/E roll and Space brakes. 0–3 change the flight view. P pauses. F5 saves, F9 continues and Escape saves and quits.
+The preview starts docked or continues its own existing save. L launches. W/S adjust throttle, A/D yaw, up/down arrows pitch, Q/E roll and Space brakes. 0–3 change the flight view. P pauses. Ctrl+S saves, Ctrl+R continues and Escape saves and quits.
 
 While docked, B fits or stores the preview cargo expansion. Brackets reduce or increase the number of fitted preview cabins. The fit is limited to four cabins, 5 t and one equipment unit per cabin, and 22 t of stock hold with a 10 t cargo expansion. The preview also checks the stock limits of 13 equipment units and four utility mounts. Fit changes publish the prospective checked save before altering the live fixture. The pilot cannot fit while launching or in flight.
 

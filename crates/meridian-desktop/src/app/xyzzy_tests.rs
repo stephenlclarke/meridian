@@ -523,7 +523,7 @@ fn help_above_secret_confirmation_blocks_publication_and_resumes_the_same_review
             .is_some_and(|panel| panel.title == "XYZZY testing help")
     );
     assert_eq!(press(&mut app, KeyCode::Enter), None);
-    assert_eq!(press(&mut app, KeyCode::F5), None);
+    assert_eq!(press(&mut app, KeyCode::KeyS), None);
     assert_eq!(app.advance_frame(true, 1200), FrameAdvance::Continue(None));
     assert_eq!(ok(app.game.world.save_bytes()), before);
     assert!(!directory.0.join("commander.meridian").exists());
