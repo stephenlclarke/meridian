@@ -6,6 +6,20 @@ use crate::traffic::NpcPhase;
 
 use crate::docking::Vec3;
 
+pub(super) const SCOOP_APERTURE: Vec3 = Vec3::new(0.0, -45.0, 55.0);
+
+impl crate::station::OriginalStationData {
+    pub(in crate::flight) fn wreck_work_standoff(&self) -> f64 {
+        // The near wreck face must clear both the player hull and the rotated scoop aperture.
+        // Both current hulls keep that face inside the 85-unit scoop reach at this distance.
+        let aperture_radius = SCOOP_APERTURE.dot(SCOOP_APERTURE).sqrt();
+        // Stay outside both hulls and keep the near face beyond the scoop aperture.
+        self.npc_geometry().player_clearance_radius()
+            + self.player_clearance_radius().max(aperture_radius)
+            + 2.0
+    }
+}
+
 fn difference(a: Vec3, b: Vec3) -> Vec3 {
     Vec3::new(a.x - b.x, a.y - b.y, a.z - b.z)
 }
@@ -123,9 +137,9 @@ impl World {
                 // the inner edge of its half-unit position tolerance.
                 Some(rock.bounding_radius() + hull.player_clearance_radius() + 2.0)
             }
-            WorkTargetId::Wreck(_) => Some(hull.player_npc_clearance() + 2.0),
+            WorkTargetId::Wreck(_) => Some(hull.wreck_work_standoff()),
             // Original local scoop aperture is 45 below and 55 forward.
-            WorkTargetId::Ore(_) => Some(45.0_f64.hypot(55.0)),
+            WorkTargetId::Ore(_) => Some(SCOOP_APERTURE.dot(SCOOP_APERTURE).sqrt()),
         }
     }
 
@@ -158,7 +172,7 @@ impl World {
             ),
         );
         let distance = error.dot(error).sqrt();
-        let acceleration = f64::from(crate::flight::ACCELERATION) * scale;
+        let acceleration = f64::from(self.player_hull_kind().flight_rates().1) * scale;
         let gain = if distance > 0.0 {
             (acceleration / distance).sqrt().min(0.75)
         } else {
@@ -209,7 +223,7 @@ impl World {
         let direction = if retreating { -1.0 } else { 1.0 };
         let facing = direction * to_target.dot(player.orientation.z) > distance * 0.995;
         let units = f64::from(crate::flight::DISTANCE_PER_SPEED_UNIT);
-        let acceleration = f64::from(crate::flight::ACCELERATION) * units;
+        let acceleration = f64::from(self.player_hull_kind().flight_rates().1) * units;
         let delta_t = f64::from(crate::FIXED_DELTA_SECONDS);
         let desired = if facing {
             // Reserve one additional tick of travel alongside continuous braking distance.

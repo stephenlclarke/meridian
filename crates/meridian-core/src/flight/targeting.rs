@@ -875,8 +875,10 @@ impl World {
                 (angle / f64::from(rate * super::FIXED_DELTA_SECONDS)).clamp(-1.0, 1.0) as f32
             }
         };
-        let yaw = control(bearing, super::YAW_RATE);
-        let pitch = control(elevation, super::PITCH_RATE);
+        let hull = self.player_hull_kind();
+        let (_, _, pitch_rate, yaw_rate, _) = hull.flight_rates();
+        let yaw = control(bearing, yaw_rate);
+        let pitch = control(elevation, pitch_rate);
         let output = FlightInput {
             yaw,
             pitch,
@@ -886,13 +888,14 @@ impl World {
             let desired = self.work_hold_input(work, output);
             if let WorkTargetId::Wreck(id) = work.id
                 && self.auto_salvage_eligible(id)
-                && let Some(standoff) = self.work_standoff(work)
+                && let Some(geometry) = self.station_data.as_ref()
             {
                 return wreck_avoidance::protect(
                     &mut self.targeting.wreck_avoidance,
                     self.state,
+                    hull,
                     work.position,
-                    standoff,
+                    geometry.player_npc_clearance() + 1.0,
                     desired,
                 );
             }

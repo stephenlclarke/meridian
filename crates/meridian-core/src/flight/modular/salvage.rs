@@ -198,7 +198,7 @@ fn direct_feed_admissible(
     );
     let range = to_source.dot(to_source).sqrt();
     let radius = station.npc_geometry().player_clearance_radius();
-    let standoff = station.player_npc_clearance() + 2.0;
+    let standoff = station.wreck_work_standoff();
     if !(standoff - 0.5..=standoff + 0.5).contains(&range)
         || to_source.dot(player.orientation.z) < range * 0.999
     {
@@ -215,7 +215,7 @@ fn direct_feed_admissible(
         to_source.y * factor,
         to_source.z * factor,
     );
-    let aperture = player.orientation.apply(Vec3::new(0.0, -45.0, 55.0));
+    let aperture = player.orientation.apply(super::work::SCOOP_APERTURE);
     let out_of_source = Vec3::new(
         near_face.x - to_source.x,
         near_face.y - to_source.y,

@@ -1632,13 +1632,9 @@ fn occupied_cut_requires_explicit_review_and_retains_actual_finite_game_contact(
     assert!(cold.fitted_salvage_cutter().is_none());
     // This tiny historical mutation still passes the relative-speed envelope;
     // only the independently retained preceding traffic movement rejects it.
-    let radius = cold
-        .station_data
-        .as_ref()
-        .unwrap()
-        .player_clearance_radius();
+    let standoff = cold.station_data.as_ref().unwrap().wreck_work_standoff();
     cold.occupied_salvage
-        .alter_first_target_speed_for_test(0.01, radius);
+        .alter_first_target_speed_for_test(0.01, standoff);
     assert!(cold.save_bytes().is_err());
     let forged = cold.unchecked_test_save().unwrap();
     assert!(World::from_save_bytes(&forged).is_err());

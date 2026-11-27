@@ -68,6 +68,8 @@ In the ordinary Fleet game, open **Ctrl+Shift+X** at a berth. Review and confirm
 | Ammunition and fuel | Five loaded standard missiles. A former nine-pylon commander retains surplus rounds in storage under their original identities. The test command fills the fitted fuel capacity. |
 | Ownership | Paid items keep their receipts. New items and the hull use XYZZY provenance. The quest and PLUGH purchase have separate acquisition paths. |
 
+For wreck recovery, the targeting computer stops with the wreck’s near face inside the 85 m scoop reach and ahead of the lower-forward aperture. Manual recovery uses the same distance and requires a settled ship. Continue checks the transfer against the hull flown at the time.
+
 The frozen [SH171 flagship contract](../integration/sh171-medusa/MEDUSA-FLAGSHIP.json) records four laser facings, four utility mounts and 13 stock equipment units. Select front, rear, port or starboard with 0–3. All four draw from the same energy pool and share heat and cooldown. Survey gear, rescue and salvage beams, Alien Seeker ammunition and the source-specific alien attachment do not have ordinary Fleet equipment implementations here. The proposed 32 equipment units and candidate performance figures have no adopted fitting contract.
 
 ## SH171 Medusa compatibility

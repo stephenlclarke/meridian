@@ -506,3 +506,47 @@ fn manual_scanner_recovers_finite_wreck_cargo_without_targeting_modules() {
     );
     assert_eq!(continued.targeting_tier(), None);
 }
+
+#[test]
+fn medusa_recovers_a_real_wreck_unit_and_keeps_it_on_cold_continue() {
+    let mut world = finance_salvage();
+    refuel_for_return(&mut world);
+    let manifest = terminal_source(&mut world);
+    jump_and_dock(&mut world, SystemId::RENAS);
+    let tick = world.snapshot().tick;
+    let cutter = some(world.fitted_salvage_cutter()).id;
+    let store = ok(world.review_module(ModuleAction::Store { item: cutter }, tick));
+    ok(world.prepare_module(store, tick)).commit();
+    let issue = ok(world.review_xyzzy(meridian_core::XyzzyAction::ActivateMedusa, tick));
+    ok(world.prepare_xyzzy(issue, tick)).commit();
+    assert!(world.xyzzy_medusa_active());
+    assert!(world.fitted_salvage_cutter().is_none());
+    dock_at(&mut world, SystemId::AVENOR);
+    ok(world.request_launch(world.snapshot().tick));
+    ok(world.step(FlightInput::default()));
+    let target = WorkTargetId::Wreck(manifest.source);
+    salvage_filter(&mut world);
+    assert!(select_wreck(&mut world, target));
+    let held = some(world.commodity_quantity(manifest.commodity));
+    for _ in 0..12000 {
+        ok(world.step(FlightInput::default()));
+        if world.commodity_quantity(manifest.commodity) == Some(held + 1) {
+            let loaded = ok(World::from_save_bytes(&ok(world.save_bytes())));
+            assert!(loaded.xyzzy_medusa_active());
+            assert_eq!(
+                loaded.commodity_quantity(manifest.commodity),
+                Some(held + 1)
+            );
+            assert_eq!(ok(loaded.wreck_manifest(manifest.source)), manifest);
+            assert_eq!(loaded.credits_tenths(), world.credits_tenths());
+            return;
+        }
+    }
+    panic!(
+        "no Medusa cargo transfer at the real wreck: {:?}, position {:?}, speed {}, refusal {:?}",
+        world.automatic_work_status(),
+        world.snapshot().position,
+        world.snapshot().speed,
+        world.snapshot().motion_refusal
+    );
+}

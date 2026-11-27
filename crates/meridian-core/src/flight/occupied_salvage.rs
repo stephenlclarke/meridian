@@ -105,7 +105,7 @@ pub(super) struct State {
 }
 impl State {
     #[cfg(test)]
-    pub(super) fn alter_first_target_speed_for_test(&mut self, speed: f64, radius: f64) {
+    pub(super) fn alter_first_target_speed_for_test(&mut self, speed: f64, standoff: f64) {
         let receipt = &mut self.contacts[0];
         // Keep the other validation envelope satisfied; the mutation must
         // fail precisely because it disagrees with measured motion.
@@ -120,7 +120,7 @@ impl State {
             receipt.speed,
             body.pose,
             speed,
-            radius * 2.0
+            standoff
         ));
         assert_ne!(receipt.target_speed, speed);
         receipt.target_speed = speed;
@@ -314,7 +314,7 @@ impl State {
                 receipt.speed,
                 body.pose,
                 receipt.target_speed,
-                data.player_npc_clearance(),
+                data.wreck_work_standoff(),
             ) {
                 return Err(INVALID);
             }
@@ -394,7 +394,7 @@ fn working_hold(
     speed: f32,
     target: RigidPose,
     target_speed: f64,
-    clearance: f64,
+    standoff: f64,
 ) -> bool {
     let range = distance(player.position, target.position);
     let velocity = |pose: RigidPose, units: f64| {
@@ -405,7 +405,7 @@ fn working_hold(
             pose.orientation.z.z * v,
         )
     };
-    (range - (clearance + 2.0)).abs() <= 0.5
+    (range - standoff).abs() <= 0.5
         && distance(
             velocity(player, f64::from(speed)),
             velocity(target, target_speed),
@@ -603,7 +603,7 @@ impl World {
             self.state.speed,
             body.pose,
             target_speed,
-            data.player_npc_clearance(),
+            data.wreck_work_standoff(),
         ) {
             return Err(OccupiedCutError::UnsafeHold);
         }
