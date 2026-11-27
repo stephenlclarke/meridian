@@ -643,3 +643,7 @@ integration/sh072-griffon-mk-ii/CANDIDATE-FIT-SUPPORT-FANS.json text eol=lf
 integration/sh073-griffon-spectre/CANDIDATE-FIT-SUPPORT-FANS.json text eol=lf
 integration/sh072-griffon-mk-ii/ARCHIVE-FIT-SUPPORT-FANS.json text eol=lf
 integration/sh073-griffon-spectre/ARCHIVE-FIT-SUPPORT-FANS.json text eol=lf
+
+# Shared algorithm pinned by the directed hull measurement receipts.
+tools/directed_hull_fit.py text eol=lf
+tools/fleet_hull_measurement.py text eol=lf

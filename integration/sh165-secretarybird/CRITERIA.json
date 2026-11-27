@@ -190,6 +190,8 @@
     }
   },
   "replayPins": {
+    "tools/fleet_hull_measurement.py": "3570747d9f650efc7d0e4f88352e9fd32e42ab394f4669100223fbac0c1be6b7",
+    "tools/directed_hull_fit.py": "dbd5d45e5052453646b752695815d6cb53c6ccb2c3ad6694451a4c7e19fa8bf7",
     "integration/sh165-secretarybird/SECRETARYBIRD-STUDIO.json": "48d38ec67cfa8d367a15a2fbcc625e7789a61c870e394517c6a9784160cd01d2",
     "integration/sh165-secretarybird/FROZEN-SOURCES.json": "732ce3a3e96f19f0e0df4709717bf1bbaec18cf504999bb939f511183e12889f",
     "integration/sh165-secretarybird/CONTACT-CANDIDATE.json": "1f92bef2aa8cb0aef827bc8ad4b3de9bce41a0c0531d8f369333f1f86f5d95f2",
@@ -210,7 +212,7 @@
     "tools/measure_banteng_geometry.py": "9356864e227302598fcae4e833ecb706b1ed8a5e600cbb4076b7165dc1e54bea",
     "tools/measure_goshawk_surface_fit.py": "5407ef1e5fad41810aa95444ca1338fe33a91e5c9857dcb752b4e4cf2fca6d0b",
     "tools/measure_lanner_geometry.py": "55d13a28602e6ed791adecd85ff43f3c8a7fbe118cf0977272e1747422c2408d",
-    "tools/measure_secretarybird.py": "c0254b3ec3d1fc35873fab82930028cee6ce76129cb78e749377ac6104b2ea4a",
+    "tools/measure_secretarybird.py": "a7f2ff5324c15aed9c539b240a9588d911bd72b0fa799ad27ded43e1f7c3a364",
     "tools/prepare_eagle_cruiser_geometry.py": "a1ea3b5d72f35e1f2932da71afa3ff8a276a504f7309a1086a2b3df35988addc",
     "tools/prepare_secretarybird.py": "0757251637028b62c51d217b3087967e6e2636159b838b4978b5a61e93b17cc8",
     "tools/verify_eagle_cruiser_geometry.py": "cb053ee5873fee62ee456bb3776e98d29b2cbb44c7344599bc617a8579164d43",

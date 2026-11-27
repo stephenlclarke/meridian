@@ -190,6 +190,8 @@
     }
   },
   "replayPins": {
+    "tools/fleet_hull_measurement.py": "3570747d9f650efc7d0e4f88352e9fd32e42ab394f4669100223fbac0c1be6b7",
+    "tools/directed_hull_fit.py": "dbd5d45e5052453646b752695815d6cb53c6ccb2c3ad6694451a4c7e19fa8bf7",
     "integration/sh160-wolf-cutter/WOLF-CUTTER-STUDIO.json": "8bb404e86f4efac5eb7202399649de38b8363f9640d745936788fc53fcc14d70",
     "integration/sh160-wolf-cutter/FROZEN-SOURCES.json": "fd8ac9a0afcddb2271e5bd48b8702dfcc48fa46623c5a522531351c6b7b383ba",
     "integration/sh160-wolf-cutter/CONTACT-CANDIDATE.json": "a196a9791efbea70ca61bca42d255f10f7a1b69516962983efced0e9b9c2331c",
@@ -210,7 +212,7 @@
     "tools/measure_banteng_geometry.py": "9356864e227302598fcae4e833ecb706b1ed8a5e600cbb4076b7165dc1e54bea",
     "tools/measure_goshawk_surface_fit.py": "5407ef1e5fad41810aa95444ca1338fe33a91e5c9857dcb752b4e4cf2fca6d0b",
     "tools/measure_lanner_geometry.py": "55d13a28602e6ed791adecd85ff43f3c8a7fbe118cf0977272e1747422c2408d",
-    "tools/measure_wolf_cutter.py": "96f4b49c3f3313ae5dc6ad9826e3dd7d61ea7180f52b9b9c3299cd61377d4c28",
+    "tools/measure_wolf_cutter.py": "e46eaa00147a6be49487ff403f39826c621d2549b55293c490546d8978685e7b",
     "tools/prepare_eagle_cruiser_geometry.py": "a1ea3b5d72f35e1f2932da71afa3ff8a276a504f7309a1086a2b3df35988addc",
     "tools/prepare_wolf_cutter.py": "5136c552799af3785c5314dd4d3e53bd44d5ceab35175ba7cca3b650c3be9908",
     "tools/verify_eagle_cruiser_geometry.py": "cb053ee5873fee62ee456bb3776e98d29b2cbb44c7344599bc617a8579164d43",
