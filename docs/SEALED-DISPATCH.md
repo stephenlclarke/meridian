@@ -1,6 +1,6 @@
 # G01 Sealed Dispatch
 
-At a main orbital, press **5** for Equipment. Use **]** to reach **G01 sealed dispatch board**. The three package rows show the sender, route and fee. Choose a row with **Up** or **Down**. Press **Enter** to review it. **B** goes back. Confirming with **Enter** puts one original sealed record aboard and saves the game. It uses one free hold tonne. The sender charges no deposit and sets no deadline.
+At a main orbital, press **5** for Equipment. Use **]** to reach **G01 sealed dispatch board**. The three package rows show the sender, route and fee. Choose a row with **Up** or **Down**. Press **Enter** to review it. **B** goes back. Confirming with **Enter** puts one original sealed record aboard and saves the game. It uses one free hold tonne. The sender charges no deposit and sets no deadline. Unlimited test fuel prevents collection. Test refills are unavailable while the record is aboard.
 
 Open the galaxy chart with **1** and select the next quoted stop. Review the direct route and confirm it before launching. Fly each leg, paying the ordinary fuel cost. At the final main orbital, enter through the doorway. Open the dispatch board and review **Receiving officer / hand over original**. **Enter** transfers that record, releases its tonne and credits the displayed fee. The first delivery adds the **Sealed Dispatch Family Trace** to the **Shift+J** journal. Each new job can pay its own fee.
 

@@ -187,7 +187,7 @@ impl Ledger {
 }
 
 impl State {
-    pub(super) fn dispatch_occupancy(&self) -> (usize, usize) {
+    pub(in crate::flight) fn dispatch_occupancy(&self) -> (usize, usize) {
         let mut total = 0;
         let mut active = 0;
         for event in &self.events {
@@ -375,6 +375,25 @@ mod tests {
                     world.snapshot().tick
                 )
                 .is_err()
+        );
+    }
+
+    #[test]
+    fn sealed_dispatch_refuses_test_refills_while_the_original_is_aboard() {
+        let mut world = World::new_commander(41004).unwrap_or_else(|error| panic!("{error:?}"));
+        confirm(&mut world, DispatchAction::Collect(1));
+        let before = world
+            .save_bytes()
+            .unwrap_or_else(|error| panic!("{error:?}"));
+        assert_eq!(
+            world.review_xyzzy(crate::XyzzyAction::Enter, world.snapshot().tick),
+            Err(crate::XyzzyError::ActiveFuelPractice)
+        );
+        assert_eq!(
+            world
+                .save_bytes()
+                .unwrap_or_else(|error| panic!("{error:?}")),
+            before
         );
     }
 

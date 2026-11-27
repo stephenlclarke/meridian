@@ -1290,6 +1290,13 @@ impl State {
             };
             transaction = validate_module_purchase(e, owner, transaction)?;
             if let ModuleAction::Dispatch(action) = e.action {
+                let start = ledger
+                    .dispatch
+                    .active()
+                    .map_or(e.revision, |record| record.issue_revision);
+                if !world.xyzzy.dispatch_fuel_is_ordinary(start, e.revision) {
+                    return Err(INVALID);
+                }
                 world
                     .jump_journal
                     .validate_passenger_berth(e.dock, e.tick)?;
@@ -1441,6 +1448,13 @@ impl State {
         ledger
             .validate_budgets(account, world.emp.utility_mounts(), allowance)
             .map_err(|_| INVALID)?;
+        if ledger.dispatch.active().is_some_and(|r| {
+            !world
+                .xyzzy
+                .dispatch_fuel_is_ordinary(r.issue_revision, account.revision())
+        }) {
+            return Err(INVALID);
+        }
         if ledger.revision != account.modular_revision() {
             return Err(INVALID);
         }
@@ -2099,7 +2113,15 @@ impl World {
             return Err(ModuleError::Capacity);
         }
         let item = match action {
-            ModuleAction::Dispatch(DispatchAction::Collect(_)) => u64::from(account.fuel_tenths()),
+            ModuleAction::Dispatch(DispatchAction::Collect(_)) => {
+                if !self
+                    .xyzzy
+                    .dispatch_fuel_is_ordinary(account.revision(), account.revision())
+                {
+                    return Err(ModuleError::DispatchUnavailable);
+                }
+                u64::from(account.fuel_tenths())
+            }
             ModuleAction::Dispatch(action) => {
                 let record = ledger
                     .dispatch

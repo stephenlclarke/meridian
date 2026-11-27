@@ -7,7 +7,7 @@
   "undoAfter": [],
   "kind": "inverse",
   "manifest": "integration/sealed-dispatch/PROTECTED-CORE-INVERSE.json",
-  "sha256": "9abe5c09e38689fafc6a98cc601a7d4f3fdf1c2bee0d8d37260a94136f18965f",
+  "sha256": "9869189b7e9b36e1bc30f1fc85aef134d655e8f5a9a6b7afec7ed51fa292406c",
   "base": "73e821e14a715a25b0fbf47bdff7f25e535088d5",
   "label": "G01 sealed dispatch custody and station delivery"
 }

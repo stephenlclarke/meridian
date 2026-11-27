@@ -145,6 +145,19 @@ impl State {
     fn unlimited_fuel(&self) -> bool {
         self.records.last().is_some_and(|r| r.unlimited_fuel)
     }
+    pub(super) fn dispatch_fuel_is_ordinary(&self, issue: u64, through: u64) -> bool {
+        !self
+            .records
+            .iter()
+            .take_while(|r| r.end_revision <= issue)
+            .last()
+            .is_some_and(|r| r.unlimited_fuel)
+            && !self.records.iter().any(|r| {
+                r.revision > issue
+                    && r.revision <= through
+                    && (r.unlimited_fuel || r.action.refills(r.unlimited_fuel))
+            })
+    }
     pub(super) fn automatic_ecm(&self) -> bool {
         self.active()
             && self
@@ -571,6 +584,11 @@ impl World {
             && !self.xyzzy.active()
         {
             return Err(XyzzyError::Inactive);
+        }
+        if self.modular.dispatch_occupancy().1 != 0
+            && (action == XyzzyAction::ToggleUnlimitedFuel || action.refills(false))
+        {
+            return Err(XyzzyError::ActiveFuelPractice);
         }
         if self
             .navigation_trade_snapshot()
