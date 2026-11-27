@@ -56,6 +56,9 @@ fn count_slots(
                     i.kind != ModuleKind::FuelStorage
                         || index >= crate::navigation::MAX_FUEL_STORAGE_UNITS
                 }
+                ModuleSlot::LeftLaser | ModuleSlot::RightLaser | ModuleSlot::RearLaser => {
+                    definition.hull != "SH171" || i.kind.laser_profile().is_none()
+                }
                 _ => slot != i.kind.slot(),
             })
         })

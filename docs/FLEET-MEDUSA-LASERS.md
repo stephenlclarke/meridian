@@ -1,21 +1,17 @@
-# Fleet Medusa laser controls
+# Fleet Medusa laser fitting and controls
 
-In the ordinary Fleet app, open the XYZZY menu with **Control+Shift+X** at the main orbital. Review and confirm the Medusa issue. Close the menu and launch. Select **0** for front, **1** for rear, **2** for port (left) or **3** for starboard (right). Hold **Z** to fire the laser on that view. The energy, heat and cooldown readouts apply to all four mounts. Switching view during cooldown does not ready another shot.
+The Fleet Medusa has four laser mounts. Its first XYZZY issue fits a Naval Laser to each one. The Peregrine has one front laser mount.
 
-The front mount fires the currently installed modular laser. Storing it leaves the front mount empty. The XYZZY hull issue supplies three integral Naval Lasers for the other facings. Each has a distinct item identity tied to the issuing commander and the first issue revision. Repeating the issue or continuing a save retains those identities. Front-mounted mining and salvage tools continue to operate through the front view. The standalone Medusa preview keeps its own flight fixture.
+## Fit a laser
 
-## Integration and verification
+At a station, open **5 Equipment** and choose **Front laser**, **Port laser**, **Starboard laser** or **Aft laser**. Each mount shows its installed class. Select a compatible class to buy at that station, or select an item in storage to fit. Review the mount, item and price, then confirm. The displaced gun goes into storage with its original identity and purchase record. Other mounts keep their fits.
 
-The release base is `a2959bd36951917066caec5279684de5f0fba659`. Apply G3's Fleet issue and save changes through `2e73396654a8e2ee80692fadd059dc6751936807` first. The laser changes use `World::xyzzy_medusa_issue()` for provenance and `World::xyzzy_medusa_active()` for flight input. The combined branch contains both layers. Inspect the laser delta with `git diff 2e733966..HEAD`. The laser inverse first restores the G3 source. The separate Fleet issue inverse then restores the release base.
+To move an installed gun to another mount, store it first, then fit it from the destination mount. An empty mount cannot fire. Ordinary purchases use the station’s technology level, the listed price, available credits and ownership limits. An issued Naval Laser can be stored and fitted again. [Laser classes, prices and firing intervals](FAST-LASERS.md#original-profiles-and-paid-custody)
 
-On the assigned compiler lane run:
+## Fire the selected mount
 
-```sh
-cargo test --locked -p meridian-core sh171_lasers
-cargo test --locked -p meridian-desktop sh171_lasers
-cargo clippy --locked --workspace --all-targets -- -D warnings
-```
+Select **0** for front, **1** for aft, **2** for port or **3** for starboard. Hold **Z** to fire along the selected view. The installed class determines damage and the interval between shots. All four mounts draw from the same energy supply and share heat and cooldown. Switching views during cooldown keeps the remaining delay.
 
-For the native gameplay check, use a disposable ordinary Fleet commander. Issue the Medusa, launch, select each view and fire. Check the shot direction, installed front item, three distinct side/rear items and shared cooldown. Save in a side view and Continue. Check that the view, fitted item, energy and cooldown return. Use a separate Peregrine commander to check its existing front fire.
+The Mining Laser can fire from a combat mount. Asteroid extraction uses the front tool. **Continue** restores the fitted and stored items. Reissuing the Medusa or selecting its maximum outfit refits its owned Naval Lasers and stores the guns they replace.
 
 The frozen hull design names the mounts, and the original maximum outfit grants a Naval Laser at each supported mount. The original mount enumeration supplies their names. [SH171 design](https://github.com/stephenlclarke/l337/blob/a11fe16924d87d06021816f9037952afcbac08db/docs/fleet-design-v2/ships/SH171.toml) · [Original outfit grant](https://github.com/stephenlclarke/l337/blob/a11fe16924d87d06021816f9037952afcbac08db/Sources/L337Core/EquipmentMutations.swift#L76) · [Original mounts](https://github.com/stephenlclarke/l337/blob/a11fe16924d87d06021816f9037952afcbac08db/Sources/L337Core/LaserSpecification.swift#L38)

@@ -15,7 +15,7 @@ enum Kind {
     EcmLocalFlight,
     Pulse,
     Laser(super::OrdinaryWeapon),
-    IntegralLaser(super::FlightView),
+    FacingLaser(super::FlightView, super::OrdinaryWeapon),
     Mining(u8),
 }
 impl Kind {
@@ -88,16 +88,15 @@ impl State {
         if facing == super::FlightView::Front {
             return self.laser(clock, weapon);
         }
-        if !self.enabled || weapon != super::OrdinaryWeapon::FrontNavalLaser {
+        if !self.enabled || !weapon.is_laser() {
             return Err(FireError::InvalidGeometry);
         }
-        self.append(clock, Kind::IntegralLaser(facing))
+        self.append(clock, Kind::FacingLaser(facing, weapon))
             .map_err(|()| FireError::SequenceExhausted)
     }
     pub(super) fn has_rapid_spend(&self) -> bool {
         self.events.iter().any(|event| {
-            matches!(event.kind, Kind::IntegralLaser(_))
-                || matches!(event.kind, Kind::Laser(weapon) if weapon.cooldown_ticks() == 6)
+            matches!(event.kind, Kind::Laser(weapon) | Kind::FacingLaser(_, weapon) if weapon.cooldown_ticks() == 6)
         })
     }
     pub(super) fn quiet_since(&self, tick: u64, anchor: u64, physical: u64) -> bool {
@@ -181,7 +180,11 @@ impl State {
                 Kind::EcmLocalFlight => 8,
                 Kind::Pulse => 1,
                 Kind::Laser(weapon) => weapon.tag() + 1,
-                Kind::IntegralLaser(view) => view.integral_tag(64),
+                // Keep the original three Naval tags for saves from the first hull issue.
+                Kind::FacingLaser(view, super::OrdinaryWeapon::FrontNavalLaser) => {
+                    view.integral_tag(64)
+                }
+                Kind::FacingLaser(view, weapon) => view.integral_tag(67 + 3 * weapon.tag()),
                 Kind::Mining(body) => 32 + body,
             });
         }
@@ -203,8 +206,16 @@ impl State {
                 tag @ 3..=6 if version >= 16 => {
                     Kind::Laser(super::OrdinaryWeapon::from_tag(tag - 1)?)
                 }
-                tag @ 64..=66 if version >= 17 => {
-                    Kind::IntegralLaser(super::medusa_lasers::INTEGRAL[usize::from(tag - 64)])
+                tag @ 64..=66 if version >= 17 => Kind::FacingLaser(
+                    super::medusa_lasers::INTEGRAL[usize::from(tag - 64)],
+                    super::OrdinaryWeapon::FrontNavalLaser,
+                ),
+                tag @ (67..=69 | 73..=81) if version >= 17 => {
+                    let offset = tag - 67;
+                    Kind::FacingLaser(
+                        super::medusa_lasers::INTEGRAL[usize::from(offset % 3)],
+                        super::OrdinaryWeapon::from_tag(offset / 3)?,
+                    )
                 }
                 tag @ 32..=43 if version >= 16 => Kind::Mining(tag - 32),
                 _ => return Err(INVALID),
@@ -266,30 +277,19 @@ impl State {
                     mining_count += 1;
                     Effect::Mining
                 }
-                Kind::IntegralLaser(facing) => {
-                    let (dock, _, _) = world.xyzzy_medusa_issue().ok_or(INVALID)?;
-                    if event.clock <= self.berth_clock(dock.sequence()).ok_or(INVALID)? {
-                        return Err(INVALID);
-                    }
-                    let item = world.integral_laser(facing).ok_or(INVALID)?;
-                    let weapon = super::OrdinaryWeapon::FrontNavalLaser;
-                    lasers.push(LaserSpend {
-                        emission: next_emission,
-                        clock: event.clock,
-                        weapon,
-                        item,
-                    });
-                    Effect::Laser(weapon)
-                }
                 kind => {
-                    let weapon = match kind {
-                        Kind::Pulse => super::OrdinaryWeapon::FrontPulseLaser,
-                        Kind::Laser(weapon) => weapon,
+                    let (facing, weapon) = match kind {
+                        Kind::Pulse => (
+                            super::FlightView::Front,
+                            super::OrdinaryWeapon::FrontPulseLaser,
+                        ),
+                        Kind::Laser(weapon) => (super::FlightView::Front, weapon),
+                        Kind::FacingLaser(facing, weapon) => (facing, weapon),
                         _ => return Err(INVALID),
                     };
                     let fitted = world
                         .modular
-                        .front_at_physical(world, event.clock, next_emission)
+                        .laser_at_physical(world, facing, event.clock, next_emission)
                         .ok_or(INVALID)?;
                     if super::OrdinaryWeapon::from_module(fitted.kind) != Some(weapon) {
                         return Err(INVALID);
@@ -544,7 +544,7 @@ fn validate_laser_receipts(
         .flat_map(|p| p.integral_hits())
     {
         let shot = spend(emission)?;
-        if world.integral_view_at(shot.item, tick) != Some(facing)
+        if world.laser_fit_at_tick(facing, tick, emission) != Some((shot.item, shot.weapon))
             || shot.clock > tick
             || end.checked_sub(shot.clock).ok_or(INVALID)?
                 > world.state.tick.checked_sub(tick).ok_or(INVALID)?

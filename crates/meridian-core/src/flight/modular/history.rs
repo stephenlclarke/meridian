@@ -1,7 +1,5 @@
 //! Independent accepted berth and combined accommodation/cargo history.
-use super::{
-    CommanderAccount, INVALID, Ledger, ModuleAction, ModuleError, ModuleKind, State, World,
-};
+use super::{CommanderAccount, INVALID, ModuleAction, ModuleError, ModuleKind, State, World};
 use crate::{
     flight::navigation_trade::{ReservationInterval, State as TradeState},
     navigation::DockContext,
@@ -455,7 +453,7 @@ impl State {
         if old_freight != 0 || !last_exact {
             return Err(INVALID);
         }
-        let mut ledger = Ledger::born(first.dock.owner().seed())?;
+        let mut ledger = self.born_ledger(first.dock.owner().seed())?;
         let mut counters = [0; 2];
         let mut fitted_units = 0;
         let mut cabin_mass = 0;

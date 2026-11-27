@@ -421,26 +421,17 @@ impl App {
         if self.game.world.snapshot().mode == FlightMode::Docked {
             crate::help::Panel::docked(review)
         } else {
-            let weapon = self
-                .game
-                .world
-                .modular_equipment_snapshot()
-                .and_then(|modules| {
-                    modules
-                        .items
-                        .into_iter()
-                        .find(|item| item.slot == Some(meridian_core::ModuleSlot::FrontLaser))
-                })
-                .map(|item| item.kind.name());
-            crate::help::Panel::flight_facing(
-                if self.game.world.selected_laser_view() == FlightView::Front {
-                    weapon
-                } else {
-                    Some("Naval Laser")
-                },
-                review,
-                self.game.world.selected_laser_view(),
-            )
+            let world = &self.game.world;
+            let facing = world.selected_laser_view();
+            let slot = meridian_core::ModuleSlot::laser(facing);
+            let weapon = world.modular_equipment_snapshot().and_then(|modules| {
+                modules
+                    .items
+                    .into_iter()
+                    .find(|item| item.slot == Some(slot))
+                    .map(|item| item.kind.name())
+            });
+            crate::help::Panel::flight_facing(weapon, review, facing)
         }
     }
 
