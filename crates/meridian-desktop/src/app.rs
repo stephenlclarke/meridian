@@ -1009,7 +1009,10 @@ impl App {
         let in_flight = self.game.world.snapshot().mode == FlightMode::Flight;
         if in_flight {
             match code {
-                KeyCode::Tab => return self.cycle_computer_target(),
+                KeyCode::Tab => return self.cycle_computer_target(false),
+                KeyCode::KeyM if self.modifiers == ModifiersState::SHIFT => {
+                    return self.cycle_computer_target(true);
+                }
                 KeyCode::KeyF => return self.toggle_computer_assistance(),
                 KeyCode::KeyT => return self.lock_computer_target(),
                 KeyCode::Backspace | KeyCode::Delete => return self.release_computer_target(),

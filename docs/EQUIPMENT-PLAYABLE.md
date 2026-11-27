@@ -35,13 +35,13 @@ Authored new tests: source offers, cash/technology refusal, earned Intermediate 
 | Energy: Basic, Intermediate (Extra), Advanced (Naval), Elite | Born; three ordered shop grades | Ready: recharge 1/2/3/4x, capacity 1x; higher-grade shop TLs constrain admission | Elite grant; more playable stations needed to reach paid Naval TL17 |
 | Navigation: Basic, Intermediate (Advanced saved key), Advanced (Military saved key) | Born / two paid grades | Ready: 7/14/21 LY module reach with hull floor, actual fit and route history | Advanced; full original world/station scope remains |
 | Targeting: Basic, Advanced, Docking, Identification, Pirate, Military | Six paid grades and stored identities | Identification or higher shows type and custody for current ordinary rocks and ore. Tab selects a contact and Shift+I expands its details. | Military; original automatic options remain open |
-| Mining and Salvage Targeting | Two independent paid modules require fitted core | Partial: rock hold, ore/wreck guidance; no positive complete salvage or ore intake | Both granted; custody and work closure open |
+| Mining and Salvage Targeting | Two independent paid modules require fitted core | Shift+M selects the next current rock or ore with the Mining Targeting Module fitted. Tab selects across all scanner contacts. See [automatic work](AUTOMATIC-WORK.md) for rock hold, ore intake and salvage. | Both available in the explicit maximum outfit |
 | Lasers: Pulse, Beam, Mining, Military, Naval | Pulse born; four repeatable ordinary shop/held definitions; Naval reward or paid PLUGH-only listing | Partial: real front paths; other facings and dedicated native Mining utility open | Naval front; not all supported native facings |
 | Ammunition: Standard Missile, Alien Seeker Missile | Standard paid and finite nine pylons on SH025; Alien Seeker requires recovered research then repeat procurement | Standard ready; alien round, salvage variants and compatible hull pylon count open | Finite standard refill only; no virtual infinite inventory |
 | Large Cargo Bay | Paid unique hull-bound expansion | Ready: actual SH025 92→127 t; full-hold removal refuses | Actual item granted; other hull expansion and unlimited cargo open |
 | Fuel Scoops | Paid unique fitted utility; source F-only test fit | Candidate: real solar fuel and cabin thermal effect; physical ore/cargo intake owner still open | Maximum and separate scoop-only action; [solar source and acceptance](SOLAR-FUEL-SCOOPS.md) |
 | ECM | Paid unique utility | Candidate: owned fit, exact manual field debit and actual local standard-projectile termination; cold retains time-only cooldown and outcomes | Guarded automatic setting only; incoming missile interaction remains open; shared mounts constrain maximum; EMP is distinct. [Source and preview limits](STOCK-ECM.md) |
-| Escape Pod | Paid unique utility | Open: eject, retained actual hull/body/crew and rescue/consumption | Maximum grant open |
+| Escape Pod | Original unique utility, 3,600 CR at TL6 | Open. Player ejection requires a retained abandoned hull, body, crew and rescue outcome. The frozen player action settles losses and docks immediately. | Maximum grant open |
 | Energy Bomb | Paid unique utility | Open: finite owned ordnance, in-game effects and retained source | Maximum grant open |
 | Galactic Hyperdrive | Paid unique utility (TL15) | Open: actual one-use inter-galaxy travel, destination and journal | Maximum grant open |
 | Salvage Cutter | Paid unique compatible work utility | Source candidate: independent SH025 fit; finite ordinary external terminal-material custody | Maximum grants one owned unit; stores it when all three shared mounts are full |
@@ -56,6 +56,16 @@ Authored new tests: source offers, cash/technology refusal, earned Intermediate 
 The ordinary Identification core costs 6,000 CR at TL9 and follows Docking in the paid equipment sequence. A stored core grants no readout. The source for the mining readout is `TargetingComputer.swift` (SHA-256 `096f8cee2331a03c60826d4f54c905c2967c9a31d55747cdfcda0815c623e7dd`) and `WorkTargetRuntime.swift` (`a4072efc794e3d0c0aec9eaa41d215a2ccb9a19b5634614e08a8f55aca4140e4`) at the immutable revision below. Ordinary belt rock is classed as `rock` and a released ore fragment as `cargo`. Both have `abandoned` custody while available. Selection is transient. After Continue, select the contact again to read it with the restored module.
 
 Basic fuel remains ordinary paid station service. Additional research recipes, physical salvage features, custom component tuning, passenger service, ordinary earned items and quest issue policies require their own source-to-runtime closure. The [existing XYZZY action inventory](XYZZY-ACTIONS.json) tracks non-equipment menu actions separately.
+
+## Escape Pod source gap
+
+At the frozen revision below, `Game.escapePod()` refuses occupied passenger berths. It stages consumption of the fitted pod, settles mission and cargo losses, records abandoned people, clears the electrical charge, resets legal status and fuel, and calls `dock()`. It commits the candidate only after docking and commander validation. `NativeEquipmentConsumption.swift` binds consumption to the fitted item. `ScriptFreight.swift` records the escape cause against held units. The original clue-journal test checks that earned clues survive escape.
+
+Meridian still needs an authoritative player rescue transition that identifies the abandoned hull, its people and cargo, the rescue actor and the arrival. The frozen player path clears the scene at docking. The SH040 Newt stock-inspection asset supplies its shape only. Neither supplies this transition or evidence of physical station entry. Ejection stays unavailable pending that source or an approved gameplay specification.
+
+## Mining contact selection
+
+Buy the Basic Targeting Module and the Mining Targeting Module (2,000 CR at TL6) and fit both. In flight, press **Shift+M** to cycle current belt rocks and released ore in scanner order. **Tab** cycles all scanner contacts. **F** changes manual or assisted control. Manual mining uses the existing tool and scoop controls. The frozen selection rules are in `WorkTargetSelection.swift` (SHA-256 `66a21e1837b13bd58b63cd46300b2b47fcf3b55f823a9363b03e224e4c361b70`) and `WorkTargetRuntime.swift` at the revision below. Shift+M is the Meridian shortcut.
 
 ## SH171 Medusa compatibility
 
