@@ -1014,13 +1014,25 @@ impl World {
                     pose = actor.pose;
                 }
                 let identified = tier >= TargetingTier::Identification;
+                // The selected work record can follow a released fragment away from its rock.
+                let kind = match work.id {
+                    WorkTargetId::Asteroid(_) => Some("rock"),
+                    WorkTargetId::Ore(_) => Some("cargo"),
+                    WorkTargetId::Wreck(_) => None,
+                };
+                let fields = match (identified, kind) {
+                    (true, Some(kind)) => {
+                        vec![("Type", kind.into()), ("Custody", "abandoned".into())]
+                    }
+                    _ => Vec::new(),
+                };
                 (
                     TargetMode::Work(work.role),
                     guidance,
                     pose,
                     identified.then_some(model),
                     None,
-                    Vec::new(),
+                    fields,
                 )
             }
         };
@@ -1338,6 +1350,67 @@ mod tests {
         assert!(world.auto_docking_active());
         world.cancel_targeting();
         assert!(!world.auto_docking_active());
+    }
+
+    #[test]
+    fn paid_identification_work_readout_follows_the_fitted_item_across_continue() {
+        fn rock_fields(world: &mut World) -> Vec<(&'static str, String)> {
+            let tick = world.snapshot().tick;
+            for _ in 0..world.scanner_targets().len() {
+                assert!(world.cycle_scanner_target(tick, [1280, 720]).unwrap());
+                let target = world.targeting_snapshot().unwrap();
+                if matches!(
+                    target.identity,
+                    TargetIdentity::Work(WorkTargetId::Asteroid(_))
+                ) {
+                    return target.fields;
+                }
+            }
+            panic!("expected a live scanner rock at Avenor");
+        }
+
+        let mut world = fitted(TargetingTier::Identification);
+        let item = world
+            .modular_equipment_snapshot()
+            .unwrap()
+            .items
+            .into_iter()
+            .find(|item| item.kind == ModuleKind::Targeting(TargetingTier::Identification))
+            .unwrap();
+        assert!(matches!(
+            item.provenance,
+            crate::ModuleProvenance::Paid {
+                paid_tenths: 60_000,
+                ..
+            }
+        ));
+        let balance = world.credits_tenths();
+        module(&mut world, ModuleAction::Store { item: item.id });
+        let mut stored = World::from_save_bytes(&world.save_bytes().unwrap()).unwrap();
+        launch(&mut stored);
+        assert!(rock_fields(&mut stored).is_empty());
+
+        module(
+            &mut world,
+            ModuleAction::Install {
+                item: item.id,
+                replacing: None,
+            },
+        );
+        let mut restored = World::from_save_bytes(&world.save_bytes().unwrap()).unwrap();
+        assert!(
+            restored
+                .modular_equipment_snapshot()
+                .unwrap()
+                .items
+                .contains(&item)
+        );
+        assert_eq!(restored.credits_tenths(), balance);
+        launch(&mut restored);
+        assert_eq!(
+            rock_fields(&mut restored),
+            vec![("Type", "rock".into()), ("Custody", "abandoned".into())]
+        );
     }
 
     #[test]
