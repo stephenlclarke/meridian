@@ -402,8 +402,8 @@ impl State {
             if matches!(r.action, XyzzyAction::FitFuelScoops | XyzzyAction::FitEcm) {
                 commerce.modular.validate_utility_test_record(
                     r.dock.owner().seed(),
-                    r.revision,
-                    r.end_revision,
+                    (r.revision, r.end_revision),
+                    self.medusa_at(r.revision),
                     account,
                     commerce.emp,
                     if r.action == XyzzyAction::FitEcm {
@@ -693,6 +693,26 @@ impl World {
             bytes,
         })
     }
+    fn fit_xyzzy_cargo_bay(&mut self, review: XyzzyReview) -> Result<(), SaveError> {
+        let prior = self.commander_account.as_ref().ok_or(INVALID)?;
+        let previous_cargo_revision = prior.equipment_state().revision();
+        let account = prior
+            .grant_xyzzy_cargo_bay(
+                super::services::service_site(review.dock.system()).ok_or(INVALID)?,
+            )
+            .map_err(|_| INVALID)?;
+        if self.modular.has_test_cargo_history()
+            && account.equipment_state().revision() != previous_cargo_revision
+        {
+            self.modular
+                .record_test_cargo_fit(&account, review.dock, review.tick)?;
+        }
+        if account.equipment_state().revision() != previous_cargo_revision {
+            self.modular.record_bay(&account, review.dock);
+        }
+        self.commander_account = Some(account);
+        Ok(())
+    }
     fn apply_xyzzy(&mut self, review: XyzzyReview) -> Result<(), SaveError> {
         let first = !self.xyzzy.active();
         let mode = if first {
@@ -734,6 +754,8 @@ impl World {
         self.xyzzy.records.push(record);
         self.commander_account = Some(account);
         if first_medusa {
+            // Exchange the bay with the hull before any module replays the retained cargo.
+            self.fit_xyzzy_cargo_bay(review)?;
             self.pulse.replay_berth(super::weapons::MEDUSA_ENERGY);
             let station = super::OriginalStationData::medusa_bundled()
                 .map_err(|_| SaveError::ContentMismatch)?;
@@ -789,24 +811,10 @@ impl World {
                 .equipment_state()
                 .units_used()
                 != 0;
-            if max_tanks || cargo_fitted || self.xyzzy_has_free_ordinary_utility_mount()? {
-                let prior = self.commander_account.as_ref().ok_or(INVALID)?;
-                let previous_cargo_revision = prior.equipment_state().revision();
-                let account = prior
-                    .grant_xyzzy_cargo_bay(
-                        super::services::service_site(review.dock.system()).ok_or(INVALID)?,
-                    )
-                    .map_err(|_| INVALID)?;
-                if self.modular.has_test_cargo_history()
-                    && account.equipment_state().revision() != previous_cargo_revision
-                {
-                    self.modular
-                        .record_test_cargo_fit(&account, review.dock, review.tick)?;
-                }
-                if account.equipment_state().revision() != previous_cargo_revision {
-                    self.modular.record_bay(&account, review.dock);
-                }
-                self.commander_account = Some(account);
+            if !first_medusa
+                && (max_tanks || cargo_fitted || self.xyzzy_has_free_ordinary_utility_mount()?)
+            {
+                self.fit_xyzzy_cargo_bay(review)?;
             }
             if review.action == XyzzyAction::ActivateMedusa
                 && self.damage.enabled()

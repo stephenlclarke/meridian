@@ -7,7 +7,7 @@
   "undoAfter": [],
   "kind": "inverse",
   "manifest": "integration/fleet-xyzzy-medusa/PROTECTED-CORE-INVERSE.json",
-  "sha256": "e1c86f9163ee42b0ca5aa2d7bbafa1d7c6ecd240ef451f342c452ae061a74ca6",
+  "sha256": "87cf2a286ce5b2e2c09f88620218a1ce79b9aed2603dc962f322760379b10573",
   "base": "a2959bd36951917066caec5279684de5f0fba659",
   "label": "Fleet XYZZY playable Medusa"
 }

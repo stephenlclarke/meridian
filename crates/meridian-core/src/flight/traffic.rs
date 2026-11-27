@@ -144,7 +144,7 @@ impl World {
                 identity.system,
                 before.position,
                 after.position,
-                data.player_clearance_radius(),
+                data.player_npc_clearance(),
             )
         })
     }

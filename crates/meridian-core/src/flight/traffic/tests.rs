@@ -128,6 +128,22 @@ fn actual_cargo_pilot_receives_native_npc_damage_without_player_incident_or_inve
     assert_eq!(w.combat_snapshot(), loaded.combat_snapshot());
 }
 #[test]
+fn pirate_hit_on_the_peregrine_survives_a_real_medusa_exchange_and_continue() {
+    let mut world = cargo_pilot();
+    let hit = first_player_contact(&mut world);
+    ok(world.request_jump(crate::navigation::SystemId::RENAS, world.snapshot().tick));
+    let remaining = some(some(world.snapshot().navigation).travel).remaining_ticks;
+    steps(&mut world, remaining as usize);
+    crate::flight::missiles::tests::dock(&mut world);
+    assert!(world.traffic.player_hits().contains(&hit));
+    let tick = world.snapshot().tick;
+    let review = ok(world.review_xyzzy(crate::XyzzyAction::ActivateMedusa, tick));
+    ok(world.prepare_xyzzy(review, tick)).commit();
+    let loaded = cold(&world);
+    assert_eq!(loaded.player_hull_kind(), crate::PlayerHullKind::Medusa);
+    assert!(loaded.traffic.player_hits().contains(&hit));
+}
+#[test]
 fn sustained_actual_npc_pulses_reach_real_hull_energy_and_exact_cold_replay_rejects_extra_damage() {
     let mut w = cargo_pilot();
     first_player_contact(&mut w);

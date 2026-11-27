@@ -94,18 +94,10 @@ impl World {
 
     /// Geometry for retained flight evidence predating a hull change at its recorded berth.
     pub(super) fn station_at_visit(&self, visit: u64) -> Option<&OriginalStationData> {
-        if self
-            .xyzzy_medusa_issue()
-            .is_some_and(|(dock, _, _)| visit <= dock.visit())
-        {
-            static PEREGRINE: std::sync::OnceLock<Result<OriginalStationData, StationError>> =
-                std::sync::OnceLock::new();
-            return PEREGRINE
-                .get_or_init(OriginalStationData::bundled)
-                .as_ref()
-                .ok();
-        }
-        self.station_data.as_ref()
+        Some(self.station_data.as_ref()?.player_geometry_at(
+            visit,
+            self.xyzzy_medusa_issue().map(|(dock, _, _)| dock.visit()),
+        ))
     }
 
     pub(super) fn hull_at_visit(&self, visit: u64) -> PlayerHullKind {

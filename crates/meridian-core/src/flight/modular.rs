@@ -1486,12 +1486,13 @@ impl State {
     pub(super) fn validate_utility_test_record(
         &self,
         owner: u64,
-        start: u64,
-        end: u64,
+        revisions: (u64, u64),
+        medusa: bool,
         account: &CommanderAccount,
         emp: &super::emp::State,
         kind: ModuleKind,
     ) -> Result<(), SaveError> {
+        let (start, end) = revisions;
         let fit_at = |revision| -> Result<Ledger, SaveError> {
             let mut ledger = Ledger::born(owner)?;
             let mut counters = [0; 2];
@@ -1523,7 +1524,9 @@ impl State {
             .iter()
             .find(|event| event.revision == end)
             .ok_or(INVALID)?;
-        let budget = crate::equipment::definition().map_err(|_| INVALID)?;
+        let budget = crate::equipment::definition()
+            .map_err(|_| INVALID)?
+            .for_player(medusa);
         let cargo = self.known_cargo_mounts_at(account, end);
         let mounts = u16::from(after_ledger.fuel_storage_count())
             + u16::from(after_ledger.fitted(ModuleSlot::UtilityFuelScoops).is_some())

@@ -275,7 +275,7 @@ pub(in crate::flight) fn replay_launch_step(
         } else if !traffic.player_motion_clear(
             before.position,
             after.position,
-            data.player_clearance_radius(),
+            data.player_npc_clearance(),
         ) {
             (
                 Motion::Stopped {
@@ -466,11 +466,7 @@ pub(super) fn replay_motion<'a>(
             world
                 .traffic
                 .validate_missile_scene(s, world.state.tick, data)?;
-            !s.player_motion_clear(
-                before.position,
-                after.position,
-                data.player_clearance_radius(),
-            )
+            !s.player_motion_clear(before.position, after.position, data.player_npc_clearance())
         }
         StopKind::Mule => mule_blocked()?,
         StopKind::Asteroid => !asteroid_clear(),

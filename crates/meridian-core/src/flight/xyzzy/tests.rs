@@ -987,3 +987,103 @@ fn medusa_refuses_an_oversize_manifest_before_mutating_the_commander() {
     );
     assert_eq!(cold(&world).equipment_snapshot().unwrap(), fit);
 }
+
+#[test]
+fn medusa_refits_stored_utilities_in_the_fourth_mount_on_continue() {
+    let mut world = World::new_commander(14403).unwrap();
+    apply(&mut world, XyzzyAction::ActivateMedusa);
+    for (kind, action) in [
+        (ModuleKind::Ecm, XyzzyAction::FitEcm),
+        (ModuleKind::FuelScoops, XyzzyAction::FitFuelScoops),
+    ] {
+        let original = world.modular_equipment_snapshot().unwrap();
+        assert_eq!(original.utility_mounts_used, 4);
+        let item = *original
+            .items
+            .iter()
+            .find(|item| item.kind == kind)
+            .unwrap();
+        module(&mut world, ModuleAction::Store { item: item.id });
+        world = cold(&world);
+        assert_eq!(
+            world
+                .modular_equipment_snapshot()
+                .unwrap()
+                .utility_mounts_used,
+            3
+        );
+        apply(&mut world, action);
+        world = cold(&world);
+        let fit = world.modular_equipment_snapshot().unwrap();
+        assert_eq!(fit.utility_mounts_used, 4);
+        assert!(fit.items.contains(&item));
+    }
+}
+
+#[test]
+fn medusa_installs_bay_with_stored_cabin_and_full_manifest_before_granting_modules() {
+    let funded = crate::flight::equipment::tests::earned_world(14404);
+    for paid_bay in [false, true] {
+        let mut world = cold(&funded);
+        let tick = world.snapshot().tick;
+        let expected_bay = if paid_bay {
+            world
+                .request_equipment(crate::equipment::Command::PurchaseCargoBay, tick)
+                .unwrap();
+            world.equipment_snapshot().unwrap().owned
+        } else {
+            None
+        };
+        world.request_refuel(tick).unwrap();
+        journey(&mut world, SystemId::AVENOR);
+        let cabin = module(
+            &mut world,
+            ModuleAction::Purchase {
+                kind: ModuleKind::Cabin(crate::CabinGrade::Economy),
+            },
+        );
+        module(&mut world, ModuleAction::Store { item: cabin });
+        let stored = *world
+            .modular_equipment_snapshot()
+            .unwrap()
+            .items
+            .iter()
+            .find(|item| item.id == cabin)
+            .unwrap();
+        assert!(stored.slot.is_none());
+        let tick = world.snapshot().tick;
+        if let Some(bay) = expected_bay {
+            world
+                .request_equipment(crate::equipment::Command::UnfitCargoBay(bay.id), tick)
+                .unwrap();
+        }
+        for _ in 0..32 {
+            world
+                .request_station_service(crate::station_services::Command::BuyFood, tick)
+                .unwrap();
+        }
+        world = cold(&world);
+        assert!(!world.xyzzy_medusa_active());
+        assert_eq!(world.service_snapshot().unwrap().used_tonnes, 32);
+        apply(&mut world, XyzzyAction::ActivateMedusa);
+        world = cold(&world);
+        let bay = world.equipment_snapshot().unwrap().owned.unwrap();
+        assert!(bay.fitted);
+        if let Some(prior) = expected_bay {
+            assert_eq!(bay.id, prior.id);
+            assert_eq!(bay.paid_tenths, prior.paid_tenths);
+        }
+        let manifest = world.service_snapshot().unwrap();
+        assert_eq!(
+            (manifest.used_tonnes, manifest.hold_capacity_tonnes),
+            (32, 32)
+        );
+        let items = world.modular_equipment_snapshot().unwrap().items;
+        assert!(items.contains(&stored));
+        assert!(
+            items
+                .iter()
+                .any(|item| item.kind == ModuleKind::NavalLaser && item.slot.is_some())
+        );
+    }
+}

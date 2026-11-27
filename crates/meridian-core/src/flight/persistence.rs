@@ -851,12 +851,13 @@ impl World {
                 "NPC player hit has no resource birth provenance",
             ));
         }
-        self.traffic.validate(
+        self.traffic.validate_with_hull_change(
             nav.owner,
             self.state.tick,
             self.combat.emissions,
             station,
             markets,
+            self.xyzzy_medusa_issue().map(|(dock, _, _)| dock.visit()),
         )?;
         self.validate_traffic_player_scenes()?;
         self.occupied_salvage.validate(self, commerce.modular)?;
