@@ -384,7 +384,13 @@ impl Docked {
                         self.route = Some(target);
                         self.feedback = "Destination selected; launch and press J to jump".into();
                     }
-                    Intent::Change(action) => self.feedback = profile.command(action)?,
+                    Intent::Change(action) => {
+                        self.feedback = profile.command(action)?;
+                        if matches!(action, Action::Module(ModuleAction::Dispatch(_))) {
+                            // Publishing a dispatch replaces the offers with contacts, or vice versa.
+                            self.screens.reset_equipment_selection();
+                        }
+                    }
                 }
             }
             ui::Request::SetNavigationRoute(plan) => {
@@ -1993,6 +1999,71 @@ mod tests {
                     .any(|row| row.node == node && row.fitted == 1)
             );
         }
+    }
+
+    #[test]
+    fn sealed_dispatch_third_offer_selects_the_receiving_officer_after_collection() {
+        let (_directory, mut profile, mut menu) = start();
+        ok(menu.open(&profile.world, ui::Screen::Equipment));
+        ok(menu.request(
+            &mut profile,
+            ui::Request::InspectEquipmentSlot(dispatch::BOARD.into()),
+        ));
+        for key in [ui::Key::Next, ui::Key::Next, ui::Key::Confirm] {
+            present(&mut menu, &profile);
+            ok(menu.input(&mut profile, ui::Input::Key(key)));
+        }
+        let pending = menu
+            .pending
+            .as_ref()
+            .unwrap_or_else(|| panic!("missing package review"));
+        assert!(
+            pending
+                .view
+                .details
+                .iter()
+                .any(|line| line == "Collect sealed package 3")
+        );
+        assert!(
+            pending
+                .view
+                .details
+                .iter()
+                .any(|line| line.contains("Renas > Lareria") && line.contains("500 CR"))
+        );
+        present(&mut menu, &profile);
+        ok(menu.input(&mut profile, ui::Input::Key(ui::Key::Confirm)));
+        present(&mut menu, &profile);
+        let labels = &menu
+            .painted
+            .as_ref()
+            .unwrap_or_else(|| panic!("missing contract board frame"))
+            .labels;
+        assert!(
+            labels
+                .iter()
+                .any(|l| l.text.starts_with("> Receiving officer"))
+        );
+        assert!(labels.iter().any(|l| l.text.contains("Original record")));
+        assert!(
+            !labels
+                .iter()
+                .any(|l| l.text.contains("No equipment offered"))
+        );
+        assert_eq!(profile.world.dispatch_records().len(), 1);
+        present(&mut menu, &profile);
+        ok(menu.input(&mut profile, ui::Input::Key(ui::Key::Next)));
+        present(&mut menu, &profile);
+        ok(menu.input(&mut profile, ui::Input::Key(ui::Key::Confirm)));
+        assert!(menu.pending.as_ref().is_some_and(|p| {
+            p.view
+                .details
+                .iter()
+                .any(|s| s.contains("abandon for zero fee"))
+        }));
+        present(&mut menu, &profile);
+        ok(menu.input(&mut profile, ui::Input::Key(ui::Key::Back)));
+        assert!(profile.world.dispatch_records()[0].terminal.is_none());
     }
 
     #[test]
