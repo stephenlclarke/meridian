@@ -64,11 +64,11 @@ In the ordinary Fleet game, open **Ctrl+Shift+X** at a berth. Review and confirm
 | Hull and cargo | 22 t stock hold and 10 t expansion. The issue checks actual cargo and outstanding reservations against the 32 t hold. |
 | Reactor and shields | 410 energy, Elite Energy Unit, Elite shields. The 4.7 energy/s base becomes 18.8/s with Elite fitted. The 300-unit base banks use the existing Elite shield multiplier. |
 | Flight computers | Advanced navigation and hyperspace drive, Military targeting, Mining and Salvage Targeting Modules. |
-| Tools and utilities | Naval front laser, interchangeable Mining Laser, Fuel Scoops, maximum-grade EMP and stock E.C.M. The Salvage Cutter uses the existing tool exchange when the mounts are occupied. |
+| Tools and utilities | Naval Lasers on all four facings, an interchangeable front Mining Laser, Fuel Scoops, maximum-grade EMP and stock E.C.M. The Salvage Cutter uses the existing tool exchange when the mounts are occupied. |
 | Ammunition and fuel | Five loaded standard missiles. A former nine-pylon commander retains surplus rounds in storage under their original identities. The test command fills the fitted fuel capacity. |
 | Ownership | Paid items keep their receipts. New items and the hull use XYZZY provenance. The quest and PLUGH purchase have separate acquisition paths. |
 
-The frozen [SH171 flagship contract](../integration/sh171-medusa/MEDUSA-FLAGSHIP.json) records four laser facings, four utility mounts and 13 stock equipment units. The three additional laser facings are being qualified separately. Survey gear, rescue and salvage beams, Alien Seeker ammunition and the source-specific alien attachment do not have ordinary Fleet equipment implementations here. The proposed 32 equipment units and candidate performance figures have no adopted fitting contract.
+The frozen [SH171 flagship contract](../integration/sh171-medusa/MEDUSA-FLAGSHIP.json) records four laser facings, four utility mounts and 13 stock equipment units. Select front, rear, port or starboard with 0–3. All four draw from the same energy pool and share heat and cooldown. Survey gear, rescue and salvage beams, Alien Seeker ammunition and the source-specific alien attachment do not have ordinary Fleet equipment implementations here. The proposed 32 equipment units and candidate performance figures have no adopted fitting contract.
 
 ## SH171 Medusa compatibility
 

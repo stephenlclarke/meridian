@@ -1834,7 +1834,7 @@ fn medusa_exchange_preserves_real_emp_target_and_peregrine_self_splash() {
         .owned_emp()
         .unwrap()
         .grades
-        .profile(State::energy_stage(&world).unwrap())
+        .profile(super::State::energy_stage(&world).unwrap())
         .unwrap();
     let pulse = world.emp.pulses[0].clone();
     assert!(

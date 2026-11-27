@@ -34,12 +34,12 @@
     },
     "flight/emp/tests.rs": {
       "beforeSHA256": "80a082a07f56c228f2cc28c585e271fb007be6ace1fb304a0092711db737f05d",
-      "afterSHA256": "8d0412fbd4271dcf14c205456d480f1d429de4d34dde9ad5595baf08a196fe80",
+      "afterSHA256": "1045120f9f79b24df392c6de2671ec9177363f4b63504fc6238dfaf3382395cd",
       "hunks": [
         {
           "offset": 70473,
           "before": "",
-          "after": "\n#[test]\nfn medusa_exchange_preserves_real_emp_target_and_peregrine_self_splash() {\n    let mut world = World::new_commander(12001).unwrap();\n    secret(&mut world);\n    let (mut world, target) = defender(world);\n    start_charge(&mut world, target);\n    hold(&mut world, target, 600);\n    let profile = world\n        .owned_emp()\n        .unwrap()\n        .grades\n        .profile(State::energy_stage(&world).unwrap())\n        .unwrap();\n    let pulse = world.emp.pulses[0].clone();\n    assert!(\n        pulse\n            .contacts\n            .iter()\n            .any(|contact| contact.victim == scene::Victim::Player)\n    );\n    world\n        .request_emp_trigger(false, world.snapshot().tick)\n        .unwrap();\n    crate::flight::missiles::tests::issue_medusa_at_renas(&mut world);\n    let loaded = cold(&world);\n    assert_eq!(loaded.emp.pulses[0], pulse);\n    let contacts = pulse.release.contacts(&loaded, profile, target).unwrap();\n    assert_eq!(contacts, pulse.contacts);\n}\n"
+          "after": "\n#[test]\nfn medusa_exchange_preserves_real_emp_target_and_peregrine_self_splash() {\n    let mut world = World::new_commander(12001).unwrap();\n    secret(&mut world);\n    let (mut world, target) = defender(world);\n    start_charge(&mut world, target);\n    hold(&mut world, target, 600);\n    let profile = world\n        .owned_emp()\n        .unwrap()\n        .grades\n        .profile(super::State::energy_stage(&world).unwrap())\n        .unwrap();\n    let pulse = world.emp.pulses[0].clone();\n    assert!(\n        pulse\n            .contacts\n            .iter()\n            .any(|contact| contact.victim == scene::Victim::Player)\n    );\n    world\n        .request_emp_trigger(false, world.snapshot().tick)\n        .unwrap();\n    crate::flight::missiles::tests::issue_medusa_at_renas(&mut world);\n    let loaded = cold(&world);\n    assert_eq!(loaded.emp.pulses[0], pulse);\n    let contacts = pulse.release.contacts(&loaded, profile, target).unwrap();\n    assert_eq!(contacts, pulse.contacts);\n}\n"
         }
       ]
     },
