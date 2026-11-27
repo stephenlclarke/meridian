@@ -99,6 +99,46 @@ impl Sight {
 #[cfg(test)]
 mod tests {
     use super::*;
+    fn ok<T, E: std::fmt::Debug>(value: Result<T, E>) -> T {
+        value.unwrap_or_else(|error| panic!("{error:?}"))
+    }
+
+    #[test]
+    fn front_sight_follows_the_fitted_mining_laser_and_selected_salvage_cutter() {
+        use meridian_core::{ModuleAction, XyzzyAction};
+        let mut miner = ok(World::new_commander(7412));
+        let grant = ok(miner.review_xyzzy(XyzzyAction::Enter, 0));
+        ok(miner.prepare_xyzzy(grant, 0)).commit();
+        let purchase = ok(miner.review_module(ModuleAction::PurchaseMiningLaser, 0));
+        ok(miner.prepare_module(purchase, 0)).commit();
+        ok(miner.request_launch(0));
+        ok(miner.step(Default::default()));
+        assert_eq!(
+            Sight::capture(&miner, miner.snapshot()),
+            Some(Sight::Mining)
+        );
+
+        let mut salvage = ok(World::from_save_bytes(include_bytes!(
+            "../../../../meridian-core/tests/fixtures/occupied-cut-held-v17.bin"
+        )));
+        let count = salvage.scanner_targets().len();
+        for _ in 0..count {
+            ok(salvage.cycle_scanner_target(salvage.snapshot().tick, [640, 240]));
+            if salvage.selected_disabled_salvage_target().is_some() {
+                assert_eq!(
+                    Sight::capture(&salvage, salvage.snapshot()),
+                    Some(Sight::Cutter)
+                );
+                salvage.cancel_targeting();
+                assert_ne!(
+                    Sight::capture(&salvage, salvage.snapshot()),
+                    Some(Sight::Cutter)
+                );
+                return;
+            }
+        }
+        panic!("disabled contact missing from the retained scanner fixture");
+    }
     #[test]
     fn ordinary_mounts_project_the_committed_ray_to_the_sight_centre() {
         use crate::mesh::{apply_flight_view, player_pose};
