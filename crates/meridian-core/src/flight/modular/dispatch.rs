@@ -243,16 +243,25 @@ mod tests {
         let tick = world.snapshot().tick;
         let review = world
             .review_module(ModuleAction::Dispatch(action), tick)
-            .unwrap();
-        world.prepare_module(review, tick).unwrap().commit();
+            .unwrap_or_else(|error| panic!("unexpected refusal: {error:?}"));
+        world
+            .prepare_module(review, tick)
+            .unwrap_or_else(|error| panic!("unexpected refusal: {error:?}"))
+            .commit();
     }
     fn cold(world: &World) -> World {
-        World::from_save_bytes(&world.save_bytes().unwrap()).unwrap()
+        World::from_save_bytes(
+            &world
+                .save_bytes()
+                .unwrap_or_else(|error| panic!("unexpected refusal: {error:?}")),
+        )
+        .unwrap_or_else(|error| panic!("unexpected refusal: {error:?}"))
     }
 
     #[test]
     fn sealed_dispatch_two_leg_original_survives_cold_and_pays_only_at_lareria() {
-        let mut world = World::new_commander(41001).unwrap();
+        let mut world = World::new_commander(41001)
+            .unwrap_or_else(|error| panic!("unexpected refusal: {error:?}"));
         let offers = world.dispatch_offers();
         assert_eq!(
             offers.iter().map(|o| o.row).collect::<Vec<_>>(),
@@ -263,16 +272,26 @@ mod tests {
             vec![SystemId::AVENOR, SystemId::RENAS, SystemId::LARERIA]
         );
         assert_eq!(offers[2].fee_tenths, 5000);
-        let cash = world.credits_tenths().unwrap();
+        let cash = world
+            .credits_tenths()
+            .unwrap_or_else(|| panic!("missing credits_tenths"));
         confirm(&mut world, DispatchAction::Collect(5));
         let held = world.dispatch_records();
         assert_eq!(world.credits_tenths(), Some(cash));
-        assert_eq!(world.service_snapshot().unwrap().used_tonnes, 1);
+        assert_eq!(
+            world
+                .service_snapshot()
+                .unwrap_or_else(|| panic!("missing service_snapshot"))
+                .used_tonnes,
+            1
+        );
         let mut world = cold(&world);
         assert_eq!(world.dispatch_records(), held);
         assert!(world.dispatch_offers().is_empty());
         journey(&mut world, SystemId::RENAS);
-        let before = world.save_bytes().unwrap();
+        let before = world
+            .save_bytes()
+            .unwrap_or_else(|error| panic!("unexpected refusal: {error:?}"));
         for action in [
             DispatchAction::Collect(1),
             DispatchAction::Receive,
@@ -284,27 +303,48 @@ mod tests {
                     .is_err()
             );
         }
-        assert_eq!(world.save_bytes().unwrap(), before);
+        assert_eq!(
+            world
+                .save_bytes()
+                .unwrap_or_else(|error| panic!("unexpected refusal: {error:?}")),
+            before
+        );
         journey(&mut world, SystemId::LARERIA);
         let mut world = cold(&world);
         let tick = world.snapshot().tick;
         let review = world
             .review_module(ModuleAction::Dispatch(DispatchAction::Receive), tick)
-            .unwrap();
-        let before = world.save_bytes().unwrap();
+            .unwrap_or_else(|error| panic!("unexpected refusal: {error:?}"));
+        let before = world
+            .save_bytes()
+            .unwrap_or_else(|error| panic!("unexpected refusal: {error:?}"));
         assert!(
             world
                 .prepare_module(review, tick)
-                .unwrap()
+                .unwrap_or_else(|error| panic!("unexpected refusal: {error:?}"))
                 .publish_with(|_| Err(()))
                 .is_err()
         );
-        assert_eq!(world.save_bytes().unwrap(), before);
+        assert_eq!(
+            world
+                .save_bytes()
+                .unwrap_or_else(|error| panic!("unexpected refusal: {error:?}")),
+            before
+        );
         confirm(&mut world, DispatchAction::Receive);
         let world = cold(&world);
         assert_eq!(world.credits_tenths(), Some(cash + 5000));
-        assert_eq!(world.service_snapshot().unwrap().used_tonnes, 0);
-        let record = world.dispatch_records().pop().unwrap();
+        assert_eq!(
+            world
+                .service_snapshot()
+                .unwrap_or_else(|| panic!("missing service_snapshot"))
+                .used_tonnes,
+            0
+        );
+        let record = world
+            .dispatch_records()
+            .pop()
+            .unwrap_or_else(|| panic!("missing pop"));
         assert_eq!(
             (record.issue_revision, record.issuer, record.offer),
             (held[0].issue_revision, held[0].issuer, offers[2].clone())
@@ -313,13 +353,15 @@ mod tests {
             record.terminal,
             Some((
                 DispatchAction::Receive,
-                world.current_dock_context().unwrap()
+                world
+                    .current_dock_context()
+                    .unwrap_or_else(|| panic!("missing current_dock_context"))
             ))
         );
         assert_eq!(
             world
                 .unwritten_route_clue_progress()
-                .unwrap()
+                .unwrap_or_else(|| panic!("missing unwritten_route_clue_progress"))
                 .earned
                 .iter()
                 .filter(|c| c.clue_id == "sealed-dispatch-family-trace")
@@ -338,10 +380,13 @@ mod tests {
 
     #[test]
     fn sealed_dispatch_second_delivery_pays_its_own_fee_and_keeps_one_clue() {
-        let mut world = World::new_commander(41003).unwrap();
+        let mut world = World::new_commander(41003)
+            .unwrap_or_else(|error| panic!("unexpected refusal: {error:?}"));
         for _ in 0..2 {
             let offer = world.dispatch_offers().remove(0);
-            let before = world.credits_tenths().unwrap();
+            let before = world
+                .credits_tenths()
+                .unwrap_or_else(|| panic!("missing credits_tenths"));
             confirm(&mut world, DispatchAction::Collect(offer.row));
             for &stop in &offer.path[1..] {
                 journey(&mut world, stop);
@@ -350,7 +395,11 @@ mod tests {
             assert_eq!(world.credits_tenths(), Some(before + offer.fee_tenths));
             world = cold(&world);
             assert_eq!(
-                world.unwritten_route_clue_progress().unwrap().earned.len(),
+                world
+                    .unwritten_route_clue_progress()
+                    .unwrap_or_else(|| panic!("missing unwritten_route_clue_progress"))
+                    .earned
+                    .len(),
                 1
             );
         }
@@ -359,18 +408,25 @@ mod tests {
 
     #[test]
     fn sealed_dispatch_sender_abandonment_releases_only_the_original_tonne() {
-        let mut world = World::new_commander(41002).unwrap();
+        let mut world = World::new_commander(41002)
+            .unwrap_or_else(|error| panic!("unexpected refusal: {error:?}"));
         let cash = world.credits_tenths();
         confirm(&mut world, DispatchAction::Collect(1));
         let first = world.dispatch_records()[0].issue_revision;
         confirm(&mut world, DispatchAction::Abandon);
         let mut world = cold(&world);
         assert_eq!(world.credits_tenths(), cash);
-        assert_eq!(world.service_snapshot().unwrap().used_tonnes, 0);
+        assert_eq!(
+            world
+                .service_snapshot()
+                .unwrap_or_else(|| panic!("missing service_snapshot"))
+                .used_tonnes,
+            0
+        );
         assert!(
             world
                 .unwritten_route_clue_progress()
-                .unwrap()
+                .unwrap_or_else(|| panic!("missing unwritten_route_clue_progress"))
                 .earned
                 .is_empty()
         );

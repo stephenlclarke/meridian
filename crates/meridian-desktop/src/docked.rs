@@ -2011,14 +2011,18 @@ mod tests {
             Some(if received { 11300 } else { 7200 })
         );
         assert_eq!(
-            profile.world.service_snapshot().unwrap().used_tonnes,
+            profile
+                .world
+                .service_snapshot()
+                .unwrap_or_else(|| panic!("missing dispatch state"))
+                .used_tonnes,
             u16::from(!received)
         );
         assert_eq!(
             profile
                 .world
                 .unwritten_route_clue_progress()
-                .unwrap()
+                .unwrap_or_else(|| panic!("missing dispatch state"))
                 .earned
                 .len(),
             usize::from(received)
@@ -2029,7 +2033,9 @@ mod tests {
     fn sealed_dispatch_board_flies_ordinary_route_and_cold_continues_original_record() {
         fn board(menu: &mut Docked, profile: &mut Profile) {
             ok(menu.open(&profile.world, ui::Screen::Equipment));
-            let count = ok(equipment_panel(&profile.world, "cargo", "")).slots.len();
+            let count = ok(equipment_panel(&profile.world, &menu.slot, ""))
+                .slots
+                .len();
             for _ in 0..count {
                 if menu.slot == dispatch::BOARD {
                     return;
@@ -2063,7 +2069,7 @@ mod tests {
         assert!(
             menu.pending
                 .as_ref()
-                .unwrap()
+                .unwrap_or_else(|| panic!("missing dispatch state"))
                 .view
                 .details
                 .iter()
@@ -2082,7 +2088,7 @@ mod tests {
         assert!(
             menu.pending
                 .as_ref()
-                .unwrap()
+                .unwrap_or_else(|| panic!("missing dispatch state"))
                 .view
                 .details
                 .iter()
