@@ -778,6 +778,7 @@ fn sh171_lasers_held_fire_uses_the_ordinary_fleet_view_and_restores_the_mount() 
         assert_eq!(shot.map(|s| s.fitted_item_id), Some(fit.fitted_item_id));
         assert!(ids.insert(fit.fitted_item_id));
         ok(app.game.save());
+        drop(app);
         let mut reopened = open(&directory.0);
         ok(reopened.continue_saved());
         assert_eq!(reopened.world.flight_view(), view);

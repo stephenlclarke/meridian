@@ -92,7 +92,14 @@ fn actual_world_poses_render_every_source_triangle_and_color_without_mutating_pr
     let mut scene = scene.clone();
     scene.last_beam = None;
     let mut output = Vec::new();
-    ok(append(snapshot, station, &ship, &scene, &mut output));
+    ok(append(
+        snapshot,
+        station,
+        &ship,
+        &scene,
+        meridian_core::FlightView::Front,
+        &mut output,
+    ));
     assert_eq!(output.len(), ship.len() * 2);
     for (actor, body) in scene.actors.iter().zip(output.chunks_exact(ship.len())) {
         assert_eq!(actor.hull_id, "SH025");
@@ -145,7 +152,14 @@ fn rotated_translated_pose_uses_full_native_basis_not_only_yaw_or_origin() {
     );
     let camera = ok(camera_for(snapshot, station));
     let mut output = Vec::new();
-    ok(append(snapshot, station, &ship, &scene, &mut output));
+    ok(append(
+        snapshot,
+        station,
+        &ship,
+        &scene,
+        meridian_core::FlightView::Front,
+        &mut output,
+    ));
     for (v, actual) in ship.iter().zip(output) {
         let expected = camera.pose.orientation.inverse_coordinates(Vec3::new(
             123.0 + f64::from(v.position[2]) - camera.pose.position.x,
@@ -172,7 +186,14 @@ fn all_airborne_phases_and_destroyed_solids_remain_complete_only_is_hidden() {
     );
     let mut retained = Vec::new();
     scene.actors[0].phase = NpcPhase::Destroyed;
-    ok(append(snapshot, station, &ship, &scene, &mut retained));
+    ok(append(
+        snapshot,
+        station,
+        &ship,
+        &scene,
+        meridian_core::FlightView::Front,
+        &mut retained,
+    ));
     for phase in [
         NpcPhase::Departing,
         NpcPhase::Outbound,
@@ -187,7 +208,14 @@ fn all_airborne_phases_and_destroyed_solids_remain_complete_only_is_hidden() {
     ] {
         scene.actors[0].phase = phase;
         let mut output = Vec::new();
-        ok(append(snapshot, station, &ship, &scene, &mut output));
+        ok(append(
+            snapshot,
+            station,
+            &ship,
+            &scene,
+            meridian_core::FlightView::Front,
+            &mut output,
+        ));
         if phase == NpcPhase::Complete {
             assert!(output.is_empty());
         } else {
@@ -225,7 +253,14 @@ fn each_flight_view_rotates_full_hull_and_preserves_forward_depth_for_its_cardin
             camera.pose.position.z + offset[2],
         );
         let mut output = Vec::new();
-        ok(append(&snapshot, station, &ship, &scene, &mut output));
+        ok(append(
+            &snapshot,
+            station,
+            &ship,
+            &scene,
+            meridian_core::FlightView::Front,
+            &mut output,
+        ));
         apply_flight_view(view, &mut output);
         assert_eq!(output.len(), ship.len());
         for v in output {
@@ -271,7 +306,14 @@ fn retained_beam_ends_at_recorded_point_even_after_victim_pose_moves() {
     let camera = ok(camera_for(&snapshot, station));
     let beam = scene.last_beam.unwrap_or_else(|| panic!("beam"));
     let mut output = Vec::new();
-    ok(append(&snapshot, station, &ship, &scene, &mut output));
+    ok(append(
+        &snapshot,
+        station,
+        &ship,
+        &scene,
+        meridian_core::FlightView::Front,
+        &mut output,
+    ));
     assert_eq!(output.len(), crate::mesh::PULSE_VERTEX_COUNT);
     for (indices, endpoint) in [([0, 1], beam.origin), ([2, 5], beam.point)] {
         let v = camera.pose.orientation.inverse_coordinates(Vec3::new(
@@ -288,7 +330,14 @@ fn retained_beam_ends_at_recorded_point_even_after_victim_pose_moves() {
     }
     scene.actors[0].pose.position = Vec3::new(9000.0, -8000.0, 7000.0);
     let mut moved = Vec::new();
-    ok(append(&snapshot, station, &ship, &scene, &mut moved));
+    ok(append(
+        &snapshot,
+        station,
+        &ship,
+        &scene,
+        meridian_core::FlightView::Front,
+        &mut moved,
+    ));
     same(&output, &moved);
     for view in [
         FlightView::Front,
@@ -368,7 +417,14 @@ fn beam_tick_lifetime_and_player_pulse_identity_never_replay_future_or_old_recei
             world.station_port().unwrap_or_else(|| panic!("port")),
         );
         let mut output = Vec::new();
-        ok(append(&snapshot, station, &ship, &scene, &mut output));
+        ok(append(
+            &snapshot,
+            station,
+            &ship,
+            &scene,
+            meridian_core::FlightView::Front,
+            &mut output,
+        ));
         assert_eq!(output.len(), count);
         assert_eq!(contains_pulse(&scene, snapshot.tick, &pulse), count != 0);
     }
@@ -397,13 +453,33 @@ fn unsupported_populations_and_hulls_refuse_without_a_proxy_or_partial_append() 
         let mut scene = scene.clone();
         scene.actors[0].population = population;
         let mut output = vec![sentinel];
-        assert!(append(snapshot, station, &ship, &scene, &mut output).is_err());
+        assert!(
+            append(
+                snapshot,
+                station,
+                &ship,
+                &scene,
+                meridian_core::FlightView::Front,
+                &mut output
+            )
+            .is_err()
+        );
         same(&output, &[sentinel]);
     }
     let mut scene = scene.clone();
     scene.actors[0].hull_id = "SH031";
     let mut output = vec![sentinel];
-    assert!(append(snapshot, station, &ship, &scene, &mut output).is_err());
+    assert!(
+        append(
+            snapshot,
+            station,
+            &ship,
+            &scene,
+            meridian_core::FlightView::Front,
+            &mut output
+        )
+        .is_err()
+    );
     same(&output, &[sentinel]);
 }
 
@@ -547,7 +623,14 @@ fn actual_incoming_player_hit_uses_retained_segment_and_expires_without_inventin
     let camera = ok(camera_for(snapshot, station));
     let ship = ok(load_ship());
     let mut output = Vec::new();
-    ok(append(snapshot, station, &ship, &scene, &mut output));
+    ok(append(
+        snapshot,
+        station,
+        &ship,
+        &scene,
+        meridian_core::FlightView::Front,
+        &mut output,
+    ));
     assert_eq!(output.len(), crate::mesh::PULSE_VERTEX_COUNT);
     for (indices, endpoint) in [([0, 1], hit.source_pose.position), ([2, 5], hit.point)] {
         let expected = camera.pose.orientation.inverse_coordinates(Vec3::new(
@@ -567,12 +650,26 @@ fn actual_incoming_player_hit_uses_retained_segment_and_expires_without_inventin
         actor.pose.position.x += 4000.0;
     }
     let mut moved = Vec::new();
-    ok(append(snapshot, station, &ship, &scene, &mut moved));
+    ok(append(
+        snapshot,
+        station,
+        &ship,
+        &scene,
+        meridian_core::FlightView::Front,
+        &mut moved,
+    ));
     same(&output, &moved);
     let mut later = *snapshot;
     later.tick = hit.world_tick + 5;
     let mut expired = Vec::new();
-    ok(append(&later, station, &ship, &scene, &mut expired));
+    ok(append(
+        &later,
+        station,
+        &ship,
+        &scene,
+        meridian_core::FlightView::Front,
+        &mut expired,
+    ));
     assert!(expired.is_empty());
     assert_eq!(original, &actual_incoming().1);
 }
@@ -651,7 +748,17 @@ fn malformed_incoming_player_segment_refuses_without_partial_traffic_vertices() 
             color: [0.2, 0.3, 0.4],
         };
         let mut output = vec![sentinel];
-        assert!(append(snapshot, station, &ship, &scene, &mut output).is_err());
+        assert!(
+            append(
+                snapshot,
+                station,
+                &ship,
+                &scene,
+                meridian_core::FlightView::Front,
+                &mut output
+            )
+            .is_err()
+        );
         assert_eq!(output.len(), 1);
         same(&output, &[sentinel]);
     }
