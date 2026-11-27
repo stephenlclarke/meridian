@@ -767,7 +767,9 @@ impl App {
                 if let Some(menu) = &mut self.docked {
                     menu.close();
                 }
-                self.leave_commander();
+                // Viewing mission details does not issue a World pause/resume command.
+                self.commander_open = false;
+                self.clear_held_input();
                 self.game_key(code);
             }
             KeyCode::KeyL if self.has_berth() => self.launch_from_commander(),
