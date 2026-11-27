@@ -123,6 +123,92 @@ fn measured_return(p: &mut Profile) {
     assert_eq!(p.world.snapshot().mode, FlightMode::Docked);
     assert!(some(p.world.flight_reception_snapshot()).ready);
 }
+
+fn renas_training_offer(p: &mut Profile) -> bool {
+    action(p, Action::MissionDetails);
+    p.lines(true, None)
+        .iter()
+        .any(|line| line.contains("R REVIEWS OPTIONAL FLIGHT PRACTICE"))
+}
+
+#[test]
+fn completed_freight_opens_optional_renas_lesson_and_cold_debrief_keeps_both_clues() {
+    let directory = Directory::new();
+    let mut p = directory.profile();
+    assert!(!renas_training_offer(&mut p));
+    for command in [Action::Contact, Action::Review, Action::Confirm] {
+        action(&mut p, command);
+    }
+    super::tests::travel(&mut p);
+    action(&mut p, Action::Contact);
+    for _ in 0..7 {
+        action(&mut p, Action::Review);
+        action(&mut p, Action::Confirm);
+    }
+    assert!(!renas_training_offer(&mut p));
+    action(&mut p, Action::ReviewAll);
+    action(&mut p, Action::Confirm);
+    let freight = some(p.world.mission_snapshot()).freight;
+    assert_eq!(freight.completed_jobs, 1);
+    assert_eq!(p.world.credits_tenths(), Some(14500));
+    ok(p.prepare_quit());
+    drop(p);
+
+    let mut p = ok(Profile::open(directory.0.clone()));
+    ok(p.continue_saved());
+    assert!(renas_training_offer(&mut p));
+    assert!(p.command(Action::Confirm).is_err());
+    action(&mut p, Action::Review);
+    action(&mut p, Action::Back);
+    assert!(
+        some(p.world.flight_reception_snapshot())
+            .attempts
+            .is_empty()
+    );
+    assert!(renas_training_offer(&mut p));
+    action(&mut p, Action::Review);
+    action(&mut p, Action::Confirm);
+    assert!(!renas_training_offer(&mut p));
+    assert!(p.command(Action::ReviewFlightLesson).is_err());
+    measured_return(&mut p);
+    assert_eq!(
+        some(p.world.unwritten_route_clue_progress()).earned.len(),
+        1
+    );
+    ok(p.prepare_quit());
+    drop(p);
+
+    let mut p = ok(Profile::open(directory.0.clone()));
+    ok(p.continue_saved());
+    action(&mut p, Action::ReviewFlightLesson);
+    action(&mut p, Action::Confirm);
+    assert!(p.command(Action::Confirm).is_err());
+    let settled = some(p.world.flight_reception_snapshot());
+    assert_eq!(
+        settled.attempts[0].outcome,
+        Some(FlightReceptionOutcome::Complete)
+    );
+    drop(p);
+
+    let mut p = ok(Profile::open(directory.0.clone()));
+    ok(p.continue_saved());
+    assert!(!renas_training_offer(&mut p));
+    assert_eq!(some(p.world.mission_snapshot()).freight, freight);
+    assert_eq!(some(p.world.flight_reception_snapshot()), settled);
+    let clues = some(p.world.unwritten_route_clue_progress());
+    assert_eq!(
+        clues
+            .earned
+            .iter()
+            .map(|clue| clue.clue_id)
+            .collect::<Vec<_>>(),
+        [
+            "consented-freight-family-trace",
+            "flight-reception-family-trace"
+        ]
+    );
+    assert_eq!(p.world.credits_tenths(), Some(14500));
+}
 #[test]
 fn each_lesson_publication_failure_preserves_live_state_and_the_retained_valid_file() {
     for command in [Action::ReviewFlightLesson, Action::CancelFlightLesson] {

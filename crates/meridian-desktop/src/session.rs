@@ -63,6 +63,34 @@ pub(crate) enum PracticeSelection {
     Closure(PracticeClosureReview),
 }
 
+#[derive(Clone, Copy)]
+enum MissionDetails {
+    Freight,
+    RenasTraining(FlightReceptionReview),
+}
+
+impl MissionDetails {
+    fn at(world: &World) -> Self {
+        if world
+            .current_dock_context()
+            .is_some_and(|dock| dock.system() == SystemId::RENAS)
+            && world.active_freight_job().is_none()
+            && world
+                .mission_snapshot()
+                .is_some_and(|mission| mission.freight.clue.is_some())
+            && world
+                .flight_reception_snapshot()
+                .is_some_and(|lesson| lesson.trace.is_none())
+            && let Ok(review) =
+                world.review_flight_reception(FlightReceptionAction::Accept, world.snapshot().tick)
+        {
+            Self::RenasTraining(review)
+        } else {
+            Self::Freight
+        }
+    }
+}
+
 pub struct Session {
     job: Option<JobId>,
     pending: Option<(Review, Choice)>,
@@ -71,7 +99,7 @@ pub struct Session {
     pub(crate) pending_flight: Option<FlightReceptionReview>,
     show_flight_lesson: bool,
     pub(crate) pending_practice: Option<PracticeSelection>,
-    show_objective: bool,
+    mission_details: Option<MissionDetails>,
     market_open: bool,
     equipment_open: bool,
     selected_commodity: CommodityId,
@@ -87,7 +115,7 @@ impl Default for Session {
             pending_flight: None,
             show_flight_lesson: false,
             pending_practice: None,
-            show_objective: false,
+            mission_details: None,
             market_open: false,
             equipment_open: false,
             selected_commodity: CommodityId::Food,
@@ -111,7 +139,7 @@ impl Session {
         self.show_flight_lesson = false;
         self.pending = None;
         self.pending_practice = None;
-        self.show_objective = false;
+        self.mission_details = None;
         self.market_open = false;
         self.equipment_open = false;
     }
@@ -144,7 +172,7 @@ impl Session {
             } => {
                 if completion.is_some() {
                     self.job = None;
-                    Ok("Freight complete. 730 CR settled. First family clue recorded; no repeat settlement.".into())
+                    Ok("Freight complete. 730 CR paid. Family clue retained. I opens mission details.".into())
                 } else {
                     Ok(format!(
                         "One tonne received. {remaining} remain; R reviews the next unit."
@@ -367,8 +395,8 @@ impl Session {
             }
             Action::MissionDetails => {
                 self.invalidate();
-                self.show_objective = true;
-                Ok("Mission details. T contacts crew; R opens a new review.".into())
+                self.mission_details = Some(MissionDetails::at(world));
+                Ok("Mission details.".into())
             }
             Action::Contact => {
                 self.invalidate();
@@ -384,6 +412,13 @@ impl Session {
                     "Speaking with {}. R reviews freight terms.",
                     npc.name()
                 ))
+            }
+            Action::Review
+                if let Some(MissionDetails::RenasTraining(review)) = self.mission_details =>
+            {
+                self.invalidate();
+                self.pending_flight = Some(review);
+                Ok("Renas flight practice. Enter accepts and saves. B goes back.".into())
             }
             Action::Review | Action::ReviewAll | Action::ReviewAbandonment => {
                 self.review_command(world, action)
@@ -509,7 +544,7 @@ impl Session {
             append_paragraph(lines, dialogue.notice);
             return true;
         }
-        if self.show_objective
+        if self.mission_details.is_some()
             && let Some(objective) = presentation::objective(world)
         {
             append_missile_panel(world, world.snapshot().mode, lines);
@@ -592,6 +627,9 @@ impl Session {
                         .into()
                 }
             }
+        } else if matches!(self.mission_details, Some(MissionDetails::RenasTraining(_))) {
+            "RENAS TRAINING BERTH | R REVIEWS OPTIONAL FLIGHT PRACTICE | FIRST SUCCESS EARNS A CLUE"
+                .into()
         } else {
             "T SELECTS THE CURRENT CONTACT; R OPENS A REVIEW BEFORE ENTER CAN CONFIRM".into()
         }
@@ -722,7 +760,7 @@ impl Session {
         self.help_review().is_some()
             || self.show_trade_lesson
             || self.show_flight_lesson
-            || self.show_objective
+            || self.mission_details.is_some()
             || self.equipment_open
             || self.market_open
     }
