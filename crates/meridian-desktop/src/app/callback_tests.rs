@@ -1654,6 +1654,49 @@ fn docked_freight_review_stays_accessible_after_feedback_expires_and_help_closes
 }
 
 #[test]
+fn cold_renas_commander_opens_mission_details_and_preserves_the_lesson_review() {
+    use crate::session::Action;
+    let directory = TestDirectory::new();
+    {
+        let mut app = app(&directory);
+        for action in [Action::Contact, Action::Review, Action::Confirm] {
+            ok(app.game.command(action));
+        }
+        crate::profile::tests::travel(&mut app.game);
+        for action in [Action::Contact, Action::ReviewAll, Action::Confirm] {
+            ok(app.game.command(action));
+        }
+        ok(app.game.prepare_quit());
+    }
+    let mut app = startup(&directory);
+    let before = ok(app.game.world.save_bytes());
+    let path = directory.0.join("commander.meridian");
+    let disk = ok(std::fs::read(&path));
+    assert!(app.commander_open && app.has_berth());
+    assert!(
+        commander_labels(&mut app)
+            .iter()
+            .any(|line| line.contains("I Mission details"))
+    );
+    assert!(app.commander_key(KeyCode::KeyI));
+    assert!(!app.commander_open && !app.menu_active());
+    assert!(
+        app.game
+            .lines(true, None)
+            .iter()
+            .any(|line| line.contains("R REVIEWS OPTIONAL FLIGHT PRACTICE"))
+    );
+    app.game_key(KeyCode::KeyR);
+    app.show_station_commander();
+    assert!(!app.commander_open);
+    assert_eq!(app.game.session.help_review(), Some("Flight lesson review"));
+    assert_eq!(ok(app.game.world.save_bytes()), before);
+    assert_eq!(ok(std::fs::read(path)), disk);
+    app.game_key(KeyCode::KeyB);
+    assert!(app.game.session.help_review().is_none());
+}
+
+#[test]
 fn ordinary_start_opens_fresh_commander_with_live_station_bindings_and_without_a_save() {
     let directory = TestDirectory::new();
     let path = directory.0.join("commander.meridian");

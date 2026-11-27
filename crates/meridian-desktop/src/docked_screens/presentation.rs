@@ -223,7 +223,7 @@ pub(crate) fn commander_frame(
                 Ink::Cyan,
                 canvas,
             );
-            "L Launch | F5 Save | F9 Reload"
+            "L Launch | I Mission details | F5 Save | F9 Reload"
         } else {
             "Enter Resume flight | F5 Save | F9 Reload"
         }

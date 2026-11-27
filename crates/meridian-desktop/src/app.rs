@@ -715,6 +715,11 @@ impl App {
     }
 
     fn show_station_commander(&mut self) {
+        if self.game.session.help_review().is_some() {
+            self.notice
+                .set("Confirm or cancel the current review first".into());
+            return;
+        }
         if self.menu_active()
             && let Some(menu) = &mut self.docked
             && menu.review_pending()
@@ -755,6 +760,15 @@ impl App {
                 {
                     self.leave_commander();
                 }
+            }
+            KeyCode::KeyI
+                if self.has_berth() && !self.quit_failed && !player_destroyed(&self.game.world) =>
+            {
+                if let Some(menu) = &mut self.docked {
+                    menu.close();
+                }
+                self.leave_commander();
+                self.game_key(code);
             }
             KeyCode::KeyL if self.has_berth() => self.launch_from_commander(),
             KeyCode::Enter if self.game.playing() && !self.has_berth() => {

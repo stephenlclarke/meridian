@@ -100,9 +100,10 @@ impl Panel {
             ],
         );
         if has_berth {
-            panel
-                .lines
-                .insert(0, "L Launch | 0 Commander details".into());
+            panel.lines.insert(
+                0,
+                "L Launch | I Mission details | 0 Commander details".into(),
+            );
             panel.lines.insert(
                 1,
                 "1 Galaxy | 2 System | 3 Showroom | 4 Market | 5 Equipment".into(),
