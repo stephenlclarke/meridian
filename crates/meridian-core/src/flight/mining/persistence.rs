@@ -38,13 +38,12 @@ impl World {
             return Err(invalid);
         }
         for hit in self.mining.strokes() {
+            self.validate_mining_visit(hit.owner, hit.world_tick, hit.physical_tick)?;
             let data = self.station_at_visit(hit.owner.visit).ok_or(invalid)?;
             if hit.owner.owner != owner.owner
                 || hit.owner.hull != owner.hull
                 || hit.owner.visit > owner.visit
                 || hit.speed > self.hull_at_visit(hit.owner.visit).flight_rates().0
-                || hit.world_tick > self.state.tick
-                || hit.physical_tick > self.combat.physical_tick()
                 || hit.emission > self.combat.emissions
                 || self
                     .commander_account
@@ -123,16 +122,11 @@ impl World {
             )?;
         }
         for receipt in self.mining.collections() {
+            self.validate_mining_visit(receipt.owner, receipt.world_tick, receipt.physical_tick)?;
             if receipt.owner.owner != owner.owner
                 || receipt.owner.hull != owner.hull
                 || receipt.owner.visit > owner.visit
                 || receipt.speed > self.hull_at_visit(receipt.owner.visit).flight_rates().0
-                || receipt.world_tick > self.state.tick
-                || receipt.physical_tick > self.combat.physical_tick()
-                || self
-                    .jump_journal
-                    .system_at_visit(receipt.owner.visit, receipt.world_tick)?
-                    != receipt.owner.system
                 || self
                     .commander_account
                     .as_ref()
@@ -145,23 +139,6 @@ impl World {
             {
                 return Err(invalid);
             }
-            let (jumps, arrival) = self.jump_journal.visit_origin(receipt.owner.visit);
-            let launch = receipt
-                .owner
-                .visit
-                .checked_sub(1)
-                .and_then(|v| v.checked_sub(jumps))
-                .ok_or(invalid)?;
-            let berth = self.damage.berth_clock(launch).ok_or(invalid)?;
-            if arrival.map_or(receipt.physical_tick <= berth, |arrival| {
-                receipt.physical_tick < arrival
-            }) || self
-                .damage
-                .berth_clock(launch.checked_add(1).ok_or(invalid)?)
-                .is_some_and(|next| receipt.physical_tick >= next)
-            {
-                return Err(invalid);
-            }
         }
         if self.state.mode != FlightMode::Docked
             && !self.mining_motion_clear(
@@ -171,6 +148,69 @@ impl World {
             )
         {
             return Err(invalid);
+        }
+        Ok(())
+    }
+    pub(super) fn validate_mining_visit(
+        &self,
+        owner: crate::CombatIdentity,
+        tick: u64,
+        clock: u64,
+    ) -> Result<(), SaveError> {
+        let invalid = SaveError::InvalidState("mining visit timing");
+        if tick > self.state.tick
+            || clock > self.combat.physical_tick()
+            || tick.checked_sub(clock).is_none_or(|offset| {
+                self.state
+                    .tick
+                    .checked_sub(self.combat.physical_tick())
+                    .is_none_or(|end| offset > end)
+            })
+            || self.jump_journal.system_at_visit(owner.visit, tick)? != owner.system
+            || self
+                .xyzzy_medusa_issue()
+                .is_some_and(|(dock, issue, _)| (owner.visit > dock.visit()) != (tick > issue))
+        {
+            return Err(invalid);
+        }
+        let (jumps, arrival) = self.jump_journal.visit_origin(owner.visit);
+        let launch = owner
+            .visit
+            .checked_sub(1)
+            .and_then(|v| v.checked_sub(jumps))
+            .ok_or(invalid)?;
+        let berth = self.damage.berth_clock(launch).ok_or(invalid)?;
+        if arrival.map_or(clock <= berth, |arrival| clock < arrival)
+            || self
+                .damage
+                .berth_clock(launch.checked_add(1).ok_or(invalid)?)
+                .is_some_and(|next| clock >= next)
+        {
+            return Err(invalid);
+        }
+        // Both clocks advance together in flight, including through hyperspace.
+        // The neighbouring jump seals their exact offset on this flight.
+        if let Some(next) = self.jump_journal.completed_timing(owner.visit)?
+            && next
+                .departure_tick
+                .checked_sub(tick)
+                .zip(next.departure_clock.checked_sub(clock))
+                .is_none_or(|(elapsed, physical)| elapsed != physical)
+        {
+            return Err(invalid);
+        }
+        if arrival.is_some() {
+            let prev = self
+                .jump_journal
+                .completed_timing(owner.visit - 1)?
+                .ok_or(invalid)?;
+            if tick
+                .checked_sub(prev.arrival_tick)
+                .zip(clock.checked_sub(prev.arrival_clock))
+                .is_none_or(|(elapsed, physical)| elapsed != physical)
+            {
+                return Err(invalid);
+            }
         }
         Ok(())
     }

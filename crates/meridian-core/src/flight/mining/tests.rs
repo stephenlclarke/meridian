@@ -706,6 +706,51 @@ fn secret_outfit_preserves_paid_mining_work_custody_and_refuses_inflight_reactiv
 }
 
 #[test]
+fn peregrine_stroke_cannot_be_relabelled_as_a_later_medusa_visit() {
+    let (mut world, _) = paid(12005);
+    approach(&mut world);
+    work(&mut world);
+    crate::flight::missiles::tests::issue_medusa_at_renas(&mut world);
+    crate::flight::equipment::tests::journey(&mut world, SystemId::AVENOR);
+    launch(&mut world);
+    let mut continued = cold(&world);
+    let original = continued.mining.strokes()[0].clone();
+    let later = some(continued.combat_identity());
+    assert_eq!(later.system, original.owner.system);
+    assert!(later.visit > original.owner.visit);
+    assert!(world.xyzzy_medusa_active());
+    let bytes = ok(continued.save_bytes());
+    for (world_tick, physical_tick) in [
+        (original.world_tick, original.physical_tick),
+        (continued.snapshot().tick, original.physical_tick),
+        (original.world_tick, continued.combat.physical_tick()),
+    ] {
+        let mut forged = cold(&continued);
+        let mut hit = original.clone();
+        hit.owner.visit = later.visit;
+        hit.world_tick = world_tick;
+        hit.peers.world_tick = world_tick;
+        hit.physical_tick = physical_tick;
+        assert!(
+            continued
+                .validate_mining_visit(hit.owner, world_tick, physical_tick)
+                .is_err()
+        );
+        forged.mining = ok(forged
+            .mining
+            .before_emission(hit.emission)
+            .prepare_work(hit))
+        .0;
+        assert!(
+            continued
+                .restore_bytes(&ok(forged.unchecked_test_save()))
+                .is_err()
+        );
+        assert_eq!(ok(continued.save_bytes()), bytes);
+    }
+}
+
+#[test]
 fn medusa_mining_above_peregrine_speed_repeats_and_replays_cold() {
     let mut world = ok(World::new_commander(12005));
     let issue = ok(world.review_xyzzy(crate::XyzzyAction::ActivateMedusa, 0));

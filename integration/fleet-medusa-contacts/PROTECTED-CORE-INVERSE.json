@@ -86,7 +86,7 @@
     },
     "flight/mining/persistence.rs": {
       "beforeSHA256": "bb89cd2d613a6452f256a13fbb7377fc5041d82e23aa9e4f5ddf528c6b443417",
-      "afterSHA256": "ca7529722e865e1aca9e9860de60fd4d044062b9509ef6c4b543d33ca5532bd0",
+      "afterSHA256": "cecbfe4c749486cd531b06f9fbab4038bbc31910cfa9c733023774333d88b9e6",
       "hunks": [
         {
           "offset": 1262,
@@ -96,30 +96,40 @@
         {
           "offset": 1506,
           "before": "",
-          "after": "            let data = self.station_at_visit(hit.owner.visit).ok_or(invalid)?;\n"
+          "after": "            self.validate_mining_visit(hit.owner, hit.world_tick, hit.physical_tick)?;\n            let data = self.station_at_visit(hit.owner.visit).ok_or(invalid)?;\n"
         },
         {
-          "offset": 1728,
-          "before": "",
+          "offset": 1815,
+          "before": "                || hit.world_tick > self.state.tick\n                || hit.physical_tick > self.combat.physical_tick()\n",
           "after": "                || hit.speed > self.hull_at_visit(hit.owner.visit).flight_rates().0\n"
         },
         {
-          "offset": 2406,
+          "offset": 2374,
           "before": "                || !self.mining_motion_at_source(hit.pose, hit.emission)\n",
           "after": "                || !self.mining_motion_at_source(data, hit.pose, hit.emission)\n"
         },
         {
-          "offset": 5217,
+          "offset": 5030,
           "before": "",
+          "after": "            self.validate_mining_visit(receipt.owner, receipt.world_tick, receipt.physical_tick)?;\n"
+        },
+        {
+          "offset": 5284,
+          "before": "                || receipt.world_tick > self.state.tick\n                || receipt.physical_tick > self.combat.physical_tick()\n                || self\n                    .jump_journal\n                    .system_at_visit(receipt.owner.visit, receipt.world_tick)?\n                    != receipt.owner.system\n",
           "after": "                || receipt.speed > self.hull_at_visit(receipt.owner.visit).flight_rates().0\n"
         },
         {
-          "offset": 7278,
-          "before": "    fn mining_motion_at_source(&self, pose: RigidPose, emission: u64) -> bool {\n",
-          "after": "    fn mining_motion_at_source(\n        &self,\n        data: &crate::station::OriginalStationData,\n        pose: RigidPose,\n        emission: u64,\n    ) -> bool {\n"
+          "offset": 5855,
+          "before": "            {\n                return Err(invalid);\n            }\n            let (jumps, arrival) = self.jump_journal.visit_origin(receipt.owner.visit);\n            let launch = receipt\n                .owner\n                .visit\n                .checked_sub(1)\n                .and_then(|v| v.checked_sub(jumps))\n                .ok_or(invalid)?;\n            let berth = self.damage.berth_clock(launch).ok_or(invalid)?;\n            if arrival.map_or(receipt.physical_tick <= berth, |arrival| {\n                receipt.physical_tick < arrival\n            }) || self\n                .damage\n                .berth_clock(launch.checked_add(1).ok_or(invalid)?)\n                .is_some_and(|next| receipt.physical_tick >= next)\n",
+          "after": ""
         },
         {
-          "offset": 7685,
+          "offset": 6310,
+          "before": "    fn mining_motion_at_source(&self, pose: RigidPose, emission: u64) -> bool {\n",
+          "after": "    pub(super) fn validate_mining_visit(\n        &self,\n        owner: crate::CombatIdentity,\n        tick: u64,\n        clock: u64,\n    ) -> Result<(), SaveError> {\n        let invalid = SaveError::InvalidState(\"mining visit timing\");\n        if tick > self.state.tick\n            || clock > self.combat.physical_tick()\n            || tick.checked_sub(clock).is_none_or(|offset| {\n                self.state\n                    .tick\n                    .checked_sub(self.combat.physical_tick())\n                    .is_none_or(|end| offset > end)\n            })\n            || self.jump_journal.system_at_visit(owner.visit, tick)? != owner.system\n            || self\n                .xyzzy_medusa_issue()\n                .is_some_and(|(dock, issue, _)| (owner.visit > dock.visit()) != (tick > issue))\n        {\n            return Err(invalid);\n        }\n        let (jumps, arrival) = self.jump_journal.visit_origin(owner.visit);\n        let launch = owner\n            .visit\n            .checked_sub(1)\n            .and_then(|v| v.checked_sub(jumps))\n            .ok_or(invalid)?;\n        let berth = self.damage.berth_clock(launch).ok_or(invalid)?;\n        if arrival.map_or(clock <= berth, |arrival| clock < arrival)\n            || self\n                .damage\n                .berth_clock(launch.checked_add(1).ok_or(invalid)?)\n                .is_some_and(|next| clock >= next)\n        {\n            return Err(invalid);\n        }\n        // Both clocks advance together in flight, including through hyperspace.\n        // The neighbouring jump seals their exact offset on this flight.\n        if let Some(next) = self.jump_journal.completed_timing(owner.visit)?\n            && next\n                .departure_tick\n                .checked_sub(tick)\n                .zip(next.departure_clock.checked_sub(clock))\n                .is_none_or(|(elapsed, physical)| elapsed != physical)\n        {\n            return Err(invalid);\n        }\n        if arrival.is_some() {\n            let prev = self\n                .jump_journal\n                .completed_timing(owner.visit - 1)?\n                .ok_or(invalid)?;\n            if tick\n                .checked_sub(prev.arrival_tick)\n                .zip(clock.checked_sub(prev.arrival_clock))\n                .is_none_or(|(elapsed, physical)| elapsed != physical)\n            {\n                return Err(invalid);\n            }\n        }\n        Ok(())\n    }\n    fn mining_motion_at_source(\n        &self,\n        data: &crate::station::OriginalStationData,\n        pose: RigidPose,\n        emission: u64,\n    ) -> bool {\n"
+        },
+        {
+          "offset": 9130,
           "before": "        self.mining_motion_clear_with(\n",
           "after": "        Self::mining_motion_clear_with(\n            Some(data),\n"
         }
@@ -127,7 +137,7 @@
     },
     "flight/mining/tests.rs": {
       "beforeSHA256": "b248399997fcca376ce1430e8610e4b920a9679ee128268436d9c9483be83424",
-      "afterSHA256": "111ba0979f6c013cf3c7f725d853facd39f69256073a04352f4dd641e6160322",
+      "afterSHA256": "312104aedaff5325e04f7424d0987ff017ea97487e932248ff52e5d40e649ccc",
       "hunks": [
         {
           "offset": 22284,
@@ -142,7 +152,7 @@
         {
           "offset": 25222,
           "before": "",
-          "after": "\n#[test]\nfn medusa_mining_above_peregrine_speed_repeats_and_replays_cold() {\n    let mut world = ok(World::new_commander(12005));\n    let issue = ok(world.review_xyzzy(crate::XyzzyAction::ActivateMedusa, 0));\n    ok(world.prepare_xyzzy(issue, 0)).commit();\n    let items = some(world.modular_equipment_snapshot()).items;\n    let mining = some(\n        items\n            .iter()\n            .find(|item| item.kind == crate::ModuleKind::MiningLaser),\n    );\n    let front = some(\n        items\n            .iter()\n            .find(|item| item.slot == Some(crate::ModuleSlot::FrontLaser)),\n    );\n    module(\n        &mut world,\n        ModuleAction::Install {\n            item: mining.id,\n            replacing: Some(front.id),\n        },\n    );\n    launch(&mut world);\n    stop(&mut world);\n    let rock = some(world.mining_belt_snapshot()).bodies[0];\n    aim_at(&mut world, rock.position);\n    for _ in 0..1800 {\n        let snapshot = some(world.mining_belt_snapshot());\n        if world.snapshot().speed > 40.0\n            && snapshot\n                .front_contact\n                .is_some_and(|hit| hit.asteroid == rock.id)\n        {\n            let first = work(&mut world);\n            assert_eq!(first.contact.asteroid, rock.id);\n            world = cold(&world);\n            steps(&mut world, 20);\n            reject_historical_stroke_speed(&world, 50.4);\n            assert!(world.snapshot().speed > 40.0);\n            assert_eq!(work(&mut world).contact.asteroid, rock.id);\n            stop(&mut world);\n            assert_eq!(cold(&world).mining.strokes().len(), 2);\n            return;\n        }\n        ok(world.step(FlightInput {\n            throttle: 1.0,\n            ..Default::default()\n        }));\n    }\n    panic!(\"Medusa did not reach a native mining contact at speed\");\n}\n"
+          "after": "\n#[test]\nfn peregrine_stroke_cannot_be_relabelled_as_a_later_medusa_visit() {\n    let (mut world, _) = paid(12005);\n    approach(&mut world);\n    work(&mut world);\n    crate::flight::missiles::tests::issue_medusa_at_renas(&mut world);\n    crate::flight::equipment::tests::journey(&mut world, SystemId::AVENOR);\n    launch(&mut world);\n    let mut continued = cold(&world);\n    let original = continued.mining.strokes()[0].clone();\n    let later = some(continued.combat_identity());\n    assert_eq!(later.system, original.owner.system);\n    assert!(later.visit > original.owner.visit);\n    assert!(world.xyzzy_medusa_active());\n    let bytes = ok(continued.save_bytes());\n    for (world_tick, physical_tick) in [\n        (original.world_tick, original.physical_tick),\n        (continued.snapshot().tick, original.physical_tick),\n        (original.world_tick, continued.combat.physical_tick()),\n    ] {\n        let mut forged = cold(&continued);\n        let mut hit = original.clone();\n        hit.owner.visit = later.visit;\n        hit.world_tick = world_tick;\n        hit.peers.world_tick = world_tick;\n        hit.physical_tick = physical_tick;\n        assert!(\n            continued\n                .validate_mining_visit(hit.owner, world_tick, physical_tick)\n                .is_err()\n        );\n        forged.mining = ok(forged\n            .mining\n            .before_emission(hit.emission)\n            .prepare_work(hit))\n        .0;\n        assert!(\n            continued\n                .restore_bytes(&ok(forged.unchecked_test_save()))\n                .is_err()\n        );\n        assert_eq!(ok(continued.save_bytes()), bytes);\n    }\n}\n\n#[test]\nfn medusa_mining_above_peregrine_speed_repeats_and_replays_cold() {\n    let mut world = ok(World::new_commander(12005));\n    let issue = ok(world.review_xyzzy(crate::XyzzyAction::ActivateMedusa, 0));\n    ok(world.prepare_xyzzy(issue, 0)).commit();\n    let items = some(world.modular_equipment_snapshot()).items;\n    let mining = some(\n        items\n            .iter()\n            .find(|item| item.kind == crate::ModuleKind::MiningLaser),\n    );\n    let front = some(\n        items\n            .iter()\n            .find(|item| item.slot == Some(crate::ModuleSlot::FrontLaser)),\n    );\n    module(\n        &mut world,\n        ModuleAction::Install {\n            item: mining.id,\n            replacing: Some(front.id),\n        },\n    );\n    launch(&mut world);\n    stop(&mut world);\n    let rock = some(world.mining_belt_snapshot()).bodies[0];\n    aim_at(&mut world, rock.position);\n    for _ in 0..1800 {\n        let snapshot = some(world.mining_belt_snapshot());\n        if world.snapshot().speed > 40.0\n            && snapshot\n                .front_contact\n                .is_some_and(|hit| hit.asteroid == rock.id)\n        {\n            let first = work(&mut world);\n            assert_eq!(first.contact.asteroid, rock.id);\n            world = cold(&world);\n            steps(&mut world, 20);\n            reject_historical_stroke_speed(&world, 50.4);\n            assert!(world.snapshot().speed > 40.0);\n            assert_eq!(work(&mut world).contact.asteroid, rock.id);\n            stop(&mut world);\n            assert_eq!(cold(&world).mining.strokes().len(), 2);\n            return;\n        }\n        ok(world.step(FlightInput {\n            throttle: 1.0,\n            ..Default::default()\n        }));\n    }\n    panic!(\"Medusa did not reach a native mining contact at speed\");\n}\n"
         }
       ]
     },
@@ -229,6 +239,32 @@
           "offset": 4880,
           "before": "    ok(world.request_jump(crate::navigation::SystemId::RENAS, world.snapshot().tick));\n    let remaining = some(some(world.snapshot().navigation).travel).remaining_ticks;\n    steps(&mut world, remaining as usize);\n    crate::flight::missiles::tests::dock(&mut world);\n    assert!(world.traffic.player_hits().contains(&hit));\n    let tick = world.snapshot().tick;\n    let review = ok(world.review_xyzzy(crate::XyzzyAction::ActivateMedusa, tick));\n    ok(world.prepare_xyzzy(review, tick)).commit();\n",
           "after": "    crate::flight::missiles::tests::issue_medusa_at_renas(&mut world);\n"
+        }
+      ]
+    },
+    "flight/xyzzy.rs": {
+      "beforeSHA256": "b8362d5997bfc243b60506d32fc30882286cd678a8e641cd61bcd45d22e1e026",
+      "afterSHA256": "40bd66730ffc9c06e58b10d8847330eec9271e02141e5809ed3ba7d8ab98b1fb",
+      "hunks": [
+        {
+          "offset": 3162,
+          "before": "",
+          "after": "    MedusaFuelOverCapacity { carried: u16, capacity: u16 },\n"
+        },
+        {
+          "offset": 3450,
+          "before": "",
+          "after": "        if let Self::MedusaFuelOverCapacity { carried, capacity } = *self {\n            return write!(\n                f,\n                \"Medusa refit needs the auxiliary tank mounts. Fuel aboard {:.1} LY, base capacity {:.1} LY. Use at least {:.1} LY of fuel, then return to a berth. Turn unlimited fuel off first if active.\",\n                f64::from(carried) / 10.0,\n                f64::from(capacity) / 10.0,\n                f64::from(carried.saturating_sub(capacity)) / 10.0\n            );\n        }\n"
+        },
+        {
+          "offset": 23069,
+          "before": "",
+          "after": "            && account.fuel_storage_count() > 0\n            && account.fuel_tenths() > crate::navigation::FUEL_CAPACITY\n        {\n            return Err(XyzzyError::MedusaFuelOverCapacity {\n                carried: account.fuel_tenths(),\n                capacity: crate::navigation::FUEL_CAPACITY,\n            });\n        }\n        if action == XyzzyAction::ActivateMedusa\n"
+        },
+        {
+          "offset": 27685,
+          "before": "",
+          "after": "        if review.action == XyzzyAction::ActivateMedusa {\n            // Store displaced utility items on the private candidate before the hull exchange.\n            let equipment = self.modular_equipment_snapshot().ok_or(INVALID)?;\n            for item in equipment.items.iter().filter(|item| {\n                item.slot.is_some()\n                    && matches!(\n                        item.kind,\n                        super::ModuleKind::SalvageCutter | super::ModuleKind::FuelStorage\n                    )\n            }) {\n                let store = self\n                    .review_module(super::ModuleAction::Store { item: item.id }, review.tick)\n                    .map_err(|_| INVALID)?;\n                self.prepare_module(store, review.tick)\n                    .map_err(|_| INVALID)?\n                    .commit();\n            }\n        }\n"
         }
       ]
     },

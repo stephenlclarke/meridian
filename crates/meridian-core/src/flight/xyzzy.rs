@@ -88,6 +88,7 @@ pub enum XyzzyError {
     Paused,
     BerthRequired,
     MedusaHoldFull,
+    MedusaFuelOverCapacity { carried: u16, capacity: u16 },
     Inactive,
     ActiveFuelPractice,
     ActiveContractCustody,
@@ -96,6 +97,15 @@ pub enum XyzzyError {
 }
 impl core::fmt::Display for XyzzyError {
     fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        if let Self::MedusaFuelOverCapacity { carried, capacity } = *self {
+            return write!(
+                f,
+                "Medusa refit needs the auxiliary tank mounts. Fuel aboard {:.1} LY, base capacity {:.1} LY. Use at least {:.1} LY of fuel, then return to a berth. Turn unlimited fuel off first if active.",
+                f64::from(carried) / 10.0,
+                f64::from(capacity) / 10.0,
+                f64::from(carried.saturating_sub(capacity)) / 10.0
+            );
+        }
         write!(f, "XYZZY action refused: {self:?}")
     }
 }
@@ -610,6 +620,15 @@ impl World {
             return Err(XyzzyError::ActiveFuelPractice);
         }
         if action == XyzzyAction::ActivateMedusa
+            && account.fuel_storage_count() > 0
+            && account.fuel_tenths() > crate::navigation::FUEL_CAPACITY
+        {
+            return Err(XyzzyError::MedusaFuelOverCapacity {
+                carried: account.fuel_tenths(),
+                capacity: crate::navigation::FUEL_CAPACITY,
+            });
+        }
+        if action == XyzzyAction::ActivateMedusa
             && self
                 .reserved_service_projection()
                 .map_err(|_| XyzzyError::ActiveContractCustody)?
@@ -714,6 +733,24 @@ impl World {
         Ok(())
     }
     fn apply_xyzzy(&mut self, review: XyzzyReview) -> Result<(), SaveError> {
+        if review.action == XyzzyAction::ActivateMedusa {
+            // Store displaced utility items on the private candidate before the hull exchange.
+            let equipment = self.modular_equipment_snapshot().ok_or(INVALID)?;
+            for item in equipment.items.iter().filter(|item| {
+                item.slot.is_some()
+                    && matches!(
+                        item.kind,
+                        super::ModuleKind::SalvageCutter | super::ModuleKind::FuelStorage
+                    )
+            }) {
+                let store = self
+                    .review_module(super::ModuleAction::Store { item: item.id }, review.tick)
+                    .map_err(|_| INVALID)?;
+                self.prepare_module(store, review.tick)
+                    .map_err(|_| INVALID)?
+                    .commit();
+            }
+        }
         let first = !self.xyzzy.active();
         let mode = if first {
             true

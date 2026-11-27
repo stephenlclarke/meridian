@@ -65,7 +65,7 @@ In the ordinary Fleet game, open **Ctrl+Shift+X** at a berth. Review and confirm
 | Reactor and shields | 410 energy, Elite Energy Unit, Elite shields. The 4.7 energy/s base becomes 18.8/s with Elite fitted. The 300-unit base banks use the existing Elite shield multiplier. |
 | Flight computers | Advanced navigation and hyperspace drive, Military targeting, Mining and Salvage Targeting Modules. |
 | Tools and utilities | Naval Lasers on all four facings, an interchangeable front Mining Laser, Fuel Scoops, maximum-grade EMP and stock E.C.M. The Salvage Cutter uses the existing tool exchange when the mounts are occupied. |
-| Ammunition and fuel | Five loaded standard missiles. A former nine-pylon commander retains surplus rounds in storage under their original identities. The test command fills the fitted fuel capacity. |
+| Ammunition and fuel | Five loaded standard missiles. A former nine-pylon commander retains surplus rounds in storage under their original identities. The refit stores fitted auxiliary tanks and the cutter under their existing item IDs. It fills the 13.0 LY base tank. If more than 13.0 LY is aboard, the menu shows how much fuel to use before returning. |
 | Ownership | Paid items keep their receipts. New items and the hull use XYZZY provenance. The quest and PLUGH purchase have separate acquisition paths. |
 
 For wreck recovery, the targeting computer stops with the wreck’s near face inside the 85 m scoop reach and ahead of the lower-forward aperture. Manual recovery uses the same distance and requires a settled ship. Continue checks the transfer against the hull flown at the time.
