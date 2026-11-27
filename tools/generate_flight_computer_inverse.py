@@ -1,6 +1,7 @@
 """Generate the exact flight-computer inverse from the frozen integrated source."""
 import difflib
 import json
+import re
 import subprocess
 import sys
 
@@ -34,12 +35,16 @@ def file_inverse(before, after):
 
 def generate(root, base=FLIGHT_COMPUTER_BASE):
     """Compare only the existing protected paths against their immutable Git blobs."""
+    if not isinstance(base, str) or not re.fullmatch(r'[0-9a-f]{40}', base):
+        raise ValueError('Use an exact 40-character lowercase Git commit SHA')
+    # Construct object expressions from canonical hexadecimal bytes and pinned paths.
+    base = bytes.fromhex(base).hex()
     prefix = 'crates/meridian-core/src/'
     inverse = {}
     for relative in sorted(protected_core_pins(root)):
         path = prefix + relative
         before = subprocess.check_output(
-            ['git', 'cat-file', 'blob', base + ':' + path], cwd=root,
+            ['git', 'cat-file', 'blob', '--', base + ':' + path], cwd=root,
         )
         after = (root / path).read_bytes()
         if before != after:
@@ -51,6 +56,7 @@ def generate(root, base=FLIGHT_COMPUTER_BASE):
 if __name__ == '__main__':
     # The default is the historical flight-computer source. A new, separately pinned
     # inverse may use its own explicit immutable parent without rewriting old evidence.
+    if len(sys.argv) > 2:
+        raise SystemExit('Usage: generate_flight_computer_inverse.py [commit SHA]')
     base = sys.argv[1] if len(sys.argv) == 2 else FLIGHT_COMPUTER_BASE
-    assert len(sys.argv) <= 2 and len(base) == 40
     sys.stdout.buffer.write((json.dumps(generate(ROOT, base), indent=2) + '\n').encode('utf-8'))

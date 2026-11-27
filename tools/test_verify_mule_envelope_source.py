@@ -303,5 +303,16 @@ class FlightComputerInverse(unittest.TestCase):
             self.assertEqual(verifier.undo_flight_computer('b.rs', sources['b.rs'], inverse['files']), b'old\n')
             self.assertEqual(git.call_count, 2)
             for call, relative in zip(git.call_args_list, ('a.rs', 'b.rs'), strict=True):
-                self.assertEqual(call.args[0], ['git', 'cat-file', 'blob',
+                self.assertEqual(call.args[0], ['git', 'cat-file', 'blob', '--',
                     verifier.FLIGHT_COMPUTER_BASE + ':crates/meridian-core/src/' + relative])
+
+    def test_generator_rejects_noncanonical_base_before_git_or_reading_pins(self):
+        invalid_bases = (None, '', 'a' * 39, 'a' * 41, 'A' * 40, 'g' * 40,
+                         '-' + 'a' * 39, 'a' * 39 + '\n')
+        with patch.object(generator, 'protected_core_pins') as pins, \
+             patch.object(generator.subprocess, 'check_output') as git:
+            for base in invalid_bases:
+                with self.subTest(base=base), self.assertRaisesRegex(ValueError, 'Git commit SHA'):
+                    generator.generate(verifier.ROOT, base)
+            pins.assert_not_called()
+            git.assert_not_called()
