@@ -1,6 +1,17 @@
 {
   "base": "a2959bd36951917066caec5279684de5f0fba659",
   "files": {
+    "equipment.rs": {
+      "beforeSHA256": "03f18b8069ac215897ad718687b65d947d3f476d583d800fedca929e43b5c42f",
+      "afterSHA256": "9327badea264f545afe0fc0dd12007d632e2c89a4518ba86fb86a8b18216de3e",
+      "hunks": [
+        {
+          "offset": 268,
+          "before": "",
+          "after": "pub(crate) const MEDUSA_HOLD_TONNES: u16 = 22;\npub(crate) const MEDUSA_EXPANDED_HOLD_TONNES: u16 = 32;\n"
+        }
+      ]
+    },
     "equipment/content.rs": {
       "beforeSHA256": "bde7c56569f1a6fc9740942b3f2c19589f8ef19a5e46bb770f5aa2797760cd49",
       "afterSHA256": "2336a41b6cbe200ddad2e2196df2e8f72a435bb49706db42553b4e2e81847f65",
@@ -245,6 +256,17 @@
         }
       ]
     },
+    "flight/flight_reception/persistence.rs": {
+      "beforeSHA256": "10f65a16d585475c279d21c93442bfbea20f2d799dbd26b7b94a7352911d2f78",
+      "afterSHA256": "5bd42ff8a6044d3421ada618932a41e403ae5e176aace7818a039ac65e0c1ae9",
+      "hunks": [
+        {
+          "offset": 10962,
+          "before": "            validate_flight(&sample.flight)?;\n",
+          "after": "            validate_flight(world, &sample.flight)?;\n"
+        }
+      ]
+    },
     "flight/missiles.rs": {
       "beforeSHA256": "c704fc62602fbdbd21dbe1cb205ae0e9ba490b879804a6483777cf19acdd99a9",
       "afterSHA256": "a7a1ffe49015cea7e68d1f804251c4ed913b1700c94d3f32dcab39c5fccb8ab8",
@@ -261,12 +283,28 @@
         }
       ]
     },
-    "flight/missiles/persistence.rs": {
-      "beforeSHA256": "492d9bd87244d79317fe79d8f74fa83755f0685250b659a6b8161ba42b122f7f",
-      "afterSHA256": "2d04787d41d82e3d3ad8a9be01a8196635e68005adc9bdc180398e6bd5bba711",
+    "flight/missiles/npc.rs": {
+      "beforeSHA256": "14831f769de994c1ba853886e31b90db310240f58e17b900aa1108acbf60c345",
+      "afterSHA256": "09347ef6693cc03a8227865c35ad339b40e9876a9d28d92b346f20c42871c3f0",
       "hunks": [
         {
-          "offset": 52367,
+          "offset": 13227,
+          "before": "        super::super::persistence::validate_flight(&m.flight)?;\n",
+          "after": "        super::super::persistence::validate_flight(world, &m.flight)?;\n"
+        }
+      ]
+    },
+    "flight/missiles/persistence.rs": {
+      "beforeSHA256": "492d9bd87244d79317fe79d8f74fa83755f0685250b659a6b8161ba42b122f7f",
+      "afterSHA256": "3eb4d23f8d743ce068f8592e81c61af01f687b173bd3499419d66377320a3031",
+      "hunks": [
+        {
+          "offset": 42881,
+          "before": "        super::super::persistence::validate_flight(&m.flight)?;\n",
+          "after": "        super::super::persistence::validate_flight(world, &m.flight)?;\n"
+        },
+        {
+          "offset": 52374,
           "before": "                .front_weapon_at_tick(shot.fitted_item_id, shot.tick, emission)\n",
           "after": "                .laser_weapon_at_tick(shot.fitted_item_id, shot.tick, emission)\n"
         }
@@ -329,9 +367,25 @@
         }
       ]
     },
+    "flight/navigation_trade/persistence.rs": {
+      "beforeSHA256": "4fb04e53706e337d1c364a3a44aaa2941ea86ed66d0928023d3f5b14cf2c9dec",
+      "afterSHA256": "12573177ba7bd3057e7b77eb0a193e0f15ce3606b475459905c533568670c2eb",
+      "hunks": [
+        {
+          "offset": 21022,
+          "before": "",
+          "after": "        let definition = crate::equipment::definition()\n            .map_err(|_| INVALID)?\n            .for_player(c.world.xyzzy.medusa_at(self.account_revision));\n"
+        },
+        {
+          "offset": 21434,
+          "before": "            || ![92, 127].contains(&self.capacity)\n",
+          "after": "            || ![\n                definition.base_hold_tonnes,\n                definition.base_hold_tonnes + definition.extra_hold_tonnes,\n            ]\n            .contains(&self.capacity)\n"
+        }
+      ]
+    },
     "flight/persistence.rs": {
       "beforeSHA256": "4628ba0f08a5dde7da89774d797598ce12b27c55fb69b4d51c821aae554bcf1a",
-      "afterSHA256": "8a98164376cce74c877f47b2e61921d6644afaac8f3ae61cfe67d990119ad34c",
+      "afterSHA256": "4585629b862cccbc284e3d28ac3b6733327373675ed7e924ce538d2361405b60",
       "hunks": [
         {
           "offset": 21133,
@@ -359,17 +413,17 @@
           "after": "        validate_flight_speed(&self.state, self.player_hull_kind().flight_rates().0)?;\n"
         },
         {
-          "offset": 41977,
-          "before": "",
-          "after": "    validate_flight_speed(s, MAX_SPEED)\n}\npub(super) fn validate_flight_speed(s: &Snapshot, max_speed: f32) -> Result<(), SaveError> {\n"
+          "offset": 41906,
+          "before": "pub(super) fn validate_flight(s: &Snapshot) -> Result<(), SaveError> {\n",
+          "after": "pub(super) fn validate_flight(world: &World, s: &Snapshot) -> Result<(), SaveError> {\n    let maximum = if world\n        .xyzzy_medusa_issue()\n        .is_some_and(|(_, tick, _)| s.tick > tick)\n    {\n        super::PlayerHullKind::Medusa.flight_rates().0\n    } else {\n        MAX_SPEED\n    };\n    validate_flight_speed(s, maximum)\n}\npub(super) fn validate_flight_speed(s: &Snapshot, max_speed: f32) -> Result<(), SaveError> {\n"
         },
         {
-          "offset": 42232,
+          "offset": 42452,
           "before": "            * f64::from(MAX_SPEED * DISTANCE_PER_SPEED_UNIT * FIXED_DELTA_SECONDS)\n",
           "after": "            * f64::from(max_speed * DISTANCE_PER_SPEED_UNIT * FIXED_DELTA_SECONDS)\n"
         },
         {
-          "offset": 42362,
+          "offset": 42582,
           "before": "        || !(0.0..=MAX_SPEED).contains(&s.speed)\n",
           "after": "        || !(0.0..=max_speed).contains(&s.speed)\n"
         }
@@ -635,9 +689,20 @@
         }
       ]
     },
+    "flight/xyzzy/tests.rs": {
+      "beforeSHA256": "67d63f51b5eb4f0a3b9d2c0b3c8baa13a581f33f39f95452141fbbcf810095be",
+      "afterSHA256": "c9a5dcb85e886565e91488ebce358533510c343f5291ea448ca1a06fb095cc56",
+      "hunks": [
+        {
+          "offset": 31804,
+          "before": "",
+          "after": "\n#[test]\nfn medusa_upgrades_a_saved_clarke_once_and_retains_paid_gear_and_excess_rounds() {\n    let mut legacy = World::new_commander(14401).unwrap();\n    apply(&mut legacy, XyzzyAction::Enter);\n    let paid = module(\n        &mut legacy,\n        ModuleAction::Purchase {\n            kind: ModuleKind::PulseLaser,\n        },\n    );\n    let cash = legacy.credits_tenths();\n    assert_eq!(cash, Some(9_985_500));\n    let rounds = legacy.ammunition_snapshot().unwrap().items;\n    assert_eq!(rounds.len(), 9);\n    let mut world = cold(&legacy);\n    assert_eq!(world.player_hull_kind(), crate::PlayerHullKind::Peregrine);\n    assert!(world.xyzzy_medusa_issue().is_none());\n    apply(&mut world, XyzzyAction::ActivateMedusa);\n    let issue = world.xyzzy_medusa_issue().unwrap();\n    let gear = world.modular_equipment_snapshot().unwrap().items;\n    assert!(\n        gear.iter().any(|item| item.id == paid\n            && matches!(item.provenance, crate::ModuleProvenance::Paid { .. }))\n    );\n    for _ in 0..2 {\n        world = cold(&world);\n        assert_eq!(world.player_hull_kind(), crate::PlayerHullKind::Medusa);\n        assert_eq!(world.xyzzy_medusa_issue(), Some(issue));\n        assert_eq!(world.credits_tenths(), cash);\n        assert_eq!(world.modular_equipment_snapshot().unwrap().items, gear);\n        let magazine = world.ammunition_snapshot().unwrap();\n        assert_eq!(magazine.capacity, 5);\n        assert_eq!(magazine.items.len(), rounds.len());\n        for old in &rounds {\n            let held = magazine\n                .items\n                .iter()\n                .find(|item| item.item == old.item)\n                .unwrap();\n            assert_eq!(held.pylon, old.pylon.filter(|p| *p < 5));\n            assert_eq!(held.purchase, old.purchase);\n            assert!(!held.consumed);\n        }\n        apply(&mut world, XyzzyAction::ActivateMedusa);\n    }\n    world.request_launch(world.snapshot().tick).unwrap();\n    for _ in 0..190 {\n        world\n            .step(crate::FlightInput {\n                throttle: 1.0,\n                ..Default::default()\n            })\n            .unwrap();\n    }\n    assert_eq!(world.snapshot().speed, 50.3);\n    let loaded = cold(&world);\n    assert_eq!(loaded.snapshot(), world.snapshot());\n    assert_eq!(\n        loaded\n            .flight_resources_snapshot()\n            .unwrap()\n            .energy_capacity_hundredths,\n        41000\n    );\n}\n"
+        }
+      ]
+    },
     "freight/g02.rs": {
       "beforeSHA256": "a273becd4a69e7ad3a9fbfd89efd61490a614715fa4be8dc47141ca4c81ea6c2",
-      "afterSHA256": "caeebea14cdd76d9447279c6842111958f5db1f56df4030ad541a033d73739c9",
+      "afterSHA256": "1e90d45a5187463588ed527c676f1a1a4a9ad900cdaf22519704aa88f398c26d",
       "hunks": [
         {
           "offset": 5588,
@@ -665,12 +730,17 @@
           "after": "        self.data.hold_capacity()\n"
         },
         {
-          "offset": 53369,
+          "offset": 17184,
+          "before": "",
+          "after": "        if self.data.medusa\n            && matches!(command, crate::equipment::Command::UnfitCargoBay(_))\n            && used > 22\n        {\n            return Err(EquipmentError::HoldFull);\n        }\n"
+        },
+        {
+          "offset": 53570,
           "before": "        || occupied_tonnes(data, account) > u128::from(account.equipment.capacity())\n",
           "after": "        || occupied_tonnes(data, account) > u128::from(account.hold_capacity())\n"
         },
         {
-          "offset": 55659,
+          "offset": 55860,
           "before": "    if occupied_tonnes(data, account) + 8 > u128::from(account.equipment.capacity()) {\n",
           "after": "    if occupied_tonnes(data, account) + 8 > u128::from(account.hold_capacity()) {\n"
         }
@@ -684,6 +754,17 @@
           "offset": 6132,
           "before": "",
           "after": "                medusa: false,\n"
+        }
+      ]
+    },
+    "station_services.rs": {
+      "beforeSHA256": "4220651c337a8d7b1b4f783a1f76dc4369b0288aa645c8c8798c5f26f28b3636",
+      "afterSHA256": "29a34901069c4b3d4b45a43918b1db1fcda73d571e44f79cd361c5e860aacc48",
+      "hunks": [
+        {
+          "offset": 17377,
+          "before": "",
+          "after": "            crate::equipment::MEDUSA_HOLD_TONNES,\n            crate::equipment::MEDUSA_EXPANDED_HOLD_TONNES,\n"
         }
       ]
     }

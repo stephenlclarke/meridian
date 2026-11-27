@@ -7,7 +7,7 @@
   "undoAfter": [],
   "kind": "inverse",
   "manifest": "integration/fleet-medusa-outfit/PROTECTED-CORE-INVERSE.json",
-  "sha256": "a7a97fa020e972effb4cc855a952aa5fd77698f123c942d29286ef8631fe289a",
+  "sha256": "21ddcf5db26a72da43920b02cbdb26247751ca58f04f173f8071c06f7c5a0cfe",
   "base": "a2959bd36951917066caec5279684de5f0fba659",
   "label": "Ordinary Fleet Medusa issue, loadout and four-facing lasers"
 }
