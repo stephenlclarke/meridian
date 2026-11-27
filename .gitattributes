@@ -643,3 +643,11 @@ integration/sh072-griffon-mk-ii/CANDIDATE-FIT-SUPPORT-FANS.json text eol=lf
 integration/sh073-griffon-spectre/CANDIDATE-FIT-SUPPORT-FANS.json text eol=lf
 integration/sh072-griffon-mk-ii/ARCHIVE-FIT-SUPPORT-FANS.json text eol=lf
 integration/sh073-griffon-spectre/ARCHIVE-FIT-SUPPORT-FANS.json text eol=lf
+
+# Scout source and measurements must replay identically on CRLF checkouts.
+assets/fleet/sh033/** -text
+integration/sh033-panther-scout/*.json -text
+tools/measure_panther_scout.py text eol=lf
+tools/measure_panther_scout_fit.py text eol=lf
+tools/prepare_panther_scout_studio.py text eol=lf
+tools/verify_panther_scout_station.py text eol=lf

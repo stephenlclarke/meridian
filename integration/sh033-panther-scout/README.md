@@ -1,0 +1,33 @@
+# SH033 Panther Scout hull definition
+
+The original Panther Scout data is bound to immutable L337 revision `a11fe16924d87d06021816f9037952afcbac08db`, tree `68fec574df12ddf74acb14747e0dd6839f478642`. The Scout resource, native export and contract are independent of SH032 Panther Explorer; the original family registration and physical-contract references distinguish the two variants. Their checksums and the original MIT terms are retained in the authored definition. The shared original texture bytes are reused from the existing SH001 assets without duplicating them.
+
+`PANTHER-SCOUT-STUDIO.json` is a schema-1 data-defined hull. It preserves the original metre-space detailed and native triangle positions and ordering, forest-ivory palette, per-face material indices and UVs. The original 2,672 detailed vertices / 5,212 faces and 188 native vertices / 320 faces become 2,744 and 212 support-indexed vertices respectively, with unchanged faces. Only arch-band seam vertices are duplicated. Thirty-five local rounded convex support groups include the Scout's own axial survey spine and paired sails. The arch bands keep the side openings clear. Engineering is unassigned (`null`); no new hull admission, combat configuration, or player ownership is claimed.
+
+`CLEARANCE-FIXTURES.json` records four positively separated open paths, four solid convex-support midpoint witnesses, and aligned and offset original SH028 aperture projection measurements. The conservative lower gaps for the arch openings are 0.58 m and for the upper Scout openings approximately 0.753 m, after rounding and a 0.10 m probe radius. The rectangular station aperture is 124.64 by 101.6 m. Its aligned projection margins are approximately 52.471 m horizontally and 43.22 m vertically; a 60 m lateral offset exceeds the horizontal aperture by 7.529 m.
+
+`STATION-CONTACT.json` separately proves physical station geometry. An exact rational AABB separation check covers every rounded Scout support against all 488 original SH028 triangles through the aligned crossing (lower separation 43.218 m) and the offset opening (0.979 m). At a 69.5 m lateral offset, the actual native Scout keel support at `[0,-0.524,17]` crosses the strict interior of actual station face 482 at the midpoint of the inward 2 m sweep; this is an exact contact witness, not a claim that initial contact occurs at that fraction. These source geometry certificates require no new physics implementation or game session.
+
+`SURFACE-FIT.json` bounds the maximum distance of the exposed rounded hull envelope to the original detailed mesh at 0.437–1.001 m and to the original native mesh at 2.164–2.292 m. Exact arithmetic certifies the exposed lower witnesses and conservative full-piece upper bounds; the latter include overlapping surfaces and therefore cover all exposed surfaces. The native and detailed inputs are the original unremapped triangles, not the generated overlay. The original cross-source differences are also measured independently: an original native vertex is at least 0.088 m from the detailed mesh, and an original detail vertex is at least 1.848 m from the native mesh. The larger native fit discrepancy is retained and not hidden by substituting the detailed model.
+
+## Reproduction
+
+```sh
+python3 -B tools/prepare_panther_scout_studio.py --check
+python3 -B -m unittest discover -s tools -p 'test_panther_scout_studio.py' -v
+python3 -B tools/prepare_panther_scout_studio.py --check --validator /absolute/path/to/meridian-hull-tool
+python3 -B tools/verify_panther_scout_station.py
+python3 -B tools/measure_panther_scout_fit.py
+```
+
+The optional validator argument uses the already-built actual executable, not a mock or a compiler. `VALIDATOR-RECEIPT.json` records the actual author-stage run using the release binary from the earlier Hull Studio source `1789030980e0d2a7897c2dc48518fad728c9bbf2` (tree `fb22a072408e94b4553ea9c5e586916ff7e6ecae`): four open paths passed together with exit zero, and each of the four solid paths independently refused with exit one. The validator and input hashes are retained. The fit replay requires the existing pinned scientific requirements and Python assertions enabled. This receipt records the original author-stage validator. The candidate also reruns these five cases through its own hull tool.
+
+## Ordinary stock Showroom
+
+Search for **SH033** or **Panther Scout**. The stock entry authenticates the original definition and its 695,657-byte installed Studio export. The corner regression checks all 15,636 corners against the original detailed artwork before the arch seams were duplicated. The Scout is available for inspection with engineering unassigned.
+
+A single rounded convex support spanning both meshes blocks all four authored passages in the production validator. The existing 35 local supports pass all four. The keel, survey spine and both sails each block their solid probe. The production station test clears the full aligned crossing and detects contact in the offset motion after a clear start.
+
+The fixed-fan certificate reproduces the 437–1,001 mm detailed and 2,164–2,292 mm native bounds. The largest native witness is on the left pipe mount. Each opposite-mesh witness is rechecked against the original target triangles. Routine tests run the numerical certificate and station CLI and compare the raw output with the committed reports.
+
+[Portable fit and original-mesh witnesses](CERTIFIED-FIT.json) · [Measurement inputs and commands](CRITERIA.json)

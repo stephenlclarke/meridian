@@ -69,6 +69,18 @@ const DESCRIPTORS: &[StockDescriptor] = &[
     },
     StockDescriptor {
         model: AvailableModel {
+            object: "SH033",
+            geometry_key: "integration/sh033-panther-scout/PANTHER-SCOUT-STUDIO.json",
+        },
+        name: "Panther Scout",
+        package: include_bytes!(
+            "../../../../integration/sh033-panther-scout/PANTHER-SCOUT-STUDIO.json"
+        ),
+        fnv: 0xc92a_0036_3138_2c1b,
+        export_fnv: Some(0x32b7_c3fd_2e9a_e7f3),
+    },
+    StockDescriptor {
+        model: AvailableModel {
             object: "SH035",
             geometry_key: STAG_GEOMETRY_KEY,
         },
@@ -815,7 +827,7 @@ mod tests {
     #[test]
     fn every_stock_descriptor_authenticates_its_own_source_and_real_preview() {
         let catalogue = ok(crate::docked_screens::Catalogue::bundled());
-        assert_eq!(STOCK_MODELS.len(), 109);
+        assert_eq!(STOCK_MODELS.len(), 110);
         for held in [
             "SH082", "SH102", "SH103", "SH108", "SH112", "SH113", "SH114", "SH115", "SH116",
             "SH117", "SH118", "SH119", "SH120", "SH121", "SH122", "SH123", "SH124", "SH125",
@@ -956,6 +968,24 @@ mod tests {
         let mut changed = KITE_PACKAGE.to_vec();
         changed[0] ^= 1;
         assert!(load_stock(descriptor("SH031"), &changed).is_err());
+    }
+
+    #[test]
+    fn stock_panther_scout_preserves_the_survey_variant_and_its_original_corner_artwork() {
+        let entry = descriptor("SH033");
+        let export = ok(authenticated_package_bytes(entry, entry.package));
+        assert_eq!(export.len(), 695657);
+        let package = ok(HullPackage::from_json(export));
+        assert_eq!(package.name, "Panther Scout");
+        assert!(package.engineering.is_none());
+        assert_eq!(package.native.triangles.len(), 320);
+        let visual = ok(load_stock(entry, entry.package));
+        let packed = include_bytes!("../../../../assets/fleet/sh033/visual.bin");
+        assert_original_corners(&visual, packed, [0.0, 0.68, -1.545], 37.09, 15636, 1216);
+        let peer = descriptor("SH035");
+        assert!(load_stock(entry, peer.package).is_err());
+        assert!(load_stock(peer, entry.package).is_err());
+        assert_stock_and_local("SH033", entry.model.geometry_key);
     }
 
     #[test]

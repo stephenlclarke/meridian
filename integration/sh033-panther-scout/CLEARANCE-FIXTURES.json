@@ -1,0 +1,165 @@
+{
+  "hull": "SH033",
+  "roundingMetres": 0.02,
+  "openRoutes": [
+    {
+      "name": "Port arch opening",
+      "start": [
+        -5.7,
+        0.5,
+        -8
+      ],
+      "end": [
+        -5.7,
+        0.5,
+        7
+      ],
+      "radiusMetres": 0.1,
+      "provedLowerGapMetres": 0.5800000000000002,
+      "expectedPassed": true
+    },
+    {
+      "name": "Starboard arch opening",
+      "start": [
+        5.7,
+        0.5,
+        -8
+      ],
+      "end": [
+        5.7,
+        0.5,
+        7
+      ],
+      "radiusMetres": 0.1,
+      "provedLowerGapMetres": 0.5800000000000002,
+      "expectedPassed": true
+    },
+    {
+      "name": "Port Scout upper opening",
+      "start": [
+        -3.8,
+        6,
+        -10
+      ],
+      "end": [
+        -3.8,
+        6,
+        -2
+      ],
+      "radiusMetres": 0.1,
+      "provedLowerGapMetres": 0.7532124598286487,
+      "expectedPassed": true
+    },
+    {
+      "name": "Starboard Scout upper opening",
+      "start": [
+        3.8,
+        6,
+        -10
+      ],
+      "end": [
+        3.8,
+        6,
+        -2
+      ],
+      "radiusMetres": 0.1,
+      "provedLowerGapMetres": 0.7532124598286487,
+      "expectedPassed": true
+    }
+  ],
+  "solidRoutes": [
+    {
+      "name": "keel",
+      "start": [
+        -1.0,
+        -1.8,
+        0.7418139358490564
+      ],
+      "end": [
+        1.0,
+        -1.8,
+        0.7418139358490564
+      ],
+      "radiusMetres": 0.1,
+      "supportInteriorWitness": [
+        0.0,
+        -1.8,
+        0.7418139358490564
+      ],
+      "expectedPassed": false
+    },
+    {
+      "name": "scout-survey-spine",
+      "start": [
+        -1.0,
+        6.0,
+        -3.0305007924528304
+      ],
+      "end": [
+        1.0,
+        6.0,
+        -3.0305007924528304
+      ],
+      "radiusMetres": 0.1,
+      "supportInteriorWitness": [
+        0.0,
+        6.0,
+        -3.0305007924528304
+      ],
+      "expectedPassed": false
+    },
+    {
+      "name": "left-scout-sail",
+      "start": [
+        -6.8,
+        5.2,
+        -8.0
+      ],
+      "end": [
+        -4.8,
+        5.2,
+        -8.0
+      ],
+      "radiusMetres": 0.1,
+      "supportInteriorWitness": [
+        -5.8,
+        5.2,
+        -8.0
+      ],
+      "expectedPassed": false
+    },
+    {
+      "name": "right-scout-sail",
+      "start": [
+        4.8,
+        5.2,
+        -8.0
+      ],
+      "end": [
+        6.8,
+        5.2,
+        -8.0
+      ],
+      "radiusMetres": 0.1,
+      "supportInteriorWitness": [
+        5.8,
+        5.2,
+        -8.0
+      ],
+      "expectedPassed": false
+    }
+  ],
+  "stationAperture": {
+    "sourceSHA256": "31a7ed33803e78ebbe7bb87c0658e47a786e8bba9107d513b2e534ccd30cf71f",
+    "widthMetres": 124.64,
+    "heightMetres": 101.6,
+    "alignedProjectionMarginMetres": [
+      52.471000000000004,
+      43.22
+    ],
+    "offsetXMetres": 60,
+    "offsetProjectionExcessMetres": 7.5290000000000035,
+    "scope": "Projection only; physical SH028 station sweep not yet run"
+  },
+  "scope": "Conservative local AABB gap and actual convex support interior witnesses; Rust clearance validation pending"
+}

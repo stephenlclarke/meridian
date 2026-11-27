@@ -111,3 +111,7 @@ see it in the disposable game session. The Studio export command refuses
 schema 2. The standalone game accepts schema 2 only through
 `--inspect-hull-package`. Schema 1 retains the 512-face native limit and
 excludes archived inspection packages from the flight export.
+
+## Panther Scout stock inspection
+
+Search for **SH033** or **Panther Scout** in the station Showroom. The forest-ivory Scout retains its survey spine, paired sails and original 320-face native mesh. Its 35 rounded supports leave four passages open. The [Scout hull record](../integration/sh033-panther-scout/README.md) gives the source measurements and contact checks.
