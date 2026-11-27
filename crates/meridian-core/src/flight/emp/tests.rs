@@ -1822,3 +1822,33 @@ fn native_death_before_recovery_stays_dead_and_refuses_recovery_without_resource
     assert!(loaded.emp.episodes.last().unwrap().recovered_at.is_none());
     cold(&loaded);
 }
+
+#[test]
+fn medusa_exchange_preserves_real_emp_target_and_peregrine_self_splash() {
+    let mut world = World::new_commander(12001).unwrap();
+    secret(&mut world);
+    let (mut world, target) = defender(world);
+    start_charge(&mut world, target);
+    hold(&mut world, target, 600);
+    let profile = world
+        .owned_emp()
+        .unwrap()
+        .grades
+        .profile(State::energy_stage(&world).unwrap())
+        .unwrap();
+    let pulse = world.emp.pulses[0].clone();
+    assert!(
+        pulse
+            .contacts
+            .iter()
+            .any(|contact| contact.victim == scene::Victim::Player)
+    );
+    world
+        .request_emp_trigger(false, world.snapshot().tick)
+        .unwrap();
+    crate::flight::missiles::tests::issue_medusa_at_renas(&mut world);
+    let loaded = cold(&world);
+    assert_eq!(loaded.emp.pulses[0], pulse);
+    let contacts = pulse.release.contacts(&loaded, profile, target).unwrap();
+    assert_eq!(contacts, pulse.contacts);
+}

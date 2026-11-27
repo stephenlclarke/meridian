@@ -173,8 +173,9 @@ fn direct_feed_admissible(
     manifest: WreckManifest,
     retained: RecoveryPose,
     tick: u64,
+    visit: u64,
 ) -> bool {
-    let Some(station) = world.station_data.as_ref() else {
+    let Some(station) = world.station_at_visit(visit) else {
         return false;
     };
     let Some(sample) = retained.snapshot(world, tick) else {
@@ -196,8 +197,8 @@ fn direct_feed_admissible(
         source.z - player.position.z,
     );
     let range = to_source.dot(to_source).sqrt();
-    let radius = station.player_clearance_radius();
-    let standoff = 2.0 * radius + 2.0;
+    let radius = station.npc_geometry().player_clearance_radius();
+    let standoff = station.player_npc_clearance() + 2.0;
     if !(standoff - 0.5..=standoff + 0.5).contains(&range)
         || to_source.dot(player.orientation.z) < range * 0.999
     {
@@ -552,7 +553,7 @@ impl super::State {
                         .saturating_sub(world.combat.physical_tick())
                 || r.visit > world.combat_identity().ok_or(INVALID)?.visit
                 || world.jump_journal.system_at_visit(r.visit, r.tick)? != r.source.system()
-                || !direct_feed_admissible(world, manifest, r.pose, r.tick)
+                || !direct_feed_admissible(world, manifest, r.pose, r.tick, r.visit)
                 || (r.tick == world.state.tick
                     && r.physical == world.combat.physical_tick()
                     && r.pose != RecoveryPose::capture(world.state))
@@ -869,8 +870,11 @@ impl World {
         let Ok(manifest) = self.wreck_manifest(id) else {
             return "Claim unavailable";
         };
+        let Some(identity) = self.combat_identity() else {
+            return "Salvage unavailable";
+        };
         let pose = RecoveryPose::capture(self.state);
-        if !direct_feed_admissible(self, manifest, pose, self.state.tick) {
+        if !direct_feed_admissible(self, manifest, pose, self.state.tick, identity.visit) {
             return "Hold for recovery";
         }
         let tick = self.state.tick;
@@ -885,9 +889,6 @@ impl World {
             return "Salvage unavailable";
         };
         let Some(session) = self.freight_session.as_ref() else {
-            return "Salvage unavailable";
-        };
-        let Some(identity) = self.combat_identity() else {
             return "Salvage unavailable";
         };
         let Ok(cabins) = self.cabin_tonnes() else {

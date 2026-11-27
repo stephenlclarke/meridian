@@ -1,0 +1,117 @@
+{
+  "base": "492e49b6cab7a75d70e03c91796b6a3ad62399c1",
+  "files": {
+    "flight/emp/scene.rs": {
+      "beforeSHA256": "a605ed41aa4baa6c66d4c5d2efba65f4adef80e6c64a7cfb0fbfb775dbe86b67",
+      "afterSHA256": "0a2b0eb5a97cbbc99bdc7085e19e5956a30ae917742f1a4afdc18b0bf0e99cbe",
+      "hunks": [
+        {
+          "offset": 2396,
+          "before": "            .station_data\n            .as_ref()\n",
+          "after": "            .station_at_visit(self.owner.visit)\n"
+        },
+        {
+          "offset": 2687,
+          "before": "",
+          "after": "                .npc_geometry()\n"
+        },
+        {
+          "offset": 7276,
+          "before": "            .station_data\n            .as_ref()\n",
+          "after": "            .station_at_visit(self.owner.visit)\n"
+        },
+        {
+          "offset": 9775,
+          "before": "        let data = world.station_data.as_ref().ok_or(INVALID)?;\n",
+          "after": "        let data = world.station_at_visit(self.owner.visit).ok_or(INVALID)?;\n"
+        },
+        {
+          "offset": 11333,
+          "before": "",
+          "after": "\n#[cfg(test)]\nmod tests {\n    use super::*;\n\n    #[test]\n    fn live_medusa_emp_scene_uses_each_victims_own_surface()\n    -> Result<(), Box<dyn std::error::Error>> {\n        let mut world = World::new_commander(12005)?;\n        let review = world.review_xyzzy(crate::XyzzyAction::ActivateMedusa, 0)?;\n        world.prepare_xyzzy(review, 0)?.commit();\n        crate::flight::practice::tests::launch(&mut world);\n        for _ in 0..700 {\n            world.step(crate::FlightInput {\n                throttle: 1.0,\n                ..Default::default()\n            })?;\n        }\n        let state = world.snapshot();\n        let player =\n            crate::station::flight_pose(state.position, state.orientation).ok_or(\"player pose\")?;\n        let owner = world.combat_identity().ok_or(\"commander\")?;\n        let scene = Scene::capture(\n            &world.traffic,\n            &world.missiles,\n            world.combat.emissions,\n            owner,\n            player,\n            state.tick,\n            world.combat.physical_tick(),\n        )?;\n        let actor = scene.bodies.first().ok_or(\"traffic birth\")?;\n        let geometry = world.station_data.as_ref().ok_or(\"station\")?;\n        for (victim, pose, hull) in [\n            (Victim::Npc(actor.id), actor.pose, geometry.npc_geometry()),\n            (Victim::Player, player, geometry),\n        ] {\n            let origin = add(pose.position, Vec3::new(0.0, 500.0, 0.0));\n            let point = hull.player_missile_aimpoint(pose, origin)?;\n            let ray = unit(sub(point, origin)).ok_or(\"aim\")?;\n            let distance = hull\n                .player_beam_distance(pose, origin, ray, 1000.0)?\n                .ok_or(\"native surface\")?;\n            let contact = scene\n                .nearest(&world, origin, ray, 1000.0, None, true)?\n                .ok_or(\"EMP contact\")?;\n            assert_eq!((contact.0, contact.2), (victim, distance));\n        }\n        Ok(())\n    }\n}\n"
+        }
+      ]
+    },
+    "flight/emp/tests.rs": {
+      "beforeSHA256": "80a082a07f56c228f2cc28c585e271fb007be6ace1fb304a0092711db737f05d",
+      "afterSHA256": "8d0412fbd4271dcf14c205456d480f1d429de4d34dde9ad5595baf08a196fe80",
+      "hunks": [
+        {
+          "offset": 70473,
+          "before": "",
+          "after": "\n#[test]\nfn medusa_exchange_preserves_real_emp_target_and_peregrine_self_splash() {\n    let mut world = World::new_commander(12001).unwrap();\n    secret(&mut world);\n    let (mut world, target) = defender(world);\n    start_charge(&mut world, target);\n    hold(&mut world, target, 600);\n    let profile = world\n        .owned_emp()\n        .unwrap()\n        .grades\n        .profile(State::energy_stage(&world).unwrap())\n        .unwrap();\n    let pulse = world.emp.pulses[0].clone();\n    assert!(\n        pulse\n            .contacts\n            .iter()\n            .any(|contact| contact.victim == scene::Victim::Player)\n    );\n    world\n        .request_emp_trigger(false, world.snapshot().tick)\n        .unwrap();\n    crate::flight::missiles::tests::issue_medusa_at_renas(&mut world);\n    let loaded = cold(&world);\n    assert_eq!(loaded.emp.pulses[0], pulse);\n    let contacts = pulse.release.contacts(&loaded, profile, target).unwrap();\n    assert_eq!(contacts, pulse.contacts);\n}\n"
+        }
+      ]
+    },
+    "flight/missiles/npc.rs": {
+      "beforeSHA256": "09347ef6693cc03a8227865c35ad339b40e9876a9d28d92b346f20c42871c3f0",
+      "afterSHA256": "aa20026bae75d1aab74d3793f942d6ed7bcaf5442ed6c85dd909f1e6f7fbb175",
+      "hunks": [
+        {
+          "offset": 2968,
+          "before": "",
+          "after": "            .npc_geometry()\n"
+        },
+        {
+          "offset": 8172,
+          "before": "        let data = world.station_data.as_ref().ok_or(INVALID)?;\n",
+          "after": "        let data = world\n            .station_at_visit(p.origin.owner.visit)\n            .ok_or(INVALID)?;\n"
+        },
+        {
+          "offset": 13176,
+          "before": "        let data = world.station_data.as_ref().ok_or(INVALID)?;\n",
+          "after": "        let data = world\n            .station_at_visit(p.origin.owner.visit)\n            .ok_or(INVALID)?;\n"
+        },
+        {
+          "offset": 14569,
+          "before": "",
+          "after": "            .npc_geometry()\n"
+        }
+      ]
+    },
+    "flight/missiles/npc/tests.rs": {
+      "beforeSHA256": "a32d510e20cff413a469ae5f684a456904d2905831f43d116f2e326f7981d584",
+      "afterSHA256": "f48fe37701d2cbd4fd3f3db76fe15cf85c20dec5da8f32673c7e5ad5002acfb1",
+      "hunks": [
+        {
+          "offset": 18677,
+          "before": "",
+          "after": "\n#[test]\nfn medusa_exchange_retains_peregrine_missile_impact_and_guides_on_live_npc_mesh() {\n    let mut world = impacted();\n    let hit = world.traffic.missile_hits()[0];\n    crate::flight::missiles::tests::issue_medusa_at_renas(&mut world);\n    world = cold(&world);\n    assert_eq!(world.traffic.missile_hits()[0], hit);\n    // Start a separate Medusa flight with fresh local traffic for the live guidance query.\n    let mut world = World::new_commander(12005).unwrap();\n    let issue = world\n        .review_xyzzy(crate::XyzzyAction::ActivateMedusa, 0)\n        .unwrap();\n    world.prepare_xyzzy(issue, 0).unwrap().commit();\n    launch(&mut world);\n    for _ in 0..700 {\n        world\n            .step(crate::FlightInput {\n                throttle: 1.0,\n                ..Default::default()\n            })\n            .unwrap();\n    }\n    let npc = trader(&world);\n    let origin =\n        crate::flight::flight_pose(world.snapshot().position, world.snapshot().orientation)\n            .unwrap()\n            .position;\n    let geometry = world.station_data.as_ref().unwrap();\n    let correct = geometry\n        .npc_geometry()\n        .player_missile_aimpoint(npc.pose, origin)\n        .unwrap();\n    assert_ne!(\n        geometry.player_missile_aimpoint(npc.pose, origin).unwrap(),\n        correct\n    );\n    assert_eq!(\n        world\n            .resolve_missile_guidance(\n                MissileTarget::Npc(npc.id),\n                origin,\n                &world.traffic,\n                world.practice\n            )\n            .unwrap(),\n        Some(correct)\n    );\n    cold(&world);\n}\n"
+        }
+      ]
+    },
+    "flight/missiles/persistence.rs": {
+      "beforeSHA256": "3eb4d23f8d743ce068f8592e81c61af01f687b173bd3499419d66377320a3031",
+      "afterSHA256": "6f3d5edb38bb8932b8e70e7e8c45bc5185276cfd33f7b3d636f6dedecc9f8f2d",
+      "hunks": [
+        {
+          "offset": 38531,
+          "before": "        let data = world.station_data.as_ref().ok_or(INVALID)?;\n",
+          "after": "        let data = world.station_at_visit(o.owner.visit).ok_or(INVALID)?;\n"
+        }
+      ]
+    },
+    "flight/missiles/tests.rs": {
+      "beforeSHA256": "1609ce38e46ee5acf94ac3ca077ae53bdffb6b904f9098431142630d1d60bea4",
+      "afterSHA256": "e46027ec8bec47c3ba72bba9eaabc37c5019239991c3baba0f50b90966bc0462",
+      "hunks": [
+        {
+          "offset": 3023,
+          "before": "",
+          "after": "}\n\npub(in crate::flight) fn issue_medusa_at_renas(world: &mut World) {\n    world\n        .request_jump(crate::navigation::SystemId::RENAS, world.snapshot().tick)\n        .unwrap();\n    let remaining = world\n        .snapshot()\n        .navigation\n        .unwrap()\n        .travel\n        .unwrap()\n        .remaining_ticks;\n    for _ in 0..remaining {\n        world.step(FlightInput::default()).unwrap();\n    }\n    dock(world);\n    let tick = world.snapshot().tick;\n    let review = world\n        .review_xyzzy(crate::XyzzyAction::ActivateMedusa, tick)\n        .unwrap();\n    world.prepare_xyzzy(review, tick).unwrap().commit();\n"
+        }
+      ]
+    },
+    "flight/traffic/tests.rs": {
+      "beforeSHA256": "4bb55c5ea3562e2aeb429f77ed16bb23bbd443d5cfe20a40e7bd4e374276cf3a",
+      "afterSHA256": "ac4d110d12b59545247ae74e53ed7063879841974e1130ce22412e6aac5f9961",
+      "hunks": [
+        {
+          "offset": 4880,
+          "before": "    ok(world.request_jump(crate::navigation::SystemId::RENAS, world.snapshot().tick));\n    let remaining = some(some(world.snapshot().navigation).travel).remaining_ticks;\n    steps(&mut world, remaining as usize);\n    crate::flight::missiles::tests::dock(&mut world);\n    assert!(world.traffic.player_hits().contains(&hit));\n    let tick = world.snapshot().tick;\n    let review = ok(world.review_xyzzy(crate::XyzzyAction::ActivateMedusa, tick));\n    ok(world.prepare_xyzzy(review, tick)).commit();\n",
+          "after": "    crate::flight::missiles::tests::issue_medusa_at_renas(&mut world);\n"
+        }
+      ]
+    }
+  }
+}

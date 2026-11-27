@@ -78,6 +78,7 @@ impl World {
         self.station_data
             .as_ref()
             .ok_or(StepError::NonFiniteState)?
+            .npc_geometry()
             .player_missile_aimpoint(body.pose, origin)
             .map(Some)
             .map_err(|_| StepError::NonFiniteState)
@@ -233,7 +234,9 @@ impl State {
             .get(i)
             .and_then(|e| e.as_ref())
             .ok_or(INVALID)?;
-        let data = world.station_data.as_ref().ok_or(INVALID)?;
+        let data = world
+            .station_at_visit(p.origin.owner.visit)
+            .ok_or(INVALID)?;
         world
             .traffic
             .validate_missile_scene(&e.scene, world.state.tick, data)?;
@@ -359,7 +362,9 @@ impl State {
         dock_sequence: u64,
         motion_tick: u64,
     ) -> Result<(), SaveError> {
-        let data = world.station_data.as_ref().ok_or(INVALID)?;
+        let data = world
+            .station_at_visit(p.origin.owner.visit)
+            .ok_or(INVALID)?;
         let m = self.motions[i].as_ref().ok_or(INVALID)?;
         super::super::persistence::validate_flight(world, &m.flight)?;
         if m.flight.tick != motion_tick
@@ -388,6 +393,7 @@ impl State {
             .validate_missile_scene(scene, world.state.tick, data)?;
         let target = scene.target(id).ok_or(INVALID)?;
         let aimpoint = data
+            .npc_geometry()
             .player_missile_aimpoint(target.pose, m.position)
             .map_err(|_| INVALID)?;
         let direction = unit(sub(aimpoint, m.position)).ok_or(INVALID)?;

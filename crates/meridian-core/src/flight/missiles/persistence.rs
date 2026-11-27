@@ -1049,7 +1049,7 @@ impl State {
         }
         let player =
             super::super::flight_pose(m.flight.position, m.flight.orientation).ok_or(INVALID)?;
-        let data = world.station_data.as_ref().ok_or(INVALID)?;
+        let data = world.station_at_visit(o.owner.visit).ok_or(INVALID)?;
         let cleared = m.cleared
             || length(sub(m.position, player.position)) > data.player_clearance_radius() + 1e-6;
         let travel = (MISSILE_SPEED / 60.0).min((MISSILE_RANGE - m.travel).max(0.0));

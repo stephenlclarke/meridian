@@ -112,7 +112,7 @@ impl World {
 
     /// Desired centre-to-centre separation, using the same hull bounds as swept motion.
     pub(in crate::flight) fn work_standoff(&self, target: WorkTarget) -> Option<f64> {
-        let player_radius = self.station_data.as_ref()?.player_clearance_radius();
+        let hull = self.station_data.as_ref()?;
         match target.id {
             WorkTargetId::Asteroid(id) => {
                 let rock = self
@@ -121,10 +121,9 @@ impl World {
                     .filter(|rock| rock.id == id)?;
                 // Leave the settled hold outside the swept collision margin even at
                 // the inner edge of its half-unit position tolerance.
-                Some(rock.bounding_radius() + player_radius + 2.0)
+                Some(rock.bounding_radius() + hull.player_clearance_radius() + 2.0)
             }
-            // Traffic rejects centre distances <= 2 * radius + 1.
-            WorkTargetId::Wreck(_) => Some(2.0 * player_radius + 2.0),
+            WorkTargetId::Wreck(_) => Some(hull.player_npc_clearance() + 2.0),
             // Original local scoop aperture is 45 below and 55 forward.
             WorkTargetId::Ore(_) => Some(45.0_f64.hypot(55.0)),
         }
