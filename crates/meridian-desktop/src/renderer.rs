@@ -380,14 +380,23 @@ impl Renderer {
     }
 
     pub fn scanner_viewport(&self) -> [u32; 2] {
+        self.cockpit_viewport(false)
+    }
+
+    fn cockpit_viewport(&self, docked: bool) -> [u32; 2] {
         let size = self.size;
         if self.is_zero_sized() {
             return [1, 1];
         }
         let logical = size.to_logical::<f64>(self.window.scale_factor());
         let height = logical.height.round().max(1.) as u32;
-        let fraction =
-            hud::cockpit::flight_height(logical.width.round() as u32, height) / height as f32;
+        let width = logical.width.round() as u32;
+        let top = if docked && width >= 320 && height >= 240 {
+            hud::cockpit::Layout::new(width, height).top
+        } else {
+            hud::cockpit::flight_height(width, height)
+        };
+        let fraction = top / height as f32;
         [
             size.width,
             (size.height as f32 * fraction)
@@ -890,8 +899,9 @@ impl Renderer {
             self.recover_surface(recovery)
         });
         let Some((frame, reconfigure)) = Self::prepare_acquired_frame(acquired, || {
-            let flight_size = if cockpit.is_some() {
-                let [width, height] = self.scanner_viewport();
+            let flight_size = if let Some(instruments) = cockpit {
+                let [width, height] = self
+                    .cockpit_viewport(instruments.flight.mode == meridian_core::FlightMode::Docked);
                 PhysicalSize::new(width, height)
             } else {
                 self.size

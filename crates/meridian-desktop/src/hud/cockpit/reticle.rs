@@ -107,7 +107,7 @@ mod tests {
         ok(world.step(Default::default()));
         assert_eq!(Sight::capture(&world, world.snapshot()), None);
         assert!(
-            crate::help::Panel::flight_status(&world)
+            crate::help::Panel::flight_status(&world, None, Default::default())
                 .lines
                 .iter()
                 .any(|line| line == "FRONT LASER MOUNT EMPTY")

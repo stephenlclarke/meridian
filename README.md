@@ -6,7 +6,7 @@ The Fleet, Medusa and Hull Studio preview adds 115 station Showroom models and a
 
 In the Fleet development build, open **5 Equipment** at a station to buy, store or refit the XYZZY Medusa’s front, aft, port and starboard lasers independently. Use **0–3** to select a view and **Z** to fire its fitted class. [Fleet Medusa laser controls](docs/FLEET-MEDUSA-LASERS.md)
 
-The development cockpit shows the pilot’s view above the scanner. Its centre sight identifies the active laser or work tool by shape and colour. Press **H**, then **I**, for flight status. [Cockpit instruments](docs/COCKPIT-HUD.md)
+The development cockpit shows the pilot’s view above the scanner. Its centre sight identifies the active laser or work tool by shape and colour. Press **H**, then **I**, for flight status. Press **N** on that card to choose a notice position. [Cockpit instruments](docs/COCKPIT-HUD.md)
 
 The ordinary-drive development candidate adds the Basic, Intermediate and Advanced hyperspace drive slot to Equipment. Paid upgrades change the actual jump countdown and station mass lock; explicit XYZZY maximum fitting uses the Advanced drive. The [equipment implementation and testing ledger](docs/EQUIPMENT-PLAYABLE.md) records all catalogue grades, remaining gameplay paths and Medusa compatibility constraints. This candidate is not part of Preview 10 and awaits owned validation.
 

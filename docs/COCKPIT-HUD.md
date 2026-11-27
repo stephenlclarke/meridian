@@ -12,6 +12,8 @@ The sight marks the centre of the flight scene and follows the action bound to *
 
 Press **H**, then **I**, to inspect flight status, including the fitted or empty laser mount, EMP, test fuel settings, manual assistance, practice, docking, jump countdown and current rock contact when available. **Escape** closes the card. Input feedback and pilot-opened reviews remain visible when needed.
 
+Flight notices appear below the instruments by default. Open **H**, then **I**, and press **N** to cycle through **Instruments**, **Upper left**, **Upper right** and **Status only**. The choice applies for the current app session. Flight Status retains the latest notice after it expires. Corner notices return to the instrument footer while target guidance is visible. Contact warnings and terminal recovery instructions always use the footer.
+
 ## Published scope
 
 [Preview 7 v0.7.0-preview.1](https://github.com/stephenlclarke/meridian/releases/tag/v0.7.0-preview.1) includes the joined HUD, nine-pylon feed, NPC scanner and contextual Help. All three owned platforms passed 603 Rust tests and 99 Python tests on compiled `076639d`; final-head/main coverage and exact-main zero-issue Sonar passed before publication. The new signed Mac binary passed bounded title/System Help and cold Continue; earlier `c98fc86` native checks cover all five station cards, fitted flight Help and manual pause. These are separate immutable runs. The sections below retain the original authoring context; their old UNRUN and integration-pending statements do not describe the published source. Native compact resizing, precise ticks, original screenshot comparison, FPS/race and leak cure remain unobserved or unresolved.

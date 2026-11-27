@@ -2,6 +2,7 @@
 use crate::docked_screens::Screen;
 use meridian_core::unwritten_route::ClueProgress;
 
+pub(crate) const FLIGHT_STATUS: &str = "Flight status";
 pub(crate) const FLIGHT_CONTROLS: &str = "Flight controls";
 
 pub const MAX_LINES: usize = 18;
@@ -133,9 +134,21 @@ impl Panel {
         }
         panel
     }
-    pub(crate) fn flight_status(world: &meridian_core::World) -> Self {
-        let mut panel = Self::new("Flight status", &[]);
-        for line in crate::session::Session::flight_status(world) {
+    pub(crate) fn flight_status(
+        world: &meridian_core::World,
+        last_notice: Option<&str>,
+        placement: crate::hud::cockpit::notice::Placement,
+    ) -> Self {
+        let mut panel = Self::new(FLIGHT_STATUS, &[]);
+        panel.footer = "N Change notice position | Escape / H Close";
+        panel
+            .lines
+            .push(format!("Notice position: {}", placement.name()));
+        let last = last_notice.map(|message| format!("Last notice: {message}"));
+        for line in last
+            .into_iter()
+            .chain(crate::session::Session::flight_status(world))
+        {
             let mut row = String::new();
             for word in line.split_whitespace() {
                 if row.len() + 1 + word.len() > MAX_COLUMNS {

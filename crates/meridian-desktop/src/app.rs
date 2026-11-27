@@ -28,6 +28,7 @@ use winit::{
 
 use crate::audio::host::DesktopAudio;
 use crate::clock::FixedClock;
+use crate::hud::cockpit::notice::Placement;
 use crate::profile::Profile;
 use crate::renderer::{HudScene, Presentation, Renderer, SceneEffects, StationScene};
 use crate::session::Action;
@@ -154,6 +155,7 @@ struct Notice {
     text: Option<String>,
     expires: Option<Instant>,
     missile: bool,
+    urgent: bool,
 }
 
 impl Notice {
@@ -161,6 +163,12 @@ impl Notice {
         self.text = Some(message);
         self.expires = Some(Instant::now() + std::time::Duration::from_secs(4));
         self.missile = false;
+        self.urgent = false;
+    }
+
+    fn warn(&mut self, message: String) {
+        self.set(message);
+        self.urgent = true;
     }
 
     fn expire(&mut self, now: Instant) -> bool {
@@ -179,6 +187,8 @@ struct App {
     audio: Option<DesktopAudio>,
     validation_view: FlightView,
     target_details: Option<bool>,
+    notice_placement: Placement,
+    last_flight_notice: Option<String>,
     validation_timing: Option<mule_validation::FrameTiming>,
     celestial: crate::celestial::WorldAdapter,
     quit_failed: bool,
@@ -287,6 +297,8 @@ impl App {
             audio: None,
             validation_view: FlightView::Front,
             target_details: None,
+            notice_placement: Placement::default(),
+            last_flight_notice: None,
             validation_timing: internal.then(mule_validation::FrameTiming::default),
             quit_failed: false,
             terminal_redraw_pending: false,
@@ -432,6 +444,17 @@ impl App {
         }
     }
 
+    fn flight_status_panel(&self) -> crate::help::Panel {
+        crate::help::Panel::flight_status(
+            &self.game.world,
+            self.notice
+                .text
+                .as_deref()
+                .or(self.last_flight_notice.as_deref()),
+            self.notice_placement,
+        )
+    }
+
     fn route_help(&mut self, code: KeyCode, repeat: bool, text: Option<&str>) -> bool {
         let searching = self.xyzzy.is_none()
             && self.menu_active()
@@ -440,11 +463,17 @@ impl App {
         let toggle = question || (code == KeyCode::KeyH && !searching);
         let journal = code == KeyCode::KeyJ && self.modifiers.shift_key() && !searching;
         if let Some(panel) = &self.help {
+            if !repeat && code == KeyCode::KeyN && panel.title == crate::help::FLIGHT_STATUS {
+                self.notice_placement = self.notice_placement.next();
+                self.help = Some(self.flight_status_panel());
+                self.request_redraw();
+                return true;
+            }
             if !repeat
                 && code == KeyCode::KeyI
                 && panel.title.starts_with(crate::help::FLIGHT_CONTROLS)
             {
-                self.help = Some(crate::help::Panel::flight_status(&self.game.world));
+                self.help = Some(self.flight_status_panel());
                 self.request_redraw();
                 return true;
             }
@@ -762,10 +791,10 @@ impl App {
     }
 
     fn save_profile(&mut self) {
-        self.notice.set(match self.game.save() {
-            Ok(message) => message,
-            Err(error) => error,
-        });
+        match self.game.save() {
+            Ok(message) => self.notice.set(message),
+            Err(error) => self.notice.warn(error),
+        }
     }
 
     fn new_commander_from_key(&mut self, seed: u64) {
@@ -784,6 +813,7 @@ impl App {
     }
 
     fn sync_profile_controls(&mut self) {
+        self.last_flight_notice = None;
         self.paused = self.game.world.mission_snapshot().is_some_and(|m| m.paused);
         self.quit_failed = false;
         self.terminal_redraw_pending = false;
@@ -1123,7 +1153,7 @@ impl App {
             Ok(refusal) => refusal,
             Err(StepError::InvalidMode) if player_destroyed(&self.game.world) => None,
             Err(error) if matches!(error, StepError::Collision | StepError::UnsafeEntry) => {
-                self.notice.set(error.to_string());
+                self.notice.warn(error.to_string());
                 None
             }
             Err(error) => return FrameAdvance::Fatal(error),
@@ -1135,7 +1165,7 @@ impl App {
             return FrameAdvance::Continue(frame_refusal);
         }
         if let Some(refusal) = frame_refusal {
-            self.notice.set(
+            self.notice.warn(
                 match refusal {
                     MotionRefusal::CelestialContact => {
                         "Celestial contact: stopped before the physical surface"
@@ -1425,9 +1455,20 @@ impl App {
         elapsed: f64,
         viewport: impl FnOnce(Option<&Renderer>) -> Option<[f64; 2]>,
     ) -> Result<PreparedPresentation, String> {
-        let hud_lines = self
-            .game
-            .lines(active, pulse_notice.or(self.notice.text.as_deref()));
+        let notice = if self.notice.urgent || self.quit_failed || player_destroyed(&self.game.world)
+        {
+            self.notice.text.as_deref().or(pulse_notice)
+        } else {
+            pulse_notice.or(self.notice.text.as_deref())
+        };
+        if self.game.playing()
+            && self.game.world.snapshot().mode != FlightMode::Docked
+            && let Some(message) = notice
+            && self.last_flight_notice.as_deref() != Some(message)
+        {
+            self.last_flight_notice = Some(message.to_owned());
+        }
+        let hud_lines = self.game.lines(active, notice);
         let docked_frame =
             self.docked_frame(if self.modal_open() { 0.0 } else { elapsed }, viewport)?;
         Ok(PreparedPresentation {
@@ -1592,7 +1633,7 @@ impl App {
             None
         };
         let traffic = self.game.world.traffic_snapshot();
-        let cockpit = if self.game.playing()
+        let mut cockpit = if self.game.playing()
             && !self.commander_open
             && !self.game.is_internal_validation()
             && !self.game.is_medusa_preview()
@@ -1673,6 +1714,16 @@ impl App {
             );
             let practice = self.game.world.practice_snapshot();
             let targeting = Self::target_readout(&self.game.world);
+            if let Some(c) = &mut cockpit
+                && c.flight.mode != FlightMode::Docked
+            {
+                c.notice_placement = (!self.game.session.hud_panel_open()).then(|| {
+                    self.notice_placement.effective(
+                        self.notice.urgent || self.quit_failed || c.destroyed,
+                        targeting.is_some(),
+                    )
+                });
+            }
             renderer.set_player_hull(
                 self.game.world.player_hull_kind(),
                 self.game.is_medusa_preview(),

@@ -450,3 +450,44 @@ fn control_shortcuts_preserve_modal_enter_and_use_the_correct_save_slot() {
     assert_eq!(preview.game.world.snapshot(), prior);
     assert_eq!(ok(std::fs::read(fleet)), saved);
 }
+
+#[test]
+fn flight_status_cycles_notice_positions_and_keeps_the_last_launch_notice() {
+    use crate::hud::cockpit::notice::Placement;
+    let directory = TestDirectory::new();
+    let mut app = app(&directory);
+    let launch = ok(app.game.command(Action::Launch));
+    app.notice.set(launch.clone());
+    ok(app.game.world.step(FlightInput::default()));
+    let before = ok(app.game.world.save_bytes());
+    let prepared = ok(app.prepare_presentation(true, None, 0., |_| None));
+    assert_eq!(prepared.hud_lines, [launch.clone()]);
+    let deadline = app
+        .notice
+        .expires
+        .unwrap_or_else(|| panic!("timed launch feedback"));
+    assert!(app.expire_hud_notice(deadline));
+    press(&mut app, KeyCode::KeyH, Some("h"));
+    press(&mut app, KeyCode::KeyI, Some("i"));
+    for expected in [
+        Placement::Instruments,
+        Placement::UpperLeft,
+        Placement::UpperRight,
+        Placement::StatusOnly,
+        Placement::Instruments,
+    ] {
+        assert_eq!(app.notice_placement, expected);
+        let panel = app.help.as_ref().unwrap_or_else(|| panic!("status card"));
+        assert!(
+            panel
+                .lines
+                .iter()
+                .any(|line| line == &format!("Notice position: {}", expected.name()))
+        );
+        assert!(panel.lines.iter().any(|line| line.contains(&launch)));
+        assert!(panel.footer.contains("N Change notice position"));
+        press(&mut app, KeyCode::KeyN, Some("n"));
+    }
+    press(&mut app, KeyCode::Escape, None);
+    assert_eq!(ok(app.game.world.save_bytes()), before);
+}

@@ -14,7 +14,7 @@ The Fleet XYZZY development change issues an SH171 Medusa to the ordinary comman
 
 ## Ordinary cockpit viewport
 
-The desktop source uses the pilot’s position and projects the flight scene above the scanner. Tool sights follow the current mount and selected work equipment. Flight Help opens a separate status card. [Cockpit display and controls](COCKPIT-HUD.md#ordinary-flight-viewport)
+The desktop source uses the pilot’s position and projects the flight scene above the scanner. Tool sights follow the current mount and selected work equipment. Flight Help opens a status card with the latest notice and its placement control. Routine feedback defaults to the instrument footer. [Cockpit display and controls](COCKPIT-HUD.md#ordinary-flight-viewport)
 
 ## Independent laser fitting
 

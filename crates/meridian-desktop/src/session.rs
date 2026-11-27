@@ -1171,7 +1171,7 @@ mod tests {
     fn missile_controls_cycle_actual_locks_consume_a_round_and_continue_state() {
         fn assert_visible(session: &Session, world: &World) {
             assert!(session.lines(world, true, None).is_empty());
-            let panel = crate::help::Panel::flight_status(world);
+            let panel = crate::help::Panel::flight_status(world, None, Default::default());
             assert!(
                 panel
                     .lines

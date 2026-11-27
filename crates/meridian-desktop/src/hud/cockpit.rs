@@ -1,5 +1,6 @@
 //! L337 a11fe169 CockpitDisplay.swift gauge grouping/scanner and StationNavigation.swift.
 //! Only World snapshots supply readings. Missing simulations have no invented needle.
+pub(crate) mod notice;
 mod reticle;
 use super::{glyph, quad};
 use crate::mesh::{Vertex, rotate_inverse};
@@ -45,6 +46,7 @@ pub struct ScannerTarget {
 pub struct Cockpit {
     pub flight: Snapshot,
     sight: Option<reticle::Sight>,
+    pub(crate) notice_placement: Option<notice::Placement>,
     pub view: FlightView,
     pub shield: [Option<f32>; 2],
     pub energy: Option<f32>,
@@ -106,6 +108,8 @@ impl Cockpit {
         Ok(Self {
             flight,
             sight: reticle::Sight::capture(world, flight),
+            notice_placement: (flight.mode != FlightMode::Docked)
+                .then_some(notice::Placement::default()),
             view: world.flight_view(),
             shield: [
                 combat.map(|c| {
@@ -485,9 +489,18 @@ fn scanner(out: &mut Vec<Vertex>, c: &Cockpit, l: Layout, size: [f32; 2]) {
     }
 }
 /// Appends bounded geometry after the existing review/control overlay, without gameplay access.
+fn flight_layout(width: u32, height: u32) -> Layout {
+    let mut layout = Layout::new(width, height);
+    // Scanner stalks extend half an ellipse above or below their base point.
+    let radius = if width < 900 { 32.0 } else { 46.0 };
+    let scanner_depth = 8.0 + layout.row + 16.0 + 2.5 * radius + 6.0;
+    layout.top = (layout.top.min(height as f32 - scanner_depth) - notice::FOOTER_HEIGHT).max(64.);
+    layout
+}
+
 pub(crate) fn flight_height(width: u32, height: u32) -> f32 {
     if width >= 320 && height >= 240 {
-        Layout::new(width, height).top
+        flight_layout(width, height).top
     } else {
         height as f32
     }
@@ -501,7 +514,11 @@ pub fn append(c: &Cockpit, width: u32, height: u32, out: &mut Vec<Vertex>) {
         return;
     }
     let size = [width as f32, height as f32];
-    let l = Layout::new(width, height);
+    let l = if c.flight.mode == FlightMode::Docked {
+        Layout::new(width, height)
+    } else {
+        flight_layout(width, height)
+    };
     quad(out, [0.0, l.top, size[0], size[1]], [0.0, 0.0, 0.0], size);
     line(out, [0.0, l.top], [size[0], l.top], YELLOW, size);
     label(
