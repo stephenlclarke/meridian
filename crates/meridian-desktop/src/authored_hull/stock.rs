@@ -77,6 +77,16 @@ const DESCRIPTORS: &[StockDescriptor] = &[
         fnv: STAG_FNV,
         export_fnv: Some(STAG_EXPORT_FNV),
     },
+    StockDescriptor {
+        model: AvailableModel {
+            object: "SH041",
+            geometry_key: "integration/sh041-serval-fighter/SERVAL-STUDIO.json",
+        },
+        name: "Serval Fighter",
+        package: include_bytes!("../../../../integration/sh041-serval-fighter/SERVAL-STUDIO.json"),
+        fnv: 0xf221_6ff4_c936_a648,
+        export_fnv: Some(0x8ab8_fc60_7d39_cc92),
+    },
     stock_package!(
         "SH042",
         "Saker",
@@ -815,7 +825,7 @@ mod tests {
     #[test]
     fn every_stock_descriptor_authenticates_its_own_source_and_real_preview() {
         let catalogue = ok(crate::docked_screens::Catalogue::bundled());
-        assert_eq!(STOCK_MODELS.len(), 109);
+        assert_eq!(STOCK_MODELS.len(), 110);
         for held in [
             "SH082", "SH102", "SH103", "SH108", "SH112", "SH113", "SH114", "SH115", "SH116",
             "SH117", "SH118", "SH119", "SH120", "SH121", "SH122", "SH123", "SH124", "SH125",
@@ -956,6 +966,23 @@ mod tests {
         let mut changed = KITE_PACKAGE.to_vec();
         changed[0] ^= 1;
         assert!(load_stock(descriptor("SH031"), &changed).is_err());
+    }
+
+    #[test]
+    fn stock_serval_preserves_original_corners_and_refuses_crossed_packages() {
+        let entry = descriptor("SH041");
+        let export = ok(authenticated_package_bytes(entry, entry.package));
+        assert_eq!(export.len(), 565867);
+        let package = ok(HullPackage::from_json(export));
+        assert!(package.engineering.is_none());
+        assert_eq!(package.native.triangles.len(), 224);
+        let packed = include_bytes!("../../../../assets/fleet/sh041/visual.bin");
+        let visual = ok(load_stock(entry, entry.package));
+        assert_original_corners(&visual, packed, [0.0, 1.317, -2.295], 29.59, 12708, 1216);
+        let peer = descriptor("SH042");
+        assert!(load_stock(entry, peer.package).is_err());
+        assert!(load_stock(peer, entry.package).is_err());
+        assert_stock_and_local("SH041", entry.model.geometry_key);
     }
 
     #[test]

@@ -647,3 +647,12 @@ integration/sh073-griffon-spectre/ARCHIVE-FIT-SUPPORT-FANS.json text eol=lf
 # Shared algorithm pinned by the directed hull measurement receipts.
 tools/directed_hull_fit.py text eol=lf
 tools/fleet_hull_measurement.py text eol=lf
+# SH041 exact certificate source tools; no broad newline override.
+tools/measure_serval_fighter.py text eol=lf
+tools/prepare_serval_studio.py text eol=lf
+tools/measure_serval_surface_fit.py text eol=lf
+tools/verify_serval_station.py text eol=lf
+tools/verify_serval_studio.py text eol=lf
+tools/measure_goshawk_surface_fit.py text eol=lf
+tools/import_goshawk_envelope_source.py text eol=lf
+tools/encode_goshawk_visual.py text eol=lf
