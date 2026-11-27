@@ -1,0 +1,98 @@
+{
+  "id": "SH037",
+  "name": "Vulture Mk I",
+  "legacyRevision": "a11fe16924d87d06021816f9037952afcbac08db",
+  "sourceUnits": "relative",
+  "metresPerSourceUnit": 9.819967266775777,
+  "metresPerSourceUnitExact": "6000/611",
+  "scaleBasis": "Adopted original engineering scale",
+  "detail": {
+    "vertices": 5132,
+    "faces": 8272,
+    "components": 501,
+    "bounds": [
+      [
+        -12.925541734860884,
+        -4.635024549918167,
+        -15.761047463175121
+      ],
+      [
+        12.925541734860884,
+        6.206219312602291,
+        14.238952536824875
+      ]
+    ]
+  },
+  "originalNative": {
+    "vertices": 1812,
+    "faces": 3016,
+    "components": 155,
+    "bounds": [
+      [
+        -12.95679869067103,
+        -4.635024549918167,
+        -15.761047463175121
+      ],
+      [
+        12.95679869067103,
+        6.206219312602291,
+        14.238952536824875
+      ]
+    ]
+  },
+  "studioNativeProxy": {
+    "vertices": 272,
+    "faces": 512,
+    "faceLimit": 512,
+    "bounds": [
+      [
+        -12.957387888707036,
+        -4.635613747954173,
+        -15.761636661211128
+      ],
+      [
+        12.957387888707036,
+        6.206808510638297,
+        14.239541734860882
+      ]
+    ],
+    "input": {
+      "bytes": 43045,
+      "sha256": "491f39c14121e9d89bdb8c67522842c03fee684acd700ce711e4b3417ec1eff9"
+    }
+  },
+  "shapePieces": 8,
+  "pins": {
+    "contract.toml": "1205c491e12819aaed94eff59ab4c8e22bc52cea61abbdbdb77834fa03301099",
+    "engineering.json": "0043c48d88c2c86063ad8aaaf99870dba03fbef733d5ed553f0db3066db50345",
+    "native-export.json": "e56098421799168e67178fe5fee7c8b5d829142af921a24e425d7f508d556ca6",
+    "resource.toml": "4719491723bbaffa5901691987a7b980053d5d0b63c8afc10f3882c31139de78",
+    "LICENSE": "033b7058d73f22c3c6b8a5825eb866ca2d67088f3ee94dd5f3e46da59d624766"
+  },
+  "outputs": {
+    "source.vertices": {
+      "bytes": 173204,
+      "sha256": "8752d3c31e1613ad396c6073fa659189eedc9a226243994c5e786add31d2d561"
+    },
+    "source-triangles.bin": {
+      "bytes": 141600,
+      "sha256": "ecfa814c969047a81f88a9899fd9d20a0279c40db9ff644aa1c272178264ff6d"
+    },
+    "source-piece-membership.bin": {
+      "bytes": 7216,
+      "sha256": "5f426200249124edd356b59ba61c6aa6424c307f810732841e74a5772e9995dc"
+    },
+    "PIECES.json": {
+      "bytes": 223,
+      "sha256": "c02b96a8cafd002e17d8c6840751115c421ebe2f4a34f3463b629920275eba3a"
+    },
+    "visual.bin": {
+      "bytes": 1389712,
+      "sha256": "d88ec8c4f6a11347a7299f734338fa2cd845c3a0076a5e1685b40a69cc869700"
+    },
+    "original-native-visual.bin": {
+      "bytes": 506704,
+      "sha256": "80b016f9dd232ba8024bc946752adda924b5d21d3190d872f40ec74ee8e31723"
+    }
+  }
+}

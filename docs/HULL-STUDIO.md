@@ -111,3 +111,7 @@ see it in the disposable game session. The Studio export command refuses
 schema 2. The standalone game accepts schema 2 only through
 `--inspect-hull-package`. Schema 1 retains the 512-face native limit and
 excludes archived inspection packages from the flight export.
+
+## Vulture Mk I
+
+The [SH037 Vulture Mk I](VULTURE-MK-I-GAMEPLAY-ENVELOPE.md) opens in the stock Showroom with all 8,272 original detailed faces. The Studio definition uses the 512-face proxy. The original 3,016-face native mesh remains in the source archive.

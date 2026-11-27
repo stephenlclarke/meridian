@@ -643,3 +643,9 @@ integration/sh072-griffon-mk-ii/CANDIDATE-FIT-SUPPORT-FANS.json text eol=lf
 integration/sh073-griffon-spectre/CANDIDATE-FIT-SUPPORT-FANS.json text eol=lf
 integration/sh072-griffon-mk-ii/ARCHIVE-FIT-SUPPORT-FANS.json text eol=lf
 integration/sh073-griffon-spectre/ARCHIVE-FIT-SUPPORT-FANS.json text eol=lf
+
+# Vulture Mk I replay helpers have published byte hashes.
+tools/measure_vulture_mk_i_air.py text eol=lf
+tools/prepare_vulture_mk_i_geometry.py text eol=lf
+tools/prepare_vulture_mk_i_studio.py text eol=lf
+tools/verify_vulture_mk_i_geometry.py text eol=lf
