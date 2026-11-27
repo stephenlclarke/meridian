@@ -154,7 +154,7 @@ impl State {
                 || hit.emission <= prior_emission
                 || hit.item == 0
                 || !hit.speed.is_finite()
-                || !(0.0..=crate::flight::MAX_SPEED).contains(&hit.speed)
+                || hit.speed < 0.0
                 || !hit.pose.orientation.is_valid_rotation()
                 || !finite(hit.pose.position)
                 || hit.owner.owner == 0

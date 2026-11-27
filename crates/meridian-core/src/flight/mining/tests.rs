@@ -618,6 +618,17 @@ fn explicit_old_fifteen_save_refuses_before_mining_state_changes() {
     );
     assert_eq!(ok(fresh.save_bytes()), before);
 }
+fn reject_historical_stroke_speed(world: &World, speed: f32) {
+    let mut candidate = cold(world);
+    let mut hit = candidate.mining.strokes()[0].clone();
+    assert!(hit.world_tick < candidate.snapshot().tick);
+    hit.speed = speed;
+    let opening = candidate.mining.before_emission(hit.emission);
+    candidate.mining = ok(opening.prepare_work(hit)).0;
+    let bytes = ok(candidate.unchecked_test_save());
+    assert!(World::from_save_bytes(&bytes).is_err());
+}
+
 #[test]
 fn original_work_has_no_invented_slow_speed_gate_and_never_changes_player_motion() {
     let (mut w, _) = paid(12005);
@@ -633,6 +644,8 @@ fn original_work_has_no_invented_slow_speed_gate_and_never_changes_player_motion
     let shot = work(&mut w);
     assert_eq!(shot.remaining_energy, 50.0);
     assert_eq!(w.snapshot(), motion);
+    steps(&mut w, 1);
+    reject_historical_stroke_speed(&w, 40.0);
     let _continued = cold(&w);
 }
 
@@ -690,4 +703,57 @@ fn secret_outfit_preserves_paid_mining_work_custody_and_refuses_inflight_reactiv
     assert_eq!(continued.service_snapshot(), cargo);
     assert_eq!(some(continued.fitted_mining_tool()).item, item);
     assert_eq!(some(continued.mining_belt_snapshot()).pending_ore.len(), 1);
+}
+
+#[test]
+fn medusa_mining_above_peregrine_speed_repeats_and_replays_cold() {
+    let mut world = ok(World::new_commander(12005));
+    let issue = ok(world.review_xyzzy(crate::XyzzyAction::ActivateMedusa, 0));
+    ok(world.prepare_xyzzy(issue, 0)).commit();
+    let items = some(world.modular_equipment_snapshot()).items;
+    let mining = some(
+        items
+            .iter()
+            .find(|item| item.kind == crate::ModuleKind::MiningLaser),
+    );
+    let front = some(
+        items
+            .iter()
+            .find(|item| item.slot == Some(crate::ModuleSlot::FrontLaser)),
+    );
+    module(
+        &mut world,
+        ModuleAction::Install {
+            item: mining.id,
+            replacing: Some(front.id),
+        },
+    );
+    launch(&mut world);
+    stop(&mut world);
+    let rock = some(world.mining_belt_snapshot()).bodies[0];
+    aim_at(&mut world, rock.position);
+    for _ in 0..1800 {
+        let snapshot = some(world.mining_belt_snapshot());
+        if world.snapshot().speed > 40.0
+            && snapshot
+                .front_contact
+                .is_some_and(|hit| hit.asteroid == rock.id)
+        {
+            let first = work(&mut world);
+            assert_eq!(first.contact.asteroid, rock.id);
+            world = cold(&world);
+            steps(&mut world, 20);
+            reject_historical_stroke_speed(&world, 50.4);
+            assert!(world.snapshot().speed > 40.0);
+            assert_eq!(work(&mut world).contact.asteroid, rock.id);
+            stop(&mut world);
+            assert_eq!(cold(&world).mining.strokes().len(), 2);
+            return;
+        }
+        ok(world.step(FlightInput {
+            throttle: 1.0,
+            ..Default::default()
+        }));
+    }
+    panic!("Medusa did not reach a native mining contact at speed");
 }

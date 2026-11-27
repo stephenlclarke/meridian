@@ -53,6 +53,99 @@
         }
       ]
     },
+    "flight/mining.rs": {
+      "beforeSHA256": "159aa6934240088087db935838b6b06d5a7b3070c5ebd94d4ffc06f0c3054b8a",
+      "afterSHA256": "f91fd3b962763761d4481d3fe0108bae803912f8c9fc1c5d2d33abd55495f52b",
+      "hunks": [
+        {
+          "offset": 3208,
+          "before": "        self.mining_motion_clear_with(&self.mining, identity.system, before, after, angular)\n",
+          "after": "        Self::mining_motion_clear_with(\n            self.station_data.as_ref(),\n            &self.mining,\n            identity.system,\n            before,\n            after,\n            angular,\n        )\n"
+        },
+        {
+          "offset": 3481,
+          "before": "",
+          "after": "        data: &crate::station::OriginalStationData,\n"
+        },
+        {
+          "offset": 3770,
+          "before": "        self.mining_motion_clear_with(&self.mining.at_step(tick), system, before, after, angular)\n",
+          "after": "        Self::mining_motion_clear_with(\n            Some(data),\n            &self.mining.at_step(tick),\n            system,\n            before,\n            after,\n            angular,\n        )\n"
+        },
+        {
+          "offset": 4003,
+          "before": "        &self,\n",
+          "after": "        data: Option<&crate::station::OriginalStationData>,\n"
+        },
+        {
+          "offset": 4315,
+          "before": "        self.station_data.as_ref().is_some_and(|data| {\n",
+          "after": "        data.is_some_and(|data| {\n"
+        }
+      ]
+    },
+    "flight/mining/persistence.rs": {
+      "beforeSHA256": "bb89cd2d613a6452f256a13fbb7377fc5041d82e23aa9e4f5ddf528c6b443417",
+      "afterSHA256": "ca7529722e865e1aca9e9860de60fd4d044062b9509ef6c4b543d33ca5532bd0",
+      "hunks": [
+        {
+          "offset": 1262,
+          "before": "        let data = self.station_data.as_ref().ok_or(invalid)?;\n",
+          "after": ""
+        },
+        {
+          "offset": 1506,
+          "before": "",
+          "after": "            let data = self.station_at_visit(hit.owner.visit).ok_or(invalid)?;\n"
+        },
+        {
+          "offset": 1728,
+          "before": "",
+          "after": "                || hit.speed > self.hull_at_visit(hit.owner.visit).flight_rates().0\n"
+        },
+        {
+          "offset": 2406,
+          "before": "                || !self.mining_motion_at_source(hit.pose, hit.emission)\n",
+          "after": "                || !self.mining_motion_at_source(data, hit.pose, hit.emission)\n"
+        },
+        {
+          "offset": 5217,
+          "before": "",
+          "after": "                || receipt.speed > self.hull_at_visit(receipt.owner.visit).flight_rates().0\n"
+        },
+        {
+          "offset": 7278,
+          "before": "    fn mining_motion_at_source(&self, pose: RigidPose, emission: u64) -> bool {\n",
+          "after": "    fn mining_motion_at_source(\n        &self,\n        data: &crate::station::OriginalStationData,\n        pose: RigidPose,\n        emission: u64,\n    ) -> bool {\n"
+        },
+        {
+          "offset": 7685,
+          "before": "        self.mining_motion_clear_with(\n",
+          "after": "        Self::mining_motion_clear_with(\n            Some(data),\n"
+        }
+      ]
+    },
+    "flight/mining/tests.rs": {
+      "beforeSHA256": "b248399997fcca376ce1430e8610e4b920a9679ee128268436d9c9483be83424",
+      "afterSHA256": "111ba0979f6c013cf3c7f725d853facd39f69256073a04352f4dd641e6160322",
+      "hunks": [
+        {
+          "offset": 22284,
+          "before": "",
+          "after": "fn reject_historical_stroke_speed(world: &World, speed: f32) {\n    let mut candidate = cold(world);\n    let mut hit = candidate.mining.strokes()[0].clone();\n    assert!(hit.world_tick < candidate.snapshot().tick);\n    hit.speed = speed;\n    let opening = candidate.mining.before_emission(hit.emission);\n    candidate.mining = ok(opening.prepare_work(hit)).0;\n    let bytes = ok(candidate.unchecked_test_save());\n    assert!(World::from_save_bytes(&bytes).is_err());\n}\n\n"
+        },
+        {
+          "offset": 23214,
+          "before": "",
+          "after": "    steps(&mut w, 1);\n    reject_historical_stroke_speed(&w, 40.0);\n"
+        },
+        {
+          "offset": 25222,
+          "before": "",
+          "after": "\n#[test]\nfn medusa_mining_above_peregrine_speed_repeats_and_replays_cold() {\n    let mut world = ok(World::new_commander(12005));\n    let issue = ok(world.review_xyzzy(crate::XyzzyAction::ActivateMedusa, 0));\n    ok(world.prepare_xyzzy(issue, 0)).commit();\n    let items = some(world.modular_equipment_snapshot()).items;\n    let mining = some(\n        items\n            .iter()\n            .find(|item| item.kind == crate::ModuleKind::MiningLaser),\n    );\n    let front = some(\n        items\n            .iter()\n            .find(|item| item.slot == Some(crate::ModuleSlot::FrontLaser)),\n    );\n    module(\n        &mut world,\n        ModuleAction::Install {\n            item: mining.id,\n            replacing: Some(front.id),\n        },\n    );\n    launch(&mut world);\n    stop(&mut world);\n    let rock = some(world.mining_belt_snapshot()).bodies[0];\n    aim_at(&mut world, rock.position);\n    for _ in 0..1800 {\n        let snapshot = some(world.mining_belt_snapshot());\n        if world.snapshot().speed > 40.0\n            && snapshot\n                .front_contact\n                .is_some_and(|hit| hit.asteroid == rock.id)\n        {\n            let first = work(&mut world);\n            assert_eq!(first.contact.asteroid, rock.id);\n            world = cold(&world);\n            steps(&mut world, 20);\n            reject_historical_stroke_speed(&world, 50.4);\n            assert!(world.snapshot().speed > 40.0);\n            assert_eq!(work(&mut world).contact.asteroid, rock.id);\n            stop(&mut world);\n            assert_eq!(cold(&world).mining.strokes().len(), 2);\n            return;\n        }\n        ok(world.step(FlightInput {\n            throttle: 1.0,\n            ..Default::default()\n        }));\n    }\n    panic!(\"Medusa did not reach a native mining contact at speed\");\n}\n"
+        }
+      ]
+    },
     "flight/missiles/npc.rs": {
       "beforeSHA256": "09347ef6693cc03a8227865c35ad339b40e9876a9d28d92b346f20c42871c3f0",
       "afterSHA256": "aa20026bae75d1aab74d3793f942d6ed7bcaf5442ed6c85dd909f1e6f7fbb175",
@@ -112,6 +205,22 @@
         }
       ]
     },
+    "flight/practice/tests.rs": {
+      "beforeSHA256": "2904824ce814b5748e3b18b503bcf9c5a27da1b7cd1957b22fe135b8e5f8540f",
+      "afterSHA256": "90cd924c64a1f3c8d3a84d07f04edc910b9fd21d583e736daa00fa852f99bd5b",
+      "hunks": [
+        {
+          "offset": 3292,
+          "before": "    let ticks = (yaw.abs() / (0.65 / 60.0)).ceil() as u16;\n",
+          "after": "    let yaw_per_tick = world.player_hull_kind().flight_rates().3 / 60.0;\n    let ticks = (yaw.abs() / yaw_per_tick).ceil() as u16;\n"
+        },
+        {
+          "offset": 3493,
+          "before": "                yaw: yaw / (0.65 / 60.0) / f32::from(ticks),\n",
+          "after": "                yaw: yaw / yaw_per_tick / f32::from(ticks),\n"
+        }
+      ]
+    },
     "flight/traffic/tests.rs": {
       "beforeSHA256": "4bb55c5ea3562e2aeb429f77ed16bb23bbd443d5cfe20a40e7bd4e374276cf3a",
       "afterSHA256": "ac4d110d12b59545247ae74e53ed7063879841974e1130ce22412e6aac5f9961",
@@ -120,6 +229,28 @@
           "offset": 4880,
           "before": "    ok(world.request_jump(crate::navigation::SystemId::RENAS, world.snapshot().tick));\n    let remaining = some(some(world.snapshot().navigation).travel).remaining_ticks;\n    steps(&mut world, remaining as usize);\n    crate::flight::missiles::tests::dock(&mut world);\n    assert!(world.traffic.player_hits().contains(&hit));\n    let tick = world.snapshot().tick;\n    let review = ok(world.review_xyzzy(crate::XyzzyAction::ActivateMedusa, tick));\n    ok(world.prepare_xyzzy(review, tick)).commit();\n",
           "after": "    crate::flight::missiles::tests::issue_medusa_at_renas(&mut world);\n"
+        }
+      ]
+    },
+    "mining/ledger.rs": {
+      "beforeSHA256": "81dceb0c44ff22bd6e8db5565732f7daaf6032fa6b2fecf52a39d3be003e65ca",
+      "afterSHA256": "2f33f8740a19166af60e3446af08eaf4b5311efed0f0b3d1da4f7238ecb4910f",
+      "hunks": [
+        {
+          "offset": 5790,
+          "before": "                || !(0.0..=crate::flight::MAX_SPEED).contains(&hit.speed)\n",
+          "after": "                || hit.speed < 0.0\n"
+        }
+      ]
+    },
+    "mining/ore.rs": {
+      "beforeSHA256": "13743527e29e8bef8bd9524372b11c511c15d25df9d4dde1812857f9a65c04c7",
+      "afterSHA256": "0e7ddf61c804f79d28f3a76795e707cc868f8c34976edfa5b19e44f567a75ada",
+      "hunks": [
+        {
+          "offset": 1883,
+          "before": "            || !(0.0..=crate::flight::MAX_SPEED).contains(&speed)\n",
+          "after": "            || speed < 0.0\n"
         }
       ]
     }

@@ -30,7 +30,6 @@ impl World {
         let invalid = SaveError::InvalidState("mining source, contact or discharge provenance");
         self.mining.validate()?;
         let owner = self.combat_identity().ok_or(invalid)?;
-        let data = self.station_data.as_ref().ok_or(invalid)?;
         if self
             .mining
             .expiry_receipts()
@@ -39,9 +38,11 @@ impl World {
             return Err(invalid);
         }
         for hit in self.mining.strokes() {
+            let data = self.station_at_visit(hit.owner.visit).ok_or(invalid)?;
             if hit.owner.owner != owner.owner
                 || hit.owner.hull != owner.hull
                 || hit.owner.visit > owner.visit
+                || hit.speed > self.hull_at_visit(hit.owner.visit).flight_rates().0
                 || hit.world_tick > self.state.tick
                 || hit.physical_tick > self.combat.physical_tick()
                 || hit.emission > self.combat.emissions
@@ -53,7 +54,7 @@ impl World {
                 || hit.peers.system != hit.owner.system
                 || hit.peers.world_tick != hit.world_tick
                 || hit.peers.stage != crate::traffic::SceneStage::Command(hit.emission)
-                || !self.mining_motion_at_source(hit.pose, hit.emission)
+                || !self.mining_motion_at_source(data, hit.pose, hit.emission)
                 || (hit.world_tick == self.state.tick
                     && (flight_pose(self.state.position, self.state.orientation) != Some(hit.pose)
                         || self.state.speed != hit.speed))
@@ -125,6 +126,7 @@ impl World {
             if receipt.owner.owner != owner.owner
                 || receipt.owner.hull != owner.hull
                 || receipt.owner.visit > owner.visit
+                || receipt.speed > self.hull_at_visit(receipt.owner.visit).flight_rates().0
                 || receipt.world_tick > self.state.tick
                 || receipt.physical_tick > self.combat.physical_tick()
                 || self
@@ -172,11 +174,17 @@ impl World {
         }
         Ok(())
     }
-    fn mining_motion_at_source(&self, pose: RigidPose, emission: u64) -> bool {
+    fn mining_motion_at_source(
+        &self,
+        data: &crate::station::OriginalStationData,
+        pose: RigidPose,
+        emission: u64,
+    ) -> bool {
         // Historical native contact lies outside the actual source mesh. A later terminal
         // tombstone must not legitimize having fired from inside an intact original rock.
         let original = self.mining.before_emission(emission);
-        self.mining_motion_clear_with(
+        Self::mining_motion_clear_with(
+            Some(data),
             &original,
             crate::navigation::SystemId::AVENOR,
             pose,

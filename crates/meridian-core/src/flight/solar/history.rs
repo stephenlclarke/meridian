@@ -295,7 +295,14 @@ pub(in crate::flight) fn replay_launch_step(
                 },
                 FlightMode::Launching,
             )
-        } else if !world.mining_motion_clear_at_step(owner.system, tick, before, after, angular) {
+        } else if !world.mining_motion_clear_at_step(
+            data,
+            owner.system,
+            tick,
+            before,
+            after,
+            angular,
+        ) {
             (
                 Motion::Stopped {
                     input,
@@ -436,8 +443,9 @@ pub(super) fn replay_motion<'a>(
         input.pitch.abs() * pitch_rate + input.yaw.abs() * yaw_rate + input.roll.abs() * roll_rate,
     ) * f64::from(super::super::FIXED_DELTA_SECONDS);
     let next_tick = anchor.tick.checked_add(1).ok_or(INVALID)?;
-    let asteroid_clear =
-        || world.mining_motion_clear_at_step(anchor.system, next_tick, before, after, angular);
+    let asteroid_clear = || {
+        world.mining_motion_clear_at_step(data, anchor.system, next_tick, before, after, angular)
+    };
     let crosses = || data.crosses_aperture(before, after);
     let station_clear = || data.motion_clear(before, after, angular);
     let mule_blocked = || {

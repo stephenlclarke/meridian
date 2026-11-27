@@ -7,7 +7,7 @@
   "undoAfter": [],
   "kind": "inverse",
   "manifest": "integration/fleet-medusa-contacts/PROTECTED-CORE-INVERSE.json",
-  "sha256": "1d4e5d64e18bff2f1c01f2dddcdd22a4bc62c1415d2ddbc29ea9dba0883099e7",
+  "sha256": "8f22da3ccd7fe7272e828ee98eb88404f5abb4912fb4b735401932a4f5f819d0",
   "base": "492e49b6cab7a75d70e03c91796b6a3ad62399c1",
   "label": "Fleet Medusa historical and live contact geometry"
 }
