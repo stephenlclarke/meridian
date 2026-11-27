@@ -643,3 +643,10 @@ integration/sh072-griffon-mk-ii/CANDIDATE-FIT-SUPPORT-FANS.json text eol=lf
 integration/sh073-griffon-spectre/CANDIDATE-FIT-SUPPORT-FANS.json text eol=lf
 integration/sh072-griffon-mk-ii/ARCHIVE-FIT-SUPPORT-FANS.json text eol=lf
 integration/sh073-griffon-spectre/ARCHIVE-FIT-SUPPORT-FANS.json text eol=lf
+
+# The Okapi certificates bind the original source and current measurement tools.
+tools/measure_okapi.py text eol=lf
+tools/measure_okapi_air.py text eol=lf
+tools/prepare_okapi_geometry.py text eol=lf
+tools/prepare_okapi_studio.py text eol=lf
+tools/verify_okapi_geometry.py text eol=lf

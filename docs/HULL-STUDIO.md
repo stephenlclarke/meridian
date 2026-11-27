@@ -111,3 +111,7 @@ see it in the disposable game session. The Studio export command refuses
 schema 2. The standalone game accepts schema 2 only through
 `--inspect-hull-package`. Schema 1 retains the 512-face native limit and
 excludes archived inspection packages from the flight export.
+
+## Okapi stock inspection
+
+Search for **SH029** or **Okapi** in the station Showroom. The slate-and-orange trader retains its three pallets, raised top rails and original 120-face native mesh. Its [geometry record](OKAPI-GAMEPLAY-ENVELOPE.md) gives the measured clearances and the source of its empty-hull mass reference.
