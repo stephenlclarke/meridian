@@ -22,8 +22,6 @@ The [solar fuel source candidate](SOLAR-FUEL-SCOOPS.md) adds the original near-s
 
 ## The Unwritten Route clue journal
 
-The post-preview [Navigation and Trade candidate](NAVIGATION-TRADE.md) connects the station market selection to the original T04 lesson. The goal reads the active plan, original purchase, sale and return from the commander. The Windows gameplay test results for this change are pending.
-
 The [ordinary clue journal](../integration/unwritten-route/README.md) reads the existing first receipts for five playable source families against the original 64-clue catalogue. Shift+J opens the journal. Later trail instructions and the paid Medusa path follow the original quest prerequisites.
 
 ## Passenger cabins and G04 source candidate
@@ -646,6 +644,10 @@ The first requested Rear frame remained Front because the World was paused; it i
 Version 10 retains measured endpoint, permission, fit, terminal and first-trace chronology with explicit v4-v9 readers. These results remain bound to compiled source `152ac26`; subsequent documentation-only changes do not become new native runs. Protected integration at `a583b61`, authoritative exact-main CI/Sonar, separate v10 installation and GitHub publication have passed as recorded above. Full missions, fleet, genuine live player hit, memory, performance, commercial and notarization acceptance remain open.
 
 ## Qualified source: original navigation and trade
+
+The post-preview [Navigation and Trade candidate](NAVIGATION-TRADE.md) connects the station market selection to the original T04 lesson. The goal reads the active plan, original purchase, sale and return from the commander. Avenor and Renas are the two lesson destinations in this candidate. Choosing another reachable chart destination remains open.
+
+On native Windows, `991b7ebf` passed all six trade lesson tests and strict workspace Clippy. The Food round trip kept the original tonne, charged a net loss of 9.8 CR and awarded one clue after the debrief. The new market callback initially failed because it tried to cancel an unpainted review. At `458c0b7c`, the corrected test checked the refusal, presented the review, cancelled it and continued the selected Furs plan from disk. All 24 Help tests passed on that revision, including the market callback.
 
 The [T04 slice](NAVIGATION-TRADE.md) on compiled source `bb5862ba071959aa2e86d71d92f02e22320ea195`, tree `1e3863468da1ebb00fe8369cb44f94df3772001a`, adds separate consent and selected route/stock/current-fit confirmation at the existing Avenor/Renas main berths. It reserves capacity without buying, binds an identified ordinary tonne to its actual purchase, fuel-debited journeys, same-tonne destination sale and physical return, then prepares separate zero-cash reception and a once-only family trace. Profile publishes ordinary purchase/sale/refill and lesson candidates before committing live state. Actual G02/T02/T01/T04 owners share the original three-active/128-record bounds.
 

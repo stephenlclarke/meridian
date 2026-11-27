@@ -107,8 +107,6 @@ A separate explicitly prepared public-core setup supplied four nonfatal contacts
 
 Open the [Unwritten Route clue journal](integration/unwritten-route/README.md) with **Shift+J** to see the source clues your commander has earned.
 
-At Avenor or Renas, select goods in the market and press **7** for the [Navigation and Trade lesson](docs/NAVIGATION-TRADE.md). **R** reviews the next station action. Carry one original tonne to the other berth, sell it there and return for the debrief. A real trading loss still qualifies for the first lesson clue.
-
 The current desktop source opens **Commander details** on startup. An empty slot starts a fresh commander at Avenor in memory. A valid slot shows the existing commander at the saved location before simulation resumes. Press **L** to launch from a station or **Enter** to resume a saved flight. Station services use **1–5** at a valid berth, and **0** returns to Commander details when docked. Use **H** or **?** for the current controls.
 
 Preview 8 uses the earlier startup controls. N starts a commander; C continues a current-format V17 save with the supported EMP content fingerprint. Unsupported formats/content refuse without changing the file. Use the download’s isolated profile: `Meridian EMP Sonar Preview/saves-current-emp-2d5f4a5` under macOS Application Support, or adjacent `saves-emp-2d5f4a5` on Windows. A second N confirms replacing the current commander, and the old disk file remains until an explicit save or normal saved quit. Click the window for keyboard focus.
@@ -139,6 +137,8 @@ H or ? opens a dismissible help popup for the current screen, including station 
 | Escape / window close | Save before exit; failure keeps the app open |
 
 The [station trade estimate details](integration/followup-trade-detail/README.md) show the current finite commodity allocation behind the chart scan and route estimates. They do not purchase, sell or install a route.
+
+At Avenor or Renas, select goods in the market and press **7** for the [Navigation and Trade lesson](docs/NAVIGATION-TRADE.md). **R** reviews the next station action. Carry one original tonne to the other berth, sell it there and return for the debrief. A real trading loss still qualifies for the first lesson clue.
 
 The [atomic market quantity controls](integration/followup-bulk-market/README.md) review and settle all requested native units together or refuse the entire purchase or sale. They retain the existing per-unit receipts and save format.
 
