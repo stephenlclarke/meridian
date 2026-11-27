@@ -631,7 +631,7 @@ impl World {
         prepared.pulse.advance(
             self.state.mode,
             next.mode,
-            self.energy_recharge_hundredths(),
+            self.step_energy_recharge(self.energy_recharge_hundredths()),
             self.energy_capacity(),
         );
         if self.state.mode != FlightMode::Docked {

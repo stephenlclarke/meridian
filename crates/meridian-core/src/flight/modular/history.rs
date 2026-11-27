@@ -655,26 +655,13 @@ mod tests {
 
     #[test]
     fn every_prefix_must_fit_even_when_a_later_action_releases_capacity() {
-        assert_eq!(
-            check_fit(0, 90, 18, 0, crate::equipment::definition().unwrap()),
-            Ok(())
-        );
-        assert_eq!(
-            check_fit(0, 95, 19, 0, crate::equipment::definition().unwrap()),
-            Err(INVALID)
-        );
-        assert_eq!(
-            check_fit(0, 125, 25, 1, crate::equipment::definition().unwrap()),
-            Err(INVALID)
-        );
-        assert_eq!(
-            check_fit(2, 120, 24, 1, crate::equipment::definition().unwrap()),
-            Err(INVALID)
-        );
-        assert_eq!(
-            check_fit(2, 115, 23, 1, crate::equipment::definition().unwrap()),
-            Ok(())
-        );
+        let stock =
+            crate::equipment::definition().unwrap_or_else(|e| panic!("stock equipment: {e:?}"));
+        assert_eq!(check_fit(0, 90, 18, 0, stock), Ok(()));
+        assert_eq!(check_fit(0, 95, 19, 0, stock), Err(INVALID));
+        assert_eq!(check_fit(0, 125, 25, 1, stock), Err(INVALID));
+        assert_eq!(check_fit(2, 120, 24, 1, stock), Err(INVALID));
+        assert_eq!(check_fit(2, 115, 23, 1, stock), Ok(()));
     }
 
     #[test]
