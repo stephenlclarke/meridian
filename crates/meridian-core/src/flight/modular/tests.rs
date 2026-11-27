@@ -88,7 +88,13 @@ fn check_local_launch(bytes: &[u8], growth: usize) {
     let mut stored = World::decode_saved_world(bytes).unwrap();
     assert_eq!(stored.save_bytes().unwrap(), bytes);
     let mut world = World::from_save_bytes(bytes).unwrap();
-    let live_before_launch = world.save_bytes().unwrap();
+    assert_eq!(world.current_dock_context(), stored.current_dock_context());
+    assert_eq!(
+        world.modular_equipment_snapshot(),
+        stored.modular_equipment_snapshot()
+    );
+    assert_eq!(world.credits_tenths(), stored.credits_tenths());
+    assert_eq!(world.snapshot().navigation, stored.snapshot().navigation);
     let session = stored.freight_session.as_mut().unwrap();
     let (epoch, review_sequence) = session.continue_floor();
     session.invalidate_after_continue((0, 0)).unwrap();
@@ -98,9 +104,11 @@ fn check_local_launch(bytes: &[u8], growth: usize) {
     );
     // The two review counters and their resulting checksum explain the entire
     // difference between the unchanged disk image and this continued commander.
-    assert_eq!(stored.save_bytes().unwrap(), live_before_launch);
+    let expected_continued = stored.save_bytes().unwrap();
     let mut opening = Writer::new();
     world.modular.encode(&mut opening);
+    let live_before_launch = world.save_bytes().unwrap();
+    assert_eq!(expected_continued, live_before_launch);
     assert!(world.request_launch(world.snapshot().tick + 1).is_err());
     assert_eq!(world.save_bytes().unwrap(), live_before_launch);
     for _ in 0..9 {
