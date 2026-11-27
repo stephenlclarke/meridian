@@ -676,9 +676,9 @@ impl OrdinaryImpact {
             return world.missiles.validate_ordinary(self, world);
         }
         let body = flight_pose(self.position, self.orientation).ok_or(invalid)?;
-        let facing = world
-            .integral_view_at(self.item, self.tick)
-            .unwrap_or(super::FlightView::Front);
+        let (facing, weapon) = world
+            .owned_laser_at(self.item, self.tick, self.attacker)
+            .ok_or(invalid)?;
         let pose = facing.laser_ray(body);
         let station = world.state.station.ok_or(invalid)?;
         let distance = world
@@ -701,14 +701,7 @@ impl OrdinaryImpact {
         if self.victim_entity != 1
             || self.attacker.owner != current.owner
             || self.attacker.hull != current.hull
-            || (if facing == super::FlightView::Front {
-                world.owned_front_laser_at(self.item, self.tick, self.attacker)
-            } else {
-                world
-                    .xyzzy_medusa_issue()
-                    .filter(|(dock, _, _)| dock.visit() < self.attacker.visit)
-                    .map(|_| OrdinaryWeapon::FrontNavalLaser)
-            }) != Some(self.weapon)
+            || weapon != self.weapon
             || station_index(self.attacker.system).is_none()
             || self.attacker.visit < 2
             || self.attacker.visit > current.visit

@@ -957,6 +957,53 @@ fn medusa_upgrades_a_saved_clarke_once_and_retains_paid_gear_and_excess_rounds()
 }
 
 #[test]
+fn medusa_reissue_refits_owned_naval_lasers_without_losing_paid_guns() {
+    use crate::FlightView::{Front, Left, Rear, Right};
+
+    let mut w = World::new_commander(31815).unwrap();
+    apply(&mut w, XyzzyAction::ActivateMedusa);
+    let mounts = [Front, Rear, Left, Right];
+    let initial = mounts.map(|f| w.laser_mount_snapshot(f).unwrap());
+    let pulse = module(
+        &mut w,
+        ModuleAction::PurchaseLaser {
+            kind: ModuleKind::PulseLaser,
+            facing: Left,
+        },
+    );
+    let beam = module(
+        &mut w,
+        ModuleAction::PurchaseLaser {
+            kind: ModuleKind::BeamLaser,
+            facing: Rear,
+        },
+    );
+    let inventory = w.modular_equipment_snapshot().unwrap().items;
+    let cash = w.credits_tenths();
+    let mut w = cold(&w);
+    assert_eq!(w.laser_mount_snapshot(Left).unwrap().fitted_item_id, pulse);
+    assert_eq!(w.laser_mount_snapshot(Rear).unwrap().fitted_item_id, beam);
+    for action in [
+        XyzzyAction::MaximumSupportedHardware,
+        XyzzyAction::ActivateMedusa,
+    ] {
+        apply(&mut w, action);
+        w = cold(&w);
+        let items = w.modular_equipment_snapshot().unwrap().items;
+        assert_eq!(items.len(), inventory.len());
+        for previous in &inventory {
+            let restored = items.iter().find(|item| item.id == previous.id).unwrap();
+            assert_eq!(restored.provenance, previous.provenance);
+            if [pulse, beam].contains(&restored.id) {
+                assert!(restored.slot.is_none());
+            }
+        }
+        assert_eq!(w.credits_tenths(), cash);
+        assert_eq!(mounts.map(|f| w.laser_mount_snapshot(f).unwrap()), initial);
+    }
+}
+
+#[test]
 fn medusa_refuses_an_oversize_manifest_before_mutating_the_commander() {
     let mut world = World::new_commander(14402).unwrap();
     apply(&mut world, XyzzyAction::Enter);

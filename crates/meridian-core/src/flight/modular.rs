@@ -1,5 +1,5 @@
 //! Paid modular equipment custody. Effects live in the actual weapon/work owners, not menu rows.
-use super::{FlightMode, ShieldGrade, World};
+use super::{FlightMode, FlightView, ShieldGrade, World};
 use crate::{
     equipment::TargetingTier,
     freight::g02::CommanderAccount,
@@ -10,6 +10,8 @@ use core::fmt;
 mod cabins;
 mod fuel_history;
 mod history;
+mod laser_slots;
+pub(super) use laser_slots::issued_laser_id;
 mod salvage;
 pub(super) use cabins::add_cabin_mass;
 pub use cabins::{
@@ -321,6 +323,9 @@ impl ModuleKind {
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum ModuleSlot {
     FrontLaser,
+    LeftLaser,
+    RightLaser,
+    RearLaser,
     Energy,
     UtilityFuelScoops,
     UtilitySalvageCutter,
@@ -337,6 +342,11 @@ pub enum ModuleSlot {
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum ModuleProvenance {
     StandardBirth,
+    MedusaIssue {
+        dock: DockContext,
+        tick: u64,
+        account_revision: u64,
+    },
     XYZzy {
         grant: u32,
         dock: DockContext,
@@ -386,6 +396,15 @@ pub enum ModuleAction {
     Purchase {
         kind: ModuleKind,
     },
+    PurchaseLaser {
+        kind: ModuleKind,
+        facing: FlightView,
+    },
+    InstallLaser {
+        item: u64,
+        replacing: Option<u64>,
+        facing: FlightView,
+    },
     PurchaseFuelScoops,
     /// Reserved for the explicit XYZZY outfit; ordinary reviews refuse it.
     GrantStoredSalvageCutter,
@@ -426,7 +445,7 @@ impl ModuleAction {
             Self::PurchaseMiningLaser | Self::GrantStoredMiningLaser => {
                 Some(ModuleKind::MiningLaser)
             }
-            Self::Purchase { kind } => Some(kind),
+            Self::Purchase { kind } | Self::PurchaseLaser { kind, .. } => Some(kind),
             _ => None,
         }
     }
@@ -496,6 +515,8 @@ struct Event {
 }
 #[derive(Debug, Clone, PartialEq, Eq, Default)]
 pub(super) struct State {
+    // Derived from the first authenticated hull issue at world restore.
+    mount_issue: Option<(DockContext, u64, u64)>,
     events: Vec<Event>,
     cargo_fit_history: Vec<fuel_history::CargoFit>,
     history: history::History,
@@ -552,6 +573,8 @@ pub(super) struct Ledger {
     passage: cabins::Passage,
     auto_return: Option<u64>,
     salvage_return: Option<salvage::Exchange>,
+    pending_mount_issue: Option<(DockContext, u64, u64)>,
+    has_side_mounts: bool,
 }
 impl Ledger {
     pub(super) fn passenger_totals(&self) -> (u32, u64) {
@@ -673,7 +696,17 @@ impl Ledger {
         Ok(())
     }
     fn install(&mut self, index: usize, replacing: Option<u64>) -> Result<(), ModuleError> {
-        let slot = if self.items[index].kind == ModuleKind::FuelStorage {
+        self.install_at(index, replacing, None)
+    }
+    fn install_at(
+        &mut self,
+        index: usize,
+        replacing: Option<u64>,
+        facing: Option<FlightView>,
+    ) -> Result<(), ModuleError> {
+        let slot = if let Some(facing) = facing {
+            self.laser_slot(self.items[index].kind, facing)?
+        } else if self.items[index].kind == ModuleKind::FuelStorage {
             if replacing.is_some() {
                 return Err(ModuleError::StaleOccupant);
             }
@@ -741,6 +774,17 @@ impl Ledger {
         })
     }
     fn apply(&mut self, event: Event, transaction: u32) -> Result<(), ModuleError> {
+        self.issue_mounts_through(event.revision)?;
+        let facing = match event.action {
+            ModuleAction::PurchaseLaser { facing, .. }
+            | ModuleAction::InstallLaser { facing, .. } => {
+                if event.xyzzy {
+                    return Err(ModuleError::NotForSale);
+                }
+                Some(facing)
+            }
+            _ => None,
+        };
         if self.salvage_return.is_some()
             && !matches!(event.action, ModuleAction::FlightSalvageExchange { .. })
         {
@@ -823,7 +867,12 @@ impl Ledger {
                 if kind == ModuleKind::FuelStorage || kind.slot() == ModuleSlot::PassengerCabin {
                     None
                 } else {
-                    self.fitted(kind.slot()).map(|i| i.id)
+                    self.fitted(if let Some(facing) = facing {
+                        self.laser_slot(kind, facing)?
+                    } else {
+                        kind.slot()
+                    })
+                    .map(|i| i.id)
                 };
             self.items.push(OwnedModule {
                 id: event.item,
@@ -850,8 +899,8 @@ impl Ledger {
                 event.action,
                 ModuleAction::GrantStoredMiningLaser | ModuleAction::GrantStoredSalvageCutter
             ) {
-                self.install(self.items.len() - 1, replacing)?;
-                if kind.slot() == ModuleSlot::FrontLaser {
+                self.install_at(self.items.len() - 1, replacing, facing)?;
+                if self.items.last().and_then(|i| i.slot) == Some(ModuleSlot::FrontLaser) {
                     self.auto_return = None;
                 }
             }
@@ -892,7 +941,10 @@ impl Ledger {
                     i.slot = None;
                     self.test_tank_items.retain(|&id| id != item);
                 }
-                ModuleAction::Install { item, replacing } => {
+                ModuleAction::Install { item, replacing }
+                | ModuleAction::InstallLaser {
+                    item, replacing, ..
+                } => {
                     let index = self
                         .items
                         .iter()
@@ -901,8 +953,8 @@ impl Ledger {
                     if self.items[index].slot.is_some() {
                         return Err(ModuleError::NoChange);
                     }
-                    self.install(index, replacing)?;
-                    if self.items[index].kind.slot() == ModuleSlot::FrontLaser {
+                    self.install_at(index, replacing, facing)?;
+                    if self.items[index].slot == Some(ModuleSlot::FrontLaser) {
                         self.auto_return = None;
                     }
                 }
@@ -911,7 +963,8 @@ impl Ledger {
                 | ModuleAction::FlightLaserExchange { .. }
                 | ModuleAction::PurchaseFuelScoops
                 | ModuleAction::GrantStoredSalvageCutter
-                | ModuleAction::Purchase { .. } => {
+                | ModuleAction::Purchase { .. }
+                | ModuleAction::PurchaseLaser { .. } => {
                     return Err(ModuleError::NotForSale);
                 }
                 ModuleAction::Passenger(action) => return self.apply_passage(event, action),
@@ -951,7 +1004,9 @@ fn validate_module_purchase(e: &Event, owner: u64, mut transaction: u32) -> Resu
             }
         }
     } else if match e.action {
-        ModuleAction::Store { item } | ModuleAction::Install { item, .. } => item != e.item,
+        ModuleAction::Store { item }
+        | ModuleAction::Install { item, .. }
+        | ModuleAction::InstallLaser { item, .. } => item != e.item,
         _ => false,
     } {
         return Err(INVALID);
@@ -961,7 +1016,7 @@ fn validate_module_purchase(e: &Event, owner: u64, mut transaction: u32) -> Resu
 
 impl State {
     fn ledger_at_revision(&self, owner: u64, revision: u64) -> Result<Ledger, SaveError> {
-        let mut ledger = Ledger::born(owner)?;
+        let mut ledger = self.born_ledger(owner)?;
         let mut counters = [0; 2];
         for event in self
             .events
@@ -998,7 +1053,7 @@ impl State {
         visit: u64,
         count: u8,
     ) -> Result<bool, SaveError> {
-        let mut ledger = Ledger::born(owner)?;
+        let mut ledger = self.born_ledger(owner)?;
         let mut counters = [0; 2];
         let mut possible = false;
         for event in self
@@ -1014,7 +1069,7 @@ impl State {
         Ok(possible || ledger.fuel_storage_count() == count)
     }
     pub(super) fn account_events(&self, owner: u64) -> Result<Vec<super::AccountEvent>, SaveError> {
-        let mut ledger = Ledger::born(owner)?;
+        let mut ledger = self.born_ledger(owner)?;
         let mut counters = [0; 2];
         let mut events = Vec::new();
         for e in &self.events {
@@ -1052,7 +1107,9 @@ impl State {
             ) || (self.history.tracks_revision(e.revision)
                 && matches!(
                     e.action,
-                    ModuleAction::Store { .. } | ModuleAction::Install { .. }
+                    ModuleAction::Store { .. }
+                        | ModuleAction::Install { .. }
+                        | ModuleAction::InstallLaser { .. }
                 ))
             {
                 super::AccountEffect::Debit(0)
@@ -1109,7 +1166,7 @@ impl State {
 
     /// Read-only historical actual item/fit proof for a retained work emission.
     pub(super) fn mining_was_fitted(&self, hit: &crate::mining::MiningStroke) -> bool {
-        let Ok(mut ledger) = Ledger::born(hit.owner.owner) else {
+        let Ok(mut ledger) = self.born_ledger(hit.owner.owner) else {
             return false;
         };
         let mut counters = [0; 2];
@@ -1156,7 +1213,7 @@ impl State {
         account: &CommanderAccount,
     ) -> Result<Ledger, SaveError> {
         let owner = world.combat_identity().ok_or(INVALID)?.owner;
-        let mut ledger = Ledger::born(owner)?;
+        let mut ledger = self.born_ledger(owner)?;
         let mut transaction = 0_u32;
         let mut grants = 0_u32;
         let mut previous: Option<Event> = None;
@@ -1172,6 +1229,20 @@ impl State {
                 e.revision,
                 previous.map(|p| (p.dock.sequence(), p.tick, p.revision)),
             )?;
+            if matches!(
+                e.action,
+                ModuleAction::PurchaseLaser { .. } | ModuleAction::InstallLaser { .. }
+            ) {
+                world
+                    .jump_journal
+                    .validate_passenger_berth(e.dock, e.tick)?;
+                if let Some((issue_dock, issue_tick, issue_revision)) = self.mount_issue
+                    && e.revision >= issue_revision
+                    && (e.tick < issue_tick || e.dock.sequence() < issue_dock.sequence())
+                {
+                    return Err(INVALID);
+                }
+            }
             if let ModuleAction::FlightLaserExchange {
                 visit,
                 clock,
@@ -1358,6 +1429,9 @@ impl State {
             }
             previous = Some(*e);
         }
+        ledger
+            .issue_mounts_through(account.revision())
+            .map_err(|_| INVALID)?;
         for (offset, slot, component) in [
             (
                 7,
@@ -1383,7 +1457,7 @@ impl State {
             if born.owner() != owner || !born.is_standard_birth() || born.component() != component {
                 return Err(INVALID);
             }
-            let fitted = ledger.fitted(slot).is_some_and(|i| i.id == owner + offset);
+            let fitted = ledger.item_is_fitted(owner + offset, slot);
             if born.fitted_hull() != fitted.then_some(world.combat_identity().ok_or(INVALID)?.hull)
             {
                 return Err(INVALID);
@@ -1415,7 +1489,7 @@ impl State {
         Ok(ledger)
     }
     fn ledger_at(&self, owner: u64, tick: u64, visit: u64) -> Option<Ledger> {
-        let mut ledger = Ledger::born(owner).ok()?;
+        let mut ledger = self.born_ledger(owner).ok()?;
         let mut transaction = 0;
         let mut grants = 0;
         for event in self.events.iter().filter(|e| e.tick <= tick) {
@@ -1432,6 +1506,12 @@ impl State {
             ledger
                 .apply(*event, if event.xyzzy { grants } else { transaction })
                 .ok()?;
+        }
+        if let Some((dock, issue_tick, revision)) = self.mount_issue
+            && dock.visit() < visit
+            && issue_tick < tick
+        {
+            ledger.issue_mounts_through(revision).ok()?;
         }
         Some(ledger)
     }
@@ -1494,7 +1574,7 @@ impl State {
     ) -> Result<(), SaveError> {
         let (start, end) = revisions;
         let fit_at = |revision| -> Result<Ledger, SaveError> {
-            let mut ledger = Ledger::born(owner)?;
+            let mut ledger = self.born_ledger(owner)?;
             let mut counters = [0; 2];
             for event in self
                 .events
@@ -1562,6 +1642,18 @@ impl State {
         w.u32(self.events.len() as u32 | flags);
         for e in &self.events {
             match e.action {
+                ModuleAction::PurchaseLaser { kind, facing } => {
+                    w.u8(21);
+                    w.u8(kind.tag());
+                    w.u8(laser_slots::tag(facing));
+                }
+                ModuleAction::InstallLaser {
+                    replacing, facing, ..
+                } => {
+                    w.u8(22);
+                    w.u8(laser_slots::tag(facing));
+                    w.option(replacing.as_ref(), |w, i| w.u64(*i));
+                }
                 ModuleAction::PurchaseMiningLaser => w.u8(0),
                 ModuleAction::GrantStoredMiningLaser => w.u8(19),
                 ModuleAction::FlightLaserExchange {
@@ -1637,7 +1729,7 @@ impl State {
         let mut events = Vec::new();
         for _ in 0..count {
             let tag = r.u8()?;
-            let kind = if tag == 3 && version >= 16 {
+            let kind = if matches!(tag, 3 | 21) && version >= 16 {
                 let kind = ModuleKind::from_tag(r.u8()?)?;
                 if version < 17 && kind.navigation_reach_ly().is_some() {
                     return Err(SaveError::InvalidEncoding);
@@ -1646,7 +1738,12 @@ impl State {
             } else {
                 None
             };
-            let replacing = if tag == 2 {
+            let facing = if matches!(tag, 21 | 22) {
+                Some(laser_slots::facing(r.u8()?)?)
+            } else {
+                None
+            };
+            let replacing = if matches!(tag, 2 | 22) {
                 r.option(|r| r.u64())?
             } else {
                 None
@@ -1673,6 +1770,15 @@ impl State {
             let revision = r.u64()?;
             let xyzzy = r.bool()?;
             let action = match tag {
+                21 => ModuleAction::PurchaseLaser {
+                    kind: kind.ok_or(INVALID)?,
+                    facing: facing.ok_or(INVALID)?,
+                },
+                22 => ModuleAction::InstallLaser {
+                    item,
+                    replacing,
+                    facing: facing.ok_or(INVALID)?,
+                },
                 0 => ModuleAction::PurchaseMiningLaser,
                 19 => ModuleAction::GrantStoredMiningLaser,
                 18 => {
@@ -1744,6 +1850,7 @@ impl State {
             return Err(SaveError::InvalidEncoding);
         }
         Ok(Self {
+            mount_issue: None,
             events,
             cargo_fit_history,
             history,
@@ -1860,22 +1967,26 @@ impl World {
         })
         .collect()
     }
-    pub(super) fn owned_front_laser_at(
+    pub(super) fn owned_laser_at(
         &self,
         item: u64,
         tick: u64,
         owner: super::CombatIdentity,
-    ) -> Option<super::OrdinaryWeapon> {
+    ) -> Option<(FlightView, super::OrdinaryWeapon)> {
         let current = self.combat_identity()?;
         if current.owner != owner.owner || current.hull != owner.hull || owner.visit > current.visit
         {
             return None;
         }
         let item = self.modular.item_at(owner.owner, item, tick, owner.visit)?;
-        if item.slot != Some(ModuleSlot::FrontLaser) {
-            return None;
+        let facing = item.slot?.laser_facing()?;
+        if facing != FlightView::Front {
+            let (dock, issue_tick, _) = self.modular.mount_issue?;
+            if tick <= issue_tick || owner.visit <= dock.visit() {
+                return None;
+            }
         }
-        super::OrdinaryWeapon::from_module(item.kind)
+        Some((facing, item.kind.laser_profile()?))
     }
     pub(super) fn energy_recharge_hundredths(&self) -> u16 {
         let multiplier = self
@@ -1888,10 +1999,13 @@ impl World {
         super::weapons::ENERGY_RECHARGE_HUNDREDTHS * multiplier
     }
     pub(super) fn modular_front(&self) -> Option<OwnedModule> {
+        self.fitted_laser_item(FlightView::Front)
+    }
+    pub(super) fn fitted_laser_item(&self, facing: FlightView) -> Option<OwnedModule> {
         self.modular
             .ledger(self, self.commander_account.as_ref()?)
             .ok()?
-            .front()
+            .fitted(ModuleSlot::laser(facing))
     }
     pub fn fitted_mining_tool(&self) -> Option<FittedMiningTool> {
         let account = self.commander_account.as_ref()?;
@@ -1993,7 +2107,9 @@ impl World {
             .purchase_kind()
             .is_some_and(|kind| resource_slot(kind.slot()))
             || match action {
-                ModuleAction::Store { item } | ModuleAction::Install { item, .. } => self
+                ModuleAction::Store { item }
+                | ModuleAction::Install { item, .. }
+                | ModuleAction::InstallLaser { item, .. } => self
                     .modular
                     .ledger(self, account)
                     .map_err(ModuleError::Save)?
@@ -2083,7 +2199,12 @@ impl World {
             + ledger
                 .items
                 .iter()
-                .filter(|item| !matches!(item.provenance, ModuleProvenance::StandardBirth))
+                .filter(|item| {
+                    matches!(
+                        item.provenance,
+                        ModuleProvenance::Paid { .. } | ModuleProvenance::XYZzy { .. }
+                    )
+                })
                 .count()
             > 256
         {
@@ -2139,7 +2260,9 @@ impl World {
                 .ok_or(ModuleError::SequenceExhausted)?
         } else {
             match review.action {
-                ModuleAction::Store { item } | ModuleAction::Install { item, .. } => item,
+                ModuleAction::Store { item }
+                | ModuleAction::Install { item, .. }
+                | ModuleAction::InstallLaser { item, .. } => item,
                 ModuleAction::Passenger(action) => cabins::receipt_data(self, action)?,
                 _ => return Err(ModuleError::NotForSale),
             }
@@ -2172,7 +2295,7 @@ impl World {
             .map_err(ModuleError::Save)?;
         ledger.apply(event, (self.modular.purchase_count() + 1) as u32)?;
         let owner = review.dock.owner().seed();
-        let pulse_fitted = ledger.front().is_some_and(|i| i.id == owner + 7);
+        let pulse_fitted = ledger.item_is_fitted(owner + 7, ModuleSlot::FrontLaser);
         let energy_fitted = ledger
             .fitted(ModuleSlot::Energy)
             .is_some_and(|i| i.id == owner + 5);
@@ -2246,13 +2369,20 @@ mod shield_tests;
 mod tests;
 
 impl State {
-    pub(super) fn front_at_physical(
+    pub(super) fn laser_at_physical(
         &self,
         world: &World,
+        facing: FlightView,
         clock: u64,
         firing_emission: u64,
     ) -> Option<OwnedModule> {
-        let mut ledger = Ledger::born(world.combat_identity()?.owner).ok()?;
+        if facing != FlightView::Front {
+            let (dock, _, _) = self.mount_issue?;
+            if clock <= world.damage.berth_clock(dock.sequence())? {
+                return None;
+            }
+        }
+        let mut ledger = self.born_ledger(world.combat_identity()?.owner).ok()?;
         let mut counters = [0; 2];
         for event in &self.events {
             if let ModuleAction::FlightLaserExchange {
@@ -2269,13 +2399,21 @@ impl State {
             }
             ledger.replay(*event, &mut counters).ok()?;
         }
-        ledger.front()
+        if let Some((dock, _, revision)) = self.mount_issue
+            && world.damage.berth_clock(dock.sequence())? < clock
+        {
+            ledger.issue_mounts_through(revision).ok()?;
+        }
+        ledger.fitted(ModuleSlot::laser(facing))
     }
 }
 
 impl World {
-    fn historical_front_at_tick(&self, tick: u64, firing_emission: u64) -> Option<OwnedModule> {
-        let mut ledger = Ledger::born(self.combat_identity()?.owner).ok()?;
+    fn laser_ledger_at_tick(&self, tick: u64, firing_emission: u64) -> Option<Ledger> {
+        let mut ledger = self
+            .modular
+            .born_ledger(self.combat_identity()?.owner)
+            .ok()?;
         let mut counters = [0; 2];
         for event in self
             .modular
@@ -2289,23 +2427,53 @@ impl World {
             }
             ledger.replay(*event, &mut counters).ok()?;
         }
-        ledger.front()
+        if let Some((_, issue_tick, revision)) = self.modular.mount_issue
+            && issue_tick < tick
+        {
+            ledger.issue_mounts_through(revision).ok()?;
+        }
+        Some(ledger)
     }
-    pub(super) fn front_weapon_at_tick(
+    pub(super) fn historical_laser_at_tick(
+        &self,
+        facing: FlightView,
+        tick: u64,
+        emission: u64,
+    ) -> Option<OwnedModule> {
+        if facing != FlightView::Front && tick <= self.modular.mount_issue?.1 {
+            return None;
+        }
+        self.laser_ledger_at_tick(tick, emission)?
+            .fitted(ModuleSlot::laser(facing))
+    }
+    pub(super) fn historical_fitted_laser_item(
         &self,
         item: u64,
         tick: u64,
         emission: u64,
-    ) -> Option<super::OrdinaryWeapon> {
-        let fitted = self.historical_front_at_tick(tick, emission)?;
-        if item != fitted.id {
-            return None;
-        }
-        super::OrdinaryWeapon::from_module(fitted.kind)
+    ) -> Option<OwnedModule> {
+        self.laser_ledger_at_tick(tick, emission)?
+            .items
+            .into_iter()
+            .find(|i| {
+                i.id == item
+                    && i.slot
+                        .and_then(ModuleSlot::laser_facing)
+                        .is_some_and(|facing| {
+                            facing == FlightView::Front
+                                || self
+                                    .modular
+                                    .mount_issue
+                                    .is_some_and(|(_, issue_tick, _)| tick > issue_tick)
+                        })
+            })
     }
     pub(super) fn front_cadence_at_tick(&self, tick: u64) -> Option<u8> {
-        super::OrdinaryWeapon::from_module(self.historical_front_at_tick(tick, u64::MAX)?.kind)
-            .map(super::OrdinaryWeapon::cooldown_ticks)
+        super::OrdinaryWeapon::from_module(
+            self.historical_laser_at_tick(FlightView::Front, tick, u64::MAX)?
+                .kind,
+        )
+        .map(super::OrdinaryWeapon::cooldown_ticks)
     }
 }
 
@@ -2477,11 +2645,7 @@ impl World {
         ledger
             .validate_budgets(current, self.emp.utility_mounts(), allowance)
             .map_err(|_| MiningError::InvalidState)?;
-        let born = |slot, offset| {
-            ledger
-                .fitted(slot)
-                .is_some_and(|item| item.id == owner.owner + offset)
-        };
+        let born = |slot, offset| ledger.item_is_fitted(owner.owner + offset, slot);
         let account = current
             .prepare_module(
                 0,
@@ -2519,11 +2683,22 @@ impl World {
         if tank && ledger.fuel_storage_count() == crate::navigation::MAX_FUEL_STORAGE_UNITS {
             return Ok(());
         }
-        let existing = ledger
-            .items
-            .iter()
-            .find(|item| item.kind == kind && (!tank || item.slot.is_none()))
-            .copied();
+        let existing = if kind == ModuleKind::NavalLaser {
+            // The front grant must leave every other emplacement in place.
+            ledger.front().filter(|item| item.kind == kind).or_else(|| {
+                ledger
+                    .items
+                    .iter()
+                    .find(|item| item.kind == kind && item.slot.is_none())
+                    .copied()
+            })
+        } else {
+            ledger
+                .items
+                .iter()
+                .find(|item| item.kind == kind && (!tank || item.slot.is_none()))
+                .copied()
+        };
         let cutter_stored = if kind == ModuleKind::SalvageCutter {
             let definition = current.equipment_definition().map_err(|_| INVALID)?;
             let (units, mounts) = ledger
@@ -2583,11 +2758,7 @@ impl World {
         };
         ledger.apply(event, grant).map_err(|_| INVALID)?;
         let owner = dock.owner().seed();
-        let born_fitted = |slot, offset| {
-            ledger
-                .fitted(slot)
-                .is_some_and(|item| item.id == owner + offset)
-        };
+        let born_fitted = |slot, offset| ledger.item_is_fitted(owner + offset, slot);
         let account = current
             .prepare_module(
                 0,
@@ -2622,7 +2793,7 @@ impl State {
         world: &World,
     ) -> Result<Vec<(u64, Option<u8>)>, SaveError> {
         let owner = world.combat_identity().ok_or(INVALID)?.owner;
-        let mut ledger = Ledger::born(owner)?;
+        let mut ledger = self.born_ledger(owner)?;
         let mut counters = [0; 2];
         let mut changes = vec![(0, Some(0))];
         for event in &self.events {

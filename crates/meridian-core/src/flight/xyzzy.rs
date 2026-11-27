@@ -732,7 +732,50 @@ impl World {
         self.commander_account = Some(account);
         Ok(())
     }
+    fn refit_medusa_side_lasers(&mut self, tick: u64) -> Result<(), SaveError> {
+        use super::{ModuleAction, ModuleKind, ModuleSlot};
+
+        let (dock, _, revision) = self.xyzzy_medusa_issue().ok_or(INVALID)?;
+        let ledger = self
+            .modular
+            .ledger(self, self.commander_account.as_ref().ok_or(INVALID)?)?;
+        let mut stored: Vec<_> = ledger
+            .items
+            .iter()
+            .filter(|item| item.kind == ModuleKind::NavalLaser && item.slot.is_none())
+            .map(|item| item.id)
+            .collect();
+        for facing in super::medusa_lasers::INTEGRAL {
+            let occupant = ledger
+                .items
+                .iter()
+                .find(|item| item.slot == Some(ModuleSlot::laser(facing)));
+            if occupant.is_some_and(|item| item.kind == ModuleKind::NavalLaser) {
+                continue;
+            }
+            let original =
+                super::modular::issued_laser_id(dock, revision, facing).ok_or(INVALID)?;
+            let index = stored
+                .iter()
+                .position(|id| *id == original)
+                .or_else(|| stored.len().checked_sub(1))
+                .ok_or(INVALID)?;
+            let action = ModuleAction::InstallLaser {
+                item: stored.remove(index),
+                replacing: occupant.map(|item| item.id),
+                facing,
+            };
+            let review = self.review_module(action, tick).map_err(|_| INVALID)?;
+            self.prepare_module(review, tick)
+                .map_err(|_| INVALID)?
+                .commit();
+        }
+        Ok(())
+    }
     fn apply_xyzzy(&mut self, review: XyzzyReview) -> Result<(), SaveError> {
+        if review.action.outfit() && self.xyzzy_medusa_active() {
+            self.refit_medusa_side_lasers(review.tick)?;
+        }
         if review.action == XyzzyAction::ActivateMedusa {
             // Store displaced utility items on the private candidate before the hull exchange.
             let equipment = self.modular_equipment_snapshot().ok_or(INVALID)?;
@@ -791,6 +834,7 @@ impl World {
         self.xyzzy.records.push(record);
         self.commander_account = Some(account);
         if first_medusa {
+            self.modular.bind_mount_issue(self.xyzzy_medusa_issue());
             // Exchange the bay with the hull before any module replays the retained cargo.
             self.fit_xyzzy_cargo_bay(review)?;
             self.pulse.replay_berth(super::weapons::MEDUSA_ENERGY);
