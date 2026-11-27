@@ -657,6 +657,99 @@ fn actual_missile_notice_and_restored_airborne_session_do_not_replay() {
 }
 
 #[test]
+fn paid_energy_readout_follows_fitting_charge_and_cold_continue() {
+    use crate::session::Action;
+    use meridian_core::{ModuleAction, ModuleKind, ModuleProvenance, ModuleSlot};
+    let directory = TestDirectory::new();
+    let slot = directory.0.join("commander.meridian");
+    // This older outfit supplies cash. The Extra unit below is an ordinary paid purchase.
+    ok(std::fs::write(
+        &slot,
+        include_bytes!("../../../meridian-core/tests/fixtures/xyzzy-paid-base-v17.bin"),
+    ));
+    let mut profile = open(&directory.0);
+    ok(profile.continue_saved());
+    let cash = profile.world.credits_tenths();
+    ok(profile.command(Action::Module(ModuleAction::Purchase {
+        kind: ModuleKind::ExtraEnergyUnit,
+    })));
+    assert_eq!(
+        profile.world.credits_tenths(),
+        cash.map(|value| value - 72000)
+    );
+    let items = profile
+        .world
+        .modular_equipment_snapshot()
+        .unwrap_or_else(|| panic!("owned modules"))
+        .items;
+    let paid = items
+        .iter()
+        .find(|item| {
+            item.kind == ModuleKind::ExtraEnergyUnit
+                && matches!(item.provenance, ModuleProvenance::Paid { .. })
+        })
+        .unwrap_or_else(|| panic!("paid Extra unit"))
+        .id;
+    let basic = items
+        .iter()
+        .find(|item| item.kind == ModuleKind::BasicEnergySystem)
+        .unwrap_or_else(|| panic!("born energy system"))
+        .id;
+    ok(profile.command(Action::Module(ModuleAction::Install {
+        item: basic,
+        replacing: Some(paid),
+    })));
+    let mut app = App::with_profile(profile);
+    launched(&mut app);
+    app.game_key(KeyCode::KeyY);
+    assert!(
+        app.notice.text.as_deref().is_some_and(
+            |s| s.starts_with("Basic Energy System |") && s.ends_with("Recharge 4.2/s")
+        )
+    );
+    drop(app);
+
+    // Launch and inspection did not write a save. Reopen the last paid fitting at berth.
+    let mut profile = open(&directory.0);
+    ok(profile.continue_saved());
+    ok(profile.command(Action::Module(ModuleAction::Install {
+        item: paid,
+        replacing: Some(basic),
+    })));
+    let mut app = App::with_profile(profile);
+    launched(&mut app);
+    let tick = app.game.world.snapshot().tick;
+    ok(app.game.world.request_fire_front_laser(tick));
+    ok(app.game.world.step(FlightInput::default()));
+    app.game_key(KeyCode::KeyY);
+    let reading = app.notice.text.clone();
+    assert_eq!(
+        reading.as_deref(),
+        Some("Extra Energy Unit | Energy 379.14/380 | Recharge 8.4/s")
+    );
+    ok(app.game.save());
+    drop(app);
+
+    let mut profile = open(&directory.0);
+    ok(profile.continue_saved());
+    let modules = profile
+        .world
+        .modular_equipment_snapshot()
+        .unwrap_or_else(|| panic!("cold modules"));
+    assert!(
+        modules
+            .items
+            .iter()
+            .any(|item| item.id == paid && item.slot == Some(ModuleSlot::Energy))
+    );
+    let mut app = App::with_profile(profile);
+    let bytes = ok(app.game.world.save_bytes());
+    app.game_key(KeyCode::KeyY);
+    assert_eq!(app.notice.text, reading);
+    assert_eq!(ok(app.game.world.save_bytes()), bytes);
+}
+
+#[test]
 fn flight_mining_shortcut_and_audio_chord_have_distinct_effects() {
     use meridian_core::{TargetIdentity, XyzzyAction, equipment::WorkTargetId};
     use winit::keyboard::ModifiersState;

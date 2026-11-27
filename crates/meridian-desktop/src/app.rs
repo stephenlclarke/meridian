@@ -998,6 +998,30 @@ impl App {
         }
     }
 
+    fn show_energy_status(&mut self) {
+        let world = &self.game.world;
+        let message = match (
+            world.flight_resources_snapshot(),
+            world.modular_equipment_snapshot(),
+        ) {
+            (Some(resources), Some(modules)) => {
+                let fitted = modules
+                    .items
+                    .iter()
+                    .find(|item| item.slot == Some(meridian_core::ModuleSlot::Energy));
+                let name = fitted.map_or("Empty energy slot", |item| item.kind.name());
+                let charge = f32::from(resources.energy_hundredths) / 100.0;
+                let capacity = f32::from(resources.energy_capacity_hundredths) / 100.0;
+                let rate = f32::from(resources.energy_recharge_hundredths_per_tick)
+                    / (100.0 * meridian_core::FIXED_DELTA_SECONDS);
+                format!("{name} | Energy {charge:.2}/{capacity:.0} | Recharge {rate:.1}/s")
+            }
+            _ => "Ship energy data unavailable".into(),
+        };
+        self.notice.set(message);
+        self.request_redraw();
+    }
+
     fn game_key(&mut self, code: KeyCode) {
         if player_destroyed(&self.game.world) {
             self.notice.set(DESTROYED_NOTICE.into());
@@ -1010,6 +1034,7 @@ impl App {
         let in_flight = self.game.world.snapshot().mode == FlightMode::Flight;
         if in_flight {
             match code {
+                KeyCode::KeyY if self.modifiers.is_empty() => return self.show_energy_status(),
                 KeyCode::Tab => return self.cycle_computer_target(ScannerCycle::All),
                 KeyCode::KeyM if self.modifiers == ModifiersState::SHIFT => {
                     return self.cycle_computer_target(ScannerCycle::Mining);

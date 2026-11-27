@@ -32,7 +32,7 @@ Authored new tests: source offers, cash/technology refusal, earned Intermediate 
 | --- | --- | --- | --- |
 | Drive: Basic, Intermediate, Advanced | Born / paid / paid; this candidate | Actual timed travel and historical fit | Advanced; candidate |
 | Shield: Basic, Basic II (Pulse), Intermediate (Mining), Intermediate II (Beam), Advanced (Military), Advanced II (Capital), Elite | Basic born; four successive shop grades; Capital is Elite-rank reward or paid PLUGH-only listing, Elite acquisition-only by default | Candidate: real capacity ratios 1/1.5/1.8/2/2.3/6.9/9.2, recharge 1x; wider banks, fit and damage replay. Actual rank and PLUGH still open | Elite maximum and separate explicit seven-grade selector; [source and acceptance](SHIELD-GRADES.md) |
-| Energy: Basic, Intermediate (Extra), Advanced (Naval), Elite | Born; three ordered shop grades | Ready: recharge 1/2/3/4x, capacity 1x; higher-grade shop TLs constrain admission | Elite grant; more playable stations needed to reach paid Naval TL17 |
+| Energy: Basic, Intermediate (Extra), Advanced (Naval), Elite | Born; three ordered shop grades | Recharge 1/2/3/4x with the same capacity. In flight, Y shows the fitted unit, current energy, capacity and recharge per second. | Elite grant; more playable stations needed to reach paid Naval TL17 |
 | Navigation: Basic, Intermediate (Advanced saved key), Advanced (Military saved key) | Born / two paid grades | Ready: 7/14/21 LY module reach with hull floor, actual fit and route history | Advanced; full original world/station scope remains |
 | Targeting: Basic, Advanced, Docking, Identification, Pirate, Military | Six paid grades and stored identities | Identification or higher shows type and custody for current ordinary rocks and ore. Tab selects a contact and Shift+I expands its details. | Military; original automatic options remain open |
 | Mining and Salvage Targeting | Two independent paid modules require fitted core | Shift+M selects the next current rock or ore with the Mining Targeting Module fitted. Shift+V selects wrecks with recoverable cargo with the Salvage Targeting Module fitted. Tab selects across all scanner contacts. See [automatic work](AUTOMATIC-WORK.md) for rock hold, ore intake and salvage. | Both available in the explicit maximum outfit |
@@ -42,8 +42,8 @@ Authored new tests: source offers, cash/technology refusal, earned Intermediate 
 | Fuel Scoops | Paid unique fitted utility; source F-only test fit | Candidate: real solar fuel and cabin thermal effect; physical ore/cargo intake owner still open | Maximum and separate scoop-only action; [solar source and acceptance](SOLAR-FUEL-SCOOPS.md) |
 | ECM | Paid unique utility | Candidate: owned fit, exact manual field debit and actual local standard-projectile termination; cold retains time-only cooldown and outcomes | Guarded automatic setting only; incoming missile interaction remains open; shared mounts constrain maximum; EMP is distinct. [Source and preview limits](STOCK-ECM.md) |
 | Escape Pod | Original unique utility, 3,600 CR at TL6 | Open. Player ejection requires a retained abandoned hull, body, crew and rescue outcome. The frozen player action settles losses and docks immediately. | Maximum grant open |
-| Energy Bomb | Paid unique utility | Open: finite owned ordnance, in-game effects and retained source | Maximum grant open |
-| Galactic Hyperdrive | Paid unique utility (TL15) | Open: actual one-use inter-galaxy travel, destination and journal | Maximum grant open |
+| Energy Bomb | Paid unique utility | Open. Original use consumes the fitted item and requires more than 180 hull energy. Every eligible body needs an attributed result and each applicable destruction needs a settled incident before the action commits. | Maximum grant open |
+| Galactic Hyperdrive | Paid unique utility (TL15) | Open. Costs 28,500 CR at TL15. The highest admitted shop is TL14. Arrival, station data and the saved journey must support the next galaxy before the fitted drive can be consumed. | Maximum grant open |
 | Salvage Cutter | Paid unique compatible work utility | Source candidate: independent SH025 fit; finite ordinary external terminal-material custody | Maximum grants one owned unit; stores it when all three shared mounts are full |
 | Fuel Storage Unit (four physical repeatable slots) | Candidate: four owned, three normal shared SH025 utility mounts, 2,000 CR each | Actual capacity +70 each, separately paid refuel, occupied removal refusal, historical account and route proof | Explicit four-tank test maximum with custody guard; [source and acceptance](FUEL-STORAGE.md) |
 | EMP Pirate Blaster; Power, Capacity, Recharge each grades 0, 1, 2, 3 | Paid utility, three independent sequential paid axes | Ready for current local finite pulse/capacity/recharge; broader original law/actors and native recovery open | Maximum fits utility and all three grade 3 axes; source values are Root-adopted balance estimates |
@@ -62,6 +62,10 @@ Basic fuel remains ordinary paid station service. Additional research recipes, p
 At the frozen revision below, `Game.escapePod()` refuses occupied passenger berths. It stages consumption of the fitted pod, settles mission and cargo losses, records abandoned people, clears the electrical charge, resets legal status and fuel, and calls `dock()`. It commits the candidate only after docking and commander validation. `NativeEquipmentConsumption.swift` binds consumption to the fitted item. `ScriptFreight.swift` records the escape cause against held units. The original clue-journal test checks that earned clues survive escape.
 
 Meridian still needs an authoritative player rescue transition that identifies the abandoned hull, its people and cargo, the rescue actor and the arrival. The frozen player path clears the scene at docking. The SH040 Newt stock-inspection asset supplies its shape only. Neither supplies this transition or evidence of physical station entry. Ejection stays unavailable pending that source or an approved gameplay specification.
+
+## Energy in flight
+
+Buy the Extra Energy Unit for 7,200 CR at TL9 or higher. It replaces the fitted Basic Energy System and stores the original item. Press **Y** in ordinary SH025 flight to read the fitted item, current hull energy, capacity and recharge rate. Press it again after energy use to see the new reading. Basic restores 4.2 energy/s and Extra restores 8.4 energy/s, up to 380. Storing Extra and refitting Basic restores the lower rate. Continue reads the saved fit and current charge.
 
 ## Mining contact selection
 
@@ -83,6 +87,8 @@ Revision `a11fe16924d87d06021816f9037952afcbac08db`, tree `68fec574df12ddf74acb1
 
 | Original path (under `Sources/L337Core/` unless noted) | SHA-256 |
 | --- | --- |
+| NativeShipValues.swift | `98705f53ae126240c328b72c8c34f3402bbd72f02da99c5418cbade119c09e54` |
+| NavalMissions.swift | `207eb8e4ba0e4428e89ddebdcbd1c438aa44808ee9b36095a649a484d8a19bb0` |
 | HyperspaceDriveDefinition.swift | `931e8c50576e69dbaa41819b25e5a61c9ccdecefae9a581cb432ba76a89a91d3` |
 | HyperspaceActivationPolicy.swift | `54f39bb030469535cef84db3737ff2e347ee9d741234d8135654852829041665` |
 | HyperspaceDriveRuntime.swift | `28ab31e945096be00dd37d1280f9365af63762d70e5fe98b0cbccb957a17f4fa` |
