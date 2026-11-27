@@ -742,3 +742,49 @@ fn testing_menu_h_help_wins_over_hidden_galaxy_and_showroom_search_without_losin
         assert!(!directory.0.join("commander.meridian").exists());
     }
 }
+
+#[test]
+fn fleet_menu_issues_medusa_to_historical_paid_emp_commander_and_cold_continues() {
+    let directory = TestDirectory::new();
+    let path = directory.0.join("commander.meridian");
+    let legacy = include_bytes!("../../../meridian-core/tests/fixtures/xyzzy-paid-base-v17.bin");
+    ok(fs::write(&path, legacy));
+    let mut profile = open(&directory.0);
+    ok(profile.continue_saved());
+    let old = profile
+        .world
+        .owned_emp()
+        .unwrap_or_else(|| panic!("historical paid EMP"));
+    let cash = profile.world.credits_tenths();
+    let commander = profile.world.commander_id();
+    assert!(profile.world.xyzzy_medusa_issue().is_none());
+    let mut app = App::with_profile(profile);
+    activate(&mut app);
+    let issued = app
+        .game
+        .world
+        .xyzzy_medusa_issue()
+        .unwrap_or_else(|| panic!("Medusa issue"));
+    drop(app);
+    let mut reopened = open(&directory.0);
+    ok(reopened.continue_saved());
+    let world = &reopened.world;
+    assert_eq!(
+        world.player_hull_kind(),
+        meridian_core::PlayerHullKind::Medusa
+    );
+    assert_eq!(world.xyzzy_medusa_issue(), Some(issued));
+    assert_eq!(world.commander_id(), commander);
+    assert_eq!(world.credits_tenths(), cash);
+    let emp = world
+        .owned_emp()
+        .unwrap_or_else(|| panic!("retained paid EMP"));
+    assert_eq!(
+        (emp.item, emp.provenance, emp.paid_tenths),
+        (old.item, old.provenance, old.paid_tenths)
+    );
+    assert_eq!(
+        (emp.grades.power, emp.grades.capacity, emp.grades.recharge),
+        (3, 3, 3)
+    );
+}
