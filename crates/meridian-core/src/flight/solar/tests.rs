@@ -966,6 +966,26 @@ fn fitted_partially_charged_emp_keeps_actual_final_transfer_when_solar_heat_kill
     assert_eq!(cold.combat_snapshot(), world.combat_snapshot());
 }
 
+fn record_scoop_turn(world: &World, pass: usize, phase: &str) {
+    let ship = world.snapshot();
+    let solar = world.solar_snapshot().unwrap();
+    let player = world.combat_snapshot().unwrap().player;
+    eprintln!(
+        "Aelavia pass {pass} {phase}: tick={} mode={:?} speed={:.2} radius={:.3} temperature={:.3} energy={} fuel={} scoop={:?}",
+        ship.tick,
+        ship.mode,
+        ship.speed,
+        ratio(world),
+        solar.cabin_temperature,
+        player.energy_hundredths,
+        fuel(world),
+        solar.status
+    );
+    assert_eq!(ship.mode, crate::FlightMode::Flight);
+    assert!(!player.destroyed);
+    assert!(solar.cabin_temperature < 0.75, "solar danger at {phase}");
+}
+
 #[test]
 fn aelavia_naval_purchase_recharges_in_flight_and_scoops_fuel_for_return() {
     use crate::navigation::SystemId;
@@ -1021,6 +1041,7 @@ fn aelavia_naval_purchase_recharges_in_flight_and_scoops_fuel_for_return() {
         && matches!(i.provenance, ModuleProvenance::Paid { dock, paid_tenths: 196_000, .. } if dock == berth)
     ));
     solar_approach(&mut world);
+    record_scoop_turn(&world, 0, "outer approach");
     world
         .request_fire_front_laser(world.snapshot().tick)
         .unwrap();
@@ -1035,19 +1056,27 @@ fn aelavia_naval_purchase_recharges_in_flight_and_scoops_fuel_for_return() {
         (38_000, 21)
     );
 
-    // One or more passes through the outer corona. Turn out before thermal saturation.
-    for _ in 0..4 {
+    // Range is checked against unrounded distance, while the actual debit is in whole
+    // units. Keep one spare unit after meeting both conditions on the return leg.
+    let return_target = route
+        .fuel_units
+        .max((route.distance_ly * 10.0).ceil() as u16)
+        + 1;
+    assert!(fuel(&world) < return_target);
+    for pass in 1..=8 {
         let sun = world.celestial_snapshot().unwrap().sun;
+        record_scoop_turn(&world, pass, "turn inbound");
         aim_3d(&mut world, sun.position);
         for _ in 0..2500 {
-            if fuel(&world) >= 207 || ratio(&world) < 2.2 {
+            if fuel(&world) >= return_target || ratio(&world) <= 2.65 {
                 break;
             }
             cruise(&mut world, 8.0);
         }
-        if fuel(&world) >= 207 {
-            break;
-        }
+        // From speed 8 the ship uses about 0.05 solar radii to brake. At or beyond
+        // 2.60 radii the equilibrium temperature is below the 0.75 cockpit warning.
+        stop(&mut world);
+        record_scoop_turn(&world, pass, "braked for outbound turn");
         let pos =
             crate::station::flight_pose(world.snapshot().position, world.snapshot().orientation)
                 .unwrap()
@@ -1066,8 +1095,18 @@ fn aelavia_naval_purchase_recharges_in_flight_and_scoops_fuel_for_return() {
             }
             cruise(&mut world, 8.0);
         }
+        assert!(ratio(&world) > 3.2, "failed to clear the collection band");
+        if fuel(&world) >= return_target {
+            break;
+        }
     }
-    assert!(fuel(&world) >= 207);
+    let departure_fuel = fuel(&world);
+    assert!(
+        departure_fuel >= return_target,
+        "collected {departure_fuel}, need {return_target}"
+    );
+    record_scoop_turn(&world, 0, "ready for return jump");
+    assert!(!world.xyzzy_snapshot().unwrap().unlimited_fuel);
     assert_eq!(world.credits_tenths(), Some(cash - 196_000));
     world
         .request_jump(SystemId::LARERIA, world.snapshot().tick)
@@ -1076,6 +1115,7 @@ fn aelavia_naval_purchase_recharges_in_flight_and_scoops_fuel_for_return() {
         world.step(FlightInput::default()).unwrap();
     }
     let cold = World::from_save_bytes(&world.save_bytes().unwrap()).unwrap();
+    assert_eq!(fuel(&cold), departure_fuel - route.fuel_units);
     assert_eq!(
         cold.snapshot().navigation.unwrap().system,
         SystemId::LARERIA
