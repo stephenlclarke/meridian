@@ -1051,6 +1051,9 @@ impl App {
                 KeyCode::KeyV if self.modifiers == ModifiersState::SHIFT => {
                     return self.cycle_computer_target(ScannerCycle::Salvage);
                 }
+                KeyCode::KeyF if self.modifiers == ModifiersState::SHIFT => {
+                    return self.toggle_orientation_only();
+                }
                 KeyCode::KeyF => return self.toggle_computer_assistance(),
                 KeyCode::KeyT => return self.lock_computer_target(),
                 KeyCode::Backspace | KeyCode::Delete => return self.release_computer_target(),

@@ -137,6 +137,7 @@ pub(super) struct State {
     scanner: bool,
     manual: bool,
     pilot_override: bool,
+    orientation_only: bool,
     work_status: Option<&'static str>,
     wreck_avoidance: Option<wreck_avoidance::Steering>,
     origin: Option<CombatIdentity>,
@@ -412,6 +413,33 @@ impl World {
                 || self.targeting_tier().is_none())
     }
 
+    fn scanner_orientation_only(&self) -> bool {
+        self.targeting.scanner && self.targeting.orientation_only
+    }
+
+    /// Choose what the computer may do when scanner assistance is engaged.
+    pub fn toggle_orientation_only(&mut self) -> Result<bool, &'static str> {
+        if self.is_paused() {
+            return Err("Resume flight to change targeting");
+        }
+        if self.targeting_origin().is_none() {
+            return Err("Target assistance unavailable");
+        }
+        if self.targeting_tier().is_none() {
+            return Err("Fit a targeting core for orientation assistance");
+        }
+        self.targeting.orientation_only = !self.targeting.orientation_only;
+        if self.scanner_orientation_only() {
+            self.mark_released_fragment();
+            if self.targeting_station_selected() {
+                self.auto_docking = None;
+            }
+            self.targeting.work_status = None;
+            self.targeting.wreck_avoidance = None;
+        }
+        Ok(self.targeting.orientation_only)
+    }
+
     /// The pilot can operate real fitted work equipment while using steering assistance.
     pub fn pilot_operates_selected_tool(&self) -> bool {
         if !self.targeting.scanner {
@@ -466,6 +494,7 @@ impl World {
     pub(super) fn station_docking_assistance(&self) -> bool {
         self.targeting_station_selected()
             && !self.manual_scanner_target()
+            && !self.scanner_orientation_only()
             && self
                 .targeting_tier()
                 .is_some_and(|t| t >= TargetingTier::Docking)
@@ -613,8 +642,9 @@ impl World {
             if let TargetIdentity::Work(WorkTargetId::Asteroid(id)) = selected {
                 // Only a previously acquired automated mining job can follow ore after
                 // its parent disappears. A fresh scanner pass lists the fragment itself.
-                let retain_source =
-                    !self.manual_scanner_target() && self.work_targeting_fit().mining;
+                let retain_source = !self.manual_scanner_target()
+                    && !self.scanner_orientation_only()
+                    && self.work_targeting_fit().mining;
                 return self
                     .available_work_contacts(retain_source)
                     .into_iter()
@@ -663,7 +693,7 @@ impl World {
     }
 
     fn automatic_work_target(&self, candidate: Candidate) -> Option<WorkTarget> {
-        if self.manual_scanner_target() {
+        if self.manual_scanner_target() || self.scanner_orientation_only() {
             return None;
         }
         if self.targeting.scanner
@@ -711,6 +741,7 @@ impl World {
         }
         if !self.targeting.scanner
             || self.manual_scanner_target()
+            || self.scanner_orientation_only()
             || self.targeting_tier()? < TargetingTier::Advanced
         {
             return None;
@@ -1094,6 +1125,8 @@ impl World {
             mode,
             guidance: if self.manual_scanner_target() {
                 "Manual target"
+            } else if self.scanner_orientation_only() {
+                "Orientation only"
             } else {
                 guidance
             },
@@ -1397,6 +1430,107 @@ mod tests {
         assert!(world.auto_docking_active());
         world.cancel_targeting();
         assert!(!world.auto_docking_active());
+    }
+
+    #[test]
+    fn orientation_only_keeps_the_rock_centred_and_the_pilot_in_charge_of_work() {
+        let mut world = fitted(TargetingTier::Advanced);
+        launch(&mut world);
+        assert!(world.toggle_orientation_only().unwrap());
+        assert!(
+            world
+                .cycle_mining_contact(world.snapshot().tick, [1280, 720])
+                .unwrap()
+        );
+        let rock = world.selected_work_target().unwrap();
+        let work_count = world.mining.work_count();
+        let fit = world.modular_equipment_snapshot().unwrap();
+        let speed = world.snapshot().speed;
+        let angle_to_rock = |world: &World| {
+            let state = world.snapshot();
+            let pose = super::super::flight_pose(state.position, state.orientation).unwrap();
+            let direction = pose
+                .orientation
+                .inverse_coordinates(offset(rock.position, pose.position));
+            direction
+                .x
+                .hypot(direction.y)
+                .atan2(direction.z)
+                .to_degrees()
+        };
+        let initial_angle = angle_to_rock(&world);
+        assert!(
+            initial_angle > 1.0,
+            "rock must start off-axis: {initial_angle}°"
+        );
+        for _ in 0..12 {
+            world.step(FlightInput::default()).unwrap();
+            assert_eq!(
+                world.targeting_snapshot().unwrap().guidance,
+                "Orientation only"
+            );
+            assert_eq!(world.selected_work_target().unwrap().id, rock.id);
+            assert!(world.pilot_operates_selected_tool());
+            assert_eq!(world.automatic_work_status(), None);
+        }
+        let final_angle = angle_to_rock(&world);
+        assert!(
+            final_angle < initial_angle,
+            "angle to rock: {initial_angle}° -> {final_angle}°"
+        );
+        assert_eq!(world.snapshot().speed, speed);
+        assert_eq!(world.mining.work_count(), work_count);
+        assert_eq!(world.modular_equipment_snapshot().unwrap().items, fit.items);
+        let throttle = FlightInput {
+            throttle: 0.5,
+            ..FlightInput::default()
+        };
+        assert_eq!(
+            world.targeting_flight_input(throttle).throttle,
+            throttle.throttle
+        );
+        assert!(!world.manual_scanner_target());
+        let manual = FlightInput {
+            roll: 0.5,
+            ..FlightInput::default()
+        };
+        assert_eq!(world.targeting_flight_input(manual), manual);
+        assert!(world.manual_scanner_target());
+        assert!(world.toggle_scanner_assistance().unwrap());
+        assert_eq!(
+            world.targeting_snapshot().unwrap().guidance,
+            "Orientation only"
+        );
+        assert!(!world.toggle_orientation_only().unwrap());
+        world.step(FlightInput::default()).unwrap();
+        assert!(world.automatic_work_status().is_some());
+        assert_eq!(world.selected_work_target().unwrap().id, rock.id);
+    }
+
+    #[test]
+    fn orientation_only_interrupts_and_resumes_station_docking_on_the_same_mark() {
+        let mut world = fitted(TargetingTier::Docking);
+        launch(&mut world);
+        let tick = world.snapshot().tick;
+        for _ in 0..world.scanner_targets().len() {
+            assert!(world.cycle_scanner_target(tick, [1280, 720]).unwrap());
+            if world.targeting_station_selected() {
+                break;
+            }
+        }
+        assert!(world.targeting_station_selected());
+        world.step(FlightInput::default()).unwrap();
+        assert!(world.auto_docking_active());
+        let mark = world.targeting_snapshot().unwrap().identity;
+        assert!(world.toggle_orientation_only().unwrap());
+        for _ in 0..5 {
+            world.step(FlightInput::default()).unwrap();
+            assert!(!world.auto_docking_active());
+            assert_eq!(world.targeting_snapshot().unwrap().identity, mark);
+        }
+        assert!(!world.toggle_orientation_only().unwrap());
+        world.step(FlightInput::default()).unwrap();
+        assert!(world.auto_docking_active());
     }
 
     #[test]

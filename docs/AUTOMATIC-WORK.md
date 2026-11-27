@@ -16,6 +16,8 @@ With a targeting core and the matching module fitted, **Shift+M** cycles rocks a
 | Docking targeting and navigation computer | Selecting a station starts the docking approach. **N** also starts or cancels automatic docking. |
 | Mining or Salvage targeting module and work equipment | Selecting the corresponding contact starts the work sequence. Occupied cutter contact still requires confirmation. |
 
+With a targeting core fitted, press **Shift+F** to choose how much the computer does. The cockpit shows **Orientation only** when the computer is steering. Use the throttle and brake to set your distance. Operate the fitted tool yourself. Selecting a station in this mode keeps its bearing without starting docking. Press **Shift+F** again for the usual fitted functions. You can set this before selecting a contact. Changing the setting during manual flight keeps you in control until you engage assistance.
+
 Steering by hand takes over the current approach and keeps the scanner mark. Press **F** to resume assistance on that contact. **Delete** clears it. With Basic alignment, the pilot can still use the throttle. Identification adds legal status to the readout. Pirate targeting adds available cargo and route information. Military targeting adds shield and laser heat readings.
 
 In manual flight, point the fitted mining laser at the selected rock and press **Z**. To collect released ore, select the fragment, match speed and bring it into the scoop below the nose. Press **Z** to collect. At an eligible wreck, match its motion at cutter range and press **Z** with the cutter and scoops fitted. A disabled occupied ship opens a review before contact. Press **T** to request a missile lock on the selected ship. Laser fire against a ship always needs pilot input.

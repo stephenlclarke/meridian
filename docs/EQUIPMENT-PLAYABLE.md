@@ -52,7 +52,7 @@ At `d8f6b274`, the Mac local-sortie test compared a freshly continued commander 
 | Shield: Basic, Basic II (Pulse), Intermediate (Mining), Intermediate II (Beam), Advanced (Military), Advanced II (Capital), Elite | Basic born; four successive shop grades; Capital is Elite-rank reward or paid PLUGH-only listing, Elite acquisition-only by default | Candidate: real capacity ratios 1/1.5/1.8/2/2.3/6.9/9.2, recharge 1x; wider banks, fit and damage replay. Actual rank and PLUGH still open | Elite maximum and separate explicit seven-grade selector; [source and acceptance](SHIELD-GRADES.md) |
 | Energy: Basic, Intermediate (Extra), Advanced (Naval), Elite | Born; three ordered shop grades | Recharge 1/2/3/4x with the same capacity. In flight, Y shows the fitted unit, current energy, capacity and recharge per second. | Elite grant. Aelavia (G01-S235, TL17) offers the paid Naval grade. |
 | Navigation: Basic, Intermediate (Advanced saved key), Advanced (Military saved key) | Born / two paid grades | 7/14/21 LY module reach with hull floor. Shift+R plots a route during flight using the fitted unit and available fuel. | Advanced; full original world/station scope remains |
-| Targeting: Basic, Advanced, Docking, Identification, Pirate, Military | Six paid grades and stored identities | Identification or higher shows type and custody for current ordinary rocks and ore. Tab selects a contact and Shift+I expands its details. | Military; original automatic options remain open |
+| Targeting: Basic, Advanced, Docking, Identification, Pirate, Military | Six paid grades and stored identities | Identification or higher shows type and custody for current ordinary rocks and ore. Tab selects a contact and Shift+I expands its details. | Shift+F selects orientation only or full fitted assistance. Military and other original automatic options remain open |
 | Mining and Salvage Targeting | Two independent paid modules require fitted core | Shift+M selects the next current rock or ore with the Mining Targeting Module fitted. Shift+V selects wrecks with recoverable cargo with the Salvage Targeting Module fitted. Tab selects across all scanner contacts. See [automatic work](AUTOMATIC-WORK.md) for rock hold, ore intake and salvage. | Both available in the explicit maximum outfit |
 | Lasers: Pulse, Beam, Mining, Military, Naval | Pulse born; four repeatable ordinary shop/held definitions; Naval reward or paid PLUGH-only listing | Partial: real front paths; other facings and dedicated native Mining utility open | Naval front; not all supported native facings |
 | Ammunition: Standard Missile, Alien Seeker Missile | Standard paid and finite nine pylons on SH025; Alien Seeker requires recovered research then repeat procurement | Standard ready; alien round, salvage variants and compatible hull pylon count open | Finite standard refill only; no virtual infinite inventory |
@@ -90,6 +90,14 @@ Press **Shift+R** in local flight to see feasible routes between the supported s
 ## Energy in flight
 
 Buy the Extra Energy Unit for 7,200 CR at TL9 or higher. It replaces the fitted Basic Energy System and stores the original item. Press **Y** in ordinary SH025 flight to read the fitted item, current hull energy, capacity and recharge rate. Press it again after energy use to see the new reading. Basic restores 4.2 energy/s and Extra restores 8.4 energy/s, up to 380. Storing Extra and refitting Basic restores the lower rate. Continue reads the saved fit and current charge.
+
+## Scanner orientation only
+
+Press **Shift+F** in local flight with a fitted targeting core. The choice applies to the current mark and subsequent scanner selections. **F** still switches between assisted and manual steering. **Delete** releases the mark. Loading a save starts with the normal fitted assistance.
+
+The original at `a11fe16924d87d06021816f9037952afcbac08db` tracks ordinary ships at pilot-set cruise speed. Its `WorkTargetSelection.swift` distinguishes tracking, hold, auto-scoop and docking. `AutoTargetControl.swift` dispatches the selected action. Shift+F is Meridian’s control for choosing tracking alone.
+
+For native acceptance, select a rock with the Mining Targeting Module fitted. Switch to orientation only and verify the bow tracks the rock while throttle, brake and tool operation stay under pilot control. Steer by hand, resume with F and check the rock stays marked. With docking-grade targeting and a navigation computer, select a station during assisted flight. Switch to orientation only during approach. Verify automatic docking stops, the station stays marked and a second Shift+F resumes approach. An unfitted core must report its requirement and leave the manual mark intact.
 
 ## Mining contact selection
 

@@ -12,6 +12,8 @@ The navigation development branch lets pilots plot and save a route in flight wi
 
 On the equipment development branch, **Y** shows the fitted SH025 energy system and its effective recharge rate in flight. [Energy in flight](EQUIPMENT-PLAYABLE.md#energy-in-flight)
 
+The equipment development branch adds **Shift+F** to choose orientation-only scanner assistance. With a targeting core fitted, the computer faces the selected contact while the pilot controls speed, tools and docking. Gameplay and desktop checks cover the control. Native qualification is pending.
+
 The equipment development branch adds **Shift+M** for rocks and ore and **Shift+V** for wrecks with recoverable cargo. Each shortcut requires its matching targeting module and a fitted core. [Equipment controls](EQUIPMENT-PLAYABLE.md#salvage-contact-selection)
 
 The development save store explicitly unlocks on close. Dell Linux reproduced the cold-reopen failure during concurrent process startup and verified the fix while retaining exclusive access for a live owner.
