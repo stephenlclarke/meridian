@@ -6,6 +6,8 @@ Peregrine Mk III, including both original meshes, its palette and its 69
 collision pieces. The browser connects only to the loopback server. Stop the
 server with Quit Studio or Ctrl+C in its terminal.
 
+Studio uses local HTTP on `127.0.0.1` and does not serve network clients. It checks the local Host and, when sent, Origin. The server serves only its shipped editor assets and the JSON API. Browser uploads do not select paths on the server; use the local CLI to open a split definition or write to an explicit export path.
+
 ## Author a ship
 
 1. Open a ship definition or start with the reference. Give a new ship its own

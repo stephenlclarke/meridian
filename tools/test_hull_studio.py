@@ -1,7 +1,9 @@
 """Authoring imports, measurements and the local validator boundary."""
 
+import http.client
 import io
 import json
+import os
 import struct
 import sys
 import tempfile
@@ -28,6 +30,72 @@ def sample():
 
 
 class HullStudioTests(unittest.TestCase):
+    def test_http_serves_only_the_shipped_editor_and_typed_json(self):
+        with studio.ThreadingHTTPServer(
+            ("127.0.0.1", 0), studio.StudioRequest
+        ) as server:
+            server.example = definitions.encode(sample())
+            server.preview = studio.GamePreview(None)
+            server.validator = Path("validator")
+            worker = threading.Thread(target=server.serve_forever)
+            worker.start()
+            try:
+                port = server.server_port
+                address = f"127.0.0.1:{port}"
+
+                def request(route, headers=None, method="GET", body=None):
+                    connection = http.client.HTTPConnection(
+                        "127.0.0.1", port, timeout=5
+                    )
+                    try:
+                        connection.request(method, route, body=body, headers=headers or {})
+                        response = connection.getresponse()
+                        return response.status, dict(response.getheaders()), response.read()
+                    finally:
+                        connection.close()
+
+                for route, (filename, mime) in studio.WEB_FILES.items():
+                    with self.subTest(route=route):
+                        status, headers, body = request(route)
+                        self.assertEqual(status, 200)
+                        self.assertEqual(headers["Content-Type"], mime)
+                        self.assertEqual(
+                            headers["Content-Security-Policy"], studio.CONTENT_SECURITY_POLICY
+                        )
+                        self.assertEqual(headers["X-Content-Type-Options"], "nosniff")
+                        self.assertEqual(
+                            body, (Path(studio.__file__).with_name("web") / filename).read_bytes()
+                        )
+                status, headers, body = request("/api/example")
+                self.assertEqual(status, 200)
+                self.assertEqual(headers["Content-Type"], "application/json")
+                self.assertEqual(body, server.example)
+                self.assertEqual(request("/geometry.test.mjs")[0], 404)
+                self.assertEqual(request("/", {"Host": "invalid.local"})[0], 403)
+                self.assertEqual(
+                    request("/", {"Origin": "https://invalid.local", "Host": address})[0],
+                    403,
+                )
+                package = sample() | {"name": "A < B & C"}
+                report = {"valid": True}
+                upload = definitions.encode({"definition": package})
+                with mock.patch.object(studio, "build", return_value=(package, report)), mock.patch.object(studio, "inspect_surface"):
+                    for route, expected in (
+                        ("/api/build", {"package": package, "report": report}),
+                        ("/api/export", package),
+                    ):
+                        status, headers, body = request(
+                            route, {"Content-Type": "application/json"}, "POST", upload
+                        )
+                        self.assertEqual(status, 200)
+                        self.assertEqual(headers["Content-Type"], "application/json")
+                        self.assertEqual(headers["X-Content-Type-Options"], "nosniff")
+                        self.assertEqual(headers["Content-Security-Policy"], studio.CONTENT_SECURITY_POLICY)
+                        self.assertEqual(body, definitions.encode(expected))
+            finally:
+                server.shutdown()
+                worker.join(5)
+
     def test_reference_keeps_exact_original_topology_and_appearance(self):
         src = definitions.ROOT / "assets/fleet/sh023"
         hull = definitions.parse(definitions.reference_bytes())
@@ -83,6 +151,31 @@ class HullStudioTests(unittest.TestCase):
             p.write_text('{"detail":{"file":"../other.json"}}')
             with self.assertRaisesRegex(ValueError, "directory"):
                 definitions.local_definition(p)
+
+    def test_cli_export_accepts_explicit_user_selected_paths(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            source = root / "source.json"
+            destination = root / "selected" / "result.json"
+            destination.parent.mkdir()
+            validator = root / "validator"
+            validator.touch()
+            definition = sample()
+            source.write_bytes(definitions.encode(definition))
+            package = definitions.prepare(definition)
+            args = [
+                "studio.py", "--validator", os.fspath(validator), "--definition",
+                os.fspath(source), "--export", os.fspath(destination),
+            ]
+            with (
+                mock.patch.object(sys, "argv", args),
+                mock.patch.object(studio, "build", return_value=(package, {"valid": True})) as build,
+                mock.patch("builtins.print"),
+            ):
+                studio.main()
+            build.assert_called_once_with(definition, validator.resolve())
+            self.assertEqual(destination.read_bytes(), definitions.encode(package))
+            self.assertEqual(list(destination.parent.iterdir()), [destination])
 
     def test_nearest_sample_uses_face_interiors_and_respects_scale(self):
         face = [[0, 0, 0], [4, 0, 0], [0, 4, 0]]

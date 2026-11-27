@@ -2,7 +2,6 @@
 
 import argparse
 import json
-import mimetypes
 import os
 import subprocess
 import sys
@@ -20,6 +19,18 @@ from surface import envelope_view
 
 
 MAX_UPLOAD_BYTES = 64 * 1024 * 1024 + 32
+WEB_FILES = {
+    "/": ("index.html", "text/html; charset=utf-8"),
+    "/index.html": ("index.html", "text/html; charset=utf-8"),
+    "/style.css": ("style.css", "text/css; charset=utf-8"),
+    "/app.js": ("app.js", "text/javascript; charset=utf-8"),
+    "/geometry.js": ("geometry.js", "text/javascript; charset=utf-8"),
+    "/viewer.js": ("viewer.js", "text/javascript; charset=utf-8"),
+}
+CONTENT_SECURITY_POLICY = (
+    "default-src 'self'; object-src 'none'; base-uri 'none'; "
+    "frame-ancestors 'none'; form-action 'none'"
+)
 
 
 class InvalidHull(ValueError):
@@ -168,6 +179,7 @@ class StudioRequest(BaseHTTPRequestHandler):
         self.send_header("Cache-Control", "no-store")
         self.send_header("X-Content-Type-Options", "nosniff")
         self.send_header("Referrer-Policy", "no-referrer")
+        self.send_header("Content-Security-Policy", CONTENT_SECURITY_POLICY)
         if attachment:
             self.send_header(
                 "Content-Disposition", 'attachment; filename="ship.hull.json"'
@@ -192,15 +204,15 @@ class StudioRequest(BaseHTTPRequestHandler):
             )
         if route == "/api/example":
             return self.respond(200, self.server.example)
+        resource = WEB_FILES.get(route)
+        if resource is None:
+            return self.respond(404, encode({"error": "Unknown resource"}))
+        filename, mime = resource
         root = Path(__file__).with_name("web").resolve()
-        path = (root / ("index.html" if route == "/" else route.lstrip("/"))).resolve()
+        path = (root / filename).resolve()
         if not path.is_relative_to(root) or not path.is_file():
             return self.respond(404, encode({"error": "Unknown resource"}))
-        self.respond(
-            200,
-            path.read_bytes(),
-            mimetypes.guess_type(path.name)[0] or "application/octet-stream",
-        )
+        self.respond(200, path.read_bytes(), mime)
 
     def do_POST(self):
         if not self.local():
