@@ -3,6 +3,8 @@
 
 pub mod g02;
 
+pub use crate::flight::{DispatchAction, DispatchOffer, DispatchRecord};
+
 pub const REWARD_TENTHS: u32 = 7300;
 pub const CLUE_ID: &str = "consented-freight-family-trace";
 

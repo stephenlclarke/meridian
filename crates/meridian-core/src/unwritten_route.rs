@@ -47,7 +47,10 @@ impl World {
                 .find(|r| {
                     r.issuer.owner().seed() == owner
                         && r.issuer.ship().ordinal() == hull
-                        && matches!(r.terminal, Some((crate::DispatchAction::Receive, _)))
+                        && matches!(
+                            r.terminal,
+                            Some((crate::freight::DispatchAction::Receive, _))
+                        )
                 })
                 .map(|_| {
                     BaseClue::new(

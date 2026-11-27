@@ -352,13 +352,13 @@ impl Profile {
                 meridian_core::ModuleAction::Store { .. } => "Owned module stored.",
                 meridian_core::ModuleAction::Install { .. } => "Owned module fitted.",
                 meridian_core::ModuleAction::Dispatch(action) => match action {
-                    meridian_core::DispatchAction::Collect(_) => {
+                    meridian_core::freight::DispatchAction::Collect(_) => {
                         "Original sealed record aboard. Fly the quoted route."
                     }
-                    meridian_core::DispatchAction::Receive => {
+                    meridian_core::freight::DispatchAction::Receive => {
                         "Original record delivered. Quoted fee paid."
                     }
-                    meridian_core::DispatchAction::Abandon => {
+                    meridian_core::freight::DispatchAction::Abandon => {
                         "Original record returned to the sender. No payment."
                     }
                 },

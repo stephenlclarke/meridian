@@ -1,9 +1,11 @@
 //! G01 sealed dispatch at the currently admitted original main orbitals.
 use super::{Event, Ledger, ModuleAction, ModuleError, State, World};
-use crate::navigation::{
-    DockContext, DockOrigin, OriginalNavigation, ROUTE_SYSTEMS, SystemId, fuel_capacity,
-};
+use crate::navigation::{DockContext, DockOrigin, OriginalNavigation, SystemId, fuel_capacity};
 use sha2::{Digest, Sha256};
+use std::sync::OnceLock;
+
+// The saved collect tag selects this immutable route graph. New issuers require a new generation.
+const MARKETS_V1: [SystemId; 3] = [SystemId::AVENOR, SystemId::LARERIA, SystemId::RENAS];
 
 pub const DISPATCH_DIGEST: &str =
     "8cd3f7b667d3842cbe2c0f4a6acb9d304fc4bede2fce66573169569e2ed4fcb3";
@@ -45,7 +47,7 @@ impl Dispatch {
     }
     fn offers(&self, ledger: &Ledger, dock: DockContext, fuel: u16) -> Vec<DispatchOffer> {
         if self.active().is_some()
-            || !ROUTE_SYSTEMS.contains(&dock.system())
+            || !MARKETS_V1.contains(&dock.system())
             || fuel > fuel_capacity(ledger.fuel_storage_count())
         {
             return Vec::new();
@@ -65,7 +67,11 @@ impl Dispatch {
         if seed == 0 {
             seed = 0x6d2b79f5;
         }
-        let Ok(nav) = OriginalNavigation::bundled() else {
+        static CATALOGUE: OnceLock<Option<OriginalNavigation>> = OnceLock::new();
+        let Some(nav) = CATALOGUE
+            .get_or_init(|| OriginalNavigation::bundled().ok())
+            .as_ref()
+        else {
             return Vec::new();
         };
         let mut paths = vec![vec![dock.system()]];
@@ -83,7 +89,7 @@ impl Dispatch {
             if path.len() >= 4 {
                 continue;
             }
-            for target in ROUTE_SYSTEMS {
+            for target in MARKETS_V1 {
                 if paths.iter().any(|p| p.last() == Some(&target)) {
                     continue;
                 }
@@ -207,6 +213,9 @@ impl World {
         ledger.dispatch.offers(&ledger, dock, account.fuel_tenths())
     }
     pub fn dispatch_records(&self) -> Vec<DispatchRecord> {
+        if self.modular.dispatch_occupancy().0 == 0 {
+            return Vec::new();
+        }
         self.commander_account
             .as_ref()
             .and_then(|account| self.modular.ledger(self, account).ok())

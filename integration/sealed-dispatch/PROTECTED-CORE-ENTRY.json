@@ -1,0 +1,13 @@
+{
+  "schema": 1,
+  "id": "sealed-dispatch",
+  "undoBefore": [
+    "followup-bulk-market"
+  ],
+  "undoAfter": [],
+  "kind": "inverse",
+  "manifest": "integration/sealed-dispatch/PROTECTED-CORE-INVERSE.json",
+  "sha256": "29ecee7f581a4464c68f5fd3cad43c3390cbac33f82bdef5758c8dbc0e709700",
+  "base": "73e821e14a715a25b0fbf47bdff7f25e535088d5",
+  "label": "G01 sealed dispatch custody and station delivery"
+}

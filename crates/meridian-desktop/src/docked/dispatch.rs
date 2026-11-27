@@ -1,5 +1,5 @@
 use super::{base_row, ui};
-use meridian_core::{DispatchAction, ModuleAction, World, navigation::SystemId};
+use meridian_core::{ModuleAction, World, freight::DispatchAction, navigation::SystemId};
 
 pub(super) const BOARD: &str = "sealed-dispatch";
 pub(super) const TITLE: &str = "G01 sealed dispatch board";

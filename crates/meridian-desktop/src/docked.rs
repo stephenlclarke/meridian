@@ -142,7 +142,7 @@ struct Anchor {
     equipment: Option<equipment::Snapshot>,
     ammunition: Option<meridian_core::AmmunitionSnapshot>,
     modules: Option<meridian_core::ModularEquipmentSnapshot>,
-    dispatch: Option<meridian_core::DispatchRecord>,
+    dispatch: Option<meridian_core::freight::DispatchRecord>,
     passage: Option<meridian_core::PassengerJourneySnapshot>,
     emp: Option<meridian_core::EmpSnapshot>,
     services: Option<meridian_core::ServiceSnapshot>,
