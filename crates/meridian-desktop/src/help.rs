@@ -120,7 +120,7 @@ impl Panel {
                 "W/S Accelerate/slow | Space Brake to zero | Arrows Pitch | A/D Yaw | Q/E Roll",
                 "N Start or cancel auto-docking | 0 Front | 1 Rear | 2 Left | 3 Right view",
                 "T Lock selected ship for missiles | F1 Next missile target | F2 Arm / safe",
-                "F3 Launch missile | F4 Safe/clear target | K E.C.M. (22 energy)",
+                "F3 Launch missile | F4 Safe/clear target | K E.C.M. (22 energy) | Y Energy",
                 "J Jump | Shift+J Clue Journal | Hold U 10 seconds: EMP (release to cancel)",
                 "F6 Flight lesson | F12 Cancel | C Lesson details | F7 Close run | F8 Reception",
                 "Tab Next scanner target (no core: mark) | F Manual/assist | Delete Release",

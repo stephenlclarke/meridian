@@ -254,6 +254,7 @@ fn flight_help_lists_the_computer_keys_and_consumes_them_while_open() {
         "scoop ore | cut wreck | occupied review",
         "T Lock selected ship for missiles",
         "Shift+I Target details",
+        "Y Energy",
     ] {
         assert!(text.contains(binding), "Missing {binding}");
     }
