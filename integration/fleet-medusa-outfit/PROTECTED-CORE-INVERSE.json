@@ -128,7 +128,7 @@
     },
     "flight/damage.rs": {
       "beforeSHA256": "9b3aa8b3803a55aa39e5fa15f7b211a7f5cf325cac80f7b5cf9b3bbaafe43614",
-      "afterSHA256": "0f6cc5532340646ab00d55aae7298bf660bdcdbf56bc06a5bac2f236ac08204d",
+      "afterSHA256": "342ad779b53e66aa550747b66a4f4e1aedc4b4ac826e236c732a494985bdbd9e",
       "hunks": [
         {
           "offset": 725,
@@ -183,32 +183,32 @@
         {
           "offset": 23528,
           "before": "        advance_with_rate(&mut pools, at.checked_sub(clock).ok_or(INVALID)?, recharge);\n",
-          "after": "        advance_with_rate(\n            &mut pools,\n            at.checked_sub(clock).ok_or(INVALID)?,\n            recharge,\n            capacity,\n        );\n"
+          "after": "        advance_with_rate(\n            &mut pools,\n            clock,\n            at.checked_sub(clock).ok_or(INVALID)?,\n            recharge,\n            capacity,\n        );\n"
         },
         {
-          "offset": 23739,
+          "offset": 23758,
           "before": "                pools.pulse.replay_berth();\n",
           "after": "                pools.pulse.replay_berth(capacity);\n"
         },
         {
-          "offset": 23829,
+          "offset": 23848,
           "before": "",
           "after": "            }\n            Effect::MedusaIssue => {\n                capacity = super::weapons::MEDUSA_ENERGY;\n                pools.pulse.replay_berth(capacity);\n"
         },
         {
-          "offset": 25630,
+          "offset": 25649,
           "before": "    advance_with_rate(&mut pools, end.checked_sub(clock).ok_or(INVALID)?, recharge);\n",
-          "after": "    advance_with_rate(\n        &mut pools,\n        end.checked_sub(clock).ok_or(INVALID)?,\n        recharge,\n        capacity,\n    );\n"
+          "after": "    advance_with_rate(\n        &mut pools,\n        clock,\n        end.checked_sub(clock).ok_or(INVALID)?,\n        recharge,\n        capacity,\n    );\n"
         },
         {
-          "offset": 25780,
+          "offset": 25814,
           "before": "fn advance_with_rate(pools: &mut Pools, elapsed: u64, recharge: u16) {\n    pools.pulse.replay_advance_with_rate(elapsed, recharge);\n",
-          "after": "fn advance_with_rate(pools: &mut Pools, elapsed: u64, recharge: u16, capacity: u16) {\n    pools\n        .pulse\n        .replay_advance_with_rate(elapsed, recharge, capacity);\n"
+          "after": "fn advance_with_rate(pools: &mut Pools, start: u64, elapsed: u64, recharge: u16, capacity: u16) {\n    pools\n        .pulse\n        .replay_advance_with_rate(start, elapsed, recharge, capacity);\n"
         },
         {
-          "offset": 26078,
+          "offset": 26131,
           "before": "    advance_with_rate(pools, elapsed, 7);\n",
-          "after": "    advance_with_rate(\n        pools,\n        elapsed,\n        7,\n        super::weapons::ENERGY_CAPACITY_HUNDREDTHS,\n    );\n"
+          "after": "    advance_with_rate(\n        pools,\n        0,\n        elapsed,\n        7,\n        super::weapons::ENERGY_CAPACITY_HUNDREDTHS,\n    );\n"
         }
       ]
     },
@@ -269,7 +269,7 @@
     },
     "flight/missiles.rs": {
       "beforeSHA256": "c704fc62602fbdbd21dbe1cb205ae0e9ba490b879804a6483777cf19acdd99a9",
-      "afterSHA256": "a7a1ffe49015cea7e68d1f804251c4ed913b1700c94d3f32dcab39c5fccb8ab8",
+      "afterSHA256": "9156189f6ef9974afb05c9a7c8ce1ceb736469a9ed1ad60003144a881123c323",
       "hunks": [
         {
           "offset": 6640,
@@ -277,9 +277,9 @@
           "after": "    pub(super) fn laser_interceptions(&self) -> impl Iterator<Item = (u64, &super::PulseShot)> {\n        self.beams.iter().flatten().map(|b| (b.emission, &b.shot))\n    }\n"
         },
         {
-          "offset": 21574,
-          "before": "",
-          "after": "            self.energy_capacity(),\n"
+          "offset": 21527,
+          "before": "            self.energy_recharge_hundredths(),\n",
+          "after": "            self.step_energy_recharge(self.energy_recharge_hundredths()),\n            self.energy_capacity(),\n"
         }
       ]
     },
@@ -519,7 +519,7 @@
     },
     "flight/weapons.rs": {
       "beforeSHA256": "635d6d624283c410b5fbcbf24cbe92be1c24abbeccf46649f3537f081077bb65",
-      "afterSHA256": "561915c3ab837d18047900571503d92b56593fd5e7bb0f5f97e9a2f3b452eb69",
+      "afterSHA256": "5362aeba46c704471a8f4d15ee539b4997d60df00aa65fa65cd4e873a6be99d0",
       "hunks": [
         {
           "offset": 281,
@@ -527,82 +527,92 @@
           "after": "pub(super) const MEDUSA_ENERGY: u16 = 41_000;\n"
         },
         {
-          "offset": 4054,
+          "offset": 3955,
+          "before": "",
+          "after": "/// Recharge in whole hundredths between two physics ticks. Keep the fractional\n/// part across ticks so the Medusa's original 4.7 energy/s is exact over a second.\nfn recovered_energy(start: u64, elapsed: u64, peregrine_rate: u16, capacity: u16) -> u64 {\n    if capacity != MEDUSA_ENERGY {\n        return elapsed.saturating_mul(u64::from(peregrine_rate));\n    }\n    let per_second = u128::from(peregrine_rate / ENERGY_RECHARGE_HUNDREDTHS) * 470;\n    let phase = u128::from(start % 60);\n    let amount = ((phase + u128::from(elapsed)) * per_second) / 60 - phase * per_second / 60;\n    u64::try_from(amount).unwrap_or(u64::MAX)\n}\n\n"
+        },
+        {
+          "offset": 4683,
           "before": "        self.replay_advance_with_rate(elapsed, 7);\n",
-          "after": "        self.replay_advance_with_rate(elapsed, 7, ENERGY_CAPACITY_HUNDREDTHS);\n"
+          "after": "        self.replay_advance_with_rate(0, elapsed, 7, ENERGY_CAPACITY_HUNDREDTHS);\n"
         },
         {
-          "offset": 4139,
+          "offset": 4771,
           "before": "    pub(super) fn replay_advance_with_rate(&mut self, elapsed: u64, recharge: u16) {\n",
-          "after": "    pub(super) fn replay_advance_with_rate(&mut self, elapsed: u64, recharge: u16, capacity: u16) {\n"
+          "after": "    pub(super) fn replay_advance_with_rate(\n        &mut self,\n        start: u64,\n        elapsed: u64,\n        recharge: u16,\n        capacity: u16,\n    ) {\n"
         },
         {
-          "offset": 4357,
-          "before": "            .min(38000) as u16;\n",
-          "after": "            .min(u64::from(capacity)) as u16;\n"
+          "offset": 4975,
+          "before": "            .saturating_add(elapsed.saturating_mul(u64::from(recharge)))\n            .min(38000) as u16;\n",
+          "after": "            .saturating_add(recovered_energy(start, elapsed, recharge, capacity))\n            .min(u64::from(capacity)) as u16;\n"
         },
         {
-          "offset": 4562,
+          "offset": 5262,
           "before": "    pub(super) fn replay_berth(&mut self) {\n        self.energy = 38000;\n",
           "after": "    pub(super) fn replay_berth(&mut self, capacity: u16) {\n        self.energy = capacity;\n"
         },
         {
-          "offset": 4682,
+          "offset": 5382,
           "before": "    pub(super) fn advance(&mut self, opening: FlightMode, next: FlightMode, recharge: u16) {\n",
           "after": "    pub(super) fn advance(\n        &mut self,\n        opening: FlightMode,\n        next: FlightMode,\n        recharge: u16,\n        capacity: u16,\n    ) {\n"
         },
         {
-          "offset": 5087,
+          "offset": 5787,
           "before": "            self.energy = ENERGY_CAPACITY_HUNDREDTHS;\n",
           "after": "            self.energy = capacity;\n"
         },
         {
-          "offset": 5167,
+          "offset": 5867,
           "before": "            self.energy = (self.energy + recharge).min(ENERGY_CAPACITY_HUNDREDTHS);\n",
           "after": "            self.energy = (self.energy + recharge).min(capacity);\n"
         },
         {
-          "offset": 13922,
+          "offset": 14622,
           "before": "",
           "after": "        self.pulse_scene_facing(pose, super::FlightView::Front)\n    }\n    pub(super) fn pulse_scene_facing(\n        &self,\n        pose: crate::docking::RigidPose,\n        facing: super::FlightView,\n    ) -> Result<(Option<super::practice::Practice>, PulseContact, f64), FireError> {\n"
         },
         {
-          "offset": 15248,
+          "offset": 15948,
           "before": "        let hit = practice\n            .as_mut()\n            .and_then(|p| p.contact_limited(self.state, pose, cap, solid));\n",
           "after": "        let hit = practice.as_mut().and_then(|p| {\n            p.contact_limited(\n                self.state,\n                pose,\n                cap,\n                solid,\n                facing,\n                self.combat.emissions.checked_add(1)?,\n            )\n        });\n"
         },
         {
-          "offset": 17736,
+          "offset": 18436,
           "before": "",
-          "after": "    pub(super) fn energy_capacity(&self) -> u16 {\n        if self.xyzzy_medusa_active() {\n            MEDUSA_ENERGY\n        } else {\n            ENERGY_CAPACITY_HUNDREDTHS\n        }\n    }\n"
+          "after": "    pub(super) fn step_energy_recharge(&self, nominal: u16) -> u16 {\n        recovered_energy(\n            self.combat.physical_tick(),\n            1,\n            nominal,\n            self.energy_capacity(),\n        ) as u16\n    }\n    pub(super) fn energy_capacity(&self) -> u16 {\n        if self.xyzzy_medusa_active() {\n            MEDUSA_ENERGY\n        } else {\n            ENERGY_CAPACITY_HUNDREDTHS\n        }\n    }\n"
         },
         {
-          "offset": 18086,
-          "before": "            energy_capacity_hundredths: ENERGY_CAPACITY_HUNDREDTHS,\n",
-          "after": "            energy_capacity_hundredths: self.energy_capacity(),\n"
+          "offset": 18978,
+          "before": "",
+          "after": "        let nominal = self.energy_recharge_hundredths();\n"
         },
         {
-          "offset": 19827,
+          "offset": 19074,
+          "before": "            energy_capacity_hundredths: ENERGY_CAPACITY_HUNDREDTHS,\n            energy_recharge_hundredths_per_tick: self.energy_recharge_hundredths(),\n",
+          "after": "            energy_capacity_hundredths: self.energy_capacity(),\n            energy_recharge_hundredths_per_tick: self.step_energy_recharge(nominal),\n"
+        },
+        {
+          "offset": 20816,
           "before": "",
           "after": "    pub fn request_fire_selected_laser(\n        &mut self,\n        expected_tick: u64,\n    ) -> Result<PulseShot, FireError> {\n        self.request_discharge(expected_tick, false, self.selected_laser_view())\n    }\n"
         },
         {
-          "offset": 20146,
+          "offset": 21135,
           "before": "",
           "after": "    ) -> Result<PulseShot, FireError> {\n        if self.selected_laser_view() != super::FlightView::Front {\n            return Err(FireError::StaleCommand);\n        }\n        self.request_discharge(expected_tick, pulse_only, super::FlightView::Front)\n    }\n    fn request_discharge(\n        &mut self,\n        expected_tick: u64,\n        pulse_only: bool,\n        facing: super::FlightView,\n"
         },
         {
-          "offset": 21081,
+          "offset": 22070,
           "before": "        let (fitted_item_id, weapon) = self.fitted_front_laser().ok_or(if pulse_only {\n",
           "after": "        let (fitted_item_id, weapon) = self.selected_fit().ok_or(if pulse_only {\n"
         },
         {
-          "offset": 21605,
+          "offset": 22594,
           "before": "",
           "after": "        let pose = facing.laser_ray(pose);\n"
         },
         {
-          "offset": 21728,
+          "offset": 22717,
           "before": "        let (mut practice, contact, end_distance) = self.pulse_scene(pose)?;\n",
           "after": "        let (mut practice, contact, end_distance) = self.pulse_scene_facing(pose, facing)?;\n"
         }

@@ -6,7 +6,7 @@ The front mount fires the currently installed modular laser. Storing it leaves t
 
 ## Integration and verification
 
-The release base is `a2959bd36951917066caec5279684de5f0fba659`. Apply G3's Fleet issue and save changes through `e9a867683b50011fa6af7836511cfa8f8fd6050a` first. The laser changes use `World::xyzzy_medusa_issue()` for provenance and `World::xyzzy_medusa_active()` for flight input. The combined branch contains both layers. Inspect the laser delta with `git diff e9a86768..HEAD`. Its protected-source inverse covers both layers against the release base.
+The release base is `a2959bd36951917066caec5279684de5f0fba659`. Apply G3's Fleet issue and save changes through `a387b30a9ad1206bb15b08d5e40f26422c223bfd` first. The laser changes use `World::xyzzy_medusa_issue()` for provenance and `World::xyzzy_medusa_active()` for flight input. The combined branch contains both layers. Inspect the laser delta with `git diff a387b30a..HEAD`. Its protected-source inverse covers both layers against the release base.
 
 On the assigned compiler lane run:
 
