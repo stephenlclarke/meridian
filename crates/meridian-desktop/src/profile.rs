@@ -775,27 +775,7 @@ impl Profile {
             return lines;
         }
         if self.playing {
-            let mut lines = self.session.lines(&self.world, active, notice);
-            if self.world.snapshot().mode == FlightMode::Docked && !self.session.hud_panel_open() {
-                return lines;
-            }
-            if let Some(secret) = self.world.xyzzy_snapshot().filter(|state| state.active) {
-                lines.insert(
-                    0,
-                    format!(
-                        "CLARKE | XYZZY | FUEL {}",
-                        if secret.unlimited_fuel {
-                            "UNLIMITED"
-                        } else {
-                            "NORMAL"
-                        }
-                    ),
-                );
-            }
-            if let Some(emp) = crate::docked_screens::emp::status(&self.world) {
-                lines.push(emp);
-            }
-            return lines;
+            return self.session.lines(&self.world, active, notice);
         }
         vec![
             "MERIDIAN".into(),
