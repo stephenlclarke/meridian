@@ -323,12 +323,7 @@ fn normal_docked_launch_and_all_flight_views_keep_critical_rows_visible_at_minim
                 .take(budget)
                 .collect::<Vec<_>>()
                 .join("\n");
-            if p.world.snapshot().mode != FlightMode::Launching {
-                assert_eq!(rendered, notice.unwrap_or_default());
-            } else {
-                assert!(rendered.contains("H / ? HELP"), "Clipped help hint");
-                assert!(rendered.contains(crate::flight_lesson::view_name(p.world.flight_view())));
-            }
+            assert_eq!(rendered, notice.unwrap_or_default());
 
             let before = ok(p.world.save_bytes());
             let panel = if p.world.snapshot().mode == FlightMode::Docked {

@@ -451,7 +451,12 @@ impl App {
         let question = text == Some("?") || (code == KeyCode::Slash && self.modifiers.shift_key());
         let toggle = question || (code == KeyCode::KeyH && !searching);
         let journal = code == KeyCode::KeyJ && self.modifiers.shift_key() && !searching;
-        if self.help.is_some() {
+        if let Some(panel) = &self.help {
+            if !repeat && code == KeyCode::KeyI && panel.title == crate::help::FLIGHT_CONTROLS {
+                self.help = Some(crate::help::Panel::flight_status(&self.game.world));
+                self.request_redraw();
+                return true;
+            }
             if !repeat && (toggle || journal || code == KeyCode::KeyH || code == KeyCode::Escape) {
                 self.help = None;
                 self.clear_held_input();
@@ -1586,28 +1591,14 @@ impl App {
         prepared: PreparedPresentation,
     ) {
         let PreparedPresentation {
-            mut hud_lines,
+            hud_lines,
             docked_frame,
         } = prepared;
-        if snapshot.mode == FlightMode::Flight && self.game.world.manual_scanner_target() {
-            hud_lines.insert(hud_lines.len().min(2), "MANUAL TARGET | F ASSIST".into());
-        }
         let belt = if snapshot.mode == FlightMode::Flight {
             self.game.world.mining_belt_snapshot()
         } else {
             None
         };
-        if let Some(belt) = &belt {
-            match asteroid_render::hud_line(snapshot, belt, None) {
-                Ok(Some(line)) => hud_lines.insert(hud_lines.len().min(2), line),
-                Ok(None) => {}
-                Err(error) => {
-                    self.fail(event_loop, error);
-                    return;
-                }
-            }
-        }
-
         let traffic = self.game.world.traffic_snapshot();
         let cockpit = if self.game.playing()
             && !self.commander_open
@@ -1690,7 +1681,10 @@ impl App {
             );
             let practice = self.game.world.practice_snapshot();
             let targeting = Self::target_readout(&self.game.world);
-            renderer.set_player_hull(self.game.world.player_hull_kind());
+            renderer.set_player_hull(
+                self.game.world.player_hull_kind(),
+                self.game.is_medusa_preview(),
+            );
             renderer.set_flight_view(if self.game.is_internal_validation() {
                 self.validation_view
             } else {

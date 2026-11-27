@@ -1,0 +1,202 @@
+//! Pilot sight in the same viewport and facing as the projected flight geometry.
+use super::{Vertex, flight_height, line};
+use meridian_core::{
+    FlightMode, FlightView, OrdinaryWeapon, Snapshot, World, equipment::WorkTargetId,
+};
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub(super) enum Sight {
+    Pulse,
+    Beam,
+    Military,
+    Naval,
+    Mining,
+    Cutter,
+    Scoop,
+}
+
+impl Sight {
+    pub(super) fn capture(world: &World, flight: Snapshot) -> Option<Self> {
+        if flight.mode != FlightMode::Flight
+            || flight.navigation?.travel.is_some()
+            || world.combat_snapshot().is_some_and(|c| c.player.destroyed)
+            || world.selected_laser_view() != world.flight_view()
+        {
+            return None;
+        }
+        if world.flight_view() == FlightView::Front
+            && let Some(work) = world.selected_work_target()
+        {
+            let manual = world.pilot_operates_selected_tool();
+            let specialist = world.work_targeting_fit();
+            match work.id {
+                WorkTargetId::Wreck(_) if manual || specialist.salvage => {
+                    return world.fitted_salvage_cutter().map(|_| Self::Cutter);
+                }
+                WorkTargetId::Ore(_) if manual || specialist.mining => {
+                    return world.fitted_fuel_scoops().map(|_| Self::Scoop);
+                }
+                WorkTargetId::Asteroid(_) if manual || specialist.mining => {
+                    if !manual
+                        && world
+                            .targeting_snapshot()
+                            .is_some_and(|t| t.tracked_fragment.is_some())
+                    {
+                        return world.fitted_fuel_scoops().map(|_| Self::Scoop);
+                    }
+                    return world.fitted_mining_tool().map(|_| Self::Mining);
+                }
+                _ => {}
+            }
+        }
+        Self::laser(world.selected_laser_snapshot()?.weapon)
+    }
+
+    fn laser(weapon: OrdinaryWeapon) -> Option<Self> {
+        Some(match weapon {
+            OrdinaryWeapon::FrontPulseLaser => Self::Pulse,
+            OrdinaryWeapon::FrontBeamLaser => Self::Beam,
+            OrdinaryWeapon::FrontMilitaryLaser => Self::Military,
+            OrdinaryWeapon::FrontNavalLaser => Self::Naval,
+            OrdinaryWeapon::FrontMiningLaser => Self::Mining,
+            OrdinaryWeapon::StandardMissile => return None,
+        })
+    }
+
+    pub(super) fn draw(self, width: u32, height: u32, out: &mut Vec<Vertex>) {
+        if width < 48 || height < 48 {
+            return;
+        }
+        let size = [width as f32, height as f32];
+        let centre = [size[0] * 0.5, flight_height(width, height) * 0.5];
+        // One arm in logical pixels. Rotate it about the bore, keeping the contact visible.
+        let (color, strokes): (_, &[[f32; 4]]) = match self {
+            Self::Pulse => ([0.5, 1.0, 0.6], &[[5., 0., 13., 0.]]),
+            Self::Beam => ([0.35, 0.85, 1.0], &[[6., -2., 14., -2.], [6., 2., 14., 2.]]),
+            Self::Military => ([1.0, 0.6, 0.35], &[[6., 0., 13., -4.], [6., 0., 13., 4.]]),
+            Self::Naval => ([0.85, 0.6, 1.0], &[[6., 0., 15., 0.], [11., -3., 11., 3.]]),
+            Self::Mining => ([1.0, 0.85, 0.25], &[[6., 0., 0., 6.], [9., 0., 14., 0.]]),
+            Self::Cutter => ([1.0, 0.45, 0.3], &[[5., 5., 12., 5.], [12., 5., 12., 1.]]),
+            Self::Scoop => ([0.55, 0.9, 0.9], &[[5., 7., 10., 7.], [10., 7., 10., 12.]]),
+        };
+        for turn in 0..4 {
+            let point = |x: f32, y: f32| {
+                let [dx, dy] = match turn {
+                    0 => [x, y],
+                    1 => [-y, x],
+                    2 => [-x, -y],
+                    _ => [y, -x],
+                };
+                [centre[0] + dx, centre[1] + dy]
+            };
+            for &[x, y, u, v] in strokes {
+                line(out, point(x, y), point(u, v), color, size);
+            }
+        }
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    #[test]
+    fn ordinary_mounts_project_the_committed_ray_to_the_sight_centre() {
+        use crate::mesh::{apply_flight_view, player_pose};
+        for medusa in [false, true] {
+            let mut world =
+                World::new_commander(7411).unwrap_or_else(|error| panic!("commander: {error:?}"));
+            if medusa {
+                let review = world
+                    .review_xyzzy(meridian_core::XyzzyAction::ActivateMedusa, 0)
+                    .unwrap_or_else(|error| panic!("review: {error:?}"));
+                world
+                    .prepare_xyzzy(review, 0)
+                    .unwrap_or_else(|error| panic!("issue: {error:?}"))
+                    .commit();
+            }
+            assert_eq!(Sight::capture(&world, world.snapshot()), None);
+            world
+                .request_launch(world.snapshot().tick)
+                .unwrap_or_else(|error| panic!("launch: {error:?}"));
+            for _ in 0..600 {
+                world
+                    .step(Default::default())
+                    .unwrap_or_else(|error| panic!("step: {error:?}"));
+                if world.snapshot().mode == FlightMode::Flight {
+                    break;
+                }
+            }
+            for view in [
+                FlightView::Front,
+                FlightView::Left,
+                FlightView::Right,
+                FlightView::Rear,
+            ] {
+                world
+                    .request_flight_view(view, world.snapshot().tick)
+                    .unwrap_or_else(|error| panic!("view: {error:?}"));
+                let snapshot = world.snapshot();
+                let sight = Sight::capture(&world, snapshot);
+                if view != world.selected_laser_view() {
+                    assert_eq!(sight, None);
+                    continue;
+                }
+                let fit = world
+                    .selected_laser_snapshot()
+                    .unwrap_or_else(|| panic!("missing fitted laser"));
+                assert_eq!(sight, Sight::laser(fit.weapon));
+                let shot = world
+                    .request_fire_selected_laser(snapshot.tick)
+                    .unwrap_or_else(|error| panic!("fire: {error:?}"));
+                let eye = player_pose(&snapshot);
+                assert_eq!(shot.origin, eye.position);
+                let local = eye.orientation.inverse_coordinates(shot.direction);
+                let mut ray = [Vertex {
+                    position: [local.x as f32, local.y as f32, local.z as f32],
+                    color: [0.; 3],
+                }];
+                apply_flight_view(view, &mut ray);
+                let [x, y, z] = ray[0].position;
+                assert!(x.abs() < 1e-5 && y.abs() < 1e-5 && z > 0.999);
+                for _ in 0..fit.cooldown_ticks_per_shot {
+                    world
+                        .step(Default::default())
+                        .unwrap_or_else(|error| panic!("cooldown: {error:?}"));
+                }
+            }
+        }
+    }
+    #[test]
+    fn all_fitted_tool_sights_have_distinct_geometry_centred_in_the_scene() {
+        for [w, h] in [[640, 360], [1280, 720], [831, 617], [240, 180]] {
+            let mut signatures = Vec::new();
+            for sight in [
+                Sight::Pulse,
+                Sight::Beam,
+                Sight::Military,
+                Sight::Naval,
+                Sight::Mining,
+                Sight::Cutter,
+                Sight::Scoop,
+            ] {
+                let mut vertices = Vec::new();
+                sight.draw(w, h, &mut vertices);
+                let points: Vec<_> = vertices.iter().map(|v| v.position).collect();
+                assert!(!points.is_empty());
+                assert!(!signatures.contains(&points));
+                for (axis, centre) in [0., 1. - flight_height(w, h) / h as f32]
+                    .into_iter()
+                    .enumerate()
+                {
+                    let min = points.iter().map(|p| p[axis]).fold(f32::INFINITY, f32::min);
+                    let max = points
+                        .iter()
+                        .map(|p| p[axis])
+                        .fold(f32::NEG_INFINITY, f32::max);
+                    assert!(((max + min) * 0.5 - centre).abs() < 1e-5);
+                }
+                signatures.push(points);
+            }
+        }
+    }
+}

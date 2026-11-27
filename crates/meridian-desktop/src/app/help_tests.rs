@@ -271,12 +271,18 @@ fn flight_help_lists_the_computer_keys_and_consumes_them_while_open() {
     press(&mut app, KeyCode::Escape, None);
     app.game_key(KeyCode::KeyN);
     assert!(app.game.world.auto_docking_active());
-    assert!(
-        app.game
-            .lines(true, None)
-            .iter()
-            .any(|line| line.contains("AUTO DOCK"))
-    );
+    assert!(app.game.lines(true, None).is_empty());
+    let saved = ok(app.game.world.save_bytes());
+    press(&mut app, KeyCode::KeyH, Some("h"));
+    press(&mut app, KeyCode::KeyI, Some("i"));
+    let panel = app
+        .help
+        .as_ref()
+        .unwrap_or_else(|| panic!("missing flight status"));
+    assert_eq!(panel.title, "Flight status");
+    assert!(panel.lines.iter().any(|line| line.contains("AUTO DOCK")));
+    press(&mut app, KeyCode::Escape, None);
+    assert_eq!(ok(app.game.world.save_bytes()), saved);
     app.game_key(KeyCode::KeyN);
     assert!(!app.game.world.auto_docking_active());
     app.game_key(KeyCode::KeyN);
