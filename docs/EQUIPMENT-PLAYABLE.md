@@ -34,6 +34,8 @@ The focused test at `b70f83c2618cf290fb47fb6a21ed99b3866914ca` failed on Dell WS
 
 At `c7b10a20` the return passed on Dell Linux (7.92 s) and native Windows (21.11 s). Six passes raised fuel from 65 to 210 units. The return to Lareria used 205 units and the cold save restored 5. The follow-on test also refuels at Lareria, travels to Avenor and switches to the mining tool in flight with the Naval purchase as its last station equipment receipt.
 
+The extended tool exchange passed on Dell Linux (10.70 s) and native Windows (26.98 s) at `01c4e328`. The next receipt check compares the actual purchase tick and dock sequence with the completed jumps. Test cases cover a claimed berth on the jump-arrival tick, the wrong berth sequence and a purchase recorded after departure. A later flight tool exchange retains the original purchase berth.
+
 ## Current reconciliation
 
 `Ready` below means source for the listed SH025 paths exists; the current preview can predate it. It does not claim new native testing, other hull compatibility or full parity. `Partial` names a concrete missing path. `Open` means no playable equipment implementation now. All rows require review of paid or appropriate non-paid acquisition, fit/storage, real effect and save/Continue before closure. XYZZY is a separate explicit acquisition path, not a substitute for ordinary payment or a mission receipt.

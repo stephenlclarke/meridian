@@ -391,6 +391,14 @@ impl DockContext {
     pub fn origin(self) -> DockOrigin {
         self.origin
     }
+    #[cfg(test)]
+    pub(crate) fn with_test_chronology(self, sequence: u64, tick: u64) -> Self {
+        Self {
+            sequence,
+            tick,
+            ..self
+        }
+    }
     pub fn station_class(self) -> &'static str {
         "main-orbital"
     }

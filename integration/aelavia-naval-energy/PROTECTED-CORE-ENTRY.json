@@ -7,7 +7,7 @@
   "undoAfter": [],
   "kind": "inverse",
   "manifest": "integration/aelavia-naval-energy/PROTECTED-CORE-INVERSE.json",
-  "sha256": "9f78338553f34e78c2f4af799b049c00cda5e6f52a2e81f05139459c2b9df471",
+  "sha256": "985c3988049d927f1a169b2f94cec9f5a0f63c71790cb190504b610fd4f01e08",
   "base": "c6ee283a9afd0f8fb98347a41e6c199036a8d254",
   "label": "Aelavia Naval Energy Unit"
 }

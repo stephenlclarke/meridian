@@ -1125,6 +1125,8 @@ fn aelavia_naval_purchase_recharges_in_flight_and_scoops_fuel_for_return() {
         world.flight_resources_snapshot()
     );
 
+    crate::flight::modular::tests::check_aelavia_receipt_chronology(&cold);
+
     // The last modular receipt is still the Aelavia purchase even after refuelling
     // and docking elsewhere. The flight exchange must retain that actual anchor.
     let mut world = cold;

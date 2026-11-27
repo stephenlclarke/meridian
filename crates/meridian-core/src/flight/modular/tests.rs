@@ -5,6 +5,59 @@ use super::*;
 use crate::flight::practice::tests::launch;
 use crate::save::Writer;
 
+// Run against the actual post-return state, when the Naval purchase is historical.
+pub(in crate::flight) fn check_aelavia_receipt_chronology(world: &World) {
+    let account = world.commander_account.as_ref().unwrap();
+    let receipt = *world.modular.events.last().unwrap();
+    let dock = receipt.dock;
+    assert_eq!(dock.system(), SystemId::AELAVIA);
+    assert_eq!(
+        receipt.action.purchase_kind(),
+        Some(ModuleKind::NavalEnergyUnit)
+    );
+    let arrival = world
+        .jump_journal
+        .completed_timing(dock.visit() - 1)
+        .unwrap()
+        .unwrap();
+    let departure = world
+        .jump_journal
+        .completed_timing(dock.visit() + 1)
+        .unwrap()
+        .unwrap();
+    assert_eq!(arrival.destination, dock.system());
+    assert_eq!(departure.source, dock.system());
+    assert!(arrival.arrival_tick < dock.tick() && receipt.tick < departure.departure_tick);
+    assert!(world.modular.ledger(world, account).is_ok());
+
+    for (description, berth, tick) in [
+        (
+            "jump arrival used as a physical berth",
+            dock.with_test_chronology(dock.sequence(), arrival.arrival_tick),
+            receipt.tick,
+        ),
+        (
+            "wrong berth sequence for the actual visit",
+            dock.with_test_chronology(dock.sequence() - 1, dock.tick()),
+            receipt.tick,
+        ),
+        (
+            "purchase after departure",
+            dock,
+            departure.departure_tick + 1,
+        ),
+    ] {
+        let mut state = world.modular.clone();
+        let candidate = state.events.last_mut().unwrap();
+        candidate.dock = berth;
+        candidate.tick = tick;
+        assert!(
+            state.ledger(world, account).is_err(),
+            "accepted {description}"
+        );
+    }
+}
+
 fn funded(seed: u64) -> World {
     crate::flight::equipment::tests::earned_world(seed)
 }

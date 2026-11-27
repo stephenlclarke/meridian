@@ -1180,12 +1180,8 @@ impl State {
                 && (e.action.purchase_kind() == Some(ModuleKind::NavalEnergyUnit)
                     || flight_exchange)
             {
-                if world
-                    .jump_journal
-                    .system_at_visit(e.dock.visit(), e.dock.tick())?
-                    != e.dock.system()
-                {
-                    return Err(INVALID);
+                if !flight_exchange {
+                    world.jump_journal.validate_berth_at(e.dock, e.tick)?;
                 }
                 super::ammunition::validate_physical_berth_event
             } else {
@@ -1292,9 +1288,7 @@ impl State {
             };
             transaction = validate_module_purchase(e, owner, transaction)?;
             if let ModuleAction::Passenger(action) = e.action {
-                world
-                    .jump_journal
-                    .validate_passenger_berth(e.dock, e.tick)?;
+                world.jump_journal.validate_berth_at(e.dock, e.tick)?;
                 if !self.history.owns_berth(e.dock) {
                     return Err(INVALID);
                 }
@@ -2264,7 +2258,7 @@ mod navigation_tests;
 #[cfg(test)]
 mod shield_tests;
 #[cfg(test)]
-mod tests;
+pub(super) mod tests;
 
 impl State {
     pub(super) fn front_at_physical(
