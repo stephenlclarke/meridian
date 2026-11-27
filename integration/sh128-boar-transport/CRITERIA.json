@@ -187,6 +187,8 @@
     }
   },
   "replayPins": {
+    "tools/fleet_hull_measurement.py": "2292d26dd1f4fee134b854c952aeed227632a34a09248ed549e8a891d708d4d6",
+    "tools/directed_hull_fit.py": "dbd5d45e5052453646b752695815d6cb53c6ccb2c3ad6694451a4c7e19fa8bf7",
     "integration/sh128-boar-transport/BOAR-TRANSPORT-STUDIO.json": "4915495c526d762ae444128a1c0a452d147292127cf16578a79e0ee4f8b643ed",
     "integration/sh128-boar-transport/FROZEN-SOURCES.json": "70639baa55e866ad462b51e56dc9318b6c6524c95883f09119d744bf3ba3c61e",
     "integration/sh128-boar-transport/CONTACT-CANDIDATE.json": "8edb51e485d1050eed0681d665cd511cdea5afae9e6aa234366fc14dbc592cc9",
@@ -207,7 +209,7 @@
     "tools/measure_banteng_geometry.py": "9356864e227302598fcae4e833ecb706b1ed8a5e600cbb4076b7165dc1e54bea",
     "tools/measure_goshawk_surface_fit.py": "5407ef1e5fad41810aa95444ca1338fe33a91e5c9857dcb752b4e4cf2fca6d0b",
     "tools/measure_lanner_geometry.py": "55d13a28602e6ed791adecd85ff43f3c8a7fbe118cf0977272e1747422c2408d",
-    "tools/measure_boar_transport.py": "e0981395ae28683086e88258fc755fc9a6bb2944fa57e16608e21e655d33581d",
+    "tools/measure_boar_transport.py": "f893524f40258b3047abb66699ed5e050997e4f5fda25aa2ed107aacfb74eeb5",
     "tools/prepare_eagle_cruiser_geometry.py": "a1ea3b5d72f35e1f2932da71afa3ff8a276a504f7309a1086a2b3df35988addc",
     "tools/prepare_boar_transport.py": "65243bfe7d11248d7ff94900cf7a027944970d6efd1a62333dae1a04c616629e",
     "tools/verify_eagle_cruiser_geometry.py": "cb053ee5873fee62ee456bb3776e98d29b2cbb44c7344599bc617a8579164d43",

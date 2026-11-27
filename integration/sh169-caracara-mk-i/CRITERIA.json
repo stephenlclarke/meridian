@@ -190,6 +190,8 @@
     }
   },
   "replayPins": {
+    "tools/fleet_hull_measurement.py": "2292d26dd1f4fee134b854c952aeed227632a34a09248ed549e8a891d708d4d6",
+    "tools/directed_hull_fit.py": "dbd5d45e5052453646b752695815d6cb53c6ccb2c3ad6694451a4c7e19fa8bf7",
     "integration/sh169-caracara-mk-i/CARACARA-MK-I-STUDIO.json": "b6e06abdd47282b38cc2f5119faa894fb91b3a4f0c5c37fde581abc4c9e2d17c",
     "integration/sh169-caracara-mk-i/FROZEN-SOURCES.json": "e3f92971c1a09deb5e901b01719a01dcec91a8b088e70c0c77be25209cb399b4",
     "integration/sh169-caracara-mk-i/CONTACT-CANDIDATE.json": "cb4cc9b6591cd7cf22edf8540127a392728abcdbd37340689ddddef1353c8a7a",
@@ -210,7 +212,7 @@
     "tools/measure_banteng_geometry.py": "9356864e227302598fcae4e833ecb706b1ed8a5e600cbb4076b7165dc1e54bea",
     "tools/measure_goshawk_surface_fit.py": "5407ef1e5fad41810aa95444ca1338fe33a91e5c9857dcb752b4e4cf2fca6d0b",
     "tools/measure_lanner_geometry.py": "55d13a28602e6ed791adecd85ff43f3c8a7fbe118cf0977272e1747422c2408d",
-    "tools/measure_caracara_mk_i.py": "8c48ffcae6a66f6befcf8d7d262dd8ec1fe9af502a7b962252ecaf6000352863",
+    "tools/measure_caracara_mk_i.py": "7e5d2382aa6969b18615ac2cbbc559a3f8ee21daa58bb0e4520a1e60dbb5dcb7",
     "tools/prepare_eagle_cruiser_geometry.py": "a1ea3b5d72f35e1f2932da71afa3ff8a276a504f7309a1086a2b3df35988addc",
     "tools/prepare_caracara_mk_i.py": "2b4e9909d2341df74c2ae6fe8966275e144a76d2de83f0cecd04fbce160760bd",
     "tools/verify_eagle_cruiser_geometry.py": "cb053ee5873fee62ee456bb3776e98d29b2cbb44c7344599bc617a8579164d43",
