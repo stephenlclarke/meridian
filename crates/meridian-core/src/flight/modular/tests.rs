@@ -6,7 +6,11 @@ use crate::flight::practice::tests::launch;
 use crate::save::Writer;
 
 // Run against the actual post-return state, when the Naval purchase is historical.
-pub(in crate::flight) fn check_aelavia_receipt_chronology(world: &World) {
+pub(in crate::flight) fn check_aelavia_receipt_chronology(
+    world: &World,
+    first_flight_tick: u64,
+    solar_tick: u64,
+) {
     let account = world.commander_account.as_ref().unwrap();
     let receipt = *world.modular.events.last().unwrap();
     let dock = receipt.dock;
@@ -30,7 +34,14 @@ pub(in crate::flight) fn check_aelavia_receipt_chronology(world: &World) {
     assert!(arrival.arrival_tick < dock.tick() && receipt.tick < departure.departure_tick);
     assert!(world.modular.ledger(world, account).is_ok());
 
+    assert!(
+        receipt.tick < first_flight_tick
+            && first_flight_tick < solar_tick
+            && solar_tick < departure.departure_tick
+    );
     for (description, berth, tick) in [
+        ("first physical step after launch", dock, first_flight_tick),
+        ("solar approach before jump", dock, solar_tick),
         (
             "jump arrival used as a physical berth",
             dock.with_test_chronology(dock.sequence(), arrival.arrival_tick),
@@ -55,7 +66,62 @@ pub(in crate::flight) fn check_aelavia_receipt_chronology(world: &World) {
             state.ledger(world, account).is_err(),
             "accepted {description}"
         );
+        state.naval_berth = None;
+        assert!(
+            state.ledger(world, account).is_err(),
+            "legacy receipt accepted {description}"
+        );
     }
+}
+
+pub(in crate::flight) fn check_naval_local_sortie(paid: &World) {
+    let mut world = World::from_save_bytes(&paid.save_bytes().unwrap()).unwrap();
+    for _ in 0..9 {
+        world.step(crate::FlightInput::default()).unwrap();
+    }
+    let launch_tick = world.snapshot().tick;
+    launch(&mut world);
+    let first_flight = world.snapshot().tick;
+    world.toggle_auto_docking().unwrap();
+    for _ in 0..5000 {
+        if world.current_dock_context().is_some() {
+            break;
+        }
+        world.step(crate::FlightInput::default()).unwrap();
+    }
+    let next = world.current_dock_context().unwrap();
+    let sale = *world.modular.events.last().unwrap();
+    assert_eq!(next.system(), sale.dock.system());
+    assert_eq!(next.sequence(), sale.dock.sequence() + 1);
+    assert_eq!(next.visit(), sale.dock.visit() + 1);
+    for _ in 0..64 {
+        world.step(crate::FlightInput::default()).unwrap();
+    }
+    assert_eq!(
+        world.modular.naval_berth,
+        Some(NavalBerth::Launched(launch_tick))
+    );
+    let mut cold = World::from_save_bytes(&world.save_bytes().unwrap()).unwrap();
+    let mut state = cold.modular.clone();
+    state.events.last_mut().unwrap().tick = first_flight;
+    let account = cold.commander_account.as_ref().unwrap();
+    assert!(state.ledger(&cold, account).is_err());
+    state.naval_berth = None;
+    // The later actual docking tick and physical entry clock still identify
+    // the preceding no-jump flight exactly, despite the subsequent docked wait.
+    assert!(state.ledger(&cold, account).is_err());
+
+    launch(&mut cold);
+    let mut state = cold.modular.clone();
+    let account = cold.commander_account.as_ref().unwrap();
+    assert!(state.ledger(&cold, account).is_ok());
+    state.events.last_mut().unwrap().tick = first_flight;
+    assert!(state.ledger(&cold, account).is_err());
+    // An older tag-3 sale retains neither the launch stamp nor that intermediate
+    // docking tick after leaving again. Preserve the genuine receipt in that gap.
+    state.events.last_mut().unwrap().tick = sale.tick;
+    state.naval_berth = None;
+    assert!(state.ledger(&cold, account).is_ok());
 }
 
 fn funded(seed: u64) -> World {

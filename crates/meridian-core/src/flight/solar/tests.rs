@@ -121,6 +121,10 @@ fn cruise(world: &mut World, speed: f32) {
 }
 fn solar_approach(world: &mut World) {
     launch(world);
+    approach_sun_in_flight(world);
+}
+
+fn approach_sun_in_flight(world: &mut World) {
     let sun = world.celestial_snapshot().unwrap().sun;
     aim_3d(world, sun.position);
     assert!(MotionFrame::from(world.snapshot()).ratio_and_nose(sun).1 > 0.999);
@@ -1033,6 +1037,9 @@ fn aelavia_naval_purchase_recharges_in_flight_and_scoops_fuel_for_return() {
         (ModuleKind::NavalEnergyUnit, 17, 196_000, true)
     );
     let cash = world.credits_tenths().unwrap();
+    for _ in 0..7 {
+        world.step(FlightInput::default()).unwrap();
+    }
     let id = module(&mut world, ModuleKind::NavalEnergyUnit);
     assert_eq!(world.credits_tenths(), Some(cash - 196_000));
     let mut world = World::from_save_bytes(&world.save_bytes().unwrap()).unwrap();
@@ -1040,7 +1047,15 @@ fn aelavia_naval_purchase_recharges_in_flight_and_scoops_fuel_for_return() {
         i.id == id && i.slot == Some(crate::ModuleSlot::Energy)
         && matches!(i.provenance, ModuleProvenance::Paid { dock, paid_tenths: 196_000, .. } if dock == berth)
     ));
-    solar_approach(&mut world);
+    crate::flight::modular::tests::check_naval_local_sortie(&world);
+    for _ in 0..12 {
+        world.step(FlightInput::default()).unwrap();
+    }
+    launch(&mut world);
+    let first_flight_tick = world.snapshot().tick;
+    assert_eq!(world.snapshot().mode, crate::FlightMode::Flight);
+    approach_sun_in_flight(&mut world);
+    let solar_flight_tick = world.snapshot().tick;
     record_scoop_turn(&world, 0, "outer approach");
     world
         .request_fire_front_laser(world.snapshot().tick)
@@ -1125,7 +1140,11 @@ fn aelavia_naval_purchase_recharges_in_flight_and_scoops_fuel_for_return() {
         world.flight_resources_snapshot()
     );
 
-    crate::flight::modular::tests::check_aelavia_receipt_chronology(&cold);
+    crate::flight::modular::tests::check_aelavia_receipt_chronology(
+        &cold,
+        first_flight_tick,
+        solar_flight_tick,
+    );
 
     // The last modular receipt is still the Aelavia purchase even after refuelling
     // and docking elsewhere. The flight exchange must retain that actual anchor.

@@ -36,6 +36,10 @@ At `c7b10a20` the return passed on Dell Linux (7.92 s) and native Windows (21.11
 
 The extended tool exchange passed on Dell Linux (10.70 s) and native Windows (26.98 s) at `01c4e328`. The next receipt check compares the actual purchase tick and dock sequence with the completed jumps. Test cases cover a claimed berth on the jump-arrival tick, the wrong berth sequence and a purchase recorded after departure. A later flight tool exchange retains the original purchase berth.
 
+New Naval purchase receipts record the actual station launch tick when the launch command succeeds. The purchase and launch may share a tick. The next exterior step is already too late to buy. A local flight that immediately redocks still closes the original purchase berth. The test waits at the later berth and departs again to check this boundary.
+
+Earlier v17 purchases have no station-launch timestamp. Their physical clock stops while docked. A world and physical clock pair from the same uninterrupted flight therefore gives the exact preceding launch tick when combined with the physical clock at station entry. The decoder uses the current uninterrupted flight, its first jump, the immediately following physical berth, or a retained solar sample from the launch visit. If none survives, the later total docked time gives only an upper bound. The original receipt remains readable within that bound. Later in-flight tool changes keep their own event times.
+
 ## Current reconciliation
 
 `Ready` below means source for the listed SH025 paths exists; the current preview can predate it. It does not claim new native testing, other hull compatibility or full parity. `Partial` names a concrete missing path. `Open` means no playable equipment implementation now. All rows require review of paid or appropriate non-paid acquisition, fit/storage, real effect and save/Continue before closure. XYZZY is a separate explicit acquisition path, not a substitute for ordinary payment or a mission receipt.

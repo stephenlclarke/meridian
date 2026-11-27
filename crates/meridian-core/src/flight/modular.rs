@@ -10,6 +10,8 @@ use core::fmt;
 mod cabins;
 mod fuel_history;
 mod history;
+mod naval_berth;
+use naval_berth::NavalBerth;
 mod salvage;
 pub(super) use cabins::add_cabin_mass;
 pub use cabins::{
@@ -499,6 +501,7 @@ pub(super) struct State {
     events: Vec<Event>,
     cargo_fit_history: Vec<fuel_history::CargoFit>,
     history: history::History,
+    naval_berth: Option<NavalBerth>,
     salvage: salvage::State,
 }
 pub struct PreparedModule<'a> {
@@ -1181,7 +1184,7 @@ impl State {
                     || flight_exchange)
             {
                 if !flight_exchange {
-                    world.jump_journal.validate_berth_at(e.dock, e.tick)?;
+                    self.validate_naval_berth(world, e)?;
                 }
                 super::ammunition::validate_physical_berth_event
             } else {
@@ -1598,8 +1601,16 @@ impl State {
                     w.bool(restoring);
                 }
                 ModuleAction::Purchase { kind } => {
-                    w.u8(3);
-                    w.u8(kind.tag());
+                    if let Some(berth) = self
+                        .naval_berth
+                        .filter(|_| kind == ModuleKind::NavalEnergyUnit)
+                    {
+                        w.u8(21);
+                        w.u64(berth.encoded_tick());
+                    } else {
+                        w.u8(3);
+                        w.u8(kind.tag());
+                    }
                 }
                 ModuleAction::PurchaseFuelScoops => w.u8(16),
                 ModuleAction::GrantStoredSalvageCutter => w.u8(17),
@@ -1654,6 +1665,7 @@ impl State {
             return Err(SaveError::TooLarge);
         }
         let mut events = Vec::new();
+        let mut naval_berth = None;
         for _ in 0..count {
             let tag = r.u8()?;
             let kind = if tag == 3 && version >= 16 {
@@ -1686,6 +1698,13 @@ impl State {
             } else {
                 None
             };
+            if tag == 21
+                && naval_berth
+                    .replace(NavalBerth::from_tick(r.u64()?))
+                    .is_some()
+            {
+                return Err(INVALID);
+            }
             let item = r.u64()?;
             let dock = DockContext::decode_save(r)?;
             let tick = r.u64()?;
@@ -1693,6 +1712,9 @@ impl State {
             let xyzzy = r.bool()?;
             let action = match tag {
                 0 => ModuleAction::PurchaseMiningLaser,
+                21 if !xyzzy && dock.system() == SystemId::AELAVIA => ModuleAction::Purchase {
+                    kind: ModuleKind::NavalEnergyUnit,
+                },
                 19 => ModuleAction::GrantStoredMiningLaser,
                 18 => {
                     let (replacing, visit, clock, emission, restoring) =
@@ -1765,6 +1787,7 @@ impl State {
         Ok(Self {
             events,
             cargo_fit_history,
+            naval_berth,
             history,
             salvage,
         })
@@ -2218,6 +2241,9 @@ impl World {
         let mut state = self.modular.clone();
         if history::requires_history(review.action) {
             state.history.activate(self, current, review.dock)?;
+        }
+        if aelavia_naval_purchase(review.dock.system(), review.action) {
+            state.naval_berth = Some(NavalBerth::Occupied);
         }
         state.events.push(event);
         let mut combat = self.combat;

@@ -1,6 +1,17 @@
 {
   "base": "c6ee283a9afd0f8fb98347a41e6c199036a8d254",
   "files": {
+    "flight.rs": {
+      "beforeSHA256": "e36fd880c0177c3b03c913871e213eac66159eb19abc303c65805efa35a899b2",
+      "afterSHA256": "5e5feab0a35c99678c2239bddef8dbf5a10237fdbd9ab0fc01ccb3459d214365",
+      "hunks": [
+        {
+          "offset": 22976,
+          "before": "",
+          "after": "        self.modular.record_naval_launch(expected_tick);\n"
+        }
+      ]
+    },
     "flight/ammunition.rs": {
       "beforeSHA256": "fa936a3746563a7a2ce733a4e29c0cfb2d8140190c2fdb0e6f083df2ec3cc07f",
       "afterSHA256": "abd6cb1666a797b078ba62dfba0a23e9caf2ba6b97ee06032d607049884c4696",
@@ -30,7 +41,7 @@
     },
     "flight/modular.rs": {
       "beforeSHA256": "271c8afc708a475b106eac5999f64a757fe83de5e0814f6477a9bed90b948133",
-      "afterSHA256": "c34ec23ad267339215477788c2ec39a79f6ce4a5484210e589139e2a9d8acc61",
+      "afterSHA256": "ece79dc36414090b42a85bf2199909a85801c8df7385f5c43fb8520194f9df5f",
       "hunks": [
         {
           "offset": 222,
@@ -38,57 +49,97 @@
           "after": "    navigation::{DockContext, DriveGrade, NavigationFitChange, NavigationGrade, SystemId},\n"
         },
         {
-          "offset": 34172,
+          "offset": 413,
+          "before": "",
+          "after": "mod naval_berth;\nuse naval_berth::NavalBerth;\n"
+        },
+        {
+          "offset": 18413,
+          "before": "",
+          "after": "    naval_berth: Option<NavalBerth>,\n"
+        },
+        {
+          "offset": 34255,
           "before": "",
           "after": "// OriginalWorlds/catalogue.json at a11fe169 lists G01-S235 at TL17.\nfn module_shop_technology(system: SystemId, kind: ModuleKind) -> Option<u8> {\n    if system == SystemId::AELAVIA {\n        return (kind == ModuleKind::NavalEnergyUnit).then_some(17);\n    }\n    let site = super::services::service_site(system)?;\n    Some(crate::equipment::definition().ok()?.offer(site).technology)\n}\n\nfn aelavia_naval_purchase(system: SystemId, action: ModuleAction) -> bool {\n    system == SystemId::AELAVIA && action.purchase_kind() == Some(ModuleKind::NavalEnergyUnit)\n}\n\n"
         },
         {
-          "offset": 34967,
+          "offset": 35050,
           "before": "            let site = super::services::service_site(e.dock.system()).ok_or(INVALID)?;\n            if crate::equipment::definition()\n                .map_err(|_| INVALID)?\n                .offer(site)\n                .technology\n                < required\n            {\n",
           "after": "            if module_shop_technology(e.dock.system(), kind).ok_or(INVALID)? < required {\n"
         },
         {
-          "offset": 43023,
+          "offset": 43106,
           "before": "            super::ammunition::validate_berth_event(\n",
-          "after": "            // Flight exchanges reuse the preceding modular event's berth. Their own\n            // validators below check that exact predecessor, flight visit and clock.\n            let flight_exchange = matches!(\n                e.action,\n                ModuleAction::FlightLaserExchange { .. }\n                    | ModuleAction::FlightSalvageExchange { .. }\n            );\n            let validate_berth = if !e.xyzzy\n                && e.dock.system() == SystemId::AELAVIA\n                && (e.action.purchase_kind() == Some(ModuleKind::NavalEnergyUnit)\n                    || flight_exchange)\n            {\n                if !flight_exchange {\n                    world.jump_journal.validate_berth_at(e.dock, e.tick)?;\n                }\n                super::ammunition::validate_physical_berth_event\n            } else {\n                super::ammunition::validate_berth_event\n            };\n            validate_berth(\n"
+          "after": "            // Flight exchanges reuse the preceding modular event's berth. Their own\n            // validators below check that exact predecessor, flight visit and clock.\n            let flight_exchange = matches!(\n                e.action,\n                ModuleAction::FlightLaserExchange { .. }\n                    | ModuleAction::FlightSalvageExchange { .. }\n            );\n            let validate_berth = if !e.xyzzy\n                && e.dock.system() == SystemId::AELAVIA\n                && (e.action.purchase_kind() == Some(ModuleKind::NavalEnergyUnit)\n                    || flight_exchange)\n            {\n                if !flight_exchange {\n                    self.validate_naval_berth(world, e)?;\n                }\n                super::ammunition::validate_physical_berth_event\n            } else {\n                super::ammunition::validate_berth_event\n            };\n            validate_berth(\n"
         },
         {
-          "offset": 48485,
+          "offset": 48551,
           "before": "                world\n                    .jump_journal\n                    .validate_passenger_berth(e.dock, e.tick)?;\n",
           "after": "                world.jump_journal.validate_berth_at(e.dock, e.tick)?;\n"
         },
         {
-          "offset": 69433,
+          "offset": 61337,
+          "before": "                    w.u8(3);\n                    w.u8(kind.tag());\n",
+          "after": "                    if let Some(berth) = self\n                        .naval_berth\n                        .filter(|_| kind == ModuleKind::NavalEnergyUnit)\n                    {\n                        w.u8(21);\n                        w.u64(berth.encoded_tick());\n                    } else {\n                        w.u8(3);\n                        w.u8(kind.tag());\n                    }\n"
+        },
+        {
+          "offset": 63759,
+          "before": "",
+          "after": "        let mut naval_berth = None;\n"
+        },
+        {
+          "offset": 64853,
+          "before": "",
+          "after": "            if tag == 21\n                && naval_berth\n                    .replace(NavalBerth::from_tick(r.u64()?))\n                    .is_some()\n            {\n                return Err(INVALID);\n            }\n"
+        },
+        {
+          "offset": 65351,
+          "before": "",
+          "after": "                21 if !xyzzy && dock.system() == SystemId::AELAVIA => ModuleAction::Purchase {\n                    kind: ModuleKind::NavalEnergyUnit,\n                },\n"
+        },
+        {
+          "offset": 68239,
+          "before": "",
+          "after": "            naval_berth,\n"
+        },
+        {
+          "offset": 70267,
           "before": "        let Some(site) = self\n            .current_dock_context()\n            .and_then(|d| super::services::service_site(d.system()))\n        else {\n",
           "after": "        let Some(dock) = self.current_dock_context() else {\n"
         },
         {
-          "offset": 69535,
+          "offset": 70369,
           "before": "        let Ok(base) = crate::equipment::definition() else {\n            return Vec::new();\n        };\n        let technology = base.offer(site).technology;\n",
           "after": ""
         },
         {
-          "offset": 71187,
+          "offset": 72021,
           "before": "",
           "after": "            let technology = module_shop_technology(dock.system(), kind)?;\n"
         },
         {
-          "offset": 76060,
+          "offset": 76894,
           "before": "        let facts = self\n            .current_service_facts(tick)\n",
           "after": "        self.station_command_admission(tick)\n"
         },
         {
-          "offset": 76391,
+          "offset": 77225,
           "before": "",
           "after": "        {\n            return Err(ModuleError::BerthRequired);\n        }\n        if super::services::service_site(dock.system()).is_none()\n            && !aelavia_naval_purchase(dock.system(), action)\n"
         },
         {
-          "offset": 78189,
+          "offset": 79023,
           "before": "            let technology = crate::equipment::definition()\n                .map_err(|_| ModuleError::BerthRequired)?\n                .offer(facts.site)\n                .technology;\n",
           "after": "            let technology =\n                module_shop_technology(dock.system(), kind).ok_or(ModuleError::BerthRequired)?;\n"
         },
         {
-          "offset": 85965,
+          "offset": 85731,
+          "before": "",
+          "after": "        if aelavia_naval_purchase(review.dock.system(), review.action) {\n            state.naval_berth = Some(NavalBerth::Occupied);\n        }\n"
+        },
+        {
+          "offset": 86942,
           "before": "mod tests;\n",
           "after": "pub(super) mod tests;\n"
         }
@@ -96,12 +147,12 @@
     },
     "flight/modular/tests.rs": {
       "beforeSHA256": "4b82329e06fbaa2505e863bf68130dc9b9d050af6131c5c66b4b2699f81c425e",
-      "afterSHA256": "49564e9281a55a73fe97b103aa35967e9a7c56cd65e2adf0fd869fadab3418be",
+      "afterSHA256": "3db1120a5c0c6b9438ed0e764cb4f4c950b05079ab8d8ec1835431a44a384422",
       "hunks": [
         {
           "offset": 286,
           "before": "",
-          "after": "\n// Run against the actual post-return state, when the Naval purchase is historical.\npub(in crate::flight) fn check_aelavia_receipt_chronology(world: &World) {\n    let account = world.commander_account.as_ref().unwrap();\n    let receipt = *world.modular.events.last().unwrap();\n    let dock = receipt.dock;\n    assert_eq!(dock.system(), SystemId::AELAVIA);\n    assert_eq!(\n        receipt.action.purchase_kind(),\n        Some(ModuleKind::NavalEnergyUnit)\n    );\n    let arrival = world\n        .jump_journal\n        .completed_timing(dock.visit() - 1)\n        .unwrap()\n        .unwrap();\n    let departure = world\n        .jump_journal\n        .completed_timing(dock.visit() + 1)\n        .unwrap()\n        .unwrap();\n    assert_eq!(arrival.destination, dock.system());\n    assert_eq!(departure.source, dock.system());\n    assert!(arrival.arrival_tick < dock.tick() && receipt.tick < departure.departure_tick);\n    assert!(world.modular.ledger(world, account).is_ok());\n\n    for (description, berth, tick) in [\n        (\n            \"jump arrival used as a physical berth\",\n            dock.with_test_chronology(dock.sequence(), arrival.arrival_tick),\n            receipt.tick,\n        ),\n        (\n            \"wrong berth sequence for the actual visit\",\n            dock.with_test_chronology(dock.sequence() - 1, dock.tick()),\n            receipt.tick,\n        ),\n        (\n            \"purchase after departure\",\n            dock,\n            departure.departure_tick + 1,\n        ),\n    ] {\n        let mut state = world.modular.clone();\n        let candidate = state.events.last_mut().unwrap();\n        candidate.dock = berth;\n        candidate.tick = tick;\n        assert!(\n            state.ledger(world, account).is_err(),\n            \"accepted {description}\"\n        );\n    }\n}\n"
+          "after": "\n// Run against the actual post-return state, when the Naval purchase is historical.\npub(in crate::flight) fn check_aelavia_receipt_chronology(\n    world: &World,\n    first_flight_tick: u64,\n    solar_tick: u64,\n) {\n    let account = world.commander_account.as_ref().unwrap();\n    let receipt = *world.modular.events.last().unwrap();\n    let dock = receipt.dock;\n    assert_eq!(dock.system(), SystemId::AELAVIA);\n    assert_eq!(\n        receipt.action.purchase_kind(),\n        Some(ModuleKind::NavalEnergyUnit)\n    );\n    let arrival = world\n        .jump_journal\n        .completed_timing(dock.visit() - 1)\n        .unwrap()\n        .unwrap();\n    let departure = world\n        .jump_journal\n        .completed_timing(dock.visit() + 1)\n        .unwrap()\n        .unwrap();\n    assert_eq!(arrival.destination, dock.system());\n    assert_eq!(departure.source, dock.system());\n    assert!(arrival.arrival_tick < dock.tick() && receipt.tick < departure.departure_tick);\n    assert!(world.modular.ledger(world, account).is_ok());\n\n    assert!(\n        receipt.tick < first_flight_tick\n            && first_flight_tick < solar_tick\n            && solar_tick < departure.departure_tick\n    );\n    for (description, berth, tick) in [\n        (\"first physical step after launch\", dock, first_flight_tick),\n        (\"solar approach before jump\", dock, solar_tick),\n        (\n            \"jump arrival used as a physical berth\",\n            dock.with_test_chronology(dock.sequence(), arrival.arrival_tick),\n            receipt.tick,\n        ),\n        (\n            \"wrong berth sequence for the actual visit\",\n            dock.with_test_chronology(dock.sequence() - 1, dock.tick()),\n            receipt.tick,\n        ),\n        (\n            \"purchase after departure\",\n            dock,\n            departure.departure_tick + 1,\n        ),\n    ] {\n        let mut state = world.modular.clone();\n        let candidate = state.events.last_mut().unwrap();\n        candidate.dock = berth;\n        candidate.tick = tick;\n        assert!(\n            state.ledger(world, account).is_err(),\n            \"accepted {description}\"\n        );\n        state.naval_berth = None;\n        assert!(\n            state.ledger(world, account).is_err(),\n            \"legacy receipt accepted {description}\"\n        );\n    }\n}\n\npub(in crate::flight) fn check_naval_local_sortie(paid: &World) {\n    let mut world = World::from_save_bytes(&paid.save_bytes().unwrap()).unwrap();\n    for _ in 0..9 {\n        world.step(crate::FlightInput::default()).unwrap();\n    }\n    let launch_tick = world.snapshot().tick;\n    launch(&mut world);\n    let first_flight = world.snapshot().tick;\n    world.toggle_auto_docking().unwrap();\n    for _ in 0..5000 {\n        if world.current_dock_context().is_some() {\n            break;\n        }\n        world.step(crate::FlightInput::default()).unwrap();\n    }\n    let next = world.current_dock_context().unwrap();\n    let sale = *world.modular.events.last().unwrap();\n    assert_eq!(next.system(), sale.dock.system());\n    assert_eq!(next.sequence(), sale.dock.sequence() + 1);\n    assert_eq!(next.visit(), sale.dock.visit() + 1);\n    for _ in 0..64 {\n        world.step(crate::FlightInput::default()).unwrap();\n    }\n    assert_eq!(\n        world.modular.naval_berth,\n        Some(NavalBerth::Launched(launch_tick))\n    );\n    let mut cold = World::from_save_bytes(&world.save_bytes().unwrap()).unwrap();\n    let mut state = cold.modular.clone();\n    state.events.last_mut().unwrap().tick = first_flight;\n    let account = cold.commander_account.as_ref().unwrap();\n    assert!(state.ledger(&cold, account).is_err());\n    state.naval_berth = None;\n    // The later actual docking tick and physical entry clock still identify\n    // the preceding no-jump flight exactly, despite the subsequent docked wait.\n    assert!(state.ledger(&cold, account).is_err());\n\n    launch(&mut cold);\n    let mut state = cold.modular.clone();\n    let account = cold.commander_account.as_ref().unwrap();\n    assert!(state.ledger(&cold, account).is_ok());\n    state.events.last_mut().unwrap().tick = first_flight;\n    assert!(state.ledger(&cold, account).is_err());\n    // An older tag-3 sale retains neither the launch stamp nor that intermediate\n    // docking tick after leaving again. Preserve the genuine receipt in that gap.\n    state.events.last_mut().unwrap().tick = sale.tick;\n    state.naval_berth = None;\n    assert!(state.ledger(&cold, account).is_ok());\n}\n"
         }
       ]
     },

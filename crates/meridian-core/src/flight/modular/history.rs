@@ -122,6 +122,13 @@ impl History {
         }
     }
 
+    pub(super) fn berth_at_sequence(&self, sequence: u64) -> Option<DockContext> {
+        self.berths
+            .iter()
+            .copied()
+            .find(|b| b.sequence() == sequence)
+    }
+
     pub(super) fn owns_berth(&self, dock: DockContext) -> bool {
         self.berths.contains(&dock)
     }

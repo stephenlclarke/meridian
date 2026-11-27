@@ -581,6 +581,7 @@ impl World {
         if let Some(account) = &mut self.commander_account {
             account.record_departure_legality();
         }
+        self.modular.record_naval_launch(expected_tick);
         self.state = next;
         self.navigation = navigation;
         self.ecm = ecm;
