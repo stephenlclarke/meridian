@@ -2117,6 +2117,7 @@ mod tests {
         key(&mut menu, &mut profile, ui::Key::Confirm);
         let before = ok(profile.world.save_bytes());
         let slot = dir.0.join("commander.meridian");
+        let before_disk = ok(std::fs::read(&slot));
         let backup = dir.0.join("bonded-writer-backup");
         ok(std::fs::rename(&slot, &backup));
         ok(std::fs::create_dir(&slot));
@@ -2125,7 +2126,7 @@ mod tests {
             menu.input(&mut profile, ui::Input::Key(ui::Key::Confirm))
                 .is_err()
         );
-        assert_eq!(ok(std::fs::read(&backup)), before);
+        assert_eq!(ok(std::fs::read(&backup)), before_disk);
         assert_eq!(ok(profile.world.save_bytes()), before);
         ok(std::fs::remove_dir(&slot));
         ok(std::fs::rename(&backup, &slot));
