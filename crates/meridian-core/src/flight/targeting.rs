@@ -327,6 +327,15 @@ impl World {
         self.cycle_scanner_contacts(expected_tick, size, TargetFilter::Mining)
     }
 
+    /// Select a terminal wreck with external cargo still available for recovery.
+    pub fn cycle_salvage_contact(
+        &mut self,
+        expected_tick: u64,
+        size: [u32; 2],
+    ) -> Result<bool, StepError> {
+        self.cycle_scanner_contacts(expected_tick, size, TargetFilter::Salvage)
+    }
+
     fn cycle_scanner_contacts(
         &mut self,
         expected_tick: u64,
@@ -343,33 +352,39 @@ impl World {
             return Err(StepError::InvalidMode);
         }
         let origin = self.targeting_origin().ok_or(StepError::InvalidMode)?;
-        if filter == TargetFilter::Mining && !self.work_targeting_fit().mining {
-            return Ok(false);
+        match filter {
+            TargetFilter::Mining if !self.work_targeting_fit().mining => return Ok(false),
+            TargetFilter::Salvage if !self.work_targeting_fit().salvage => return Ok(false),
+            _ => {}
         }
-        let mut ordered = self.scanner_targets();
-        let eligible = |id: &TargetIdentity| {
-            filter == TargetFilter::All
-                || matches!(
-                    id,
-                    TargetIdentity::Work(WorkTargetId::Asteroid(_) | WorkTargetId::Ore(_))
-                )
+        let contacts = self.scanner_targets();
+        let includes = |id: TargetIdentity| match (filter, id) {
+            (TargetFilter::All, _) | (TargetFilter::Ships, TargetIdentity::Ship(_)) => true,
+            (
+                TargetFilter::Mining,
+                TargetIdentity::Work(WorkTargetId::Asteroid(_) | WorkTargetId::Ore(_)),
+            ) => true,
+            (TargetFilter::Salvage, TargetIdentity::Work(WorkTargetId::Wreck(source))) => {
+                self.auto_salvage_eligible(source)
+            }
+            _ => false,
         };
-        if filter == TargetFilter::Mining && !ordered.iter().any(|(id, _)| eligible(id)) {
+        let ordered: Vec<_> = contacts
+            .iter()
+            .filter_map(|(id, _)| includes(*id).then_some(*id))
+            .collect();
+        if filter != TargetFilter::All && ordered.is_empty() {
             return Ok(false);
         }
         if self.targeting.origin != Some(origin) || !self.targeting.scanner {
             self.targeting.visited.clear();
         }
         let visited = &mut self.targeting.visited;
-        visited.retain(|id| ordered.iter().any(|(other, _)| id == other));
-        ordered.retain(|(id, _)| eligible(id));
-        if ordered.iter().all(|(id, _)| visited.contains(id)) {
-            visited.retain(|id| !eligible(id));
+        visited.retain(|id| contacts.iter().any(|(other, _)| id == other));
+        if ordered.iter().all(|id| visited.contains(id)) {
+            visited.retain(|id| !ordered.contains(id));
         }
-        let next = ordered
-            .into_iter()
-            .map(|(id, _)| id)
-            .find(|id| !visited.contains(id));
+        let next = ordered.into_iter().find(|id| !visited.contains(id));
         if let Some(id) = next {
             visited.push(id);
         }

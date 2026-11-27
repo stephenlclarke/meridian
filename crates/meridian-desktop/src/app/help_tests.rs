@@ -248,7 +248,7 @@ fn flight_help_lists_the_computer_keys_and_consumes_them_while_open() {
     for binding in [
         "N Start or cancel auto-docking",
         "Tab Next scanner target (no core: mark)",
-        "Shift+M Next rock or ore (fitted targeting core + Mining Targeting Module)",
+        "Shift+M Rock/ore | Shift+V Wreck cargo | Fit core + matching targeting module",
         "F Manual/assist",
         "Basic aligns | Advanced approaches | Docking+nav docks | Specialists auto-work",
         "scoop ore | cut wreck | occupied review",

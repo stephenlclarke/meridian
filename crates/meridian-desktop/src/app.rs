@@ -13,6 +13,7 @@ use std::{
     sync::Arc,
     time::Instant,
 };
+use target_computer::ScannerCycle;
 
 use meridian_core::{
     FlightInput, FlightMode, FlightView, MotionRefusal, PulseContact, PulseShot, StepError, World,
@@ -1009,9 +1010,12 @@ impl App {
         let in_flight = self.game.world.snapshot().mode == FlightMode::Flight;
         if in_flight {
             match code {
-                KeyCode::Tab => return self.cycle_computer_target(false),
+                KeyCode::Tab => return self.cycle_computer_target(ScannerCycle::All),
                 KeyCode::KeyM if self.modifiers == ModifiersState::SHIFT => {
-                    return self.cycle_computer_target(true);
+                    return self.cycle_computer_target(ScannerCycle::Mining);
+                }
+                KeyCode::KeyV if self.modifiers == ModifiersState::SHIFT => {
+                    return self.cycle_computer_target(ScannerCycle::Salvage);
                 }
                 KeyCode::KeyF => return self.toggle_computer_assistance(),
                 KeyCode::KeyT => return self.lock_computer_target(),

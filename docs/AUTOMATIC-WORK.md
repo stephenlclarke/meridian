@@ -6,6 +6,8 @@ The Dell headless test on `200c0289` passed the paid mining journey, including c
 
 Press **Tab** to select the nearest scanner contact, including contacts behind you. Each press selects the nearest remaining contact. After the farthest, the cycle returns to the nearest. **Delete** releases the target. **F** switches between assisted and manual control while keeping the contact marked.
 
+With a targeting core and the matching module fitted, **Shift+M** cycles rocks and released ore. **Shift+V** cycles terminal wrecks with cargo left to recover. Both use scanner distance order and keep the current selection when there is no match.
+
 | Equipment or mode | What the pilot controls |
 | --- | --- |
 | Hand flight, with any fit | Steer, set speed, line up with the docking entrance or target, and operate the fitted tool. A scanner mark works without a computer. |

@@ -35,7 +35,7 @@ Authored new tests: source offers, cash/technology refusal, earned Intermediate 
 | Energy: Basic, Intermediate (Extra), Advanced (Naval), Elite | Born; three ordered shop grades | Ready: recharge 1/2/3/4x, capacity 1x; higher-grade shop TLs constrain admission | Elite grant; more playable stations needed to reach paid Naval TL17 |
 | Navigation: Basic, Intermediate (Advanced saved key), Advanced (Military saved key) | Born / two paid grades | Ready: 7/14/21 LY module reach with hull floor, actual fit and route history | Advanced; full original world/station scope remains |
 | Targeting: Basic, Advanced, Docking, Identification, Pirate, Military | Six paid grades and stored identities | Identification or higher shows type and custody for current ordinary rocks and ore. Tab selects a contact and Shift+I expands its details. | Military; original automatic options remain open |
-| Mining and Salvage Targeting | Two independent paid modules require fitted core | Shift+M selects the next current rock or ore with the Mining Targeting Module fitted. Tab selects across all scanner contacts. See [automatic work](AUTOMATIC-WORK.md) for rock hold, ore intake and salvage. | Both available in the explicit maximum outfit |
+| Mining and Salvage Targeting | Two independent paid modules require fitted core | Shift+M selects the next current rock or ore with the Mining Targeting Module fitted. Shift+V selects wrecks with recoverable cargo with the Salvage Targeting Module fitted. Tab selects across all scanner contacts. See [automatic work](AUTOMATIC-WORK.md) for rock hold, ore intake and salvage. | Both available in the explicit maximum outfit |
 | Lasers: Pulse, Beam, Mining, Military, Naval | Pulse born; four repeatable ordinary shop/held definitions; Naval reward or paid PLUGH-only listing | Partial: real front paths; other facings and dedicated native Mining utility open | Naval front; not all supported native facings |
 | Ammunition: Standard Missile, Alien Seeker Missile | Standard paid and finite nine pylons on SH025; Alien Seeker requires recovered research then repeat procurement | Standard ready; alien round, salvage variants and compatible hull pylon count open | Finite standard refill only; no virtual infinite inventory |
 | Large Cargo Bay | Paid unique hull-bound expansion | Ready: actual SH025 92→127 t; full-hold removal refuses | Actual item granted; other hull expansion and unlimited cargo open |
@@ -66,6 +66,10 @@ Meridian still needs an authoritative player rescue transition that identifies t
 ## Mining contact selection
 
 Buy the Basic Targeting Module and the Mining Targeting Module (2,000 CR at TL6) and fit both. In flight, press **Shift+M** to cycle current belt rocks and released ore in scanner order. **Tab** cycles all scanner contacts. **F** changes manual or assisted control. Manual mining uses the existing tool and scoop controls. The frozen selection rules are in `WorkTargetSelection.swift` (SHA-256 `66a21e1837b13bd58b63cd46300b2b47fcf3b55f823a9363b03e224e4c361b70`) and `WorkTargetRuntime.swift` at the revision below. Shift+M is the Meridian shortcut.
+
+## Salvage contact selection
+
+Fit a targeting core and the Salvage Targeting Module (4,000 CR at TL8). Press **Shift+V** in flight to cycle wrecks in scanner distance order. Each wreck must have cargo left on its external salvage manifest. An empty search keeps the current contact selected. Cargo transfer uses the existing cutter, scoop and hold checks. Use **Tab** for other contacts, including disabled ships with people aboard. The wreck selection follows the salvage hold in the same frozen `WorkTargetSelection.swift`. Shift+V is the Meridian shortcut.
 
 ## SH171 Medusa compatibility
 

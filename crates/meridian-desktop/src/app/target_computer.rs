@@ -12,6 +12,13 @@ fn with_work_status(
     target
 }
 
+#[derive(Clone, Copy)]
+pub(super) enum ScannerCycle {
+    All,
+    Mining,
+    Salvage,
+}
+
 impl App {
     pub(super) fn target_readout(world: &World) -> Option<TargetingSnapshot> {
         world
@@ -19,7 +26,7 @@ impl App {
             .map(|target| with_work_status(target, world.automatic_work_status()))
     }
 
-    pub(super) fn cycle_computer_target(&mut self, mining_only: bool) {
+    pub(super) fn cycle_computer_target(&mut self, cycle: ScannerCycle) {
         // Scanner membership comes from World, not camera clipping or fitted equipment.
         let size = self
             .renderer
@@ -28,10 +35,10 @@ impl App {
                 renderer.scanner_viewport()
             });
         let tick = self.game.world.snapshot().tick;
-        let result = if mining_only {
-            self.game.world.cycle_mining_contact(tick, size)
-        } else {
-            self.game.world.cycle_scanner_target(tick, size)
+        let result = match cycle {
+            ScannerCycle::All => self.game.world.cycle_scanner_target(tick, size),
+            ScannerCycle::Mining => self.game.world.cycle_mining_contact(tick, size),
+            ScannerCycle::Salvage => self.game.world.cycle_salvage_contact(tick, size),
         };
         let message = match result {
             Ok(true) => self.game.world.targeting_snapshot().map_or_else(
@@ -48,11 +55,18 @@ impl App {
                     )
                 },
             ),
-            Ok(false) if mining_only && !self.game.world.work_targeting_fit().mining => {
-                "Fit a targeting core and Mining Targeting Module".into()
+            Ok(false) => match cycle {
+                ScannerCycle::All => "NO SCANNER TARGETS",
+                ScannerCycle::Mining if !self.game.world.work_targeting_fit().mining => {
+                    "Fit a targeting core and Mining Targeting Module"
+                }
+                ScannerCycle::Mining => "No mining contacts",
+                ScannerCycle::Salvage if !self.game.world.work_targeting_fit().salvage => {
+                    "Fit a targeting core and Salvage Targeting Module"
+                }
+                ScannerCycle::Salvage => "No recoverable wrecks",
             }
-            Ok(false) if mining_only => "No mining contacts".into(),
-            Ok(false) => "NO SCANNER TARGETS".into(),
+            .into(),
             Err(error) => error.to_string(),
         };
         self.notice.set(message);

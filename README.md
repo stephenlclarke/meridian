@@ -124,6 +124,7 @@ H or ? opens a dismissible help popup for the current screen, including station 
 | R, then D in a station route review (development) | Inspect estimated trade per leg; D, B or Enter closes details without installing a route |
 | L; W/S; arrows; A/D; Q/E; Space | Launch; thrust; pitch; yaw; roll; brake |
 | N in flight (development) | Engage the fitted navigation computer for docking, or cancel the approach |
+| Shift+M / Shift+V in flight (development) | Cycle rocks and ore / wrecks with cargo left to recover. Fit a targeting core and the matching Mining or Salvage Targeting Module. |
 | Tab / F / Delete / Shift+I in flight (development) | Cycle scanner contacts by distance / switch between assisted and manual targeting / release target / show target details |
 | J; T (docked); R; Enter; B; F (docked) | Travel; select contact; review; confirm; cancel; buy fuel |
 | M; [ / ]; Left/Right; Shift+Left/Right; G / Shift+G | Market; commodity selection; adjust quantity by 1 / 10; review buy/sell |

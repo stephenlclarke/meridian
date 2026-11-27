@@ -124,7 +124,7 @@ impl Panel {
                 "J Jump | Shift+J Clue Journal | Hold U 10 seconds: EMP (release to cancel)",
                 "F6 Flight lesson | F12 Cancel | C Lesson details | F7 Close run | F8 Reception",
                 "Tab Next scanner target (no core: mark) | F Manual/assist | Delete Release",
-                "Shift+M Next rock or ore (fitted targeting core + Mining Targeting Module)",
+                "Shift+M Rock/ore | Shift+V Wreck cargo | Fit core + matching targeting module",
                 "Basic aligns | Advanced approaches | Docking+nav docks | Specialists auto-work",
                 "I Mission details | Shift+I Target details | Occupied: Enter/Escape",
                 "F10 Practice review at Avenor | 4 Trade review | 5 Plan | 6 Cancel | 7 Details",
