@@ -657,6 +657,65 @@ fn actual_missile_notice_and_restored_airborne_session_do_not_replay() {
 }
 
 #[test]
+fn flight_mining_shortcut_and_audio_chord_have_distinct_effects() {
+    use meridian_core::{TargetIdentity, XyzzyAction, equipment::WorkTargetId};
+    use winit::keyboard::ModifiersState;
+    let directory = TestDirectory::new();
+    let mut app = app(&directory);
+    ok(app.game.xyzzy(XyzzyAction::Enter));
+    attach_audio(&mut app);
+    launched(&mut app);
+    let sound = app.audio_help_line();
+    app.modifiers = ModifiersState::SHIFT;
+    let code = key(
+        &mut app,
+        KeyCode::KeyM,
+        ElementState::Pressed,
+        false,
+        Some("M"),
+    );
+    assert_eq!(code, Some(KeyCode::KeyM));
+    app.game_key(code.unwrap_or_else(|| panic!("missing mining key")));
+    let selected = app
+        .game
+        .world
+        .targeting_snapshot()
+        .unwrap_or_else(|| panic!("missing rock"));
+    assert!(matches!(
+        selected.identity,
+        TargetIdentity::Work(WorkTargetId::Asteroid(_))
+    ));
+    assert_eq!(app.audio_help_line(), sound);
+
+    app.modifiers = ModifiersState::CONTROL | ModifiersState::SHIFT;
+    assert_eq!(
+        key(
+            &mut app,
+            KeyCode::KeyM,
+            ElementState::Pressed,
+            false,
+            Some("M")
+        ),
+        None
+    );
+    assert!(app.audio_help_line().ends_with("Muted"));
+    assert_eq!(app.game.world.targeting_snapshot(), Some(selected.clone()));
+
+    app.modifiers = ModifiersState::empty();
+    let contacts = app.game.world.scanner_targets();
+    let next = contacts
+        .iter()
+        .find(|(id, _)| *id != selected.identity)
+        .unwrap_or_else(|| panic!("missing scanner contact"))
+        .0;
+    app.game_key(KeyCode::Tab);
+    assert_eq!(
+        app.game.world.targeting_snapshot().map(|s| s.identity),
+        Some(next)
+    );
+}
+
+#[test]
 fn actual_mute_chord_is_modal_and_consumes_events_while_unavailable() {
     use crate::audio::SoundEffect::Laser;
     use winit::keyboard::ModifiersState;

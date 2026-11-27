@@ -19,7 +19,7 @@ impl App {
             .map(|target| with_work_status(target, world.automatic_work_status()))
     }
 
-    pub(super) fn cycle_computer_target(&mut self) {
+    pub(super) fn cycle_computer_target(&mut self, mining_only: bool) {
         // Scanner membership comes from World, not camera clipping or fitted equipment.
         let size = self
             .renderer
@@ -28,7 +28,12 @@ impl App {
                 renderer.scanner_viewport()
             });
         let tick = self.game.world.snapshot().tick;
-        let message = match self.game.world.cycle_scanner_target(tick, size) {
+        let result = if mining_only {
+            self.game.world.cycle_mining_contact(tick, size)
+        } else {
+            self.game.world.cycle_scanner_target(tick, size)
+        };
+        let message = match result {
             Ok(true) => self.game.world.targeting_snapshot().map_or_else(
                 || "NO TARGETS".into(),
                 |target| {
@@ -43,6 +48,10 @@ impl App {
                     )
                 },
             ),
+            Ok(false) if mining_only && !self.game.world.work_targeting_fit().mining => {
+                "Fit a targeting core and Mining Targeting Module".into()
+            }
+            Ok(false) if mining_only => "No mining contacts".into(),
             Ok(false) => "NO SCANNER TARGETS".into(),
             Err(error) => error.to_string(),
         };

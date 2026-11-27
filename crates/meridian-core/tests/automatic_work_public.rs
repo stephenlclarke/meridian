@@ -350,6 +350,60 @@ fn verify_manual_override(mut world: World, mining_item: u64, pulse_item: u64) {
     assert!(world.fitted_mining_tool().is_none());
 }
 
+fn verify_mining_contact_cycle(mut world: World) {
+    let item = some(
+        some(world.modular_equipment_snapshot())
+            .items
+            .into_iter()
+            .find(|item| item.kind == ModuleKind::MiningTargeting),
+    );
+    let tick = world.snapshot().tick;
+    let store = ok(world.review_module(ModuleAction::Store { item: item.id }, tick));
+    ok(world.prepare_module(store, tick)).commit();
+    let mut stored = ok(World::from_save_bytes(&ok(world.save_bytes())));
+    launch_mining(&mut stored);
+    let tick = stored.snapshot().tick;
+    let size = [1280, 720];
+    assert!(ok(stored.cycle_scanner_target(tick, size)));
+    let before = stored.targeting_snapshot();
+    assert!(!ok(stored.cycle_mining_contact(tick, size)));
+    assert_eq!(stored.targeting_snapshot(), before);
+
+    let tick = world.snapshot().tick;
+    let fit = ok(world.review_module(
+        ModuleAction::Install {
+            item: item.id,
+            replacing: None,
+        },
+        tick,
+    ));
+    ok(world.prepare_module(fit, tick)).commit();
+    let mut restored = ok(World::from_save_bytes(&ok(world.save_bytes())));
+    assert!(
+        some(restored.modular_equipment_snapshot())
+            .items
+            .contains(&item)
+    );
+    launch_mining(&mut restored);
+    let expected: Vec<_> = restored
+        .scanner_targets()
+        .into_iter()
+        .map(|(id, _)| id)
+        .filter(|id| {
+            matches!(
+                id,
+                TargetIdentity::Work(WorkTargetId::Asteroid(_) | WorkTargetId::Ore(_))
+            )
+        })
+        .collect();
+    assert!(expected.len() > 1);
+    let tick = restored.snapshot().tick;
+    for id in expected.iter().chain(expected.first()) {
+        assert!(ok(restored.cycle_mining_contact(tick, size)));
+        assert_eq!(some(restored.targeting_snapshot()).identity, *id);
+    }
+}
+
 fn verify_manual_marks_actual_released_fragment(mut world: World) {
     let rock = launch_mining(&mut world);
     let parent = TargetIdentity::Work(WorkTargetId::Asteroid(rock.id));
@@ -364,6 +418,12 @@ fn verify_manual_marks_actual_released_fragment(mut world: World) {
         assert_eq!(assisted.identity, parent);
         assert_eq!(assisted.tracked_fragment, Some(ore.id));
         let fragment = TargetIdentity::Work(WorkTargetId::Ore(ore.id));
+        let mut cold = ok(World::from_save_bytes(&ok(world.save_bytes())));
+        let tick = cold.snapshot().tick;
+        assert!((0..cold.scanner_targets().len()).any(|_| {
+            ok(cold.cycle_mining_contact(tick, [1280, 720]))
+                && some(cold.targeting_snapshot()).identity == fragment
+        }));
         assert!(!ok(world.toggle_scanner_assistance()));
         assert!(world.manual_scanner_target());
         assert_eq!(some(world.targeting_snapshot()).identity, fragment);
@@ -466,6 +526,7 @@ fn earned_mining_select_once_delivers_one_real_ore_unit_and_retains_it_on_contin
     // Refusal and manual cancellation each start from the same paid fit.
     // The delivery journey gets its own first target selection.
     let docked_save = ok(world.save_bytes());
+    verify_mining_contact_cycle(ok(World::from_save_bytes(&docked_save)));
     refuse_missing_scoops(ok(World::from_save_bytes(&docked_save)));
     verify_manual_override(
         ok(World::from_save_bytes(&docked_save)),

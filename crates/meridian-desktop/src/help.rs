@@ -121,14 +121,14 @@ impl Panel {
                 "N Start or cancel auto-docking | 0 Front | 1 Rear | 2 Left | 3 Right view",
                 "T Lock selected ship for missiles | F1 Next missile target | F2 Arm / safe",
                 "F3 Launch missile | F4 Safe/clear target | K E.C.M. (22 energy)",
-                "J Jump | Shift+J Clue Journal | P Pause / resume",
+                "J Jump | Shift+J Clue Journal | Hold U 10 seconds: EMP (release to cancel)",
                 "F6 Flight lesson | F12 Cancel | C Lesson details | F7 Close run | F8 Reception",
                 "Tab Next scanner target (no core: mark) | F Manual/assist | Delete Release",
+                "Shift+M Next rock or ore (fitted targeting core + Mining Targeting Module)",
                 "Basic aligns | Advanced approaches | Docking+nav docks | Specialists auto-work",
                 "I Mission details | Shift+I Target details | Occupied: Enter/Escape",
-                "Hold U 10 seconds: EMP | Release U cancels unfinished charge",
                 "F10 Practice review at Avenor | 4 Trade review | 5 Plan | 6 Cancel | 7 Details",
-                "F5 Save | F9 Reload | F11 Fullscreen | Escape Save/Quit",
+                "P Pause / resume | F5 Save | F9 Reload | F11 Fullscreen | Escape Save/Quit",
             ],
         );
         panel.lines.insert(

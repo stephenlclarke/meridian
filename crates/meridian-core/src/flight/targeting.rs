@@ -315,6 +315,24 @@ impl World {
         expected_tick: u64,
         size: [u32; 2],
     ) -> Result<bool, StepError> {
+        self.cycle_scanner_contacts(expected_tick, size, TargetFilter::All)
+    }
+
+    /// Select a live rock or released ore fragment using the fitted mining computer.
+    pub fn cycle_mining_contact(
+        &mut self,
+        expected_tick: u64,
+        size: [u32; 2],
+    ) -> Result<bool, StepError> {
+        self.cycle_scanner_contacts(expected_tick, size, TargetFilter::Mining)
+    }
+
+    fn cycle_scanner_contacts(
+        &mut self,
+        expected_tick: u64,
+        size: [u32; 2],
+        filter: TargetFilter,
+    ) -> Result<bool, StepError> {
         if expected_tick != self.state.tick {
             return Err(StepError::StaleCommand);
         }
@@ -325,14 +343,28 @@ impl World {
             return Err(StepError::InvalidMode);
         }
         let origin = self.targeting_origin().ok_or(StepError::InvalidMode)?;
-        let ordered = self.scanner_targets();
+        if filter == TargetFilter::Mining && !self.work_targeting_fit().mining {
+            return Ok(false);
+        }
+        let mut ordered = self.scanner_targets();
+        let eligible = |id: &TargetIdentity| {
+            filter == TargetFilter::All
+                || matches!(
+                    id,
+                    TargetIdentity::Work(WorkTargetId::Asteroid(_) | WorkTargetId::Ore(_))
+                )
+        };
+        if filter == TargetFilter::Mining && !ordered.iter().any(|(id, _)| eligible(id)) {
+            return Ok(false);
+        }
         if self.targeting.origin != Some(origin) || !self.targeting.scanner {
             self.targeting.visited.clear();
         }
         let visited = &mut self.targeting.visited;
         visited.retain(|id| ordered.iter().any(|(other, _)| id == other));
-        if visited.len() == ordered.len() {
-            visited.clear();
+        ordered.retain(|(id, _)| eligible(id));
+        if ordered.iter().all(|(id, _)| visited.contains(id)) {
+            visited.retain(|id| !eligible(id));
         }
         let next = ordered
             .into_iter()
@@ -344,7 +376,7 @@ impl World {
         self.auto_docking = None;
         self.targeting.scanner = true;
         self.targeting.pilot_override = false;
-        self.targeting.filter = TargetFilter::All;
+        self.targeting.filter = filter;
         self.targeting.origin = Some(origin);
         self.targeting.selected = next;
         self.targeting.size = size;
