@@ -517,3 +517,53 @@ fn actual_npc_missile_motion_refuses_a_changed_scene_clock_before_restore() {
 }
 
 mod wreck;
+
+#[test]
+fn medusa_exchange_retains_peregrine_missile_impact_and_guides_on_live_npc_mesh() {
+    let mut world = impacted();
+    let hit = world.traffic.missile_hits()[0];
+    crate::flight::missiles::tests::issue_medusa_at_renas(&mut world);
+    world = cold(&world);
+    assert_eq!(world.traffic.missile_hits()[0], hit);
+    // Start a separate Medusa flight with fresh local traffic for the live guidance query.
+    let mut world = World::new_commander(12005).unwrap();
+    let issue = world
+        .review_xyzzy(crate::XyzzyAction::ActivateMedusa, 0)
+        .unwrap();
+    world.prepare_xyzzy(issue, 0).unwrap().commit();
+    launch(&mut world);
+    for _ in 0..700 {
+        world
+            .step(crate::FlightInput {
+                throttle: 1.0,
+                ..Default::default()
+            })
+            .unwrap();
+    }
+    let npc = trader(&world);
+    let origin =
+        crate::flight::flight_pose(world.snapshot().position, world.snapshot().orientation)
+            .unwrap()
+            .position;
+    let geometry = world.station_data.as_ref().unwrap();
+    let correct = geometry
+        .npc_geometry()
+        .player_missile_aimpoint(npc.pose, origin)
+        .unwrap();
+    assert_ne!(
+        geometry.player_missile_aimpoint(npc.pose, origin).unwrap(),
+        correct
+    );
+    assert_eq!(
+        world
+            .resolve_missile_guidance(
+                MissileTarget::Npc(npc.id),
+                origin,
+                &world.traffic,
+                world.practice
+            )
+            .unwrap(),
+        Some(correct)
+    );
+    cold(&world);
+}

@@ -45,6 +45,8 @@ impl State {
             return Ok(());
         };
         let clock = self.clocks[i];
+        let player_radius = data.player_clearance_radius();
+        let data = data.npc_geometry();
         let radius = data.player_clearance_radius();
         if clock >= 480
             && self.actors[i * 2].is_none()
@@ -55,8 +57,14 @@ impl State {
                 .map_err(|_| TrafficError::InvalidState)?;
             let start = crate::station::flight_pose(launch.position, launch.orientation)
                 .ok_or(TrafficError::InvalidState)?;
-            if self.spawn_clear(system, start.position, player_before, player_after, radius)
-                && celestial_clear(start.position, start.position, radius)
+            if self.spawn_clear(
+                system,
+                start.position,
+                player_before,
+                player_after,
+                radius,
+                player_radius,
+            ) && celestial_clear(start.position, start.position, radius)
             {
                 let (commodity, units) = manifest(self.seed, system);
                 let site = site(system).ok_or(TrafficError::InvalidState)?;
@@ -98,8 +106,14 @@ impl State {
         if clock >= 900 && pirate_present(self.seed, system) && self.actors[i * 2 + 1].is_none() {
             let position = Vec3::new(2400.0, 0.0, 10500.0);
             let native = pose(position, core::f64::consts::PI);
-            if self.spawn_clear(system, position, player_before, player_after, radius)
-                && data.motion_clear(native, native, 0.0)
+            if self.spawn_clear(
+                system,
+                position,
+                player_before,
+                player_after,
+                radius,
+                player_radius,
+            ) && data.motion_clear(native, native, 0.0)
                 && celestial_clear(position, position, radius)
             {
                 self.actors[i * 2 + 1] = Some(Actor {
@@ -135,8 +149,9 @@ impl State {
         player_before: Vec3,
         player_after: Vec3,
         radius: f64,
+        player_radius: f64,
     ) -> bool {
-        segment_distance(player_before, player_after, position) > radius * 2.0 + 64.0
+        segment_distance(player_before, player_after, position) > radius + player_radius + 64.0
             && self
                 .actors
                 .iter()

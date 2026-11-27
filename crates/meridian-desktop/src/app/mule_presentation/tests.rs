@@ -167,6 +167,7 @@ fn the_paid_freight_sortie_adds_mule_to_the_existing_camera_and_flight_mesh() {
             station,
             &ship,
             &traffic,
+            meridian_core::FlightView::Front,
             &mut ordinary,
         ));
         ok(mesh::traffic::append(
@@ -174,6 +175,7 @@ fn the_paid_freight_sortie_adds_mule_to_the_existing_camera_and_flight_mesh() {
             station,
             &ship,
             &traffic,
+            meridian_core::FlightView::Front,
             &mut with_mule,
         ));
     }

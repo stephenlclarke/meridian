@@ -315,16 +315,18 @@ pub fn append_pulse(
     snapshot: &Snapshot,
     station: StationRender<'_>,
     shot: &PulseShot,
+    facing: meridian_core::FlightView,
     output: &mut Vec<Vertex>,
 ) -> Result<(), String> {
     let camera = camera_for(snapshot, station)?;
-    append_segment(&camera, shot.origin, shot.end, output)
+    append_segment(&camera, shot.origin, shot.end, facing, output)
 }
 
 fn append_segment(
     camera: &Camera,
     origin: Vec3,
     endpoint: Vec3,
+    facing: meridian_core::FlightView,
     output: &mut Vec<Vertex>,
 ) -> Result<(), String> {
     let view = |world| {
@@ -343,11 +345,18 @@ fn append_segment(
     if length == 0.0 {
         return Ok(());
     }
+    use meridian_core::FlightView;
+    let (right, forward) = match facing {
+        FlightView::Front => (Vec3::new(1., 0., 0.), Vec3::new(0., 0., 1.)),
+        FlightView::Rear => (Vec3::new(-1., 0., 0.), Vec3::new(0., 0., -1.)),
+        FlightView::Left => (Vec3::new(0., 0., 1.), Vec3::new(-1., 0., 0.)),
+        FlightView::Right => (Vec3::new(0., 0., -1.), Vec3::new(1., 0., 0.)),
+    };
     let vertex = |center: Vec3, x: f64, y: f64| Vertex {
         position: [
-            (center.x + x) as f32,
+            (center.x + x * right.x) as f32,
             (center.y + y) as f32,
-            center.z as f32,
+            (center.z + x * right.z) as f32,
         ],
         color: [1.0, 0.24, 0.09],
     };
@@ -362,8 +371,13 @@ fn append_segment(
     let mut along = (12.0 / length).min(0.5);
     // Match the flight projection's near plane for a short visible segment.
     let near = 1.0;
-    if start.z + along * extent.z <= near && start.z <= near && end.z > near {
-        let visible_start = (near - start.z) / extent.z;
+    let start_depth = start.dot(forward);
+    let end_depth = end.dot(forward);
+    if start_depth + along * (end_depth - start_depth) <= near
+        && start_depth <= near
+        && end_depth > near
+    {
+        let visible_start = (near - start_depth) / (end_depth - start_depth);
         along = (1.0 + visible_start) * 0.5;
     }
     let center = Vec3::new(
@@ -769,8 +783,14 @@ mod tests {
                 contact,
             };
             let mut output = Vec::with_capacity(PULSE_VERTEX_COUNT);
-            append_pulse(&snapshot, station, &shot, &mut output)
-                .unwrap_or_else(|error| panic!("{error}"));
+            append_pulse(
+                &snapshot,
+                station,
+                &shot,
+                meridian_core::FlightView::Front,
+                &mut output,
+            )
+            .unwrap_or_else(|error| panic!("{error}"));
             // Match flight.wgsl's perspective division at aspect 1.
             let has_visible_triangle = output.as_chunks::<3>().0.iter().any(|vertices| {
                 let [a, b, c] = vertices.map(|vertex| vertex.position);
@@ -790,6 +810,43 @@ mod tests {
         }
     }
 
+    #[test]
+    fn sh171_lasers_flash_has_projected_area_in_every_facing_at_the_near_plane() {
+        use meridian_core::FlightView;
+        let camera = Camera {
+            pose: RigidPose {
+                position: Vec3::new(0., 0., 0.),
+                orientation: meridian_core::docking::Basis3::IDENTITY,
+            },
+            draw_ship: false,
+        };
+        for (facing, endpoint) in [
+            (FlightView::Front, Vec3::new(0., 0., 1.25)),
+            (FlightView::Rear, Vec3::new(0., 0., -1.25)),
+            (FlightView::Left, Vec3::new(-1.25, 0., 0.)),
+            (FlightView::Right, Vec3::new(1.25, 0., 0.)),
+        ] {
+            let mut vertices = Vec::new();
+            append_segment(
+                &camera,
+                camera.pose.position,
+                endpoint,
+                facing,
+                &mut vertices,
+            )
+            .unwrap_or_else(|e| panic!("{e}"));
+            apply_flight_view(facing, &mut vertices);
+            let flash = &vertices[6..9];
+            assert!(
+                flash
+                    .iter()
+                    .all(|v| v.position[2] > 1. && v.position[2] < 1.25)
+            );
+            let [a, b, c] = [flash[0], flash[1], flash[2]]
+                .map(|v| [v.position[0] / v.position[2], v.position[1] / v.position[2]]);
+            assert!(((b[0] - a[0]) * (c[1] - a[1]) - (b[1] - a[1]) * (c[0] - a[0])).abs() > 0.001);
+        }
+    }
     #[test]
     fn close_station_view_uses_pilot_pose_and_has_no_fixture_rings() {
         let mut snapshot = meridian_core::World::new().snapshot();

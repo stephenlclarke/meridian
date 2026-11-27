@@ -173,6 +173,9 @@ impl Profile {
         Ok(publication_message(
             published,
             match action {
+                meridian_core::XyzzyAction::ActivateMedusa => {
+                    "SH171 Medusa test outfit fitted and saved."
+                }
                 meridian_core::XyzzyAction::Enter => {
                     "CLARKE active. Maximum outfit fitted and saved."
                 }

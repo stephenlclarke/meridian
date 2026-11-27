@@ -120,7 +120,7 @@ impl RecoveryPose {
             tick,
             ..world.state
         };
-        super::super::persistence::validate_flight(&sample).ok()?;
+        super::super::persistence::validate_flight(world, &sample).ok()?;
         Some(sample)
     }
 
@@ -173,8 +173,9 @@ fn direct_feed_admissible(
     manifest: WreckManifest,
     retained: RecoveryPose,
     tick: u64,
+    visit: u64,
 ) -> bool {
-    let Some(station) = world.station_data.as_ref() else {
+    let Some(station) = world.station_at_visit(visit) else {
         return false;
     };
     let Some(sample) = retained.snapshot(world, tick) else {
@@ -196,8 +197,8 @@ fn direct_feed_admissible(
         source.z - player.position.z,
     );
     let range = to_source.dot(to_source).sqrt();
-    let radius = station.player_clearance_radius();
-    let standoff = 2.0 * radius + 2.0;
+    let radius = station.npc_geometry().player_clearance_radius();
+    let standoff = station.wreck_work_standoff();
     if !(standoff - 0.5..=standoff + 0.5).contains(&range)
         || to_source.dot(player.orientation.z) < range * 0.999
     {
@@ -214,7 +215,7 @@ fn direct_feed_admissible(
         to_source.y * factor,
         to_source.z * factor,
     );
-    let aperture = player.orientation.apply(Vec3::new(0.0, -45.0, 55.0));
+    let aperture = player.orientation.apply(super::work::SCOOP_APERTURE);
     let out_of_source = Vec3::new(
         near_face.x - to_source.x,
         near_face.y - to_source.y,
@@ -552,7 +553,7 @@ impl super::State {
                         .saturating_sub(world.combat.physical_tick())
                 || r.visit > world.combat_identity().ok_or(INVALID)?.visit
                 || world.jump_journal.system_at_visit(r.visit, r.tick)? != r.source.system()
-                || !direct_feed_admissible(world, manifest, r.pose, r.tick)
+                || !direct_feed_admissible(world, manifest, r.pose, r.tick, r.visit)
                 || (r.tick == world.state.tick
                     && r.physical == world.combat.physical_tick()
                     && r.pose != RecoveryPose::capture(world.state))
@@ -656,7 +657,9 @@ impl World {
             .find(|item| item.kind == ModuleKind::SalvageCutter && item.slot.is_none())
             .copied()
             .ok_or(ModuleError::MissingItem)?;
-        let definition = crate::equipment::definition().map_err(|_| ModuleError::Capacity)?;
+        let definition = account
+            .equipment_definition()
+            .map_err(|_| ModuleError::Capacity)?;
         let (units, mounts) = ledger.budget_usage(account, self.emp.utility_mounts())?;
         if units >= definition.equipment_units_capacity
             || mounts > definition.utility_mounts_capacity
@@ -867,8 +870,11 @@ impl World {
         let Ok(manifest) = self.wreck_manifest(id) else {
             return "Claim unavailable";
         };
+        let Some(identity) = self.combat_identity() else {
+            return "Salvage unavailable";
+        };
         let pose = RecoveryPose::capture(self.state);
-        if !direct_feed_admissible(self, manifest, pose, self.state.tick) {
+        if !direct_feed_admissible(self, manifest, pose, self.state.tick, identity.visit) {
             return "Hold for recovery";
         }
         let tick = self.state.tick;
@@ -883,9 +889,6 @@ impl World {
             return "Salvage unavailable";
         };
         let Some(session) = self.freight_session.as_ref() else {
-            return "Salvage unavailable";
-        };
-        let Some(identity) = self.combat_identity() else {
             return "Salvage unavailable";
         };
         let Ok(cabins) = self.cabin_tonnes() else {

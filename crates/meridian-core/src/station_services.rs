@@ -514,6 +514,8 @@ fn validate_account(account: AccountProjection) -> Result<(), Error> {
         || ![
             crate::equipment::STANDARD_HOLD_TONNES,
             crate::equipment::EXPANDED_HOLD_TONNES,
+            crate::equipment::MEDUSA_HOLD_TONNES,
+            crate::equipment::MEDUSA_EXPANDED_HOLD_TONNES,
         ]
         .contains(&account.hold_capacity_tonnes)
         || !valid_native_quantities(account.other_commodities, account.reserved_commodities)

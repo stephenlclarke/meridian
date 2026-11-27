@@ -55,6 +55,23 @@ Authored new tests: source offers, cash/technology refusal, earned Intermediate 
 
 Basic fuel remains ordinary paid station service. Additional research recipes, physical salvage features, custom component tuning, passenger service, ordinary earned items and quest issue policies require their own source-to-runtime closure. The [existing XYZZY action inventory](XYZZY-ACTIONS.json) tracks non-equipment menu actions separately.
 
+## Fleet XYZZY Medusa
+
+In the ordinary Fleet game, open **Ctrl+Shift+X** at a berth. Review and confirm **Activate / refit SH171 Medusa**. The normal commander slot records the first test issue, uses the SH171 mesh and collision supports, and applies its flight controls. The 50.3 top speed and 18.0 acceleration come from the stock hull. **Continue** restores the issued hull and equipment. A pre-existing XYZZY commander keeps their cash, paid receipts and stored items. A first-time activation uses the existing once-only cash grant.
+
+| System | Issued configuration |
+| --- | --- |
+| Hull and cargo | 22 t stock hold and 10 t expansion. The issue checks actual cargo and outstanding reservations against the 32 t hold. |
+| Reactor and shields | 410 energy, Elite Energy Unit, Elite shields. The 4.7 energy/s base becomes 18.8/s with Elite fitted. The 300-unit base banks use the existing Elite shield multiplier. |
+| Flight computers | Advanced navigation and hyperspace drive, Military targeting, Mining and Salvage Targeting Modules. |
+| Tools and utilities | Naval Lasers on all four facings, an interchangeable front Mining Laser, Fuel Scoops, maximum-grade EMP and stock E.C.M. The Salvage Cutter uses the existing tool exchange when the mounts are occupied. |
+| Ammunition and fuel | Five loaded standard missiles. A former nine-pylon commander retains surplus rounds in storage under their original identities. The refit stores fitted auxiliary tanks and the cutter under their existing item IDs. It fills the 13.0 LY base tank. If more than 13.0 LY is aboard, the menu shows how much fuel to use before returning. |
+| Ownership | Paid items keep their receipts. New items and the hull use XYZZY provenance. The quest and PLUGH purchase have separate acquisition paths. |
+
+For wreck recovery, the targeting computer stops with the wreck’s near face inside the 85 m scoop reach and ahead of the lower-forward aperture. Manual recovery uses the same distance and requires a settled ship. Continue checks the transfer against the hull flown at the time.
+
+The frozen [SH171 flagship contract](../integration/sh171-medusa/MEDUSA-FLAGSHIP.json) records four laser facings, four utility mounts and 13 stock equipment units. Select front, rear, port or starboard with 0–3. All four draw from the same energy pool and share heat and cooldown. Survey gear, rescue and salvage beams, Alien Seeker ammunition and the source-specific alien attachment do not have ordinary Fleet equipment implementations here. The proposed 32 equipment units and candidate performance figures have no adopted fitting contract.
+
 ## SH171 Medusa compatibility
 
 The original human clarification distinguishes the four explicit configurations. The mission instance is limited and beatable; the paid PLUGH showroom ship is stock and gets no free maximum fit; a legally fully upgraded player Medusa must be the most powerful ship under matched-condition and matched-attachment comparison. Do not copy the player maximum into the mission actor or replace the actual quest salvage/receiving requirement with a purchase. The source's exact limited equipment nodes and comparative power result are not yet established.

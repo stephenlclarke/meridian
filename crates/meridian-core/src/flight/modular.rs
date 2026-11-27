@@ -661,7 +661,9 @@ impl Ledger {
         emp_mounts: u16,
         allowance: u16,
     ) -> Result<(), ModuleError> {
-        let definition = crate::equipment::definition().map_err(|_| ModuleError::BerthRequired)?;
+        let definition = account
+            .equipment_definition()
+            .map_err(|_| ModuleError::BerthRequired)?;
         let (units, mounts) = self.budget_usage(account, emp_mounts)?;
         if units.saturating_sub(allowance) > definition.equipment_units_capacity
             || mounts.saturating_sub(allowance) > definition.utility_mounts_capacity
@@ -1159,8 +1161,9 @@ impl State {
         let mut grants = 0_u32;
         let mut previous: Option<Event> = None;
         let mut previous_exchange: Option<(u64, u64, u64)> = None;
-        let budget = crate::equipment::definition().map_err(|_| INVALID)?;
+        let stock = crate::equipment::definition().map_err(|_| INVALID)?;
         for e in &self.events {
+            let budget = stock.for_player(world.xyzzy.medusa_at(e.revision));
             super::ammunition::validate_berth_event(
                 world,
                 account,
@@ -1312,7 +1315,6 @@ impl State {
                     }
                     ledger.mark_test_tanks();
                 } else {
-                    let budget = crate::equipment::definition().map_err(|_| INVALID)?;
                     if u16::from(tanks)
                         + u16::from(ledger.fitted(ModuleSlot::UtilityFuelScoops).is_some())
                         + u16::from(ledger.fitted(ModuleSlot::UtilitySalvageCutter).is_some())
@@ -1484,12 +1486,13 @@ impl State {
     pub(super) fn validate_utility_test_record(
         &self,
         owner: u64,
-        start: u64,
-        end: u64,
+        revisions: (u64, u64),
+        medusa: bool,
         account: &CommanderAccount,
         emp: &super::emp::State,
         kind: ModuleKind,
     ) -> Result<(), SaveError> {
+        let (start, end) = revisions;
         let fit_at = |revision| -> Result<Ledger, SaveError> {
             let mut ledger = Ledger::born(owner)?;
             let mut counters = [0; 2];
@@ -1521,7 +1524,9 @@ impl State {
             .iter()
             .find(|event| event.revision == end)
             .ok_or(INVALID)?;
-        let budget = crate::equipment::definition().map_err(|_| INVALID)?;
+        let budget = crate::equipment::definition()
+            .map_err(|_| INVALID)?
+            .for_player(medusa);
         let cargo = self.known_cargo_mounts_at(account, end);
         let mounts = u16::from(after_ledger.fuel_storage_count())
             + u16::from(after_ledger.fitted(ModuleSlot::UtilityFuelScoops).is_some())
@@ -1775,7 +1780,7 @@ impl World {
             .iter()
             .find(|o| o.kind == ModuleKind::MiningLaser)
             .copied();
-        let definition = crate::equipment::definition().ok()?;
+        let definition = account.equipment_definition().ok()?;
         Some(ModularEquipmentSnapshot {
             equipment_units_used: ledger.fitted_units() + account.equipment_state().units_used(),
             equipment_units_capacity: definition.equipment_units_capacity,
@@ -2520,7 +2525,7 @@ impl World {
             .find(|item| item.kind == kind && (!tank || item.slot.is_none()))
             .copied();
         let cutter_stored = if kind == ModuleKind::SalvageCutter {
-            let definition = crate::equipment::definition().map_err(|_| INVALID)?;
+            let definition = current.equipment_definition().map_err(|_| INVALID)?;
             let (units, mounts) = ledger
                 .budget_usage(current, self.emp.utility_mounts())
                 .map_err(|_| INVALID)?;

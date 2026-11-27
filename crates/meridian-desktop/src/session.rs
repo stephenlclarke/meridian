@@ -687,11 +687,12 @@ impl Session {
         }
         if snapshot.mode == FlightMode::Flight
             && snapshot.navigation.is_some_and(|nav| nav.travel.is_none())
-            && let Some(laser) = world.front_laser_snapshot()
+            && let Some(laser) = world.selected_laser_snapshot()
             && let Some(resources) = world.flight_resources_snapshot()
         {
             lines.push(format!(
-                "Z FIRE FRONT {} | ENERGY {}.{:02} | HEAT {}.{} | COOLDOWN {} TICKS",
+                "Z FIRE {} {} | ENERGY {}.{:02} | HEAT {}.{} | COOLDOWN {} TICKS",
+                crate::flight_lesson::view_name(world.selected_laser_view()),
                 laser.weapon.label(),
                 resources.energy_hundredths / 100,
                 resources.energy_hundredths % 100,

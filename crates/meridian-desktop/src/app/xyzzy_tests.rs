@@ -28,7 +28,11 @@ fn activate(app: &mut App) {
     menu(app);
     assert_eq!(press(app, KeyCode::Enter), None);
     assert_eq!(press(app, KeyCode::Enter), None);
-    assert!(app.xyzzy.as_ref().is_some_and(|menu| !menu.reviewing));
+    assert!(
+        app.xyzzy.as_ref().is_some_and(|menu| !menu.reviewing),
+        "XYZZY result: {:?}",
+        app.notice.text
+    );
     press(app, KeyCode::Escape);
     assert_eq!(app.game.world.commander_name(), Some("CLARKE"));
 }
@@ -47,7 +51,11 @@ fn secret_menu_requires_explicit_chord_and_confirmation_and_cancel_never_grants(
     assert!(app.xyzzy.as_ref().is_some_and(|menu| menu.reviewing));
     assert_eq!(ok(app.game.world.save_bytes()), before);
     press(&mut app, KeyCode::Escape);
-    assert!(app.xyzzy.as_ref().is_some_and(|menu| !menu.reviewing));
+    assert!(
+        app.xyzzy.as_ref().is_some_and(|menu| !menu.reviewing),
+        "XYZZY result: {:?}",
+        app.notice.text
+    );
     press(&mut app, KeyCode::KeyB);
     assert!(app.xyzzy.is_none());
     assert_eq!(ok(app.game.world.save_bytes()), before);
@@ -97,7 +105,19 @@ fn actual_secret_menu_publishes_clarke_real_outfit_and_visible_provenance_then_c
             .iter()
             .filter(|item| item.pylon.is_some() && !item.consumed)
             .count(),
-        9
+        5
+    );
+    assert_eq!(ammo.capacity, 5);
+    assert_eq!(
+        world.player_hull_kind(),
+        meridian_core::PlayerHullKind::Medusa
+    );
+    assert_eq!(
+        world
+            .equipment_snapshot()
+            .unwrap_or_else(|| panic!("fit"))
+            .hold_capacity_tonnes,
+        32
     );
     assert!(ammo.purchases.is_empty());
     assert!(app.game.lines(true, None).is_empty());
@@ -121,6 +141,14 @@ fn actual_secret_menu_publishes_clarke_real_outfit_and_visible_provenance_then_c
     }
     let bytes = ok(fs::read(directory.0.join("commander.meridian")));
     let cold_world = ok(World::from_save_bytes(&bytes));
+    assert_eq!(
+        cold_world.player_hull_kind(),
+        meridian_core::PlayerHullKind::Medusa
+    );
+    assert_eq!(
+        cold_world.xyzzy_medusa_issue(),
+        app.game.world.xyzzy_medusa_issue()
+    );
     assert_eq!(cold_world.commander_name(), Some("CLARKE"));
     assert_eq!(
         cold_world.modular_equipment_snapshot(),
@@ -516,7 +544,11 @@ fn activate_refit_and_toggle_fuel_without_leaving_the_menu() {
     menu(&mut app);
     press(&mut app, KeyCode::Enter);
     press(&mut app, KeyCode::Enter);
-    assert!(app.xyzzy.as_ref().is_some_and(|menu| !menu.reviewing));
+    assert!(
+        app.xyzzy.as_ref().is_some_and(|menu| !menu.reviewing),
+        "XYZZY result: {:?}",
+        app.notice.text
+    );
     let items = app.game.world.ammunition_snapshot();
     let modules = app.game.world.modular_equipment_snapshot();
     for steps in [1, 1, 7] {
@@ -529,7 +561,11 @@ fn activate_refit_and_toggle_fuel_without_leaving_the_menu() {
         assert_eq!(app.game.world.ammunition_snapshot(), items);
         assert_eq!(app.game.world.modular_equipment_snapshot(), modules);
     }
-    assert!(app.xyzzy.as_ref().is_some_and(|menu| !menu.reviewing));
+    assert!(
+        app.xyzzy.as_ref().is_some_and(|menu| !menu.reviewing),
+        "XYZZY result: {:?}",
+        app.notice.text
+    );
     // Wrap through the testing rows to the fuel action.
     for _ in 0..6 {
         press(&mut app, KeyCode::ArrowUp);
@@ -688,7 +724,11 @@ fn testing_menu_h_help_wins_over_hidden_galaxy_and_showroom_search_without_losin
         assert!(app.help.is_none());
         assert!(app.xyzzy.as_ref().is_some_and(|menu| menu.reviewing));
         press(&mut app, KeyCode::Escape);
-        assert!(app.xyzzy.as_ref().is_some_and(|menu| !menu.reviewing));
+        assert!(
+            app.xyzzy.as_ref().is_some_and(|menu| !menu.reviewing),
+            "XYZZY result: {:?}",
+            app.notice.text
+        );
         press(&mut app, KeyCode::Escape);
         assert!(app.xyzzy.is_none());
         assert!(app.docked.as_ref().is_some_and(Docked::search_active));
@@ -701,4 +741,98 @@ fn testing_menu_h_help_wins_over_hidden_galaxy_and_showroom_search_without_losin
         assert_eq!(ok(app.game.world.save_bytes()), world);
         assert!(!directory.0.join("commander.meridian").exists());
     }
+}
+
+#[test]
+fn fleet_menu_issues_medusa_to_historical_paid_emp_commander_and_cold_continues() {
+    let directory = TestDirectory::new();
+    let path = directory.0.join("commander.meridian");
+    let legacy = include_bytes!("../../../meridian-core/tests/fixtures/xyzzy-paid-base-v17.bin");
+    ok(fs::write(&path, legacy));
+    let mut profile = open(&directory.0);
+    ok(profile.continue_saved());
+    let old = profile
+        .world
+        .owned_emp()
+        .unwrap_or_else(|| panic!("historical paid EMP"));
+    let cash = profile.world.credits_tenths();
+    let commander = profile.world.commander_id();
+    assert!(profile.world.xyzzy_medusa_issue().is_none());
+    let mut app = App::with_profile(profile);
+    activate(&mut app);
+    let issued = app
+        .game
+        .world
+        .xyzzy_medusa_issue()
+        .unwrap_or_else(|| panic!("Medusa issue"));
+    drop(app);
+    let mut reopened = open(&directory.0);
+    ok(reopened.continue_saved());
+    let world = &reopened.world;
+    assert_eq!(
+        world.player_hull_kind(),
+        meridian_core::PlayerHullKind::Medusa
+    );
+    assert_eq!(world.xyzzy_medusa_issue(), Some(issued));
+    assert_eq!(world.commander_id(), commander);
+    assert_eq!(world.credits_tenths(), cash);
+    let emp = world
+        .owned_emp()
+        .unwrap_or_else(|| panic!("retained paid EMP"));
+    assert_eq!(
+        (emp.item, emp.provenance, emp.paid_tenths),
+        (old.item, old.provenance, old.paid_tenths)
+    );
+    assert_eq!(
+        (emp.grades.power, emp.grades.capacity, emp.grades.recharge),
+        (3, 3, 3)
+    );
+}
+
+#[test]
+fn sh171_lasers_held_fire_uses_the_ordinary_fleet_view_and_restores_the_mount() {
+    let directory = TestDirectory::new();
+    let mut app = app(&directory);
+    activate(&mut app);
+    ok(app.game.command(Action::Launch));
+    ok(app.game.world.step(FlightInput::default()));
+    let mut ids = std::collections::BTreeSet::new();
+    for view in [
+        meridian_core::FlightView::Rear,
+        meridian_core::FlightView::Left,
+        meridian_core::FlightView::Right,
+        meridian_core::FlightView::Front,
+    ] {
+        ok(app.game.command(Action::SetFlightView(view)));
+        let fit = app
+            .game
+            .world
+            .selected_laser_snapshot()
+            .unwrap_or_else(|| panic!("missing mount"));
+        let mut shot = None;
+        let mut fired = 0;
+        ok(super::step_frame(
+            &mut app.game.world,
+            FlightInput::default(),
+            1,
+            true,
+            &mut shot,
+            &mut None,
+            || fired += 1,
+        ));
+        assert_eq!(fired, 1);
+        assert_eq!(shot.map(|s| s.fitted_item_id), Some(fit.fitted_item_id));
+        assert!(ids.insert(fit.fitted_item_id));
+        ok(app.game.save());
+        drop(app);
+        let mut reopened = open(&directory.0);
+        ok(reopened.continue_saved());
+        assert_eq!(reopened.world.flight_view(), view);
+        assert_eq!(reopened.world.selected_laser_snapshot(), Some(fit));
+        app = App::with_profile(reopened);
+        for _ in 0..fit.cooldown_ticks_per_shot {
+            ok(app.game.world.step(FlightInput::default()));
+        }
+    }
+    assert_eq!(ids.len(), 4);
 }
