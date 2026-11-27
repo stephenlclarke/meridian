@@ -580,6 +580,7 @@ fn replay(events: &[ResourceEvent], end: u64) -> Result<Pools, SaveError> {
     for &(at, phase, _, effect) in events {
         advance_with_rate(
             &mut pools,
+            clock,
             at.checked_sub(clock).ok_or(INVALID)?,
             recharge,
             capacity,
@@ -637,16 +638,17 @@ fn replay(events: &[ResourceEvent], end: u64) -> Result<Pools, SaveError> {
     }
     advance_with_rate(
         &mut pools,
+        clock,
         end.checked_sub(clock).ok_or(INVALID)?,
         recharge,
         capacity,
     );
     Ok(pools)
 }
-fn advance_with_rate(pools: &mut Pools, elapsed: u64, recharge: u16, capacity: u16) {
+fn advance_with_rate(pools: &mut Pools, start: u64, elapsed: u64, recharge: u16, capacity: u16) {
     pools
         .pulse
-        .replay_advance_with_rate(elapsed, recharge, capacity);
+        .replay_advance_with_rate(start, elapsed, recharge, capacity);
     pools.shields.advance(elapsed);
 }
 
@@ -657,6 +659,7 @@ mod tests;
 fn advance(pools: &mut Pools, elapsed: u64) {
     advance_with_rate(
         pools,
+        0,
         elapsed,
         7,
         super::weapons::ENERGY_CAPACITY_HUNDREDTHS,

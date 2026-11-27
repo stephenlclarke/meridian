@@ -126,14 +126,32 @@ impl Default for PulseResources {
         }
     }
 }
+/// Recharge in whole hundredths between two physics ticks. Keep the fractional
+/// part across ticks so the Medusa's original 4.7 energy/s is exact over a second.
+fn recovered_energy(start: u64, elapsed: u64, peregrine_rate: u16, capacity: u16) -> u64 {
+    if capacity != MEDUSA_ENERGY {
+        return elapsed.saturating_mul(u64::from(peregrine_rate));
+    }
+    let per_second = u128::from(peregrine_rate / ENERGY_RECHARGE_HUNDREDTHS) * 470;
+    let phase = u128::from(start % 60);
+    let amount = ((phase + u128::from(elapsed)) * per_second) / 60 - phase * per_second / 60;
+    u64::try_from(amount).unwrap_or(u64::MAX)
+}
+
 impl PulseResources {
     #[cfg(test)]
     pub(super) fn replay_advance(&mut self, elapsed: u64) {
-        self.replay_advance_with_rate(elapsed, 7, ENERGY_CAPACITY_HUNDREDTHS);
+        self.replay_advance_with_rate(0, elapsed, 7, ENERGY_CAPACITY_HUNDREDTHS);
     }
-    pub(super) fn replay_advance_with_rate(&mut self, elapsed: u64, recharge: u16, capacity: u16) {
+    pub(super) fn replay_advance_with_rate(
+        &mut self,
+        start: u64,
+        elapsed: u64,
+        recharge: u16,
+        capacity: u16,
+    ) {
         self.energy = u64::from(self.energy)
-            .saturating_add(elapsed.saturating_mul(u64::from(recharge)))
+            .saturating_add(recovered_energy(start, elapsed, recharge, capacity))
             .min(u64::from(capacity)) as u16;
         self.heat = u64::from(self.heat).saturating_sub(elapsed) as u16;
         self.cooldown = u64::from(self.cooldown).saturating_sub(elapsed) as u8;
@@ -461,6 +479,14 @@ impl World {
             .map(|(item, _)| item)
     }
 
+    pub(super) fn step_energy_recharge(&self, nominal: u16) -> u16 {
+        recovered_energy(
+            self.combat.physical_tick(),
+            1,
+            nominal,
+            self.energy_capacity(),
+        ) as u16
+    }
     pub(super) fn energy_capacity(&self) -> u16 {
         if self.xyzzy_medusa_active() {
             MEDUSA_ENERGY
@@ -470,9 +496,10 @@ impl World {
     }
     pub fn flight_resources_snapshot(&self) -> Option<FlightResourcesSnapshot> {
         self.commander_account.as_ref()?;
+        let nominal = self.energy_recharge_hundredths();
         Some(FlightResourcesSnapshot {
             energy_capacity_hundredths: self.energy_capacity(),
-            energy_recharge_hundredths_per_tick: self.energy_recharge_hundredths(),
+            energy_recharge_hundredths_per_tick: self.step_energy_recharge(nominal),
             energy_hundredths: self.pulse.energy,
             heat_fifths: self.pulse.heat,
             cooldown_ticks: self.pulse.cooldown,
