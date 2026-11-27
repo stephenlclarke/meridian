@@ -453,7 +453,7 @@ fn nonfinite_body_or_retained_segment_rolls_back_the_entire_traffic_append() {
     invalid.last_beam = None;
     invalid.actors[1].pose.position.x = f64::NAN;
     let mut output = vec![sentinel];
-    assert!(append(snapshot, station, &ship, &invalid, &mut output).is_err());
+    assert!(append(snapshot, station, &ship, &invalid, Front, &mut output).is_err());
     same(&output, &[sentinel]);
     let (_, mut invalid) = beam_fixture();
     invalid
@@ -462,7 +462,7 @@ fn nonfinite_body_or_retained_segment_rolls_back_the_entire_traffic_append() {
         .unwrap_or_else(|| panic!("beam"))
         .point
         .z = f64::INFINITY;
-    assert!(append(snapshot, station, &ship, &invalid, &mut output).is_err());
+    assert!(append(snapshot, station, &ship, &invalid, Front, &mut output).is_err());
     same(&output, &[sentinel]);
 }
 
@@ -485,7 +485,7 @@ fn capacity_is_bounded_by_real_hull_size_and_refuses_excess_descriptive_bodies()
         world.station_port().unwrap_or_else(|| panic!("port")),
     );
     let mut output = Vec::new();
-    assert!(append(snapshot, station, &ship, &invalid, &mut output).is_err());
+    assert!(append(snapshot, station, &ship, &invalid, Front, &mut output).is_err());
     assert!(output.is_empty());
     // Actual station asset is unchanged; NPC rendering does not replace it with a fixture.
     assert!(!ok(load_station()).is_empty());
