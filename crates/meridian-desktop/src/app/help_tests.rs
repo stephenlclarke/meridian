@@ -376,10 +376,10 @@ fn training_shortcuts_open_the_same_review_from_commander_and_station() {
         for from_commander in [true, false] {
             let dir = TestDirectory::new();
             let mut app = app(&dir);
+            station(&mut app, ui::Screen::System);
             if from_commander {
-                app.commander_open = true;
-            } else {
-                station(&mut app, ui::Screen::System);
+                app.show_station_commander();
+                assert!(app.commander_open);
             }
             app.modifiers = ModifiersState::SHIFT;
             assert_eq!(press(&mut app, digit, None), None);

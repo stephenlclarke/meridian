@@ -1214,8 +1214,10 @@ impl App {
         {
             return true;
         }
-        if self.menu_active()
-            && let Some(menu) = &mut self.docked
+        if let Some(menu) = self
+            .docked
+            .as_mut()
+            .filter(|menu| menu.active(&self.game.world))
         {
             if menu.review_pending() {
                 menu.feedback("Confirm or cancel the current station review first".into());
