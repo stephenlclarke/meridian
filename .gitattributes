@@ -643,3 +643,10 @@ integration/sh072-griffon-mk-ii/CANDIDATE-FIT-SUPPORT-FANS.json text eol=lf
 integration/sh073-griffon-spectre/CANDIDATE-FIT-SUPPORT-FANS.json text eol=lf
 integration/sh072-griffon-mk-ii/ARCHIVE-FIT-SUPPORT-FANS.json text eol=lf
 integration/sh073-griffon-spectre/ARCHIVE-FIT-SUPPORT-FANS.json text eol=lf
+
+# The Harrier source and probe calculations use pinned LF bytes.
+tools/measure_harrier.py text eol=lf
+tools/measure_harrier_air.py text eol=lf
+tools/prepare_harrier_geometry.py text eol=lf
+tools/prepare_harrier_studio.py text eol=lf
+tools/verify_harrier_geometry.py text eol=lf

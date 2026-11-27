@@ -98,6 +98,18 @@ points per group, counting both meshes, and 256 clearance routes. Rounding
 must be positive and at most 20 mm. The gap measured at concave surfaces can
 exceed that rounding distance wherever a convex group bridges a recess.
 
+## Harrier stock inspection
+
+Search for **Harrier** or **SH026** in the Showroom and select its blueprint
+fabrication row. Its stock model uses the original 8,884 detailed faces and
+512 bare native faces. The earlier 2,852-face export includes preview hardware.
+The source archive retains that export for comparison.
+
+The Studio definition preserves the orange-and-black palette, the three
+original maps and 180 rounded collision groups. Its four clearance probes
+run through the pod channels and the empty rails. The 25,545 kg dry mass
+appears only in the legacy profile.
+
 ## Archived mesh inspection
 
 Schema 2 accepts archived low-detail artwork for local inspection. Each mesh

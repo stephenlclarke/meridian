@@ -545,6 +545,46 @@ fn model_previews_require_real_asset_handles_and_share_the_same_orientation() {
     assert!(ui.frame(&ctx, view()).models.is_empty());
 }
 #[test]
+fn harrier_showroom_search_requires_its_registered_stock_geometry() {
+    let catalogue = catalogue();
+    let world = world();
+    let mut ctx = context(&world, &catalogue);
+    let policy = catalogue
+        .object("SH026")
+        .map(|row| (row.name, row.purchase_policy));
+    assert_eq!(policy, Some(("Harrier", "blueprintFabrication")));
+    let stock = &crate::authored_hull::STOCK_MODELS[..];
+    let without_harrier: Vec<_> = stock
+        .iter()
+        .copied()
+        .filter(|asset| asset.object != "SH026")
+        .collect();
+    for query in ["Harrier", "SH026"] {
+        let mut ui = DockedScreens::new(SystemId::AVENOR, "SH025");
+        ui.open(Screen::Showroom);
+        ctx.models = &without_harrier;
+        key(&mut ui, &ctx, Key::Search);
+        let frame = ui.frame(&ctx, view());
+        ui.handle(Input::Text(query.into()), &frame, &ctx);
+        assert_eq!(ui.selected_ship(), "SH026");
+        assert!(
+            !ui.frame(&ctx, view())
+                .models
+                .iter()
+                .any(|m| m.object == "SH026")
+        );
+        ctx.models = stock;
+        assert!(
+            ui.frame(&ctx, view())
+                .models
+                .iter()
+                .any(|m| m.object == "SH026"
+                    && m.geometry_key == "integration/sh026-harrier/HARRIER-STUDIO.json")
+        );
+    }
+}
+
+#[test]
 fn unsupported_exchange_cannot_be_inferred_from_catalogue_flyable_status() {
     let c = catalogue();
     let w = world();

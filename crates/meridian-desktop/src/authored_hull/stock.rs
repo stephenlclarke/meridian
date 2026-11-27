@@ -49,6 +49,16 @@ macro_rules! stock_package {
 const DESCRIPTORS: &[StockDescriptor] = &[
     StockDescriptor {
         model: AvailableModel {
+            object: "SH026",
+            geometry_key: "integration/sh026-harrier/HARRIER-STUDIO.json",
+        },
+        name: "Harrier",
+        package: include_bytes!("../../../../integration/sh026-harrier/HARRIER-STUDIO.json"),
+        fnv: 0xf298_120d_ff8b_0eb9,
+        export_fnv: Some(0xc7f8_4205_5427_bfe9),
+    },
+    StockDescriptor {
+        model: AvailableModel {
             object: "SH030",
             geometry_key: SPARROWHAWK_GEOMETRY_KEY,
         },
@@ -815,7 +825,7 @@ mod tests {
     #[test]
     fn every_stock_descriptor_authenticates_its_own_source_and_real_preview() {
         let catalogue = ok(crate::docked_screens::Catalogue::bundled());
-        assert_eq!(STOCK_MODELS.len(), 109);
+        assert_eq!(STOCK_MODELS.len(), 110);
         for held in [
             "SH082", "SH102", "SH103", "SH108", "SH112", "SH113", "SH114", "SH115", "SH116",
             "SH117", "SH118", "SH119", "SH120", "SH121", "SH122", "SH123", "SH124", "SH125",
@@ -872,7 +882,7 @@ mod tests {
         let visual = ok(load_sparrowhawk(SPARROWHAWK_PACKAGE));
         let original = include_bytes!("../../../../assets/fleet/sh030/visual.bin");
         assert_eq!(&original[..8], b"SPRHVIZ1");
-        assert_original_corners(&visual, original, [0., 1.35, 0.], 25.0, 9324, 1216);
+        assert_original_corners(&visual, original, [0., 1.35, 0.], 25.0, 9324, 1216, true);
         let mut changed = SPARROWHAWK_PACKAGE.to_vec();
         changed[0] ^= 1;
         assert!(load_sparrowhawk(&changed).is_err());
@@ -891,6 +901,7 @@ mod tests {
         extent: f64,
         corners: usize,
         unmapped_faces: usize,
+        has_emitters: bool,
     ) {
         assert_eq!(visual.bytes().len(), corners * 56);
         assert_eq!(original.len(), 16 + visual.bytes().len());
@@ -927,7 +938,7 @@ mod tests {
             }
         }
         assert_eq!(unmapped, unmapped_faces * 3);
-        assert!(emitters > 0);
+        assert_eq!(emitters > 0, has_emitters);
     }
 
     #[test]
@@ -943,7 +954,7 @@ mod tests {
         let kite = ok(load_stock(descriptor("SH031"), KITE_PACKAGE));
         let packed = include_bytes!("../../../../assets/fleet/sh031/visual.bin");
         assert_eq!(&packed[..8], b"KITEVIZ1");
-        assert_original_corners(&kite, packed, [0.; 3], 39.0, 9324, 1216);
+        assert_original_corners(&kite, packed, [0.; 3], 39.0, 9324, 1216, true);
         assert!(load_stock(descriptor("SH031"), SPARROWHAWK_PACKAGE).is_err());
         assert!(load_stock(descriptor("SH030"), KITE_PACKAGE).is_err());
         assert!(
@@ -956,6 +967,40 @@ mod tests {
         let mut changed = KITE_PACKAGE.to_vec();
         changed[0] ^= 1;
         assert!(load_stock(descriptor("SH031"), &changed).is_err());
+    }
+
+    #[test]
+    fn stock_harrier_uses_original_bare_hull_corners_and_source_bound_pod_supports() {
+        let entry = descriptor("SH026");
+        let export = ok(authenticated_package_bytes(entry, entry.package));
+        let package = ok(HullPackage::from_json(export));
+        assert_eq!(package.name, "Harrier");
+        assert!(package.engineering.is_none());
+        assert_eq!(package.native.triangles.len(), 512);
+        let original = ok(meridian_core::harrier::HarrierHullSource::bundled());
+        assert_eq!(
+            ok(package.pieces()).as_slice(),
+            original.pieces().as_slice()
+        );
+        let packed = include_bytes!("../../../../assets/fleet/sh026/visual.bin");
+        let visual = ok(load_stock(entry, entry.package));
+        assert_original_corners(
+            &visual,
+            packed,
+            [
+                -0.11690124045801475,
+                -0.7527838740458019,
+                0.17175572519083993,
+            ],
+            30.0,
+            26652,
+            200,
+            false,
+        );
+        let peer = descriptor("SH030");
+        assert!(load_stock(entry, peer.package).is_err());
+        assert!(load_stock(peer, entry.package).is_err());
+        assert_stock_and_local("SH026", entry.model.geometry_key);
     }
 
     #[test]
@@ -981,7 +1026,15 @@ mod tests {
         let visual = ok(load_stock(entry, STAG_PACKAGE));
         let packed = include_bytes!("../../../../assets/fleet/sh035/visual.bin");
         assert_eq!(&packed[..8], b"STAGVIZ1");
-        assert_original_corners(&visual, packed, [0., 4.25, -1.545], 69.09, 10476, 1240);
+        assert_original_corners(
+            &visual,
+            packed,
+            [0., 4.25, -1.545],
+            69.09,
+            10476,
+            1240,
+            true,
+        );
         for peer in ["SH030", "SH031"] {
             let d = descriptor(peer);
             assert!(load_stock(entry, d.package).is_err());
