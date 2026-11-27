@@ -59,6 +59,51 @@ fn plan(w: &mut World, id: Id) {
         },
     );
 }
+
+#[test]
+fn lareria_trade_uses_paid_navigation_reach_and_replays_its_historical_fit() {
+    use crate::{ModuleAction, ModuleKind};
+    let mut w = funded(15804);
+    journey(&mut w, SystemId::AVENOR);
+    service(&mut w, Command::RefillFuel);
+    confirm(&mut w, Action::Accept);
+    let leg = Action::Plan {
+        destination: SystemId::LARERIA,
+        commodity: Id::Food,
+    };
+    let before = ok(w.save_bytes());
+    assert_eq!(
+        w.review_navigation_trade(leg, w.snapshot().tick),
+        Err(Error::UnsupportedRoute)
+    );
+    assert_eq!(ok(w.save_bytes()), before);
+    let tick = w.snapshot().tick;
+    let review = ok(w.review_module(
+        ModuleAction::Purchase {
+            kind: ModuleKind::IntermediateNavigation,
+        },
+        tick,
+    ));
+    let item = ok(w.prepare_module(review, tick)).commit();
+    assert_eq!(w.jump_reach_ly(), Some(14.0));
+    confirm(&mut w, leg);
+    service(&mut w, Command::BuyCommodity(Id::Food));
+    journey(&mut w, SystemId::LARERIA);
+    let mut w = cold(&w);
+    service(&mut w, Command::SellCommodity(Id::Food));
+    service(&mut w, Command::RefillFuel);
+    journey(&mut w, SystemId::AVENOR);
+    confirm(&mut w, Action::Receive);
+    let expected = snap(&w);
+    assert_eq!(expected.attempts[0].fuel_units_used, 198);
+    assert_eq!(expected.attempts[0].fuel_paid_tenths, 198);
+    assert!(expected.trace.is_some());
+    let tick = w.snapshot().tick;
+    let review = ok(w.review_module(ModuleAction::Store { item }, tick));
+    ok(w.prepare_module(review, tick)).commit();
+    assert_eq!(w.jump_reach_ly(), Some(9.0));
+    assert_eq!(snap(&cold(&w)), expected);
+}
 fn service(w: &mut World, command: Command) -> Event {
     let tick = w.snapshot().tick;
     ok(w.request_station_service(command, tick))

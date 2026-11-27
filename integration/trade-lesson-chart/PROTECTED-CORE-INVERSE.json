@@ -1,0 +1,64 @@
+{
+  "base": "fde936052ae05628959e3b6a39838d2271575c0a",
+  "files": {
+    "flight/modular.rs": {
+      "beforeSHA256": "271c8afc708a475b106eac5999f64a757fe83de5e0814f6477a9bed90b948133",
+      "afterSHA256": "bb07bfb75b2514d0623af8cd662df61a62bda398249b0c4da111e6dca7723b50",
+      "hunks": [
+        {
+          "offset": 36161,
+          "before": "",
+          "after": "    }\n    pub(super) fn jump_reach_at_revision(\n        &self,\n        owner: u64,\n        revision: u64,\n    ) -> Result<f64, SaveError> {\n        Ok(self.ledger_at_revision(owner, revision)?.jump_reach_ly())\n"
+        }
+      ]
+    },
+    "flight/navigation_trade/actions.rs": {
+      "beforeSHA256": "9d5d53cd45c1e0370601eadc40617191d7ef84617e1c67de9ada1d9071f473e1",
+      "afterSHA256": "c6f5dfca50417741e9c594a656c24b4504180a78fdae5bb1186c3ca57a6e81c9",
+      "hunks": [
+        {
+          "offset": 341,
+          "before": "use crate::navigation::{DockContext, STOCK_JUMP_REACH_LY, SystemId, stock_jump_fuel_cost};\n",
+          "after": "use crate::navigation::{DockContext, SystemId, stock_jump_fuel_cost};\n"
+        },
+        {
+          "offset": 5318,
+          "before": "        if distance <= 0.0 || distance > STOCK_JUMP_REACH_LY {\n",
+          "after": "        if distance <= 0.0 || distance > self.jump_reach_ly().ok_or(Error::UnsupportedRoute)? {\n"
+        }
+      ]
+    },
+    "flight/navigation_trade/persistence.rs": {
+      "beforeSHA256": "4fb04e53706e337d1c364a3a44aaa2941ea86ed66d0928023d3f5b14cf2c9dec",
+      "afterSHA256": "de0765d7ee1b8d6f8e2484a4c8db0fb34ab4aae082e6efd32bf6f10639a7a115",
+      "hunks": [
+        {
+          "offset": 344,
+          "before": "    DockContext, DockOrigin, STOCK_JUMP_REACH_LY, SavedNavigationSummary, SystemId,\n    stock_jump_fuel_cost,\n",
+          "after": "    DockContext, DockOrigin, SavedNavigationSummary, SystemId, stock_jump_fuel_cost,\n"
+        },
+        {
+          "offset": 21539,
+          "before": "            || distance > STOCK_JUMP_REACH_LY\n",
+          "after": "            || distance\n                > c.commerce\n                    .modular\n                    .jump_reach_at_revision(c.nav.owner, self.account_revision)?\n"
+        },
+        {
+          "offset": 31398,
+          "before": "            || distance > STOCK_JUMP_REACH_LY\n",
+          "after": "            || distance\n                > c.commerce\n                    .modular\n                    .jump_reach_at_revision(c.nav.owner, self.account_revision)?\n"
+        }
+      ]
+    },
+    "flight/navigation_trade/tests.rs": {
+      "beforeSHA256": "b1f389d33fac32acc4b81496117b75f281affde627b8b1aa09d86aef3fb37a6e",
+      "afterSHA256": "0126c3edabbf79d8b69028f3677130f0c16cd433556ff504581d4b1e39f94dc0",
+      "hunks": [
+        {
+          "offset": 2028,
+          "before": "",
+          "after": "}\n\n#[test]\nfn lareria_trade_uses_paid_navigation_reach_and_replays_its_historical_fit() {\n    use crate::{ModuleAction, ModuleKind};\n    let mut w = funded(15804);\n    journey(&mut w, SystemId::AVENOR);\n    service(&mut w, Command::RefillFuel);\n    confirm(&mut w, Action::Accept);\n    let leg = Action::Plan {\n        destination: SystemId::LARERIA,\n        commodity: Id::Food,\n    };\n    let before = ok(w.save_bytes());\n    assert_eq!(\n        w.review_navigation_trade(leg, w.snapshot().tick),\n        Err(Error::UnsupportedRoute)\n    );\n    assert_eq!(ok(w.save_bytes()), before);\n    let tick = w.snapshot().tick;\n    let review = ok(w.review_module(\n        ModuleAction::Purchase {\n            kind: ModuleKind::IntermediateNavigation,\n        },\n        tick,\n    ));\n    let item = ok(w.prepare_module(review, tick)).commit();\n    assert_eq!(w.jump_reach_ly(), Some(14.0));\n    confirm(&mut w, leg);\n    service(&mut w, Command::BuyCommodity(Id::Food));\n    journey(&mut w, SystemId::LARERIA);\n    let mut w = cold(&w);\n    service(&mut w, Command::SellCommodity(Id::Food));\n    service(&mut w, Command::RefillFuel);\n    journey(&mut w, SystemId::AVENOR);\n    confirm(&mut w, Action::Receive);\n    let expected = snap(&w);\n    assert_eq!(expected.attempts[0].fuel_units_used, 198);\n    assert_eq!(expected.attempts[0].fuel_paid_tenths, 198);\n    assert!(expected.trace.is_some());\n    let tick = w.snapshot().tick;\n    let review = ok(w.review_module(ModuleAction::Store { item }, tick));\n    ok(w.prepare_module(review, tick)).commit();\n    assert_eq!(w.jump_reach_ly(), Some(9.0));\n    assert_eq!(snap(&cold(&w)), expected);\n"
+        }
+      ]
+    }
+  }
+}

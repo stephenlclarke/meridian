@@ -1278,10 +1278,10 @@ impl App {
             && let Some(menu) = self
                 .docked
                 .as_mut()
-                .filter(|menu| menu.screen() == ui::Screen::Trading)
+                .filter(|menu| matches!(menu.screen(), ui::Screen::Trading | ui::Screen::Galaxy))
         {
             if !repeat {
-                match menu.open_market_lesson(&mut self.game) {
+                match menu.open_trade_lesson(&mut self.game) {
                     Ok(message) => self.notice.set(message),
                     Err(error) => menu.feedback(error),
                 }

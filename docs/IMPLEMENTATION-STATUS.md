@@ -645,7 +645,7 @@ Version 10 retains measured endpoint, permission, fit, terminal and first-trace 
 
 ## Qualified source: original navigation and trade
 
-The post-preview [Navigation and Trade candidate](NAVIGATION-TRADE.md) connects the station market selection to the original T04 lesson. The goal reads the active plan, original purchase, sale and return from the commander. Avenor and Renas are the two lesson destinations in this candidate. Choosing another reachable chart destination remains open.
+The station [Navigation and Trade lesson](NAVIGATION-TRADE.md) connects the selected goods to T04 consent, purchase, sale and the return to the issuer. The chart destination candidate adds selection among the three live markets, checks current fuel and fitted reach before confirming, and verifies historical reach when loading a saved plan or journey.
 
 On native Windows, `991b7ebf` passed all six trade lesson tests and strict workspace Clippy. The Food round trip kept the original tonne, charged a net loss of 9.8 CR and awarded one clue after the debrief. The new market callback initially failed because it tried to cancel an unpainted review. At `458c0b7c`, the corrected test checked the refusal, presented the review, cancelled it and continued the selected Furs plan from disk. All 24 Help tests passed on that revision, including the market callback.
 

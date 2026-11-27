@@ -1765,7 +1765,7 @@ fn publication_message(published: SaveCommit, message: String) -> Result<String,
 }
 
 #[cfg(test)]
-mod trade_lesson_tests;
+pub(crate) mod trade_lesson_tests;
 
 #[cfg(test)]
 #[path = "profile/ammunition_tests.rs"]

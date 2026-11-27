@@ -138,7 +138,7 @@ H or ? opens a dismissible help popup for the current screen, including station 
 
 The [station trade estimate details](integration/followup-trade-detail/README.md) show the current finite commodity allocation behind the chart scan and route estimates. They do not purchase, sell or install a route.
 
-At Avenor or Renas, select goods in the market and press **7** for the [Navigation and Trade lesson](docs/NAVIGATION-TRADE.md). **R** reviews the next station action. Carry one original tonne to the other berth, sell it there and return for the debrief. A real trading loss still qualifies for the first lesson clue.
+At Avenor, Renas or Lareria, open the galaxy chart with **1**, highlight a reachable market and press **7** to choose the [Navigation and Trade lesson](docs/NAVIGATION-TRADE.md) destination. In the market, **7** selects the goods. **R** from the lesson reviews consent, then the one-tonne plan. Sell the original tonne at the chosen berth and return to the issuer for the debrief. A trading loss still qualifies for the first clue.
 
 The [atomic market quantity controls](integration/followup-bulk-market/README.md) review and settle all requested native units together or refuse the entire purchase or sale. They retain the existing per-unit receipts and save format.
 

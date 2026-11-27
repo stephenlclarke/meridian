@@ -23,6 +23,7 @@ pub enum Action {
     CancelTradeLesson,
     TradeLessonDetails,
     MarketTradeLesson(CommodityId),
+    ChartTradeLesson(SystemId),
     ReviewFlightLesson,
     CancelFlightLesson,
     FlightLessonDetails,
@@ -76,6 +77,7 @@ pub struct Session {
     market_open: bool,
     equipment_open: bool,
     selected_commodity: CommodityId,
+    trade_destination: Option<(SystemId, SystemId)>,
 }
 
 impl Default for Session {
@@ -92,6 +94,7 @@ impl Default for Session {
             market_open: false,
             equipment_open: false,
             selected_commodity: CommodityId::Food,
+            trade_destination: None,
         }
     }
 }
@@ -267,11 +270,7 @@ impl Session {
                     .navigation
                     .ok_or("No current navigation")?
                     .system;
-                let destination = if current == SystemId::AVENOR {
-                    SystemId::RENAS
-                } else {
-                    SystemId::AVENOR
-                };
+                let destination = self.trade_destination_for(current);
                 NavigationTradeAction::Plan {
                     destination,
                     commodity: self.selected_commodity,
@@ -334,10 +333,32 @@ impl Session {
             Action::ReviewTradeLesson | Action::PlanTradeLesson | Action::CancelTradeLesson => {
                 self.review_trade_lesson(world, action)
             }
-            Action::TradeLessonDetails | Action::MarketTradeLesson(_) => {
+            Action::TradeLessonDetails
+            | Action::MarketTradeLesson(_)
+            | Action::ChartTradeLesson(_) => {
                 self.invalidate();
                 if let Action::MarketTradeLesson(id) = action {
                     self.selected_commodity = id;
+                }
+                if let Action::ChartTradeLesson(target) = action {
+                    let berth = world
+                        .current_dock_context()
+                        .ok_or("Choose a destination at a main orbital")?;
+                    if let Some(state) = world.navigation_trade_snapshot()
+                        && let Some(attempt) =
+                            state.attempts.last().filter(|a| Some(a.id) == state.active)
+                    {
+                        if attempt.plan.is_some() {
+                            return Err(
+                                "The current trade lesson already has a confirmed destination."
+                                    .into(),
+                            );
+                        }
+                        if attempt.issuing_dock.system() != berth.system() {
+                            return Err("Choose the trade destination at the issuing berth.".into());
+                        }
+                    }
+                    self.trade_destination = Some((berth.system(), target));
                 }
                 self.show_trade_lesson = true;
                 Ok("Navigation and trade lesson. R reviews the next station action.".into())
@@ -504,7 +525,7 @@ impl Session {
                 self.invalidate();
                 world
                     .request_jump(target, world.snapshot().tick)
-                    .map(|_| "Jump committed; fuel consumed at departure".into())
+                    .map(|_| "Jump spooling. Fuel debits on arrival.".into())
                     .map_err(|e| e.to_string())
             }
             Action::Jump => {
@@ -513,11 +534,8 @@ impl Session {
                     .snapshot()
                     .navigation
                     .ok_or("No commander navigation")?;
-                let target = if navigation.system == SystemId::RENAS {
-                    SystemId::AVENOR
-                } else {
-                    SystemId::RENAS
-                };
+                let target = crate::trade_lesson::travel_target(world, navigation.system)
+                    .unwrap_or_else(|| default_trade_destination(navigation.system));
                 world
                     .request_jump(target, world.snapshot().tick)
                     .map(|_| "Jump spooling. Fuel debits on arrival.".into())
@@ -583,6 +601,11 @@ impl Session {
             return true;
         }
         false
+    }
+    fn trade_destination_for(&self, origin: SystemId) -> SystemId {
+        self.trade_destination
+            .filter(|(from, _)| *from == origin)
+            .map_or_else(|| default_trade_destination(origin), |(_, target)| target)
     }
 
     fn review_line(&self) -> String {
@@ -799,7 +822,15 @@ impl Session {
             return lines;
         }
         if self.show_trade_lesson {
-            crate::trade_lesson::append_details(world, self.selected_commodity, &mut lines);
+            let selected = snapshot
+                .navigation
+                .map(|nav| self.trade_destination_for(nav.system));
+            crate::trade_lesson::append_details(
+                world,
+                self.selected_commodity,
+                selected,
+                &mut lines,
+            );
             return lines;
         }
         if self.append_flight_lesson_panel(world, &mut lines) {
@@ -949,6 +980,14 @@ fn practice_line(world: &World) -> Option<String> {
         format!("{state}{close}")
     };
     Some(line)
+}
+
+fn default_trade_destination(origin: SystemId) -> SystemId {
+    if origin == SystemId::RENAS {
+        SystemId::AVENOR
+    } else {
+        SystemId::RENAS
+    }
 }
 
 /// Original fixed dialogue is word-wrapped before the renderer's column bound.

@@ -56,7 +56,7 @@ fn planned(p: &mut Profile) {
     review(p, Action::ReviewTradeLesson);
     review(p, Action::PlanTradeLesson);
 }
-fn journey(p: &mut Profile) {
+pub(crate) fn journey(p: &mut Profile) {
     action(p, Action::Launch);
     ok(p.world.step(FlightInput::default()));
     action(p, Action::Jump);

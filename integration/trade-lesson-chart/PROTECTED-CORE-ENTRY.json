@@ -1,0 +1,11 @@
+{
+  "schema": 1,
+  "id": "trade-lesson-chart",
+  "undoBefore": ["followup-bulk-market"],
+  "undoAfter": [],
+  "kind": "inverse",
+  "manifest": "integration/trade-lesson-chart/PROTECTED-CORE-INVERSE.json",
+  "sha256": "0eb017fb490f74a4384b10850ee15368ae98e139aa70eb7a59398a4a2c152cf9",
+  "base": "fde936052ae05628959e3b6a39838d2271575c0a",
+  "label": "Trade lesson chart destination and fitted range"
+}

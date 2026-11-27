@@ -8,6 +8,7 @@ fn system_name(id: SystemId) -> &'static str {
     match id {
         SystemId::AVENOR => "AVENOR",
         SystemId::RENAS => "RENAS",
+        SystemId::LARERIA => "LARERIA",
         _ => "UNAVAILABLE",
     }
 }
@@ -24,7 +25,7 @@ pub fn review_title(action: NavigationTradeAction) -> &'static str {
 pub fn append_review(review: NavigationTradeReview, lines: &mut Vec<String>) {
     let terms = match review.action() {
         NavigationTradeAction::Accept => {
-            "Accept trade practice at this berth. Then open 7, select a legal tonne commodity with [ / ] and press R to review the route, stock, price, hold and fuel. No lesson fee or cash reward."
+            "Accept trade practice here. On the galaxy chart, 7 chooses a destination. In the lesson, [ / ] selects goods and R reviews the route, stock, price, hold and fuel. No lesson fee or cash reward."
         }
         NavigationTradeAction::Plan { .. } => {
             "Confirm this selected direct route and one tonne of this commodity using the current owned fit and stock. Reserve one hold tonne without buying it. G makes the ordinary purchase; travel, sell the same original tonne at the destination and return here. Trade may lose money."
@@ -66,13 +67,15 @@ fn objective(
     state: &NavigationTradeSnapshot,
     berth: Option<SystemId>,
     selected: CommodityId,
+    destination: Option<SystemId>,
 ) -> String {
     let Some(attempt) = state
         .attempts
         .last()
         .filter(|attempt| Some(attempt.id) == state.active)
     else {
-        return "At Avenor or Renas main orbital, press R to review trade practice.".into();
+        return "At Avenor, Renas or Lareria main orbital, press R to review trade practice."
+            .into();
     };
     let issuer = attempt.issuing_dock.system();
     let home = system_name(issuer);
@@ -81,9 +84,13 @@ fn objective(
         return "Press R for the debrief. Enter confirms the trade and saves.".into();
     }
     let Some(plan) = attempt.plan else {
+        if berth != Some(issuer) {
+            return format!("Return to {home} to review the trade plan.");
+        }
         return format!(
-            "At {home}, select a legal tonne with [ / ]. R reviews the plan for {}.",
-            name(selected)
+            "At {home}, select a legal tonne with [ / ]. R reviews the plan for {} to {}.",
+            name(selected),
+            destination.map_or("UNAVAILABLE", system_name)
         );
     };
     let goods = name(plan.commodity);
@@ -103,12 +110,42 @@ fn objective(
     }
 }
 
-pub fn append_details(world: &World, selected: CommodityId, lines: &mut Vec<String>) {
+pub fn travel_target(world: &World, current: SystemId) -> Option<SystemId> {
+    let state = world.navigation_trade_snapshot()?;
+    let attempt = state
+        .attempts
+        .last()
+        .filter(|a| Some(a.id) == state.active)?;
+    let plan = attempt.plan?;
+    let issuer = attempt.issuing_dock.system();
+    if attempt.held_tonne.is_some() && current == issuer {
+        Some(plan.destination)
+    } else if attempt.sale.is_some() && current == plan.destination {
+        Some(issuer)
+    } else {
+        None
+    }
+}
+
+pub fn append_details(
+    world: &World,
+    selected: CommodityId,
+    destination: Option<SystemId>,
+    lines: &mut Vec<String>,
+) {
     let Some(state) = world.navigation_trade_snapshot() else {
         return;
     };
     let berth = world.current_dock_context().map(|dock| dock.system());
-    crate::session::append_paragraph(lines, &objective(&state, berth, selected));
+    crate::session::append_paragraph(lines, &objective(&state, berth, selected, destination));
+    if state.active.is_none()
+        && let Some(target) = destination
+    {
+        lines.push(format!(
+            "DESTINATION {} | GALAXY CHART: 7 CHOOSES ANOTHER",
+            system_name(target)
+        ));
+    }
     lines.push("7 TRADE GOAL | R REVIEW | 6 REVIEW CANCELLATION | F REFUEL".into());
     lines.push(format!(
         "RECORDS {} | ACTIVE SERVICES {} | RESERVED HOLD {}T",
