@@ -437,11 +437,13 @@ impl World {
     ) -> Result<PreparedPulseImpact, FireError> {
         let identity = self.combat_identity().ok_or(FireError::NoCommander)?;
         let fitted = self
-            .fitted_front_laser()
+            .selected_fit()
             .ok_or(FireError::NoFittedFrontLaser)?;
         let legal = self.legal_value().ok_or(FireError::NoCommander)?;
         let pose = flight_pose(self.state.position, self.state.orientation)
             .ok_or(FireError::InvalidGeometry)?;
+        let facing=self.selected_laser_view();
+        let pose=facing.laser_ray(pose);
         if shot.tick != self.state.tick
             || self.state.mode != FlightMode::Flight
             || self.is_paused()
@@ -451,7 +453,7 @@ impl World {
         {
             return Err(FireError::StaleCommand);
         }
-        let (_, expected, distance) = self.pulse_scene(pose)?;
+        let (_, expected, distance) = self.pulse_scene_facing(pose,facing)?;
         if shot.contact != expected || shot.end != add_scaled(shot.origin, shot.direction, distance)
         {
             return Err(FireError::InvalidGeometry);
@@ -508,7 +510,7 @@ impl World {
             weapon: fitted.1,
             opening_pulse: self.pulse,
             opening_damage: self.damage.clone(),
-            damage: self.damage.laser(self.combat.physical_tick(), fitted.1)?,
+            damage: self.damage.facing_laser(self.combat.physical_tick(), fitted.1,facing)?,
             pulse,
             epoch: self
                 .freight_session
@@ -553,7 +555,7 @@ impl PreparedPulseImpact {
             || world.damage != self.opening_damage
             || world.combat_identity() != Some(self.identity)
             || world.legal_value() != Some(self.opening_legal)
-            || world.fitted_front_laser() != Some((self.item, self.weapon))
+            || world.selected_fit() != Some((self.item, self.weapon))
         {
             return Err(FireError::StaleCommand);
         }
@@ -672,7 +674,9 @@ impl OrdinaryImpact {
         if self.weapon == OrdinaryWeapon::StandardMissile {
             return world.missiles.validate_ordinary(self, world);
         }
-        let pose = flight_pose(self.position, self.orientation).ok_or(invalid)?;
+        let body=flight_pose(self.position,self.orientation).ok_or(invalid)?;
+        let facing=world.integral_view_at(self.item,self.tick).unwrap_or(super::FlightView::Front);
+        let pose=facing.laser_ray(body);
         let station = world.state.station.ok_or(invalid)?;
         let distance = world
             .station_data
@@ -694,7 +698,9 @@ impl OrdinaryImpact {
         if self.victim_entity != 1
             || self.attacker.owner != current.owner
             || self.attacker.hull != current.hull
-            || world.owned_front_laser_at(self.item, self.tick, self.attacker) != Some(self.weapon)
+            || (if facing==super::FlightView::Front {world.owned_front_laser_at(self.item,self.tick,self.attacker)} else {
+                 world.xyzzy_medusa_issue().filter(|(dock,_,_)|dock.visit()<self.attacker.visit).map(|_|OrdinaryWeapon::FrontNavalLaser)
+             }) != Some(self.weapon)
             || station_index(self.attacker.system).is_none()
             || self.attacker.visit < 2
             || self.attacker.visit > current.visit
