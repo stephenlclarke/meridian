@@ -138,8 +138,8 @@ impl Panel {
                 "N Start or cancel auto-docking | 0 Front | 1 Rear | 2 Left | 3 Right view",
                 "T Lock selected ship for missiles | 8 Next missile target | 9 Arm / safe",
                 "= Launch missile | - Safe/clear target | K E.C.M. (22 energy)",
-                "J Jump | Shift+J Clue Journal | P Pause / resume",
-                "Shift+1 Lesson | Shift+2 Cancel | C Details | Shift+5 Close | Shift+4 Receive",
+                "J Jump | Shift+J Clue Journal | P Pause | Shift+4 Reception | Shift+5 Close",
+                "Shift+1 Flight lesson | Shift+2 Cancel | C Lesson details",
                 "Tab Next scanner target (no core: mark) | F Manual/assist | Delete Release",
                 "Basic aligns | Advanced approaches | Docking+nav docks | Specialists auto-work",
                 "I Mission details | Shift+I Target details | Occupied: Enter/Escape",
@@ -175,14 +175,14 @@ impl Panel {
         let mut panel = Self::new(
             "Station controls",
             &[
-                "L Launch | F Buy fuel",
+                "L Launch | F Buy fuel | P Pause",
                 "T Select crew | R Review interaction | I Mission details",
                 "V Review deliveries | X Review abandonment",
                 "Enter Confirm review | B Cancel review",
                 "Shift+1 Flight lesson | Shift+2 Cancel | C Lesson details",
                 "Shift+5 Close practice | Shift+4 Reception | Shift+3 Practice review",
                 "6 Cancel trade lesson | 7 Trade lesson details",
-                "Ctrl+S Save | Ctrl+R Reload | P Pause | Ctrl+Enter Fullscreen | Esc Quit",
+                "Ctrl+S Save | Ctrl+R Reload | Ctrl+Enter Fullscreen | Escape Save/Quit",
             ],
         );
         panel.navigation();

@@ -737,11 +737,24 @@ impl Profile {
             let state = self.world.snapshot();
             let mut lines = vec![
                 "SH171 MEDUSA | ISOLATED PREVIEW / NOT A QUEST REWARD".into(),
-                format!("{:?} | SPEED {:.2} / 50.30 | TICK {} | {}", state.mode, state.speed, state.tick,
-                    if active { "RUNNING" } else { "PAUSED" }),
-                format!("CARGO {} / {} t | CABINS {} / 4 | EQUIPMENT {} / 13 | UTILITY {} / 4", fit.cargo_used_tonnes(), fit.cargo_capacity_tonnes(), fit.cabins, fit.equipment_used(), fit.utility_used()),
+                format!(
+                    "{:?} | SPEED {:.2} / 50.30 | TICK {} | {}",
+                    state.mode,
+                    state.speed,
+                    state.tick,
+                    if active { "RUNNING" } else { "PAUSED" }
+                ),
+                format!(
+                    "CARGO {} / {} t | CABINS {} / 4 | EQUIPMENT {} / 13 | UTILITY {} / 4",
+                    fit.cargo_used_tonnes(),
+                    fit.cargo_capacity_tonnes(),
+                    fit.cabins,
+                    fit.equipment_used(),
+                    fit.utility_used()
+                ),
                 "L launch | W/S throttle | A/D yaw | arrows pitch | Q/E roll | Space brake".into(),
-                "Docked: B cargo expansion | [ / ] cabin count | Ctrl+S save / Ctrl+R continue | P pause | Esc quit".into(),
+                "Docked: B cargo expansion | [ / ] cabin count".into(),
+                "Ctrl+S save | Ctrl+R continue | Ctrl+Enter fullscreen | P pause | Esc quit".into(),
             ];
             if let Some(notice) = notice {
                 lines.push(notice.into());

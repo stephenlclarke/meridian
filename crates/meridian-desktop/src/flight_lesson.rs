@@ -59,7 +59,11 @@ pub fn append_details(world: &World, lines: &mut Vec<String>) {
     crate::session::append_paragraph(lines, &line(world));
     crate::session::append_paragraph(
         lines,
-        "0 FRONT | 1 REAR | 2 LEFT | 3 RIGHT | Shift+1 REVIEW CONSENT OR RECEPTION | Shift+2 REVIEW CANCELLATION | ENTER CONFIRM AND SAVE | B BACK",
+        "0 FRONT | 1 REAR | 2 LEFT | 3 RIGHT | Shift+1 REVIEW CONSENT OR RECEPTION",
+    );
+    crate::session::append_paragraph(
+        lines,
+        "Shift+2 REVIEW CANCELLATION | ENTER CONFIRM AND SAVE | B BACK",
     );
     let Some(state) = world.flight_reception_snapshot() else {
         return;
