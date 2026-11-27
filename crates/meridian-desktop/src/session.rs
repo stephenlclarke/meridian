@@ -607,8 +607,31 @@ impl Session {
         }
     }
 
-    fn flight_alerts(world: &World, notice: Option<&str>) -> Vec<String> {
-        let mut lines: Vec<String> = notice.into_iter().map(str::to_owned).collect();
+    pub(crate) fn flight_status(world: &World) -> Vec<String> {
+        let mut lines = vec![format!(
+            "{} VIEW | SPEED {:.1}",
+            crate::flight_lesson::view_name(world.flight_view()),
+            world.snapshot().speed
+        )];
+        let flight = world.snapshot();
+        if let Some(nav) = flight.navigation {
+            let credits = world.credits_tenths().unwrap_or_default();
+            lines.push(format!(
+                "FUEL {:.1}/{:.1} | CREDITS {}.{} CR | TICK {}",
+                f32::from(nav.fuel_units) / 10.,
+                f32::from(nav.fuel_capacity_units) / 10.,
+                credits / 10,
+                credits % 10,
+                flight.tick
+            ));
+        }
+        if let Some(fit) = world.selected_laser_snapshot() {
+            lines.push(format!(
+                "{} {} LASER",
+                crate::flight_lesson::view_name(world.selected_laser_view()),
+                fit.weapon.label()
+            ));
+        }
         if let Some(phase) = world.auto_docking_status() {
             lines.push(format!("AUTO DOCK | {phase} | N Cancel"));
         }
@@ -624,6 +647,28 @@ impl Session {
                 "JUMP COUNTDOWN: {:.1} SECONDS",
                 travel.remaining_ticks as f32 / 60.0
             ));
+        }
+        if let Some(state) = world.xyzzy_snapshot().filter(|state| state.active) {
+            lines.push(format!(
+                "CLARKE | XYZZY | FUEL {}",
+                if state.unlimited_fuel {
+                    "UNLIMITED"
+                } else {
+                    "NORMAL"
+                }
+            ));
+        }
+        if let Some(emp) = crate::docked_screens::emp::status(world) {
+            lines.push(emp);
+        }
+        if world.manual_scanner_target() {
+            lines.push("MANUAL TARGET | F ASSIST".into());
+        }
+        if let Some(belt) = world.mining_belt_snapshot() {
+            match crate::asteroid_render::hud_line(world.snapshot(), &belt, None) {
+                Ok(Some(line)) | Err(line) => lines.push(line),
+                Ok(None) => {}
+            }
         }
         lines
     }
@@ -731,11 +776,7 @@ impl Session {
     pub fn lines(&self, world: &World, active: bool, notice: Option<&str>) -> Vec<String> {
         let snapshot = world.snapshot();
         if !self.hud_panel_open() {
-            match snapshot.mode {
-                FlightMode::Docked => return notice.into_iter().map(str::to_owned).collect(),
-                FlightMode::Flight => return Self::flight_alerts(world, notice),
-                FlightMode::Launching => {}
-            }
+            return notice.into_iter().map(str::to_owned).collect();
         }
         let name = snapshot
             .navigation

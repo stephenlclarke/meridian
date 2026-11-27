@@ -6,6 +6,8 @@ The Fleet, Medusa and Hull Studio preview adds 115 station Showroom models and a
 
 The ordinary Fleet XYZZY Medusa candidate carries four laser facings. Use **0–3** to select the view and **Z** to fire its installed laser. [Fleet Medusa laser controls](docs/FLEET-MEDUSA-LASERS.md)
 
+The development cockpit shows the pilot’s view above the scanner. Its centre sight identifies the active laser or work tool by shape and colour. Press **H**, then **I**, for flight status. [Cockpit instruments](docs/COCKPIT-HUD.md)
+
 The ordinary-drive development candidate adds the Basic, Intermediate and Advanced hyperspace drive slot to Equipment. Paid upgrades change the actual jump countdown and station mass lock; explicit XYZZY maximum fitting uses the Advanced drive. The [equipment implementation and testing ledger](docs/EQUIPMENT-PLAYABLE.md) records all catalogue grades, remaining gameplay paths and Medusa compatibility constraints. This candidate is not part of Preview 10 and awaits owned validation.
 
 The stock-shield development candidate adds seven independently testable shield grades, an actual finite bank capacity for each grade, four ordinary paid upgrades and a dedicated XYZZY test selector. It preserves the original maximum outfit and the distinct unresolved Elite-rank and PLUGH-only acquisition paths. [Shield source, fitting and test controls](docs/SHIELD-GRADES.md). Owned validation is pending.

@@ -59,7 +59,7 @@ fn station<'a>(
         pose: snapshot.station.unwrap_or_else(|| panic!("station")),
         port,
         docked: false,
-        player_hull: meridian_core::PlayerHullKind::Peregrine,
+        medusa_preview: false,
     }
 }
 

@@ -1,5 +1,6 @@
 //! L337 a11fe169 CockpitDisplay.swift gauge grouping/scanner and StationNavigation.swift.
 //! Only World snapshots supply readings. Missing simulations have no invented needle.
+mod reticle;
 use super::{glyph, quad};
 use crate::mesh::{Vertex, rotate_inverse};
 use meridian_core::equipment::WorkTargetId;
@@ -43,6 +44,7 @@ pub struct ScannerTarget {
 #[derive(Debug, Clone, PartialEq)]
 pub struct Cockpit {
     pub flight: Snapshot,
+    sight: Option<reticle::Sight>,
     pub view: FlightView,
     pub shield: [Option<f32>; 2],
     pub energy: Option<f32>,
@@ -103,6 +105,7 @@ impl Cockpit {
         let scanner_targets = capture_scanner_targets(world, flight, &projected, traffic.as_ref())?;
         Ok(Self {
             flight,
+            sight: reticle::Sight::capture(world, flight),
             view: world.flight_view(),
             shield: [
                 combat.map(|c| {
@@ -482,7 +485,18 @@ fn scanner(out: &mut Vec<Vertex>, c: &Cockpit, l: Layout, size: [f32; 2]) {
     }
 }
 /// Appends bounded geometry after the existing review/control overlay, without gameplay access.
+pub(crate) fn flight_height(width: u32, height: u32) -> f32 {
+    if width >= 320 && height >= 240 {
+        Layout::new(width, height).top
+    } else {
+        height as f32
+    }
+}
+
 pub fn append(c: &Cockpit, width: u32, height: u32, out: &mut Vec<Vertex>) {
+    if let Some(sight) = c.sight {
+        sight.draw(width, height, out);
+    }
     if width < 320 || height < 240 {
         return;
     }

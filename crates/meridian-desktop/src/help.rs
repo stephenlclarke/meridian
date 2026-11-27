@@ -2,6 +2,8 @@
 use crate::docked_screens::Screen;
 use meridian_core::unwritten_route::ClueProgress;
 
+pub(crate) const FLIGHT_CONTROLS: &str = "Flight controls";
+
 pub const MAX_LINES: usize = 18;
 pub const MAX_COLUMNS: usize = 78;
 pub const MAX_VERTICES: usize = 6 + MAX_LINES * MAX_COLUMNS * 35 * 6;
@@ -127,9 +129,26 @@ impl Panel {
         }
         panel
     }
+    pub(crate) fn flight_status(world: &meridian_core::World) -> Self {
+        let mut panel = Self::new("Flight status", &[]);
+        for line in crate::session::Session::flight_status(world) {
+            let mut row = String::new();
+            for word in line.split_whitespace() {
+                if row.len() + 1 + word.len() > MAX_COLUMNS {
+                    panel.lines.push(std::mem::take(&mut row));
+                }
+                if !row.is_empty() {
+                    row.push(' ');
+                }
+                row.push_str(word);
+            }
+            panel.lines.push(row);
+        }
+        panel
+    }
     pub fn flight(weapon: Option<&str>, review: Option<&str>) -> Self {
         let mut panel = Self::new(
-            "Flight controls",
+            FLIGHT_CONTROLS,
             &[
                 "W/S Accelerate/slow | Space Brake to zero | Arrows Pitch | A/D Yaw | Q/E Roll",
                 "N Start or cancel auto-docking | 0 Front | 1 Rear | 2 Left | 3 Right view",
@@ -158,6 +177,7 @@ impl Panel {
                 },
             ),
         );
+        panel.footer = "I Flight status | Escape / H / ? Close help";
         panel.review(review, "After help: B cancels; Escape saves and quits");
         // The host app appends the audio control; reserve that row as well as title/footer.
         if panel.lines.len() < MAX_LINES - 3 {
