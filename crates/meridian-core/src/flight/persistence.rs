@@ -891,6 +891,7 @@ impl World {
                 ammunition
                     .paid
                     .checked_add(modular.paid)
+                    .and_then(|paid| paid.checked_add(modular.bonds_paid()))
                     .and_then(|paid| paid.checked_add(emp.0))
                     .ok_or(SaveError::InvalidState("paid equipment overflow"))?,
                 ammunition

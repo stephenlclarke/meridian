@@ -296,7 +296,7 @@ impl World {
                 choice: g02::Choice::Accept,
                 ..
             }
-        ) && !self.original_service_has_capacity()
+        ) && (!self.original_service_has_capacity() || self.modular.bonded_occupancy().1 != 0)
         {
             return Err(MissionError::SharedCapacity);
         }

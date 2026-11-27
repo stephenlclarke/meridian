@@ -278,8 +278,9 @@ fn berth_offset(
 #[derive(Clone, Copy)]
 enum Change {
     Cargo(i16),
+    Freight(i16),
     Bay(u64),
-    Fit(u16, u16),
+    Fit(u16, u16, bool),
 }
 
 impl State {
@@ -449,7 +450,7 @@ impl State {
                 {
                     return Err(INVALID);
                 }
-                changes.push((revision, Change::Cargo(delta)));
+                changes.push((revision, Change::Freight(delta)));
             }
         }
         if old_freight != 0 || !last_exact {
@@ -488,7 +489,11 @@ impl State {
                 }
                 changes.push((
                     event.revision,
-                    Change::Fit(units, ledger.contract_hold_tonnes()),
+                    Change::Fit(
+                        units,
+                        ledger.contract_hold_tonnes(),
+                        ledger.bonded.active().is_some(),
+                    ),
                 ));
             }
         }
@@ -520,6 +525,8 @@ impl State {
             budget,
             &intervals,
         )?;
+        let mut bonded_active = false;
+        let mut freight_mass = 0_i16;
         for (revision, change) in timeline {
             if revision <= previous || revision > account.revision() {
                 return Err(INVALID);
@@ -528,11 +535,19 @@ impl State {
             match change {
                 Some(Change::Cargo(delta)) => cargo = cargo.checked_add(delta).ok_or(INVALID)?,
                 Some(Change::Bay(sequence)) => bay_sequence = sequence,
-                Some(Change::Fit(units, mass)) => {
+                Some(Change::Freight(delta)) => {
+                    cargo = cargo.checked_add(delta).ok_or(INVALID)?;
+                    freight_mass = freight_mass.checked_add(delta).ok_or(INVALID)?;
+                }
+                Some(Change::Fit(units, mass, bonded)) => {
+                    bonded_active = bonded;
                     fitted_units = units;
                     cabin_mass = mass;
                 }
                 None => {}
+            }
+            if bonded_active && freight_mass != 0 {
+                return Err(INVALID);
             }
             check_prefix(
                 revision,
@@ -652,6 +667,7 @@ pub(super) fn requires_history(action: ModuleAction) -> bool {
             kind: ModuleKind::Cabin(_)
         } | ModuleAction::Passenger(_)
             | ModuleAction::Dispatch(_)
+            | ModuleAction::Bonded(_)
     )
 }
 

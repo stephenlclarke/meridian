@@ -1,4 +1,5 @@
 //! Host menu state is ephemeral. Only Profile's prepared commands can change the game.
+mod bonded;
 mod dispatch;
 use crate::{
     authored_hull::AuthoredHulls, docked_screens as ui, profile::Profile, session::Action,
@@ -142,6 +143,7 @@ struct Anchor {
     equipment: Option<equipment::Snapshot>,
     ammunition: Option<meridian_core::AmmunitionSnapshot>,
     modules: Option<meridian_core::ModularEquipmentSnapshot>,
+    bonded: Option<meridian_core::freight::BondedRecord>,
     dispatch: Option<meridian_core::freight::DispatchRecord>,
     passage: Option<meridian_core::PassengerJourneySnapshot>,
     emp: Option<meridian_core::EmpSnapshot>,
@@ -158,6 +160,7 @@ impl Anchor {
             equipment: world.equipment_snapshot(),
             ammunition: world.ammunition_snapshot(),
             modules: world.modular_equipment_snapshot(),
+            bonded: world.bonded_records().pop(),
             dispatch: world.dispatch_records().pop(),
             passage: world.passenger_journey_snapshot(),
             emp: world.emp_snapshot(),
@@ -386,7 +389,10 @@ impl Docked {
                     }
                     Intent::Change(action) => {
                         self.feedback = profile.command(action)?;
-                        if matches!(action, Action::Module(ModuleAction::Dispatch(_))) {
+                        if matches!(
+                            action,
+                            Action::Module(ModuleAction::Dispatch(_) | ModuleAction::Bonded(_))
+                        ) {
                             // Publishing a dispatch replaces the offers with contacts, or vice versa.
                             self.screens.reset_equipment_selection();
                         }
@@ -583,7 +589,7 @@ impl Docked {
                 .unwrap_or_else(|| "This fitting action is unavailable".into()));
         }
         let action = equipment_action(world, &node, instance, &slot, operation)?;
-        let details = if slot == dispatch::BOARD {
+        let details = if slot == dispatch::BOARD || slot == bonded::BOARD {
             let mut details = vec![row.name.clone()];
             details.extend(row.readout.clone());
             details
@@ -605,7 +611,9 @@ impl Docked {
         self.review(
             world,
             Intent::Change(action),
-            if slot == dispatch::BOARD {
+            if slot == bonded::BOARD {
+                bonded::TITLE
+            } else if slot == dispatch::BOARD {
                 dispatch::TITLE
             } else if slot == "passenger-service" {
                 "Passenger service review"
@@ -651,6 +659,14 @@ fn equipment_action(
     operation: ui::EquipmentOperation,
 ) -> Result<Action, String> {
     use ui::EquipmentOperation::{Buy, Fit, Store};
+    if slot == bonded::BOARD {
+        if operation != Buy || instance.is_some() {
+            return Err("Select a TOREN board action".into());
+        }
+        return bonded::action(node)
+            .map(|action| Action::Module(ModuleAction::Bonded(action)))
+            .ok_or_else(|| "Unknown TOREN action".into());
+    }
     if slot == dispatch::BOARD {
         if operation != Buy || instance.is_some() {
             return Err("Select a dispatch board action".into());
@@ -1315,6 +1331,19 @@ fn equipment_panel(
         .into(),
         available: true,
     });
+    slots.push(ui::EquipmentSlot {
+        id: bonded::BOARD.into(),
+        label: bonded::TITLE.into(),
+        available: true,
+        fitted: world
+            .bonded_records()
+            .last()
+            .filter(|r| r.remaining() > 0)
+            .map_or_else(
+                || "Contract board".into(),
+                |r| format!("{} t aboard", r.remaining()),
+            ),
+    });
     append_pylon_slots(&mut slots, &ammo);
     for (id, label, slot) in [
         ("targeting", "Targeting computer", ModuleSlot::Targeting),
@@ -1400,6 +1429,8 @@ fn equipment_panel(
         if slot == ModuleSlot::Shield {
             rows.extend(shield_acquisition_rows());
         }
+    } else if selected == bonded::BOARD {
+        rows = bonded::rows(world);
     } else if selected == dispatch::BOARD {
         rows = dispatch::rows(world);
     } else if selected == "passenger-service" {
@@ -1999,6 +2030,109 @@ mod tests {
                     .any(|row| row.node == node && row.fitted == 1)
             );
         }
+    }
+
+    #[test]
+    fn bonded_freight_cold_child() {
+        let Some(path) = std::env::var_os("MERIDIAN_G03_TEST_SLOT") else {
+            return;
+        };
+        let remaining: u16 = ok(ok(std::env::var("MERIDIAN_G03_EXPECTED")).parse());
+        let mut profile = open(std::path::Path::new(&path));
+        ok(profile.continue_saved());
+        let record = profile.world.bonded_records().remove(0);
+        assert_eq!(record.remaining(), remaining);
+        assert_eq!(record.offer.fee_tenths, 5750);
+        assert_eq!(
+            profile.world.credits_tenths(),
+            Some(if remaining == 0 { 12950 } else { 6450 })
+        );
+        assert_eq!(
+            profile.world.service_snapshot().map(|s| s.used_tonnes),
+            Some(remaining)
+        );
+        assert_eq!(
+            profile
+                .world
+                .unwritten_route_clue_progress()
+                .map(|p| p.earned.len()),
+            Some(usize::from(remaining == 0))
+        );
+    }
+
+    #[test]
+    fn bonded_freight_board_cold_partial_writer_refusal_and_final_settlement() {
+        fn key(menu: &mut Docked, profile: &mut Profile, key: ui::Key) {
+            present(menu, profile);
+            ok(menu.input(profile, ui::Input::Key(key)));
+        }
+        fn board(menu: &mut Docked, profile: &mut Profile) {
+            ok(menu.open(&profile.world, ui::Screen::Equipment));
+            ok(menu.request(
+                profile,
+                ui::Request::InspectEquipmentSlot(bonded::BOARD.into()),
+            ));
+        }
+        fn reopen(profile: Profile, dir: &TestDirectory, n: u16) -> Profile {
+            let expected = profile.world.bonded_records();
+            drop(profile);
+            let child = ok(std::process::Command::new(ok(std::env::current_exe()))
+                .args(["--exact", "docked::tests::bonded_freight_cold_child"])
+                .env("MERIDIAN_G03_TEST_SLOT", &dir.0)
+                .env("MERIDIAN_G03_EXPECTED", n.to_string())
+                .status());
+            assert!(child.success());
+            let mut profile = open(&dir.0);
+            ok(profile.continue_saved());
+            assert_eq!(profile.world.bonded_records(), expected);
+            profile
+        }
+        let (dir, mut profile, mut menu) = start();
+        board(&mut menu, &mut profile);
+        let before = ok(profile.world.save_bytes());
+        key(&mut menu, &mut profile, ui::Key::Confirm);
+        assert!(
+            menu.pending.as_ref().is_some_and(|p| p
+                .view
+                .details
+                .iter()
+                .any(|s| s.contains("575 CR + 75 CR")))
+        );
+        key(&mut menu, &mut profile, ui::Key::Back);
+        assert_eq!(ok(profile.world.save_bytes()), before);
+        for _ in 0..2 {
+            key(&mut menu, &mut profile, ui::Key::Confirm);
+        }
+        let mut profile = reopen(profile, &dir, 3);
+        crate::profile::tests::travel(&mut profile);
+        let mut menu = ok(Docked::new(&profile.world));
+        board(&mut menu, &mut profile);
+        for _ in 0..2 {
+            key(&mut menu, &mut profile, ui::Key::Confirm);
+        }
+        let mut profile = reopen(profile, &dir, 2);
+        let mut menu = ok(Docked::new(&profile.world));
+        board(&mut menu, &mut profile);
+        key(&mut menu, &mut profile, ui::Key::Next);
+        key(&mut menu, &mut profile, ui::Key::Confirm);
+        let before = ok(profile.world.save_bytes());
+        let slot = dir.0.join("commander.meridian");
+        let backup = dir.0.join("bonded-writer-backup");
+        ok(std::fs::rename(&slot, &backup));
+        ok(std::fs::create_dir(&slot));
+        present(&mut menu, &profile);
+        assert!(
+            menu.input(&mut profile, ui::Input::Key(ui::Key::Confirm))
+                .is_err()
+        );
+        assert_eq!(ok(std::fs::read(&backup)), before);
+        assert_eq!(ok(profile.world.save_bytes()), before);
+        ok(std::fs::remove_dir(&slot));
+        ok(std::fs::rename(&backup, &slot));
+        for _ in 0..2 {
+            key(&mut menu, &mut profile, ui::Key::Confirm);
+        }
+        let _profile = reopen(profile, &dir, 0);
     }
 
     #[test]

@@ -323,6 +323,7 @@ impl State {
             .ok()
             .and_then(|count| count.checked_mul(CABIN_TONNES))
             .and_then(|mass| mass.checked_add(self.dispatch_occupancy().1 as u16))
+            .and_then(|mass| mass.checked_add(self.bonded_occupancy().1))
             .ok_or(services::Error::InvalidAccount)
     }
 }
@@ -386,6 +387,7 @@ impl Ledger {
     pub(in crate::flight) fn contract_hold_tonnes(&self) -> u16 {
         self.items.iter().filter_map(fitted_cabin).count() as u16 * CABIN_TONNES
             + u16::from(self.dispatch.active().is_some())
+            + self.bonded.active().map_or(0, |r| r.remaining())
     }
 }
 

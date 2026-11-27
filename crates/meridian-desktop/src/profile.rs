@@ -351,6 +351,18 @@ impl Profile {
                 }
                 meridian_core::ModuleAction::Store { .. } => "Owned module stored.",
                 meridian_core::ModuleAction::Install { .. } => "Owned module fitted.",
+                meridian_core::ModuleAction::Bonded(action) => match action {
+                    meridian_core::freight::BondedAction::Accept(_) => {
+                        "Three original Machinery tonnes aboard. TOREN holds the 75 CR bond."
+                    }
+                    meridian_core::freight::BondedAction::ReceiveOne
+                    | meridian_core::freight::BondedAction::ReceiveAll => {
+                        "TOREN workshop receipt saved."
+                    }
+                    meridian_core::freight::BondedAction::Abandon => {
+                        "Remaining original tonnes returned. The 75 CR bond is forfeited."
+                    }
+                },
                 meridian_core::ModuleAction::Dispatch(action) => match action {
                     meridian_core::freight::DispatchAction::Collect(_) => {
                         "Original sealed record aboard. Fly the quoted route."

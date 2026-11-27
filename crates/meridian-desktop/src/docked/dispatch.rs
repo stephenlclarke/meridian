@@ -16,7 +16,7 @@ pub(super) fn action(node: &str) -> Option<DispatchAction> {
         .find(|(id, _)| *id == node)
         .map(|(_, action)| *action)
 }
-fn name(system: SystemId) -> &'static str {
+pub(super) fn name(system: SystemId) -> &'static str {
     match system {
         SystemId::AVENOR => "Avenor",
         SystemId::LARERIA => "Lareria",

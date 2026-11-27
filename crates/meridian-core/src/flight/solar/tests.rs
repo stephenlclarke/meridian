@@ -1004,3 +1004,28 @@ fn fitted_partially_charged_emp_keeps_actual_final_transfer_when_solar_heat_kill
     assert_eq!(cold.emp_snapshot(), Some(emp));
     assert_eq!(cold.combat_snapshot(), world.combat_snapshot());
 }
+
+#[test]
+fn bonded_freight_loss_forfeits_bond_and_preserves_original_ids() {
+    use crate::freight::{BondedAction, BondedUnit};
+    let mut world = World::new_commander(18294).unwrap();
+    let tick = world.snapshot().tick;
+    let review = world
+        .review_module(ModuleAction::Bonded(BondedAction::Accept(0)), tick)
+        .unwrap();
+    world.prepare_module(review, tick).unwrap().commit();
+    let issued = world.bonded_records().pop().unwrap();
+    solar_approach(&mut world);
+    overheat_unfitted_ship(&mut world);
+    let cold = World::from_save_bytes(&world.save_bytes().unwrap()).unwrap();
+    let lost = cold.bonded_records().pop().unwrap();
+    assert_eq!(lost.issue_revision, issued.issue_revision);
+    assert_eq!(lost.units, [BondedUnit::Lost; 3]);
+    assert_eq!(cold.credits_tenths(), Some(6450));
+    assert!(
+        cold.unwritten_route_clue_progress()
+            .unwrap()
+            .earned
+            .is_empty()
+    );
+}
