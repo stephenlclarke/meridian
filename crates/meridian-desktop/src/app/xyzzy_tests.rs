@@ -742,3 +742,50 @@ fn testing_menu_h_help_wins_over_hidden_galaxy_and_showroom_search_without_losin
         assert!(!directory.0.join("commander.meridian").exists());
     }
 }
+
+#[test]
+fn sh171_lasers_held_fire_uses_the_ordinary_fleet_view_and_restores_the_mount() {
+    let directory = TestDirectory::new();
+    let mut app = app(&directory);
+    activate(&mut app);
+    ok(app.game.command(Action::Launch));
+    ok(app.game.world.step(FlightInput::default()));
+    let mut ids = std::collections::BTreeSet::new();
+    for view in [
+        meridian_core::FlightView::Rear,
+        meridian_core::FlightView::Left,
+        meridian_core::FlightView::Right,
+        meridian_core::FlightView::Front,
+    ] {
+        ok(app.game.command(Action::SetFlightView(view)));
+        let fit = app
+            .game
+            .world
+            .selected_laser_snapshot()
+            .unwrap_or_else(|| panic!("missing mount"));
+        let mut shot = None;
+        let mut fired = 0;
+        ok(super::step_frame(
+            &mut app.game.world,
+            FlightInput::default(),
+            1,
+            true,
+            &mut shot,
+            &mut None,
+            || fired += 1,
+        ));
+        assert_eq!(fired, 1);
+        assert_eq!(shot.map(|s| s.fitted_item_id), Some(fit.fitted_item_id));
+        assert!(ids.insert(fit.fitted_item_id));
+        ok(app.game.save());
+        let mut reopened = open(&directory.0);
+        ok(reopened.continue_saved());
+        assert_eq!(reopened.world.flight_view(), view);
+        assert_eq!(reopened.world.selected_laser_snapshot(), Some(fit));
+        app = App::with_profile(reopened);
+        for _ in 0..fit.cooldown_ticks_per_shot {
+            ok(app.game.world.step(FlightInput::default()));
+        }
+    }
+    assert_eq!(ids.len(), 4);
+}

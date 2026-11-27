@@ -298,10 +298,7 @@ impl World {
                     .as_ref()
                     .ok_or(FireError::InvalidGeometry)?,
                 traffic::PlayerBeamInput {
-                    weapon: self
-                        .selected_fit()
-                        .ok_or(FireError::NoFittedFrontLaser)?
-                        .1,
+                    weapon: self.selected_fit().ok_or(FireError::NoFittedFrontLaser)?.1,
                     system: owner.system,
                     source: BeamSource::Player {
                         owner: owner.owner,

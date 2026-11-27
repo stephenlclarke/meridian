@@ -113,6 +113,20 @@ impl Panel {
         panel
     }
 
+    pub fn flight_facing(
+        weapon: Option<&str>,
+        review: Option<&str>,
+        facing: meridian_core::FlightView,
+    ) -> Self {
+        let mut panel = Self::flight(weapon, review);
+        if facing != meridian_core::FlightView::Front {
+            panel.lines[1] = format!(
+                "Z Fire {} Naval Laser",
+                crate::flight_lesson::view_name(facing)
+            );
+        }
+        panel
+    }
     pub fn flight(weapon: Option<&str>, review: Option<&str>) -> Self {
         let mut panel = Self::new(
             "Flight controls",

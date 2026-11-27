@@ -137,6 +137,7 @@ struct FirstHit {
     tick: u64,
     firing_pose: RecordedPose,
     missile: Option<super::MissileOrigin>,
+    integral: Option<(super::FlightView, u64)>,
 }
 #[derive(Debug, Clone, Copy, PartialEq)]
 struct Range {
@@ -233,12 +234,20 @@ impl Practice {
         }
         self.observe_quiet_step(next.tick);
     }
+    pub(super) fn integral_hits(&self) -> impl Iterator<Item = (u64, super::FlightView, u64)> + '_ {
+        self.range
+            .iter()
+            .flat_map(|r| r.hits.iter().flatten())
+            .filter_map(|h| h.integral.map(|(f, e)| (h.tick, f, e)))
+    }
     pub(super) fn contact_limited(
         &mut self,
         shot: Snapshot,
         pose: RigidPose,
         limit: f64,
         station_distance: Option<f64>,
+        facing: super::FlightView,
+        emission: u64,
     ) -> Option<(PracticeBeaconId, f64, bool)> {
         let range = self.active_range()?;
         let (ordinal, distance) =
@@ -251,6 +260,7 @@ impl Practice {
                 tick: shot.tick,
                 firing_pose: RecordedPose::from_snapshot(shot),
                 missile: None,
+                integral: (facing != super::FlightView::Front).then_some((facing, emission)),
             });
         }
         Some((id, distance, first_hit))
@@ -378,6 +388,7 @@ impl Practice {
                 tick: flight.tick,
                 firing_pose: RecordedPose::from_snapshot(flight),
                 missile: Some(origin),
+                integral: None,
             });
             return true;
         }
