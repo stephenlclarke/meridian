@@ -852,6 +852,7 @@ fn module_rows(
     slot: ModuleSlot,
     tick: u64,
 ) -> Vec<ui::EquipmentRow> {
+    let hull = world.player_hull_kind().source_id();
     let label = match slot {
         ModuleSlot::FrontLaser => "Front laser",
         ModuleSlot::Energy => "Energy system",
@@ -930,38 +931,39 @@ fn module_rows(
             }
         } else if item.kind == ModuleKind::SalvageCutter {
             row.compatibility =
-                "Unique SH025 work utility; 1 shared mount and 1 equipment unit".into();
+                format!("Unique {hull} work utility; 1 shared mount and 1 equipment unit");
             row.readout
                 .push("Requires lawful salvage custody; not a combat laser".into());
         } else if item.kind == ModuleKind::Ecm {
-            row.compatibility = "Unique SH025 utility; 1 shared mount and 1 equipment unit".into();
+            row.compatibility =
+                format!("Unique {hull} utility; 1 shared mount and 1 equipment unit");
             row.readout
                 .push("K: activate E.C.M. in flight | Requires more than 22 energy".into());
         } else if let ModuleKind::Shield(grade) = item.kind {
-            row.compatibility = "Owned SH025 shield module; one fitted shield required".into();
+            row.compatibility = format!("Owned {hull} shield module; one fitted shield required");
             row.readout.push(format!(
                 "Capacity {} per bank | Recharge unchanged",
                 grade.capacity() / 100
             ));
         } else if let ModuleKind::Drive(grade) = item.kind {
-            row.compatibility = "Owned SH025 hyperspace drive; one fitted drive required".into();
+            row.compatibility = format!("Owned {hull} hyperspace drive; one fitted drive required");
             row.readout.push(format!(
                 "Spool {}s | Station mass lock {}",
                 grade.spool_ticks() / 60,
                 grade.mass_lock_distance()
             ));
         } else if let Some(reach) = item.kind.navigation_reach_ly() {
-            row.compatibility = "Owned SH025 navigation module".into();
+            row.compatibility = format!("Owned {hull} navigation module");
             row.readout.push(format!("Module jump limit {reach} LY"));
         } else if matches!(item.kind, ModuleKind::Targeting(_)) {
-            row.compatibility = "Owned SH025 computer module".into();
+            row.compatibility = format!("Owned {hull} computer module");
             row.readout.push("Equipment units 1".into());
         } else if matches!(
             item.kind,
             ModuleKind::MiningTargeting | ModuleKind::SalvageTargeting
         ) {
             row.compatibility =
-                "Independent SH025 fitting; requires a fitted targeting core".into();
+                format!("Independent {hull} fitting; requires a fitted targeting core");
             row.readout.push(
                 if item.kind == ModuleKind::MiningTargeting {
                     "Live rock hold and pending ore tracking"
@@ -972,7 +974,7 @@ fn module_rows(
             );
         } else {
             row.compatibility =
-                "Owned SH025 module; fitting preserves shared energy and heat".into();
+                format!("Owned {hull} module; fitting preserves shared energy and heat");
         }
         if let Some(profile) = item.kind.laser_profile() {
             row.readout.push(format!(
@@ -1042,8 +1044,10 @@ fn module_rows(
         if offer.kind == ModuleKind::FuelStorage {
             row.readout
                 .push("Adds 7.0 LY of tank fuel; fuel not included".into());
-            row.readout
-                .push("Normal SH025: 3 shared utility mounts; global ownership cap 4".into());
+            row.readout.push(format!(
+                "Normal {hull}: {} shared utility mounts; global ownership cap 4",
+                modules.utility_mounts_capacity
+            ));
         } else if let ModuleKind::Cabin(grade) = offer.kind {
             row.readout.push(format!(
                 "5t | {} places | {}",

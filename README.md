@@ -16,6 +16,8 @@ The passenger-cabin development candidate offers all six original paid cabin lay
 
 In the scanner development build, press **Tab** to mark the nearest contact. Press again to move through the others by distance. **F** switches between hand flight and the assistance your equipment provides. You can aim and fire at ships, fly a docking approach, mine or salvage by hand. [Flight controls and required equipment](docs/AUTOMATIC-WORK.md)
 
+In a normal Fleet commander slot, dock and press **Ctrl+Shift+X**. Choose **Activate / refit SH171 Medusa**, press **Enter** to review, then **Enter** to confirm. Launch from that berth to fly the issued ship. Its 32-tonne expanded hold, five loaded missile positions and fitted equipment travel with the commander through Save and Continue. Existing CLARKE commanders use the same row and keep their current credits. [Medusa test outfit and limits](docs/EQUIPMENT-PLAYABLE.md#fleet-xyzzy-medusa)
+
 ## Goshawk Explorer in the Ship Showroom
 
 In Preview 10, press 3 at a station and search for Goshawk Explorer. Compare shows the Peregrine Mk V beside the Goshawk for a new commander. Press C for a single-ship view. Mac testing verified the original dark green hull, silver cross-member, open wishbone and refusal of an unavailable exchange. Preview 9 predates this ship. [Goshawk geometry and Showroom controls](docs/GOSHAWK-GAMEPLAY-ENVELOPE.md)

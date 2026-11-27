@@ -8,6 +8,8 @@ The [automatic work candidate](AUTOMATIC-WORK.md) uses the existing targets and 
 
 The development save store explicitly unlocks on close. Dell Linux reproduced the cold-reopen failure during concurrent process startup and verified the fix while retaining exclusive access for a live owner.
 
+The Fleet XYZZY development change issues an SH171 Medusa to the ordinary commander slot through the testing menu. It includes a five-position missile rack, an expanded 32 t hold, fitted systems, and a test issue tied to the berth and account revision that survives Continue. [Equipment and acceptance scope](EQUIPMENT-PLAYABLE.md#fleet-xyzzy-medusa)
+
 ## Ordinary hyperspace drive source candidate
 
 The station Equipment screen exposes the born Basic drive and the two original paid upgrades. Their actual countdowns are 10, 5 and 1 second, and the existing station mass-lock thresholds are 600, 480 and 360. Purchases, refitting, saved pending jumps, historical completed legs and the explicit XYZZY top-grade grant use the same owned equipment ledger. The [equipment implementation and testing ledger](EQUIPMENT-PLAYABLE.md) reconciles remaining original grades and Medusa design constraints. Authored source and regression coverage await the owning compiler, whole-slice review, CI and native preview.

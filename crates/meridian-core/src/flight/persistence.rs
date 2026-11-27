@@ -820,6 +820,14 @@ impl World {
             account,
             commerce.modular.paid_count(),
         )?;
+        if self.xyzzy_medusa_active()
+            && ammunition
+                .items
+                .iter()
+                .any(|item| item.pylon.is_some_and(|p| p >= 5))
+        {
+            return Err(SaveError::InvalidState("missile outside Medusa rack"));
+        }
         self.missiles
             .validate(self, practice, history, nav.dock_sequence)?;
         self.combat.validate(self)?;

@@ -624,7 +624,9 @@ impl World {
             legal: self.legal_value().unwrap_or(0),
             traffic: traffic.clone(),
         };
-        prepared.combat.advance(self.state.mode, next.mode);
+        prepared
+            .combat
+            .advance(self.state.mode, next.mode, self.xyzzy_medusa_active());
         prepared.pulse.advance(
             self.state.mode,
             next.mode,

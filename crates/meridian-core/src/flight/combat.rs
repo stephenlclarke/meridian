@@ -254,7 +254,7 @@ impl State {
         self.last = Some(hit);
         Ok((hit, penalty))
     }
-    pub(super) fn advance(&mut self, opening: FlightMode, next: FlightMode) {
+    pub(super) fn advance(&mut self, opening: FlightMode, next: FlightMode, medusa: bool) {
         if opening == FlightMode::Docked {
             return;
         }
@@ -262,7 +262,8 @@ impl State {
         if next == FlightMode::Docked {
             self.shields.fill();
         } else {
-            self.shields.advance(1);
+            self.shields
+                .advance_for_hull(self.physical_tick - 1, 1, medusa);
         }
     }
     pub(super) fn can_advance(self, opening: FlightMode) -> bool {

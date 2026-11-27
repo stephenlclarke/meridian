@@ -649,7 +649,9 @@ fn advance_with_rate(pools: &mut Pools, start: u64, elapsed: u64, recharge: u16,
     pools
         .pulse
         .replay_advance_with_rate(start, elapsed, recharge, capacity);
-    pools.shields.advance(elapsed);
+    pools
+        .shields
+        .advance_for_hull(start, elapsed, capacity == super::weapons::MEDUSA_ENERGY);
 }
 
 #[cfg(test)]

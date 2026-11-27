@@ -1,0 +1,594 @@
+{
+  "base": "a2959bd36951917066caec5279684de5f0fba659",
+  "files": {
+    "equipment.rs": {
+      "beforeSHA256": "03f18b8069ac215897ad718687b65d947d3f476d583d800fedca929e43b5c42f",
+      "afterSHA256": "9327badea264f545afe0fc0dd12007d632e2c89a4518ba86fb86a8b18216de3e",
+      "hunks": [
+        {
+          "offset": 268,
+          "before": "",
+          "after": "pub(crate) const MEDUSA_HOLD_TONNES: u16 = 22;\npub(crate) const MEDUSA_EXPANDED_HOLD_TONNES: u16 = 32;\n"
+        }
+      ]
+    },
+    "equipment/content.rs": {
+      "beforeSHA256": "bde7c56569f1a6fc9740942b3f2c19589f8ef19a5e46bb770f5aa2797760cd49",
+      "afterSHA256": "2336a41b6cbe200ddad2e2196df2e8f72a435bb49706db42553b4e2e81847f65",
+      "hunks": [
+        {
+          "offset": 1113,
+          "before": "",
+          "after": "    pub(crate) fn for_player(mut self, medusa: bool) -> Self {\n        if medusa {\n            self.hull = \"SH171\";\n            self.base_hold_tonnes = 22;\n            self.extra_hold_tonnes = 10;\n            self.utility_mounts_capacity = 4;\n            self.equipment_units_capacity = 13;\n        }\n        self\n    }\n\n"
+        }
+      ]
+    },
+    "flight.rs": {
+      "beforeSHA256": "e36fd880c0177c3b03c913871e213eac66159eb19abc303c65805efa35a899b2",
+      "afterSHA256": "3078e5fe6c53e70cd31ec517f7f2ae71c7a3dcb8bf60c101541a8158756c5308",
+      "hunks": [
+        {
+          "offset": 25634,
+          "before": "        let hull = if self.medusa_preview_fit.is_some() {\n            PlayerHullKind::Medusa\n        } else {\n            PlayerHullKind::Peregrine\n        };\n",
+          "after": "        let hull = self.player_hull_kind();\n"
+        }
+      ]
+    },
+    "flight/ammunition.rs": {
+      "beforeSHA256": "fa936a3746563a7a2ce733a4e29c0cfb2d8140190c2fdb0e6f083df2ec3cc07f",
+      "afterSHA256": "6cb27ecbbb4c2436249f961dd957a870ee9ba4b1f680c39f7e44bd4fd98b1509",
+      "hunks": [
+        {
+          "offset": 3874,
+          "before": "",
+          "after": "        capacity: usize,\n"
+        },
+        {
+          "offset": 4243,
+          "before": "                let pylon = self\n                    .rounds()\n",
+          "after": "                let pylon = self.rounds()[..capacity]\n"
+        },
+        {
+          "offset": 5378,
+          "before": "                if usize::from(pylon) >= PYLONS {\n",
+          "after": "                if usize::from(pylon) >= capacity {\n"
+        },
+        {
+          "offset": 10388,
+          "before": "                .apply(e.action, e.item, (!e.xyzzy).then_some(purchases))\n",
+          "after": "                .apply(\n                    e.action,\n                    e.item,\n                    (!e.xyzzy).then_some(purchases),\n                    world.missile_capacity_at(e.revision),\n                )\n"
+        },
+        {
+          "offset": 14747,
+          "before": "            capacity: PYLONS as u8,\n",
+          "after": "            capacity: self.missile_capacity_at(u64::MAX) as u8,\n"
+        },
+        {
+          "offset": 16435,
+          "before": "        ledger.apply(action, 0, Some(0))?;\n",
+          "after": "        ledger.apply(action, 0, Some(0), self.missile_capacity_at(u64::MAX))?;\n"
+        },
+        {
+          "offset": 20810,
+          "before": "",
+          "after": "    fn missile_capacity_at(&self, revision: u64) -> usize {\n        if self.xyzzy.medusa_at(revision) {\n            5\n        } else {\n            PYLONS\n        }\n    }\n"
+        },
+        {
+          "offset": 21273,
+          "before": "            let Some(pylon) = ledger.rounds().iter().position(Option::is_none) else {\n",
+          "after": "            let capacity = self.missile_capacity_at(u64::MAX);\n            let rounds = ledger.rounds();\n            if let Some(round) = rounds[capacity..].iter().flatten().next() {\n                let account = current\n                    .prepare_ammunition(0, None, false)\n                    .map_err(|_| INVALID)?;\n                self.ammunition.events.push(Event {\n                    xyzzy: false,\n                    action: AmmunitionAction::Store { item: round.item },\n                    dock,\n                    tick,\n                    revision: account.revision(),\n                    item: round.item,\n                });\n                self.commander_account = Some(account);\n                continue;\n            }\n            let Some(pylon) = rounds[..capacity].iter().position(Option::is_none) else {\n"
+        }
+      ]
+    },
+    "flight/combat.rs": {
+      "beforeSHA256": "b34743521b5bbdf8f4664e6497ed8d5fb50e76e4ad447449ee5922a710ba8aa1",
+      "afterSHA256": "576fc790566b20a9d683c98290e95e0b8a5dc384fef86c145dfe1a7f7aa38aa4",
+      "hunks": [
+        {
+          "offset": 8739,
+          "before": "    pub(super) fn advance(&mut self, opening: FlightMode, next: FlightMode) {\n",
+          "after": "    pub(super) fn advance(&mut self, opening: FlightMode, next: FlightMode, medusa: bool) {\n"
+        },
+        {
+          "offset": 9027,
+          "before": "            self.shields.advance(1);\n",
+          "after": "            self.shields\n                .advance_for_hull(self.physical_tick - 1, 1, medusa);\n"
+        }
+      ]
+    },
+    "flight/damage.rs": {
+      "beforeSHA256": "9b3aa8b3803a55aa39e5fa15f7b211a7f5cf325cac80f7b5cf9b3bbaafe43614",
+      "afterSHA256": "1262d48a5c4456cbe6f88b688344ee9097d47e4c2e173d7267d1078e9677f950",
+      "hunks": [
+        {
+          "offset": 14920,
+          "before": "",
+          "after": "        if let Some((dock, _, _)) = world.xyzzy_medusa_issue() {\n            let clock = self.berth_clock(dock.sequence()).ok_or(INVALID)?;\n            events.push((clock, 0, u64::MAX, Effect::MedusaIssue));\n        }\n"
+        },
+        {
+          "offset": 19914,
+          "before": "",
+          "after": "    MedusaIssue,\n"
+        },
+        {
+          "offset": 20559,
+          "before": "",
+          "after": "    let mut capacity = super::weapons::ENERGY_CAPACITY_HUNDREDTHS;\n"
+        },
+        {
+          "offset": 20670,
+          "before": "        advance_with_rate(&mut pools, at.checked_sub(clock).ok_or(INVALID)?, recharge);\n",
+          "after": "        advance_with_rate(\n            &mut pools,\n            clock,\n            at.checked_sub(clock).ok_or(INVALID)?,\n            recharge,\n            capacity,\n        );\n"
+        },
+        {
+          "offset": 20900,
+          "before": "                pools.pulse.replay_berth();\n",
+          "after": "                pools.pulse.replay_berth(capacity);\n"
+        },
+        {
+          "offset": 20990,
+          "before": "",
+          "after": "            }\n            Effect::MedusaIssue => {\n                capacity = super::weapons::MEDUSA_ENERGY;\n                pools.pulse.replay_berth(capacity);\n"
+        },
+        {
+          "offset": 22791,
+          "before": "    advance_with_rate(&mut pools, end.checked_sub(clock).ok_or(INVALID)?, recharge);\n",
+          "after": "    advance_with_rate(\n        &mut pools,\n        clock,\n        end.checked_sub(clock).ok_or(INVALID)?,\n        recharge,\n        capacity,\n    );\n"
+        },
+        {
+          "offset": 22956,
+          "before": "fn advance_with_rate(pools: &mut Pools, elapsed: u64, recharge: u16) {\n    pools.pulse.replay_advance_with_rate(elapsed, recharge);\n    pools.shields.advance(elapsed);\n",
+          "after": "fn advance_with_rate(pools: &mut Pools, start: u64, elapsed: u64, recharge: u16, capacity: u16) {\n    pools\n        .pulse\n        .replay_advance_with_rate(start, elapsed, recharge, capacity);\n    pools\n        .shields\n        .advance_for_hull(start, elapsed, capacity == super::weapons::MEDUSA_ENERGY);\n"
+        },
+        {
+          "offset": 23350,
+          "before": "    advance_with_rate(pools, elapsed, 7);\n",
+          "after": "    advance_with_rate(\n        pools,\n        0,\n        elapsed,\n        7,\n        super::weapons::ENERGY_CAPACITY_HUNDREDTHS,\n    );\n"
+        }
+      ]
+    },
+    "flight/damage/tests.rs": {
+      "beforeSHA256": "d3d9a2de6aab314abab43875b3c77fbc8e4429b0880e6e1bc9ce057336f1a9d1",
+      "afterSHA256": "ca86706fd71247aa9ffbd1f159af937a3efa072e12b6cad8e1549e8fd1dd5c9c",
+      "hunks": [
+        {
+          "offset": 4754,
+          "before": "    expected.replay_berth();\n",
+          "after": "    expected.replay_berth(crate::ENERGY_CAPACITY_HUNDREDTHS);\n"
+        }
+      ]
+    },
+    "flight/emp/equipment.rs": {
+      "beforeSHA256": "f9926ff582004339a8055d523dcf13b0401efe138e3ba61af74beadcdcb4e450",
+      "afterSHA256": "3c6741b5b698da92ae81a583c7170765c1e75e714c6e73185776f88efa6061f8",
+      "hunks": [
+        {
+          "offset": 3816,
+          "before": "        let definition = crate::equipment::definition().map_err(|_| EmpError::BerthRequired)?;\n",
+          "after": "        let definition = account\n            .equipment_definition()\n            .map_err(|_| EmpError::BerthRequired)?;\n"
+        }
+      ]
+    },
+    "flight/emp/validation.rs": {
+      "beforeSHA256": "023730d48acca990555e97f3890022d65743661b674631ec8f8a9de2354d89f6",
+      "afterSHA256": "579e116512aa0d79a3d2547fe4870b9a28ea8a5396d9be09dfaa1996bc46736b",
+      "hunks": [
+        {
+          "offset": 15721,
+          "before": "                crate::equipment::definition()\n",
+          "after": "                account\n                    .equipment_definition()\n"
+        }
+      ]
+    },
+    "flight/equipment.rs": {
+      "beforeSHA256": "1d7aa717ee2bf796159db5341023241eab1107ee77495c247be032d57bff341a",
+      "afterSHA256": "08e2b081f075fc5940d2a138e2e5c61282012e50bd0ea545dfc05166d7010c50",
+      "hunks": [
+        {
+          "offset": 1481,
+          "before": "        let definition = equipment::definition().ok()?;\n",
+          "after": "        let definition = account.equipment_definition().ok()?;\n"
+        }
+      ]
+    },
+    "flight/flight_reception/persistence.rs": {
+      "beforeSHA256": "10f65a16d585475c279d21c93442bfbea20f2d799dbd26b7b94a7352911d2f78",
+      "afterSHA256": "5bd42ff8a6044d3421ada618932a41e403ae5e176aace7818a039ac65e0c1ae9",
+      "hunks": [
+        {
+          "offset": 10962,
+          "before": "            validate_flight(&sample.flight)?;\n",
+          "after": "            validate_flight(world, &sample.flight)?;\n"
+        }
+      ]
+    },
+    "flight/missiles.rs": {
+      "beforeSHA256": "c704fc62602fbdbd21dbe1cb205ae0e9ba490b879804a6483777cf19acdd99a9",
+      "afterSHA256": "99789575f98bfb9fb1c969ecb676317aeddcdb6d1cc16d6f729e862c5a90e4a8",
+      "hunks": [
+        {
+          "offset": 21212,
+          "before": "        prepared.combat.advance(self.state.mode, next.mode);\n",
+          "after": "        prepared\n            .combat\n            .advance(self.state.mode, next.mode, self.xyzzy_medusa_active());\n"
+        },
+        {
+          "offset": 21411,
+          "before": "            self.energy_recharge_hundredths(),\n",
+          "after": "            self.step_energy_recharge(self.energy_recharge_hundredths()),\n            self.energy_capacity(),\n"
+        }
+      ]
+    },
+    "flight/missiles/npc.rs": {
+      "beforeSHA256": "14831f769de994c1ba853886e31b90db310240f58e17b900aa1108acbf60c345",
+      "afterSHA256": "09347ef6693cc03a8227865c35ad339b40e9876a9d28d92b346f20c42871c3f0",
+      "hunks": [
+        {
+          "offset": 13227,
+          "before": "        super::super::persistence::validate_flight(&m.flight)?;\n",
+          "after": "        super::super::persistence::validate_flight(world, &m.flight)?;\n"
+        }
+      ]
+    },
+    "flight/missiles/persistence.rs": {
+      "beforeSHA256": "492d9bd87244d79317fe79d8f74fa83755f0685250b659a6b8161ba42b122f7f",
+      "afterSHA256": "d9260201f99fb981fc27d8358ca9169e6a7899ffc654fe938ceb0aa8f686b8e5",
+      "hunks": [
+        {
+          "offset": 42881,
+          "before": "        super::super::persistence::validate_flight(&m.flight)?;\n",
+          "after": "        super::super::persistence::validate_flight(world, &m.flight)?;\n"
+        }
+      ]
+    },
+    "flight/modular.rs": {
+      "beforeSHA256": "271c8afc708a475b106eac5999f64a757fe83de5e0814f6477a9bed90b948133",
+      "afterSHA256": "856b575877b06678e0c2f75760ad04538c3af21d4309a59804fb68f00f84ecb0",
+      "hunks": [
+        {
+          "offset": 23851,
+          "before": "        let definition = crate::equipment::definition().map_err(|_| ModuleError::BerthRequired)?;\n",
+          "after": "        let definition = account\n            .equipment_definition()\n            .map_err(|_| ModuleError::BerthRequired)?;\n"
+        },
+        {
+          "offset": 42552,
+          "before": "        let budget = crate::equipment::definition().map_err(|_| INVALID)?;\n",
+          "after": "        let stock = crate::equipment::definition().map_err(|_| INVALID)?;\n"
+        },
+        {
+          "offset": 42658,
+          "before": "",
+          "after": "            let budget = stock.for_player(world.xyzzy.medusa_at(e.revision));\n"
+        },
+        {
+          "offset": 49814,
+          "before": "                    let budget = crate::equipment::definition().map_err(|_| INVALID)?;\n",
+          "after": ""
+        },
+        {
+          "offset": 67501,
+          "before": "        let definition = crate::equipment::definition().ok()?;\n",
+          "after": "        let definition = account.equipment_definition().ok()?;\n"
+        },
+        {
+          "offset": 94605,
+          "before": "            let definition = crate::equipment::definition().map_err(|_| INVALID)?;\n",
+          "after": "            let definition = current.equipment_definition().map_err(|_| INVALID)?;\n"
+        }
+      ]
+    },
+    "flight/modular/scoops.rs": {
+      "beforeSHA256": "8c114b556cf50accdc4cf23ab978a61971c25c7b90bf3b20e396eab4137d2ffa",
+      "afterSHA256": "29cee46a0abe4a904f8b585a2a90cd9fdedd06d8c90a67ae71086badd6800d94",
+      "hunks": [
+        {
+          "offset": 1694,
+          "before": "    if definition.hull != \"SH025\"\n",
+          "after": "    if !matches!(definition.hull, \"SH025\" | \"SH171\")\n"
+        },
+        {
+          "offset": 2884,
+          "before": "        crate::equipment::definition().map_err(|_| ModuleError::BerthRequired)?,\n",
+          "after": "        account\n            .equipment_definition()\n            .map_err(|_| ModuleError::BerthRequired)?,\n"
+        },
+        {
+          "offset": 3278,
+          "before": "        let definition = crate::equipment::definition().ok()?;\n",
+          "after": "        let definition = account.equipment_definition().ok()?;\n"
+        }
+      ]
+    },
+    "flight/navigation_trade/persistence.rs": {
+      "beforeSHA256": "4fb04e53706e337d1c364a3a44aaa2941ea86ed66d0928023d3f5b14cf2c9dec",
+      "afterSHA256": "12573177ba7bd3057e7b77eb0a193e0f15ce3606b475459905c533568670c2eb",
+      "hunks": [
+        {
+          "offset": 21022,
+          "before": "",
+          "after": "        let definition = crate::equipment::definition()\n            .map_err(|_| INVALID)?\n            .for_player(c.world.xyzzy.medusa_at(self.account_revision));\n"
+        },
+        {
+          "offset": 21434,
+          "before": "            || ![92, 127].contains(&self.capacity)\n",
+          "after": "            || ![\n                definition.base_hold_tonnes,\n                definition.base_hold_tonnes + definition.extra_hold_tonnes,\n            ]\n            .contains(&self.capacity)\n"
+        }
+      ]
+    },
+    "flight/persistence.rs": {
+      "beforeSHA256": "4628ba0f08a5dde7da89774d797598ce12b27c55fb69b4d51c821aae554bcf1a",
+      "afterSHA256": "e14eaef6ce7c9b392eba7dc973d6bbfd3f1b23a887f1f579334e20ac3ce77915",
+      "hunks": [
+        {
+          "offset": 21133,
+          "before": "        let station_data =\n            OriginalStationData::bundled().map_err(|_| SaveError::ContentMismatch)?;\n",
+          "after": ""
+        },
+        {
+          "offset": 21188,
+          "before": "        state.station = Some(station_data.station_pose());\n",
+          "after": ""
+        },
+        {
+          "offset": 21252,
+          "before": "        let commander_account = CommanderAccount::decode_save(&mut r, version)?;\n",
+          "after": "        let mut commander_account = CommanderAccount::decode_save(&mut r, version)?;\n"
+        },
+        {
+          "offset": 21540,
+          "before": "",
+          "after": "        let medusa = xyzzy.medusa_at(u64::MAX);\n        commander_account.set_medusa(medusa);\n        let station_data = if medusa {\n            OriginalStationData::medusa_bundled()\n        } else {\n            OriginalStationData::bundled()\n        }\n        .map_err(|_| SaveError::ContentMismatch)?;\n        state.station = Some(station_data.station_pose());\n"
+        },
+        {
+          "offset": 29491,
+          "before": "        validate_flight(&self.state)?;\n",
+          "after": "        validate_flight_speed(&self.state, self.player_hull_kind().flight_rates().0)?;\n"
+        },
+        {
+          "offset": 32603,
+          "before": "",
+          "after": "        if self.xyzzy_medusa_active()\n            && ammunition\n                .items\n                .iter()\n                .any(|item| item.pylon.is_some_and(|p| p >= 5))\n        {\n            return Err(SaveError::InvalidState(\"missile outside Medusa rack\"));\n        }\n"
+        },
+        {
+          "offset": 42181,
+          "before": "pub(super) fn validate_flight(s: &Snapshot) -> Result<(), SaveError> {\n",
+          "after": "pub(super) fn validate_flight(world: &World, s: &Snapshot) -> Result<(), SaveError> {\n    let maximum = if world\n        .xyzzy_medusa_issue()\n        .is_some_and(|(_, tick, _)| s.tick > tick)\n    {\n        super::PlayerHullKind::Medusa.flight_rates().0\n    } else {\n        MAX_SPEED\n    };\n    validate_flight_speed(s, maximum)\n}\npub(super) fn validate_flight_speed(s: &Snapshot, max_speed: f32) -> Result<(), SaveError> {\n"
+        },
+        {
+          "offset": 42727,
+          "before": "            * f64::from(MAX_SPEED * DISTANCE_PER_SPEED_UNIT * FIXED_DELTA_SECONDS)\n",
+          "after": "            * f64::from(max_speed * DISTANCE_PER_SPEED_UNIT * FIXED_DELTA_SECONDS)\n"
+        },
+        {
+          "offset": 42857,
+          "before": "        || !(0.0..=MAX_SPEED).contains(&s.speed)\n",
+          "after": "        || !(0.0..=max_speed).contains(&s.speed)\n"
+        }
+      ]
+    },
+    "flight/weapons.rs": {
+      "beforeSHA256": "635d6d624283c410b5fbcbf24cbe92be1c24abbeccf46649f3537f081077bb65",
+      "afterSHA256": "67949709ed2f71b8b3ca20476593bf5caab8c6e83365278c621ec2b8f2c363fc",
+      "hunks": [
+        {
+          "offset": 281,
+          "before": "",
+          "after": "pub(super) const MEDUSA_ENERGY: u16 = 41_000;\n"
+        },
+        {
+          "offset": 3955,
+          "before": "",
+          "after": "/// Recharge in whole hundredths between two physics ticks. Keep the fractional\n/// part across ticks so the Medusa's original 4.7 energy/s is exact over a second.\nfn recovered_energy(start: u64, elapsed: u64, peregrine_rate: u16, capacity: u16) -> u64 {\n    if capacity != MEDUSA_ENERGY {\n        return elapsed.saturating_mul(u64::from(peregrine_rate));\n    }\n    let per_second = u128::from(peregrine_rate / ENERGY_RECHARGE_HUNDREDTHS) * 470;\n    let phase = u128::from(start % 60);\n    let amount = ((phase + u128::from(elapsed)) * per_second) / 60 - phase * per_second / 60;\n    u64::try_from(amount).unwrap_or(u64::MAX)\n}\n\n"
+        },
+        {
+          "offset": 4683,
+          "before": "        self.replay_advance_with_rate(elapsed, 7);\n",
+          "after": "        self.replay_advance_with_rate(0, elapsed, 7, ENERGY_CAPACITY_HUNDREDTHS);\n"
+        },
+        {
+          "offset": 4771,
+          "before": "    pub(super) fn replay_advance_with_rate(&mut self, elapsed: u64, recharge: u16) {\n",
+          "after": "    pub(super) fn replay_advance_with_rate(\n        &mut self,\n        start: u64,\n        elapsed: u64,\n        recharge: u16,\n        capacity: u16,\n    ) {\n"
+        },
+        {
+          "offset": 4975,
+          "before": "            .saturating_add(elapsed.saturating_mul(u64::from(recharge)))\n            .min(38000) as u16;\n",
+          "after": "            .saturating_add(recovered_energy(start, elapsed, recharge, capacity))\n            .min(u64::from(capacity)) as u16;\n"
+        },
+        {
+          "offset": 5262,
+          "before": "    pub(super) fn replay_berth(&mut self) {\n        self.energy = 38000;\n",
+          "after": "    pub(super) fn replay_berth(&mut self, capacity: u16) {\n        self.energy = capacity;\n"
+        },
+        {
+          "offset": 5382,
+          "before": "    pub(super) fn advance(&mut self, opening: FlightMode, next: FlightMode, recharge: u16) {\n",
+          "after": "    pub(super) fn advance(\n        &mut self,\n        opening: FlightMode,\n        next: FlightMode,\n        recharge: u16,\n        capacity: u16,\n    ) {\n"
+        },
+        {
+          "offset": 5787,
+          "before": "            self.energy = ENERGY_CAPACITY_HUNDREDTHS;\n",
+          "after": "            self.energy = capacity;\n"
+        },
+        {
+          "offset": 5867,
+          "before": "            self.energy = (self.energy + recharge).min(ENERGY_CAPACITY_HUNDREDTHS);\n",
+          "after": "            self.energy = (self.energy + recharge).min(capacity);\n"
+        },
+        {
+          "offset": 17996,
+          "before": "",
+          "after": "    pub(super) fn step_energy_recharge(&self, nominal: u16) -> u16 {\n        recovered_energy(\n            self.combat.physical_tick(),\n            1,\n            nominal,\n            self.energy_capacity(),\n        ) as u16\n    }\n    pub(super) fn energy_capacity(&self) -> u16 {\n        if self.xyzzy_medusa_active() {\n            MEDUSA_ENERGY\n        } else {\n            ENERGY_CAPACITY_HUNDREDTHS\n        }\n    }\n"
+        },
+        {
+          "offset": 18538,
+          "before": "",
+          "after": "        let nominal = self.energy_recharge_hundredths();\n"
+        },
+        {
+          "offset": 18634,
+          "before": "            energy_capacity_hundredths: ENERGY_CAPACITY_HUNDREDTHS,\n            energy_recharge_hundredths_per_tick: self.energy_recharge_hundredths(),\n",
+          "after": "            energy_capacity_hundredths: self.energy_capacity(),\n            energy_recharge_hundredths_per_tick: self.step_energy_recharge(nominal),\n"
+        }
+      ]
+    },
+    "flight/xyzzy.rs": {
+      "beforeSHA256": "04ca9973164108e94a06339fb7977c2b8869db1dc98d9df01ad501e0d1ffc08b",
+      "afterSHA256": "c67ece5c81e4a33a69785904a4cd1ae301387a8daba68015159fe4808e3f7dcd",
+      "hunks": [
+        {
+          "offset": 658,
+          "before": "",
+          "after": "    /// Issue the normal Fleet commander a test Medusa. Old Enter receipts keep their original hull.\n    ActivateMedusa,\n"
+        },
+        {
+          "offset": 1326,
+          "before": "",
+          "after": "                | Self::ActivateMedusa\n"
+        },
+        {
+          "offset": 2003,
+          "before": "",
+          "after": "            Self::ActivateMedusa => 15,\n"
+        },
+        {
+          "offset": 2508,
+          "before": "",
+          "after": "            15 => Ok(Self::ActivateMedusa),\n"
+        },
+        {
+          "offset": 3142,
+          "before": "",
+          "after": "    MedusaHoldFull,\n"
+        },
+        {
+          "offset": 4736,
+          "before": "",
+          "after": "    pub(super) fn medusa_at(&self, revision: u64) -> bool {\n        self.records\n            .iter()\n            .any(|r| r.action == XyzzyAction::ActivateMedusa && r.revision <= revision)\n    }\n"
+        },
+        {
+          "offset": 7190,
+          "before": "            record.action == XyzzyAction::FitEcm\n                && record.dock == dock\n",
+          "after": "            matches!(\n                record.action,\n                XyzzyAction::FitEcm | XyzzyAction::ActivateMedusa\n            ) && record.dock == dock\n"
+        },
+        {
+          "offset": 13262,
+          "before": "                    XyzzyAction::Enter | XyzzyAction::MaximumFuelStorage\n",
+          "after": "                    XyzzyAction::Enter\n                        | XyzzyAction::ActivateMedusa\n                        | XyzzyAction::MaximumFuelStorage\n"
+        },
+        {
+          "offset": 19482,
+          "before": "",
+          "after": "    /// First issue within the validated XYZZY ledger. Subsequent refits retain its identity.\n    pub fn xyzzy_medusa_issue(&self) -> Option<(DockContext, u64, u64)> {\n        self.xyzzy\n            .records\n            .iter()\n            .find(|r| r.action == XyzzyAction::ActivateMedusa)\n            .map(|r| (r.dock, r.tick, r.revision))\n    }\n    pub fn xyzzy_medusa_active(&self) -> bool {\n        self.xyzzy.medusa_at(u64::MAX)\n    }\n"
+        },
+        {
+          "offset": 20770,
+          "before": "            label: if self.xyzzy.active() {\n",
+          "after": "            label: if self.xyzzy_medusa_active() {\n                \"XYZZY / COMMANDER CLARKE / SH171 MEDUSA\"\n            } else if self.xyzzy.active() {\n"
+        },
+        {
+          "offset": 21927,
+          "before": "        if !matches!(action, XyzzyAction::Enter | XyzzyAction::MaximumFuelStorage)\n            && !self.xyzzy.active()\n",
+          "after": "        if !matches!(\n            action,\n            XyzzyAction::Enter | XyzzyAction::ActivateMedusa | XyzzyAction::MaximumFuelStorage\n        ) && !self.xyzzy.active()\n"
+        },
+        {
+          "offset": 22412,
+          "before": "",
+          "after": "        }\n        if action == XyzzyAction::ActivateMedusa\n            && self\n                .reserved_service_projection()\n                .map_err(|_| XyzzyError::ActiveContractCustody)?\n                .used_tonnes\n                > 32\n        {\n            return Err(XyzzyError::MedusaHoldFull);\n"
+        },
+        {
+          "offset": 27188,
+          "before": "",
+          "after": "        let first_medusa =\n            review.action == XyzzyAction::ActivateMedusa && !self.xyzzy_medusa_active();\n"
+        },
+        {
+          "offset": 27393,
+          "before": "",
+          "after": "        if first_medusa {\n            self.pulse.replay_berth(super::weapons::MEDUSA_ENERGY);\n            let station = super::OriginalStationData::medusa_bundled()\n                .map_err(|_| SaveError::ContentMismatch)?;\n            self.state.station = Some(station.station_pose());\n            self.station_data = Some(station);\n            self.commander_account\n                .as_mut()\n                .ok_or(INVALID)?\n                .set_medusa(true);\n        }\n"
+        },
+        {
+          "offset": 30872,
+          "before": "",
+          "after": "            if review.action == XyzzyAction::ActivateMedusa\n                && self.damage.enabled()\n                && (self.fitted_ecm().is_some() || self.xyzzy_has_free_ordinary_utility_mount()?)\n            {\n                self.grant_xyzzy_module(review.dock, review.tick, super::ModuleKind::Ecm)?;\n            }\n"
+        }
+      ]
+    },
+    "flight/xyzzy/tests.rs": {
+      "beforeSHA256": "67d63f51b5eb4f0a3b9d2c0b3c8baa13a581f33f39f95452141fbbcf810095be",
+      "afterSHA256": "1fefdc3840e7eef48b94a63d9b2b994790fdc7e8b7c3cfa27ed790bafc5b174c",
+      "hunks": [
+        {
+          "offset": 31804,
+          "before": "",
+          "after": "\n#[test]\nfn medusa_upgrades_a_saved_clarke_once_and_retains_paid_gear_and_excess_rounds() {\n    let mut legacy = World::new_commander(14401).unwrap();\n    apply(&mut legacy, XyzzyAction::Enter);\n    let paid = module(\n        &mut legacy,\n        ModuleAction::Purchase {\n            kind: ModuleKind::PulseLaser,\n        },\n    );\n    let cash = legacy.credits_tenths();\n    assert_eq!(cash, Some(9_985_500));\n    let rounds = legacy.ammunition_snapshot().unwrap().items;\n    assert_eq!(rounds.len(), 9);\n    let mut world = cold(&legacy);\n    assert_eq!(world.player_hull_kind(), crate::PlayerHullKind::Peregrine);\n    assert!(world.xyzzy_medusa_issue().is_none());\n    apply(&mut world, XyzzyAction::ActivateMedusa);\n    let issue = world.xyzzy_medusa_issue().unwrap();\n    let gear = world.modular_equipment_snapshot().unwrap().items;\n    assert!(\n        gear.iter().any(|item| item.id == paid\n            && matches!(item.provenance, crate::ModuleProvenance::Paid { .. }))\n    );\n    for _ in 0..2 {\n        world = cold(&world);\n        assert_eq!(world.player_hull_kind(), crate::PlayerHullKind::Medusa);\n        assert_eq!(world.xyzzy_medusa_issue(), Some(issue));\n        assert_eq!(world.credits_tenths(), cash);\n        assert_eq!(world.modular_equipment_snapshot().unwrap().items, gear);\n        let magazine = world.ammunition_snapshot().unwrap();\n        assert_eq!(magazine.capacity, 5);\n        assert_eq!(magazine.items.len(), rounds.len());\n        for old in &rounds {\n            let held = magazine\n                .items\n                .iter()\n                .find(|item| item.item == old.item)\n                .unwrap();\n            assert_eq!(held.pylon, old.pylon.filter(|p| *p < 5));\n            assert_eq!(held.purchase, old.purchase);\n            assert!(!held.consumed);\n        }\n        apply(&mut world, XyzzyAction::ActivateMedusa);\n    }\n    world.request_launch(world.snapshot().tick).unwrap();\n    for _ in 0..190 {\n        world\n            .step(crate::FlightInput {\n                throttle: 1.0,\n                ..Default::default()\n            })\n            .unwrap();\n    }\n    assert_eq!(world.snapshot().speed, 50.3);\n    let loaded = cold(&world);\n    assert_eq!(loaded.snapshot(), world.snapshot());\n    assert_eq!(\n        loaded\n            .flight_resources_snapshot()\n            .unwrap()\n            .energy_capacity_hundredths,\n        41000\n    );\n}\n\n#[test]\nfn medusa_refuses_an_oversize_manifest_before_mutating_the_commander() {\n    let mut world = World::new_commander(14402).unwrap();\n    apply(&mut world, XyzzyAction::Enter);\n    for _ in 0..33 {\n        world\n            .request_station_service(crate::station_services::Command::BuyFood, 0)\n            .unwrap();\n    }\n    let before = world.save_bytes().unwrap();\n    assert_eq!(\n        world.review_xyzzy(XyzzyAction::ActivateMedusa, 0),\n        Err(XyzzyError::MedusaHoldFull)\n    );\n    assert_eq!(world.save_bytes().unwrap(), before);\n    world\n        .request_station_service(crate::station_services::Command::SellFood, 0)\n        .unwrap();\n    apply(&mut world, XyzzyAction::ActivateMedusa);\n    let fit = world.equipment_snapshot().unwrap();\n    assert_eq!((fit.used_tonnes, fit.hold_capacity_tonnes), (32, 32));\n    assert!(\n        world\n            .request_equipment(\n                crate::equipment::Command::UnfitCargoBay(fit.owned.unwrap().id),\n                0\n            )\n            .is_err()\n    );\n    assert_eq!(cold(&world).equipment_snapshot().unwrap(), fit);\n}\n"
+        }
+      ]
+    },
+    "freight/g02.rs": {
+      "beforeSHA256": "a273becd4a69e7ad3a9fbfd89efd61490a614715fa4be8dc47141ca4c81ea6c2",
+      "afterSHA256": "1e90d45a5187463588ed527c676f1a1a4a9ad900cdaf22519704aa88f398c26d",
+      "hunks": [
+        {
+          "offset": 5588,
+          "before": "",
+          "after": "    // Reconstructed from the ordinary account\u2019s XYZZY issue record.\n    medusa: bool,\n"
+        },
+        {
+          "offset": 6161,
+          "before": "",
+          "after": "    fn hold_capacity(&self) -> u16 {\n        if self.medusa {\n            if self.equipment.owned().is_some_and(|item| item.fitted) {\n                32\n            } else {\n                22\n            }\n        } else {\n            self.equipment.capacity()\n        }\n    }\n\n"
+        },
+        {
+          "offset": 7582,
+          "before": "",
+          "after": "                medusa: false,\n"
+        },
+        {
+          "offset": 15629,
+          "before": "",
+          "after": "    pub(crate) fn equipment_definition(\n        &self,\n    ) -> Result<crate::equipment::Definition, crate::equipment::Error> {\n        Ok(crate::equipment::definition()?.for_player(self.data.medusa))\n    }\n    pub(crate) fn set_medusa(&mut self, medusa: bool) {\n        self.data.medusa = medusa;\n    }\n"
+        },
+        {
+          "offset": 15981,
+          "before": "        self.data.equipment.capacity()\n",
+          "after": "        self.data.hold_capacity()\n"
+        },
+        {
+          "offset": 17184,
+          "before": "",
+          "after": "        if self.data.medusa\n            && matches!(command, crate::equipment::Command::UnfitCargoBay(_))\n            && used > 22\n        {\n            return Err(EquipmentError::HoldFull);\n        }\n"
+        },
+        {
+          "offset": 53570,
+          "before": "        || occupied_tonnes(data, account) > u128::from(account.equipment.capacity())\n",
+          "after": "        || occupied_tonnes(data, account) > u128::from(account.hold_capacity())\n"
+        },
+        {
+          "offset": 55860,
+          "before": "    if occupied_tonnes(data, account) + 8 > u128::from(account.equipment.capacity()) {\n",
+          "after": "    if occupied_tonnes(data, account) + 8 > u128::from(account.hold_capacity()) {\n"
+        }
+      ]
+    },
+    "freight/g02/persistence.rs": {
+      "beforeSHA256": "b1a068c6c9a1c463766a459372b100e1e12ebef2fc34ed9500729a15c7b19489",
+      "afterSHA256": "b9f2d7d8ab7f0efabae6b1b719282b729eebe30cde31def228c2ec04e3a17fa8",
+      "hunks": [
+        {
+          "offset": 6132,
+          "before": "",
+          "after": "                medusa: false,\n"
+        }
+      ]
+    },
+    "station_services.rs": {
+      "beforeSHA256": "4220651c337a8d7b1b4f783a1f76dc4369b0288aa645c8c8798c5f26f28b3636",
+      "afterSHA256": "29a34901069c4b3d4b45a43918b1db1fcda73d571e44f79cd361c5e860aacc48",
+      "hunks": [
+        {
+          "offset": 17377,
+          "before": "",
+          "after": "            crate::equipment::MEDUSA_HOLD_TONNES,\n            crate::equipment::MEDUSA_EXPANDED_HOLD_TONNES,\n"
+        }
+      ]
+    }
+  }
+}
