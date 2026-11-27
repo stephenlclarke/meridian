@@ -82,6 +82,25 @@ class TestPeregrineMk3Sources(unittest.TestCase):
             with self.assertRaisesRegex(ValueError, 'changed SH023 original'):
                 peregrine_mk3.prepare(folder)
 
+    def test_authentication_requires_exact_numeric_target_length(self):
+        with tempfile.TemporaryDirectory() as folder:
+            destination = Path(folder)
+            for name in peregrine_mk3.PINS:
+                shutil.copyfile(peregrine_mk3.FOLDER / name, destination / name)
+            engineering_path = destination / "engineering.json"
+            engineering = json.loads(engineering_path.read_bytes())
+            for length in (40, 40.0, 40.00000000000001, "40.0"):
+                with self.subTest(length=length):
+                    engineering["targetDetailedLengthMetres"] = length
+                    raw = json.dumps(engineering).encode()
+                    engineering_path.write_bytes(raw)
+                    with mock.patch.dict(peregrine_mk3.PINS, {"engineering.json": hashlib.sha256(raw).hexdigest()}):
+                        if length in (40, 40.0):
+                            peregrine_mk3.authenticate(destination)
+                        else:
+                            with self.assertRaisesRegex(ValueError, "wrong SH023 calibration"):
+                                peregrine_mk3.authenticate(destination)
+
     def test_source_partition_rejects_malformed_membership(self):
         with self.assertRaisesRegex(ValueError, 'duplicate vertex assignment'):
             peregrine_mk3.membership([(0, 1, 2)], [[0, 1, 2], [1]], 3)

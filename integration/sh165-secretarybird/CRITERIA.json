@@ -210,7 +210,7 @@
     "tools/measure_banteng_geometry.py": "9356864e227302598fcae4e833ecb706b1ed8a5e600cbb4076b7165dc1e54bea",
     "tools/measure_goshawk_surface_fit.py": "5407ef1e5fad41810aa95444ca1338fe33a91e5c9857dcb752b4e4cf2fca6d0b",
     "tools/measure_lanner_geometry.py": "55d13a28602e6ed791adecd85ff43f3c8a7fbe118cf0977272e1747422c2408d",
-    "tools/measure_secretarybird.py": "c1ec6833f1bf24ddcf676b6a8cf8f46368b8038af9701b6497bb3d02b650c086",
+    "tools/measure_secretarybird.py": "c0254b3ec3d1fc35873fab82930028cee6ce76129cb78e749377ac6104b2ea4a",
     "tools/prepare_eagle_cruiser_geometry.py": "a1ea3b5d72f35e1f2932da71afa3ff8a276a504f7309a1086a2b3df35988addc",
     "tools/prepare_secretarybird.py": "0757251637028b62c51d217b3087967e6e2636159b838b4978b5a61e93b17cc8",
     "tools/verify_eagle_cruiser_geometry.py": "cb053ee5873fee62ee456bb3776e98d29b2cbb44c7344599bc617a8579164d43",

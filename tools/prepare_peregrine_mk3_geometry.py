@@ -64,9 +64,11 @@ def authenticate(folder):
     require(archive['sourcePath'] == SUCCESSOR_PATH
             and archive['sourceSHA256'] == PINS['native-successor.json'],
             'wrong active native successor')
+    target_length = engineering['targetDetailedLengthMetres']
     require(Fraction(engineering['metresPerSourceUnitExact']) == SCALE
             and engineering['metresPerSourceUnit'] == float(SCALE)
-            and engineering['targetDetailedLengthMetres'] == 40.0
+            and type(target_length) in (int, float) and math.isfinite(target_length)
+            and target_length.as_integer_ratio() == (40, 1)
             and engineering['sourceOriginUnchanged'], 'wrong SH023 calibration')
     detail, native = source['design'], source['nativeDesign']
     require(native == archive['nativeDesign'] == successor['nativeDesign'],

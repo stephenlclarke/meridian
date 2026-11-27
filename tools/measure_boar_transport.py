@@ -118,6 +118,8 @@ def directed(first,second):
         for patch in ((a,ab,ac),(ab,b,bc),(ac,bc,c),(ab,bc,ac)):
             examine(patch,face,depth+1)
         explored+=1
+    if winner is None or not pending:
+        raise ValueError("Directed fit requires a measured source face")
     upper=-pending[0][0]
     face,point,ties=winner
     lower_mm=isqrt((best*1000000/(scale*scale))//1)
