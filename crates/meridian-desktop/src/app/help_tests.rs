@@ -139,7 +139,13 @@ fn market_trade_lesson_keeps_the_selected_goods_through_review_and_continue() {
     assert_eq!(press(&mut app, KeyCode::Digit7, Some("7")), None);
     assert!(app.docked.as_ref().is_some_and(Docked::review_pending));
     assert_eq!(ok(app.game.world.save_bytes()), before);
+    // The old market frame cannot cancel a review it has never displayed.
     app.menu_input(ui::Input::Key(ui::Key::Back));
+    assert!(app.docked.as_ref().is_some_and(Docked::review_pending));
+    paint(&mut app);
+    app.menu_input(ui::Input::Key(ui::Key::Back));
+    assert!(!app.docked.as_ref().is_some_and(Docked::review_pending));
+    assert_eq!(ok(app.game.world.save_bytes()), before);
     assert_eq!(press(&mut app, KeyCode::Digit7, Some("7")), None);
     assert!(!app.menu_active());
     app.game_key(KeyCode::KeyR);
