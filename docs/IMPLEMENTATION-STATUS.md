@@ -22,7 +22,7 @@ The [solar fuel source candidate](SOLAR-FUEL-SCOOPS.md) adds the original near-s
 
 ## The Unwritten Route clue journal
 
-The post-Preview-12 candidate adds an optional [Renas flight lesson](FLIGHT-RECEPTION.md) to completed G02 mission details. Its regression follows seven partial handoffs, final freight settlement, cold acceptance, a measured local return, cold debrief and restoration of both distinct clues. Exact candidate execution is pending.
+The post-Preview-12 candidate adds an optional [Renas flight lesson](FLIGHT-RECEPTION.md) to completed G02 mission details. At `f432db49` all seven desktop flight lesson tests passed on native Windows. The new case completed seven partial handoffs and the eighth freight settlement, reopened the saved profile, accepted the Renas lesson, flew a measured local return and reopened the save for debrief. A final Continue retained both distinct clues and the same 1,450 CR balance. Interactive acceptance of this sequence remains open.
 
 The [ordinary clue journal](../integration/unwritten-route/README.md) reads the existing first receipts for five playable source families against the original 64-clue catalogue. Shift+J opens the journal. Later trail instructions and the paid Medusa path follow the original quest prerequisites.
 
