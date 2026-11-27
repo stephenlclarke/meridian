@@ -25,10 +25,31 @@ impl NavalBerth {
 }
 
 impl State {
-    pub(in crate::flight) fn record_naval_launch(&mut self, tick: u64) {
-        if self.naval_berth == Some(NavalBerth::Occupied) {
-            self.naval_berth = Some(NavalBerth::Launched(tick));
+    /// None means this launch does not close the sale berth. A tag-21 receipt
+    /// already reserves its tick; replacing tag 3 and its kind with tag 21 and
+    /// a u64 launch tick grows the modular record by seven bytes.
+    pub(in crate::flight) fn naval_launch_growth(
+        &self,
+        dock: Option<DockContext>,
+    ) -> Option<usize> {
+        let dock = dock.filter(|dock| dock.system() == crate::navigation::SystemId::AELAVIA)?;
+        match self.naval_berth {
+            Some(NavalBerth::Occupied) => Some(0),
+            Some(NavalBerth::Launched(_)) => None,
+            None => self
+                .events
+                .iter()
+                .any(|e| {
+                    !e.xyzzy
+                        && e.dock == dock
+                        && super::aelavia_naval_purchase(dock.system(), e.action)
+                })
+                .then_some(7),
         }
+    }
+
+    pub(in crate::flight) fn record_naval_launch(&mut self, tick: u64) {
+        self.naval_berth = Some(NavalBerth::Launched(tick));
     }
 
     pub(super) fn validate_naval_berth(

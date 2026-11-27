@@ -576,12 +576,17 @@ impl World {
             .ecm
             .prepare_launch(self, navigation)
             .map_err(|_| StepError::TickOverflow)?;
-        self.check_ecm_command_capacity(&ecm, navigation, 0)
+        let naval_growth = self
+            .modular
+            .naval_launch_growth(self.current_dock_context());
+        self.check_ecm_command_capacity(&ecm, navigation, naval_growth.unwrap_or(0))
             .map_err(|_| StepError::TickOverflow)?;
         if let Some(account) = &mut self.commander_account {
             account.record_departure_legality();
         }
-        self.modular.record_naval_launch(expected_tick);
+        if naval_growth.is_some() {
+            self.modular.record_naval_launch(expected_tick);
+        }
         self.state = next;
         self.navigation = navigation;
         self.ecm = ecm;

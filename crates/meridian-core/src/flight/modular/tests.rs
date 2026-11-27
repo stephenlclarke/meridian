@@ -75,13 +75,35 @@ pub(in crate::flight) fn check_aelavia_receipt_chronology(
 }
 
 pub(in crate::flight) fn check_naval_local_sortie(paid: &World) {
-    let mut world = World::from_save_bytes(&paid.save_bytes().unwrap()).unwrap();
+    let stamped = paid.save_bytes().unwrap();
+    let mut previous = World::from_save_bytes(&stamped).unwrap();
+    previous.modular.naval_berth = None;
+    let legacy = previous.save_bytes().unwrap();
+    assert_eq!(legacy.len() + 7, stamped.len());
+    check_local_launch(&stamped, 0);
+    check_local_launch(&legacy, 7);
+}
+
+fn check_local_launch(bytes: &[u8], growth: usize) {
+    let mut world = World::from_save_bytes(bytes).unwrap();
+    assert_eq!(world.save_bytes().unwrap(), bytes);
+    let mut opening = Writer::new();
+    world.modular.encode(&mut opening);
+    assert!(world.request_launch(world.snapshot().tick + 1).is_err());
+    assert_eq!(world.save_bytes().unwrap(), bytes);
     for _ in 0..9 {
         world.step(crate::FlightInput::default()).unwrap();
     }
     let launch_tick = world.snapshot().tick;
     launch(&mut world);
     let first_flight = world.snapshot().tick;
+    let mut airborne = Writer::new();
+    world.modular.encode(&mut airborne);
+    assert_eq!(airborne.bytes.len(), opening.bytes.len() + growth);
+    assert_eq!(
+        world.modular.naval_berth,
+        Some(NavalBerth::Launched(launch_tick))
+    );
     world.toggle_auto_docking().unwrap();
     for _ in 0..5000 {
         if world.current_dock_context().is_some() {
@@ -111,6 +133,16 @@ pub(in crate::flight) fn check_naval_local_sortie(paid: &World) {
     // the preceding no-jump flight exactly, despite the subsequent docked wait.
     assert!(state.ledger(&cold, account).is_err());
 
+    // A pre-upgrade save first opened at the second berth never witnessed the
+    // original launch. Departing this later berth must not manufacture that stamp.
+    if growth != 0 {
+        let mut older = World::from_save_bytes(&cold.save_bytes().unwrap()).unwrap();
+        older.modular.naval_berth = None;
+        let mut older = World::from_save_bytes(&older.save_bytes().unwrap()).unwrap();
+        launch(&mut older);
+        assert_eq!(older.modular.naval_berth, None);
+        World::from_save_bytes(&older.save_bytes().unwrap()).unwrap();
+    }
     launch(&mut cold);
     let mut state = cold.modular.clone();
     let account = cold.commander_account.as_ref().unwrap();
