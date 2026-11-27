@@ -20,6 +20,7 @@ pub enum RouteError {
     NoFeasibleRoute,
     StalePlan,
     DockRequired,
+    FlightUnavailable,
     Paused,
     Save(SaveError),
 }
@@ -34,6 +35,9 @@ impl core::fmt::Display for RouteError {
             Self::NoFeasibleRoute => "No feasible route with the current fuel and fitted drive",
             Self::StalePlan => "Route has changed; reopen the planner",
             Self::DockRequired => "Dock before setting or clearing a route",
+            Self::FlightUnavailable => {
+                "Route planning requires local flight with an available computer"
+            }
             Self::Paused => "Resume before changing the route",
             Self::Save(error) => return error.fmt(f),
         })

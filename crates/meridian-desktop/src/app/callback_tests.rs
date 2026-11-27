@@ -657,6 +657,83 @@ fn actual_missile_notice_and_restored_airborne_session_do_not_replay() {
 }
 
 #[test]
+fn flight_route_preview_cancel_and_saved_selection_use_the_fitted_computer() {
+    use meridian_core::navigation::SystemId;
+    use winit::keyboard::ModifiersState;
+    let directory = TestDirectory::new();
+    let mut app = app(&directory);
+    launched(&mut app);
+    let before = ok(app.game.world.save_bytes());
+    let slot = directory.0.join("commander.meridian");
+    let before_disk = ok(std::fs::read(&slot));
+    app.modifiers = ModifiersState::SHIFT;
+    let routed = key(
+        &mut app,
+        KeyCode::KeyR,
+        ElementState::Pressed,
+        false,
+        Some("R"),
+    );
+    app.game_key(routed.unwrap_or_else(|| panic!("flight route key")));
+    app.modifiers = ModifiersState::empty();
+    let menu = app
+        .flight_routes
+        .as_ref()
+        .unwrap_or_else(|| panic!("route planner"));
+    let panel = menu.panel();
+    assert!(
+        panel
+            .lines
+            .iter()
+            .any(|line| line.contains("Avenor > Renas > Lareria"))
+    );
+    assert!(!app.simulation_active());
+    assert_eq!(
+        key(&mut app, KeyCode::Enter, ElementState::Pressed, true, None),
+        None
+    );
+    assert_eq!(
+        key(
+            &mut app,
+            KeyCode::Escape,
+            ElementState::Pressed,
+            false,
+            None
+        ),
+        None
+    );
+    assert!(app.flight_routes.is_none());
+    assert_eq!(ok(app.game.world.save_bytes()), before);
+    assert_eq!(ok(std::fs::read(&slot)), before_disk);
+    app.open_flight_routes();
+    assert_eq!(
+        key(
+            &mut app,
+            KeyCode::ArrowDown,
+            ElementState::Pressed,
+            false,
+            None
+        ),
+        None
+    );
+    assert_eq!(
+        key(&mut app, KeyCode::Enter, ElementState::Pressed, false, None),
+        None
+    );
+    assert!(app.flight_routes.is_none());
+    let route = app
+        .game
+        .world
+        .active_route_progress()
+        .unwrap_or_else(|| panic!("saved route"));
+    assert_eq!(route.next_system, Some(SystemId::RENAS));
+    drop(app);
+    let mut profile = open(&directory.0);
+    ok(profile.continue_saved());
+    assert_eq!(profile.world.active_route_progress(), Some(route));
+}
+
+#[test]
 fn paid_energy_readout_follows_fitting_charge_and_cold_continue() {
     use crate::session::Action;
     use meridian_core::{ModuleAction, ModuleKind, ModuleProvenance, ModuleSlot};

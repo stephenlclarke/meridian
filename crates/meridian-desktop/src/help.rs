@@ -121,7 +121,7 @@ impl Panel {
                 "N Start or cancel auto-docking | 0 Front | 1 Rear | 2 Left | 3 Right view",
                 "T Lock selected ship for missiles | F1 Next missile target | F2 Arm / safe",
                 "F3 Launch missile | F4 Safe/clear target | K E.C.M. (22 energy) | Y Energy",
-                "J Jump | Shift+J Clue Journal | Hold U 10 seconds: EMP (release to cancel)",
+                "J Jump | Shift+J Clue Journal | Shift+R Routes | Hold U 10 seconds: EMP",
                 "F6 Flight lesson | F12 Cancel | C Lesson details | F7 Close run | F8 Reception",
                 "Tab Next scanner target (no core: mark) | F Manual/assist | Delete Release",
                 "Shift+M Rock/ore | Shift+V Wreck cargo | Fit core + matching targeting module",

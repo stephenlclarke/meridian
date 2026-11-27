@@ -78,6 +78,52 @@ impl World {
         )
     }
 
+    /// Reachable alternatives for the current ship, fuel and supported stations.
+    pub fn flight_route_alternatives(&self) -> Result<Vec<RouteAlternative>, RouteError> {
+        self.check_flight_route_context()?;
+        let mut alternatives = Vec::new();
+        for destination in ROUTE_SYSTEMS {
+            match self.route_alternatives(destination) {
+                Ok(routes) => alternatives.extend(routes),
+                Err(
+                    RouteError::AlreadyThere
+                    | RouteError::OutsidePlanningRadius
+                    | RouteError::NoFeasibleRoute,
+                ) => {}
+                Err(error) => return Err(error),
+            }
+        }
+        if alternatives.is_empty() {
+            return Err(RouteError::NoFeasibleRoute);
+        }
+        Ok(alternatives)
+    }
+
+    fn check_flight_route_context(&self) -> Result<(), RouteError> {
+        if self.is_paused() {
+            return Err(RouteError::Paused);
+        }
+        let current = self
+            .snapshot()
+            .navigation
+            .ok_or(RouteError::FlightUnavailable)?;
+        if self.state.mode != FlightMode::Flight
+            || current.travel.is_some()
+            || self.emp.electrical_disabled()
+            || self.combat_snapshot().is_none_or(|s| s.player.destroyed)
+        {
+            return Err(RouteError::FlightUnavailable);
+        }
+        if self
+            .navigation_route
+            .as_ref()
+            .is_some_and(|plan| plan.current_system() != current.system)
+        {
+            return Err(RouteError::DockRequired);
+        }
+        Ok(())
+    }
+
     fn route_economy(&self) -> RouteEconomy {
         let (Some(markets), Ok(cargo)) =
             (&self.station_markets, self.reserved_service_projection())
@@ -157,20 +203,18 @@ impl World {
         if self.is_paused() {
             return Err(RouteError::Paused);
         }
-        let dock = self
-            .current_dock_context()
-            .ok_or(RouteError::DockRequired)?;
+        if self.current_dock_context().is_none() {
+            if plan.is_none() {
+                return Err(RouteError::DockRequired);
+            }
+            self.check_flight_route_context()?;
+        }
+        // The current alternatives bind owner, hull, visit, jump sequence, fitted grade and fuel.
         if let Some(plan) = plan
-            && (!plan.agrees_with_ship(dock.ship())
-                || plan.stop != 0
-                || plan.origin_visit != dock.visit()
-                || self
-                    .navigation
-                    .is_none_or(|nav| plan.origin_jumps != nav.jump_sequence())
-                || !self
-                    .route_alternatives(plan.destination())?
-                    .iter()
-                    .any(|candidate| &candidate.plan == plan))
+            && !self
+                .route_alternatives(plan.destination())?
+                .iter()
+                .any(|candidate| &candidate.plan == plan)
         {
             return Err(RouteError::StalePlan);
         }

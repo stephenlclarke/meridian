@@ -255,6 +255,7 @@ fn flight_help_lists_the_computer_keys_and_consumes_them_while_open() {
         "T Lock selected ship for missiles",
         "Shift+I Target details",
         "Y Energy",
+        "Shift+R Routes",
     ] {
         assert!(text.contains(binding), "Missing {binding}");
     }

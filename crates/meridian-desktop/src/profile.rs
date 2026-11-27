@@ -644,7 +644,9 @@ impl Profile {
         prepared.commit();
         self.has_save = true;
         self.session.invalidate();
-        let message = if plan.is_some() {
+        let message = if plan.is_some() && self.world.snapshot().mode == FlightMode::Flight {
+            "Route saved. Press J to jump to the next stop."
+        } else if plan.is_some() {
             "Route saved. Check the next leg before launching."
         } else {
             "Navigation route cleared."
