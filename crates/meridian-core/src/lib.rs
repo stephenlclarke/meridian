@@ -60,6 +60,7 @@ pub mod hobby_fighter;
 pub mod hog;
 pub mod hull_package;
 pub mod hyena;
+pub mod ibex;
 pub mod jackal;
 pub mod jaguar;
 pub mod javelina;

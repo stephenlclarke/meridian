@@ -1,0 +1,21 @@
+{
+  "detailed": {
+    "oppositeSourceVertex": 1646,
+    "nearestFaces": [
+      408,
+      439,
+      440,
+      441,
+      502
+    ],
+    "strictLowerMillimetres": 88
+  },
+  "native": {
+    "oppositeSourceVertex": 1510,
+    "nearestFaces": [
+      38,
+      41
+    ],
+    "strictLowerMillimetres": 3184
+  }
+}

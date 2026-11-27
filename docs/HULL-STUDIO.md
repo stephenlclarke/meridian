@@ -111,3 +111,7 @@ see it in the disposable game session. The Studio export command refuses
 schema 2. The standalone game accepts schema 2 only through
 `--inspect-hull-package`. Schema 1 retains the 512-face native limit and
 excludes archived inspection packages from the flight export.
+
+## Ibex stock inspection
+
+Search for **SH027** or **Ibex** in the station Showroom. Its forest-and-ivory hull has two cargo keels, a cross bridge and a central trench. The [Ibex geometry record](IBEX-GAMEPLAY-ENVELOPE.md) gives the source meshes, channel clearances and station contact evidence.
