@@ -97,7 +97,19 @@ fn actual_secret_menu_publishes_clarke_real_outfit_and_visible_provenance_then_c
             .iter()
             .filter(|item| item.pylon.is_some() && !item.consumed)
             .count(),
-        9
+        5
+    );
+    assert_eq!(ammo.capacity, 5);
+    assert_eq!(
+        world.player_hull_kind(),
+        meridian_core::PlayerHullKind::Medusa
+    );
+    assert_eq!(
+        world
+            .equipment_snapshot()
+            .unwrap_or_else(|| panic!("fit"))
+            .hold_capacity_tonnes,
+        32
     );
     assert!(ammo.purchases.is_empty());
     assert!(app.game.lines(true, None).is_empty());
@@ -121,6 +133,14 @@ fn actual_secret_menu_publishes_clarke_real_outfit_and_visible_provenance_then_c
     }
     let bytes = ok(fs::read(directory.0.join("commander.meridian")));
     let cold_world = ok(World::from_save_bytes(&bytes));
+    assert_eq!(
+        cold_world.player_hull_kind(),
+        meridian_core::PlayerHullKind::Medusa
+    );
+    assert_eq!(
+        cold_world.xyzzy_medusa_issue(),
+        app.game.world.xyzzy_medusa_issue()
+    );
     assert_eq!(cold_world.commander_name(), Some("CLARKE"));
     assert_eq!(
         cold_world.modular_equipment_snapshot(),

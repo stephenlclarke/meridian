@@ -644,11 +644,7 @@ impl World {
         if next.mode == FlightMode::Docked {
             return self.publish_step(next, None);
         }
-        let hull = if self.medusa_preview_fit.is_some() {
-            PlayerHullKind::Medusa
-        } else {
-            PlayerHullKind::Peregrine
-        };
+        let hull = self.player_hull_kind();
         let (max_speed, acceleration, pitch_rate, yaw_rate, roll_rate) = hull.flight_rates();
         if !(0.0..=max_speed).contains(&self.state.speed) {
             return Err(StepError::NonFiniteState);

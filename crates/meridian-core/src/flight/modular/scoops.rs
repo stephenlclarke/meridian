@@ -49,7 +49,7 @@ fn count_slots(
     items: &[OwnedModule],
     cargo_mounts: u16,
 ) -> Result<u16, ModuleError> {
-    if definition.hull != "SH025"
+    if !matches!(definition.hull, "SH025" | "SH171")
         || items.iter().any(|i| {
             i.slot.is_some_and(|slot| match slot {
                 ModuleSlot::FuelStorage(index) => {
@@ -87,7 +87,9 @@ pub(super) fn mounts_used(
     emp_mounts: u16,
 ) -> Result<u16, ModuleError> {
     count_slots(
-        crate::equipment::definition().map_err(|_| ModuleError::BerthRequired)?,
+        account
+            .equipment_definition()
+            .map_err(|_| ModuleError::BerthRequired)?,
         items,
         account.equipment_state().units_used() + emp_mounts,
     )
@@ -96,7 +98,7 @@ impl World {
     pub fn fuel_scoops_snapshot(&self) -> Option<FuelScoopsSnapshot> {
         let account = self.commander_account.as_ref()?;
         let ledger = self.modular.ledger(self, account).ok()?;
-        let definition = crate::equipment::definition().ok()?;
+        let definition = account.equipment_definition().ok()?;
         let utility_mounts_used = count_slots(
             definition,
             &ledger.items,

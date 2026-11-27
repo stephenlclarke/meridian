@@ -18,17 +18,14 @@ pub struct Menu {
 }
 
 const ACTIONS: [(XyzzyAction, &str); 5] = [
-    (
-        XyzzyAction::Enter,
-        "Activate CLARKE and fit maximum equipment",
-    ),
+    (XyzzyAction::ActivateMedusa, "Activate / refit SH171 Medusa"),
     (
         XyzzyAction::MaximumSupportedHardware,
         "Refill and fit maximum equipment",
     ),
     (
         XyzzyAction::RestoreStarter,
-        "Refill / refit current SH025 starter outfit",
+        "Refill / refit current equipment",
     ),
     (
         XyzzyAction::ToggleUnlimitedFuel,
@@ -150,8 +147,8 @@ impl Menu {
         }
         lines.push(
             match self.action() {
-                XyzzyAction::Enter if snapshot.is_some_and(|s| !s.active) => {
-                    "Sets cash to 1,000,000 CR once and fits maximum compatible equipment."
+                XyzzyAction::ActivateMedusa if snapshot.is_some_and(|s| !s.active) => {
+                    "Issue a test Medusa. First activation sets cash to 1,000,000 CR."
                 }
                 XyzzyAction::ToggleUnlimitedFuel => "Switch between normal and unlimited fuel.",
                 XyzzyAction::FitShield(_) => {

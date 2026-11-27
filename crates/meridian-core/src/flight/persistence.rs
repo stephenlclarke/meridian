@@ -551,15 +551,21 @@ impl World {
             return Err(SaveError::TooLarge);
         }
         let mut r = Reader::new(&body[header.consumed()..base_end]);
-        let station_data =
-            OriginalStationData::bundled().map_err(|_| SaveError::ContentMismatch)?;
         let mut state = read_flight(&mut r, version)?;
-        state.station = Some(station_data.station_pose());
         let navigation = NavigationState::decode_save(&mut r)?;
-        let commander_account = CommanderAccount::decode_save(&mut r, version)?;
+        let mut commander_account = CommanderAccount::decode_save(&mut r, version)?;
         let freight_session = mission::FreightSession::decode_save(&mut r)?;
         let station_markets = StationMarkets::decode_save(&mut r)?;
         let xyzzy = super::xyzzy::State::decode(&mut r)?;
+        let medusa = xyzzy.medusa_at(u64::MAX);
+        commander_account.set_medusa(medusa);
+        let station_data = if medusa {
+            OriginalStationData::medusa_bundled()
+        } else {
+            OriginalStationData::bundled()
+        }
+        .map_err(|_| SaveError::ContentMismatch)?;
+        state.station = Some(station_data.station_pose());
         let emp = super::emp::State::decode(&mut r)?;
         let modular = super::modular::State::decode(&mut r, version)?;
         let ammunition = super::ammunition::State::decode(&mut r)?;
@@ -740,7 +746,7 @@ impl World {
             .as_ref()
             .ok_or(SaveError::NoCommander)?;
         let station = self.station_data.as_ref().ok_or(SaveError::NoCommander)?;
-        validate_flight(&self.state)?;
+        validate_flight_speed(&self.state, self.player_hull_kind().flight_rates().0)?;
         if self.celestial_snapshot().is_some_and(|scene| {
             [scene.planet, scene.sun].into_iter().any(|body| {
                 body.blocks_motion(
@@ -1058,13 +1064,16 @@ pub(super) fn read_flight(r: &mut Reader<'_>, version: u16) -> Result<Snapshot, 
     })
 }
 pub(super) fn validate_flight(s: &Snapshot) -> Result<(), SaveError> {
+    validate_flight_speed(s, MAX_SPEED)
+}
+pub(super) fn validate_flight_speed(s: &Snapshot, max_speed: f32) -> Result<(), SaveError> {
     let norm = s.orientation.iter().map(|v| v * v).sum::<f32>();
     let travel_bound = 16000.0
         + s.tick as f64
-            * f64::from(MAX_SPEED * DISTANCE_PER_SPEED_UNIT * FIXED_DELTA_SECONDS)
+            * f64::from(max_speed * DISTANCE_PER_SPEED_UNIT * FIXED_DELTA_SECONDS)
             * 1.1;
     if !s.speed.is_finite()
-        || !(0.0..=MAX_SPEED).contains(&s.speed)
+        || !(0.0..=max_speed).contains(&s.speed)
         || s.position
             .iter()
             .any(|v| !v.is_finite() || f64::from(v.abs()) > travel_bound)

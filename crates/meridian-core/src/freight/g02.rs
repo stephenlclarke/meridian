@@ -203,6 +203,8 @@ fn validate_birth_ids(ids: FreshCommanderIds) -> Result<(), Error> {
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 struct AccountData {
+    // Reconstructed from the ordinary account’s XYZZY issue record.
+    medusa: bool,
     owner: u64,
     hull: u64,
     revision: u64,
@@ -224,6 +226,18 @@ struct AccountData {
 }
 
 impl AccountData {
+    fn hold_capacity(&self) -> u16 {
+        if self.medusa {
+            if self.equipment.owned().is_some_and(|item| item.fitted) {
+                32
+            } else {
+                22
+            }
+        } else {
+            self.equipment.capacity()
+        }
+    }
+
     fn allows_stored_starter(&self, index: usize, item: OwnedStarterItem) -> bool {
         // The World separately requires the fit to match its retained modular ledger.
         matches!(index, 0..=4) && self.modular_revision > 0 && item.fitted_hull.is_none()
@@ -252,6 +266,7 @@ impl CommanderAccount {
         });
         Ok(Self {
             data: AccountData {
+                medusa: false,
                 owner: ids.owner,
                 hull: ids.hull,
                 revision: 0,
@@ -485,8 +500,16 @@ impl CommanderAccount {
     pub(crate) fn equipment_state(&self) -> crate::equipment::State {
         self.data.equipment
     }
+    pub(crate) fn equipment_definition(
+        &self,
+    ) -> Result<crate::equipment::Definition, crate::equipment::Error> {
+        Ok(crate::equipment::definition()?.for_player(self.data.medusa))
+    }
+    pub(crate) fn set_medusa(&mut self, medusa: bool) {
+        self.data.medusa = medusa;
+    }
     pub(crate) fn hold_capacity(&self) -> u16 {
-        self.data.equipment.capacity()
+        self.data.hold_capacity()
     }
     pub(crate) fn prepare_equipment(
         &self,
@@ -1565,7 +1588,7 @@ fn validate_cargo_and_utility(
     }
     if !services::valid_native_quantities(account.other_commodities, account.reserved_commodities)
         || account.reserved_food_tonnes > account.food_tonnes
-        || occupied_tonnes(data, account) > u128::from(account.equipment.capacity())
+        || occupied_tonnes(data, account) > u128::from(account.hold_capacity())
     {
         return Err(Error::InvalidFit);
     }
@@ -1642,7 +1665,7 @@ fn require_acceptance(data: &Data, account: &AccountData) -> Result<(), Error> {
     if data.allocated >= 2 {
         return Err(Error::SourceExhausted);
     }
-    if occupied_tonnes(data, account) + 8 > u128::from(account.equipment.capacity()) {
+    if occupied_tonnes(data, account) + 8 > u128::from(account.hold_capacity()) {
         return Err(Error::HoldFull);
     }
     if account.fuel_tenths < DEPARTURE_FUEL_TENTHS {

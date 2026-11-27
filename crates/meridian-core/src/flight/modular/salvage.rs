@@ -656,7 +656,9 @@ impl World {
             .find(|item| item.kind == ModuleKind::SalvageCutter && item.slot.is_none())
             .copied()
             .ok_or(ModuleError::MissingItem)?;
-        let definition = crate::equipment::definition().map_err(|_| ModuleError::Capacity)?;
+        let definition = account
+            .equipment_definition()
+            .map_err(|_| ModuleError::Capacity)?;
         let (units, mounts) = ledger.budget_usage(account, self.emp.utility_mounts())?;
         if units >= definition.equipment_units_capacity
             || mounts > definition.utility_mounts_capacity
