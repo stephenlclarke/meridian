@@ -566,7 +566,7 @@ impl Profile {
                 ),
                 PracticeSelection::Closure(review) => (
                     self.world.prepare_practice_closure(review, tick),
-                    "Practice closed and saved. F10 reviews a fresh attempt; ammunition is not refilled.",
+                    "Practice closed and saved. Shift+3 reviews a fresh attempt; ammunition is not refilled.",
                 ),
                 PracticeSelection::Reception(review) => (
                     self.world.prepare_practice_reception(review, tick),
@@ -725,7 +725,7 @@ impl Profile {
                 .combat_snapshot()
                 .is_some_and(|combat| combat.player.destroyed)
             {
-                return Err("Commander destroyed; normal Quit retains the previous save. F5 explicitly saves terminal state.".into());
+                return Err("Commander destroyed; normal Quit retains the previous save. Ctrl+S explicitly saves terminal state.".into());
             }
             self.save_with_limits(file_limit, solar_limit)?;
         }
@@ -741,7 +741,7 @@ impl Profile {
                     if active { "RUNNING" } else { "PAUSED" }),
                 format!("CARGO {} / {} t | CABINS {} / 4 | EQUIPMENT {} / 13 | UTILITY {} / 4", fit.cargo_used_tonnes(), fit.cargo_capacity_tonnes(), fit.cabins, fit.equipment_used(), fit.utility_used()),
                 "L launch | W/S throttle | A/D yaw | arrows pitch | Q/E roll | Space brake".into(),
-                "Docked: B cargo expansion | [ / ] cabin count | F5 save / F9 continue | P pause | Esc quit".into(),
+                "Docked: B cargo expansion | [ / ] cabin count | Ctrl+S save / Ctrl+R continue | P pause | Esc quit".into(),
             ];
             if let Some(notice) = notice {
                 lines.push(notice.into());

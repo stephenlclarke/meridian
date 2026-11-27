@@ -21,7 +21,7 @@ pub fn review_title(action: FlightReceptionAction) -> &'static str {
 pub fn terms(action: FlightReceptionAction) -> &'static str {
     match action {
         FlightReceptionAction::Accept => {
-            "Review current-fit flight practice at this issuing berth. Launch with the same owned hull and fit. In front view, face the station centre within 2 degrees at 1000-1500 flight units and move closer with clear sight. Return through its actual doorway, then F6 reviews reception. No fee, cargo or cash reward."
+            "Review current-fit flight practice at this issuing berth. Launch with the same owned hull and fit. In front view, face the station centre within 2 degrees at 1000-1500 flight units and move closer with clear sight. Return through its actual doorway, then Shift+1 reviews reception. No fee, cargo or cash reward."
         }
         FlightReceptionAction::Receive => {
             "Receive the actual measured flight and later return at the issuing berth. This settles zero cash and retains the first Flight Reception Family Trace once. Enter confirms and saves; B cancels this review."
@@ -37,9 +37,9 @@ pub fn line(world: &World) -> String {
         return "FLIGHT LESSON UNAVAILABLE".into();
     };
     let progress = if state.active.is_none() {
-        "F6 REVIEW FLIGHT LESSON"
+        "Shift+1 REVIEW FLIGHT LESSON"
     } else if state.ready {
-        "F6 REVIEW FLIGHT RECEPTION"
+        "Shift+1 REVIEW FLIGHT RECEPTION"
     } else if state
         .attempts
         .last()
@@ -59,7 +59,7 @@ pub fn append_details(world: &World, lines: &mut Vec<String>) {
     crate::session::append_paragraph(lines, &line(world));
     crate::session::append_paragraph(
         lines,
-        "0 FRONT | 1 REAR | 2 LEFT | 3 RIGHT | F6 REVIEW CONSENT OR RECEPTION | F12 REVIEW CANCELLATION | ENTER CONFIRM AND SAVE | B BACK",
+        "0 FRONT | 1 REAR | 2 LEFT | 3 RIGHT | Shift+1 REVIEW CONSENT OR RECEPTION | Shift+2 REVIEW CANCELLATION | ENTER CONFIRM AND SAVE | B BACK",
     );
     let Some(state) = world.flight_reception_snapshot() else {
         return;
@@ -104,6 +104,6 @@ pub fn append_details(world: &World, lines: &mut Vec<String>) {
     );
     crate::session::append_paragraph(
         lines,
-        "No cash reward. Keep the accepted hull and fit until measured. Use normal flight and actual swept entry; labels alone do not qualify. F12 reviews cancellation at the issuing berth. Earlier receipts and spent ammunition remain unchanged.",
+        "No cash reward. Keep the accepted hull and fit until measured. Use normal flight and actual swept entry; labels alone do not qualify. Shift+2 reviews cancellation at the issuing berth. Earlier receipts and spent ammunition remain unchanged.",
     );
 }

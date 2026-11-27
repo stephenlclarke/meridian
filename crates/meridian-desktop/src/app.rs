@@ -148,9 +148,9 @@ enum QuitRecovery {
 const DEFAULT_FLIGHT_WINDOW: [u32; 2] = [1280, 720];
 pub(crate) const MIN_WINDOW_LOGICAL: [f64; 2] = [640.0, 360.0];
 const DESTROYED_NOTICE: &str =
-    "DESTROYED | F9 RESTORE | N NEW (CONFIRM) | F5 SAVE TERMINAL | ESC QUIT";
+    "DESTROYED | Ctrl+R RESTORE | N NEW (CONFIRM) | Ctrl+S SAVE TERMINAL | ESC QUIT";
 const DESTROYED_QUIT_NOTICE: &str =
-    "DESTROYED | F9 RESTORE | F5 SAVE TERMINAL | Q QUIT WITHOUT SAVE";
+    "DESTROYED | Ctrl+R RESTORE | Ctrl+S SAVE TERMINAL | Q QUIT WITHOUT SAVE";
 
 #[derive(Clone, Default, Debug, PartialEq, Eq)]
 struct Notice {
@@ -627,10 +627,7 @@ impl App {
             self.request_redraw();
             return;
         }
-        let global = matches!(
-            code,
-            KeyCode::F5 | KeyCode::F9 | KeyCode::F11 | KeyCode::KeyP
-        );
+        let global = code == KeyCode::KeyP;
         if self.menu_active() && !global {
             if self.open_menu_key(code) {
                 return;
@@ -651,22 +648,10 @@ impl App {
                 self.new_commander_from_key(fresh_profile_seed());
             }
             KeyCode::KeyC if !self.game.playing() => self.load_profile(),
-            KeyCode::F9 if self.game.playing() => self.load_profile(),
-            KeyCode::F5 if self.game.playing() => self.save_profile(),
             KeyCode::KeyP if self.game.playing() => {
                 self.quit_failed = false;
                 self.paused = !self.paused;
                 self.reset_input();
-            }
-            KeyCode::F11 => {
-                if let Some(renderer) = &self.renderer {
-                    let mode = if renderer.window.fullscreen().is_some() {
-                        None
-                    } else {
-                        Some(Fullscreen::Borderless(None))
-                    };
-                    renderer.window.set_fullscreen(mode);
-                }
             }
             _ => self.game_key(code),
         }
@@ -681,16 +666,6 @@ impl App {
         use KeyCode::*;
         match code {
             Escape => self.request_quit(event_loop),
-            F5 => self.save_profile(),
-            F9 => match self.game.continue_saved() {
-                Ok(()) => {
-                    self.reset_input();
-                    self.notice.set("Medusa preview continued".into());
-                }
-                Err(error) => self
-                    .notice
-                    .set(format!("Preview Continue refused: {error}")),
-            },
             KeyP => {
                 self.paused = !self.paused;
                 self.reset_input();
@@ -747,12 +722,11 @@ impl App {
     // Returns false for shared profile and window shortcuts handled by key().
     fn commander_key(&mut self, code: KeyCode) -> bool {
         match code {
-            KeyCode::Escape | KeyCode::F11 => return false,
+            KeyCode::Escape => return false,
             KeyCode::KeyN | KeyCode::KeyC if !self.game.playing() => return false,
             KeyCode::KeyN if player_destroyed(&self.game.world) => return false,
             KeyCode::KeyP if player_destroyed(&self.game.world) => return false,
             KeyCode::KeyP | KeyCode::KeyQ if self.quit_failed => return false,
-            KeyCode::F5 | KeyCode::F9 if self.game.playing() => return false,
             KeyCode::Digit1
             | KeyCode::Digit2
             | KeyCode::Digit3
@@ -1039,13 +1013,11 @@ impl App {
             KeyCode::Digit5 => Action::PlanTradeLesson,
             KeyCode::Digit6 => Action::CancelTradeLesson,
             KeyCode::Digit7 => Action::TradeLessonDetails,
-            KeyCode::F6 => Action::ReviewFlightLesson,
-            KeyCode::F12 => Action::CancelFlightLesson,
             KeyCode::KeyC => Action::FlightLessonDetails,
-            KeyCode::F1 => Action::CycleMissileLock,
-            KeyCode::F2 => Action::ToggleMissileArm,
-            KeyCode::F3 => Action::FireMissile,
-            KeyCode::F4 => Action::ClearMissile,
+            KeyCode::Digit8 if self.modifiers.is_empty() => Action::CycleMissileLock,
+            KeyCode::Digit9 if self.modifiers.is_empty() => Action::ToggleMissileArm,
+            KeyCode::Equal if self.modifiers.is_empty() => Action::FireMissile,
+            KeyCode::Minus if self.modifiers.is_empty() => Action::ClearMissile,
             KeyCode::KeyL => Action::Launch,
             KeyCode::KeyJ => {
                 if let Some(route) = self.game.world.active_route_progress() {
@@ -1081,9 +1053,6 @@ impl App {
             KeyCode::KeyV => Action::ReviewAll,
             KeyCode::KeyX => Action::ReviewAbandonment,
             KeyCode::KeyI => Action::MissionDetails,
-            KeyCode::F7 => Action::ReviewPracticeClosure,
-            KeyCode::F8 => Action::ReviewPracticeReception,
-            KeyCode::F10 => Action::ReviewPractice,
             KeyCode::Enter => Action::Confirm,
             KeyCode::KeyB => Action::Back,
             KeyCode::KeyF => Action::Refuel,
@@ -1192,6 +1161,78 @@ impl App {
         FrameAdvance::Continue(frame_refusal)
     }
 
+    fn route_profile_shortcut(&mut self, code: KeyCode, repeat: bool) -> bool {
+        if self.modifiers != ModifiersState::CONTROL
+            || !matches!(code, KeyCode::KeyS | KeyCode::KeyR | KeyCode::Enter)
+        {
+            return false;
+        }
+        if repeat || self.modal_open() {
+            return true;
+        }
+        match code {
+            KeyCode::KeyS if self.game.playing() => self.save_profile(),
+            KeyCode::KeyR if self.game.is_medusa_preview() => match self.game.continue_saved() {
+                Ok(()) => {
+                    self.reset_input();
+                    self.notice.set("Medusa preview continued".into());
+                }
+                Err(error) => self
+                    .notice
+                    .set(format!("Preview Continue refused: {error}")),
+            },
+            KeyCode::KeyR if self.game.playing() => self.load_profile(),
+            KeyCode::Enter => {
+                if let Some(renderer) = &self.renderer {
+                    let mode = if renderer.window.fullscreen().is_some() {
+                        None
+                    } else {
+                        Some(Fullscreen::Borderless(None))
+                    };
+                    renderer.window.set_fullscreen(mode);
+                }
+            }
+            _ => {}
+        }
+        self.request_redraw();
+        true
+    }
+
+    fn route_training_shortcut(&mut self, code: KeyCode, repeat: bool) -> bool {
+        if self.modifiers != ModifiersState::SHIFT {
+            return false;
+        }
+        let action = match code {
+            KeyCode::Digit1 => Action::ReviewFlightLesson,
+            KeyCode::Digit2 => Action::CancelFlightLesson,
+            KeyCode::Digit3 => Action::ReviewPractice,
+            KeyCode::Digit4 => Action::ReviewPracticeReception,
+            KeyCode::Digit5 => Action::ReviewPracticeClosure,
+            _ => return false,
+        };
+        if repeat || !self.game.playing() || self.quit_failed || player_destroyed(&self.game.world)
+        {
+            return true;
+        }
+        if self.menu_active()
+            && let Some(menu) = &mut self.docked
+        {
+            if menu.review_pending() {
+                menu.feedback("Confirm or cancel the current station review first".into());
+                self.request_redraw();
+                return true;
+            }
+            menu.close();
+        }
+        if self.commander_open {
+            self.leave_commander();
+        }
+        self.notice
+            .set(self.game.command(action).unwrap_or_else(|error| error));
+        self.request_redraw();
+        true
+    }
+
     fn keyboard_input(&mut self, event_loop: &ActiveEventLoop, event: winit::event::KeyEvent) {
         if let Some(code) = self.route_keyboard(
             event.physical_key,
@@ -1226,6 +1267,13 @@ impl App {
                     KeyCode::Escape | KeyCode::KeyQ | KeyCode::KeyP | KeyCode::Period
                 ))
             .then_some(code);
+        }
+        if state == ElementState::Pressed
+            && self.focused
+            && !self.occluded
+            && self.route_profile_shortcut(code, repeat)
+        {
+            return None;
         }
         if self.game.is_medusa_preview() {
             if state == ElementState::Released {
@@ -1274,15 +1322,20 @@ impl App {
         if self.route_xyzzy(code, repeat) {
             return None;
         }
-        if self.commander_open {
-            return (!repeat).then_some(code);
-        }
         if self.menu_active()
             && self.docked.as_ref().is_some_and(Docked::search_active)
             && let Some(text) = text.filter(|s| s.chars().all(|c| !c.is_control()))
         {
             self.menu_input(ui::Input::Text(text.to_string()));
             return None;
+        }
+        if !(self.menu_active() && self.docked.as_ref().is_some_and(Docked::search_active))
+            && self.route_training_shortcut(code, repeat)
+        {
+            return None;
+        }
+        if self.commander_open {
+            return (!repeat).then_some(code);
         }
         if code == KeyCode::KeyP
             && self.menu_active()

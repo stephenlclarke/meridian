@@ -108,8 +108,8 @@ fn every_station_help_retains_its_screen_selection_and_all_navigation_bindings()
             KeyCode::KeyX,
             KeyCode::Digit1,
             KeyCode::Tab,
-            KeyCode::F5,
-            KeyCode::F9,
+            KeyCode::KeyS,
+            KeyCode::KeyR,
             KeyCode::KeyP,
             KeyCode::KeyL,
         ] {
@@ -295,7 +295,7 @@ fn title_help_intercepts_new_continue_quit_and_repeated_toggle_without_a_profile
     assert!(!app.game.playing());
     press(&mut app, KeyCode::KeyH, Some("h"));
     let title = app.help.clone();
-    for code in [KeyCode::KeyN, KeyCode::KeyC, KeyCode::Enter, KeyCode::F5] {
+    for code in [KeyCode::KeyN, KeyCode::KeyC, KeyCode::Enter, KeyCode::KeyS] {
         assert_eq!(press(&mut app, code, None), None);
     }
     assert_eq!(
@@ -358,4 +358,83 @@ fn session_review_help_uses_b_cancel_and_escape_first_only_dismisses_help() {
     app.game_key(KeyCode::KeyB);
     assert!(app.game.session.pending_trade.is_none());
     assert_eq!(ok(app.game.world.save_bytes()), before);
+}
+
+#[test]
+fn training_shortcuts_open_the_same_review_from_commander_and_station() {
+    use winit::keyboard::ModifiersState;
+    for (digit, action) in [
+        (KeyCode::Digit1, Action::ReviewFlightLesson),
+        (KeyCode::Digit2, Action::CancelFlightLesson),
+        (KeyCode::Digit3, Action::ReviewPractice),
+        (KeyCode::Digit4, Action::ReviewPracticeReception),
+        (KeyCode::Digit5, Action::ReviewPracticeClosure),
+    ] {
+        let expected_dir = TestDirectory::new();
+        let mut expected = app(&expected_dir);
+        let message = expected.game.command(action).unwrap_or_else(|error| error);
+        for from_commander in [true, false] {
+            let dir = TestDirectory::new();
+            let mut app = app(&dir);
+            if from_commander {
+                app.commander_open = true;
+            } else {
+                station(&mut app, ui::Screen::System);
+            }
+            app.modifiers = ModifiersState::SHIFT;
+            assert_eq!(press(&mut app, digit, None), None);
+            assert!(!app.commander_open && !app.menu_active());
+            assert_eq!(app.notice.text.as_deref(), Some(message.as_str()));
+            assert_eq!(
+                app.game.session.help_review(),
+                expected.game.session.help_review()
+            );
+            assert!(!dir.0.join("commander.meridian").exists());
+        }
+    }
+}
+
+#[test]
+fn control_shortcuts_preserve_modal_enter_and_use_the_correct_save_slot() {
+    use winit::keyboard::ModifiersState;
+    let dir = TestDirectory::new();
+    let mut ordinary = app(&dir);
+    let fleet = dir.0.join("commander.meridian");
+    press(&mut ordinary, KeyCode::KeyH, None);
+    ordinary.modifiers = ModifiersState::CONTROL;
+    for code in [KeyCode::KeyS, KeyCode::KeyR, KeyCode::Enter] {
+        assert_eq!(press(&mut ordinary, code, None), None);
+        assert!(ordinary.help.is_some());
+    }
+    assert!(!fleet.exists());
+    ordinary.modifiers = ModifiersState::empty();
+    press(&mut ordinary, KeyCode::Escape, None);
+    assert!(ordinary.help.is_none());
+    ordinary.modifiers = ModifiersState::CONTROL;
+    assert_eq!(press(&mut ordinary, KeyCode::KeyS, Some("s")), None);
+    assert!(!ordinary.keys.contains(&KeyCode::KeyS));
+    let saved = ok(std::fs::read(&fleet));
+    let opening = ordinary.game.world.snapshot();
+    ordinary.game_key(KeyCode::KeyL);
+    ordinary
+        .game
+        .world
+        .step(FlightInput::default())
+        .unwrap_or_else(|e| panic!("{e:?}"));
+    assert_ne!(ordinary.game.world.snapshot(), opening);
+    assert_eq!(press(&mut ordinary, KeyCode::KeyR, Some("r")), None);
+    assert_eq!(ordinary.game.world.snapshot(), opening);
+    let mut preview = App::with_profile(ok(crate::profile::Profile::open_medusa_preview(
+        dir.0.clone(),
+    )));
+    preview.modifiers = ModifiersState::CONTROL;
+    assert_eq!(press(&mut preview, KeyCode::KeyS, None), None);
+    assert!(!preview.keys.contains(&KeyCode::KeyS));
+    let prior = preview.game.world.snapshot();
+    assert!(dir.0.join("medusa-preview.meridian").is_file());
+    ok(preview.game.world.request_launch(prior.tick));
+    ok(preview.game.world.step(FlightInput::default()));
+    assert_eq!(press(&mut preview, KeyCode::KeyR, None), None);
+    assert_eq!(preview.game.world.snapshot(), prior);
+    assert_eq!(ok(std::fs::read(fleet)), saved);
 }

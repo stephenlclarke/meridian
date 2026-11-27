@@ -81,6 +81,6 @@ pub fn append_panel(world: &World, lines: &mut Vec<String>) -> Result<(), String
         }
         _ => "RESUME AT AN ELIGIBLE STATION BERTH FOR EQUIPMENT SERVICE".into(),
     });
-    lines.push("O CLOSE | M MARKET | I MISSION | F5 SAVE | F9 RELOAD".into());
+    lines.push("O CLOSE | M MARKET | I MISSION | Ctrl+S SAVE | Ctrl+R RELOAD".into());
     Ok(())
 }
