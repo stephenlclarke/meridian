@@ -10,6 +10,7 @@ use std::{
     fs,
     path::PathBuf,
     process::Command,
+    sync::atomic::{AtomicU64, Ordering},
     time::{SystemTime, UNIX_EPOCH},
 };
 
@@ -22,9 +23,13 @@ fn some<T>(value: Option<T>) -> T {
 struct Directory(PathBuf);
 impl Directory {
     fn new() -> Self {
+        static NEXT_DIRECTORY: AtomicU64 = AtomicU64::new(0);
         let nonce = ok(SystemTime::now().duration_since(UNIX_EPOCH)).as_nanos();
-        let path =
-            std::env::temp_dir().join(format!("meridian-trade-{}-{nonce}", std::process::id()));
+        let sequence = NEXT_DIRECTORY.fetch_add(1, Ordering::Relaxed);
+        let path = std::env::temp_dir().join(format!(
+            "meridian-trade-{}-{nonce}-{sequence}",
+            std::process::id()
+        ));
         ok(fs::create_dir(&path));
         Self(path)
     }
