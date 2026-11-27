@@ -32,6 +32,8 @@ The original `EquipmentPurchaseProgression.swift` defines the Naval grade as a s
 
 The focused test at `b70f83c2618cf290fb47fb6a21ed99b3866914ca` failed on Dell WSL Linux (6.66 s) and native Windows (12.86 s). Each ran one test, with zero passes and exit 101. Both reached the paid-item cold restore and reported `InvalidMode` at `flight/solar/tests.rs:88:14` during yaw. Neither log contains a backtrace or the ship's temperature and energy at the failing turn. The revised return test starts braking at 2.65 solar radii at speed 8, samples the ship state at each turn, and checks the fuel debit after returning. The production heat and collection rules are unchanged.
 
+At `c7b10a20` the return passed on Dell Linux (7.92 s) and native Windows (21.11 s). Six passes raised fuel from 65 to 210 units. The return to Lareria used 205 units and the cold save restored 5. The follow-on test also refuels at Lareria, travels to Avenor and switches to the mining tool in flight with the Naval purchase as its last station equipment receipt.
+
 ## Current reconciliation
 
 `Ready` below means source for the listed SH025 paths exists; the current preview can predate it. It does not claim new native testing, other hull compatibility or full parity. `Partial` names a concrete missing path. `Open` means no playable equipment implementation now. All rows require review of paid or appropriate non-paid acquisition, fit/storage, real effect and save/Continue before closure. XYZZY is a separate explicit acquisition path, not a substitute for ordinary payment or a mission receipt.

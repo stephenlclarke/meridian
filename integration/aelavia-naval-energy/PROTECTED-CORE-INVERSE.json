@@ -17,9 +17,20 @@
         }
       ]
     },
+    "flight/equipment/tests.rs": {
+      "beforeSHA256": "1a26073a2d5c79b1c04473796a283dceb631bec72ab3fe4c451f42b2cc499067",
+      "afterSHA256": "7b5339b4d222bc0ebe08bb140c631475855ea6f5201db30273ffcaf0b3b426f6",
+      "hunks": [
+        {
+          "offset": 1070,
+          "before": "",
+          "after": "    dock_after_arrival(world);\n}\n\npub(in crate::flight) fn dock_after_arrival(world: &mut World) {\n"
+        }
+      ]
+    },
     "flight/modular.rs": {
       "beforeSHA256": "271c8afc708a475b106eac5999f64a757fe83de5e0814f6477a9bed90b948133",
-      "afterSHA256": "2f5a60f33bc6367816774b1f9d40ac03263ff87ba0d5cd30ad92f05c3cdf5c3c",
+      "afterSHA256": "16abada9cde5880491ccc81e33d675ee3481ac79967837c7f1429b8998ce29d7",
       "hunks": [
         {
           "offset": 222,
@@ -39,35 +50,35 @@
         {
           "offset": 43023,
           "before": "            super::ammunition::validate_berth_event(\n",
-          "after": "            let validate_berth = if !e.xyzzy && aelavia_naval_purchase(e.dock.system(), e.action) {\n                if world\n                    .jump_journal\n                    .system_at_visit(e.dock.visit(), e.dock.tick())?\n                    != e.dock.system()\n                {\n                    return Err(INVALID);\n                }\n                super::ammunition::validate_physical_berth_event\n            } else {\n                super::ammunition::validate_berth_event\n            };\n            validate_berth(\n"
+          "after": "            // Flight exchanges reuse the preceding modular event's berth. Their own\n            // validators below check that exact predecessor, flight visit and clock.\n            let flight_exchange = matches!(\n                e.action,\n                ModuleAction::FlightLaserExchange { .. }\n                    | ModuleAction::FlightSalvageExchange { .. }\n            );\n            let validate_berth = if !e.xyzzy\n                && e.dock.system() == SystemId::AELAVIA\n                && (e.action.purchase_kind() == Some(ModuleKind::NavalEnergyUnit)\n                    || flight_exchange)\n            {\n                if world\n                    .jump_journal\n                    .system_at_visit(e.dock.visit(), e.dock.tick())?\n                    != e.dock.system()\n                {\n                    return Err(INVALID);\n                }\n                super::ammunition::validate_physical_berth_event\n            } else {\n                super::ammunition::validate_berth_event\n            };\n            validate_berth(\n"
         },
         {
-          "offset": 69080,
+          "offset": 69595,
           "before": "        let Some(site) = self\n            .current_dock_context()\n            .and_then(|d| super::services::service_site(d.system()))\n        else {\n",
           "after": "        let Some(dock) = self.current_dock_context() else {\n"
         },
         {
-          "offset": 69182,
+          "offset": 69697,
           "before": "        let Ok(base) = crate::equipment::definition() else {\n            return Vec::new();\n        };\n        let technology = base.offer(site).technology;\n",
           "after": ""
         },
         {
-          "offset": 70834,
+          "offset": 71349,
           "before": "",
           "after": "            let technology = module_shop_technology(dock.system(), kind)?;\n"
         },
         {
-          "offset": 75707,
+          "offset": 76222,
           "before": "        let facts = self\n            .current_service_facts(tick)\n",
           "after": "        self.station_command_admission(tick)\n"
         },
         {
-          "offset": 76038,
+          "offset": 76553,
           "before": "",
           "after": "        {\n            return Err(ModuleError::BerthRequired);\n        }\n        if super::services::service_site(dock.system()).is_none()\n            && !aelavia_naval_purchase(dock.system(), action)\n"
         },
         {
-          "offset": 77836,
+          "offset": 78351,
           "before": "            let technology = crate::equipment::definition()\n                .map_err(|_| ModuleError::BerthRequired)?\n                .offer(facts.site)\n                .technology;\n",
           "after": "            let technology =\n                module_shop_technology(dock.system(), kind).ok_or(ModuleError::BerthRequired)?;\n"
         }

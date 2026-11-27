@@ -1124,4 +1124,31 @@ fn aelavia_naval_purchase_recharges_in_flight_and_scoops_fuel_for_return() {
         cold.flight_resources_snapshot(),
         world.flight_resources_snapshot()
     );
+
+    // The last modular receipt is still the Aelavia purchase even after refuelling
+    // and docking elsewhere. The flight exchange must retain that actual anchor.
+    let mut world = cold;
+    crate::flight::equipment::tests::dock_after_arrival(&mut world);
+    world.request_refuel(world.snapshot().tick).unwrap();
+    journey(&mut world, SystemId::AVENOR);
+    launch(&mut world);
+    stop(&mut world);
+    assert!(
+        world
+            .cycle_mining_contact(world.snapshot().tick, [1280, 720])
+            .unwrap()
+    );
+    let previous_front = world.front_laser_snapshot().unwrap().fitted_item_id;
+    let cash = world.credits_tenths();
+    world.select_auto_mining_tool().unwrap();
+    let mining = world.fitted_mining_tool().unwrap().item;
+    let mut cold = World::from_save_bytes(&world.save_bytes().unwrap()).unwrap();
+    assert_eq!(cold.fitted_mining_tool().unwrap().item, mining);
+    cold.restore_auto_mining_tool().unwrap();
+    let restored = World::from_save_bytes(&cold.save_bytes().unwrap()).unwrap();
+    assert_eq!(
+        restored.front_laser_snapshot().unwrap().fitted_item_id,
+        previous_front
+    );
+    assert_eq!(restored.credits_tenths(), cash);
 }

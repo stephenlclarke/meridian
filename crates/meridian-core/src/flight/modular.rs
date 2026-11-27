@@ -1168,7 +1168,18 @@ impl State {
         let mut previous_exchange: Option<(u64, u64, u64)> = None;
         let budget = crate::equipment::definition().map_err(|_| INVALID)?;
         for e in &self.events {
-            let validate_berth = if !e.xyzzy && aelavia_naval_purchase(e.dock.system(), e.action) {
+            // Flight exchanges reuse the preceding modular event's berth. Their own
+            // validators below check that exact predecessor, flight visit and clock.
+            let flight_exchange = matches!(
+                e.action,
+                ModuleAction::FlightLaserExchange { .. }
+                    | ModuleAction::FlightSalvageExchange { .. }
+            );
+            let validate_berth = if !e.xyzzy
+                && e.dock.system() == SystemId::AELAVIA
+                && (e.action.purchase_kind() == Some(ModuleKind::NavalEnergyUnit)
+                    || flight_exchange)
+            {
                 if world
                     .jump_journal
                     .system_at_visit(e.dock.visit(), e.dock.tick())?
