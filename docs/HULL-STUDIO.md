@@ -111,3 +111,7 @@ see it in the disposable game session. The Studio export command refuses
 schema 2. The standalone game accepts schema 2 only through
 `--inspect-hull-package`. Schema 1 retains the 512-face native limit and
 excludes archived inspection packages from the flight export.
+
+## Serval Fighter
+
+The [SH041 Serval Fighter](SERVAL-GAMEPLAY-ENVELOPE.md) opens in the stock Showroom with its 4,236-face detailed model. Its 224-face native model and detailed model share 23 rounded supports. The package keeps the original flight and engineering references for inspection.
