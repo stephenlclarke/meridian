@@ -122,6 +122,13 @@ impl History {
         }
     }
 
+    pub(super) fn berth_at_sequence(&self, sequence: u64) -> Option<DockContext> {
+        self.berths
+            .iter()
+            .copied()
+            .find(|b| b.sequence() == sequence)
+    }
+
     pub(super) fn owns_berth(&self, dock: DockContext) -> bool {
         self.berths.contains(&dock)
     }
@@ -189,9 +196,7 @@ impl History {
             {
                 return Err(INVALID);
             }
-            world
-                .jump_journal
-                .validate_passenger_berth(*dock, dock.tick())?;
+            world.jump_journal.validate_berth_at(*dock, dock.tick())?;
             if let Some(current_offset) = current_offset {
                 let clock = world.damage.berth_clock(dock.sequence()).ok_or(INVALID)?;
                 previous_offset =

@@ -28,6 +28,10 @@ pub(in crate::flight) fn journey(world: &mut World, target: SystemId) {
     for _ in 0..remaining {
         world.step(FlightInput::default()).unwrap();
     }
+    dock_after_arrival(world);
+}
+
+pub(in crate::flight) fn dock_after_arrival(world: &mut World) {
     for _ in 0..9000 {
         let snapshot = world.snapshot();
         if snapshot.mode == FlightMode::Docked {

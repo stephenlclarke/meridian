@@ -88,6 +88,10 @@ pub struct SystemId {
     pub system: u16,
 }
 impl SystemId {
+    pub const AELAVIA: Self = Self {
+        galaxy: 0,
+        system: 235,
+    };
     pub const LARERIA: Self = Self {
         galaxy: 0,
         system: 91,
@@ -386,6 +390,14 @@ impl DockContext {
     }
     pub fn origin(self) -> DockOrigin {
         self.origin
+    }
+    #[cfg(test)]
+    pub(crate) fn with_test_chronology(self, sequence: u64, tick: u64) -> Self {
+        Self {
+            sequence,
+            tick,
+            ..self
+        }
     }
     pub fn station_class(self) -> &'static str {
         "main-orbital"

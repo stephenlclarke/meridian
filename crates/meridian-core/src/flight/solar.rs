@@ -322,6 +322,14 @@ pub(super) struct State {
     file_limit: Option<usize>,
 }
 impl State {
+    pub(super) fn first_clock_pair(&self, visit: u64) -> Option<(u64, u64)> {
+        self.runs
+            .iter()
+            .map(|run| run.opening)
+            .find(|anchor| anchor.visit == visit)
+            .map(|anchor| (anchor.tick, anchor.clock))
+    }
+
     pub(super) fn current(&self, mode: FlightMode, visit: u64, clock: u64) -> SolarSnapshot {
         let Some(last) = self.last.filter(|last| {
             mode != FlightMode::Docked && last.anchor.visit == visit && last.anchor.clock <= clock

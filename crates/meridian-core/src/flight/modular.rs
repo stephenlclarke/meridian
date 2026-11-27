@@ -3,13 +3,15 @@ use super::{FlightMode, ShieldGrade, World};
 use crate::{
     equipment::TargetingTier,
     freight::g02::CommanderAccount,
-    navigation::{DockContext, DriveGrade, NavigationFitChange, NavigationGrade},
+    navigation::{DockContext, DriveGrade, NavigationFitChange, NavigationGrade, SystemId},
     save::{Reader, SaveError, Writer},
 };
 use core::fmt;
 mod cabins;
 mod fuel_history;
 mod history;
+mod naval_berth;
+use naval_berth::NavalBerth;
 mod salvage;
 pub(super) use cabins::add_cabin_mass;
 pub use cabins::{
@@ -499,6 +501,7 @@ pub(super) struct State {
     events: Vec<Event>,
     cargo_fit_history: Vec<fuel_history::CargoFit>,
     history: history::History,
+    naval_berth: Option<NavalBerth>,
     salvage: salvage::State,
 }
 pub struct PreparedModule<'a> {
@@ -923,17 +926,24 @@ impl Ledger {
     }
 }
 
+// OriginalWorlds/catalogue.json at a11fe169 lists G01-S235 at TL17.
+fn module_shop_technology(system: SystemId, kind: ModuleKind) -> Option<u8> {
+    if system == SystemId::AELAVIA {
+        return (kind == ModuleKind::NavalEnergyUnit).then_some(17);
+    }
+    let site = super::services::service_site(system)?;
+    Some(crate::equipment::definition().ok()?.offer(site).technology)
+}
+
+fn aelavia_naval_purchase(system: SystemId, action: ModuleAction) -> bool {
+    system == SystemId::AELAVIA && action.purchase_kind() == Some(ModuleKind::NavalEnergyUnit)
+}
+
 fn validate_module_purchase(e: &Event, owner: u64, mut transaction: u32) -> Result<u32, SaveError> {
     if let Some(kind) = e.action.purchase_kind() {
         if !e.xyzzy {
             let (_, required) = kind.shop().ok_or(INVALID)?;
-            let site = super::services::service_site(e.dock.system()).ok_or(INVALID)?;
-            if crate::equipment::definition()
-                .map_err(|_| INVALID)?
-                .offer(site)
-                .technology
-                < required
-            {
+            if module_shop_technology(e.dock.system(), kind).ok_or(INVALID)? < required {
                 return Err(INVALID);
             }
             transaction = transaction.checked_add(1).ok_or(INVALID)?;
@@ -1161,7 +1171,26 @@ impl State {
         let mut previous_exchange: Option<(u64, u64, u64)> = None;
         let budget = crate::equipment::definition().map_err(|_| INVALID)?;
         for e in &self.events {
-            super::ammunition::validate_berth_event(
+            // Flight exchanges reuse the preceding modular event's berth. Their own
+            // validators below check that exact predecessor, flight visit and clock.
+            let flight_exchange = matches!(
+                e.action,
+                ModuleAction::FlightLaserExchange { .. }
+                    | ModuleAction::FlightSalvageExchange { .. }
+            );
+            let validate_berth = if !e.xyzzy
+                && e.dock.system() == SystemId::AELAVIA
+                && (e.action.purchase_kind() == Some(ModuleKind::NavalEnergyUnit)
+                    || flight_exchange)
+            {
+                if !flight_exchange {
+                    self.validate_naval_berth(world, e)?;
+                }
+                super::ammunition::validate_physical_berth_event
+            } else {
+                super::ammunition::validate_berth_event
+            };
+            validate_berth(
                 world,
                 account,
                 e.dock,
@@ -1262,9 +1291,7 @@ impl State {
             };
             transaction = validate_module_purchase(e, owner, transaction)?;
             if let ModuleAction::Passenger(action) = e.action {
-                world
-                    .jump_journal
-                    .validate_passenger_berth(e.dock, e.tick)?;
+                world.jump_journal.validate_berth_at(e.dock, e.tick)?;
                 if !self.history.owns_berth(e.dock) {
                     return Err(INVALID);
                 }
@@ -1574,8 +1601,16 @@ impl State {
                     w.bool(restoring);
                 }
                 ModuleAction::Purchase { kind } => {
-                    w.u8(3);
-                    w.u8(kind.tag());
+                    if let Some(berth) = self
+                        .naval_berth
+                        .filter(|_| kind == ModuleKind::NavalEnergyUnit)
+                    {
+                        w.u8(21);
+                        w.u64(berth.encoded_tick());
+                    } else {
+                        w.u8(3);
+                        w.u8(kind.tag());
+                    }
                 }
                 ModuleAction::PurchaseFuelScoops => w.u8(16),
                 ModuleAction::GrantStoredSalvageCutter => w.u8(17),
@@ -1630,6 +1665,7 @@ impl State {
             return Err(SaveError::TooLarge);
         }
         let mut events = Vec::new();
+        let mut naval_berth = None;
         for _ in 0..count {
             let tag = r.u8()?;
             let kind = if tag == 3 && version >= 16 {
@@ -1662,6 +1698,13 @@ impl State {
             } else {
                 None
             };
+            if tag == 21
+                && naval_berth
+                    .replace(NavalBerth::from_tick(r.u64()?))
+                    .is_some()
+            {
+                return Err(INVALID);
+            }
             let item = r.u64()?;
             let dock = DockContext::decode_save(r)?;
             let tick = r.u64()?;
@@ -1669,6 +1712,9 @@ impl State {
             let xyzzy = r.bool()?;
             let action = match tag {
                 0 => ModuleAction::PurchaseMiningLaser,
+                21 if !xyzzy && dock.system() == SystemId::AELAVIA => ModuleAction::Purchase {
+                    kind: ModuleKind::NavalEnergyUnit,
+                },
                 19 => ModuleAction::GrantStoredMiningLaser,
                 18 => {
                     let (replacing, visit, clock, emission, restoring) =
@@ -1741,6 +1787,7 @@ impl State {
         Ok(Self {
             events,
             cargo_fit_history,
+            naval_berth,
             history,
             salvage,
         })
@@ -1793,16 +1840,9 @@ impl World {
         })
     }
     pub fn module_offers(&self) -> Vec<ModuleOffer> {
-        let Some(site) = self
-            .current_dock_context()
-            .and_then(|d| super::services::service_site(d.system()))
-        else {
+        let Some(dock) = self.current_dock_context() else {
             return Vec::new();
         };
-        let Ok(base) = crate::equipment::definition() else {
-            return Vec::new();
-        };
-        let technology = base.offer(site).technology;
         [
             ModuleKind::PulseLaser,
             ModuleKind::MiningLaser,
@@ -1839,6 +1879,7 @@ impl World {
         ]
         .into_iter()
         .filter_map(|kind| {
+            let technology = module_shop_technology(dock.system(), kind)?;
             let (price_tenths, required_technology) = kind.shop()?;
             Some(ModuleOffer {
                 kind,
@@ -1972,14 +2013,18 @@ impl World {
             .commander_account
             .as_ref()
             .ok_or(ModuleError::NoCommander)?;
-        let facts = self
-            .current_service_facts(tick)
+        self.station_command_admission(tick)
             .map_err(|_| ModuleError::BerthRequired)?;
         let dock = self
             .current_dock_context()
             .ok_or(ModuleError::BerthRequired)?;
         if self.state.mode != FlightMode::Docked
             || self.combat_snapshot().is_none_or(|s| s.player.destroyed)
+        {
+            return Err(ModuleError::BerthRequired);
+        }
+        if super::services::service_site(dock.system()).is_none()
+            && !aelavia_naval_purchase(dock.system(), action)
         {
             return Err(ModuleError::BerthRequired);
         }
@@ -2017,10 +2062,8 @@ impl World {
                     "fast lasers require fresh resource history",
                 )));
             }
-            let technology = crate::equipment::definition()
-                .map_err(|_| ModuleError::BerthRequired)?
-                .offer(facts.site)
-                .technology;
+            let technology =
+                module_shop_technology(dock.system(), kind).ok_or(ModuleError::BerthRequired)?;
             validate_purchase(kind, technology, account.credits_tenths())?;
         }
         let mut ledger = self
@@ -2199,6 +2242,9 @@ impl World {
         if history::requires_history(review.action) {
             state.history.activate(self, current, review.dock)?;
         }
+        if aelavia_naval_purchase(review.dock.system(), review.action) {
+            state.naval_berth = Some(NavalBerth::Occupied);
+        }
         state.events.push(event);
         let mut combat = self.combat;
         let (account, state, bytes) = if shield_grade != combat.shields().grade() {
@@ -2238,7 +2284,7 @@ mod navigation_tests;
 #[cfg(test)]
 mod shield_tests;
 #[cfg(test)]
-mod tests;
+pub(super) mod tests;
 
 impl State {
     pub(super) fn front_at_physical(

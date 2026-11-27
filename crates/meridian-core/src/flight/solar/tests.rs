@@ -121,6 +121,10 @@ fn cruise(world: &mut World, speed: f32) {
 }
 fn solar_approach(world: &mut World) {
     launch(world);
+    approach_sun_in_flight(world);
+}
+
+fn approach_sun_in_flight(world: &mut World) {
     let sun = world.celestial_snapshot().unwrap().sun;
     aim_3d(world, sun.position);
     assert!(MotionFrame::from(world.snapshot()).ratio_and_nose(sun).1 > 0.999);
@@ -964,4 +968,208 @@ fn fitted_partially_charged_emp_keeps_actual_final_transfer_when_solar_heat_kill
     let cold = World::from_save_bytes(&world.save_bytes().unwrap()).unwrap();
     assert_eq!(cold.emp_snapshot(), Some(emp));
     assert_eq!(cold.combat_snapshot(), world.combat_snapshot());
+}
+
+fn record_scoop_turn(world: &World, pass: usize, phase: &str) {
+    let ship = world.snapshot();
+    let solar = world.solar_snapshot().unwrap();
+    let player = world.combat_snapshot().unwrap().player;
+    eprintln!(
+        "Aelavia pass {pass} {phase}: tick={} mode={:?} speed={:.2} radius={:.3} temperature={:.3} energy={} fuel={} scoop={:?}",
+        ship.tick,
+        ship.mode,
+        ship.speed,
+        ratio(world),
+        solar.cabin_temperature,
+        player.energy_hundredths,
+        fuel(world),
+        solar.status
+    );
+    assert_eq!(ship.mode, crate::FlightMode::Flight);
+    assert!(!player.destroyed);
+    assert!(solar.cabin_temperature < 0.75, "solar danger at {phase}");
+}
+
+#[test]
+fn aelavia_naval_purchase_recharges_in_flight_and_scoops_fuel_for_return() {
+    use crate::navigation::SystemId;
+    let mut world = earned_world(18296);
+    module(&mut world, ModuleKind::FuelStorage);
+    module(&mut world, ModuleKind::FuelStorage);
+    module(&mut world, ModuleKind::FuelScoops);
+    // Disposable funding and advanced navigation. Keep the three paid utility items.
+    secret(&mut world, XyzzyAction::Enter);
+    secret(&mut world, XyzzyAction::ToggleUnlimitedFuel);
+    assert!(!world.xyzzy_snapshot().unwrap().unlimited_fuel);
+    module(&mut world, ModuleKind::ExtraEnergyUnit);
+    journey(&mut world, SystemId::LARERIA);
+    let naval = ModuleAction::Purchase {
+        kind: ModuleKind::NavalEnergyUnit,
+    };
+    assert_eq!(
+        world.review_module(naval, world.snapshot().tick),
+        Err(crate::ModuleError::TechnologyUnavailable)
+    );
+    world.request_refuel(world.snapshot().tick).unwrap();
+    let route = world
+        .route_alternatives(SystemId::AELAVIA)
+        .unwrap()
+        .remove(0);
+    assert_eq!(
+        route.plan.systems(),
+        &[SystemId::LARERIA, SystemId::AELAVIA]
+    );
+    assert!((route.distance_ly - 20.55).abs() < 0.01);
+    journey(&mut world, SystemId::AELAVIA);
+    let berth = world.current_dock_context().unwrap();
+    assert_eq!(berth.system(), SystemId::AELAVIA);
+    assert_eq!(fuel(&world), 270 - route.fuel_units);
+    assert!(world.request_refuel(world.snapshot().tick).is_err());
+    let offers = world.module_offers();
+    assert_eq!(offers.len(), 1);
+    assert_eq!(
+        (
+            offers[0].kind,
+            offers[0].technology,
+            offers[0].price_tenths,
+            offers[0].available
+        ),
+        (ModuleKind::NavalEnergyUnit, 17, 196_000, true)
+    );
+    let cash = world.credits_tenths().unwrap();
+    for _ in 0..7 {
+        world.step(FlightInput::default()).unwrap();
+    }
+    let id = module(&mut world, ModuleKind::NavalEnergyUnit);
+    assert_eq!(world.credits_tenths(), Some(cash - 196_000));
+    let mut world = World::from_save_bytes(&world.save_bytes().unwrap()).unwrap();
+    assert!(world.modular_equipment_snapshot().unwrap().items.iter().any(|i|
+        i.id == id && i.slot == Some(crate::ModuleSlot::Energy)
+        && matches!(i.provenance, ModuleProvenance::Paid { dock, paid_tenths: 196_000, .. } if dock == berth)
+    ));
+    crate::flight::modular::tests::check_naval_local_sortie(&world);
+    for _ in 0..12 {
+        world.step(FlightInput::default()).unwrap();
+    }
+    launch(&mut world);
+    let first_flight_tick = world.snapshot().tick;
+    assert_eq!(world.snapshot().mode, crate::FlightMode::Flight);
+    approach_sun_in_flight(&mut world);
+    let solar_flight_tick = world.snapshot().tick;
+    record_scoop_turn(&world, 0, "outer approach");
+    world
+        .request_fire_front_laser(world.snapshot().tick)
+        .unwrap();
+    let energy = world.flight_resources_snapshot().unwrap().energy_hundredths;
+    world.step(FlightInput::default()).unwrap();
+    let recovered = world.flight_resources_snapshot().unwrap();
+    assert_eq!(
+        (
+            recovered.energy_capacity_hundredths,
+            recovered.energy_hundredths - energy
+        ),
+        (38_000, 21)
+    );
+
+    // Range is checked against unrounded distance, while the actual debit is in whole
+    // units. Keep one spare unit after meeting both conditions on the return leg.
+    let return_target = route
+        .fuel_units
+        .max((route.distance_ly * 10.0).ceil() as u16)
+        + 1;
+    assert!(fuel(&world) < return_target);
+    for pass in 1..=8 {
+        let sun = world.celestial_snapshot().unwrap().sun;
+        record_scoop_turn(&world, pass, "turn inbound");
+        aim_3d(&mut world, sun.position);
+        for _ in 0..2500 {
+            if fuel(&world) >= return_target || ratio(&world) <= 2.65 {
+                break;
+            }
+            cruise(&mut world, 8.0);
+        }
+        // From speed 8 the ship uses about 0.05 solar radii to brake. At or beyond
+        // 2.60 radii the equilibrium temperature is below the 0.75 cockpit warning.
+        stop(&mut world);
+        record_scoop_turn(&world, pass, "braked for outbound turn");
+        let pos =
+            crate::station::flight_pose(world.snapshot().position, world.snapshot().orientation)
+                .unwrap()
+                .position;
+        aim_3d(
+            &mut world,
+            Vec3::new(
+                2.0 * pos.x - sun.position.x,
+                2.0 * pos.y - sun.position.y,
+                2.0 * pos.z - sun.position.z,
+            ),
+        );
+        for _ in 0..1500 {
+            if ratio(&world) > 3.2 {
+                break;
+            }
+            cruise(&mut world, 8.0);
+        }
+        assert!(ratio(&world) > 3.2, "failed to clear the collection band");
+        if fuel(&world) >= return_target {
+            break;
+        }
+    }
+    let departure_fuel = fuel(&world);
+    assert!(
+        departure_fuel >= return_target,
+        "collected {departure_fuel}, need {return_target}"
+    );
+    record_scoop_turn(&world, 0, "ready for return jump");
+    assert!(!world.xyzzy_snapshot().unwrap().unlimited_fuel);
+    assert_eq!(world.credits_tenths(), Some(cash - 196_000));
+    world
+        .request_jump(SystemId::LARERIA, world.snapshot().tick)
+        .unwrap();
+    while world.snapshot().navigation.unwrap().travel.is_some() {
+        world.step(FlightInput::default()).unwrap();
+    }
+    let cold = World::from_save_bytes(&world.save_bytes().unwrap()).unwrap();
+    assert_eq!(fuel(&cold), departure_fuel - route.fuel_units);
+    assert_eq!(
+        cold.snapshot().navigation.unwrap().system,
+        SystemId::LARERIA
+    );
+    assert_eq!(
+        cold.flight_resources_snapshot(),
+        world.flight_resources_snapshot()
+    );
+
+    crate::flight::modular::tests::check_aelavia_receipt_chronology(
+        &cold,
+        first_flight_tick,
+        solar_flight_tick,
+    );
+
+    // The last modular receipt is still the Aelavia purchase even after refuelling
+    // and docking elsewhere. The flight exchange must retain that actual anchor.
+    let mut world = cold;
+    crate::flight::equipment::tests::dock_after_arrival(&mut world);
+    world.request_refuel(world.snapshot().tick).unwrap();
+    journey(&mut world, SystemId::AVENOR);
+    launch(&mut world);
+    stop(&mut world);
+    assert!(
+        world
+            .cycle_mining_contact(world.snapshot().tick, [1280, 720])
+            .unwrap()
+    );
+    let previous_front = world.front_laser_snapshot().unwrap().fitted_item_id;
+    let cash = world.credits_tenths();
+    world.select_auto_mining_tool().unwrap();
+    let mining = world.fitted_mining_tool().unwrap().item;
+    let mut cold = World::from_save_bytes(&world.save_bytes().unwrap()).unwrap();
+    assert_eq!(cold.fitted_mining_tool().unwrap().item, mining);
+    cold.restore_auto_mining_tool().unwrap();
+    let restored = World::from_save_bytes(&cold.save_bytes().unwrap()).unwrap();
+    assert_eq!(
+        restored.front_laser_snapshot().unwrap().fitted_item_id,
+        previous_front
+    );
+    assert_eq!(restored.credits_tenths(), cash);
 }

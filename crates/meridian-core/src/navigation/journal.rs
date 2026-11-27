@@ -389,12 +389,8 @@ impl JumpJournal {
         Ok(spent)
     }
 
-    /// Bind a retained passenger reception to the actual system travelled to before its berth.
-    pub(crate) fn validate_passenger_berth(
-        &self,
-        dock: DockContext,
-        tick: u64,
-    ) -> Result<(), SaveError> {
+    /// Verify the system and completed jump prefix at the berth and at the later station action.
+    pub(crate) fn validate_berth_at(&self, dock: DockContext, tick: u64) -> Result<(), SaveError> {
         self.spent_at(dock, tick)?;
         let count = usize::try_from(dock.visit().checked_sub(dock.sequence()).ok_or(INVALID)?)
             .map_err(|_| INVALID)?;

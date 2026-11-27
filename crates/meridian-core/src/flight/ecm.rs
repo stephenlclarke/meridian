@@ -372,9 +372,9 @@ impl World {
         &self,
         candidate: &State,
         navigation: Option<super::NavigationState>,
-        journal_growth: usize,
+        extra_save_bytes: usize,
     ) -> Result<(), SaveError> {
-        if *candidate == self.ecm && journal_growth == 0 {
+        if *candidate == self.ecm && extra_save_bytes == 0 {
             return Ok(());
         }
         let navigation_size = |navigation: Option<super::NavigationState>| {
@@ -390,7 +390,7 @@ impl World {
             .and_then(|n| n.checked_add(candidate.encoded_len()))
             .and_then(|n| n.checked_sub(navigation_size(self.navigation)))
             .and_then(|n| n.checked_add(navigation_size(navigation)))
-            .and_then(|n| n.checked_add(journal_growth))
+            .and_then(|n| n.checked_add(extra_save_bytes))
             .ok_or(SaveError::TooLarge)?;
         if size > crate::save::MAX_SAVE_BYTES {
             return Err(SaveError::TooLarge);

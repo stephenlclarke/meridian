@@ -141,12 +141,16 @@ pub(super) fn project(s: &DockedScreens, context: &Context<'_>, frame: &mut Fram
                 .map(|value| value.label())
                 .collect::<Vec<_>>()
                 .join(" / "),
-            if route.plan.systems().len() > 2 {
+            if route.plan.destination() == SystemId::AELAVIA {
+                "TL17 Naval Energy Unit".into()
+            } else if route.plan.systems().len() > 2 {
                 "Trade legs priced separately".into()
             } else {
                 "Based on current quotes".into()
             },
-            if route.plan.systems().len() > 2 {
+            if route.plan.destination() == SystemId::AELAVIA {
+                "Fit Fuel Scoops for the return".into()
+            } else if route.plan.systems().len() > 2 {
                 "Refuel at intermediate stops as needed".into()
             } else {
                 String::new()
