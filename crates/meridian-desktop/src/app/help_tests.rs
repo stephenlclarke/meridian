@@ -461,7 +461,7 @@ fn flight_status_cycles_notice_positions_and_keeps_the_last_launch_notice() {
     ok(app.game.world.step(FlightInput::default()));
     let before = ok(app.game.world.save_bytes());
     let prepared = ok(app.prepare_presentation(true, None, 0., |_| None));
-    assert_eq!(prepared.hud_lines, [launch.clone()]);
+    assert_eq!(prepared.hud_lines.as_slice(), std::slice::from_ref(&launch));
     let deadline = app
         .notice
         .expires
