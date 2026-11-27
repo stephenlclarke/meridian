@@ -111,3 +111,7 @@ see it in the disposable game session. The Studio export command refuses
 schema 2. The standalone game accepts schema 2 only through
 `--inspect-hull-package`. Schema 1 retains the 512-face native limit and
 excludes archived inspection packages from the flight export.
+
+## Zebu stock inspection
+
+Search for **SH036** or **Zebu** in the station Showroom. The stock entry opens the original long-haul trader with its detailed artwork, 192-face native mesh and three texture maps. The 64,051 kg engineering budget remains a source reference. The stock package supplies no active engineering mass. The [Zebu hull record](ZEBU-GAMEPLAY-ENVELOPE.md) gives the measured differences between the meshes and the station clearance.

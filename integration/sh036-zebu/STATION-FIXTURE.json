@@ -1,0 +1,12 @@
+{
+  "station": "SH028",
+  "sourcePins": {
+    "assets/legacy/sh028.physics": "cd54d30cab638f6b33feacf1fa78c9136f8ce346e8cc6133259bfc0472c259d5",
+    "assets/fleet/sh036/source.vertices": "8815f1d376fab5d4e7344407368cafed8fc7f460f0e5a5d1efbdad2cf2f52c13",
+    "assets/fleet/sh036/source-piece-membership.bin": "c37027337dd26c4fca22977bc8d0821d7afd9fdf980f7f7ad74967dbe7e9206f"
+  },
+  "yawHalfTurn": true,
+  "guardMillimetres": 21,
+  "aligned": {"actorXMetres": 0, "actorCentreZMetres": [163, 112]},
+  "offset": {"actorXMetres": 69.9, "actorCentreZMetres": [163, 160], "nativeLocalVertex": 31, "stationFace": 482}
+}

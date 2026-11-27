@@ -643,3 +643,9 @@ integration/sh072-griffon-mk-ii/CANDIDATE-FIT-SUPPORT-FANS.json text eol=lf
 integration/sh073-griffon-spectre/CANDIDATE-FIT-SUPPORT-FANS.json text eol=lf
 integration/sh072-griffon-mk-ii/ARCHIVE-FIT-SUPPORT-FANS.json text eol=lf
 integration/sh073-griffon-spectre/ARCHIVE-FIT-SUPPORT-FANS.json text eol=lf
+
+# Zebu source and report hashes use LF on every platform.
+tools/measure_zebu.py text eol=lf
+tools/measure_zebu_surface_fit.py text eol=lf
+tools/prepare_zebu_studio.py text eol=lf
+tools/verify_zebu_station.py text eol=lf
