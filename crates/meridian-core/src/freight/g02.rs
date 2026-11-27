@@ -540,6 +540,12 @@ impl CommanderAccount {
             .used_tonnes
             .checked_add(reserved_capacity)
             .ok_or(EquipmentError::HoldFull)?;
+        if self.data.medusa
+            && matches!(command, crate::equipment::Command::UnfitCargoBay(_))
+            && used > 22
+        {
+            return Err(EquipmentError::HoldFull);
+        }
         let (equipment, event) = self.data.equipment.prepare(
             self.data.owner,
             self.data.hull,

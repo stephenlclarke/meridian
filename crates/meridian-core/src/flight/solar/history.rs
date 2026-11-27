@@ -122,7 +122,7 @@ impl Anchor {
             || self.clock > self.tick
             || self.tick - self.clock > world.state.tick.checked_sub(end).ok_or(INVALID)?
             || world.jump_journal.system_at_visit(self.visit, self.tick)? != self.system
-            || !self.frame.valid()
+            || !self.frame.valid(world.hull_at_visit(self.visit))
         {
             return Err(INVALID);
         }
@@ -138,8 +138,7 @@ impl Anchor {
         } else {
             (
                 world
-                    .station_data
-                    .as_ref()
+                    .station_at_visit(self.visit)
                     .ok_or(INVALID)?
                     .launch_start()
                     .map_err(|_| INVALID)?
@@ -158,7 +157,7 @@ impl Anchor {
         let elapsed = self.clock.checked_sub(clock).ok_or(INVALID)?;
         let bound = elapsed as f64
             * f64::from(
-                super::super::MAX_SPEED
+                world.hull_at_visit(self.visit).flight_rates().0
                     * super::super::FIXED_DELTA_SECONDS
                     * super::super::DISTANCE_PER_SPEED_UNIT,
             )
@@ -244,21 +243,21 @@ pub(in crate::flight) fn replay_launch_step(
     {
         return Err(INVALID);
     }
-    let data = world.station_data.as_ref().ok_or(INVALID)?;
+    let data = world.station_at_visit(owner.visit).ok_or(INVALID)?;
     world
         .traffic
         .validate_missile_scene(traffic, world.state.tick, data)?;
     let frame = MotionFrame::from(opening);
+    let hull = world.hull_at_visit(owner.visit);
+    let (_, _, pitch_rate, yaw_rate, roll_rate) = hull.flight_rates();
     let input = motion.input();
-    let attempted = frame.advance(Motion::Active(input)).ok_or(INVALID)?;
+    let attempted = frame.advance(Motion::Active(input), hull).ok_or(INVALID)?;
     let scene = State::scene(world, owner.system, owner.visit, opening.tick)?;
     let before = crate::station::flight_pose(frame.position, frame.orientation).ok_or(INVALID)?;
     let after =
         crate::station::flight_pose(attempted.position, attempted.orientation).ok_or(INVALID)?;
     let angular = f64::from(
-        input.pitch.abs() * super::super::PITCH_RATE
-            + input.yaw.abs() * super::super::YAW_RATE
-            + input.roll.abs() * super::super::ROLL_RATE,
+        input.pitch.abs() * pitch_rate + input.yaw.abs() * yaw_rate + input.roll.abs() * roll_rate,
     ) * f64::from(super::super::FIXED_DELTA_SECONDS);
     let tick = opening.tick.checked_add(1).ok_or(INVALID)?;
     let mule = world
@@ -309,7 +308,7 @@ pub(in crate::flight) fn replay_launch_step(
                 before,
                 after,
                 f64::from(attempted.speed * super::super::DISTANCE_PER_SPEED_UNIT),
-                f64::from(input.roll * super::super::ROLL_RATE),
+                f64::from(input.roll * roll_rate),
                 angular,
             ) {
                 (Motion::Active(input), FlightMode::Docked)
@@ -336,7 +335,7 @@ pub(in crate::flight) fn replay_launch_step(
     if motion != expected {
         return Err(INVALID);
     }
-    let result = frame.advance(motion).ok_or(INVALID)?;
+    let result = frame.advance(motion, hull).ok_or(INVALID)?;
     Ok(Snapshot {
         position: result.position,
         orientation: result.orientation,
@@ -395,9 +394,14 @@ pub(super) fn replay_motion<'a>(
     mule: Option<&super::super::mule_renas::HistoricMuleCollider>,
     witnesses: &mut impl Iterator<Item = &'a NpcRefusal>,
 ) -> Result<MotionFrame, SaveError> {
+    let hull = world.hull_at_visit(anchor.visit);
+    let (_, _, pitch_rate, yaw_rate, roll_rate) = hull.flight_rates();
     let input = motion.input();
-    let attempted = anchor.frame.advance(Motion::Active(input)).ok_or(INVALID)?;
-    let data = world.station_data.as_ref().ok_or(INVALID)?;
+    let attempted = anchor
+        .frame
+        .advance(Motion::Active(input), hull)
+        .ok_or(INVALID)?;
+    let data = world.station_at_visit(anchor.visit).ok_or(INVALID)?;
     if scene.blocks_motion(
         anchor.frame.position,
         anchor.frame.position,
@@ -416,7 +420,7 @@ pub(super) fn replay_motion<'a>(
     } = motion
     {
         return if celestial_blocked {
-            anchor.frame.advance(motion).ok_or(INVALID)
+            anchor.frame.advance(motion, hull).ok_or(INVALID)
         } else {
             Err(INVALID)
         };
@@ -429,9 +433,7 @@ pub(super) fn replay_motion<'a>(
     let after =
         crate::station::flight_pose(attempted.position, attempted.orientation).ok_or(INVALID)?;
     let angular = f64::from(
-        input.pitch.abs() * super::super::PITCH_RATE
-            + input.yaw.abs() * super::super::YAW_RATE
-            + input.roll.abs() * super::super::ROLL_RATE,
+        input.pitch.abs() * pitch_rate + input.yaw.abs() * yaw_rate + input.roll.abs() * roll_rate,
     ) * f64::from(super::super::FIXED_DELTA_SECONDS);
     let next_tick = anchor.tick.checked_add(1).ok_or(INVALID)?;
     let asteroid_clear =
@@ -480,7 +482,7 @@ pub(super) fn replay_motion<'a>(
                     before,
                     after,
                     f64::from(attempted.speed * super::super::DISTANCE_PER_SPEED_UNIT),
-                    f64::from(input.roll * super::super::ROLL_RATE),
+                    f64::from(input.roll * roll_rate),
                     angular,
                 )
         }
@@ -488,7 +490,7 @@ pub(super) fn replay_motion<'a>(
     if !justified {
         return Err(INVALID);
     }
-    anchor.frame.advance(motion).ok_or(INVALID)
+    anchor.frame.advance(motion, hull).ok_or(INVALID)
 }
 impl SolarSnapshot {
     fn encode(self, w: &mut Writer) {
@@ -727,7 +729,7 @@ impl State {
                     &mut witnesses,
                 )?;
                 let (ratio, nose) = next.ratio_and_nose(sun);
-                if !next.valid()
+                if !next.valid(world.hull_at_visit(anchor.visit))
                     || !ratio.is_finite()
                     || !nose.is_finite()
                     || ratio <= 1.0

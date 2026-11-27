@@ -361,7 +361,7 @@ impl State {
     ) -> Result<(), SaveError> {
         let data = world.station_data.as_ref().ok_or(INVALID)?;
         let m = self.motions[i].as_ref().ok_or(INVALID)?;
-        super::super::persistence::validate_flight(&m.flight)?;
+        super::super::persistence::validate_flight(world, &m.flight)?;
         if m.flight.tick != motion_tick
             || m.flight.mode != FlightMode::Flight
             || m.age.checked_add(1) != Some(p.age_ticks)

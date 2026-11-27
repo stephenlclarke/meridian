@@ -1063,8 +1063,16 @@ pub(super) fn read_flight(r: &mut Reader<'_>, version: u16) -> Result<Snapshot, 
         motion_refusal,
     })
 }
-pub(super) fn validate_flight(s: &Snapshot) -> Result<(), SaveError> {
-    validate_flight_speed(s, MAX_SPEED)
+pub(super) fn validate_flight(world: &World, s: &Snapshot) -> Result<(), SaveError> {
+    let maximum = if world
+        .xyzzy_medusa_issue()
+        .is_some_and(|(_, tick, _)| s.tick > tick)
+    {
+        super::PlayerHullKind::Medusa.flight_rates().0
+    } else {
+        MAX_SPEED
+    };
+    validate_flight_speed(s, maximum)
 }
 pub(super) fn validate_flight_speed(s: &Snapshot, max_speed: f32) -> Result<(), SaveError> {
     let norm = s.orientation.iter().map(|v| v * v).sum::<f32>();

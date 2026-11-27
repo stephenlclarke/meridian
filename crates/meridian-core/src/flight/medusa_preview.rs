@@ -92,6 +92,33 @@ impl World {
         }
     }
 
+    /// Geometry for retained flight evidence predating a hull change at its recorded berth.
+    pub(super) fn station_at_visit(&self, visit: u64) -> Option<&OriginalStationData> {
+        if self
+            .xyzzy_medusa_issue()
+            .is_some_and(|(dock, _, _)| visit <= dock.visit())
+        {
+            static PEREGRINE: std::sync::OnceLock<Result<OriginalStationData, StationError>> =
+                std::sync::OnceLock::new();
+            return PEREGRINE
+                .get_or_init(OriginalStationData::bundled)
+                .as_ref()
+                .ok();
+        }
+        self.station_data.as_ref()
+    }
+
+    pub(super) fn hull_at_visit(&self, visit: u64) -> PlayerHullKind {
+        if self
+            .xyzzy_medusa_issue()
+            .is_some_and(|(dock, _, _)| visit > dock.visit())
+        {
+            PlayerHullKind::Medusa
+        } else {
+            PlayerHullKind::Peregrine
+        }
+    }
+
     /// Explicit, separate preview World. No ordinary commander, wallet, quest or trade exists.
     pub fn new_medusa_preview() -> Result<Self, StationError> {
         let mut world = Self::at_station(OriginalStationData::medusa_bundled()?)?;

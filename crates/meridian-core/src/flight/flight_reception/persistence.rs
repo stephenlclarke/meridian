@@ -315,7 +315,7 @@ impl Reading {
             return Err(INVALID);
         }
         for (sample, end_boundary) in [(self.first, false), (self.last, true)] {
-            validate_flight(&sample.flight)?;
+            validate_flight(world, &sample.flight)?;
             if sample.flight.station.is_some()
                 || sample.flight.navigation.is_some()
                 || sample.flight.tick > world.state.tick
