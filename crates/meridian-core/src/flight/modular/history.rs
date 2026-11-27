@@ -504,9 +504,7 @@ impl State {
             }
         }
         let mut bay_sequence = anchor.bay_revision;
-        let budget = crate::equipment::definition()
-            .map_err(|_| INVALID)?
-            .equipment_units_capacity;
+        let stock = crate::equipment::definition().map_err(|_| INVALID)?;
         let mut previous = anchor.revision;
         check_prefix(
             anchor.revision,
@@ -514,7 +512,7 @@ impl State {
             cabin_mass,
             fitted_units,
             bay_sequence,
-            budget,
+            stock.for_player(world.xyzzy.medusa_at(anchor.revision)),
             &intervals,
         )?;
         for (revision, change) in timeline {
@@ -537,7 +535,7 @@ impl State {
                 cabin_mass,
                 fitted_units,
                 bay_sequence,
-                budget,
+                stock.for_player(world.xyzzy.medusa_at(revision)),
                 &intervals,
             )?;
         }
@@ -589,17 +587,17 @@ fn check_fit(
     cabin_mass: u16,
     units: u16,
     bay_sequence: u64,
-    budget: u16,
+    definition: crate::equipment::Definition,
 ) -> Result<(), SaveError> {
     let bay = bay_sequence % 2 == 1;
     let capacity = if bay {
-        crate::equipment::EXPANDED_HOLD_TONNES
+        definition.base_hold_tonnes + definition.extra_hold_tonnes
     } else {
-        crate::equipment::STANDARD_HOLD_TONNES
+        definition.base_hold_tonnes
     };
     if cargo < 0
         || u32::from(cabin_mass) + u32::from(cargo as u16) > u32::from(capacity)
-        || units + u16::from(bay) > budget
+        || units + u16::from(bay) > definition.equipment_units_capacity
     {
         return Err(INVALID);
     }
@@ -612,7 +610,7 @@ fn check_prefix(
     cabin_mass: u16,
     units: u16,
     bay_sequence: u64,
-    budget: u16,
+    definition: crate::equipment::Definition,
     intervals: &[ReservationInterval],
 ) -> Result<(), SaveError> {
     let raw_mass = u16::try_from(cargo)
@@ -620,9 +618,9 @@ fn check_prefix(
         .and_then(|cargo| cargo.checked_add(cabin_mass))
         .ok_or(INVALID)?;
     let capacity = if bay_sequence % 2 == 1 {
-        crate::equipment::EXPANDED_HOLD_TONNES
+        definition.base_hold_tonnes + definition.extra_hold_tonnes
     } else {
-        crate::equipment::STANDARD_HOLD_TONNES
+        definition.base_hold_tonnes
     };
     for interval in intervals
         .iter()
@@ -638,7 +636,7 @@ fn check_prefix(
         cabin_mass,
         units,
         bay_sequence,
-        budget,
+        definition,
     )
 }
 
@@ -657,11 +655,26 @@ mod tests {
 
     #[test]
     fn every_prefix_must_fit_even_when_a_later_action_releases_capacity() {
-        assert_eq!(check_fit(0, 90, 18, 0, 24), Ok(()));
-        assert_eq!(check_fit(0, 95, 19, 0, 24), Err(INVALID));
-        assert_eq!(check_fit(0, 125, 25, 1, 24), Err(INVALID));
-        assert_eq!(check_fit(2, 120, 24, 1, 24), Err(INVALID));
-        assert_eq!(check_fit(2, 115, 23, 1, 24), Ok(()));
+        assert_eq!(
+            check_fit(0, 90, 18, 0, crate::equipment::definition().unwrap()),
+            Ok(())
+        );
+        assert_eq!(
+            check_fit(0, 95, 19, 0, crate::equipment::definition().unwrap()),
+            Err(INVALID)
+        );
+        assert_eq!(
+            check_fit(0, 125, 25, 1, crate::equipment::definition().unwrap()),
+            Err(INVALID)
+        );
+        assert_eq!(
+            check_fit(2, 120, 24, 1, crate::equipment::definition().unwrap()),
+            Err(INVALID)
+        );
+        assert_eq!(
+            check_fit(2, 115, 23, 1, crate::equipment::definition().unwrap()),
+            Ok(())
+        );
     }
 
     #[test]

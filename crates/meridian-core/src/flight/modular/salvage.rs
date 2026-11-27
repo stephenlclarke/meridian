@@ -120,7 +120,7 @@ impl RecoveryPose {
             tick,
             ..world.state
         };
-        super::super::persistence::validate_flight(&sample).ok()?;
+        super::super::persistence::validate_flight(world, &sample).ok()?;
         Some(sample)
     }
 

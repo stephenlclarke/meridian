@@ -889,3 +889,69 @@ fn same_tick_paid_service_before_reset_and_sale_after_reset_replay_in_account_or
     assert_eq!(w.credits_tenths(), Some(10_000_208));
     cold(&w);
 }
+
+#[test]
+fn medusa_upgrades_a_saved_clarke_once_and_retains_paid_gear_and_excess_rounds() {
+    let mut legacy = World::new_commander(14401).unwrap();
+    apply(&mut legacy, XyzzyAction::Enter);
+    let paid = module(
+        &mut legacy,
+        ModuleAction::Purchase {
+            kind: ModuleKind::PulseLaser,
+        },
+    );
+    let cash = legacy.credits_tenths();
+    assert_eq!(cash, Some(9_985_500));
+    let rounds = legacy.ammunition_snapshot().unwrap().items;
+    assert_eq!(rounds.len(), 9);
+    let mut world = cold(&legacy);
+    assert_eq!(world.player_hull_kind(), crate::PlayerHullKind::Peregrine);
+    assert!(world.xyzzy_medusa_issue().is_none());
+    apply(&mut world, XyzzyAction::ActivateMedusa);
+    let issue = world.xyzzy_medusa_issue().unwrap();
+    let gear = world.modular_equipment_snapshot().unwrap().items;
+    assert!(
+        gear.iter().any(|item| item.id == paid
+            && matches!(item.provenance, crate::ModuleProvenance::Paid { .. }))
+    );
+    for _ in 0..2 {
+        world = cold(&world);
+        assert_eq!(world.player_hull_kind(), crate::PlayerHullKind::Medusa);
+        assert_eq!(world.xyzzy_medusa_issue(), Some(issue));
+        assert_eq!(world.credits_tenths(), cash);
+        assert_eq!(world.modular_equipment_snapshot().unwrap().items, gear);
+        let magazine = world.ammunition_snapshot().unwrap();
+        assert_eq!(magazine.capacity, 5);
+        assert_eq!(magazine.items.len(), rounds.len());
+        for old in &rounds {
+            let held = magazine
+                .items
+                .iter()
+                .find(|item| item.item == old.item)
+                .unwrap();
+            assert_eq!(held.pylon, old.pylon.filter(|p| *p < 5));
+            assert_eq!(held.purchase, old.purchase);
+            assert!(!held.consumed);
+        }
+        apply(&mut world, XyzzyAction::ActivateMedusa);
+    }
+    world.request_launch(world.snapshot().tick).unwrap();
+    for _ in 0..190 {
+        world
+            .step(crate::FlightInput {
+                throttle: 1.0,
+                ..Default::default()
+            })
+            .unwrap();
+    }
+    assert_eq!(world.snapshot().speed, 50.3);
+    let loaded = cold(&world);
+    assert_eq!(loaded.snapshot(), world.snapshot());
+    assert_eq!(
+        loaded
+            .flight_resources_snapshot()
+            .unwrap()
+            .energy_capacity_hundredths,
+        41000
+    );
+}

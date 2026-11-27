@@ -1173,7 +1173,7 @@ impl State {
         motion_tick: u64,
     ) -> Result<(), SaveError> {
         let o = p.origin;
-        super::super::persistence::validate_flight(&m.flight)?;
+        super::super::persistence::validate_flight(world, &m.flight)?;
         if m.flight.tick != motion_tick
             || m.flight.mode != FlightMode::Flight
             || m.age.checked_add(1) != Some(p.age_ticks)
