@@ -204,10 +204,11 @@ fn exact_catalogue_taxonomy_is_162_ships_not_171_ships() {
     let c = catalogue();
     assert_eq!(c.worlds.len(), 2048);
     assert_eq!(c.objects.len(), 171);
-    assert_eq!(c.search_ships("").len(), 162);
+    assert_eq!(c.ship_count(), 162);
+    assert_eq!(c.search_showroom("").len(), 163);
     assert_eq!(c.object("SH028").map(|o| o.kind), Some("station"));
     assert_eq!(c.object("SH025").map(|o| o.name), Some("Peregrine Mk V"));
-    assert!(c.search_ships("SH028").is_empty());
+    assert!(c.search_showroom("SH028").is_empty());
     assert!(
         c.world(SystemId {
             galaxy: 0,
@@ -263,8 +264,8 @@ fn search_orders_prefixes_and_retains_source_identities() {
     let results = c.search_worlds(0, "ave");
     assert!(!results.is_empty());
     assert!(results[0].name.to_lowercase().starts_with("ave"));
-    assert_eq!(c.search_ships("sh025")[0].id, "SH025");
-    assert!(c.search_ships("not-a-hull").is_empty());
+    assert_eq!(c.search_showroom("sh025")[0].id, "SH025");
+    assert!(c.search_showroom("not-a-hull").is_empty());
 }
 #[test]
 fn all_five_tabs_are_navigable_by_pointer_and_semantic_keyboard() {
@@ -544,6 +545,44 @@ fn model_previews_require_real_asset_handles_and_share_the_same_orientation() {
     ctx.models = &[];
     assert!(ui.frame(&ctx, view()).models.is_empty());
 }
+#[test]
+fn newt_capsule_is_searchable_and_its_never_purchase_policy_refuses_an_offer() {
+    let catalogue = catalogue();
+    let world = world();
+    let mut context = context(&world, &catalogue);
+    context.models = &crate::authored_hull::STOCK_MODELS;
+    context.exchanges = &[ShipExchange {
+        object: "SH040",
+        purchase_tenths: 1,
+        trade_in_tenths: 0,
+        refusal: None,
+    }];
+    let mut ui = DockedScreens::new(SystemId::AVENOR, "SH025");
+    ui.open(Screen::Showroom);
+    key(&mut ui, &context, Key::Search);
+    let before = ui.frame(&context, view());
+    ui.handle(Input::Text("Newt".into()), &before, &context);
+    let frame = ui.frame(&context, view());
+    assert!(frame.models.iter().any(|model| model.object == "SH040"));
+    assert!(
+        frame
+            .hits
+            .iter()
+            .any(|hit| hit.control == Control::Key(Key::Exchange) && !hit.enabled)
+    );
+    key(&mut ui, &context, Key::Confirm);
+    assert!(matches!(
+        key(&mut ui, &context, Key::Exchange),
+        Outcome::Refused(_)
+    ));
+    assert_eq!(
+        catalogue
+            .object("SH040")
+            .map(|row| (row.kind, row.purchase_policy)),
+        Some(("capsule", "never"))
+    );
+}
+
 #[test]
 fn unsupported_exchange_cannot_be_inferred_from_catalogue_flyable_status() {
     let c = catalogue();

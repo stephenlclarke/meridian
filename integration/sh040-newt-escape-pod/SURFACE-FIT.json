@@ -1,0 +1,77 @@
+{
+  "hull": "SH040",
+  "packageSHA256": "4d21284273415002a1480b17e0e1c3f62b9df85d06f6a5ae1af38aa816551eb5",
+  "auditKernelSHA256": "5407ef1e5fad41810aa95444ca1338fe33a91e5c9857dcb752b4e4cf2fca6d0b",
+  "scientificVersions": {
+    "numpy": "2.5.5",
+    "scipy": "1.18.1",
+    "trimesh": "5.2.1"
+  },
+  "containment": {
+    "detailedVerticesChecked": 256,
+    "nativeUniqueVertices": 48,
+    "exactSupportPlanesChecked": 88,
+    "allDetailedContained": true
+  },
+  "summary": {
+    "detailed": {
+      "largestSample": {
+        "metres": 0.02023725601196179,
+        "beyondPaddingMetres": 0.00023725601196179086,
+        "point": [
+          0.4756522600160937,
+          -0.12324462653438309,
+          1.1068288896681484
+        ],
+        "closestPoint": [
+          0.45740307377184425,
+          -0.11782689936812153,
+          1.0999614327393914
+        ],
+        "face": 81,
+        "certifiedLowerMillimetres": 19,
+        "supportFacetGlobalVertices": [
+          47,
+          24,
+          36
+        ],
+        "supportFacetWeightNumeratorsOver12": [
+          7,
+          4,
+          1
+        ]
+      },
+      "fullUpperMillimetres": 29
+    },
+    "native": {
+      "largestSample": {
+        "metres": 0.02023725601196179,
+        "beyondPaddingMetres": 0.00023725601196179086,
+        "point": [
+          0.4756522600160937,
+          -0.12324462653438309,
+          1.1068288896681484
+        ],
+        "closestPoint": [
+          0.45740307377184425,
+          -0.11782689936812153,
+          1.0999614327393914
+        ],
+        "face": 81,
+        "certifiedLowerMillimetres": 19,
+        "supportFacetGlobalVertices": [
+          47,
+          24,
+          36
+        ],
+        "supportFacetWeightNumeratorsOver12": [
+          7,
+          4,
+          1
+        ]
+      },
+      "fullUpperMillimetres": 29
+    }
+  },
+  "scope": "Exact source native convex support contains all decorative interior points. Rounded exposed lower and full piece upper bound actual surfaces, not optical rendering or gameplay admission."
+}

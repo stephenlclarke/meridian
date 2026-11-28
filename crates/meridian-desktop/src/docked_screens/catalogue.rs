@@ -245,12 +245,12 @@ impl Catalogue {
         rows.sort_by_key(|w| (!w.name.to_lowercase().starts_with(&q), w.name, w.id.system));
         rows
     }
-    pub fn search_ships(&self, query: &str) -> Vec<ObjectRecord<'_>> {
+    pub fn search_showroom(&self, query: &str) -> Vec<ObjectRecord<'_>> {
         let q = query.to_lowercase();
         let mut rows: Vec<ObjectRecord<'_>> = self.objects.to_vec();
         rows.extend(self.authored.iter().map(AuthoredRecord::object));
         rows.retain(|o| {
-            o.kind == "ship"
+            matches!(o.kind, "ship" | "capsule")
                 && format!("{} {} {} {}", o.id, o.name, o.family, o.role)
                     .to_lowercase()
                     .contains(&q)

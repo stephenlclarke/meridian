@@ -289,6 +289,15 @@ pub struct Context<'a> {
     pub review: Option<&'a Review>,
     pub bindings: &'a [BindingHint<'a>],
 }
+impl Context<'_> {
+    fn exchange_offer(&self, id: &str) -> Option<&ShipExchange<'_>> {
+        if self.catalogue.object(id)?.kind != "ship" {
+            return None;
+        }
+        self.exchanges.iter().find(|offer| offer.object == id)
+    }
+}
+
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
 pub struct NavigationBodyId {
     pub system: SystemId,

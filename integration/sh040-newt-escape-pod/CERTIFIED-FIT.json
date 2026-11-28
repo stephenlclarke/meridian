@@ -1,0 +1,12 @@
+{
+  "nativeVertices": 48,
+  "detailedVertices": 256,
+  "exactSupportPlanes": 58,
+  "supportFanTriangles": 92,
+  "sharedForwardVertex": 36,
+  "exposedLowerMillimetres": 20,
+  "completeUpperMillimetres": {
+    "detailed": 29,
+    "native": 29
+  }
+}

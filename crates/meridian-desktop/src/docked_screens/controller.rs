@@ -245,7 +245,7 @@ impl DockedScreens {
             self.search_index = 0;
             self.scroll = 0;
             if self.screen == Screen::Showroom
-                && let Some(first) = context.catalogue.search_ships(&self.query).first()
+                && let Some(first) = context.catalogue.search_showroom(&self.query).first()
             {
                 self.ship = first.id.into();
             }
@@ -440,7 +440,7 @@ impl DockedScreens {
                 self.scroll = moved(self.scroll, amount, c.catalogue.specifications.len());
             }
             Screen::Showroom => {
-                let rows = c.catalogue.search_ships(&self.query);
+                let rows = c.catalogue.search_showroom(&self.query);
                 if let Some(row) = rows.get(moved(
                     rows.iter().position(|o| o.id == self.ship).unwrap_or(0),
                     amount,
@@ -868,13 +868,13 @@ impl DockedScreens {
         }
         if !c
             .catalogue
-            .search_ships(&self.query)
+            .search_showroom(&self.query)
             .iter()
             .any(|o| o.id == self.ship)
         {
             return Outcome::Refused("Select a visible matching ship".into());
         }
-        let Some(offer) = c.exchanges.iter().find(|o| o.object == self.ship) else {
+        let Some(offer) = c.exchange_offer(&self.ship) else {
             return Outcome::Refused("No admitted ship exchange offer for this hull".into());
         };
         if let Some(reason) = offer.refusal {
