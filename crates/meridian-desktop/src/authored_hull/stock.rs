@@ -79,6 +79,18 @@ const DESCRIPTORS: &[StockDescriptor] = &[
     },
     StockDescriptor {
         model: AvailableModel {
+            object: "SH037",
+            geometry_key: "integration/sh037-vulture-mk-i/VULTURE-MK-I-STUDIO.json",
+        },
+        name: "Vulture Mk I",
+        package: include_bytes!(
+            "../../../../integration/sh037-vulture-mk-i/VULTURE-MK-I-STUDIO.json"
+        ),
+        fnv: 0x01f6_2189_9c6a_8042,
+        export_fnv: Some(0x31e2_879a_813e_09bc),
+    },
+    StockDescriptor {
+        model: AvailableModel {
             object: "SH041",
             geometry_key: "integration/sh041-serval-fighter/SERVAL-STUDIO.json",
         },
@@ -825,7 +837,7 @@ mod tests {
     #[test]
     fn every_stock_descriptor_authenticates_its_own_source_and_real_preview() {
         let catalogue = ok(crate::docked_screens::Catalogue::bundled());
-        assert_eq!(STOCK_MODELS.len(), 110);
+        assert_eq!(STOCK_MODELS.len(), 111);
         for held in [
             "SH082", "SH102", "SH103", "SH108", "SH112", "SH113", "SH114", "SH115", "SH116",
             "SH117", "SH118", "SH119", "SH120", "SH121", "SH122", "SH123", "SH124", "SH125",
@@ -983,6 +995,32 @@ mod tests {
         assert!(load_stock(entry, peer.package).is_err());
         assert!(load_stock(peer, entry.package).is_err());
         assert_stock_and_local("SH041", entry.model.geometry_key);
+    }
+
+    #[test]
+    fn stock_vulture_mk_i_uses_qualified_proxy_and_all_original_detailed_corners() {
+        let entry = descriptor("SH037");
+        let export = ok(authenticated_package_bytes(entry, entry.package));
+        assert_eq!(export.len(), 317443);
+        let package = ok(HullPackage::from_json(export));
+        assert_eq!(package.native.triangles.len(), 512);
+        assert_eq!(package.native.vertices.len(), 272);
+        assert_eq!(ok(package.pieces()).len(), 8);
+        assert_eq!(package.engineering.map(|e| e.mass_kg), Some(51_330.0));
+        let visual = ok(load_stock(entry, entry.package));
+        let original = include_bytes!("../../../../assets/fleet/sh037/visual.bin");
+        assert_original_corners(
+            &visual,
+            original,
+            [0., 0.7855973813420621, -0.761047463175123],
+            30.,
+            24816,
+            8272,
+        );
+        let peer = descriptor("SH065");
+        assert!(load_stock(entry, peer.package).is_err());
+        assert!(load_stock(peer, entry.package).is_err());
+        assert_stock_and_local("SH037", entry.model.geometry_key);
     }
 
     #[test]

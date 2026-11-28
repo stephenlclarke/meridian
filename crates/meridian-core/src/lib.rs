@@ -114,6 +114,7 @@ pub mod tapir_mk_ii;
 pub mod tapir_shuttle;
 pub mod traffic;
 pub mod unwritten_route;
+pub mod vulture_mk_i;
 pub mod vulture_raider;
 pub mod warthog_escort;
 pub mod warthog_freighter;
