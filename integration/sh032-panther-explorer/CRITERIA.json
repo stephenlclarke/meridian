@@ -1,0 +1,261 @@
+{
+  "hull": "SH032 Panther Explorer",
+  "status": "ORIGINAL_SOURCE_PRESERVED;STOCK_INSPECTION_CANDIDATE;STOCK_ENGINEERING_UNASSIGNED",
+  "source": "assets/fleet/sh032/SOURCE-GEOMETRY.json",
+  "geometryTests": [
+    "panther_explorer_original_detailed_and_native_faces_share_complete_local_supports",
+    "panther_explorer_sled_and_arch_passages_clear_and_solid_sources_contact",
+    "panther_explorer_merging_adjacent_arch_supports_blocks_clearance",
+    "panther_explorer_original_sh028_aligned_crossing_clears_before_offset_native_lip_contact"
+  ],
+  "originalVisualCorners": {
+    "detailed": 16788,
+    "native": 1056
+  },
+  "originalUnmappedFaces": {
+    "detailed": 1240,
+    "native": 40,
+    "selector": 4294967295
+  },
+  "originalTextures": {
+    "assets/fleet/sh001/l337-patrol-diffuse.rgba": {
+      "bytes": 4194304,
+      "sha256": "9699517d12b4fbbb28746e00bed9ee65c19a098d14402b1d5160280c6f6bfc54",
+      "source": "Sources/L337Core/Resources/OriginalShipTextures/l337-patrol-diffuse.rgba",
+      "license": "MIT"
+    },
+    "assets/fleet/sh001/l337-strike-diffuse.rgba": {
+      "bytes": 4194304,
+      "sha256": "e56f149228caf90237a652d720ae549768bde1056af3d903dc8a5c243ad26e97",
+      "source": "Sources/L337Core/Resources/OriginalShipTextures/l337-strike-diffuse.rgba",
+      "license": "MIT"
+    },
+    "assets/fleet/sh001/l337-service-details.rgba": {
+      "bytes": 4194304,
+      "sha256": "35edd84f6ce527195dd8a9bcc039521a6efc5aa2333452bbbc30217b8372103d",
+      "source": "Sources/L337Core/Resources/OriginalShipTextures/l337-service-details.rgba",
+      "license": "MIT"
+    }
+  },
+  "nativeFaceCompliance": {
+    "sourceFaces": 352,
+    "contractMaximum": 512,
+    "state": "ORIGINAL_WITHIN_CONTRACT_LIMIT"
+  },
+  "legacyMetreAuthority": {
+    "revision": "a11fe16924d87d06021816f9037952afcbac08db",
+    "files": [
+      {
+        "path": "Sources/L337Core/OriginalPantherFamilyActivation.swift",
+        "artifact": "integration/sh032-panther-explorer/LEGACY-ACTIVATION.swift.txt",
+        "sha256": "82e845ba6b66c3340a766079136be3a0136e58f6287e9d9a380017f3414e4ff0"
+      },
+      {
+        "path": "Sources/L337Core/OriginalHullPhysicalContract.swift",
+        "artifact": "integration/sh032-panther-explorer/LEGACY-PHYSICAL-CONTRACT.swift.txt",
+        "sha256": "2c68d8d51acdd469faa25124bcc19027aec1a8f747eb267da2e84e5a98e3c027"
+      }
+    ]
+  },
+  "stockMass": "UNASSIGNED",
+  "air": {
+    "hostname": "SteveMBA",
+    "topologyUtc": "2026-11-19T10:13:02Z",
+    "fitStartUtc": "2026-11-19T10:17:55Z",
+    "fitEndUtc": "2026-11-19T10:18:01Z",
+    "witnessStartUtc": "2026-11-19T10:22:12Z",
+    "witnessEndUtc": "2026-11-19T10:22:13Z",
+    "reports": {
+      "SURFACE-FIT.json": "58912c92a5317c881dc014160e65be4b58a9a7564a86b1f1e7a1cc77f8674da4",
+      "CONTACT-RESULT.json": "69a03f4726958907d0d6f156ed23bac750d8b1ad5b8b0e346a6854a798057405",
+      "ORIGINAL-DIFFERENCE.json": "c5cca947d47bf5eafa20268142a05476cb3df1c6c094da9d0f0a0411a1af7021"
+    }
+  },
+  "independentReplay": {
+    "tools": {
+      "tools/measure_panther_explorer_air.py": "7d6cef4c5d6454531b04b9d587c6b88d996d8daf6ea6add52deb60504b63505a",
+      "tools/measure_goshawk_surface_fit.py": "5407ef1e5fad41810aa95444ca1338fe33a91e5c9857dcb752b4e4cf2fca6d0b",
+      "tools/prepare_panther_explorer_geometry.py": "962be181c2d6bfa2ae8fd3896eab0fa7c9e0595a5c297904aac3ffe9b50d70b5",
+      "tools/verify_panther_explorer_geometry.py": "f06e4615bfe024ab3265c061236c6bf4cb8a5eb3952106836a3fbe1affd8e697",
+      "tools/encode_goshawk_visual.py": "9e524e9a32a237d71d212c8b5c34ecf12cde5a8e08885b1d03991b95c278f61c",
+      "tools/import_goshawk_envelope_source.py": "14b530725629ee3eaa5b3fd69f01fe00fe371564a1a52cb398d3969142db977e",
+      "tools/prepare_panther_explorer_studio.py": "52c2c0b4ba3876d7a95c29512580c2f628776fff74fdc17715aa5ee2293ab88d"
+    },
+    "fixtures": {
+      "integration/sh032-panther-explorer/FIXTURES.json": "664598ef50017b5388f168d23c234f68a980ab00072592aa6284ea26f03938fe"
+    },
+    "reproduce": [
+      "python3 -B tools/measure_panther_explorer_air.py | cmp - integration/sh032-panther-explorer/SURFACE-FIT.json",
+      "python3 -B tools/measure_panther_explorer_air.py --difference | cmp - integration/sh032-panther-explorer/ORIGINAL-DIFFERENCE.json",
+      "python3 -B tools/verify_panther_explorer_geometry.py | cmp - integration/sh032-panther-explorer/CONTACT-RESULT.json",
+      "python3 -B tools/prepare_panther_explorer_studio.py --check"
+    ],
+    "fitDependencies": {
+      "python": "3.14.3 (assertions enabled)",
+      "numpy": "2.5.5",
+      "scipy": "1.18.1",
+      "trimesh": "5.2.1",
+      "rtree": "1.4.1"
+    },
+    "hostContactPython": "3.14.3",
+    "byteReplay": {
+      "hostname": "SteveMBA",
+      "startedUtc": "2026-11-19T10:22:14Z",
+      "finishedUtc": "2026-11-19T10:22:22Z",
+      "logSha256": "c6b344283fb2ade0856dac3d48894094ddf34236eedd5ea232ba8b47a53736e4"
+    }
+  },
+  "hullStudio": {
+    "definition": "integration/sh032-panther-explorer/PANTHER-EXPLORER-STUDIO.json",
+    "sha256": "a431888e8b5d39760fd8860673d3a1c07d3d0fff0fd2de5e79a655461f91b633",
+    "schema": 1,
+    "probeCount": 14,
+    "probeRadiusMetres": 0.1,
+    "loaderRevision": "1789030980e0d2a7897c2dc48518fad728c9bbf2",
+    "loaderSource": "tools/hull_studio/definitions.py",
+    "loaderSha256": "f68ea0f442267b793338af6ebec6a937f9e1ee3946dc9be96e58db3e2a796e43",
+    "state": "ORIGINAL_INSTALLED_SIGNED_STUDIO_EXPORT_PASS",
+    "installedExport": {
+      "testedAuthorConfigCommit": "5afd8bc84ed65cec0b6df62316594ca3a5b9978e",
+      "toolSourceHead": "1789030980e0d2a7897c2dc48518fad728c9bbf2",
+      "toolSourceTree": "fb22a072408e94b4553ea9c5e586916ff7e6ecae",
+      "studioSha256": "ee1e6e307707a385c7ad24e00cbcce589f5ab0762e31b474720715f62c146f9f",
+      "validatorSha256": "8800efb734ca5b8123ae88b1ab06aa62f1e22f37975cd6230f88581f69cf76e7",
+      "startedUtc": "2026-11-19T10:24:28.684551+00:00",
+      "finishedUtc": "2026-11-19T10:24:28.858100+00:00",
+      "supportGroups": 36,
+      "clearances": [
+        {
+          "name": "left-keel-sled-channel",
+          "passed": true
+        },
+        {
+          "name": "left-above-sled-channel",
+          "passed": true
+        },
+        {
+          "name": "left-below-aft-tie-channel",
+          "passed": true
+        },
+        {
+          "name": "left-under-arch-channel",
+          "passed": true
+        },
+        {
+          "name": "left-fore-arch-shoulder",
+          "passed": true
+        },
+        {
+          "name": "left-mid-arch-shoulder",
+          "passed": true
+        },
+        {
+          "name": "left-aft-arch-shoulder",
+          "passed": true
+        },
+        {
+          "name": "right-keel-sled-channel",
+          "passed": true
+        },
+        {
+          "name": "right-above-sled-channel",
+          "passed": true
+        },
+        {
+          "name": "right-below-aft-tie-channel",
+          "passed": true
+        },
+        {
+          "name": "right-under-arch-channel",
+          "passed": true
+        },
+        {
+          "name": "right-fore-arch-shoulder",
+          "passed": true
+        },
+        {
+          "name": "right-mid-arch-shoulder",
+          "passed": true
+        },
+        {
+          "name": "right-aft-arch-shoulder",
+          "passed": true
+        }
+      ],
+      "comparison": "Export matches the source bytes after removing its final LF; report support points and rounding match the exact definition.",
+      "packetEntries": {
+        "studio/ACTUAL-START.json": {
+          "bytes": 1262,
+          "sha256": "5412644463783a5f1782665e178fdbc1660ceb42480464f8efd05f9e3e3a8ec8"
+        },
+        "studio/PANTHER-EXPLORER-EXPORT-REPORT.json": {
+          "bytes": 99747,
+          "sha256": "6a5c54786f245d608b0883f35dec9a89c9e60f475ea69323a2999c3c964314ba"
+        },
+        "studio/PANTHER-EXPLORER.hull.json": {
+          "bytes": 748824,
+          "sha256": "1ad2314515c7793df88b61e210c24ecd8db5b7c008facd45e2aa08c461866e3e"
+        },
+        "studio/TERMINAL.json": {
+          "bytes": 3140,
+          "sha256": "c5b3b8825f9aad7d0865bc5ab3579ad5e3a681dac74341358b27d4ecb009cbdb"
+        }
+      }
+    }
+  },
+  "archSupportSelection": {
+    "groupsPerArch": 4,
+    "sourceRings": {
+      "detailed": [
+        5,
+        14,
+        22
+      ],
+      "native": [
+        1,
+        2,
+        3
+      ]
+    },
+    "duplicatedVertices": {
+      "detailed": 72,
+      "native": 24
+    },
+    "packedTriangleCornerOrder": "Exact original positions and face order per source LOD",
+    "mergedArchLosses": 8,
+    "comparison": "Whole arches and every adjacent-pair merge cross a verified clearance",
+    "unsplitFit": "UNSPLIT-FIT.json",
+    "unsplitFitSha256": "cfcdd453110367032a672a209ebe841beb4d1a096065677da378406d59c0a71c"
+  },
+  "stockScope": "Station Showroom inspection. Original stock engineering unassigned. The station and Studio use the same 36 rounded supports.",
+  "replayPins": {
+    "integration/sh032-panther-explorer/SUPPORT-FAN.json": "6cada83aa00b416a378f10886393d5e210170dbe30783f5539818b9f2f142e65",
+    "integration/sh032-panther-explorer/SURFACE-FIT.json": "58912c92a5317c881dc014160e65be4b58a9a7564a86b1f1e7a1cc77f8674da4",
+    "integration/sh032-panther-explorer/UNSPLIT-FIT.json": "cfcdd453110367032a672a209ebe841beb4d1a096065677da378406d59c0a71c",
+    "integration/sh032-panther-explorer/ORIGINAL-DIFFERENCE.json": "c5cca947d47bf5eafa20268142a05476cb3df1c6c094da9d0f0a0411a1af7021",
+    "integration/sh032-panther-explorer/PANTHER-EXPLORER-STUDIO.json": "a431888e8b5d39760fd8860673d3a1c07d3d0fff0fd2de5e79a655461f91b633",
+    "integration/sh032-panther-explorer/FIXTURES.json": "664598ef50017b5388f168d23c234f68a980ab00072592aa6284ea26f03938fe",
+    "integration/sh032-panther-explorer/CERTIFIED-FIT.json": "0f0474f782b2dd0f02b7a1fbfea6b3b71c4eae7a1ad32e2a576fb2e73859208f",
+    "integration/sh032-panther-explorer/CERTIFIED-DIFFERENCE.json": "983e9dc572a8a677ac09a0eb9f6c693a558c929656bc7f29bf5419b0a4836d8d",
+    "integration/sh032-panther-explorer/CERTIFIED-UNSPLIT.json": "0bab3e3808996106948d1beb6f54b7e95170ce68f1274f8eca933a8324103dda",
+    "integration/sh032-panther-explorer/CONTACT-RESULT.json": "69a03f4726958907d0d6f156ed23bac750d8b1ad5b8b0e346a6854a798057405",
+    "tools/measure_panther_explorer_air.py": "7d6cef4c5d6454531b04b9d587c6b88d996d8daf6ea6add52deb60504b63505a",
+    "tools/measure_goshawk_surface_fit.py": "5407ef1e5fad41810aa95444ca1338fe33a91e5c9857dcb752b4e4cf2fca6d0b",
+    "tools/prepare_panther_explorer_geometry.py": "962be181c2d6bfa2ae8fd3896eab0fa7c9e0595a5c297904aac3ffe9b50d70b5",
+    "tools/verify_panther_explorer_geometry.py": "f06e4615bfe024ab3265c061236c6bf4cb8a5eb3952106836a3fbe1affd8e697",
+    "tools/encode_goshawk_visual.py": "9e524e9a32a237d71d212c8b5c34ecf12cde5a8e08885b1d03991b95c278f61c",
+    "tools/import_goshawk_envelope_source.py": "14b530725629ee3eaa5b3fd69f01fe00fe371564a1a52cb398d3969142db977e",
+    "tools/prepare_panther_explorer_studio.py": "52c2c0b4ba3876d7a95c29512580c2f628776fff74fdc17715aa5ee2293ab88d",
+    "tools/measure_panther_explorer.py": "0f74f6392c2e1903c8e52d016eac085c18935c18d2e4cd6dc9be9c91a363d514",
+    "tools/vulture_mk_i_exact_fit.py": "479b31f8714a198a82c0e2888b8d19efe46c7b4c43a576b83ab84c571ae738c6",
+    "assets/fleet/sh032/SOURCE-GEOMETRY.json": "16ececf28c3263984ce990bd44534bc60821388307226aa08a0bd116577fc4c7"
+  },
+  "byteReplay": {
+    "commands": [
+      "python3 -B tools/measure_panther_explorer.py | cmp - integration/sh032-panther-explorer/CERTIFIED-FIT.json",
+      "python3 -B tools/measure_panther_explorer.py --difference | cmp - integration/sh032-panther-explorer/CERTIFIED-DIFFERENCE.json",
+      "python3 -B tools/measure_panther_explorer.py --unsplit | cmp - integration/sh032-panther-explorer/CERTIFIED-UNSPLIT.json",
+      "python3 -B tools/measure_panther_explorer.py --contact | cmp - integration/sh032-panther-explorer/CONTACT-RESULT.json"
+    ]
+  }
+}

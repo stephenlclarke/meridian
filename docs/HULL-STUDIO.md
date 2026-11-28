@@ -131,3 +131,7 @@ Search for **SH036** or **Zebu** in the station Showroom. The stock entry opens 
 ## Panther Scout stock inspection
 
 Search for **SH033** or **Panther Scout** in the station Showroom. The forest-ivory Scout retains its survey spine, paired sails and original 320-face native mesh. Its 35 rounded supports leave four passages open. The [Scout hull record](../integration/sh033-panther-scout/README.md) gives the source measurements and contact checks.
+
+## Panther Explorer stock inspection
+
+Search for **SH032** or **Panther Explorer** in the station Showroom. The forest-ivory Explorer has a panoramic cabin, glazed side windows and two low drive sleds. The original native mesh has 352 faces. The [Explorer geometry record](PANTHER-EXPLORER-GAMEPLAY-ENVELOPE.md) gives the arch and station clearance measurements.
