@@ -1,0 +1,67 @@
+{
+  "id": "SH041",
+  "name": "Serval Fighter",
+  "state": "EXACT_ORIGINAL_SOURCE; INSTALLED_STUDIO_EXPORT_AND_PROBES_PASS; SOURCE_SURFACE_AND_STATION_PASS; NATIVE_GAME_AND_OPERATIONAL_PENDING",
+  "legacyRevision": "0d8cc9ebe0018bf74b0d9fa10ef23b70339dd6b0",
+  "sourceManifest": "assets/fleet/sh041/SOURCE-GEOMETRY.json",
+  "sourceManifestSha256": "a953baee13f80d97e490b609650d548b03751a4fdb0468020b6f0b2df4623dc9",
+  "originalNativeSourceSha256": "5d3e7b5da7bee8f62a47aeac58f13064e185d6dc49c842863da82e2a97679fa6",
+  "sourceUnits": "metres",
+  "metresPerUnit": 1,
+  "detailed": {"vertices": 2172, "faces": 4236, "components": 27},
+  "native": {"vertices": 128, "faces": 224, "components": 8, "faceCap": 512, "archivedOriginal": true},
+  "supportGroups": 23,
+  "roundingMetres": 0.02,
+  "originalTextures": {
+    "l337-patrol-diffuse": "9699517d12b4fbbb28746e00bed9ee65c19a098d14402b1d5160280c6f6bfc54",
+    "l337-strike-diffuse": "e56f149228caf90237a652d720ae549768bde1056af3d903dc8a5c243ad26e97",
+    "l337-service-details": "35edd84f6ce527195dd8a9bcc039521a6efc5aa2333452bbbc30217b8372103d"
+  },
+  "engineering": {"active": null, "authoredDryMassKg": 23775, "finiteDryReferenceOnly": true, "nativeEvidenceQualified": false, "operatingAuthority": false, "loadedState": "UNASSIGNED", "actualCampaignAcquisition": "UNASSIGNED"},
+  "rawFiles": {
+    "integration/sh041-serval-fighter/SERVAL-STUDIO.json": "23fdf7db799e2a1e0212975cc9a430cec03cf3d89f0a2ff61fe54a1a1f72fa9e",
+    "integration/sh041-serval-fighter/CONTACT-WITNESSES.json": "3ec32eb68392507a7824d305d359cbd6599bece46903f94196127c5d100221e8",
+    "integration/sh041-serval-fighter/STATION-RESULT.json": "6dd7f939415e49854b57e806c82287c498ad625a3bcde7ceba45b4f5d35af920",
+    "integration/sh041-serval-fighter/SURFACE-FIT.json": "896b0959bf3af2e59503a8c75e1205ac10e6789ec5f4c3a87b7696c5c17eccef",
+    "integration/sh041-serval-fighter/ORIGINAL-DIFFERENCE.json": "067bd33b54612101a6a8a51611ad43399be61a12adcc9633816d17f93db7acb6",
+    "assets/legacy/sh028.physics": "cd54d30cab638f6b33feacf1fa78c9136f8ce346e8cc6133259bfc0472c259d5",
+    "tools/prepare_serval_studio.py": "0839e11c4ee06fb97fe15a1065b7384bbbccd9987f08195bbe02a6b8fbc3c76d",
+    "tools/measure_serval_surface_fit.py": "c9771a2bf221104c0689fe88859097586a36bf9c53e6a08fdd4f0eb044ea6d8f",
+    "tools/verify_serval_station.py": "395d8642015656dff0569d2939a40ea93b8f2655cf6fa7ff7c029131f79c9cd3",
+    "tools/verify_serval_studio.py": "f69889599cc13eb87a6846c0435a9b831b4f20d401197c1ef8f3af246b9cd45a",
+    "tools/measure_goshawk_surface_fit.py": "5407ef1e5fad41810aa95444ca1338fe33a91e5c9857dcb752b4e4cf2fca6d0b",
+    "tools/import_goshawk_envelope_source.py": "14b530725629ee3eaa5b3fd69f01fe00fe371564a1a52cb398d3969142db977e",
+    "tools/encode_goshawk_visual.py": "9e524e9a32a237d71d212c8b5c34ecf12cde5a8e08885b1d03991b95c278f61c"
+  },
+  "surfaceFitMillimetres": {"detailed": [278,348], "native": [1317,1323], "lowerExposedUpperCompletePieceIncludingBuried": true, "refinementDepth": 8},
+  "sourceDifferenceStrictLowerMillimetres": {"nativeVertexToDetailed": 88, "detailedVertexToNative": 1301},
+  "originalOpeningsNetMillimetres": [79,79,179],
+  "station": {"alignedNetMillimetres": 45138, "offsetStartNetMillimetres": 1159, "nativeLocalVertex": 26, "nativeGlobalVertex": 2198, "sourceStationFace": 482, "pointMetres": [69.9,1.928,136.32], "actorCentreZMetres": 148.82, "realGame": false},
+  "installedStudio": {
+    "host": "StevesM5Pro", "utcDate": "2026-11-19", "signedBundleVerified": true,
+    "launcherSha256": "ee1e6e307707a385c7ad24e00cbcce589f5ab0762e31b474720715f62c146f9f",
+    "validatorSha256": "8800efb734ca5b8123ae88b1ab06aa62f1e22f37975cd6230f88581f69cf76e7",
+    "export": {"exit": 0, "bytes": 565867, "sha256": "890a515ebbf5e52aa7185eb34e7128b4cd94f41496f9bcb4e7fd6b4273f7afdf"},
+    "positiveReport": {"bytes": 75952, "sha256": "48048e5334873b8bef901025982144e9ba6552babaa5804dbbdd2ca7ef32651b"},
+    "negativeInput": {"bytes": 566153, "sha256": "f9451db6ccb1faaaf9b315569aee725ae8f663a33350038816cc0048ed4cd785"},
+    "negativeReport": {"exit": 1, "bytes": 187761, "sha256": "153f87d0cf4eb2c103f398bfd81903901626febf4b573a9329b6c54af2c08695"},
+    "openingProbesPassed": 3, "solidProbesRefused": 3, "orderedOriginalSourcePointCount": 2300, "byteReplay": true, "gameLaunch": false
+  },
+  "measurement": {"host": "SteveMBA", "python": "3.14.3 (assertions enabled)", "numpy": "2.5.5", "scipy": "1.18.1", "trimesh": "5.2.1", "rtree": "1.4.1", "utcStarted": "2026-11-19T19:10:47Z", "utcCompleted": "2026-11-19T19:10:58Z", "surfaceAndDifferenceByteReplay": true, "stationByteReplay": true, "sourceTests": 7, "fitTests": 5},
+  "checkoutProtection": {"expectedRepositoryPins": 29, "rawAssetsAndReports": "-text", "sevenPinnedTools": "text eol=lf", "redirectedOutput": "canonical UTF-8/LF bytes"},
+  "execution": {"source": "python3 -B tools/prepare_serval_studio.py --check", "studio": "python3 -B tools/verify_serval_studio.py --studio <installed> --validator <bundled> --output <new-dir>", "fit": "python3 -B tools/measure_serval_surface_fit.py", "status": "Source and installed Studio acceptance only. Actual game rendering/acquisition/placement independent owned gates."},
+  "replayPins": {
+    "integration/sh041-serval-fighter/CERTIFIED-FIT.json": "492c395fb33ee3fa517e163e11e4baa52db3b36657a38b5d9cb787904224cd2a",
+    "integration/sh041-serval-fighter/CERTIFIED-DIFFERENCE.json": "ea9d2e2bcc481cd255d7dba9209bac9f2a9cd36ddd686d975a258a8ef54e496a",
+    "integration/sh041-serval-fighter/SUPPORT-FAN.json": "a3e193873aea6d47d79d9285f2de657d3326e2d0214f1680db41d4eb0926204b",
+    "tools/measure_serval_fighter.py": "4ec35dfcc065679e55281890d5990f765c5544a872d69579d896065338723c75",
+    "tools/vulture_mk_i_exact_fit.py": "479b31f8714a198a82c0e2888b8d19efe46c7b4c43a576b83ab84c571ae738c6"
+  },
+  "byteReplay": {
+    "commands": [
+      "python3 -B tools/measure_serval_fighter.py | cmp - integration/sh041-serval-fighter/CERTIFIED-FIT.json",
+      "python3 -B tools/measure_serval_fighter.py --difference | cmp - integration/sh041-serval-fighter/CERTIFIED-DIFFERENCE.json"
+    ]
+  },
+  "runtimeScope": "Stock catalogue inspection and source-bound SH028 contact. Empty dry reference only."
+}

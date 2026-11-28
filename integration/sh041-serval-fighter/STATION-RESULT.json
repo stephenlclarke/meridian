@@ -1,0 +1,50 @@
+{
+  "hull": "SH041",
+  "station": "SH028",
+  "stationSha256": "cd54d30cab638f6b33feacf1fa78c9136f8ce346e8cc6133259bfc0472c259d5",
+  "method": "Exact original binary64 rational fixed half-turn swept-support boxes, with 20 mm rounding and 1 mm guard; actual native vertex crosses original station triangle interior.",
+  "alignedActorCentreZMetres": [
+    150,
+    116
+  ],
+  "guardedLeadingTrailingEdgesMetres": [
+    137.479,
+    133.111
+  ],
+  "lipBandZMetres": [
+    134.32,
+    136.32
+  ],
+  "aligned": {
+    "netMillimetres": 45138,
+    "limitingSupport": 8,
+    "limitingStationFace": 452
+  },
+  "offsetActorXMetres": 69.9,
+  "offsetActorCentreZMetres": [
+    150,
+    147
+  ],
+  "offsetStart": {
+    "netMillimetres": 1159,
+    "limitingSupport": 0,
+    "limitingStationFace": 480
+  },
+  "nativeLipCrossing": {
+    "nativeLocalVertex": 26,
+    "nativeGlobalVertex": 2198,
+    "stationFace": 482,
+    "fraction": 0.3933333333333356,
+    "actorCentreZMetres": 148.82,
+    "pointMetres": [
+      69.9,
+      1.928,
+      136.32
+    ],
+    "barycentric": [
+      0.1099999999999931,
+      0.3700760582010651,
+      0.5199239417989417
+    ]
+  }
+}
