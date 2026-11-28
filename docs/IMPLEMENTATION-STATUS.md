@@ -10,6 +10,8 @@ Meridian `v0.12.0-preview.1` was published on 28 November 2026 at 04:10 UTC. Its
 | Final Windows archive | On the locked Dell, both launchers saved and cold-reopened separate profiles. Studio passed offline reference export and headless browser Help checks. The game windows remained in graphics initialisation and the Studio helper returned HTTP 503. Native gameplay, interactive Fleet refit, in-game Continue and a Showroom frame remain unverified. |
 | Earlier Linux visual run | Xvfb captures on `0eaf3fb8` showed the instrument footer, upper-right placement and fallback to the footer under target guidance. The later change at `af8e6427` affected one test assertion. |
 
+The [SH018 Onager](ONAGER-GAMEPLAY-ENVELOPE.md) core envelope uses both original meshes. Its source fixtures cover open channels, solid contacts and an offset sweep across the SH028 station lip. Stock Showroom rendering and ordinary flight admission remain open.
+
 The current desktop uses the [number row and Control shortcuts](../README.md#controls) for missiles, training, saves and fullscreen. Earlier qualification entries record the keys used by their named builds.
 
 PR #232 merged the flyable Medusa, Hull Studio, 115 selectable Showroom models and bulk trading. The local Mac build at `78bb0eba` passed Developer ID, notarisation and Gatekeeper checks for all three apps. The Medusa flight test retained its original hull, speed and expanded hold after a cold restart. Native Windows reproduced all 288 hull measurements across 104 hull directories. [Player guide](PREVIEW-RELEASES.md#fleet-medusa-and-hull-studio)

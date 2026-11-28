@@ -1,0 +1,12 @@
+{
+  "schema": 1,
+  "id": "sh018-onager",
+  "undoBefore": [
+    "followup-bulk-market"
+  ],
+  "undoAfter": [],
+  "kind": "declaration",
+  "module": "onager",
+  "before": "pub mod navigation;\n",
+  "after": "pub mod oryx_voyager;\n"
+}

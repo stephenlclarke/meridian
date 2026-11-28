@@ -8,6 +8,8 @@ At a station, open **5 Equipment** to buy, store or refit the Fleet Medusa’s f
 
 The centre sight identifies the active laser or work tool. Press **H**, then **I**, for Flight Status. Press **N** on that card to choose where notices appear. [Cockpit instruments](docs/COCKPIT-HUD.md)
 
+SH018 Onager has a source-defined 26-piece collision shield for controlled station sweeps. [Onager geometry and clearances](docs/ONAGER-GAMEPLAY-ENVELOPE.md)
+
 The ordinary-drive development candidate adds the Basic, Intermediate and Advanced hyperspace drive slot to Equipment. Paid upgrades change the actual jump countdown and station mass lock; explicit XYZZY maximum fitting uses the Advanced drive. The [equipment implementation and testing ledger](docs/EQUIPMENT-PLAYABLE.md) records all catalogue grades, remaining gameplay paths and Medusa compatibility constraints. This candidate is not part of Preview 10 and awaits owned validation.
 
 The stock-shield development candidate adds seven independently testable shield grades, an actual finite bank capacity for each grade, four ordinary paid upgrades and a dedicated XYZZY test selector. It preserves the original maximum outfit and the distinct unresolved Elite-rank and PLUGH-only acquisition paths. [Shield source, fitting and test controls](docs/SHIELD-GRADES.md). Owned validation is pending.

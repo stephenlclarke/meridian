@@ -1,3 +1,7 @@
+# SH018 source and measurement programs are pinned as Git blob bytes.
+measure_onager_air.py text eol=lf
+prepare_onager_geometry.py text eol=lf
+verify_onager_geometry.py text eol=lf
 # Shared replay helpers are hashed as Git blob bytes.
 encode_goshawk_visual.py text eol=lf
 import_goshawk_envelope_source.py text eol=lf

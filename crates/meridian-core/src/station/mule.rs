@@ -277,6 +277,17 @@ impl OriginalStationData {
 }
 
 impl OriginalStationData {
+    /// Controlled SH018 motion against the original SH028 mesh.
+    pub fn onager_motion_clear(
+        &self,
+        source: &crate::onager::OnagerHullSource,
+        start: RigidPose,
+        end: RigidPose,
+        angular_travel: f64,
+    ) -> bool {
+        self.rounded_station_motion_clear(source.pieces(), start, end, angular_travel)
+    }
+
     pub fn goshawk_custom_launch_start(
         &self,
         source: &crate::goshawk_custom::GoshawkCustomHullSource,
