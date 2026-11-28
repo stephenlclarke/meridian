@@ -2,12 +2,12 @@
   "schema": 1,
   "id": "sealed-dispatch",
   "undoBefore": [
-    "followup-bulk-market"
+    "player-laser-fittings"
   ],
   "undoAfter": [],
   "kind": "inverse",
   "manifest": "integration/sealed-dispatch/PROTECTED-CORE-INVERSE.json",
-  "sha256": "9869189b7e9b36e1bc30f1fc85aef134d655e8f5a9a6b7afec7ed51fa292406c",
-  "base": "73e821e14a715a25b0fbf47bdff7f25e535088d5",
+  "sha256": "f245287386cc69721d9dd8a6170fd78a8bf0bd313167ba13933c10f0b9ac37a4",
+  "base": "32c49cb598f7be71103cf5d58d6d8679cbf27f5b",
   "label": "G01 sealed dispatch custody and station delivery"
 }

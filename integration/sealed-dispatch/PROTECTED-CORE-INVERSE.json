@@ -1,9 +1,9 @@
 {
-  "base": "73e821e14a715a25b0fbf47bdff7f25e535088d5",
+  "base": "32c49cb598f7be71103cf5d58d6d8679cbf27f5b",
   "files": {
     "flight.rs": {
-      "beforeSHA256": "e36fd880c0177c3b03c913871e213eac66159eb19abc303c65805efa35a899b2",
-      "afterSHA256": "48719e045d3445c40c6f3e7db74e79cfdd5c5f0c0bc10696624e9084cf8c9ca3",
+      "beforeSHA256": "abb0b55ddbf5336fccb757514e3e6fceba26519bde173bf243abfec7604bb4d3",
+      "afterSHA256": "c2eb42e538d91650f8c5c9dcab3622ac90f7da9de142ec0b5563818373607af1",
       "hunks": [
         {
           "offset": 2097,
@@ -13,16 +13,16 @@
       ]
     },
     "flight/equipment.rs": {
-      "beforeSHA256": "1d7aa717ee2bf796159db5341023241eab1107ee77495c247be032d57bff341a",
-      "afterSHA256": "ae1ff3d76baf168546e281110728f39cd3dd62c8a76611243042cb5838d3f94b",
+      "beforeSHA256": "08e2b081f075fc5940d2a138e2e5c61282012e50bd0ea545dfc05166d7010c50",
+      "afterSHA256": "f723c42e02d2cb90661c78d96e5ad09dcb9a20d58fb3c7c6dc052b6765278215",
       "hunks": [
         {
-          "offset": 2994,
+          "offset": 3001,
           "before": "            + self.cabin_tonnes().map_err(MissionError::Service)?;\n",
           "after": "            + self.contract_hold_tonnes().map_err(MissionError::Service)?;\n"
         },
         {
-          "offset": 5878,
+          "offset": 5885,
           "before": "                        .cabin_tonnes()\n",
           "after": "                        .contract_hold_tonnes()\n"
         }
@@ -55,8 +55,8 @@
       ]
     },
     "flight/flight_reception/persistence.rs": {
-      "beforeSHA256": "10f65a16d585475c279d21c93442bfbea20f2d799dbd26b7b94a7352911d2f78",
-      "afterSHA256": "3721118f2fa7b0dfc01e66fe55bdb1fc4940ae58d75f8c9546b6bee00c36e490",
+      "beforeSHA256": "5bd42ff8a6044d3421ada618932a41e403ae5e176aace7818a039ac65e0c1ae9",
+      "afterSHA256": "caa93ccbd4f9a8312c7119181f76bba918eecf8460741e81d64e5fc9bd24836c",
       "hunks": [
         {
           "offset": 2094,
@@ -76,151 +76,151 @@
       ]
     },
     "flight/modular.rs": {
-      "beforeSHA256": "271c8afc708a475b106eac5999f64a757fe83de5e0814f6477a9bed90b948133",
-      "afterSHA256": "97cc37696f4f7f815655bdc7c10ef195f5a23130ccc3ddc3c4395b9f9c0ea9a6",
+      "beforeSHA256": "c8d9b6896e0307b1b7f3e17030a0c42b203317ace3a15aa29ec25ff5027a82b9",
+      "afterSHA256": "91e1a32f9c89f81aab402ba4aa8f4ba2de1986366bc2de56a4aaceb81b53e8db",
       "hunks": [
         {
-          "offset": 372,
+          "offset": 384,
           "before": "",
           "after": "mod dispatch;\npub use dispatch::{DispatchAction, DispatchOffer, DispatchRecord};\n"
         },
         {
-          "offset": 497,
+          "offset": 571,
           "before": "pub(super) use cabins::add_cabin_mass;\n",
           "after": "pub(super) use cabins::add_contract_hold_mass;\n"
         },
         {
-          "offset": 16038,
+          "offset": 16446,
           "before": "",
           "after": "    Dispatch(DispatchAction),\n"
         },
         {
-          "offset": 17312,
+          "offset": 17755,
           "before": "",
           "after": "    DispatchUnavailable,\n"
         },
         {
-          "offset": 17872,
+          "offset": 18315,
           "before": "",
           "after": "        if *self == Self::DispatchUnavailable {\n            return f\n                .write_str(\"This sealed dispatch is unavailable for the current ship or berth\");\n        }\n"
         },
         {
-          "offset": 20138,
+          "offset": 20704,
           "before": "",
           "after": "    dispatch: dispatch::Dispatch,\n"
         },
         {
-          "offset": 20265,
+          "offset": 20916,
           "before": "    pub(super) fn passenger_totals(&self) -> (u32, u64) {\n        (self.passage.reward(), self.passage.events)\n",
           "after": "    pub(super) fn contract_totals(&self) -> (u32, u64) {\n        (\n            self.passage.reward() + self.dispatch.earnings,\n            self.passage.events + self.dispatch.events,\n        )\n"
         },
         {
-          "offset": 34418,
+          "offset": 36208,
           "before": "",
           "after": "                ModuleAction::Dispatch(action) => return self.apply_dispatch(event, action),\n"
         },
         {
-          "offset": 37973,
+          "offset": 39833,
           "before": "",
           "after": "            let previous_earnings = ledger.dispatch.earnings;\n"
         },
         {
-          "offset": 38660,
+          "offset": 40520,
           "before": "",
           "after": "            } else if let ModuleAction::Dispatch(action) = e.action {\n                match action {\n                    DispatchAction::Collect(_) => super::AccountEffect::ObserveFuel(\n                        u16::try_from(e.item).map_err(|_| INVALID)?,\n                    ),\n                    DispatchAction::Receive => {\n                        super::AccountEffect::Reward(ledger.dispatch.earnings - previous_earnings)\n                    }\n                    DispatchAction::Abandon => super::AccountEffect::Debit(0),\n                }\n"
         },
         {
-          "offset": 40498,
+          "offset": 42442,
           "before": "    pub(super) fn passenger_occupancy(&self) -> (usize, usize) {\n",
           "after": "    pub(super) fn contract_occupancy(&self) -> (usize, usize) {\n"
         },
         {
-          "offset": 40927,
+          "offset": 42871,
           "before": "        (usize::from(boarded), usize::from(boarded && !ended))\n",
           "after": "        let (dispatch_records, dispatch_active) = self.dispatch_occupancy();\n        (\n            usize::from(boarded) + dispatch_records,\n            usize::from(boarded && !ended) + dispatch_active,\n        )\n"
         },
         {
-          "offset": 48437,
+          "offset": 51062,
           "before": "",
           "after": "            if let ModuleAction::Dispatch(action) = e.action {\n                let start = ledger\n                    .dispatch\n                    .active()\n                    .map_or(e.revision, |record| record.issue_revision);\n                if !world.xyzzy.dispatch_fuel_is_ordinary(start, e.revision) {\n                    return Err(INVALID);\n                }\n                world\n                    .jump_journal\n                    .validate_passenger_berth(e.dock, e.tick)?;\n                if !self.history.owns_berth(e.dock)\n                    || (action == DispatchAction::Receive\n                        && !ledger.dispatch.active().is_some_and(|r| {\n                            world\n                                .jump_journal\n                                .flown_dispatch(r.issuer, e.dock, &r.offer.path)\n                        }))\n                {\n                    return Err(INVALID);\n                }\n            }\n"
         },
         {
-          "offset": 53435,
+          "offset": 55973,
           "before": "                || ledger.cabin_tonnes() > crate::equipment::EXPANDED_HOLD_TONNES\n",
           "after": "                || ledger.contract_hold_tonnes() > crate::equipment::EXPANDED_HOLD_TONNES\n"
         },
         {
-          "offset": 55347,
+          "offset": 57974,
           "before": "        let allowance = if world.test_tank_custody_clear() && self.passenger_occupancy().1 == 0 {\n",
           "after": "        let allowance = if world.test_tank_custody_clear() && self.contract_occupancy().1 == 0 {\n"
         },
         {
-          "offset": 55652,
+          "offset": 58279,
           "before": "",
           "after": "        if ledger.dispatch.active().is_some_and(|r| {\n            !world\n                .xyzzy\n                .dispatch_fuel_is_ordinary(r.issue_revision, account.revision())\n        }) {\n            return Err(INVALID);\n        }\n"
         },
         {
-          "offset": 55987,
+          "offset": 58614,
           "before": "        if self.cabin_tonnes().map_err(|_| INVALID)? != ledger.cabin_tonnes() {\n",
           "after": "        if self.contract_hold_tonnes().map_err(|_| INVALID)? != ledger.contract_hold_tonnes() {\n"
         },
         {
-          "offset": 56126,
+          "offset": 58753,
           "before": "        if ledger.cabin_tonnes() != 0 {\n",
           "after": "        if ledger.contract_hold_tonnes() != 0 {\n"
         },
         {
-          "offset": 56342,
+          "offset": 58969,
           "before": "            add_cabin_mass(projection, ledger.cabin_tonnes()).map_err(|_| INVALID)?;\n",
           "after": "            add_contract_hold_mass(projection, ledger.contract_hold_tonnes())\n                .map_err(|_| INVALID)?;\n"
         },
         {
-          "offset": 63317,
+          "offset": 66747,
           "before": "",
-          "after": "                ModuleAction::Dispatch(DispatchAction::Collect(row)) => {\n                    w.u8(21);\n                    w.u8(row);\n                }\n                ModuleAction::Dispatch(DispatchAction::Receive) => w.u8(22),\n                ModuleAction::Dispatch(DispatchAction::Abandon) => w.u8(23),\n"
+          "after": "                ModuleAction::Dispatch(DispatchAction::Collect(row)) => {\n                    w.u8(28);\n                    w.u8(row);\n                }\n                ModuleAction::Dispatch(DispatchAction::Receive) => w.u8(29),\n                ModuleAction::Dispatch(DispatchAction::Abandon) => w.u8(23),\n"
         },
         {
-          "offset": 66046,
+          "offset": 69664,
           "before": "",
           "after": "            let dispatch_row = if tag == 21 { Some(r.u8()?) } else { None };\n"
         },
         {
-          "offset": 68096,
+          "offset": 72064,
           "before": "",
-          "after": "                21 => ModuleAction::Dispatch(DispatchAction::Collect(\n                    dispatch_row.ok_or(SaveError::InvalidEncoding)?,\n                )),\n                22 => ModuleAction::Dispatch(DispatchAction::Receive),\n                23 => ModuleAction::Dispatch(DispatchAction::Abandon),\n"
+          "after": "                28 => ModuleAction::Dispatch(DispatchAction::Collect(\n                    dispatch_row.ok_or(SaveError::InvalidEncoding)?,\n                )),\n                29 => ModuleAction::Dispatch(DispatchAction::Receive),\n                23 => ModuleAction::Dispatch(DispatchAction::Abandon),\n"
         },
         {
-          "offset": 80918,
+          "offset": 85353,
           "before": "        if matches!(action, ModuleAction::Passenger(PassengerAction::Board))\n            && !self.original_service_has_capacity()\n",
           "after": "        if matches!(\n            action,\n            ModuleAction::Passenger(PassengerAction::Board)\n                | ModuleAction::Dispatch(DispatchAction::Collect(_))\n        ) && !self.original_service_has_capacity()\n"
         },
         {
-          "offset": 81240,
+          "offset": 85675,
           "before": "",
           "after": "            ModuleAction::Dispatch(DispatchAction::Collect(_)) => {\n                if !self\n                    .xyzzy\n                    .dispatch_fuel_is_ordinary(account.revision(), account.revision())\n                {\n                    return Err(ModuleError::DispatchUnavailable);\n                }\n                u64::from(account.fuel_tenths())\n            }\n            ModuleAction::Dispatch(action) => {\n                let record = ledger\n                    .dispatch\n                    .active()\n                    .ok_or(ModuleError::DispatchUnavailable)?;\n                if action == DispatchAction::Receive\n                    && !self\n                        .jump_journal\n                        .flown_dispatch(record.issuer, dock, &record.offer.path)\n                {\n                    return Err(ModuleError::BerthRequired);\n                }\n                record.issue_revision\n            }\n"
         },
         {
-          "offset": 83742,
+          "offset": 88317,
           "before": "        if ledger.cabin_tonnes() != 0 {\n",
           "after": "        if ledger.contract_hold_tonnes() != 0 {\n"
         },
         {
-          "offset": 84127,
+          "offset": 88702,
           "before": "            let projection = add_cabin_mass(projection, ledger.cabin_tonnes())\n",
           "after": "            let projection = add_contract_hold_mass(projection, ledger.contract_hold_tonnes())\n"
         },
         {
-          "offset": 85566,
+          "offset": 90215,
           "before": "",
           "after": "                ModuleAction::Dispatch(DispatchAction::Collect(_)) => {\n                    u64::from(current.fuel_tenths())\n                }\n                ModuleAction::Dispatch(_) => {\n                    self.modular\n                        .ledger(self, current)\n                        .map_err(ModuleError::Save)?\n                        .dispatch\n                        .active()\n                        .ok_or(ModuleError::DispatchUnavailable)?\n                        .issue_revision\n                }\n"
         },
         {
-          "offset": 86996,
+          "offset": 91645,
           "before": "",
           "after": "        let old_earnings = ledger.dispatch.earnings;\n"
         },
         {
-          "offset": 87888,
+          "offset": 92544,
           "before": "            current.prepare_passage_action(action == PassengerAction::Receive)\n",
           "after": "            current.prepare_contract_action(if action == PassengerAction::Receive {\n                PASSAGE_REWARD_TENTHS\n            } else {\n                0\n            })\n        } else if matches!(review.action, ModuleAction::Dispatch(_)) {\n            current.prepare_contract_action(ledger.dispatch.earnings - old_earnings)\n"
         }
@@ -253,8 +253,8 @@
       ]
     },
     "flight/navigation_trade/persistence.rs": {
-      "beforeSHA256": "4fb04e53706e337d1c364a3a44aaa2941ea86ed66d0928023d3f5b14cf2c9dec",
-      "afterSHA256": "679bd6b468c65ebe0f023d6780e805b86d298957937ba2ae99fbaa7feaff5003",
+      "beforeSHA256": "12573177ba7bd3057e7b77eb0a193e0f15ce3606b475459905c533568670c2eb",
+      "afterSHA256": "fa600ebba48a3356dfae2fe0fc6ea320bf9d19ea969051d886c642afa2f8db3f",
       "hunks": [
         {
           "offset": 900,
@@ -279,36 +279,36 @@
       ]
     },
     "flight/persistence.rs": {
-      "beforeSHA256": "4628ba0f08a5dde7da89774d797598ce12b27c55fb69b4d51c821aae554bcf1a",
-      "afterSHA256": "cef316e37ff2a38bd7736975d1abb0faed057288f7863272fc5a326b7e4b39ce",
+      "beforeSHA256": "bb87f33082373c193045b436e09ce093cadce5516a7c070667910c4844f4160f",
+      "afterSHA256": "aaeb6151f5041ffd1508e9e26d2fddfaaa917904c1c9cd298b47d60842820d71",
       "hunks": [
         {
-          "offset": 35625,
+          "offset": 36335,
           "before": "                    .and_then(|revisions| revisions.checked_add(modular.passenger_totals().1))\n",
           "after": "                    .and_then(|revisions| revisions.checked_add(modular.contract_totals().1))\n"
         },
         {
-          "offset": 35850,
+          "offset": 36560,
           "before": "                modular.passenger_totals().0,\n",
           "after": "                modular.contract_totals().0,\n"
         },
         {
-          "offset": 37397,
+          "offset": 38107,
           "before": "    equipment_and_passage: (u32, u64, u32),\n",
           "after": "    equipment_and_contracts: (u32, u64, u32),\n"
         },
         {
-          "offset": 37528,
+          "offset": 38238,
           "before": "    let (ammunition_paid, ammunition_revisions, passenger_reward) = equipment_and_passage;\n",
           "after": "    let (ammunition_paid, ammunition_revisions, station_contract_reward) = equipment_and_contracts;\n"
         },
         {
-          "offset": 37655,
+          "offset": 38365,
           "before": "        + u128::from(passenger_reward)\n",
           "after": "        + u128::from(station_contract_reward)\n"
         },
         {
-          "offset": 38020,
+          "offset": 38730,
           "before": "        + u128::from(passenger_reward)\n",
           "after": "        + u128::from(station_contract_reward)\n"
         }
@@ -331,21 +331,21 @@
       ]
     },
     "flight/xyzzy.rs": {
-      "beforeSHA256": "04ca9973164108e94a06339fb7977c2b8869db1dc98d9df01ad501e0d1ffc08b",
-      "afterSHA256": "fc9d2e62c694a88fd6c140bb9bee86b9980a06d1a96d5c70a764f0b5b7aa2cb4",
+      "beforeSHA256": "9a316098e5990787ebc2535c4ed1352c856c682e2ae10e87a992cc9841a4f732",
+      "afterSHA256": "a6745ab246f2b46e63688cc8f809bb0c5381d5176c8451812b1030ed9c423e57",
       "hunks": [
         {
-          "offset": 4573,
+          "offset": 5600,
           "before": "",
           "after": "    }\n    pub(super) fn dispatch_fuel_is_ordinary(&self, issue: u64, through: u64) -> bool {\n        !self\n            .records\n            .iter()\n            .take_while(|r| r.end_revision <= issue)\n            .last()\n            .is_some_and(|r| r.unlimited_fuel)\n            && !self.records.iter().any(|r| {\n                r.revision > issue\n                    && r.revision <= through\n                    && (r.unlimited_fuel || r.action.refills(r.unlimited_fuel))\n            })\n"
         },
         {
-          "offset": 19525,
+          "offset": 21169,
           "before": "            && self.modular.passenger_occupancy().1 == 0\n",
           "after": "            && self.modular.contract_occupancy().1 == 0\n"
         },
         {
-          "offset": 21435,
+          "offset": 23240,
           "before": "",
           "after": "        }\n        if self.modular.dispatch_occupancy().1 != 0\n            && (action == XyzzyAction::ToggleUnlimitedFuel || action.refills(false))\n        {\n            return Err(XyzzyError::ActiveFuelPractice);\n"
         }
@@ -363,16 +363,16 @@
       ]
     },
     "freight/g02.rs": {
-      "beforeSHA256": "a273becd4a69e7ad3a9fbfd89efd61490a614715fa4be8dc47141ca4c81ea6c2",
-      "afterSHA256": "18e410a4b87de9fde969113ea8adbdd51cf56e92c79fdf77010a7f0f8e86b51a",
+      "beforeSHA256": "1e90d45a5187463588ed527c676f1a1a4a9ad900cdaf22519704aa88f398c26d",
+      "afterSHA256": "09baa3e6d83dd2b003e4d8854b20bd7c1ebdba212f536b889f431b64d5b70719",
       "hunks": [
         {
-          "offset": 11145,
+          "offset": 11544,
           "before": "    /// An original passenger transaction advances the account but does not change equipment fit.\n    pub(crate) fn prepare_passage_action(&self, delivered: bool) -> Result<Self, Error> {\n",
           "after": "    /// An original station contract transaction advances the account but does not change equipment fit.\n    pub(crate) fn prepare_contract_action(&self, reward: u32) -> Result<Self, Error> {\n"
         },
         {
-          "offset": 11497,
+          "offset": 11896,
           "before": "        if delivered {\n            data.credits = data\n                .credits\n                .checked_add(crate::flight::PASSAGE_REWARD_TENTHS)\n                .ok_or(Error::CreditOverflow)?;\n        }\n",
           "after": "        data.credits = data\n            .credits\n            .checked_add(reward)\n            .ok_or(Error::CreditOverflow)?;\n"
         }

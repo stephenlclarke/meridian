@@ -1750,10 +1750,10 @@ impl State {
                     w.bool(restoring);
                 }
                 ModuleAction::Dispatch(DispatchAction::Collect(row)) => {
-                    w.u8(21);
+                    w.u8(28);
                     w.u8(row);
                 }
-                ModuleAction::Dispatch(DispatchAction::Receive) => w.u8(22),
+                ModuleAction::Dispatch(DispatchAction::Receive) => w.u8(29),
                 ModuleAction::Dispatch(DispatchAction::Abandon) => w.u8(23),
                 ModuleAction::Store { .. } => w.u8(1),
                 ModuleAction::Install { replacing, .. } => {
@@ -1881,10 +1881,10 @@ impl State {
                 5 => ModuleAction::Passenger(PassengerAction::Board),
                 6 => ModuleAction::Passenger(PassengerAction::Receive),
                 7 => ModuleAction::Passenger(PassengerAction::Cancel),
-                21 => ModuleAction::Dispatch(DispatchAction::Collect(
+                28 => ModuleAction::Dispatch(DispatchAction::Collect(
                     dispatch_row.ok_or(SaveError::InvalidEncoding)?,
                 )),
-                22 => ModuleAction::Dispatch(DispatchAction::Receive),
+                29 => ModuleAction::Dispatch(DispatchAction::Receive),
                 23 => ModuleAction::Dispatch(DispatchAction::Abandon),
                 _ => return Err(SaveError::InvalidEncoding),
             };
