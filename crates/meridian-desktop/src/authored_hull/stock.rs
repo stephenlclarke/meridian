@@ -546,6 +546,12 @@ const DESCRIPTORS: &[StockDescriptor] = &[
         0x1474_312d_3f6b_cd46
     ),
     stock_package!(
+        "SH103",
+        "Redtail Mk III",
+        "integration/sh103-redtail-mk-iii/REDTAIL-STUDIO.json",
+        0xf779_f4eb_6b7e_b676
+    ),
+    stock_package!(
         "SH104",
         "Wildebeest",
         "integration/sh104-wildebeest/WILDEBEEST-STUDIO.json",
@@ -929,11 +935,11 @@ mod tests {
     #[test]
     fn every_stock_descriptor_authenticates_its_own_source_and_real_preview() {
         let catalogue = ok(crate::docked_screens::Catalogue::bundled());
-        assert_eq!(STOCK_MODELS.len(), 121);
+        assert_eq!(STOCK_MODELS.len(), 122);
         for held in [
-            "SH102", "SH103", "SH108", "SH112", "SH113", "SH114", "SH115", "SH116", "SH117",
-            "SH118", "SH119", "SH120", "SH121", "SH122", "SH123", "SH124", "SH125", "SH141",
-            "SH156", "SH161", "SH162", "SH164",
+            "SH102", "SH108", "SH112", "SH113", "SH114", "SH115", "SH116", "SH117", "SH118",
+            "SH119", "SH120", "SH121", "SH122", "SH123", "SH124", "SH125", "SH141", "SH156",
+            "SH161", "SH162", "SH164",
         ] {
             assert!(
                 !STOCK_MODELS.iter().any(|model| model.object == held),
@@ -1430,6 +1436,15 @@ mod tests {
         let package = ok(HullPackage::from_json(entry.package));
         assert_eq!(package.detail.triangles.len(), 3_508);
         assert_eq!(package.native.triangles.len(), 512);
+        assert_stock_and_local(entry.model.object, entry.model.geometry_key);
+    }
+
+    #[test]
+    fn redtail_mk_iii_stock_and_local_previews_use_the_qualified_package() {
+        let entry = descriptor("SH103");
+        let package = ok(HullPackage::from_json(entry.package));
+        assert_eq!(package.detail.triangles.len(), 2_328);
+        assert_eq!(package.native.triangles.len(), 140);
         assert_stock_and_local(entry.model.object, entry.model.geometry_key);
     }
 

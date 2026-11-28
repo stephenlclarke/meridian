@@ -36,7 +36,9 @@ The development source adds the [Serval Fighter](docs/SERVAL-GAMEPLAY-ENVELOPE.m
 
 Stock inspection also includes Vulture Mk II (SH038) and Vulture Mk III (SH039). Each archive keeps all 8,272 detailed faces and 3,016 original native faces.
 
-The development build adds [Cheetah (SH082)](docs/CHEETAH-SHIELD.md) to the station Showroom. Its 512-face native candidate retains the 24 measured original contacts, including the four service-well contacts lost in the earlier candidate. The source Showroom now has 127 previews.
+The development build adds [Cheetah (SH082)](docs/CHEETAH-SHIELD.md) to the station Showroom. Its 512-face native candidate retains the 24 measured original contacts, including the four service-well contacts lost in the earlier candidate.
+
+The development build adds [Redtail Mk III (SH103)](docs/REDTAIL-MK-III-INSPECTION.md) to the station Showroom. Its original 2,328-face detailed mesh and 140-face native mesh use the source calibration of one metre per unit. The source Showroom now has 128 previews.
 
 The separate [Medusa player flight preview](integration/sh171-medusa-preview/README.md) uses a dedicated profile and the admitted reduced flight geometry. On signed Mac build `5a924315`, the original SH171 artwork was visible in actual flight at 50.30/50.30. A cold restart restored the same ship, speed and expanded 32 t hold. Native docking return and fit-limit refusal were not observed in that run. Ordinary progression, fabrication and exchange do not grant the Medusa. See the [Preview 12 validation record](docs/IMPLEMENTATION-STATUS.md#published-preview-12) for final-package checks.
 
