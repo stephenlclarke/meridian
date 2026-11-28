@@ -89,6 +89,9 @@ impl DockedScreens {
     pub fn selected_system(&self) -> SystemId {
         self.selected_world
     }
+    pub fn selected_commodity(&self) -> CommodityId {
+        self.commodity
+    }
     pub fn reset_equipment_selection(&mut self) {
         self.equipment_index = 0;
         self.option_index = 0;

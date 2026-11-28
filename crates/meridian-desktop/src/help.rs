@@ -177,7 +177,7 @@ impl Panel {
                 "Basic aligns | Advanced approaches | Docking+nav docks | Specialists auto-work",
                 "I Mission details | Shift+I Target details | Occupied: Enter/Escape",
                 "Hold U 10 seconds: EMP | Release U cancels unfinished charge",
-                "Shift+3 Gunnery review | 4 Trade review | 5 Plan | 6 Cancel | 7 Details",
+                "Shift+3 Gunnery review | 7 Trade goal | At berth: R from goal to review",
                 "Ctrl+S Save | Ctrl+R Reload | Ctrl+Enter Fullscreen | Escape Save/Quit",
             ],
         );
@@ -215,7 +215,7 @@ impl Panel {
                 "Enter Confirm review | B Cancel review",
                 "Shift+1 Flight lesson | Shift+2 Cancel | C Lesson details",
                 "Shift+5 Close practice | Shift+4 Reception | Shift+3 Practice review",
-                "6 Cancel trade lesson | 7 Trade lesson details",
+                "7 Trade goal | R from goal to review | 6 Review cancellation",
                 "Ctrl+S Save | Ctrl+R Reload | Ctrl+Enter Fullscreen | Escape Save/Quit",
             ],
         );
@@ -264,6 +264,7 @@ impl Panel {
                     "G Buy | Shift+G Sell | Enter Review current trade mode",
                     "Left / Right Quantity -/+1 | Shift+Left / Right -/+10",
                     "F Refuel actual tank at the displayed price",
+                    "7 Trade lesson for selected goods | R from goal to review",
                     "Trade confirmation uses the current price and native unit",
                 ],
             ),
