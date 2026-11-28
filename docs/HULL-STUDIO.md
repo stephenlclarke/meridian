@@ -115,3 +115,7 @@ excludes archived inspection packages from the flight export.
 ## Serval Fighter
 
 The [SH041 Serval Fighter](SERVAL-GAMEPLAY-ENVELOPE.md) opens in the stock Showroom with its 4,236-face detailed model. Its 224-face native model and detailed model share 23 rounded supports. The package keeps the original flight and engineering references for inspection.
+
+## Vulture Mk I
+
+The [SH037 Vulture Mk I](VULTURE-MK-I-GAMEPLAY-ENVELOPE.md) opens in the stock Showroom with all 8,272 original detailed faces. The Studio definition uses the 512-face proxy. The original 3,016-face native mesh remains in the source archive.

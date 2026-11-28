@@ -1,0 +1,13 @@
+{
+  "schema": 1,
+  "id": "sh037-vulture-mk-i",
+  "undoBefore": [
+    "sh171-medusa-preview",
+    "sh170-caracara-mk-ii"
+  ],
+  "undoAfter": [],
+  "kind": "declaration",
+  "module": "vulture_mk_i",
+  "before": "pub mod unwritten_route;\n",
+  "after": "pub mod vulture_raider;\n"
+}
