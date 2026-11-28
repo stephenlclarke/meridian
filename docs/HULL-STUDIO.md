@@ -135,3 +135,7 @@ Search for **SH033** or **Panther Scout** in the station Showroom. The forest-iv
 ## Panther Explorer stock inspection
 
 Search for **SH032** or **Panther Explorer** in the station Showroom. The forest-ivory Explorer has a panoramic cabin, glazed side windows and two low drive sleds. The original native mesh has 352 faces. The [Explorer geometry record](PANTHER-EXPLORER-GAMEPLAY-ENVELOPE.md) gives the arch and station clearance measurements.
+
+## Okapi stock inspection
+
+Search for **SH029** or **Okapi** in the station Showroom. The slate-and-orange trader retains its three pallets, raised top rails and original 120-face native mesh. Its [geometry record](OKAPI-GAMEPLAY-ENVELOPE.md) gives the measured clearances and the source of its empty-hull mass reference.

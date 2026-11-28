@@ -691,3 +691,10 @@ tools/measure_panther_explorer_air.py text eol=lf
 tools/prepare_panther_explorer_geometry.py text eol=lf
 tools/prepare_panther_explorer_studio.py text eol=lf
 tools/verify_panther_explorer_geometry.py text eol=lf
+
+# The Okapi certificates bind the original source and current measurement tools.
+tools/measure_okapi.py text eol=lf
+tools/measure_okapi_air.py text eol=lf
+tools/prepare_okapi_geometry.py text eol=lf
+tools/prepare_okapi_studio.py text eol=lf
+tools/verify_okapi_geometry.py text eol=lf

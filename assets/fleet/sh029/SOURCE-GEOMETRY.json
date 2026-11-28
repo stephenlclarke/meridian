@@ -1,0 +1,83 @@
+{
+  "id": "SH029",
+  "name": "Okapi",
+  "legacyRevision": "a11fe16924d87d06021816f9037952afcbac08db",
+  "sourceUnits": "metres",
+  "metresPerSourceUnit": 1,
+  "detail": {
+    "vertices": 1248,
+    "faces": 2376,
+    "components": 30,
+    "bounds": [
+      [
+        -10.0,
+        -4.36,
+        -18.09
+      ],
+      [
+        10.0,
+        5.76,
+        16.0
+      ]
+    ]
+  },
+  "native": {
+    "vertices": 76,
+    "faces": 120,
+    "components": 8,
+    "bounds": [
+      [
+        -10.0,
+        -4.36,
+        -18.09
+      ],
+      [
+        10.0,
+        5.68,
+        16.0
+      ]
+    ],
+    "faceLimit": 512,
+    "approvedSourcePath": "fleet-completion-20261019/batch-02-native-lod/SH029-design.toml",
+    "approvedSourceSha256": "585cb9a7f47fb13f6249c09f2ccc262eb852c98ad10721a95730b68fc4eb7b5c"
+  },
+  "shapePieces": 26,
+  "textures": [
+    "l337-patrol-diffuse",
+    "l337-strike-diffuse",
+    "l337-service-details"
+  ],
+  "unmappedMaterialSlot": 4294967295,
+  "pins": {
+    "resource.toml": "ecf10abbdaed31818297c0658daa7ffa542214411ab285b2c9e429e3b1ea5ade",
+    "native-export.json": "57ce315d0c17fcc402f3bda4f94573fcc1f9fdee460ddadd12eccb42bb572473",
+    "contract.toml": "229d27ea2c5213bd0993c99b9545997e065673e578b7120829e5c6bd06dafc59",
+    "LICENSE": "033b7058d73f22c3c6b8a5825eb866ca2d67088f3ee94dd5f3e46da59d624766"
+  },
+  "outputs": {
+    "source.vertices": {
+      "bytes": 31792,
+      "sha256": "d55dac33d2b6d980bee625b1b9775fd5426671da9040afac2c4ffcde1529afcd"
+    },
+    "source-triangles.bin": {
+      "bytes": 29952,
+      "sha256": "f793439c378967fb67229e64f110874c0b92669d5fbba03c00b903cfaa1ac4d8"
+    },
+    "source-piece-membership.bin": {
+      "bytes": 1324,
+      "sha256": "5b3df354dd315c46f731877090f9f7f9f98d8a25a46b6a1d9bf2a435ce758fa8"
+    },
+    "PIECES.json": {
+      "bytes": 641,
+      "sha256": "a49c99191415b41dd38e9d91bb284b127017d7dad4ef61b659388cfb87eb9c07"
+    },
+    "visual.bin": {
+      "bytes": 399184,
+      "sha256": "b11a8a99e906edf7f77331474ca1e74ee8a14ede5cd73e8eb91c209193820df2"
+    },
+    "native-visual.bin": {
+      "bytes": 20176,
+      "sha256": "c362b0dafa2edfca7e7d85816bae3c5e69b874238b0c5fa900c6274e0fc9d78a"
+    }
+  }
+}
