@@ -49,6 +49,16 @@ macro_rules! stock_package {
 const DESCRIPTORS: &[StockDescriptor] = &[
     StockDescriptor {
         model: AvailableModel {
+            object: "SH029",
+            geometry_key: "integration/sh029-okapi/OKAPI-STUDIO.json",
+        },
+        name: "Okapi",
+        package: include_bytes!("../../../../integration/sh029-okapi/OKAPI-STUDIO.json"),
+        fnv: 0xd143_817b_19e2_81b8,
+        export_fnv: Some(0x0f1c_2813_b424_6b62),
+    },
+    StockDescriptor {
+        model: AvailableModel {
             object: "SH030",
             geometry_key: SPARROWHAWK_GEOMETRY_KEY,
         },
@@ -881,7 +891,7 @@ mod tests {
     #[test]
     fn every_stock_descriptor_authenticates_its_own_source_and_real_preview() {
         let catalogue = ok(crate::docked_screens::Catalogue::bundled());
-        assert_eq!(STOCK_MODELS.len(), 115);
+        assert_eq!(STOCK_MODELS.len(), 116);
         for held in [
             "SH082", "SH102", "SH103", "SH108", "SH112", "SH113", "SH114", "SH115", "SH116",
             "SH117", "SH118", "SH119", "SH120", "SH121", "SH122", "SH123", "SH124", "SH125",
@@ -1154,6 +1164,28 @@ mod tests {
         assert!(load_stock(entry, peer.package).is_err());
         assert!(load_stock(peer, entry.package).is_err());
         assert_stock_and_local("SH032", entry.model.geometry_key);
+    }
+
+    #[test]
+    fn stock_okapi_uses_original_corners_and_its_source_bound_pallet_supports() {
+        let entry = descriptor("SH029");
+        let export = ok(authenticated_package_bytes(entry, entry.package));
+        let package = ok(HullPackage::from_json(export));
+        assert_eq!(package.name, "Okapi");
+        assert!(package.engineering.is_none());
+        assert_eq!(package.native.triangles.len(), 120);
+        let original = ok(meridian_core::okapi::OkapiHullSource::bundled());
+        assert_eq!(
+            ok(package.pieces()).as_slice(),
+            original.pieces().as_slice()
+        );
+        let packed = include_bytes!("../../../../assets/fleet/sh029/visual.bin");
+        let visual = ok(load_stock(entry, entry.package));
+        assert_original_corners(&visual, packed, [0.0, 0.7, -1.045], 34.09, 7128, 1216);
+        let peer = descriptor("SH030");
+        assert!(load_stock(entry, peer.package).is_err());
+        assert!(load_stock(peer, entry.package).is_err());
+        assert_stock_and_local("SH029", entry.model.geometry_key);
     }
 
     #[test]

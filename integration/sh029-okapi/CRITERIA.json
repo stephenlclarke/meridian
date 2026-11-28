@@ -1,0 +1,155 @@
+{
+  "hull": "SH029 Okapi",
+  "status": "ORIGINAL_GEOMETRY_PRESERVED;STOCK_INSPECTION_CANDIDATE;OPERATIONAL_UNASSIGNED",
+  "source": "assets/fleet/sh029/SOURCE-GEOMETRY.json",
+  "geometryTests": [
+    "okapi_original_detailed_and_native_faces_share_complete_local_supports",
+    "okapi_pallet_and_pipe_lanes_and_rail_gaps_clear_but_original_rails_contact",
+    "okapi_original_sh028_aligned_crossing_clears_before_offset_native_lip_contact"
+  ],
+  "originalVisualCorners": {
+    "detailed": 7128,
+    "native": 360
+  },
+  "originalUnmappedFaces": {
+    "detailed": 1216,
+    "native": 16,
+    "selector": 4294967295
+  },
+  "originalTextures": {
+    "assets/fleet/sh001/l337-patrol-diffuse.rgba": {
+      "bytes": 4194304,
+      "sha256": "9699517d12b4fbbb28746e00bed9ee65c19a098d14402b1d5160280c6f6bfc54",
+      "source": "Sources/L337Core/Resources/OriginalShipTextures/l337-patrol-diffuse.rgba",
+      "license": "MIT"
+    },
+    "assets/fleet/sh001/l337-strike-diffuse.rgba": {
+      "bytes": 4194304,
+      "sha256": "e56f149228caf90237a652d720ae549768bde1056af3d903dc8a5c243ad26e97",
+      "source": "Sources/L337Core/Resources/OriginalShipTextures/l337-strike-diffuse.rgba",
+      "license": "MIT"
+    },
+    "assets/fleet/sh001/l337-service-details.rgba": {
+      "bytes": 4194304,
+      "sha256": "35edd84f6ce527195dd8a9bcc039521a6efc5aa2333452bbbc30217b8372103d",
+      "source": "Sources/L337Core/Resources/OriginalShipTextures/l337-service-details.rgba",
+      "license": "MIT"
+    }
+  },
+  "nativeFaceCompliance": {
+    "sourceFaces": 120,
+    "contractMaximum": 512,
+    "state": "ORIGINAL_WITHIN_CONTRACT_LIMIT"
+  },
+  "legacyMetreAuthority": {
+    "revision": "a11fe16924d87d06021816f9037952afcbac08db",
+    "files": [
+      {
+        "path": "Sources/L337Core/OriginalOkapiActivation.swift",
+        "artifact": "integration/sh029-okapi/LEGACY-ACTIVATION.swift.txt",
+        "sha256": "32587262dccec5bc7e0e37e9f1caf98860fed125577d7a98c62b06f229e2217e"
+      },
+      {
+        "path": "Sources/L337Core/OriginalHullPhysicalContract.swift",
+        "artifact": "integration/sh029-okapi/LEGACY-PHYSICAL-CONTRACT.swift.txt",
+        "sha256": "2c68d8d51acdd469faa25124bcc19027aec1a8f747eb267da2e84e5a98e3c027"
+      }
+    ]
+  },
+  "stockMass": "UNASSIGNED",
+  "air": {
+    "hostname": "SteveMBA",
+    "topologyUtc": "2026-11-19T09:36:03Z",
+    "fitStartUtc": "2026-11-19T09:37:53Z",
+    "fitEndUtc": "2026-11-19T09:38:17Z",
+    "witnessStartUtc": "2026-11-19T09:39:42Z",
+    "witnessEndUtc": "2026-11-19T09:39:43Z",
+    "reports": {
+      "SURFACE-FIT.json": "8696572f135dc9ae7bbe6649f99bb0a3434e6500f3d087638d0d8cf80f3f0c8b",
+      "CONTACT-RESULT.json": "33805d1a18541d46801eacbbcb2de604891c53d58cad2fb086b436aa253e7bfa",
+      "ORIGINAL-DIFFERENCE.json": "d389eb1e31465be551bb2071e165102bd3bb2a8c42370a42eefff4dc2336f880"
+    }
+  },
+  "independentReplay": {
+    "tools": {
+      "tools/measure_okapi_air.py": "a69398597a36ed49d3d9ba8077bd5b7c1fbe4c9ad67f1c29fb30633be1f0d637",
+      "tools/measure_goshawk_surface_fit.py": "5407ef1e5fad41810aa95444ca1338fe33a91e5c9857dcb752b4e4cf2fca6d0b",
+      "tools/prepare_okapi_geometry.py": "8ed1eaa8f93e2d6eb3f66d664b85f1ee4f0293103b8087529582dc987a176787",
+      "tools/verify_okapi_geometry.py": "691a60b63eea2555406c37fbfaad057fb70b7a2f6688443fae8c8ddbba133041",
+      "tools/encode_goshawk_visual.py": "9e524e9a32a237d71d212c8b5c34ecf12cde5a8e08885b1d03991b95c278f61c",
+      "tools/import_goshawk_envelope_source.py": "14b530725629ee3eaa5b3fd69f01fe00fe371564a1a52cb398d3969142db977e"
+    },
+    "fixtures": {
+      "integration/sh029-okapi/FIXTURES.json": "72697901c09eef1e129fa166064115646fdc0b3b5f774242e955f6948034df2f"
+    },
+    "reproduce": [
+      "python3 -B tools/measure_okapi_air.py | cmp - integration/sh029-okapi/SURFACE-FIT.json",
+      "python3 -B tools/measure_okapi_air.py --difference | cmp - integration/sh029-okapi/ORIGINAL-DIFFERENCE.json",
+      "python3 -B tools/verify_okapi_geometry.py | cmp - integration/sh029-okapi/CONTACT-RESULT.json"
+    ],
+    "fitDependencies": {
+      "python": "3.14.3 (assertions enabled)",
+      "numpy": "2.5.5",
+      "scipy": "1.18.1",
+      "trimesh": "5.2.1",
+      "rtree": "1.4.1"
+    },
+    "hostContactPython": "3.14.3",
+    "byteReplay": {
+      "hostname": "SteveMBA",
+      "startedUtc": "2026-11-19T09:39:44Z",
+      "finishedUtc": "2026-11-19T09:40:08Z",
+      "logSha256": "008456c51f67dc7df847d40706487f452c82a53bab795426670670908c231e63"
+    }
+  },
+  "stockScope": "Station Showroom inspection. The original catalogue lists blueprint fabrication. Stock operational mass is unassigned.",
+  "originalPhysicalReferences": {
+    "revision": "d03f1b4ecfd7588bb6b27763e31c230ebe1fbf5a",
+    "tree": "bde34fae87db847f5aeb950b427c1cbdc11be6ee",
+    "sourcePaths": {
+      "engineering-budget.json": "Sources/L337Core/Resources/OriginalFleetPhysical/SH029.json",
+      "finite-empty-reference.json": "Sources/L337Core/Resources/OkapiFiniteEmpty/SH029-finite-empty-source.json"
+    },
+    "dryReferenceKg": 45520,
+    "sameOriginalResourceNativeExportAndContract": true,
+    "operatingAuthority": false
+  },
+  "stockStudio": {
+    "sourceDefinition": "integration/sh029-okapi/OKAPI-STUDIO.json",
+    "candidateExportSHA256": "f0696ad8e8b74ca6ae97b40c09d06d35ecd07b7563255732f6415f5dd6727a15",
+    "supportGroups": 26,
+    "laneProbeRadiusMm": 100,
+    "railGapProbeRadiusMm": 20,
+    "openRoutes": 7,
+    "railSolidControls": 3
+  },
+  "replayPins": {
+    "integration/sh029-okapi/SUPPORT-FAN.json": "94f50c3720206841494b85e6f069b77eea427913c70961e008d74c1221902fea",
+    "integration/sh029-okapi/OKAPI-STUDIO.json": "2f43f933ff954f9a6e47744c7538ebef9fdea1ad37e5fa7483d7f4d57d89a9e4",
+    "integration/sh029-okapi/FIXTURES.json": "72697901c09eef1e129fa166064115646fdc0b3b5f774242e955f6948034df2f",
+    "integration/sh029-okapi/SURFACE-FIT.json": "8696572f135dc9ae7bbe6649f99bb0a3434e6500f3d087638d0d8cf80f3f0c8b",
+    "integration/sh029-okapi/ORIGINAL-DIFFERENCE.json": "d389eb1e31465be551bb2071e165102bd3bb2a8c42370a42eefff4dc2336f880",
+    "integration/sh029-okapi/CERTIFIED-FIT.json": "22608d0cf5ab6d23f0db602e35b1ef647aaba2039b2aade012d2898fca295d5a",
+    "integration/sh029-okapi/CERTIFIED-DIFFERENCE.json": "b0e0464c330e8ce8153a09d3d206194e55285980a060a6c05ac96b7bc0fd29b3",
+    "integration/sh029-okapi/CONTACT-RESULT.json": "33805d1a18541d46801eacbbcb2de604891c53d58cad2fb086b436aa253e7bfa",
+    "tools/measure_okapi_air.py": "a69398597a36ed49d3d9ba8077bd5b7c1fbe4c9ad67f1c29fb30633be1f0d637",
+    "tools/measure_goshawk_surface_fit.py": "5407ef1e5fad41810aa95444ca1338fe33a91e5c9857dcb752b4e4cf2fca6d0b",
+    "tools/prepare_okapi_geometry.py": "8ed1eaa8f93e2d6eb3f66d664b85f1ee4f0293103b8087529582dc987a176787",
+    "tools/verify_okapi_geometry.py": "691a60b63eea2555406c37fbfaad057fb70b7a2f6688443fae8c8ddbba133041",
+    "tools/encode_goshawk_visual.py": "9e524e9a32a237d71d212c8b5c34ecf12cde5a8e08885b1d03991b95c278f61c",
+    "tools/import_goshawk_envelope_source.py": "14b530725629ee3eaa5b3fd69f01fe00fe371564a1a52cb398d3969142db977e",
+    "tools/measure_okapi.py": "605e3a95af280a5c66b6fb255b6549be0fc1f1d03b6595fb74215e8cc669bb15",
+    "tools/prepare_okapi_studio.py": "16b6b812ef42b80c5f99fd42724d5e602733c9e2de55e946bdb3d4a0c7deb68b",
+    "tools/vulture_mk_i_exact_fit.py": "479b31f8714a198a82c0e2888b8d19efe46c7b4c43a576b83ab84c571ae738c6",
+    "assets/fleet/sh029/SOURCE-GEOMETRY.json": "b68a0357f478afa9e89a57d59bc2bf9f835f1c4f1bd565b9eef0791c5aceda31",
+    "assets/fleet/sh029/engineering-budget.json": "f64a24c2863cf047f852d99313ca7ee131ebcda40c3e140f43572d6fbf3aa827",
+    "assets/fleet/sh029/finite-empty-reference.json": "ad07ebd5e5ed80be9f5bc62b2da23c6d46892112bb74f0a7ec407016b93b405f"
+  },
+  "byteReplay": {
+    "commands": [
+      "python3 -B tools/measure_okapi.py | cmp - integration/sh029-okapi/CERTIFIED-FIT.json",
+      "python3 -B tools/measure_okapi.py --difference | cmp - integration/sh029-okapi/CERTIFIED-DIFFERENCE.json",
+      "python3 -B tools/measure_okapi.py --contact | cmp - integration/sh029-okapi/CONTACT-RESULT.json"
+    ]
+  }
+}

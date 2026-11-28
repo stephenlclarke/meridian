@@ -1,0 +1,13 @@
+{
+  "schema": 1,
+  "id": "sh029-okapi",
+  "undoBefore": [
+    "sh171-medusa-preview",
+    "sh170-caracara-mk-ii"
+  ],
+  "undoAfter": [],
+  "kind": "declaration",
+  "module": "okapi",
+  "before": "pub mod navigation;\n",
+  "after": "pub mod oryx_voyager;\n"
+}
