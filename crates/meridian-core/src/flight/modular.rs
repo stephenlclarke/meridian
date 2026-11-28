@@ -1037,6 +1037,13 @@ impl State {
                 .fuel_storage_count(),
         ))
     }
+    pub(super) fn jump_reach_at_revision(
+        &self,
+        owner: u64,
+        revision: u64,
+    ) -> Result<f64, SaveError> {
+        Ok(self.ledger_at_revision(owner, revision)?.jump_reach_ly())
+    }
     pub(super) fn ecm_fitted_at_revision(
         &self,
         owner: u64,

@@ -4,7 +4,7 @@ use super::{
     NavigationTradeOutcome as Outcome, NavigationTradeReview, NavigationTradeSnapshot, Plan,
     PreparedNavigationTrade, Terminal, World, legal_tonne, quantity, same_carrier, site,
 };
-use crate::navigation::{DockContext, STOCK_JUMP_REACH_LY, SystemId, stock_jump_fuel_cost};
+use crate::navigation::{DockContext, SystemId, stock_jump_fuel_cost};
 use crate::station_services::CommodityId;
 
 impl World {
@@ -145,7 +145,7 @@ impl World {
             .distance_ly(dock.system(), destination)
             .map_err(|_| Error::UnsupportedRoute)?;
         let fuel = stock_jump_fuel_cost(distance).map_err(|_| Error::UnsupportedRoute)?;
-        if distance <= 0.0 || distance > STOCK_JUMP_REACH_LY {
+        if distance <= 0.0 || distance > self.jump_reach_ly().ok_or(Error::UnsupportedRoute)? {
             return Err(Error::UnsupportedRoute);
         }
         if distance > f64::from(p.fuel_tenths) / 10.0 || fuel > p.fuel_tenths {

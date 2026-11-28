@@ -128,6 +128,88 @@ fn every_station_help_retains_its_screen_selection_and_all_navigation_bindings()
 }
 
 #[test]
+fn chart_trade_lesson_flies_to_selected_lareria_and_returns_to_renas_after_continue() {
+    use crate::profile::trade_lesson_tests::journey;
+    use meridian_core::navigation::SystemId;
+
+    fn select_lareria(app: &mut App) {
+        station(app, ui::Screen::Galaxy);
+        app.menu_input(ui::Input::Key(ui::Key::Search));
+        paint(app);
+        app.menu_input(ui::Input::Text("Lareria".into()));
+        paint(app);
+        app.menu_input(ui::Input::Key(ui::Key::Confirm));
+        paint(app);
+        assert_eq!(press(app, KeyCode::Digit7, Some("7")), None);
+    }
+    let directory = TestDirectory::new();
+    let mut app = app(&directory);
+    let before = ok(app.game.world.save_bytes());
+    select_lareria(&mut app);
+    assert!(app.menu_active());
+    assert_eq!(ok(app.game.world.save_bytes()), before);
+    journey(&mut app.game);
+    select_lareria(&mut app);
+    assert!(!app.menu_active());
+    assert!(
+        app.game
+            .lines(true, None)
+            .join(" ")
+            .contains("DESTINATION LARERIA")
+    );
+    app.game_key(KeyCode::KeyR);
+    app.game_key(KeyCode::Enter);
+    app.game_key(KeyCode::Digit7);
+    app.game_key(KeyCode::KeyR);
+    let plan = app
+        .game
+        .session
+        .pending_trade
+        .and_then(|r| r.plan())
+        .unwrap_or_else(|| panic!("missing chart plan"));
+    assert_eq!((plan.destination, plan.fuel_debit), (SystemId::LARERIA, 73));
+    app.game_key(KeyCode::Enter);
+    app.game_key(KeyCode::KeyG);
+    ok(app.game.continue_saved());
+    journey(&mut app.game);
+    assert_eq!(
+        app.game.world.current_dock_context().map(|d| d.system()),
+        Some(SystemId::LARERIA)
+    );
+    let cash = app
+        .game
+        .world
+        .credits_tenths()
+        .unwrap_or_else(|| panic!("missing account"));
+    app.game_key(KeyCode::KeyF);
+    assert_eq!(app.game.world.credits_tenths(), Some(cash - 214));
+    ok(app.game.command(Action::SellSelected));
+    ok(app.game.continue_saved());
+    journey(&mut app.game);
+    assert_eq!(
+        app.game.world.current_dock_context().map(|d| d.system()),
+        Some(SystemId::RENAS)
+    );
+    app.game_key(KeyCode::Digit7);
+    app.game_key(KeyCode::KeyR);
+    let before = app.game.world.credits_tenths();
+    app.game_key(KeyCode::Enter);
+    ok(app.game.continue_saved());
+    let state = app
+        .game
+        .world
+        .navigation_trade_snapshot()
+        .unwrap_or_else(|| panic!("missing trade"));
+    assert_eq!(state.attempts[0].fuel_units_used, 146);
+    assert_eq!(
+        state.attempts[0].buy.map(|buy| buy.tonne),
+        state.attempts[0].sale.map(|sale| sale.tonne)
+    );
+    assert!(state.trace.is_some());
+    assert_eq!(app.game.world.credits_tenths(), before);
+}
+
+#[test]
 fn market_trade_lesson_keeps_the_selected_goods_through_review_and_continue() {
     let directory = TestDirectory::new();
     let mut app = app(&directory);

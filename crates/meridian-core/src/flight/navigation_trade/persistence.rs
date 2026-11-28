@@ -5,8 +5,7 @@ use super::{
 };
 use crate::flight::persistence::Commerce;
 use crate::navigation::{
-    DockContext, DockOrigin, STOCK_JUMP_REACH_LY, SavedNavigationSummary, SystemId,
-    stock_jump_fuel_cost,
+    DockContext, DockOrigin, SavedNavigationSummary, SystemId, stock_jump_fuel_cost,
 };
 use crate::station_services::{CommodityId, MAX_MARKET_QUANTITY, StationMarkets};
 
@@ -609,7 +608,10 @@ impl Plan {
             || self.credits_at_plan < self.price
             || self.distance != distance
             || distance <= 0.0
-            || distance > STOCK_JUMP_REACH_LY
+            || distance
+                > c.commerce
+                    .modular
+                    .jump_reach_at_revision(c.nav.owner, self.account_revision)?
             || distance > f64::from(self.fuel_at_plan) / 10.0
             || self.fuel_at_plan
                 > c.commerce
@@ -870,7 +872,10 @@ impl Journey {
         if self.account_revision <= buy.account_revision
             || self.account_revision > account_revision
             || self.origin == self.destination
-            || distance > STOCK_JUMP_REACH_LY
+            || distance
+                > c.commerce
+                    .modular
+                    .jump_reach_at_revision(c.nav.owner, self.account_revision)?
             || distance > f64::from(self.fuel_before) / 10.0
             || self.tick <= buy.tick
             || self.tick > c.world.state.tick

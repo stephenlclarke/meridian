@@ -78,6 +78,9 @@ impl DockedScreens {
     pub fn search_active(&self) -> bool {
         self.searching
     }
+    pub(crate) fn route_chooser_open(&self) -> bool {
+        self.route_chooser.is_some()
+    }
 
     pub fn details_open(&self) -> bool {
         self.detail || self.options

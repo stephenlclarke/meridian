@@ -1,0 +1,13 @@
+{
+  "schema": 1,
+  "id": "trade-lesson-chart",
+  "undoBefore": [
+    "player-laser-fittings"
+  ],
+  "undoAfter": [],
+  "kind": "inverse",
+  "manifest": "integration/trade-lesson-chart/PROTECTED-CORE-INVERSE.json",
+  "sha256": "841d90de0b8bce1d48cbdeb7059091fa99064a6d9b32e595a4a95ef974f93013",
+  "base": "675d55b8b64f0be421e81051d313667d17f77242",
+  "label": "Trade lesson chart destination and fitted range"
+}

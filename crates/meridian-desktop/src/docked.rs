@@ -95,6 +95,24 @@ fn hull(world: &World) -> Result<&'static str, String> {
         .map(|s| s.definition.hull)
         .ok_or_else(|| "No owned hull".into())
 }
+fn direct_leg(world: &World, target: SystemId) -> Result<(f64, u16), String> {
+    let current = world.snapshot().navigation.ok_or("No navigation")?;
+    if !ROUTE_SYSTEMS.contains(&target) || target == current.system {
+        return Err("This destination is not available for travel".into());
+    }
+    let catalogue =
+        meridian_core::navigation::OriginalNavigation::bundled().map_err(|e| e.to_string())?;
+    let distance = catalogue
+        .distance_ly(current.system, target)
+        .map_err(|e| e.to_string())?;
+    let fuel =
+        meridian_core::navigation::stock_jump_fuel_cost(distance).map_err(|e| e.to_string())?;
+    let reach = world.jump_reach_ly().ok_or("No fitted drive")?;
+    if distance > reach.min(f64::from(current.fuel_units) / 10.0) || paused(world) {
+        return Err("Destination exceeds available range or game is paused".into());
+    }
+    Ok((distance, fuel))
+}
 fn context<'a>(
     world: &'a World,
     catalogue: &'a ui::Catalogue,
@@ -252,12 +270,23 @@ impl Docked {
     pub(crate) fn review_pending(&self) -> bool {
         self.pending.is_some()
     }
-    pub(crate) fn open_market_lesson(&mut self, profile: &mut Profile) -> Result<String, String> {
+    pub(crate) fn open_trade_lesson(&mut self, profile: &mut Profile) -> Result<String, String> {
         if self.review_pending() {
-            return Err("Confirm or cancel the current market review first.".into());
+            return Err("Confirm or cancel the current station review first.".into());
         }
-        let message =
-            profile.command(Action::MarketTradeLesson(self.screens.selected_commodity()))?;
+        let action = match self.screen() {
+            ui::Screen::Galaxy => {
+                if self.screens.route_chooser_open() {
+                    return Err("Close the route chooser to select the trade destination.".into());
+                }
+                let target = self.screens.selected_system();
+                direct_leg(&profile.world, target)?;
+                Action::ChartTradeLesson(target)
+            }
+            ui::Screen::Trading => Action::MarketTradeLesson(self.screens.selected_commodity()),
+            _ => return Err("Open the galaxy chart or market to select a trade lesson.".into()),
+        };
+        let message = profile.command(action)?;
         self.close();
         Ok(message)
     }
@@ -423,23 +452,7 @@ impl Docked {
                 ))?;
             }
             ui::Request::ReviewRoute(target) => {
-                if !ROUTE_SYSTEMS.contains(&target)
-                    || Some(target) == world.snapshot().navigation.map(|n| n.system)
-                {
-                    return Err("This destination is not available for travel".into());
-                }
-                let current = world.snapshot().navigation.ok_or("No navigation")?;
-                let catalogue = meridian_core::navigation::OriginalNavigation::bundled()
-                    .map_err(|e| e.to_string())?;
-                let distance = catalogue
-                    .distance_ly(current.system, target)
-                    .map_err(|e| e.to_string())?;
-                let fuel = meridian_core::navigation::stock_jump_fuel_cost(distance)
-                    .map_err(|e| e.to_string())?;
-                let reach = world.jump_reach_ly().ok_or("No fitted drive")?;
-                if distance > reach.min(f64::from(current.fuel_units) / 10.0) || paused(world) {
-                    return Err("Destination exceeds available range or game is paused".into());
-                }
+                let (distance, fuel) = direct_leg(world, target)?;
                 self.review(
                     world,
                     Intent::Route(target),

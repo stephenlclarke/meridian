@@ -232,7 +232,7 @@ impl Panel {
                     "Up / Down Select world | Page Up / Down Scroll",
                     "/ Search | Type a name | Enter Select result",
                     "H types into an active search; ? opens help",
-                    "R Review route | L Local chart | Home Current location",
+                    "R Review route | 7 Trade destination | L Local chart | Home Current location",
                     "P Toggle best-profit scan | Route D trade details",
                     "[ / ] Previous / next galaxy | Drag Pan | Wheel Zoom",
                 ],
