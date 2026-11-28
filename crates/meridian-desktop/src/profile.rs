@@ -4,7 +4,7 @@ use crate::{
     storage::{SaveCommit, Store},
 };
 use meridian_core::{
-    FlightMode, World,
+    World,
     save::{MAX_SAVE_FILE_BYTES, MAX_SOLAR_HISTORY_BYTES},
 };
 use std::{io, path::PathBuf};
@@ -173,6 +173,9 @@ impl Profile {
         Ok(publication_message(
             published,
             match action {
+                meridian_core::XyzzyAction::ActivateMedusa => {
+                    "SH171 Medusa test outfit fitted and saved."
+                }
                 meridian_core::XyzzyAction::Enter => {
                     "CLARKE active. Maximum outfit fitted and saved."
                 }
@@ -340,6 +343,9 @@ impl Profile {
                 | meridian_core::ModuleAction::FlightLaserExchange { .. } => {
                     "Automatic equipment action."
                 }
+                meridian_core::ModuleAction::PurchaseLaser { .. } => {
+                    "Laser purchased and fitted to the selected mount."
+                }
                 meridian_core::ModuleAction::Purchase { .. } => {
                     "Owned module purchased and fitted."
                 }
@@ -350,6 +356,9 @@ impl Profile {
                     "Temporary salvage fit is controlled by the selected lawful recovery."
                 }
                 meridian_core::ModuleAction::Store { .. } => "Owned module stored.",
+                meridian_core::ModuleAction::InstallLaser { .. } => {
+                    "Owned laser fitted to the selected mount."
+                }
                 meridian_core::ModuleAction::Install { .. } => "Owned module fitted.",
                 meridian_core::ModuleAction::Passenger(action) => match action {
                     meridian_core::PassengerAction::RequestReplies => {
@@ -563,7 +572,7 @@ impl Profile {
                 ),
                 PracticeSelection::Closure(review) => (
                     self.world.prepare_practice_closure(review, tick),
-                    "Practice closed and saved. F10 reviews a fresh attempt; ammunition is not refilled.",
+                    "Practice closed and saved. Shift+3 reviews a fresh attempt; ammunition is not refilled.",
                 ),
                 PracticeSelection::Reception(review) => (
                     self.world.prepare_practice_reception(review, tick),
@@ -722,7 +731,7 @@ impl Profile {
                 .combat_snapshot()
                 .is_some_and(|combat| combat.player.destroyed)
             {
-                return Err("Commander destroyed; normal Quit retains the previous save. F5 explicitly saves terminal state.".into());
+                return Err("Commander destroyed; normal Quit retains the previous save. Ctrl+S explicitly saves terminal state.".into());
             }
             self.save_with_limits(file_limit, solar_limit)?;
         }
@@ -734,11 +743,24 @@ impl Profile {
             let state = self.world.snapshot();
             let mut lines = vec![
                 "SH171 MEDUSA | ISOLATED PREVIEW / NOT A QUEST REWARD".into(),
-                format!("{:?} | SPEED {:.2} / 50.30 | TICK {} | {}", state.mode, state.speed, state.tick,
-                    if active { "RUNNING" } else { "PAUSED" }),
-                format!("CARGO {} / {} t | CABINS {} / 4 | EQUIPMENT {} / 13 | UTILITY {} / 4", fit.cargo_used_tonnes(), fit.cargo_capacity_tonnes(), fit.cabins, fit.equipment_used(), fit.utility_used()),
+                format!(
+                    "{:?} | SPEED {:.2} / 50.30 | TICK {} | {}",
+                    state.mode,
+                    state.speed,
+                    state.tick,
+                    if active { "RUNNING" } else { "PAUSED" }
+                ),
+                format!(
+                    "CARGO {} / {} t | CABINS {} / 4 | EQUIPMENT {} / 13 | UTILITY {} / 4",
+                    fit.cargo_used_tonnes(),
+                    fit.cargo_capacity_tonnes(),
+                    fit.cabins,
+                    fit.equipment_used(),
+                    fit.utility_used()
+                ),
                 "L launch | W/S throttle | A/D yaw | arrows pitch | Q/E roll | Space brake".into(),
-                "Docked: B cargo expansion | [ / ] cabin count | F5 save / F9 continue | P pause | Esc quit".into(),
+                "Docked: B cargo expansion | [ / ] cabin count".into(),
+                "Ctrl+S save | Ctrl+R continue | Ctrl+Enter fullscreen | P pause | Esc quit".into(),
             ];
             if let Some(notice) = notice {
                 lines.push(notice.into());
@@ -772,27 +794,7 @@ impl Profile {
             return lines;
         }
         if self.playing {
-            let mut lines = self.session.lines(&self.world, active, notice);
-            if self.world.snapshot().mode == FlightMode::Docked && !self.session.hud_panel_open() {
-                return lines;
-            }
-            if let Some(secret) = self.world.xyzzy_snapshot().filter(|state| state.active) {
-                lines.insert(
-                    0,
-                    format!(
-                        "CLARKE | XYZZY | FUEL {}",
-                        if secret.unlimited_fuel {
-                            "UNLIMITED"
-                        } else {
-                            "NORMAL"
-                        }
-                    ),
-                );
-            }
-            if let Some(emp) = crate::docked_screens::emp::status(&self.world) {
-                lines.push(emp);
-            }
-            return lines;
+            return self.session.lines(&self.world, active, notice);
         }
         vec![
             "MERIDIAN".into(),

@@ -506,3 +506,92 @@ fn manual_scanner_recovers_finite_wreck_cargo_without_targeting_modules() {
     );
     assert_eq!(continued.targeting_tier(), None);
 }
+
+#[test]
+fn medusa_recovers_a_real_wreck_unit_and_keeps_it_on_cold_continue() {
+    let mut world = finance_salvage();
+    refuel_for_return(&mut world);
+    let manifest = terminal_source(&mut world);
+    jump_and_dock(&mut world, SystemId::RENAS);
+    let tick = world.snapshot().tick;
+    let paid_cutter = some(world.fitted_salvage_cutter());
+    assert!(matches!(
+        paid_cutter.provenance,
+        ModuleProvenance::Paid { .. }
+    ));
+    let before = ok(world.save_bytes());
+    let issue = ok(world.review_xyzzy(meridian_core::XyzzyAction::ActivateMedusa, tick));
+    assert!(
+        ok(world.prepare_xyzzy(issue, tick))
+            .publish_with(|_| Err::<(), _>("write refused"))
+            .is_err()
+    );
+    assert_eq!(ok(world.save_bytes()), before);
+    ok(world.prepare_xyzzy(issue, tick)).commit();
+    let cash = world.credits_tenths();
+    let original_issue = world.xyzzy_medusa_issue();
+    for _ in 0..2 {
+        world = ok(World::from_save_bytes(&ok(world.save_bytes())));
+        let fit = some(world.modular_equipment_snapshot());
+        assert_eq!(
+            (fit.utility_mounts_used, fit.utility_mounts_capacity),
+            (4, 4)
+        );
+        assert!(world.fitted_salvage_cutter().is_none());
+        assert!(fit.items.iter().any(|item| item.id == paid_cutter.id
+            && item.slot.is_none()
+            && item.provenance == paid_cutter.provenance));
+        assert!(
+            fit.items
+                .iter()
+                .any(|item| item.kind == ModuleKind::Ecm && item.slot.is_some())
+        );
+        assert!(world.fitted_fuel_scoops().is_some());
+        assert!(
+            some(world.equipment_snapshot())
+                .owned
+                .is_some_and(|bay| bay.fitted)
+        );
+        assert!(world.owned_emp().is_some_and(|item| item.fitted));
+        assert_eq!(world.credits_tenths(), cash);
+        assert_eq!(world.xyzzy_medusa_issue(), original_issue);
+        let again = ok(world.review_xyzzy(meridian_core::XyzzyAction::ActivateMedusa, tick));
+        ok(world.prepare_xyzzy(again, tick)).commit();
+    }
+    dock_at(&mut world, SystemId::AVENOR);
+    ok(world.request_launch(world.snapshot().tick));
+    ok(world.step(FlightInput::default()));
+    let target = WorkTargetId::Wreck(manifest.source);
+    salvage_filter(&mut world);
+    assert!(select_wreck(&mut world, target));
+    let held = some(world.commodity_quantity(manifest.commodity));
+    for _ in 0..12000 {
+        ok(world.step(FlightInput::default()));
+        if world.commodity_quantity(manifest.commodity) == Some(held + 1) {
+            let loaded = ok(World::from_save_bytes(&ok(world.save_bytes())));
+            assert!(
+                some(loaded.modular_equipment_snapshot())
+                    .items
+                    .iter()
+                    .any(|item| {
+                        item.id == paid_cutter.id && item.provenance == paid_cutter.provenance
+                    })
+            );
+            assert!(loaded.xyzzy_medusa_active());
+            assert_eq!(
+                loaded.commodity_quantity(manifest.commodity),
+                Some(held + 1)
+            );
+            assert_eq!(ok(loaded.wreck_manifest(manifest.source)), manifest);
+            assert_eq!(loaded.credits_tenths(), world.credits_tenths());
+            return;
+        }
+    }
+    panic!(
+        "no Medusa cargo transfer at the real wreck: {:?}, position {:?}, speed {}, refusal {:?}",
+        world.automatic_work_status(),
+        world.snapshot().position,
+        world.snapshot().speed,
+        world.snapshot().motion_refusal
+    );
+}

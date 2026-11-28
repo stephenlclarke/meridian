@@ -22,7 +22,12 @@ impl Practice {
                     w.u64(hit.tick);
                     hit.firing_pose.encode(w);
                     if version >= 8 {
-                        w.option(hit.missile.as_ref(), |w, origin| origin.encode(w));
+                        if let Some((facing, emission)) = hit.integral {
+                            w.u8(facing.integral_tag(2));
+                            w.u64(emission);
+                        } else {
+                            w.option(hit.missile.as_ref(), |w, origin| origin.encode(w));
+                        }
                     }
                 });
             }
@@ -59,14 +64,26 @@ impl Practice {
                     opened_tick: r.u64()?,
                     hits: r.array(|r| {
                         r.option(|r| {
+                            let tick = r.u64()?;
+                            let firing_pose = RecordedPose::decode(r)?;
+                            let source = if version >= 8 { r.u8()? } else { 0 };
+                            let (missile, integral) = match source {
+                                0 => (None, None),
+                                1 => (Some(super::super::MissileOrigin::decode(r)?), None),
+                                tag @ 2..=4 if version >= 17 => (
+                                    None,
+                                    Some((
+                                        super::super::medusa_lasers::INTEGRAL[usize::from(tag - 2)],
+                                        r.u64()?,
+                                    )),
+                                ),
+                                _ => return Err(INVALID),
+                            };
                             Ok(FirstHit {
-                                tick: r.u64()?,
-                                firing_pose: RecordedPose::decode(r)?,
-                                missile: if version >= 8 {
-                                    r.option(super::super::MissileOrigin::decode)?
-                                } else {
-                                    None
-                                },
+                                tick,
+                                firing_pose,
+                                missile,
+                                integral,
                             })
                         })
                     })?,
@@ -128,8 +145,8 @@ impl Practice {
                 // advances the weapon clock; docking and arrival retain cooldown.
                 // A later discharge can only raise the remainder of this floor.
                 let elapsed = flight.tick - latest_hit;
-                let minimum = u64::from(world.front_cadence_at_tick(latest_hit).ok_or(INVALID)?)
-                    .saturating_sub(elapsed);
+                let minimum =
+                    u64::from(range.laser_cadence(latest_hit, world)?).saturating_sub(elapsed);
                 if u64::from(pulse.remaining_cooldown()) < minimum {
                     return Err(INVALID);
                 }
@@ -205,6 +222,22 @@ impl Practice {
 }
 
 impl Range {
+    fn laser_cadence(&self, tick: u64, world: &super::super::World) -> Result<u8, SaveError> {
+        if let Some((facing, emission)) = self
+            .hits
+            .iter()
+            .flatten()
+            .filter(|hit| hit.tick == tick)
+            .find_map(|hit| hit.integral)
+        {
+            let (_, weapon) = world
+                .laser_fit_at_tick(facing, tick, emission)
+                .ok_or(INVALID)?;
+            Ok(weapon.cooldown_ticks())
+        } else {
+            world.front_cadence_at_tick(tick).ok_or(INVALID)
+        }
+    }
     fn validate(
         self,
         last_active_tick: u64,
@@ -229,6 +262,7 @@ impl Range {
             if hit.missile.is_some() {
                 continue;
             } // World cross-validates the retained projectile contact.
+            let pose = hit.integral.map_or(pose, |(f, _)| f.laser_ray(pose));
             let station_distance = data
                 .beam_block_distance(
                     station,
@@ -248,7 +282,7 @@ impl Range {
         let mut hits = ticks.into_iter().filter(|tick| *tick != 0);
         if let Some(mut prior) = hits.next() {
             for tick in hits {
-                if tick - prior < u64::from(world.front_cadence_at_tick(prior).ok_or(INVALID)?) {
+                if tick - prior < u64::from(self.laser_cadence(prior, world)?) {
                     return Err(INVALID);
                 }
                 prior = tick;

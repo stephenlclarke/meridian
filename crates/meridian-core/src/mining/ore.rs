@@ -57,7 +57,7 @@ impl OreSnapshot {
         if !pose.orientation.is_valid_rotation()
             || !super::finite(pose.position)
             || !speed.is_finite()
-            || !(0.0..=crate::flight::MAX_SPEED).contains(&speed)
+            || speed < 0.0
             || centre.dot(centre) >= SCOOP_DISTANCE * SCOOP_DISTANCE
             || centre.dot(pose.orientation.y) >= 0.0
             || centre.dot(pose.orientation.z) <= 0.0

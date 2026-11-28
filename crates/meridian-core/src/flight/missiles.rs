@@ -226,6 +226,9 @@ impl Default for State {
     }
 }
 impl State {
+    pub(super) fn laser_interceptions(&self) -> impl Iterator<Item = (u64, &super::PulseShot)> {
+        self.beams.iter().flatten().map(|b| (b.emission, &b.shot))
+    }
     pub(super) fn resource_emissions(&self) -> impl Iterator<Item = (u64, u64)> + '_ {
         self.projectiles
             .iter()
@@ -624,11 +627,14 @@ impl World {
             legal: self.legal_value().unwrap_or(0),
             traffic: traffic.clone(),
         };
-        prepared.combat.advance(self.state.mode, next.mode);
+        prepared
+            .combat
+            .advance(self.state.mode, next.mode, self.xyzzy_medusa_active());
         prepared.pulse.advance(
             self.state.mode,
             next.mode,
-            self.energy_recharge_hundredths(),
+            self.step_energy_recharge(self.energy_recharge_hundredths()),
+            self.energy_capacity(),
         );
         if self.state.mode != FlightMode::Docked {
             prepared.missiles.cooldown = prepared.missiles.cooldown.saturating_sub(1);

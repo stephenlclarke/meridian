@@ -47,6 +47,7 @@ pub fn append(
     station: StationRender<'_>,
     ship: &[Vertex],
     scene: &TrafficSnapshot,
+    facing: meridian_core::FlightView,
     output: &mut Vec<Vertex>,
 ) -> Result<(), String> {
     if scene.actors.len() > MAX_TRAFFIC_ACTORS {
@@ -91,11 +92,11 @@ pub fn append(
         if let Some(hit) = incoming {
             // One latest traffic segment: on equal ticks prefer the incoming player hit.
             // This presentation tie rule changes no simulation receipt or event ordering.
-            append_segment(&camera, hit.source_pose.position, hit.point, output)?;
+            append_segment(&camera, hit.source_pose.position, hit.point, facing, output)?;
         } else if let Some(beam) = beam {
             // The actual contact point is retained at discharge time. Current victim
             // motion, its phase or a UI target never extends or redirects this segment.
-            append_segment(&camera, beam.origin, beam.point, output)?;
+            append_segment(&camera, beam.origin, beam.point, facing, output)?;
         }
         Ok(())
     })();

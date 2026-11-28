@@ -171,11 +171,13 @@ impl State {
     pub(super) fn validate_player_hits(
         &self,
         world_tick: u64,
-        data: &OriginalStationData,
+        scene: &OriginalStationData,
+        issue_berth: Option<u64>,
     ) -> Result<(), SaveError> {
         let mut prior_world = 0;
         let mut prior_physical = 0;
         for hit in self.player_hits.iter() {
+            let data = scene.player_geometry_at(hit.visit, issue_berth);
             let index = self.actor_index(hit.attacker).ok_or(INVALID)?;
             let actor = self.actors[index].ok_or(INVALID)?;
             let si = system_index(hit.attacker.system).ok_or(INVALID)?;
@@ -240,7 +242,8 @@ impl State {
                         || self.actor_index(*id) != Some(slot)
                         || !finite(pose.position)
                         || !pose.orientation.is_valid_rotation()
-                        || data
+                        || scene
+                            .npc_geometry()
                             .player_beam_distance(*pose, ray.position, ray.orientation.z, 6000.0)
                             .map_err(|_| INVALID)?
                             .is_some_and(|d| d <= distance)

@@ -93,6 +93,7 @@ fn marker(
     size: [f32; 2],
     camera: RigidPose,
     view: FlightView,
+    flight_height: f32,
     target: RigidPose,
     projection: [f32; 4],
 ) {
@@ -105,7 +106,7 @@ fn marker(
     if ![x, y, z].into_iter().all(f32::is_finite) {
         return;
     }
-    let half = [size[0] * 0.5, size[1] * 0.5];
+    let half = [size[0] * 0.5, flight_height * 0.5];
     let [aspect, focal, near, far] = projection;
     if ![aspect, focal, near, far]
         .into_iter()
@@ -187,6 +188,7 @@ pub(super) struct Overlay<'a> {
     pub camera: RigidPose,
     pub view: FlightView,
     pub projection: [f32; 4],
+    pub flight_height: f32,
     pub details: Option<bool>,
     pub model: &'a [Vertex],
 }
@@ -202,6 +204,7 @@ pub(super) fn append(out: &mut Vec<Vertex>, size: [u32; 2], overlay: Overlay<'_>
         size,
         overlay.camera,
         overlay.view,
+        overlay.flight_height,
         overlay.target.pose,
         overlay.projection,
     );
@@ -321,6 +324,7 @@ mod tests {
             camera,
             view: FlightView::Front,
             projection,
+            flight_height: 200.0,
             details: Some(false),
             model: &[],
         };
@@ -332,6 +336,7 @@ mod tests {
             [400.0, 200.0],
             camera,
             FlightView::Front,
+            200.,
             pose,
             projection,
         );
@@ -351,6 +356,7 @@ mod tests {
             [400.0, 200.0],
             camera,
             FlightView::Rear,
+            200.,
             pose,
             projection,
         );

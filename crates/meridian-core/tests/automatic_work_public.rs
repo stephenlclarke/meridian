@@ -22,6 +22,10 @@ fn some<T>(value: Option<T>) -> T {
 fn dock_at(world: &mut World, destination: SystemId) {
     ok(world.request_launch(world.snapshot().tick));
     ok(world.step(FlightInput::default()));
+    jump_and_dock(world, destination);
+}
+
+fn jump_and_dock(world: &mut World, destination: SystemId) {
     ok(world.request_jump(destination, world.snapshot().tick));
     let remaining = some(some(world.snapshot().navigation).travel).remaining_ticks;
     for _ in 0..remaining {

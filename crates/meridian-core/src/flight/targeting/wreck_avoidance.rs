@@ -2,8 +2,8 @@
 //! This predicts only clearance from the passive recovery obstacle. The standard
 //! swept traffic, asteroid, station and celestial gates still own every real movement.
 use super::super::{
-    ACCELERATION, DISTANCE_PER_SPEED_UNIT, FIXED_DELTA_SECONDS, MAX_SPEED, PITCH_RATE, ROLL_RATE,
-    YAW_RATE, axis_rotation, forward, multiply, normalize,
+    DISTANCE_PER_SPEED_UNIT, FIXED_DELTA_SECONDS, PlayerHullKind, axis_rotation, forward, multiply,
+    normalize,
 };
 use crate::docking::Vec3;
 use crate::{FlightInput, Snapshot};
@@ -32,14 +32,16 @@ impl Steering {
 
 #[derive(Clone, Copy)]
 struct Motion {
+    hull: PlayerHullKind,
     position: [f32; 3],
     orientation: [f32; 4],
     speed: f32,
 }
 
-impl From<Snapshot> for Motion {
-    fn from(snapshot: Snapshot) -> Self {
+impl Motion {
+    fn from_snapshot(snapshot: Snapshot, hull: PlayerHullKind) -> Self {
         Self {
+            hull,
             position: snapshot.position,
             orientation: snapshot.orientation,
             speed: snapshot.speed,
@@ -79,21 +81,23 @@ impl Motion {
     fn advance(self, input: FlightInput) -> Option<Self> {
         // Identical normal flight axis order, decrement and integration. No special
         // speed cap, emergency deceleration, collision exemption or position write.
-        let yaw = axis_rotation(1, input.yaw * YAW_RATE * FIXED_DELTA_SECONDS);
-        let pitch = axis_rotation(0, -input.pitch * PITCH_RATE * FIXED_DELTA_SECONDS);
-        let roll = axis_rotation(2, input.roll * ROLL_RATE * FIXED_DELTA_SECONDS);
+        let (max_speed, acceleration, pitch_rate, yaw_rate, roll_rate) = self.hull.flight_rates();
+        let yaw = axis_rotation(1, input.yaw * yaw_rate * FIXED_DELTA_SECONDS);
+        let pitch = axis_rotation(0, -input.pitch * pitch_rate * FIXED_DELTA_SECONDS);
+        let roll = axis_rotation(2, input.roll * roll_rate * FIXED_DELTA_SECONDS);
         let orientation = normalize(multiply(
             multiply(multiply(self.orientation, yaw), pitch),
             roll,
         ))?;
         let throttle = if input.brake { -1.0 } else { input.throttle };
         let speed =
-            (self.speed + throttle * ACCELERATION * FIXED_DELTA_SECONDS).clamp(0.0, MAX_SPEED);
+            (self.speed + throttle * acceleration * FIXED_DELTA_SECONDS).clamp(0.0, max_speed);
         let mut position = self.position;
         for (axis, direction) in position.iter_mut().zip(forward(orientation)) {
             *axis += direction * speed * FIXED_DELTA_SECONDS * DISTANCE_PER_SPEED_UNIT;
         }
         Some(Self {
+            hull: self.hull,
             position,
             orientation,
             speed,
@@ -106,7 +110,7 @@ impl Motion {
         // Continuous braking distance is a conservative upper bound for the real
         // discrete integrator (which applies the decrement before translation).
         let distance = f64::from(self.speed).powi(2) * f64::from(DISTANCE_PER_SPEED_UNIT)
-            / (2.0 * f64::from(ACCELERATION));
+            / (2.0 * f64::from(self.hull.flight_rates().1));
         let end = Vec3::new(
             start.x + direction.x * distance,
             start.y + direction.y * distance,
@@ -138,7 +142,8 @@ fn brake_forecast(mut motion: Motion, centre: Vec3, boundary: f64, turn: Steerin
     let mut clearance = segment_clearance(point(motion.position), point(motion.position), centre);
     // At the fixed reference speed and decrement, even maximum-speed braking is below
     // this bound. Exhausting the bound refuses a claim of a clear forecast.
-    let limit = (MAX_SPEED / (ACCELERATION * FIXED_DELTA_SECONDS)).ceil() as usize + 2;
+    let (max_speed, acceleration, _, _, _) = motion.hull.flight_rates();
+    let limit = (max_speed / (acceleration * FIXED_DELTA_SECONDS)).ceil() as usize + 2;
     for _ in 0..limit {
         if motion.speed <= 0.0 {
             return Some(clearance);
@@ -184,13 +189,12 @@ fn decide(
     latched: &mut Option<Steering>,
     motion: Motion,
     centre: Vec3,
-    standoff: f64,
+    collision_limit: f64,
     desired: FlightInput,
 ) -> FlightInput {
-    // Authoritative swept traffic requires distance strictly greater than standoff-1.
-    // Keep half the ordinary 1-unit margin for conservative prediction and float rounding.
+    // Leave half a unit beyond the swept collision limit for prediction and rounding.
     let opening = segment_clearance(point(motion.position), point(motion.position), centre);
-    let boundary = (standoff - 0.5).min((opening - 0.001).max(standoff - 1.0));
+    let boundary = (collision_limit + 0.5).min((opening - 0.001).max(collision_limit));
     if motion.speed <= 0.0 {
         *latched = None;
     }
@@ -217,17 +221,25 @@ fn decide(
 pub(super) fn protect(
     latched: &mut Option<Steering>,
     snapshot: Snapshot,
+    hull: PlayerHullKind,
     centre: Vec3,
-    standoff: f64,
+    collision_limit: f64,
     desired: FlightInput,
 ) -> FlightInput {
-    decide(latched, snapshot.into(), centre, standoff, desired)
+    decide(
+        latched,
+        Motion::from_snapshot(snapshot, hull),
+        centre,
+        collision_limit,
+        desired,
+    )
 }
 
 #[cfg(test)]
 #[allow(clippy::unwrap_used)]
 mod tests {
     use super::*;
+    use crate::flight::{ACCELERATION, MAX_SPEED};
 
     fn incident_motion() -> (Motion, Vec3) {
         // Exact Dell earned recovery trace at tick 39716 (xyzw quaternion).
@@ -238,6 +250,7 @@ mod tests {
             Motion {
                 position,
                 orientation,
+                hull: PlayerHullKind::Peregrine,
                 speed: MAX_SPEED,
             },
             centre,
@@ -254,13 +267,13 @@ mod tests {
             brake: true,
             ..FlightInput::default()
         };
-        let initial = decide(&mut latched, motion, centre, standoff, desired);
+        let initial = decide(&mut latched, motion, centre, standoff - 1.0, desired);
         assert!(initial.brake && (initial.yaw != 0.0 || initial.pitch != 0.0));
         for _ in 0..300 {
             if motion.speed <= 0.0 {
                 break;
             }
-            let command = decide(&mut latched, motion, centre, standoff, desired);
+            let command = decide(&mut latched, motion, centre, standoff - 1.0, desired);
             assert!(command.brake);
             let next = motion.advance(command).unwrap();
             assert_eq!(
@@ -275,7 +288,7 @@ mod tests {
         }
         assert_eq!(motion.speed, 0.0);
         assert_eq!(
-            decide(&mut latched, motion, centre, standoff, desired),
+            decide(&mut latched, motion, centre, standoff - 1.0, desired),
             desired
         );
         assert!(latched.is_none());
@@ -285,12 +298,13 @@ mod tests {
     fn already_unavoidable_next_sweep_does_not_manufacture_a_stop() {
         let centre = Vec3::new(0.0, 0.0, 154.0);
         let motion = Motion {
+            hull: PlayerHullKind::Peregrine,
             position: [0.0; 3],
             orientation: [0.0, 0.0, 0.0, 1.0],
             speed: MAX_SPEED,
         };
         let mut latched = None;
-        let command = decide(&mut latched, motion, centre, 154.0, FlightInput::default());
+        let command = decide(&mut latched, motion, centre, 153.0, FlightInput::default());
         let next = motion.advance(command).unwrap();
         assert!(command.brake);
         assert!(next.speed > 0.0);
@@ -307,7 +321,7 @@ mod tests {
         };
         let mut latched = None;
         assert_eq!(
-            decide(&mut latched, motion, centre, 154.0, desired),
+            decide(&mut latched, motion, centre, 153.0, desired),
             desired
         );
         assert!(latched.is_none());

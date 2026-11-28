@@ -105,7 +105,7 @@ pub(super) struct State {
 }
 impl State {
     #[cfg(test)]
-    pub(super) fn alter_first_target_speed_for_test(&mut self, speed: f64, radius: f64) {
+    pub(super) fn alter_first_target_speed_for_test(&mut self, speed: f64, standoff: f64) {
         let receipt = &mut self.contacts[0];
         // Keep the other validation envelope satisfied; the mutation must
         // fail precisely because it disagrees with measured motion.
@@ -115,7 +115,13 @@ impl State {
         let Some(body) = receipt.scene.target(receipt.contact.target) else {
             panic!("the recorded encounter must contain the selected ship");
         };
-        assert!(working_hold(pose, receipt.speed, body.pose, speed, radius));
+        assert!(working_hold(
+            pose,
+            receipt.speed,
+            body.pose,
+            speed,
+            standoff
+        ));
         assert_ne!(receipt.target_speed, speed);
         receipt.target_speed = speed;
     }
@@ -210,13 +216,13 @@ impl State {
         }
         let owner = world.combat_identity().ok_or(INVALID)?;
         let end = world.combat.physical_tick();
-        let data = world.station_data.as_ref().ok_or(INVALID)?;
         let mut previous: Option<&Receipt> = None;
         for receipt in &self.contacts {
             let contact = receipt.contact;
             let tick = contact.world_tick;
             let physical = contact.physical_tick;
             let visit = receipt.owner.visit;
+            let data = world.station_at_visit(visit).ok_or(INVALID)?;
             if receipt.owner.owner != owner.owner
                 || receipt.owner.hull != owner.hull
                 || contact.target.profile() != owner.owner
@@ -308,7 +314,7 @@ impl State {
                 receipt.speed,
                 body.pose,
                 receipt.target_speed,
-                data.player_clearance_radius(),
+                data.wreck_work_standoff(),
             ) {
                 return Err(INVALID);
             }
@@ -388,7 +394,7 @@ fn working_hold(
     speed: f32,
     target: RigidPose,
     target_speed: f64,
-    radius: f64,
+    standoff: f64,
 ) -> bool {
     let range = distance(player.position, target.position);
     let velocity = |pose: RigidPose, units: f64| {
@@ -399,7 +405,7 @@ fn working_hold(
             pose.orientation.z.z * v,
         )
     };
-    (range - (radius * 2.0 + 2.0)).abs() <= 0.5
+    (range - standoff).abs() <= 0.5
         && distance(
             velocity(player, f64::from(speed)),
             velocity(target, target_speed),
@@ -597,7 +603,7 @@ impl World {
             self.state.speed,
             body.pose,
             target_speed,
-            data.player_clearance_radius(),
+            data.wreck_work_standoff(),
         ) {
             return Err(OccupiedCutError::UnsafeHold);
         }

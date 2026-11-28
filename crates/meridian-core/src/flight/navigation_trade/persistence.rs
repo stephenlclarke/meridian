@@ -590,12 +590,19 @@ impl Plan {
             .ok_or(INVALID)?
             .distance_ly(a.dock.system(), self.destination)
             .map_err(|_| INVALID)?;
+        let definition = crate::equipment::definition()
+            .map_err(|_| INVALID)?
+            .for_player(c.world.xyzzy.medusa_at(self.account_revision));
         if site(self.destination).is_none()
             || self.destination == a.dock.system()
             || !legal_tonne(self.commodity)
             || self.confirmed_tick < a.accepted_tick
             || self.confirmed_tick > c.world.state.tick
-            || ![92, 127].contains(&self.capacity)
+            || ![
+                definition.base_hold_tonnes,
+                definition.base_hold_tonnes + definition.extra_hold_tonnes,
+            ]
+            .contains(&self.capacity)
             || self.cargo >= self.capacity
             || self.stock == 0
             || self.stock > MAX_MARKET_QUANTITY
