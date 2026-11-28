@@ -24,7 +24,7 @@ impl State {
         world: &World,
     ) -> Result<Vec<(u64, ResourceFitChange)>, SaveError> {
         let owner = world.combat_identity().ok_or(INVALID)?.owner;
-        let mut ledger = Ledger::born(owner)?;
+        let mut ledger = self.born_ledger(owner)?;
         let mut changes = Vec::new();
         let mut counters = [0; 2];
         let mut grade = ShieldGrade::Basic;
@@ -57,7 +57,7 @@ impl State {
     }
 
     fn shield_at_revision(&self, owner: u64, revision: u64) -> Result<OwnedModule, SaveError> {
-        let mut ledger = Ledger::born(owner)?;
+        let mut ledger = self.born_ledger(owner)?;
         let mut counters = [0; 2];
         for event in self
             .events

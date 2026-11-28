@@ -141,27 +141,22 @@ pub(super) enum StopKind {
     Entry,
 }
 impl MotionFrame {
-    fn advance(self, motion: Motion) -> Option<Self> {
+    fn advance(self, motion: Motion, hull: super::PlayerHullKind) -> Option<Self> {
         let Motion::Active(input) = motion else {
             return Some(Self { speed: 0.0, ..self });
         };
         input.validate().ok()?;
-        let yaw = super::axis_rotation(1, input.yaw * super::YAW_RATE * super::FIXED_DELTA_SECONDS);
-        let pitch = super::axis_rotation(
-            0,
-            -input.pitch * super::PITCH_RATE * super::FIXED_DELTA_SECONDS,
-        );
-        let roll = super::axis_rotation(
-            2,
-            input.roll * super::ROLL_RATE * super::FIXED_DELTA_SECONDS,
-        );
+        let (max_speed, acceleration, pitch_rate, yaw_rate, roll_rate) = hull.flight_rates();
+        let yaw = super::axis_rotation(1, input.yaw * yaw_rate * super::FIXED_DELTA_SECONDS);
+        let pitch = super::axis_rotation(0, -input.pitch * pitch_rate * super::FIXED_DELTA_SECONDS);
+        let roll = super::axis_rotation(2, input.roll * roll_rate * super::FIXED_DELTA_SECONDS);
         let orientation = super::normalize(super::multiply(
             super::multiply(super::multiply(self.orientation, yaw), pitch),
             roll,
         ))?;
         let throttle = if input.brake { -1.0 } else { input.throttle };
-        let speed = (self.speed + throttle * super::ACCELERATION * super::FIXED_DELTA_SECONDS)
-            .clamp(0.0, super::MAX_SPEED);
+        let speed = (self.speed + throttle * acceleration * super::FIXED_DELTA_SECONDS)
+            .clamp(0.0, max_speed);
         let mut position = self.position;
         for (axis, direction) in position.iter_mut().zip(super::forward(orientation)) {
             *axis +=
@@ -186,7 +181,7 @@ impl MotionFrame {
             / distance.max(1.0);
         (distance / sun.radius, dot)
     }
-    fn valid(self) -> bool {
+    fn valid(self, hull: super::PlayerHullKind) -> bool {
         let norm = self
             .orientation
             .iter()
@@ -194,7 +189,7 @@ impl MotionFrame {
             .sum::<f32>();
         self.position.into_iter().all(f32::is_finite)
             && self.speed.is_finite()
-            && (0.0..=super::MAX_SPEED).contains(&self.speed)
+            && (0.0..=hull.flight_rates().0).contains(&self.speed)
             && norm.is_finite()
             && (norm - 1.0).abs() <= 1e-5
             && crate::station::flight_pose(self.position, self.orientation).is_some()
@@ -463,7 +458,7 @@ impl State {
             nav.visit,
             world.combat.physical_tick(),
         );
-        if opening.frame.advance(motion) != Some(after.frame)
+        if opening.frame.advance(motion, world.player_hull_kind()) != Some(after.frame)
             || opening.clock.checked_add(1) != Some(after.clock)
             || opening.tick.checked_add(1) != Some(after.tick)
         {

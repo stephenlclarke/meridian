@@ -1,8 +1,12 @@
 # Meridian
 
-[Download Scanner Preview 11 for macOS arm64 or Windows x64](https://github.com/stephenlclarke/meridian/releases/tag/v0.11.0-preview.1). Start on Commander Details and press **H** or **?** for help. In flight, **Tab** cycles through scanner contacts from nearest to farthest. **F** switches between manual and assisted flight. At a station, press **3**, select Search and enter **Medusa** to inspect SH171. [Preview guide](docs/PREVIEW-RELEASES.md)
+[Download Meridian Preview 12 for macOS arm64 or Windows x64](https://github.com/stephenlclarke/meridian/releases/tag/v0.12.0-preview.1). Published 28 November 2026 from protected main `83ceae733d6e4f9cffc81c517fabb3eb7b39fba8`. The archive contains Fleet, the standalone Medusa and Hull Studio. [Installation and platform checks](docs/PREVIEW-RELEASES.md#fleet-medusa-and-hull-studio)
 
-The Fleet, Medusa and Hull Studio preview adds 115 station Showroom models and a dedicated flyable Medusa. Open **Meridian Medusa Preview** and press **L** to launch with a separate commander save. The Apple silicon Fleet and Medusa apps require macOS 14 or later. The packaged Hull Studio requires macOS 27 or later. [Preview installation and controls](docs/PREVIEW-RELEASES.md#fleet-medusa-and-hull-studio) · [Published previews](https://github.com/stephenlclarke/meridian/releases)
+Start **Fleet** to fly your commander. At a station, press **3** to inspect 115 Showroom models. To fly a fully fitted SH171 Medusa in your Fleet save, use the XYZZY refit described below. The standalone **Medusa Preview** uses a separate save. Fleet and Medusa require macOS 14 or later on Apple silicon. Hull Studio requires macOS 27 or later. The Windows x64 package is unsigned. Interactive Windows gameplay and Showroom rendering remain unverified.
+
+At a station, open **5 Equipment** to buy, store or refit the Fleet Medusa’s front, aft, port and starboard lasers independently. In flight, use **0–3** to select a view and hold **Z** to fire its fitted weapon. [Fleet Medusa laser controls](docs/FLEET-MEDUSA-LASERS.md)
+
+The centre sight identifies the active laser or work tool. Press **H**, then **I**, for Flight Status. Press **N** on that card to choose where notices appear. [Cockpit instruments](docs/COCKPIT-HUD.md)
 
 The ordinary-drive development candidate adds the Basic, Intermediate and Advanced hyperspace drive slot to Equipment. Paid upgrades change the actual jump countdown and station mass lock; explicit XYZZY maximum fitting uses the Advanced drive. The [equipment implementation and testing ledger](docs/EQUIPMENT-PLAYABLE.md) records all catalogue grades, remaining gameplay paths and Medusa compatibility constraints. This candidate is not part of Preview 10 and awaits owned validation.
 
@@ -14,7 +18,9 @@ The [solar fuel development candidate](docs/SOLAR-FUEL-SCOOPS.md) adds actual ne
 
 The passenger-cabin development candidate offers all six original paid cabin layouts, with real five-tonne fit costs and separate Avenor-to-Renas G04 passenger consent, boarding and reception. See [passenger cabins and G04 controls](docs/PASSENGER-CABINS.md). Owned validation is pending.
 
-In the scanner development build, press **Tab** to mark the nearest contact. Press again to move through the others by distance. **F** switches between hand flight and the assistance your equipment provides. You can aim and fire at ships, fly a docking approach, mine or salvage by hand. [Flight controls and required equipment](docs/AUTOMATIC-WORK.md)
+In Preview 12, press **Tab** to mark the nearest contact. Press again to move through the others by distance. **F** switches between hand flight and the assistance your equipment provides. You can aim and fire at ships, fly a docking approach, mine or salvage by hand. [Flight controls and required equipment](docs/AUTOMATIC-WORK.md)
+
+In a normal Fleet commander slot, dock and press **Ctrl+Shift+X**. Choose **Activate / refit SH171 Medusa**, press **Enter** to review, then **Enter** to confirm. Launch from that berth to fly the issued ship. Its 32-tonne expanded hold, five loaded missile positions and fitted equipment travel with the commander through Save and Continue. Existing CLARKE commanders use the same row and keep their current credits. [Medusa test outfit and limits](docs/EQUIPMENT-PLAYABLE.md#fleet-xyzzy-medusa)
 
 ## Goshawk Explorer in the Ship Showroom
 
@@ -24,9 +30,9 @@ The development source also provides a separate Goshawk Mk II Custom Showroom an
 
 Medusa (SH171) can be inspected in the station Showroom. The source package preserves both original meshes and the inspection shield. The Showroom lists the verified empty stock dry mass. [Medusa inspection and flight limits](integration/sh171-medusa/README.md)
 
-The follow-up development candidate offers 115 selectable stock previews in the ordinary station Showroom. This includes 109 validated Hull Studio schema-1 fleet packages and six original stock models. Cheetah (SH082) and the 22 outstanding entries in the final fleet intake remain outside the preview registry. These are catalogue previews, not new ships for purchase or flight. [Hull Studio](docs/HULL-STUDIO.md) also opens a local or archived preview in a disposable Showroom session without changing the player's ship. The earlier 37-preview Mac build passed the stock loader and station Showroom tests; the expanded registry still needs final platform and native presentation validation. [Outstanding fleet scope](docs/IMPLEMENTATION-STATUS.md#outstanding-fleet-inspection-scope)
+Preview 12 offers 115 selectable stock previews in the ordinary station Showroom. This includes 109 validated Hull Studio schema-1 fleet packages and six original stock models. Cheetah (SH082) and the 22 outstanding entries in the final fleet intake remain outside the preview registry. These are catalogue previews, not new ships for purchase or flight. [Hull Studio](docs/HULL-STUDIO.md) also opens a local or archived preview in a disposable Showroom session without changing the player's ship. The earlier 37-preview Mac build passed the stock loader and station Showroom tests; the final Mac package displayed a native nested Showroom frame. Interactive Windows Showroom rendering remains unverified. [Outstanding fleet scope](docs/IMPLEMENTATION-STATUS.md#outstanding-fleet-inspection-scope)
 
-The separate [Medusa player flight preview](integration/sh171-medusa-preview/README.md) uses a dedicated profile and the admitted reduced flight geometry. On signed Mac build `5a924315`, the original SH171 artwork was visible in actual flight at 50.30/50.30. A cold restart restored the same ship, speed and expanded 32 t hold. Native docking return and fit-limit refusal were not observed in that run. Ordinary progression, fabrication and exchange do not grant the Medusa. Final release qualification remains separate.
+The separate [Medusa player flight preview](integration/sh171-medusa-preview/README.md) uses a dedicated profile and the admitted reduced flight geometry. On signed Mac build `5a924315`, the original SH171 artwork was visible in actual flight at 50.30/50.30. A cold restart restored the same ship, speed and expanded 32 t hold. Native docking return and fit-limit refusal were not observed in that run. Ordinary progression, fabrication and exchange do not grant the Medusa. See the [Preview 12 validation record](docs/IMPLEMENTATION-STATUS.md#published-preview-12) for final-package checks.
 
 ## Internal Mule docking validation
 
@@ -54,12 +60,12 @@ The internal SH001 Mule scene uses the original SH028 station. On Mac build `ffb
 [![Rust 1.99](https://img.shields.io/badge/Rust-1.99.0-000000?logo=rust)](rust-toolchain.toml)
 [![Preview platforms](https://img.shields.io/badge/preview%20platforms-macOS%20%7C%20Windows-blue)](docs/PREVIEW-RELEASES.md)
 [![macOS signing](https://img.shields.io/badge/macOS%20signing-Developer%20ID-green)](docs/PREVIEW-RELEASES.md)
-[![Preview 8 notarization](https://img.shields.io/badge/Preview%208%20Mac-notarized%20%2B%20stapled-green)](docs/PREVIEW-RELEASES.md)
+[![Preview 12 notarisation](https://img.shields.io/badge/Preview%2012%20Mac-notarized%20%2B%20stapled-green)](docs/PREVIEW-RELEASES.md)
 [![Source-visible license](https://img.shields.io/badge/license-proprietary%20%2F%20source--visible-blue)](LICENSE)
 
 Meridian is a Rust reimplementation of the original L337 project, with direct wgpu graphics, one authoritative World and traceable original content. New code is [proprietary/source-visible](LICENSE); imported original content retains its own notices. Original Elite/Oolite assets are excluded.
 
-The current [Preview 8 EMP utility](docs/EMP.md) is published for macOS arm64 and Windows x64. It adds paid purchase, fitting, storage and power/capacity/recharge upgrades, a held-U pulse and electrical disablement that preserves hull, crew and cargo custody. Mac, Linux and native Windows qualification passed 631 Rust tests, 99 Python tests and 49 Markdown checks per platform, strict Clippy and locked release builds. The release uses corrected source `2d5f4a5`; the full earlier EMP native journey retains its separate `5e3e98a` identity. See [implementation status](docs/IMPLEMENTATION-STATUS.md) for the exact evidence and open limits.
+The earlier [Preview 8 EMP utility](docs/EMP.md) is published for macOS arm64 and Windows x64. It adds paid purchase, fitting, storage and power/capacity/recharge upgrades, a held-U pulse and electrical disablement that preserves hull, crew and cargo custody. Mac, Linux and native Windows qualification passed 631 Rust tests, 99 Python tests and 49 Markdown checks per platform, strict Clippy and locked release builds. The release uses corrected source `2d5f4a5`; the full earlier EMP native journey retains its separate `5e3e98a` identity. See [implementation status](docs/IMPLEMENTATION-STATUS.md) for the exact evidence and open limits.
 
 ## Previews and validation
 
@@ -67,7 +73,7 @@ Download qualified macOS arm64 and Windows x64 prereleases from [GitHub Releases
 
 The Preview 8 Mac app is Developer ID signed, notarized and stapled. Apple accepted the new EMP submission; the actual public download passed strict signature, ticket and Gatekeeper checks. No older ticket was reused. Windows remains unsigned and requires the external Microsoft Visual C++ x64 runtime; no DLL is bundled. Native Windows interactive gameplay remains unobserved. Notarization does not establish commercial content clearance or broader gameplay acceptance.
 
-## Current Rust checkpoint
+## Preview 8 Rust checkpoint
 
 [Preview 8 v0.8.0-preview.1](https://github.com/stephenlclarke/meridian/releases/tag/v0.8.0-preview.1) was published on 18 November 2026 at 07:26 UTC from protected main `bf31ab7`, compiled source `2d5f4a5`. All 300 committed files and modes are identical between those revisions. It retains contextual H/? Help and explicit Ctrl+Shift+X XYZZY testing, and adds the paid EMP utility. All six exact-main CI checks passed. Sonar uses that exact commit as revision and project version: zero unresolved findings, 98.8% new coverage, zero new duplication and 100% hotspot review.
 
@@ -113,6 +119,10 @@ Preview 8 uses the earlier startup controls. N starts a commander; C continues a
 
 H or ? opens a dismissible help popup for the current screen, including station details and transaction reviews. Every station popup lists 1 Galaxy, 2 System, 3 Showroom, 4 Market, 5 Equipment, Tab/Shift+Tab and Escape/back. Escape, H or ? closes help and retains the screen, selection, search and review. Gameplay and underlying actions wait while help is open. During galaxy text search, H remains a typed letter and ? opens help.
 
+### Controls
+
+The table describes the current source. Use the number row for views, training and missiles. Press the equals or minus key without Shift for missile launch or safe/unlock. Hold Control for save, reload and fullscreen.
+
 | Controls | Action |
 | --- | --- |
 | H / ? | Context help; Escape, H or ? dismisses |
@@ -130,10 +140,10 @@ H or ? opens a dismissible help popup for the current screen, including station 
 | O; K; U; Y | Equipment panel; buy/fit cargo bay; store when docked; refit |
 | Hold U in active flight | Charge the fitted EMP for 600 accepted ticks; early release cancels |
 | I; V; X | Mission details; review all held freight deliveries; review abandonment |
-| T in flight; F1; F2; F3; F4 | Lock the selected ship for missiles; next ship/practice lock; arm/safe; launch one missile; safe/unlock |
-| F7; F8; F10 | Review attempt closure; reception; fresh consent |
-| F6; F12; C; 0/1/2/3 | Flight lesson consent/reception; cancellation; details; view direction |
-| P; F11; F5; F9 | Pause; fullscreen; save; reload the current qualified save |
+| T in flight; 8; 9; =; - | Lock the selected ship for missiles; next ship/practice lock; arm/safe; launch one missile; safe/unlock |
+| Shift+5; Shift+4; Shift+3 | Review attempt closure; reception; fresh consent |
+| Shift+1; Shift+2; C; 0/1/2/3 | Flight lesson consent/reception; cancellation; details; view direction |
+| P; Ctrl+Enter; Ctrl+S; Ctrl+R | Pause; fullscreen; save; reload the current qualified save |
 | Escape / window close | Save before exit; failure keeps the app open |
 
 The [station trade estimate details](integration/followup-trade-detail/README.md) show the current finite commodity allocation behind the chart scan and route estimates. They do not purchase, sell or install a route.

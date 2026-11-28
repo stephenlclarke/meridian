@@ -193,6 +193,7 @@ impl CommanderAccount {
         let (fuel_tenths, fuel_storage_count) = crate::navigation::unpack_fuel(r.u16()?)?;
         let mut account = Self {
             data: AccountData {
+                medusa: false,
                 owner,
                 hull,
                 revision,

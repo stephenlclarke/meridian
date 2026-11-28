@@ -149,6 +149,80 @@ fn earned_four_distinct_paid_tanks_only_three_fit_and_refuel_is_separate() {
 }
 
 #[test]
+fn medusa_stores_paid_tanks_at_base_capacity_and_refuses_one_tenth_over() {
+    let mut world = earned_world(18157);
+    world.request_refuel(world.snapshot().tick).unwrap();
+    let ids = [transact(&mut world, BUY), transact(&mut world, BUY)];
+    let paid = tank_items(&world);
+    assert_eq!(fuel(&world), (130, 270));
+    let verify_exchange = |world: &mut World| {
+        secret(world, XyzzyAction::ActivateMedusa);
+        let first = world.xyzzy_medusa_issue();
+        let cash = world.credits_tenths();
+        secret(world, XyzzyAction::ActivateMedusa);
+        let continued = World::from_save_bytes(&world.save_bytes().unwrap()).unwrap();
+        assert_eq!(fuel(&continued), (130, 130));
+        assert_eq!(continued.xyzzy_medusa_issue(), first);
+        assert_eq!(continued.credits_tenths(), cash);
+        assert!(continued.xyzzy_medusa_active());
+        let stored = tank_items(&continued);
+        assert_eq!(stored.len(), ids.len());
+        for (index, item) in stored.iter().enumerate() {
+            assert_eq!(item.id, ids[index]);
+            assert_eq!(item.provenance, paid[index].provenance);
+            assert!(matches!(item.provenance, ModuleProvenance::Paid { .. }));
+            assert!(item.slot.is_none());
+        }
+    };
+    let mut exact = World::from_save_bytes(&world.save_bytes().unwrap()).unwrap();
+    verify_exchange(&mut exact);
+    world.request_refuel(world.snapshot().tick).unwrap();
+    journey(&mut world, SystemId::LARERIA);
+    crate::flight::practice::tests::launch(&mut world);
+    let vemar = SystemId {
+        galaxy: 0,
+        system: 101,
+    };
+    for destination in [vemar, SystemId::LARERIA] {
+        world
+            .request_jump(destination, world.snapshot().tick)
+            .unwrap();
+        let remaining = world
+            .snapshot()
+            .navigation
+            .unwrap()
+            .travel
+            .unwrap()
+            .remaining_ticks;
+        for _ in 0..remaining {
+            world.step(crate::FlightInput::default()).unwrap();
+        }
+    }
+    crate::flight::missiles::tests::dock(&mut world);
+    assert_eq!(fuel(&world), (131, 270));
+    let before = world.save_bytes().unwrap();
+    let err = world
+        .review_xyzzy(XyzzyAction::ActivateMedusa, world.snapshot().tick)
+        .unwrap_err();
+    assert_eq!(
+        err,
+        XyzzyError::MedusaFuelOverCapacity {
+            carried: 131,
+            capacity: 130
+        }
+    );
+    for quantity in ["13.1 LY", "13.0 LY", "0.1 LY"] {
+        assert!(err.to_string().contains(quantity));
+    }
+    assert_eq!(world.save_bytes().unwrap(), before);
+    assert_eq!(tank_items(&world), paid);
+    assert!(!world.xyzzy_medusa_active());
+    journey(&mut world, SystemId::RENAS);
+    assert_eq!(fuel(&world), (58, 270));
+    verify_exchange(&mut world);
+}
+
+#[test]
 fn explicit_max_preserves_paid_identity_grants_only_missing_tanks_fills_then_repeats() {
     let mut world = earned_world(18152);
     let paid = transact(&mut world, BUY);

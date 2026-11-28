@@ -1,12 +1,12 @@
 {
-  "base": "fde936052ae05628959e3b6a39838d2271575c0a",
+  "base": "675d55b8b64f0be421e81051d313667d17f77242",
   "files": {
     "flight/modular.rs": {
-      "beforeSHA256": "271c8afc708a475b106eac5999f64a757fe83de5e0814f6477a9bed90b948133",
-      "afterSHA256": "bb07bfb75b2514d0623af8cd662df61a62bda398249b0c4da111e6dca7723b50",
+      "beforeSHA256": "c8d9b6896e0307b1b7f3e17030a0c42b203317ace3a15aa29ec25ff5027a82b9",
+      "afterSHA256": "3067fcae72ca2d7cc27a55ec93fdbf866a8eaa087906305a2c0fb07d29cdfa3e",
       "hunks": [
         {
-          "offset": 36161,
+          "offset": 38013,
           "before": "",
           "after": "    }\n    pub(super) fn jump_reach_at_revision(\n        &self,\n        owner: u64,\n        revision: u64,\n    ) -> Result<f64, SaveError> {\n        Ok(self.ledger_at_revision(owner, revision)?.jump_reach_ly())\n"
         }
@@ -29,8 +29,8 @@
       ]
     },
     "flight/navigation_trade/persistence.rs": {
-      "beforeSHA256": "4fb04e53706e337d1c364a3a44aaa2941ea86ed66d0928023d3f5b14cf2c9dec",
-      "afterSHA256": "de0765d7ee1b8d6f8e2484a4c8db0fb34ab4aae082e6efd32bf6f10639a7a115",
+      "beforeSHA256": "12573177ba7bd3057e7b77eb0a193e0f15ce3606b475459905c533568670c2eb",
+      "afterSHA256": "e22f12fea434129f91b6dd6f3f67f0df703796fca093ebcd25923378245509a2",
       "hunks": [
         {
           "offset": 344,
@@ -38,12 +38,12 @@
           "after": "    DockContext, DockOrigin, SavedNavigationSummary, SystemId, stock_jump_fuel_cost,\n"
         },
         {
-          "offset": 21539,
+          "offset": 21843,
           "before": "            || distance > STOCK_JUMP_REACH_LY\n",
           "after": "            || distance\n                > c.commerce\n                    .modular\n                    .jump_reach_at_revision(c.nav.owner, self.account_revision)?\n"
         },
         {
-          "offset": 31398,
+          "offset": 31702,
           "before": "            || distance > STOCK_JUMP_REACH_LY\n",
           "after": "            || distance\n                > c.commerce\n                    .modular\n                    .jump_reach_at_revision(c.nav.owner, self.account_revision)?\n"
         }

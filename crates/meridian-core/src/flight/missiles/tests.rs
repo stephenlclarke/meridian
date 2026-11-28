@@ -92,6 +92,28 @@ pub(in crate::flight) fn dock(world: &mut World) {
     panic!("real physical entry did not dock");
 }
 
+pub(in crate::flight) fn issue_medusa_at_renas(world: &mut World) {
+    world
+        .request_jump(crate::navigation::SystemId::RENAS, world.snapshot().tick)
+        .unwrap();
+    let remaining = world
+        .snapshot()
+        .navigation
+        .unwrap()
+        .travel
+        .unwrap()
+        .remaining_ticks;
+    for _ in 0..remaining {
+        world.step(FlightInput::default()).unwrap();
+    }
+    dock(world);
+    let tick = world.snapshot().tick;
+    let review = world
+        .review_xyzzy(crate::XyzzyAction::ActivateMedusa, tick)
+        .unwrap();
+    world.prepare_xyzzy(review, tick).unwrap().commit();
+}
+
 #[test]
 fn actual_three_pylon_items_require_lock_arm_front_and_exact_finite_consumption() {
     let mut world = practice(1601);

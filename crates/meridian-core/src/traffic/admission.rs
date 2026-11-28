@@ -4,7 +4,7 @@ const YIELD_OFFSET: f64 = 1200.0;
 #[cfg(test)]
 mod tests;
 pub(super) fn player_approaching(context: &TickContext<'_>) -> bool {
-    let width = context.data.player_clearance_radius() * 2.0 + 64.0;
+    let width = context.data.player_npc_clearance() + 64.0;
     [context.player_before, context.player_after]
         .into_iter()
         .any(|p| {
@@ -32,7 +32,7 @@ pub(super) fn lane_clear(before: Vec3, after: Vec3, context: &TickContext<'_>) -
     if !player_approaching(context) {
         return true;
     }
-    let width = context.data.player_clearance_radius() * 2.0 + 64.0;
+    let width = context.data.player_npc_clearance() + 64.0;
     let a = Vec3::new(before.x, before.y, 0.0);
     let b = Vec3::new(after.x, after.y, 0.0);
     // An actor already in the lane must physically leave it, not disappear. Existing
