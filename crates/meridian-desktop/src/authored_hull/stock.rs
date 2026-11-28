@@ -828,6 +828,12 @@ const DESCRIPTORS: &[StockDescriptor] = &[
         0x87d4_fc04_8677_f022
     ),
     stock_package!(
+        "SH164",
+        "Toad Drug Factory",
+        "integration/sh164-toad-drug-factory/ORIGINAL-INSPECTION.json",
+        0xaa79_f5a6_4d7b_7c36
+    ),
+    stock_package!(
         "SH165",
         "Secretarybird",
         "integration/sh165-secretarybird/SECRETARYBIRD-STUDIO.json",
@@ -965,10 +971,10 @@ mod tests {
     #[test]
     fn every_stock_descriptor_authenticates_its_own_source_and_real_preview() {
         let catalogue = ok(crate::docked_screens::Catalogue::bundled());
-        assert_eq!(STOCK_MODELS.len(), 127);
+        assert_eq!(STOCK_MODELS.len(), 128);
         for held in [
             "SH102", "SH112", "SH113", "SH114", "SH115", "SH116", "SH117", "SH118", "SH119",
-            "SH120", "SH121", "SH122", "SH123", "SH124", "SH125", "SH164",
+            "SH120", "SH121", "SH122", "SH123", "SH124", "SH125",
         ] {
             assert!(
                 !STOCK_MODELS.iter().any(|model| model.object == held),
@@ -1523,6 +1529,16 @@ mod tests {
         assert_eq!(package.schema, 2);
         assert_eq!(package.detail.triangles.len(), 1_524);
         assert_eq!(package.native.triangles.len(), 596);
+        assert_stock_and_local(entry.model.object, entry.model.geometry_key);
+    }
+
+    #[test]
+    fn toad_drug_factory_stock_and_local_preview_retain_the_source_geometry() {
+        let entry = descriptor("SH164");
+        let package = ok(HullPackage::from_json(entry.package));
+        assert_eq!(package.schema, 2);
+        assert_eq!(package.detail.triangles.len(), 4_108);
+        assert_eq!(package.native.triangles.len(), 940);
         assert_stock_and_local(entry.model.object, entry.model.geometry_key);
     }
 

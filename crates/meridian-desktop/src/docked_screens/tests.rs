@@ -205,7 +205,7 @@ fn exact_catalogue_taxonomy_is_162_ships_not_171_ships() {
     assert_eq!(c.worlds.len(), 2048);
     assert_eq!(c.objects.len(), 171);
     assert_eq!(c.ship_count(), 162);
-    assert_eq!(c.search_showroom("").len(), 167);
+    assert_eq!(c.search_showroom("").len(), 168);
     assert_eq!(c.object("SH028").map(|o| o.kind), Some("station"));
     assert_eq!(c.object("SH025").map(|o| o.name), Some("Peregrine Mk V"));
     assert!(c.search_showroom("SH028").is_empty());
@@ -626,6 +626,16 @@ fn larvaal_probe_showroom_inspection_preserves_catalogue_kind_and_refuses_exchan
         "Larvaal Probe",
         "other",
         "integration/sh162-larvaal-probe/ORIGINAL-INSPECTION.json",
+    );
+}
+
+#[test]
+fn toad_drug_factory_showroom_inspection_preserves_catalogue_kind_and_refuses_exchange() {
+    assert_inspection_only_catalogue_object(
+        "SH164",
+        "Toad Drug Factory",
+        "station",
+        "integration/sh164-toad-drug-factory/ORIGINAL-INSPECTION.json",
     );
 }
 
