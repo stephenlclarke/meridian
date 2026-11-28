@@ -1,0 +1,13 @@
+{
+  "schema": 1,
+  "id": "sh009-goshawk-mk2",
+  "undoBefore": [
+    "sh170-caracara-mk-ii",
+    "player-laser-fittings"
+  ],
+  "undoAfter": [],
+  "kind": "declaration",
+  "module": "goshawk_mk2",
+  "before": "pub mod goshawk_custom;\n",
+  "after": "pub mod griffon;\n"
+}

@@ -294,6 +294,11 @@ fn selecting_goshawk_routes_the_original_preview_without_granting_exchange() {
 }
 
 #[test]
+fn selecting_goshawk_mk2_routes_its_own_original_preview_without_granting_exchange() {
+    assert_inspection_preview("Goshawk Mk II", "SH009", "assets/fleet/sh009/visual.bin");
+}
+
+#[test]
 fn selecting_mk_ii_custom_routes_its_own_preview_without_granting_exchange() {
     assert_inspection_preview(
         "Goshawk Mk II Custom",

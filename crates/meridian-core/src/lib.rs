@@ -47,6 +47,7 @@ pub mod giraffe_liner;
 pub mod gopher;
 pub mod goshawk;
 pub mod goshawk_custom;
+pub mod goshawk_mk2;
 pub mod griffon;
 pub mod griffon_mk_ii;
 pub mod griffon_spectre;

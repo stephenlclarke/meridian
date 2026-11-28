@@ -325,6 +325,19 @@ fn original_goshawk_fits_minimum_station_showroom_solo_and_compare() {
 }
 
 #[test]
+fn original_goshawk_mk2_fits_minimum_station_showroom_solo_and_compare() {
+    let vertices = ok(super::Hull::Mk2.visual());
+    assert_eq!(vertices.len(), 3_532 * 3);
+    let view = View::new(&vertices, [EMPTY_PIECE; super::GOSHAWK_MK2_PIECES]);
+    assert_variant_fits_minimum(
+        station_frames_for("Goshawk Mk II"),
+        &view,
+        &vertices,
+        "SH009",
+    );
+}
+
+#[test]
 fn original_custom_fits_minimum_station_showroom_solo_and_compare() {
     let vertices = ok(super::Hull::Custom.visual());
     assert_eq!(vertices.len(), super::CUSTOM_DETAILED_FACES * 3);

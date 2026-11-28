@@ -13,6 +13,7 @@ use meridian_core::{
         CUSTOM_DETAILED_FACES, CUSTOM_DETAILED_VERTICES, CUSTOM_NATIVE_VERTICES, CUSTOM_PIECES,
         GoshawkCustomHullSource,
     },
+    goshawk_mk2::{GOSHAWK_MK2_PIECES, GoshawkMk2HullSource},
     mule::EnvelopeError,
     peregrine_mk_i::{
         PEREGRINE_I_DETAILED_FACES, PEREGRINE_I_DETAILED_VERTICES, PEREGRINE_I_NATIVE_VERTICES,
@@ -28,10 +29,13 @@ pub(crate) use authored::{AuthoredFace, AuthoredPass, AuthoredVisual};
 
 mod medusa;
 mod player;
+mod visual_assets;
 pub(crate) use player::PlayerMedusaPass;
 
 pub(crate) const MEDUSA_GEOMETRY_KEY: &str = "assets/fleet/sh171/visual.bin";
 pub(crate) const GEOMETRY_KEY: &str = "assets/fleet/sh008/visual.bin";
+pub(crate) const MK2_GEOMETRY_KEY: &str = "assets/fleet/sh009/visual.bin";
+const MK2_SOURCE_POINTS: usize = 2_104 + 568;
 const VISUAL: &[u8] = include_bytes!("../../../../assets/fleet/sh008/visual.bin");
 const VERTICES: usize = 3_484 * 3;
 const VISUAL_FNV: u64 = 0x7a17_0c0c_6cdc_d5fd;
@@ -53,6 +57,7 @@ const EMPTY_PIECE: Piece = Piece {
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
 pub(crate) enum Hull {
     Explorer,
+    Mk2,
     Custom,
     Medusa,
     PeregrineMkI,
@@ -62,6 +67,7 @@ pub(crate) enum Hull {
 pub(crate) fn hull(model: &ModelPreview) -> Option<Hull> {
     match (model.object.as_str(), model.geometry_key.as_str()) {
         ("SH008", GEOMETRY_KEY) => Some(Hull::Explorer),
+        ("SH009", MK2_GEOMETRY_KEY) => Some(Hull::Mk2),
         ("SH010", CUSTOM_GEOMETRY_KEY) => Some(Hull::Custom),
         ("SH171", MEDUSA_GEOMETRY_KEY) => Some(Hull::Medusa),
         ("SH022", PEREGRINE_I_GEOMETRY_KEY) => Some(Hull::PeregrineMkI),
@@ -107,13 +113,9 @@ fn shader(piece_count: usize) -> String {
 impl Hull {
     fn visual(self) -> Result<Vec<VisualVertex>, &'static str> {
         match self {
-            Self::Explorer => visual(),
-            Self::Custom => authenticated_visual(
-                CUSTOM_VISUAL,
-                CUSTOM_VISUAL_FNV,
-                b"SH010VZ1",
-                CUSTOM_DETAILED_FACES * 3,
-            ),
+            Self::Explorer => visual_assets::load(GEOMETRY_KEY),
+            Self::Mk2 => visual_assets::load(MK2_GEOMETRY_KEY),
+            Self::Custom => visual_assets::load(CUSTOM_GEOMETRY_KEY),
             Self::Medusa => medusa::visual(),
             Self::PeregrineMkI => authenticated_visual(
                 PEREGRINE_I_VISUAL,
@@ -133,6 +135,7 @@ impl Hull {
     fn piece_count(self) -> usize {
         match self {
             Self::Explorer => GOSHAWK_PIECES,
+            Self::Mk2 => GOSHAWK_MK2_PIECES,
             Self::Custom => CUSTOM_PIECES,
             Self::Medusa => medusa::PIECES,
             Self::PeregrineMkI => PEREGRINE_I_PIECES,
@@ -150,6 +153,12 @@ impl Hull {
                     GOSHAWK_DETAILED_VERTICES + GOSHAWK_NATIVE_CANDIDATE_VERTICES,
                 )
                 .map_err(SupportError::Render)?;
+                Ok((triangles, pieces.to_vec()))
+            }
+            Self::Mk2 => {
+                let source = GoshawkMk2HullSource::bundled().map_err(SupportError::Source)?;
+                let (triangles, pieces) = support_mesh(source.pieces().as_ref(), MK2_SOURCE_POINTS)
+                    .map_err(SupportError::Render)?;
                 Ok((triangles, pieces.to_vec()))
             }
             Self::Custom => {
@@ -336,7 +345,7 @@ impl Pass {
     ) -> Result<Self, String> {
         match hull {
             Hull::Explorer => Self::new(device, queue, format),
-            Hull::Custom | Hull::Medusa | Hull::PeregrineMkI | Hull::PeregrineMkIII => {
+            Hull::Mk2 | Hull::Custom | Hull::Medusa | Hull::PeregrineMkI | Hull::PeregrineMkIII => {
                 Self::construct(device, queue, format, hull)
             }
         }
@@ -353,6 +362,8 @@ impl Pass {
         hull: Hull,
     ) -> Result<Self, String> {
         let vertices = hull.visual()?;
+        let vertex_count =
+            u32::try_from(vertices.len()).map_err(|_| "Showroom visual count overflow")?;
         let (triangles, pieces, shimmer) = match hull.supports() {
             Ok((triangles, pieces)) => (triangles, pieces, true),
             Err(SupportError::Source(reason)) => return Err(reason.to_string()),
@@ -391,7 +402,7 @@ impl Pass {
             viewport: [0.0; 4],
             shimmer,
             hull,
-            vertex_count: vertices.len() as u32,
+            vertex_count,
         })
     }
 
@@ -412,10 +423,19 @@ impl Pass {
             bounds.width * scale[0],
             bounds.height * scale[1],
         ];
+        let viewport = [x as f32, y as f32, width as f32, height as f32];
+        if !viewport.into_iter().all(f32::is_finite)
+            || viewport[0] < 0.0
+            || viewport[1] < 0.0
+            || viewport[2] <= 0.0
+            || viewport[3] <= 0.0
+        {
+            return Err("Invalid Showroom viewport".into());
+        }
         let data = self
             .view
             .uniforms(model.orientation, width / height, srgb)?;
-        self.viewport = [x as f32, y as f32, width as f32, height as f32];
+        self.viewport = viewport;
         queue.write_buffer(&self.hardware.uniform, 0, bytemuck::bytes_of(&data));
         Ok(())
     }
@@ -468,6 +488,51 @@ mod tests {
     #[test]
     fn goshawk_original_visual_and_all_local_supports_bind_to_the_shader() {
         check_variant(Hull::Explorer, 3484, GOSHAWK_PIECES);
+    }
+
+    #[test]
+    fn goshawk_mk2_original_visual_and_73_local_supports_bind_to_the_shader() {
+        check_variant(Hull::Mk2, 3532, GOSHAWK_MK2_PIECES);
+        let source = ok(GoshawkMk2HullSource::bundled());
+        let (triangles, pieces) = ok(Hull::Mk2.supports());
+        assert_eq!(pieces.len(), 73);
+        let mut first = 0;
+        for (rendered, original) in pieces.iter().zip(source.pieces().iter()) {
+            assert_eq!(rendered.range[0], first);
+            assert!(rendered.range[1] > 0);
+            first += rendered.range[1];
+            let (low, high) = original.source_bounds();
+            assert_eq!(rendered.low[..3], vector(low)[..3]);
+            assert_eq!(rendered.high[..3], vector(high)[..3]);
+            assert_eq!(rendered.low[3], original.rounding_metres() as f32);
+        }
+        assert_eq!(first as usize, triangles.len());
+    }
+
+    #[test]
+    fn source_selection_requires_matching_goshawk_ship_id_and_geometry_key() {
+        for (object, key, expected) in [
+            ("SH008", GEOMETRY_KEY, Hull::Explorer),
+            ("SH009", MK2_GEOMETRY_KEY, Hull::Mk2),
+            ("SH010", CUSTOM_GEOMETRY_KEY, Hull::Custom),
+        ] {
+            let mut model = ModelPreview {
+                object: object.into(),
+                geometry_key: key.into(),
+                bounds: Rect::new(0.0, 0.0, 100.0, 100.0),
+                orientation: Orientation::default(),
+            };
+            assert_eq!(hull(&model), Some(expected));
+            for other in [GEOMETRY_KEY, MK2_GEOMETRY_KEY, CUSTOM_GEOMETRY_KEY] {
+                if other != key {
+                    model.geometry_key = other.into();
+                    assert!(!matches(&model));
+                }
+            }
+            model.object = "SH025".into();
+            model.geometry_key = key.into();
+            assert!(!matches(&model));
+        }
     }
 
     #[test]
@@ -703,6 +768,11 @@ mod tests {
         );
         let pieces = members.last().unwrap_or_else(|| panic!("missing pieces"));
         assert_eq!(pieces.offset as usize, size_of::<Uniforms>());
+        assert_eq!(size_of::<Uniforms>(), 9 * 16);
+        assert_eq!(
+            members[5].offset as usize,
+            std::mem::offset_of!(Uniforms, camera)
+        );
         let TypeInner::Array {
             size: ArraySize::Constant(count),
             stride,

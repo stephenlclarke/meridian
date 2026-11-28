@@ -1,0 +1,33 @@
+{
+  "channelClearanceMillimetres": 1462,
+  "ventralClearanceMillimetres": [
+    614,
+    614
+  ],
+  "lipStart": {
+    "guardedClearanceMillimetres": 979,
+    "limitingFace": 480
+  },
+  "alignedStationSweep": {
+    "guardedClearanceMillimetres": 44410,
+    "limitingFace": 454
+  },
+  "lipIntersection": {
+    "triangleVertices": [
+      265,
+      266,
+      270
+    ],
+    "intersectionMetres": [
+      69.4,
+      0.4235970544002164,
+      136.32
+    ],
+    "sweepFraction": 0.5000000000000009,
+    "barycentric": [
+      0.3599999999999949,
+      0.13562255028108752,
+      0.5043774497189176
+    ]
+  }
+}

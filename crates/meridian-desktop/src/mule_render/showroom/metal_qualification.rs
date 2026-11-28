@@ -583,6 +583,17 @@ fn metal_goshawk_same_pose_shimmer() {
 }
 
 #[test]
+#[ignore = "Mac owner only: explicit production SH009 visual qualification"]
+fn metal_goshawk_mk2_same_pose_shimmer() {
+    same_pose_shimmer(
+        Hull::Mk2,
+        "SH009",
+        "Goshawk Mk II",
+        "MERIDIAN_SH009_EVIDENCE_DIR",
+    );
+}
+
+#[test]
 #[ignore = "Mac owner only: explicit production SH010 visual qualification"]
 fn metal_goshawk_custom_same_pose_shimmer() {
     same_pose_shimmer(

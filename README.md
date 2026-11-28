@@ -26,6 +26,8 @@ In a normal Fleet commander slot, dock and press **Ctrl+Shift+X**. Choose **Acti
 
 In Preview 10, press 3 at a station and search for Goshawk Explorer. Compare shows the Peregrine Mk V beside the Goshawk for a new commander. Press C for a single-ship view. Mac testing verified the original dark green hull, silver cross-member, open wishbone and refusal of an unavailable exchange. Preview 9 predates this ship. [Goshawk geometry and Showroom controls](docs/GOSHAWK-GAMEPLAY-ENVELOPE.md)
 
+The next Showroom candidate adds the Goshawk Mk II (SH009). Press 3 at a station, search for Goshawk Mk II, then press Enter to inspect the selection. Native rendering awaits validation. [Mk II source and appearance](docs/GOSHAWK-MK-II-SOURCE-GEOMETRY.md)
+
 The development source also provides a separate Goshawk Mk II Custom Showroom and collision candidate. Its original detailed appearance, four lower mounts and SH028 fit evidence are in the [SH010 hull guide](docs/GOSHAWK-MK-II-CUSTOM.md). Owned native validation is pending.
 
 Medusa (SH171) can be inspected in the station Showroom. The source package preserves both original meshes and the inspection shield. The Showroom lists the verified empty stock dry mass. [Medusa inspection and flight limits](integration/sh171-medusa/README.md)
