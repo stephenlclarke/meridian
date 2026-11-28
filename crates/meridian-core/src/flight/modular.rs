@@ -29,6 +29,7 @@ mod work;
 pub use scoops::{FittedFuelScoops, FuelScoopsSnapshot};
 pub const MINING_LASER_PRICE_TENTHS: u32 = 33_000;
 pub const MINING_LASER_REQUIRED_TL: u8 = 6;
+const DISPATCH_COLLECT_TAG: u8 = 28;
 const INVALID: SaveError = SaveError::InvalidState("modular equipment ownership or fitting");
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum ModuleKind {
@@ -1802,7 +1803,7 @@ impl State {
                     w.bool(restoring);
                 }
                 ModuleAction::Dispatch(DispatchAction::Collect(row)) => {
-                    w.u8(28);
+                    w.u8(DISPATCH_COLLECT_TAG);
                     w.u8(row);
                 }
                 ModuleAction::Bonded(BondedAction::Accept(tier)) => {
@@ -1887,7 +1888,7 @@ impl State {
             } else {
                 None
             };
-            let board_row = if matches!(tag, 21 | 24) {
+            let board_row = if matches!(tag, DISPATCH_COLLECT_TAG | 24) {
                 Some(r.u8()?)
             } else {
                 None
@@ -1944,7 +1945,7 @@ impl State {
                 5 => ModuleAction::Passenger(PassengerAction::Board),
                 6 => ModuleAction::Passenger(PassengerAction::Receive),
                 7 => ModuleAction::Passenger(PassengerAction::Cancel),
-                28 => ModuleAction::Dispatch(DispatchAction::Collect(
+                DISPATCH_COLLECT_TAG => ModuleAction::Dispatch(DispatchAction::Collect(
                     board_row.ok_or(SaveError::InvalidEncoding)?,
                 )),
                 24 => ModuleAction::Bonded(BondedAction::Accept(

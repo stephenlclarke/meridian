@@ -1,5 +1,5 @@
 {
-  "base": "f5fb65b53871e6dcffdeccb45494e2adcd271540",
+  "base": "7a260f8288cd76b055bb6ddd6d2248168bb2f6b2",
   "files": {
     "flight.rs": {
       "beforeSHA256": "c2eb42e538d91650f8c5c9dcab3622ac90f7da9de142ec0b5563818373607af1",
@@ -29,8 +29,8 @@
       ]
     },
     "flight/modular.rs": {
-      "beforeSHA256": "91e1a32f9c89f81aab402ba4aa8f4ba2de1986366bc2de56a4aaceb81b53e8db",
-      "afterSHA256": "0dbed637bed05d62809b3907c0f543dbb355537809bbf93ec28a18b986590189",
+      "beforeSHA256": "8b283afe8346cafc12e59d872122c2893c184f8840e96f77b93569c468f1e113",
+      "afterSHA256": "3fa70cbee3d3b65a303fe56e1fb09fbca283159a8be70b7d9e11977f5d20c500",
       "hunks": [
         {
           "offset": 372,
@@ -43,122 +43,122 @@
           "after": "pub use bonded::{BondedAction, BondedOffer, BondedRecord, BondedUnit};\n"
         },
         {
-          "offset": 16559,
+          "offset": 16596,
           "before": "",
           "after": "    Bonded(BondedAction),\n"
         },
         {
-          "offset": 17889,
+          "offset": 17926,
           "before": "",
           "after": "    BondedUnavailable,\n"
         },
         {
-          "offset": 18447,
+          "offset": 18484,
           "before": "",
           "after": "        if *self == Self::BondedUnavailable {\n            return f.write_str(\n                \"TOREN cannot accept this transaction for the current ship or consignment\",\n            );\n        }\n"
         },
         {
-          "offset": 21065,
+          "offset": 21102,
           "before": "",
           "after": "    bonded: bonded::Bonded,\n"
         },
         {
-          "offset": 21338,
+          "offset": 21375,
           "before": "            self.passage.reward() + self.dispatch.earnings,\n            self.passage.events + self.dispatch.events,\n",
           "after": "            self.passage.reward() + self.dispatch.earnings + self.bonded.credited,\n            self.passage.events + self.dispatch.events + self.bonded.events,\n"
         },
         {
-          "offset": 21508,
+          "offset": 21545,
           "before": "",
           "after": "    }\n    pub(super) fn bonds_paid(&self) -> u32 {\n        self.bonded.records.len() as u32 * bonded::BOND\n"
         },
         {
-          "offset": 36714,
+          "offset": 36751,
           "before": "",
           "after": "                ModuleAction::Bonded(action) => return self.apply_bonded(event, action),\n"
         },
         {
-          "offset": 40428,
+          "offset": 40465,
           "before": "",
           "after": "            let previous_credit = ledger.bonded.credited;\n"
         },
         {
-          "offset": 41173,
+          "offset": 41210,
           "before": "",
           "after": "            } else if let ModuleAction::Bonded(action) = e.action {\n                if matches!(action, BondedAction::Accept(_)) {\n                    super::AccountEffect::Bond {\n                        fuel: u16::try_from(e.item).map_err(|_| INVALID)?,\n                        paid: bonded::BOND,\n                    }\n                } else {\n                    super::AccountEffect::Reward(ledger.bonded.credited - previous_credit)\n                }\n"
         },
         {
-          "offset": 43979,
+          "offset": 44016,
           "before": "",
           "after": "        let (bonded_records, bonded_hold) = self.bonded_occupancy();\n"
         },
         {
-          "offset": 44135,
+          "offset": 44172,
           "before": "            usize::from(boarded) + dispatch_records,\n            usize::from(boarded && !ended) + dispatch_active,\n",
           "after": "            usize::from(boarded) + dispatch_records + bonded_records,\n            usize::from(boarded && !ended) + dispatch_active + usize::from(bonded_hold > 0),\n"
         },
         {
-          "offset": 52287,
+          "offset": 52324,
           "before": "",
           "after": "            if let ModuleAction::Bonded(action) = e.action {\n                world\n                    .jump_journal\n                    .validate_passenger_berth(e.dock, e.tick)?;\n                let active = ledger.bonded.active();\n                if !self.history.owns_berth(e.dock)\n                    || !world.xyzzy.dispatch_fuel_is_ordinary(\n                        active.map_or(e.revision, |r| r.issue_revision),\n                        e.revision,\n                    )\n                    || (action.receiving()\n                        && !active.is_some_and(|r| {\n                            world\n                                .jump_journal\n                                .flown_dispatch(r.issuer, e.dock, &r.offer.path)\n                        }))\n                {\n                    return Err(INVALID);\n                }\n            }\n"
         },
         {
-          "offset": 60360,
+          "offset": 60397,
           "before": "",
           "after": "        if ledger.bonded.active().is_some_and(|r| {\n            !world\n                .xyzzy\n                .dispatch_fuel_is_ordinary(r.issue_revision, account.revision())\n        }) {\n            return Err(INVALID);\n        }\n"
         },
         {
-          "offset": 69212,
+          "offset": 69267,
           "before": "",
           "after": "                ModuleAction::Bonded(BondedAction::Accept(tier)) => {\n                    w.u8(24);\n                    w.u8(tier);\n                }\n                ModuleAction::Bonded(BondedAction::ReceiveOne) => w.u8(25),\n                ModuleAction::Bonded(BondedAction::ReceiveAll) => w.u8(26),\n                ModuleAction::Bonded(BondedAction::Abandon) => w.u8(27),\n"
         },
         {
-          "offset": 72351,
-          "before": "            let dispatch_row = if tag == 21 { Some(r.u8()?) } else { None };\n",
-          "after": "            let board_row = if matches!(tag, 21 | 24) {\n                Some(r.u8()?)\n            } else {\n                None\n            };\n"
+          "offset": 72406,
+          "before": "            let dispatch_row = if tag == DISPATCH_COLLECT_TAG {\n",
+          "after": "            let board_row = if matches!(tag, DISPATCH_COLLECT_TAG | 24) {\n"
         },
         {
-          "offset": 74887,
+          "offset": 74978,
           "before": "                    dispatch_row.ok_or(SaveError::InvalidEncoding)?,\n",
           "after": "                    board_row.ok_or(SaveError::InvalidEncoding)?,\n"
         },
         {
-          "offset": 74973,
+          "offset": 75064,
           "before": "",
           "after": "                24 => ModuleAction::Bonded(BondedAction::Accept(\n                    board_row.ok_or(SaveError::InvalidEncoding)?,\n                )),\n                25 => ModuleAction::Bonded(BondedAction::ReceiveOne),\n                26 => ModuleAction::Bonded(BondedAction::ReceiveAll),\n                27 => ModuleAction::Bonded(BondedAction::Abandon),\n"
         },
         {
-          "offset": 88631,
+          "offset": 88722,
           "before": "",
           "after": "                | ModuleAction::Bonded(BondedAction::Accept(_))\n"
         },
         {
-          "offset": 88847,
+          "offset": 88938,
           "before": "",
           "after": "            ModuleAction::Bonded(BondedAction::Accept(_)) => {\n                if self.active_freight_job().is_some()\n                    || !self\n                        .xyzzy\n                        .dispatch_fuel_is_ordinary(account.revision(), account.revision())\n                {\n                    return Err(ModuleError::BondedUnavailable);\n                }\n                if account.credits_tenths() < bonded::BOND {\n                    return Err(ModuleError::InsufficientCredits);\n                }\n                u64::from(account.fuel_tenths())\n            }\n            ModuleAction::Bonded(action) => {\n                let record = ledger\n                    .bonded\n                    .active()\n                    .ok_or(ModuleError::BondedUnavailable)?;\n                if action.receiving()\n                    && !self\n                        .jump_journal\n                        .flown_dispatch(record.issuer, dock, &record.offer.path)\n                {\n                    return Err(ModuleError::BerthRequired);\n                }\n                record.issue_revision\n            }\n"
         },
         {
-          "offset": 94499,
+          "offset": 94590,
           "before": "                ModuleAction::Dispatch(DispatchAction::Collect(_)) => {\n",
           "after": "                ModuleAction::Bonded(BondedAction::Accept(_))\n                | ModuleAction::Dispatch(DispatchAction::Collect(_)) => {\n"
         },
         {
-          "offset": 94688,
+          "offset": 94779,
           "before": "",
           "after": "                }\n                ModuleAction::Bonded(_) => {\n                    self.modular\n                        .ledger(self, current)\n                        .map_err(ModuleError::Save)?\n                        .bonded\n                        .active()\n                        .ok_or(ModuleError::BondedUnavailable)?\n                        .issue_revision\n"
         },
         {
-          "offset": 96359,
+          "offset": 96450,
           "before": "",
           "after": "        let old_credit = ledger.bonded.credited;\n"
         },
         {
-          "offset": 97307,
+          "offset": 97398,
           "before": "            current.prepare_contract_action(if action == PassengerAction::Receive {\n                PASSAGE_REWARD_TENTHS\n            } else {\n                0\n            })\n",
           "after": "            current.prepare_contract_action(\n                0,\n                if action == PassengerAction::Receive {\n                    PASSAGE_REWARD_TENTHS\n                } else {\n                    0\n                },\n            )\n        } else if let ModuleAction::Bonded(action) = review.action {\n            current.prepare_contract_action(\n                if matches!(action, BondedAction::Accept(_)) {\n                    bonded::BOND\n                } else {\n                    0\n                },\n                ledger.bonded.credited - old_credit,\n            )\n"
         },
         {
-          "offset": 97963,
+          "offset": 98054,
           "before": "            current.prepare_contract_action(ledger.dispatch.earnings - old_earnings)\n",
           "after": "            current.prepare_contract_action(0, ledger.dispatch.earnings - old_earnings)\n"
         }
