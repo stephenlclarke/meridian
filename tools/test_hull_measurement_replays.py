@@ -59,6 +59,8 @@ AUTHORED_MODES = {
                     (('--contact',), 'CONTACT-RESULT.json')),
     'sh027-ibex': (((), 'CERTIFIED-FIT.json'), (('--difference',), 'CERTIFIED-DIFFERENCE.json'),
                     (('--contact',), 'CONTACT-RESULT.json')),
+    'sh026-harrier': (((), 'CERTIFIED-FIT.json'), (('--difference',), 'CERTIFIED-DIFFERENCE.json'),
+                    (('--contact',), 'CONTACT-RESULT.json')),
     'sh055-condor': COLLISION_MODES,
     'sh068-badger': COLLAR_MODES,
     'sh074-dzo': COLLAR_MODES,
