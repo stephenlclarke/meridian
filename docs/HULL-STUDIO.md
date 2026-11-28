@@ -123,3 +123,7 @@ The [SH037 Vulture Mk I](VULTURE-MK-I-GAMEPLAY-ENVELOPE.md) opens in the stock S
 ## Newt Escape Pod
 
 The [Newt capsule](../integration/sh040-newt-escape-pod/README.md) can be selected by name or SH040 in the station Showroom. Its original native shell and internal detailed artwork form one rounded support. The capsule is permanently unavailable for purchase.
+
+## Zebu stock inspection
+
+Search for **SH036** or **Zebu** in the station Showroom. The stock entry opens the original long-haul trader with its detailed artwork, 192-face native mesh and three texture maps. The 64,051 kg engineering budget remains a source reference. The stock package supplies no active engineering mass. The [Zebu hull record](ZEBU-GAMEPLAY-ENVELOPE.md) gives the measured differences between the meshes and the station clearance.

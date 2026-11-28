@@ -1,0 +1,62 @@
+{
+  "detailed": {
+    "strictExposedLowerMillimetres": 546,
+    "completeUpperMillimetres": 690,
+    "pieceUpperMillimetres": {
+      "lower-fuselage": 690,
+      "hump-pressure-hull": 690,
+      "port-reserve": 677,
+      "port-strut": 541,
+      "port-drive": 678,
+      "starboard-reserve": 677,
+      "starboard-strut": 541,
+      "starboard-drive": 678,
+      "glazing": 473,
+      "canopy-crest": 340,
+      "port-pipe": 260,
+      "port-pipe-mount": 668,
+      "port-clamp-0": 248,
+      "port-clamp-1": 248,
+      "port-clamp-2": 248,
+      "port-clamp-3": 248,
+      "port-clamp-4": 248,
+      "starboard-pipe": 260,
+      "starboard-pipe-mount": 668,
+      "starboard-clamp-0": 248,
+      "starboard-clamp-1": 248,
+      "starboard-clamp-2": 248,
+      "starboard-clamp-3": 248,
+      "starboard-clamp-4": 248
+    }
+  },
+  "native": {
+    "strictExposedLowerMillimetres": 4980,
+    "completeUpperMillimetres": 4989,
+    "pieceUpperMillimetres": {
+      "lower-fuselage": 4782,
+      "hump-pressure-hull": 4720,
+      "port-reserve": 3787,
+      "port-strut": 2103,
+      "port-drive": 3561,
+      "starboard-reserve": 3787,
+      "starboard-strut": 2103,
+      "starboard-drive": 3561,
+      "glazing": 1346,
+      "canopy-crest": 2198,
+      "port-pipe": 3599,
+      "port-pipe-mount": 4947,
+      "port-clamp-0": 2017,
+      "port-clamp-1": 2024,
+      "port-clamp-2": 2032,
+      "port-clamp-3": 2039,
+      "port-clamp-4": 2046,
+      "starboard-pipe": 3651,
+      "starboard-pipe-mount": 4989,
+      "starboard-clamp-0": 1997,
+      "starboard-clamp-1": 2002,
+      "starboard-clamp-2": 2007,
+      "starboard-clamp-3": 2012,
+      "starboard-clamp-4": 2017
+    }
+  }
+}

@@ -51,6 +51,7 @@ RING_MODES = MODES + ((('--ring-options',), 'RING-OPTIONS.json'),)
 AUTHORED_MODES = {
     'sh041-serval-fighter': (((), 'CERTIFIED-FIT.json'), (('--difference',), 'CERTIFIED-DIFFERENCE.json')),
     'sh040-newt-escape-pod': (((), 'CERTIFIED-FIT.json'),),
+    'sh036-zebu': (((), 'CERTIFIED-FIT.json'), (('--difference',), 'CERTIFIED-DIFFERENCE.json')),
     'sh055-condor': COLLISION_MODES,
     'sh068-badger': COLLAR_MODES,
     'sh074-dzo': COLLAR_MODES,

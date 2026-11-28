@@ -590,3 +590,6 @@ mod serval_tests;
 
 #[cfg(test)]
 mod newt_tests;
+
+#[cfg(test)]
+mod zebu_tests;
