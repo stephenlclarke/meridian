@@ -1,0 +1,40 @@
+{
+  "id": "SH164",
+  "name": "Toad Drug Factory",
+  "kind": "station",
+  "revision": "0d8cc9ebe0018bf74b0d9fa10ef23b70339dd6b0",
+  "inputs": {
+    "resource.toml": {
+      "source": "Sources/L337Core/Resources/Ships/SH164.toml",
+      "sha256": "5f80b4cff859e78e72b8619d6cfb5cf894796600688dd4afa09b61704cc7610a",
+      "bytes": 594842
+    },
+    "native-export.json": {
+      "source": "Sources/L337Core/Resources/OriginalFleetShowroomModels/SH164.json",
+      "sha256": "cabf84f33647a6f31006b61dbecf611304fd969c89c1763a6f0671943746ed00",
+      "bytes": 103315
+    },
+    "contract.toml": {
+      "source": "docs/fleet-design-v2/ships/SH164.toml",
+      "sha256": "29b8cae2acf68eee7f05547c5c0487dceb866c4ba6d3280da5d20b68e55fa4cf",
+      "bytes": 1638
+    },
+    "engineering.json": {
+      "source": "Sources/L337Core/Resources/OriginalFleetPhysical/SH164.json",
+      "sha256": "1af229dd864b6d385ca2098448a0d9dd8139bbd2c1e29424fe93ec9e6faac8dc",
+      "bytes": 173417
+    },
+    "LICENSE": {
+      "source": "LICENSE",
+      "sha256": "033b7058d73f22c3c6b8a5825eb866ca2d67088f3ee94dd5f3e46da59d624766",
+      "bytes": 1071
+    }
+  },
+  "nativeRegistrationMatches": true,
+  "geometryHashMatches": true,
+  "selectedNativeFaces": 940,
+  "archivedNativeFaces": 940,
+  "detailedFaces": 4108,
+  "originalScale": 67.58865096432108,
+  "finiteDrySourceFiles": []
+}
