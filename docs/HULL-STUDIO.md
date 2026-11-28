@@ -127,7 +127,9 @@ retains the original detailed and native artwork and both face-material tables.
 Schema 1 retains the 512-face native limit for flight export.
 
 To check this archive against a local clone of the original L337 sources, run
-the following command from the Meridian checkout.
+the following command from the Meridian checkout. It also compares each vertex’s
+group with the pinned Meridian archive. In a shallow checkout, fetch that
+archive commit first with `git fetch origin 92cdee004accf6f8f1d6b27671391e3aa8391502`.
 
 ```sh
 python3 tools/verify_original_stock_inspection.py \
