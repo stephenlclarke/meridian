@@ -426,6 +426,12 @@ const DESCRIPTORS: &[StockDescriptor] = &[
         0xcfd2_50eb_de3f_33b5
     ),
     stock_package!(
+        "SH082",
+        "Cheetah",
+        "integration/sh082-cheetah/CHEETAH-STUDIO.json",
+        0xa699_cfb3_caf3_0b34
+    ),
+    stock_package!(
         "SH083",
         "Hare Explorer",
         "integration/sh083-hare-explorer/HARE-EXPLORER-STUDIO.json",
@@ -923,11 +929,11 @@ mod tests {
     #[test]
     fn every_stock_descriptor_authenticates_its_own_source_and_real_preview() {
         let catalogue = ok(crate::docked_screens::Catalogue::bundled());
-        assert_eq!(STOCK_MODELS.len(), 120);
+        assert_eq!(STOCK_MODELS.len(), 121);
         for held in [
-            "SH082", "SH102", "SH103", "SH108", "SH112", "SH113", "SH114", "SH115", "SH116",
-            "SH117", "SH118", "SH119", "SH120", "SH121", "SH122", "SH123", "SH124", "SH125",
-            "SH141", "SH156", "SH161", "SH162", "SH164",
+            "SH102", "SH103", "SH108", "SH112", "SH113", "SH114", "SH115", "SH116", "SH117",
+            "SH118", "SH119", "SH120", "SH121", "SH122", "SH123", "SH124", "SH125", "SH141",
+            "SH156", "SH161", "SH162", "SH164",
         ] {
             assert!(
                 !STOCK_MODELS.iter().any(|model| model.object == held),
@@ -1415,6 +1421,15 @@ mod tests {
         assert_eq!(package.detail.triangles.len(), 8_272);
         assert_eq!(package.native.triangles.len(), 3_016);
         assert!(package.pieces().is_err());
+        assert_stock_and_local(entry.model.object, entry.model.geometry_key);
+    }
+
+    #[test]
+    fn cheetah_stock_and_local_previews_use_the_qualified_package() {
+        let entry = descriptor("SH082");
+        let package = ok(HullPackage::from_json(entry.package));
+        assert_eq!(package.detail.triangles.len(), 3_508);
+        assert_eq!(package.native.triangles.len(), 512);
         assert_stock_and_local(entry.model.object, entry.model.geometry_key);
     }
 

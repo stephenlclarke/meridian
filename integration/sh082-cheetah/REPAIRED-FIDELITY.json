@@ -1,0 +1,73 @@
+{
+  "unchangedParts": 21,
+  "resampledParts": [
+    {
+      "index": 0,
+      "name": "body primary pressure envelope",
+      "candidateToArchivedUpperMm": 985,
+      "archivedToCandidateUpperMm": 1048
+    },
+    {
+      "index": 7,
+      "name": "pods explicit member 0",
+      "candidateToArchivedUpperMm": 974,
+      "archivedToCandidateUpperMm": 920
+    },
+    {
+      "index": 12,
+      "name": "pods explicit member 1",
+      "candidateToArchivedUpperMm": 974,
+      "archivedToCandidateUpperMm": 961
+    },
+    {
+      "index": 17,
+      "name": "cockpit glazing envelope",
+      "candidateToArchivedUpperMm": 792,
+      "archivedToCandidateUpperMm": 708
+    },
+    {
+      "index": 20,
+      "name": "engine_pair/negative side/propulsion casing",
+      "candidateToArchivedUpperMm": 992,
+      "archivedToCandidateUpperMm": 805
+    },
+    {
+      "index": 21,
+      "name": "engine_pair/negative side/propulsion luminous recess",
+      "candidateToArchivedUpperMm": 959,
+      "archivedToCandidateUpperMm": 862
+    },
+    {
+      "index": 23,
+      "name": "engine_pair/positive side/propulsion casing",
+      "candidateToArchivedUpperMm": 992,
+      "archivedToCandidateUpperMm": 805
+    },
+    {
+      "index": 24,
+      "name": "engine_pair/positive side/propulsion luminous recess",
+      "candidateToArchivedUpperMm": 959,
+      "archivedToCandidateUpperMm": 862
+    }
+  ],
+  "silhouetteOffsetsMm": {
+    "detailed": {
+      "xy": 250,
+      "xz": 167,
+      "yz": 167
+    },
+    "archivedNative": {
+      "xy": 250,
+      "xz": 167,
+      "yz": 167
+    }
+  },
+  "wholeSurfaceUpperMm": {
+    "archivedNativeToCandidateNative": 1248,
+    "candidateNativeToArchivedNative": 992,
+    "detailedToCandidateNative": 1730,
+    "candidateNativeToDetailed": 994,
+    "detailedToArchivedNative": 1136,
+    "archivedNativeToDetailed": 897
+  }
+}
