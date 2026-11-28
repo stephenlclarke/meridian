@@ -276,6 +276,7 @@ impl Panel {
                     "EMP slot: G reviews base/grade; Y fits; U stores; no free charge",
                     "E.C.M. utility: G buy; Y fit; U store; K activates in flight",
                     "G01 sealed dispatch board: review a package, handoff or return",
+                    "G03 TOREN bonded freight: accept, receive original tonnes or abandon",
                 ],
             ),
         };

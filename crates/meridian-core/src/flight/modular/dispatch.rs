@@ -40,6 +40,77 @@ pub(super) struct Dispatch {
     pub(super) earnings: u32,
 }
 
+pub(super) fn board_draws(
+    ledger: &Ledger,
+    dock: DockContext,
+    fuel: u16,
+    digest: &str,
+    board: &str,
+    revision: usize,
+) -> Vec<Vec<SystemId>> {
+    if !MARKETS_V1.contains(&dock.system()) || fuel > fuel_capacity(ledger.fuel_storage_count()) {
+        return Vec::new();
+    }
+    let key = format!(
+        "contract-board-v1:{digest}/{board}/main-orbital:0:{}:{revision}",
+        dock.system().system
+    );
+    let hash = Sha256::digest(key.as_bytes());
+    let mut seed = u32::from_be_bytes([hash[4], hash[5], hash[6], hash[7]]);
+    if seed == 0 {
+        seed = 0x6d2b79f5;
+    }
+    static CATALOGUE: OnceLock<Option<OriginalNavigation>> = OnceLock::new();
+    let Some(nav) = CATALOGUE
+        .get_or_init(|| OriginalNavigation::bundled().ok())
+        .as_ref()
+    else {
+        return Vec::new();
+    };
+    let mut paths = vec![vec![dock.system()]];
+    let mut cursor = 0;
+    while cursor < paths.len() {
+        let path = paths[cursor].clone();
+        cursor += 1;
+        let Some(&from) = path.last() else { continue };
+        let available = if path.len() == 1 {
+            fuel
+        } else {
+            fuel_capacity(ledger.fuel_storage_count())
+        };
+        let reach = ledger.jump_reach_ly().min(f64::from(available) / 10.0);
+        if path.len() >= 4 {
+            continue;
+        }
+        for target in MARKETS_V1 {
+            if paths.iter().any(|p| p.last() == Some(&target)) {
+                continue;
+            }
+            if nav
+                .distance_ly(from, target)
+                .is_ok_and(|distance| distance <= reach)
+            {
+                let mut next = path.clone();
+                next.push(target);
+                paths.push(next);
+            }
+        }
+    }
+    paths.remove(0);
+    paths.sort_by_key(|path| path.last().map(|s| s.system));
+    if paths.is_empty() {
+        return Vec::new();
+    }
+    (0..6)
+        .map(|_| {
+            seed ^= seed << 13;
+            seed ^= seed >> 17;
+            seed ^= seed << 5;
+            paths[((u64::from(seed) * paths.len() as u64) >> 32) as usize].clone()
+        })
+        .collect()
+}
+
 impl Dispatch {
     pub(super) fn active(&self) -> Option<&DispatchRecord> {
         self.records
@@ -47,10 +118,7 @@ impl Dispatch {
             .filter(|record| record.terminal.is_none())
     }
     fn offers(&self, ledger: &Ledger, dock: DockContext, fuel: u16) -> Vec<DispatchOffer> {
-        if self.active().is_some()
-            || !MARKETS_V1.contains(&dock.system())
-            || fuel > fuel_capacity(ledger.fuel_storage_count())
-        {
+        if self.active().is_some() {
             return Vec::new();
         }
         let revision = self
@@ -59,72 +127,24 @@ impl Dispatch {
             .filter(|r| r.issuer.system() == dock.system())
             .count()
             * 2;
-        let key = format!(
-            "contract-board-v1:{DISPATCH_DIGEST}/sealed-dispatch/main-orbital:0:{}:{revision}",
-            dock.system().system
-        );
-        let hash = Sha256::digest(key.as_bytes());
-        let mut seed = u32::from_be_bytes([hash[4], hash[5], hash[6], hash[7]]);
-        if seed == 0 {
-            seed = 0x6d2b79f5;
-        }
-        static CATALOGUE: OnceLock<Option<OriginalNavigation>> = OnceLock::new();
-        let Some(nav) = CATALOGUE
-            .get_or_init(|| OriginalNavigation::bundled().ok())
-            .as_ref()
-        else {
-            return Vec::new();
-        };
-        let mut paths = vec![vec![dock.system()]];
-        let mut cursor = 0;
-        while cursor < paths.len() {
-            let path = paths[cursor].clone();
-            cursor += 1;
-            let Some(&from) = path.last() else { continue };
-            let available = if path.len() == 1 {
-                fuel
-            } else {
-                fuel_capacity(ledger.fuel_storage_count())
-            };
-            let reach = ledger.jump_reach_ly().min(f64::from(available) / 10.0);
-            if path.len() >= 4 {
-                continue;
-            }
-            for target in MARKETS_V1 {
-                if paths.iter().any(|p| p.last() == Some(&target)) {
-                    continue;
-                }
-                if nav
-                    .distance_ly(from, target)
-                    .is_ok_and(|distance| distance <= reach)
-                {
-                    let mut next = path.clone();
-                    next.push(target);
-                    paths.push(next);
-                }
-            }
-        }
-        paths.remove(0);
-        paths.sort_by_key(|path| path.last().map(|s| s.system));
-        if paths.is_empty() {
-            return Vec::new();
-        }
-        let mut offers = Vec::new();
-        for row in 0..6 {
-            seed ^= seed << 13;
-            seed ^= seed >> 17;
-            seed ^= seed << 5;
-            if row % 2 == 1 {
-                let index = ((u64::from(seed) * paths.len() as u64) >> 32) as usize;
-                let path = paths[index].clone();
-                offers.push(DispatchOffer {
-                    row,
-                    fee_tenths: 3200 + 900 * (path.len() as u32 - 1),
-                    path,
-                });
-            }
-        }
-        offers
+        board_draws(
+            ledger,
+            dock,
+            fuel,
+            DISPATCH_DIGEST,
+            "sealed-dispatch",
+            revision,
+        )
+        .into_iter()
+        .enumerate()
+        .skip(1)
+        .step_by(2)
+        .map(|(row, path)| DispatchOffer {
+            row: row as u8,
+            fee_tenths: 3200 + 900 * (path.len() as u32 - 1),
+            path,
+        })
+        .collect()
     }
 }
 

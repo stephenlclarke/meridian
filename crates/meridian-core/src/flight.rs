@@ -51,10 +51,11 @@ pub use flight_reception::{
 };
 mod modular;
 pub use modular::{
-    CABIN_TONNES, CabinGrade, CabinStatus, DispatchAction, DispatchOffer, DispatchRecord,
-    FittedFuelScoops, FittedMiningTool, FuelScoopsSnapshot, ModularEquipmentSnapshot, ModuleAction,
-    ModuleError, ModuleKind, ModuleOffer, ModuleProvenance, ModuleReview, ModuleSlot, OwnedModule,
-    PASSAGE_CLUE_ID, PASSAGE_REWARD_TENTHS, PassageStatus, PassageTerminalReceipt, PassengerAction,
+    BondedAction, BondedOffer, BondedRecord, BondedUnit, CABIN_TONNES, CabinGrade, CabinStatus,
+    DispatchAction, DispatchOffer, DispatchRecord, FittedFuelScoops, FittedMiningTool,
+    FuelScoopsSnapshot, ModularEquipmentSnapshot, ModuleAction, ModuleError, ModuleKind,
+    ModuleOffer, ModuleProvenance, ModuleReview, ModuleSlot, OwnedModule, PASSAGE_CLUE_ID,
+    PASSAGE_REWARD_TENTHS, PassageStatus, PassageTerminalReceipt, PassengerAction,
     PassengerIdentity, PassengerJourneySnapshot, PreparedModule,
 };
 mod ammunition;

@@ -46,6 +46,10 @@ The [solar fuel source candidate](SOLAR-FUEL-SCOOPS.md) adds the original near-s
 
 The [ordinary clue journal](../integration/unwritten-route/README.md) reads the existing first receipts for the implemented source families against the original 64-clue catalogue. Shift+J opens the journal. Later trail instructions and the paid Medusa path follow the original quest prerequisites.
 
+## G03 Bonded Freight candidate
+
+TOREN's board issues three original Machinery tonnes against a 75 CR bond. The workshop can receive one or all remaining tonnes. Each receipt persists. Only the final receipt pays the quoted fee, returns the bond and grants the family's first clue. The candidate covers Avenor, Renas and Lareria. Native cold acceptance and Windows validation are pending. [Player controls and source coverage](BONDED-FREIGHT.md)
+
 ## G01 sealed dispatch candidate
 
 The [contract board](SEALED-DISPATCH.md) issues a one-tonne original at Avenor, Renas or Lareria. The destination officer checks the actual flown legs and current berth. The first successful delivery earns a journal clue. Issuance, delivery and abandonment each use the existing save-before-commit station transaction.

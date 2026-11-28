@@ -625,7 +625,7 @@ impl World {
         {
             return Err(XyzzyError::Inactive);
         }
-        if self.modular.dispatch_occupancy().1 != 0
+        if (self.modular.dispatch_occupancy().1 != 0 || self.modular.bonded_occupancy().1 != 0)
             && (action == XyzzyAction::ToggleUnlimitedFuel || action.refills(false))
         {
             return Err(XyzzyError::ActiveFuelPractice);

@@ -7,7 +7,9 @@ use crate::{
     save::{Reader, SaveError, Writer},
 };
 use core::fmt;
+mod bonded;
 mod cabins;
+pub use bonded::{BondedAction, BondedOffer, BondedRecord, BondedUnit};
 mod dispatch;
 pub use dispatch::{DispatchAction, DispatchOffer, DispatchRecord};
 mod fuel_history;
@@ -429,6 +431,7 @@ pub enum ModuleAction {
     },
     Passenger(PassengerAction),
     Dispatch(DispatchAction),
+    Bonded(BondedAction),
     #[doc(hidden)]
     GrantStoredMiningLaser,
     #[doc(hidden)]
@@ -472,6 +475,7 @@ fn validate_purchase(kind: ModuleKind, technology: u8, credits: u32) -> Result<(
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum ModuleError {
     DispatchUnavailable,
+    BondedUnavailable,
     NoCommander,
     StaleReview,
     Paused,
@@ -497,6 +501,11 @@ pub enum ModuleError {
 }
 impl fmt::Display for ModuleError {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        if *self == Self::BondedUnavailable {
+            return f.write_str(
+                "TOREN cannot accept this transaction for the current ship or consignment",
+            );
+        }
         if *self == Self::DispatchUnavailable {
             return f
                 .write_str("This sealed dispatch is unavailable for the current ship or berth");
@@ -581,6 +590,7 @@ pub(super) struct Ledger {
     test_tank_items: Vec<u64>,
     passage: cabins::Passage,
     dispatch: dispatch::Dispatch,
+    bonded: bonded::Bonded,
     auto_return: Option<u64>,
     salvage_return: Option<salvage::Exchange>,
     pending_mount_issue: Option<(DockContext, u64, u64)>,
@@ -589,9 +599,12 @@ pub(super) struct Ledger {
 impl Ledger {
     pub(super) fn contract_totals(&self) -> (u32, u64) {
         (
-            self.passage.reward() + self.dispatch.earnings,
-            self.passage.events + self.dispatch.events,
+            self.passage.reward() + self.dispatch.earnings + self.bonded.credited,
+            self.passage.events + self.dispatch.events + self.bonded.events,
         )
+    }
+    pub(super) fn bonds_paid(&self) -> u32 {
+        self.bonded.records.len() as u32 * bonded::BOND
     }
     fn born(owner: u64) -> Result<Self, SaveError> {
         Ok(Self {
@@ -981,6 +994,7 @@ impl Ledger {
                     return Err(ModuleError::NotForSale);
                 }
                 ModuleAction::Passenger(action) => return self.apply_passage(event, action),
+                ModuleAction::Bonded(action) => return self.apply_bonded(event, action),
                 ModuleAction::Dispatch(action) => return self.apply_dispatch(event, action),
             }
         }
@@ -1088,6 +1102,7 @@ impl State {
         let mut events = Vec::new();
         for e in &self.events {
             let previous = ledger.fuel_storage_count();
+            let previous_credit = ledger.bonded.credited;
             let previous_earnings = ledger.dispatch.earnings;
             ledger.replay(*e, &mut counters).map_err(|_| INVALID)?;
             let count = ledger.fuel_storage_count();
@@ -1105,6 +1120,15 @@ impl State {
                 }
             } else if let Some(paid) = paid {
                 super::AccountEffect::Debit(paid)
+            } else if let ModuleAction::Bonded(action) = e.action {
+                if matches!(action, BondedAction::Accept(_)) {
+                    super::AccountEffect::Bond {
+                        fuel: u16::try_from(e.item).map_err(|_| INVALID)?,
+                        paid: bonded::BOND,
+                    }
+                } else {
+                    super::AccountEffect::Reward(ledger.bonded.credited - previous_credit)
+                }
             } else if let ModuleAction::Dispatch(action) = e.action {
                 match action {
                     DispatchAction::Collect(_) => super::AccountEffect::ObserveFuel(
@@ -1161,10 +1185,11 @@ impl State {
                 ModuleAction::Passenger(PassengerAction::Receive | PassengerAction::Cancel)
             )
         });
+        let (bonded_records, bonded_hold) = self.bonded_occupancy();
         let (dispatch_records, dispatch_active) = self.dispatch_occupancy();
         (
-            usize::from(boarded) + dispatch_records,
-            usize::from(boarded && !ended) + dispatch_active,
+            usize::from(boarded) + dispatch_records + bonded_records,
+            usize::from(boarded && !ended) + dispatch_active + usize::from(bonded_hold > 0),
         )
     }
 
@@ -1364,6 +1389,26 @@ impl State {
                 transaction
             };
             transaction = validate_module_purchase(e, owner, transaction)?;
+            if let ModuleAction::Bonded(action) = e.action {
+                world
+                    .jump_journal
+                    .validate_passenger_berth(e.dock, e.tick)?;
+                let active = ledger.bonded.active();
+                if !self.history.owns_berth(e.dock)
+                    || !world.xyzzy.dispatch_fuel_is_ordinary(
+                        active.map_or(e.revision, |r| r.issue_revision),
+                        e.revision,
+                    )
+                    || (action.receiving()
+                        && !active.is_some_and(|r| {
+                            world
+                                .jump_journal
+                                .flown_dispatch(r.issuer, e.dock, &r.offer.path)
+                        }))
+                {
+                    return Err(INVALID);
+                }
+            }
             if let ModuleAction::Dispatch(action) = e.action {
                 let start = ledger
                     .dispatch
@@ -1525,6 +1570,13 @@ impl State {
         ledger
             .validate_budgets(account, world.emp.utility_mounts(), allowance)
             .map_err(|_| INVALID)?;
+        if ledger.bonded.active().is_some_and(|r| {
+            !world
+                .xyzzy
+                .dispatch_fuel_is_ordinary(r.issue_revision, account.revision())
+        }) {
+            return Err(INVALID);
+        }
         if ledger.dispatch.active().is_some_and(|r| {
             !world
                 .xyzzy
@@ -1754,6 +1806,13 @@ impl State {
                     w.u8(DISPATCH_COLLECT_TAG);
                     w.u8(row);
                 }
+                ModuleAction::Bonded(BondedAction::Accept(tier)) => {
+                    w.u8(24);
+                    w.u8(tier);
+                }
+                ModuleAction::Bonded(BondedAction::ReceiveOne) => w.u8(25),
+                ModuleAction::Bonded(BondedAction::ReceiveAll) => w.u8(26),
+                ModuleAction::Bonded(BondedAction::Abandon) => w.u8(27),
                 ModuleAction::Dispatch(DispatchAction::Receive) => w.u8(29),
                 ModuleAction::Dispatch(DispatchAction::Abandon) => w.u8(23),
                 ModuleAction::Store { .. } => w.u8(1),
@@ -1829,7 +1888,7 @@ impl State {
             } else {
                 None
             };
-            let dispatch_row = if tag == DISPATCH_COLLECT_TAG {
+            let board_row = if matches!(tag, DISPATCH_COLLECT_TAG | 24) {
                 Some(r.u8()?)
             } else {
                 None
@@ -1887,8 +1946,14 @@ impl State {
                 6 => ModuleAction::Passenger(PassengerAction::Receive),
                 7 => ModuleAction::Passenger(PassengerAction::Cancel),
                 DISPATCH_COLLECT_TAG => ModuleAction::Dispatch(DispatchAction::Collect(
-                    dispatch_row.ok_or(SaveError::InvalidEncoding)?,
+                    board_row.ok_or(SaveError::InvalidEncoding)?,
                 )),
+                24 => ModuleAction::Bonded(BondedAction::Accept(
+                    board_row.ok_or(SaveError::InvalidEncoding)?,
+                )),
+                25 => ModuleAction::Bonded(BondedAction::ReceiveOne),
+                26 => ModuleAction::Bonded(BondedAction::ReceiveAll),
+                27 => ModuleAction::Bonded(BondedAction::Abandon),
                 29 => ModuleAction::Dispatch(DispatchAction::Receive),
                 23 => ModuleAction::Dispatch(DispatchAction::Abandon),
                 _ => return Err(SaveError::InvalidEncoding),
@@ -2234,11 +2299,39 @@ impl World {
             action,
             ModuleAction::Passenger(PassengerAction::Board)
                 | ModuleAction::Dispatch(DispatchAction::Collect(_))
+                | ModuleAction::Bonded(BondedAction::Accept(_))
         ) && !self.original_service_has_capacity()
         {
             return Err(ModuleError::Capacity);
         }
         let item = match action {
+            ModuleAction::Bonded(BondedAction::Accept(_)) => {
+                if self.active_freight_job().is_some()
+                    || !self
+                        .xyzzy
+                        .dispatch_fuel_is_ordinary(account.revision(), account.revision())
+                {
+                    return Err(ModuleError::BondedUnavailable);
+                }
+                if account.credits_tenths() < bonded::BOND {
+                    return Err(ModuleError::InsufficientCredits);
+                }
+                u64::from(account.fuel_tenths())
+            }
+            ModuleAction::Bonded(action) => {
+                let record = ledger
+                    .bonded
+                    .active()
+                    .ok_or(ModuleError::BondedUnavailable)?;
+                if action.receiving()
+                    && !self
+                        .jump_journal
+                        .flown_dispatch(record.issuer, dock, &record.offer.path)
+                {
+                    return Err(ModuleError::BerthRequired);
+                }
+                record.issue_revision
+            }
             ModuleAction::Dispatch(DispatchAction::Collect(_)) => {
                 if !self
                     .xyzzy
@@ -2364,8 +2457,18 @@ impl World {
                 ModuleAction::Store { item }
                 | ModuleAction::Install { item, .. }
                 | ModuleAction::InstallLaser { item, .. } => item,
-                ModuleAction::Dispatch(DispatchAction::Collect(_)) => {
+                ModuleAction::Bonded(BondedAction::Accept(_))
+                | ModuleAction::Dispatch(DispatchAction::Collect(_)) => {
                     u64::from(current.fuel_tenths())
+                }
+                ModuleAction::Bonded(_) => {
+                    self.modular
+                        .ledger(self, current)
+                        .map_err(ModuleError::Save)?
+                        .bonded
+                        .active()
+                        .ok_or(ModuleError::BondedUnavailable)?
+                        .issue_revision
                 }
                 ModuleAction::Dispatch(_) => {
                     self.modular
@@ -2406,6 +2509,7 @@ impl World {
             .modular
             .ledger(self, current)
             .map_err(ModuleError::Save)?;
+        let old_credit = ledger.bonded.credited;
         let old_earnings = ledger.dispatch.earnings;
         ledger.apply(event, (self.modular.purchase_count() + 1) as u32)?;
         let owner = review.dock.owner().seed();
@@ -2422,13 +2526,25 @@ impl World {
             .is_some_and(|item| item.id == owner + 3);
         let shield_grade = ledger.shield_grade().ok_or(ModuleError::ShieldRequired)?;
         let account = if let ModuleAction::Passenger(action) = review.action {
-            current.prepare_contract_action(if action == PassengerAction::Receive {
-                PASSAGE_REWARD_TENTHS
-            } else {
-                0
-            })
+            current.prepare_contract_action(
+                0,
+                if action == PassengerAction::Receive {
+                    PASSAGE_REWARD_TENTHS
+                } else {
+                    0
+                },
+            )
+        } else if let ModuleAction::Bonded(action) = review.action {
+            current.prepare_contract_action(
+                if matches!(action, BondedAction::Accept(_)) {
+                    bonded::BOND
+                } else {
+                    0
+                },
+                ledger.bonded.credited - old_credit,
+            )
         } else if matches!(review.action, ModuleAction::Dispatch(_)) {
-            current.prepare_contract_action(ledger.dispatch.earnings - old_earnings)
+            current.prepare_contract_action(0, ledger.dispatch.earnings - old_earnings)
         } else {
             current.prepare_module(
                 paid,

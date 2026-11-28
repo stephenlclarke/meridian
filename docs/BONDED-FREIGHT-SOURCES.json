@@ -1,0 +1,66 @@
+{
+  "revision": "a11fe16924d87d06021816f9037952afcbac08db",
+  "tree": "68fec574df12ddf74acb14747e0dd6839f478642",
+  "files": [
+    {
+      "path": "docs/meridian/missions/gameplay/G03-BONDED-FREIGHT.md",
+      "gitBlob": "847ea4ff199308aba58828c0f1e58f4686eaced2",
+      "bytes": 8912,
+      "sha256": "3cc48556a8b18fa518f0577594da9f5be0941bf089a05779e81362306870c617"
+    },
+    {
+      "path": "Sources/L337Core/OriginalContractOfferPolicy.swift",
+      "gitBlob": "642097372ae81734ec187eb95552c6f8d9ace6fa",
+      "bytes": 5215,
+      "sha256": "08a4460d25a5fc06e1e6281bf6b85189de88d3b02acc26fe8a61f1c209fdcfd1"
+    },
+    {
+      "path": "Sources/L337Core/ScriptCourierGeneration.swift",
+      "gitBlob": "cc86a71fb1c4ed3c5c6f6c8a96249177b9a99659",
+      "bytes": 6462,
+      "sha256": "e32b611f3efb18955d51e46c8859885fcbaa4b796de67dddf307f19bc84aaf90"
+    },
+    {
+      "path": "Sources/L337Core/ScriptFreightGeneration.swift",
+      "gitBlob": "f58d7f5ccb52e77288cd79bc3662ffbcd91af188",
+      "bytes": 24069,
+      "sha256": "5bbfb7acda7c9c194f0611d4f76891671b1144a70eadeca8b478efe55e7573f9"
+    },
+    {
+      "path": "Sources/L337Core/ScriptFreightCollections.swift",
+      "gitBlob": "3f9a44e0039fb8e388f4bc077e5f1e8247823003",
+      "bytes": 11014,
+      "sha256": "1b62e7f4b4e0bc38f4a87c32227d977229a5f8baf222528894e6e0f3cc13864f"
+    },
+    {
+      "path": "Sources/L337Core/ScriptBaseClueCatalog.swift",
+      "gitBlob": "c3b82735611964becfd1a60457f7170a6391cc43",
+      "bytes": 13702,
+      "sha256": "e910323278e77a75eefd36bacd51368d9ecbde77c25936c91c7f1ca5bc9b1de5"
+    },
+    {
+      "path": "Sources/L337Core/Resources/ScriptPacks/l337-bonded-freight/manifest.toml",
+      "gitBlob": "301c413493cec3ee3e0c86bfe2c43cb4d842f52c",
+      "bytes": 2982,
+      "sha256": "c8b08c9b1ee7e703b85a791f293f5c6af55ee90a226791bfd9c0ad03a2ba820e"
+    },
+    {
+      "path": "Sources/L337Core/Resources/ScriptPacks/l337-bonded-freight/scripts/main.lua",
+      "gitBlob": "87c9b8f8ae8b98cbb8b66a704efe6243eaf163ed",
+      "bytes": 1881,
+      "sha256": "5610566f0078003d1a53b823a80bfbfa395479a60f96dc99f745e4ad93377a30"
+    },
+    {
+      "path": "Tests/L337CoreTests/OriginalBondedFreightTests.swift",
+      "gitBlob": "e914dbc43a5de036e6512d31dda309165239f3b7",
+      "bytes": 15613,
+      "sha256": "43725bf8da2cdd440b63ab931584e5f0a142bf1924ddaa511cbdaf17cf664a7b"
+    },
+    {
+      "path": "Tests/L337CoreTests/ScriptBondedFreightTests.swift",
+      "gitBlob": "98c01f833964c7513eae82155f370a6751322386",
+      "bytes": 14946,
+      "sha256": "809378400a37bde90b9f39168d9797ae136d23fd06a99eb67b4514199b3ebcc5"
+    }
+  ]
+}

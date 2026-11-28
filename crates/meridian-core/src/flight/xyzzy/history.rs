@@ -12,6 +12,7 @@ pub(crate) enum AccountEffect {
     Debit(u32),
     Reward(u32),
     ObserveFuel(u16),
+    Bond { fuel: u16, paid: u32 },
     Sale { bid: u32, credited: u32 },
     Refill { units: u16, paid: u32 },
     TankFit { count: u8, paid: u32 },
@@ -142,6 +143,15 @@ impl State {
             match event.effect {
                 AccountEffect::Debit(paid) => cash = cash.checked_sub(paid).ok_or(INVALID)?,
                 AccountEffect::Reward(credit) => cash = cash.checked_add(credit).ok_or(INVALID)?,
+                AccountEffect::Bond {
+                    fuel: observed,
+                    paid,
+                } => {
+                    if observed != fuel {
+                        return Err(INVALID);
+                    }
+                    cash = cash.checked_sub(paid).ok_or(INVALID)?;
+                }
                 AccountEffect::ObserveFuel(observed) => {
                     if observed != fuel {
                         return Err(INVALID);

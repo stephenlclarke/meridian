@@ -1,0 +1,13 @@
+{
+  "schema": 1,
+  "id": "bonded-freight",
+  "undoBefore": [
+    "sealed-dispatch"
+  ],
+  "undoAfter": [],
+  "kind": "inverse",
+  "manifest": "integration/bonded-freight/PROTECTED-CORE-INVERSE.json",
+  "sha256": "39bb84c70020c191a669291da5637309de0bc1a2a574b59e4f3f8afaea5c23fe",
+  "base": "7a260f8288cd76b055bb6ddd6d2248168bb2f6b2",
+  "label": "G03 bonded freight custody and workshop settlement"
+}

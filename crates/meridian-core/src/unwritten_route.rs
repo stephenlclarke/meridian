@@ -42,6 +42,19 @@ impl World {
         let owner = self.commander_id()?.seed();
         let hull = self.player_ship_id()?.ordinal();
         let receipts = [
+            self.bonded_records()
+                .iter()
+                .find(|r| {
+                    r.issuer.owner().seed() == owner
+                        && r.issuer.ship().ordinal() == hull
+                        && r.complete()
+                })
+                .map(|_| {
+                    BaseClue::new(
+                        "l337.contract/bonded-freight",
+                        "bonded-freight-family-trace",
+                    )
+                }),
             self.dispatch_records()
                 .iter()
                 .find(|r| {

@@ -381,7 +381,7 @@ impl CommanderAccount {
         self.data.ammunition_revision
     }
     /// An original station contract transaction advances the account but does not change equipment fit.
-    pub(crate) fn prepare_contract_action(&self, reward: u32) -> Result<Self, Error> {
+    pub(crate) fn prepare_contract_action(&self, paid: u32, reward: u32) -> Result<Self, Error> {
         let mut data = self.data;
         data.revision = data
             .revision
@@ -389,6 +389,8 @@ impl CommanderAccount {
             .ok_or(Error::SequenceExhausted)?;
         data.credits = data
             .credits
+            .checked_sub(paid)
+            .ok_or(Error::InsufficientFunds)?
             .checked_add(reward)
             .ok_or(Error::CreditOverflow)?;
         Ok(Self { data })

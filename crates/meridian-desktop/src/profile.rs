@@ -360,6 +360,18 @@ impl Profile {
                     "Owned laser fitted to the selected mount."
                 }
                 meridian_core::ModuleAction::Install { .. } => "Owned module fitted.",
+                meridian_core::ModuleAction::Bonded(action) => match action {
+                    meridian_core::freight::BondedAction::Accept(_) => {
+                        "Three original Machinery tonnes aboard. TOREN holds the 75 CR bond."
+                    }
+                    meridian_core::freight::BondedAction::ReceiveOne
+                    | meridian_core::freight::BondedAction::ReceiveAll => {
+                        "TOREN workshop receipt saved."
+                    }
+                    meridian_core::freight::BondedAction::Abandon => {
+                        "Remaining original tonnes returned. The 75 CR bond is forfeited."
+                    }
+                },
                 meridian_core::ModuleAction::Dispatch(action) => match action {
                     meridian_core::freight::DispatchAction::Collect(_) => {
                         "Original sealed record aboard. Fly the quoted route."
@@ -1109,6 +1121,9 @@ pub(crate) mod tests {
         assert_eq!(reopened.world.solar_snapshot(), restored.solar_snapshot());
     }
     pub(crate) fn travel(profile: &mut Profile) {
+        travel_default(profile, SystemId::RENAS);
+    }
+    pub(crate) fn travel_default(profile: &mut Profile, expected: SystemId) {
         action(profile, Action::Launch);
         profile
             .world
@@ -1145,7 +1160,7 @@ pub(crate) mod tests {
         );
         assert_eq!(
             profile.world.snapshot().navigation.map(|n| n.system),
-            Some(SystemId::RENAS)
+            Some(expected)
         );
     }
     #[test]

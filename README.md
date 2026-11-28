@@ -154,6 +154,8 @@ The freight journey requires eight identified one-tonne deliveries and awards 73
 
 At a main orbital, press **5** and select **G01 sealed dispatch board** to collect a one-tonne record. Fly the quoted route and hand it to the destination receiving officer for the displayed fee and the first dispatch clue. [Sealed Dispatch controls](docs/SEALED-DISPATCH.md)
 
+Press **5** for the **G03 TOREN bonded freight** board. Carry three original Machinery tonnes to the quoted workshop. The third receipt pays the fee and returns the 75 CR bond. [Bonded Freight controls](docs/BONDED-FREIGHT.md)
+
 ## Build and contribute
 
 The workspace pins Rust and dependencies in [rust-toolchain.toml](rust-toolchain.toml) and [Cargo.lock](Cargo.lock). Use `make ci` for documentation, formatting, importers, compilation, tests and strict Clippy. `make run` starts the desktop app in an owned graphics session. G1 owns Mac compilation/native validation; Dell owns Linux/native Windows validation; MBA retains its existing fleet work.
