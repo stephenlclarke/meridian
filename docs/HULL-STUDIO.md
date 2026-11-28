@@ -123,15 +123,18 @@ see it in the disposable game session. The Studio export command refuses
 schema 2. To inspect an external schema-2 file in the standalone game, use
 `--inspect-hull-package`. The station Showroom can also display a bundled,
 authenticated archive for a stock catalogue entry. The [Vulture Mk II archive](../integration/sh038-vulture-mk-ii/ORIGINAL-INSPECTION.json)
-retains the original detailed and native artwork and both face-material tables.
+and [Vulture Mk III archive](../integration/sh039-vulture-mk-iii/ORIGINAL-INSPECTION.json)
+retain the original detailed and native artwork and both face-material tables.
 Schema 1 retains the 512-face native limit for flight export.
 
-To check this archive against a local clone of the original L337 sources, run
+To check either archive against a local clone of the original L337 sources, run
 the following command from the Meridian checkout.
 
 ```sh
 python3 tools/verify_original_stock_inspection.py \
   integration/sh038-vulture-mk-ii/ORIGINAL-INSPECTION.json /path/to/l337
+python3 tools/verify_original_stock_inspection.py \
+  integration/sh039-vulture-mk-iii/ORIGINAL-INSPECTION.json /path/to/l337
 ```
 
 ## Serval Fighter
