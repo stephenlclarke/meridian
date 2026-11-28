@@ -1,4 +1,4 @@
-"""Compare a stock inspection archive to its immutable original L337 Git inputs."""
+"""Compare a stock inspection archive to its immutable L337 and Meridian Git inputs."""
 import argparse
 from fractions import Fraction
 import hashlib
@@ -11,9 +11,31 @@ import tomllib
 LEGACY_REVISION = "d03f1b4ecfd7588bb6b27763e31c230ebe1fbf5a"
 
 
+MERIDIAN_REPO = Path(__file__).resolve().parents[1]
+GROUP_SOURCES = {
+    "SH038": {
+        "meridianRevision": "92cdee004accf6f8f1d6b27671391e3aa8391502",
+        "path": "integration/sh038-vulture-mk2/ORIGINAL-ARCHIVE-CANDIDATE.json",
+        "sha256": "830146297942971a87cef9c9d8527f15c48ccd1ecdd87d16b5c2b39ae1fcf208",
+    },
+    "SH039": {
+        "meridianRevision": "3059eb7b9a4bb938ec999c4e6fd5df0b0a8b97db",
+        "path": "integration/sh039-vulture-mk3/VULTURE-MK3-ORIGINAL-STUDIO.json",
+        "sha256": "10f3bdab6409ab73c7603966b506893d7534b2fe1917f4428f283c334b879fc8",
+    },
+}
+
+
 def require(condition, message):
     if not condition:
         raise ValueError(message)
+
+
+def read_group_archive(pin):
+    blob = f"{pin['meridianRevision']}:{pin['path']}"
+    data = subprocess.check_output(["git", "-C", MERIDIAN_REPO, "cat-file", "blob", blob])
+    require(hashlib.sha256(data).hexdigest() == pin["sha256"], "Meridian group archive hash mismatch")
+    return json.loads(data)
 
 
 def verify(package_path, repository):
@@ -23,6 +45,14 @@ def verify(package_path, repository):
     require(identity.startswith("SH") and len(identity) == 5 and identity[2:].isascii()
             and identity[2:].isdigit(), "Invalid stock identity")
     require(provenance["legacyRevision"] == LEGACY_REVISION, "Unexpected legacy revision")
+    pin = GROUP_SOURCES.get(identity)
+    require(pin is not None and provenance.get("groupSource") == pin, "Unexpected Meridian group source")
+    archive = read_group_archive(pin)
+    require(archive["id"] == identity, "Meridian group archive identity mismatch")
+    for level in ("detail", "native"):
+        groups = package[level]["groups"]
+        require(isinstance(groups, list) and all(type(group) is int for group in groups)
+                and groups == archive[level]["groups"], f"Changed {level} group membership")
     paths = {
         "resource": f"Sources/L337Core/Resources/Ships/{identity}.toml",
         "native": f"Sources/L337Core/Resources/OriginalFleetShowroomModels/{identity}.json",
@@ -69,7 +99,7 @@ def verify(package_path, repository):
                       "alpha": item["colour"] & 255, "emissive": item["emissive"]}
                      for item in source["materials"]]
         require(materials == package["materials"], f"Changed {level} palette")
-    print(f"{identity} matches all six original inputs, both meshes and both material streams.")
+    print(f"{identity} matches all six original inputs, both meshes, both material streams and both Meridian group arrays.")
 
 
 if __name__ == "__main__":
