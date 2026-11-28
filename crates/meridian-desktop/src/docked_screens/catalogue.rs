@@ -250,7 +250,10 @@ impl Catalogue {
         let mut rows: Vec<ObjectRecord<'_>> = self.objects.to_vec();
         rows.extend(self.authored.iter().map(AuthoredRecord::object));
         rows.retain(|o| {
-            matches!(o.kind, "ship" | "capsule")
+            (matches!(o.kind, "ship" | "capsule")
+                || crate::authored_hull::STOCK_MODELS
+                    .iter()
+                    .any(|model| model.object == o.id))
                 && format!("{} {} {} {}", o.id, o.name, o.family, o.role)
                     .to_lowercase()
                     .contains(&q)
