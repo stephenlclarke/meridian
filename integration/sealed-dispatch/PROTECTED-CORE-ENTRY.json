@@ -1,0 +1,13 @@
+{
+  "schema": 1,
+  "id": "sealed-dispatch",
+  "undoBefore": [
+    "player-laser-fittings"
+  ],
+  "undoAfter": [],
+  "kind": "inverse",
+  "manifest": "integration/sealed-dispatch/PROTECTED-CORE-INVERSE.json",
+  "sha256": "e1a484742eb049731dbeda61f41c7cce3c211d4dd6048321daf757c025dfcc71",
+  "base": "32c49cb598f7be71103cf5d58d6d8679cbf27f5b",
+  "label": "G01 sealed dispatch custody and station delivery"
+}

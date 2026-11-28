@@ -1,0 +1,398 @@
+{
+  "base": "32c49cb598f7be71103cf5d58d6d8679cbf27f5b",
+  "files": {
+    "flight.rs": {
+      "beforeSHA256": "abb0b55ddbf5336fccb757514e3e6fceba26519bde173bf243abfec7604bb4d3",
+      "afterSHA256": "c2eb42e538d91650f8c5c9dcab3622ac90f7da9de142ec0b5563818373607af1",
+      "hunks": [
+        {
+          "offset": 2097,
+          "before": "    CABIN_TONNES, CabinGrade, CabinStatus, FittedFuelScoops, FittedMiningTool, FuelScoopsSnapshot,\n    ModularEquipmentSnapshot, ModuleAction, ModuleError, ModuleKind, ModuleOffer, ModuleProvenance,\n    ModuleReview, ModuleSlot, OwnedModule, PASSAGE_CLUE_ID, PASSAGE_REWARD_TENTHS, PassageStatus,\n    PassageTerminalReceipt, PassengerAction, PassengerIdentity, PassengerJourneySnapshot,\n    PreparedModule,\n",
+          "after": "    CABIN_TONNES, CabinGrade, CabinStatus, DispatchAction, DispatchOffer, DispatchRecord,\n    FittedFuelScoops, FittedMiningTool, FuelScoopsSnapshot, ModularEquipmentSnapshot, ModuleAction,\n    ModuleError, ModuleKind, ModuleOffer, ModuleProvenance, ModuleReview, ModuleSlot, OwnedModule,\n    PASSAGE_CLUE_ID, PASSAGE_REWARD_TENTHS, PassageStatus, PassageTerminalReceipt, PassengerAction,\n    PassengerIdentity, PassengerJourneySnapshot, PreparedModule,\n"
+        }
+      ]
+    },
+    "flight/equipment.rs": {
+      "beforeSHA256": "08e2b081f075fc5940d2a138e2e5c61282012e50bd0ea545dfc05166d7010c50",
+      "afterSHA256": "f723c42e02d2cb90661c78d96e5ad09dcb9a20d58fb3c7c6dc052b6765278215",
+      "hunks": [
+        {
+          "offset": 3001,
+          "before": "            + self.cabin_tonnes().map_err(MissionError::Service)?;\n",
+          "after": "            + self.contract_hold_tonnes().map_err(MissionError::Service)?;\n"
+        },
+        {
+          "offset": 5885,
+          "before": "                        .cabin_tonnes()\n",
+          "after": "                        .contract_hold_tonnes()\n"
+        }
+      ]
+    },
+    "flight/flight_reception.rs": {
+      "beforeSHA256": "66613ec89ba35f5dc6a398f7548ddc1c304c39674a9d20a34ec4467fcfa80984",
+      "afterSHA256": "0603b4f248ca0f88fe930b298746149535e93d4bd1d17ba25e1bdc4f109abef5",
+      "hunks": [
+        {
+          "offset": 7723,
+          "before": "    // Only implemented owners count: original G02, G04, T02, T01 and T04.\n",
+          "after": "    // Count each contract or lesson once through its owning service.\n"
+        },
+        {
+          "offset": 8007,
+          "before": "        let (passenger_records, passenger_active) = self.modular.passenger_occupancy();\n",
+          "after": "        let (contract_records, contract_active) = self.modular.contract_occupancy();\n"
+        },
+        {
+          "offset": 8219,
+          "before": "                + passenger_records\n",
+          "after": "                + contract_records\n"
+        },
+        {
+          "offset": 8498,
+          "before": "                + passenger_active\n",
+          "after": "                + contract_active\n"
+        }
+      ]
+    },
+    "flight/flight_reception/persistence.rs": {
+      "beforeSHA256": "5bd42ff8a6044d3421ada618932a41e403ae5e176aace7818a039ac65e0c1ae9",
+      "afterSHA256": "caa93ccbd4f9a8312c7119181f76bba918eecf8460741e81d64e5fc9bd24836c",
+      "hunks": [
+        {
+          "offset": 2094,
+          "before": "        let (passenger_records, passenger_active) = world.modular.passenger_occupancy();\n",
+          "after": "        let (contract_records, contract_active) = world.modular.contract_occupancy();\n"
+        },
+        {
+          "offset": 2214,
+          "before": "            + passenger_records\n",
+          "after": "            + contract_records\n"
+        },
+        {
+          "offset": 2524,
+          "before": "            + passenger_active\n",
+          "after": "            + contract_active\n"
+        }
+      ]
+    },
+    "flight/modular.rs": {
+      "beforeSHA256": "c8d9b6896e0307b1b7f3e17030a0c42b203317ace3a15aa29ec25ff5027a82b9",
+      "afterSHA256": "8b283afe8346cafc12e59d872122c2893c184f8840e96f77b93569c468f1e113",
+      "hunks": [
+        {
+          "offset": 384,
+          "before": "",
+          "after": "mod dispatch;\npub use dispatch::{DispatchAction, DispatchOffer, DispatchRecord};\n"
+        },
+        {
+          "offset": 571,
+          "before": "pub(super) use cabins::add_cabin_mass;\n",
+          "after": "pub(super) use cabins::add_contract_hold_mass;\n"
+        },
+        {
+          "offset": 1056,
+          "before": "",
+          "after": "const DISPATCH_COLLECT_TAG: u8 = 28;\n"
+        },
+        {
+          "offset": 16483,
+          "before": "",
+          "after": "    Dispatch(DispatchAction),\n"
+        },
+        {
+          "offset": 17792,
+          "before": "",
+          "after": "    DispatchUnavailable,\n"
+        },
+        {
+          "offset": 18352,
+          "before": "",
+          "after": "        if *self == Self::DispatchUnavailable {\n            return f\n                .write_str(\"This sealed dispatch is unavailable for the current ship or berth\");\n        }\n"
+        },
+        {
+          "offset": 20741,
+          "before": "",
+          "after": "    dispatch: dispatch::Dispatch,\n"
+        },
+        {
+          "offset": 20953,
+          "before": "    pub(super) fn passenger_totals(&self) -> (u32, u64) {\n        (self.passage.reward(), self.passage.events)\n",
+          "after": "    pub(super) fn contract_totals(&self) -> (u32, u64) {\n        (\n            self.passage.reward() + self.dispatch.earnings,\n            self.passage.events + self.dispatch.events,\n        )\n"
+        },
+        {
+          "offset": 36245,
+          "before": "",
+          "after": "                ModuleAction::Dispatch(action) => return self.apply_dispatch(event, action),\n"
+        },
+        {
+          "offset": 39870,
+          "before": "",
+          "after": "            let previous_earnings = ledger.dispatch.earnings;\n"
+        },
+        {
+          "offset": 40557,
+          "before": "",
+          "after": "            } else if let ModuleAction::Dispatch(action) = e.action {\n                match action {\n                    DispatchAction::Collect(_) => super::AccountEffect::ObserveFuel(\n                        u16::try_from(e.item).map_err(|_| INVALID)?,\n                    ),\n                    DispatchAction::Receive => {\n                        super::AccountEffect::Reward(ledger.dispatch.earnings - previous_earnings)\n                    }\n                    DispatchAction::Abandon => super::AccountEffect::Debit(0),\n                }\n"
+        },
+        {
+          "offset": 42479,
+          "before": "    pub(super) fn passenger_occupancy(&self) -> (usize, usize) {\n",
+          "after": "    pub(super) fn contract_occupancy(&self) -> (usize, usize) {\n"
+        },
+        {
+          "offset": 42908,
+          "before": "        (usize::from(boarded), usize::from(boarded && !ended))\n",
+          "after": "        let (dispatch_records, dispatch_active) = self.dispatch_occupancy();\n        (\n            usize::from(boarded) + dispatch_records,\n            usize::from(boarded && !ended) + dispatch_active,\n        )\n"
+        },
+        {
+          "offset": 51099,
+          "before": "",
+          "after": "            if let ModuleAction::Dispatch(action) = e.action {\n                let start = ledger\n                    .dispatch\n                    .active()\n                    .map_or(e.revision, |record| record.issue_revision);\n                if !world.xyzzy.dispatch_fuel_is_ordinary(start, e.revision) {\n                    return Err(INVALID);\n                }\n                world\n                    .jump_journal\n                    .validate_passenger_berth(e.dock, e.tick)?;\n                if !self.history.owns_berth(e.dock)\n                    || (action == DispatchAction::Receive\n                        && !ledger.dispatch.active().is_some_and(|r| {\n                            world\n                                .jump_journal\n                                .flown_dispatch(r.issuer, e.dock, &r.offer.path)\n                        }))\n                {\n                    return Err(INVALID);\n                }\n            }\n"
+        },
+        {
+          "offset": 56010,
+          "before": "                || ledger.cabin_tonnes() > crate::equipment::EXPANDED_HOLD_TONNES\n",
+          "after": "                || ledger.contract_hold_tonnes() > crate::equipment::EXPANDED_HOLD_TONNES\n"
+        },
+        {
+          "offset": 58011,
+          "before": "        let allowance = if world.test_tank_custody_clear() && self.passenger_occupancy().1 == 0 {\n",
+          "after": "        let allowance = if world.test_tank_custody_clear() && self.contract_occupancy().1 == 0 {\n"
+        },
+        {
+          "offset": 58316,
+          "before": "",
+          "after": "        if ledger.dispatch.active().is_some_and(|r| {\n            !world\n                .xyzzy\n                .dispatch_fuel_is_ordinary(r.issue_revision, account.revision())\n        }) {\n            return Err(INVALID);\n        }\n"
+        },
+        {
+          "offset": 58651,
+          "before": "        if self.cabin_tonnes().map_err(|_| INVALID)? != ledger.cabin_tonnes() {\n",
+          "after": "        if self.contract_hold_tonnes().map_err(|_| INVALID)? != ledger.contract_hold_tonnes() {\n"
+        },
+        {
+          "offset": 58790,
+          "before": "        if ledger.cabin_tonnes() != 0 {\n",
+          "after": "        if ledger.contract_hold_tonnes() != 0 {\n"
+        },
+        {
+          "offset": 59006,
+          "before": "            add_cabin_mass(projection, ledger.cabin_tonnes()).map_err(|_| INVALID)?;\n",
+          "after": "            add_contract_hold_mass(projection, ledger.contract_hold_tonnes())\n                .map_err(|_| INVALID)?;\n"
+        },
+        {
+          "offset": 66784,
+          "before": "",
+          "after": "                ModuleAction::Dispatch(DispatchAction::Collect(row)) => {\n                    w.u8(DISPATCH_COLLECT_TAG);\n                    w.u8(row);\n                }\n                ModuleAction::Dispatch(DispatchAction::Receive) => w.u8(29),\n                ModuleAction::Dispatch(DispatchAction::Abandon) => w.u8(23),\n"
+        },
+        {
+          "offset": 69719,
+          "before": "",
+          "after": "            let dispatch_row = if tag == DISPATCH_COLLECT_TAG {\n                Some(r.u8()?)\n            } else {\n                None\n            };\n"
+        },
+        {
+          "offset": 72193,
+          "before": "",
+          "after": "                DISPATCH_COLLECT_TAG => ModuleAction::Dispatch(DispatchAction::Collect(\n                    dispatch_row.ok_or(SaveError::InvalidEncoding)?,\n                )),\n                29 => ModuleAction::Dispatch(DispatchAction::Receive),\n                23 => ModuleAction::Dispatch(DispatchAction::Abandon),\n"
+        },
+        {
+          "offset": 85500,
+          "before": "        if matches!(action, ModuleAction::Passenger(PassengerAction::Board))\n            && !self.original_service_has_capacity()\n",
+          "after": "        if matches!(\n            action,\n            ModuleAction::Passenger(PassengerAction::Board)\n                | ModuleAction::Dispatch(DispatchAction::Collect(_))\n        ) && !self.original_service_has_capacity()\n"
+        },
+        {
+          "offset": 85822,
+          "before": "",
+          "after": "            ModuleAction::Dispatch(DispatchAction::Collect(_)) => {\n                if !self\n                    .xyzzy\n                    .dispatch_fuel_is_ordinary(account.revision(), account.revision())\n                {\n                    return Err(ModuleError::DispatchUnavailable);\n                }\n                u64::from(account.fuel_tenths())\n            }\n            ModuleAction::Dispatch(action) => {\n                let record = ledger\n                    .dispatch\n                    .active()\n                    .ok_or(ModuleError::DispatchUnavailable)?;\n                if action == DispatchAction::Receive\n                    && !self\n                        .jump_journal\n                        .flown_dispatch(record.issuer, dock, &record.offer.path)\n                {\n                    return Err(ModuleError::BerthRequired);\n                }\n                record.issue_revision\n            }\n"
+        },
+        {
+          "offset": 88464,
+          "before": "        if ledger.cabin_tonnes() != 0 {\n",
+          "after": "        if ledger.contract_hold_tonnes() != 0 {\n"
+        },
+        {
+          "offset": 88849,
+          "before": "            let projection = add_cabin_mass(projection, ledger.cabin_tonnes())\n",
+          "after": "            let projection = add_contract_hold_mass(projection, ledger.contract_hold_tonnes())\n"
+        },
+        {
+          "offset": 90362,
+          "before": "",
+          "after": "                ModuleAction::Dispatch(DispatchAction::Collect(_)) => {\n                    u64::from(current.fuel_tenths())\n                }\n                ModuleAction::Dispatch(_) => {\n                    self.modular\n                        .ledger(self, current)\n                        .map_err(ModuleError::Save)?\n                        .dispatch\n                        .active()\n                        .ok_or(ModuleError::DispatchUnavailable)?\n                        .issue_revision\n                }\n"
+        },
+        {
+          "offset": 91792,
+          "before": "",
+          "after": "        let old_earnings = ledger.dispatch.earnings;\n"
+        },
+        {
+          "offset": 92691,
+          "before": "            current.prepare_passage_action(action == PassengerAction::Receive)\n",
+          "after": "            current.prepare_contract_action(if action == PassengerAction::Receive {\n                PASSAGE_REWARD_TENTHS\n            } else {\n                0\n            })\n        } else if matches!(review.action, ModuleAction::Dispatch(_)) {\n            current.prepare_contract_action(ledger.dispatch.earnings - old_earnings)\n"
+        }
+      ]
+    },
+    "flight/navigation_trade/market.rs": {
+      "beforeSHA256": "c61854b97910a12b9ea0b1b32285f0f97ecb9e6a51af1209fbe1a8910a89ef93",
+      "afterSHA256": "4c6a12258bd1710642e7a53d6a9211701df4c049b96f9e12a05439c1366431f9",
+      "hunks": [
+        {
+          "offset": 697,
+          "before": "        let cabin_capacity = self.cabin_tonnes().map_err(Error::Service)?;\n",
+          "after": "        let cabin_capacity = self.contract_hold_tonnes().map_err(Error::Service)?;\n"
+        },
+        {
+          "offset": 3924,
+          "before": "        crate::flight::modular::add_cabin_mass(projection, self.cabin_tonnes()?)\n",
+          "after": "        crate::flight::modular::add_contract_hold_mass(projection, self.contract_hold_tonnes()?)\n"
+        },
+        {
+          "offset": 8494,
+          "before": "        let after = crate::flight::modular::add_cabin_mass(\n",
+          "after": "        let after = crate::flight::modular::add_contract_hold_mass(\n"
+        },
+        {
+          "offset": 8581,
+          "before": "            world.cabin_tonnes().map_err(Error::Service)?,\n",
+          "after": "            world.contract_hold_tonnes().map_err(Error::Service)?,\n"
+        }
+      ]
+    },
+    "flight/navigation_trade/persistence.rs": {
+      "beforeSHA256": "12573177ba7bd3057e7b77eb0a193e0f15ce3606b475459905c533568670c2eb",
+      "afterSHA256": "fa600ebba48a3356dfae2fe0fc6ea320bf9d19ea969051d886c642afa2f8db3f",
+      "hunks": [
+        {
+          "offset": 900,
+          "before": "        let (passenger_records, passenger_active) = commerce.modular.passenger_occupancy();\n",
+          "after": "        let (contract_records, contract_active) = commerce.modular.contract_occupancy();\n"
+        },
+        {
+          "offset": 1031,
+          "before": "            + passenger_records\n",
+          "after": "            + contract_records\n"
+        },
+        {
+          "offset": 1307,
+          "before": "            + passenger_active\n",
+          "after": "            + contract_active\n"
+        },
+        {
+          "offset": 1856,
+          "before": "        let cabin_tonnes = commerce.modular.cabin_tonnes().map_err(|_| INVALID)?;\n        let projection = crate::flight::modular::add_cabin_mass(projection, cabin_tonnes)\n",
+          "after": "        let cabin_tonnes = commerce\n            .modular\n            .contract_hold_tonnes()\n            .map_err(|_| INVALID)?;\n        let projection = crate::flight::modular::add_contract_hold_mass(projection, cabin_tonnes)\n"
+        }
+      ]
+    },
+    "flight/persistence.rs": {
+      "beforeSHA256": "bb87f33082373c193045b436e09ce093cadce5516a7c070667910c4844f4160f",
+      "afterSHA256": "aaeb6151f5041ffd1508e9e26d2fddfaaa917904c1c9cd298b47d60842820d71",
+      "hunks": [
+        {
+          "offset": 36335,
+          "before": "                    .and_then(|revisions| revisions.checked_add(modular.passenger_totals().1))\n",
+          "after": "                    .and_then(|revisions| revisions.checked_add(modular.contract_totals().1))\n"
+        },
+        {
+          "offset": 36560,
+          "before": "                modular.passenger_totals().0,\n",
+          "after": "                modular.contract_totals().0,\n"
+        },
+        {
+          "offset": 38107,
+          "before": "    equipment_and_passage: (u32, u64, u32),\n",
+          "after": "    equipment_and_contracts: (u32, u64, u32),\n"
+        },
+        {
+          "offset": 38238,
+          "before": "    let (ammunition_paid, ammunition_revisions, passenger_reward) = equipment_and_passage;\n",
+          "after": "    let (ammunition_paid, ammunition_revisions, station_contract_reward) = equipment_and_contracts;\n"
+        },
+        {
+          "offset": 38365,
+          "before": "        + u128::from(passenger_reward)\n",
+          "after": "        + u128::from(station_contract_reward)\n"
+        },
+        {
+          "offset": 38730,
+          "before": "        + u128::from(passenger_reward)\n",
+          "after": "        + u128::from(station_contract_reward)\n"
+        }
+      ]
+    },
+    "flight/practice/lifecycle.rs": {
+      "beforeSHA256": "98cf06271767559ef2f5c4ecfc96b43e95f6bff94df7f18a9f28487d24364de0",
+      "afterSHA256": "fccb3303b6cc0cf9d325532d903ccc4d214e4978f9a4ce91b948e2e23ddabdef",
+      "hunks": [
+        {
+          "offset": 8589,
+          "before": "        let (passenger_records, passenger_active) = self.modular.passenger_occupancy();\n",
+          "after": "        let (contract_records, contract_active) = self.modular.contract_occupancy();\n"
+        },
+        {
+          "offset": 9137,
+          "before": "                + passenger_records,\n            active + t01_active + t04_active + passenger_active,\n",
+          "after": "                + contract_records,\n            active + t01_active + t04_active + contract_active,\n"
+        }
+      ]
+    },
+    "flight/xyzzy.rs": {
+      "beforeSHA256": "9a316098e5990787ebc2535c4ed1352c856c682e2ae10e87a992cc9841a4f732",
+      "afterSHA256": "a6745ab246f2b46e63688cc8f809bb0c5381d5176c8451812b1030ed9c423e57",
+      "hunks": [
+        {
+          "offset": 5600,
+          "before": "",
+          "after": "    }\n    pub(super) fn dispatch_fuel_is_ordinary(&self, issue: u64, through: u64) -> bool {\n        !self\n            .records\n            .iter()\n            .take_while(|r| r.end_revision <= issue)\n            .last()\n            .is_some_and(|r| r.unlimited_fuel)\n            && !self.records.iter().any(|r| {\n                r.revision > issue\n                    && r.revision <= through\n                    && (r.unlimited_fuel || r.action.refills(r.unlimited_fuel))\n            })\n"
+        },
+        {
+          "offset": 21169,
+          "before": "            && self.modular.passenger_occupancy().1 == 0\n",
+          "after": "            && self.modular.contract_occupancy().1 == 0\n"
+        },
+        {
+          "offset": 23240,
+          "before": "",
+          "after": "        }\n        if self.modular.dispatch_occupancy().1 != 0\n            && (action == XyzzyAction::ToggleUnlimitedFuel || action.refills(false))\n        {\n            return Err(XyzzyError::ActiveFuelPractice);\n"
+        }
+      ]
+    },
+    "freight.rs": {
+      "beforeSHA256": "fe7044bf3c2aca5304f1e22ce91b6839fd1af7a0d1807f9e33d0486fbf0b6766",
+      "afterSHA256": "bf2c0fa3e0d1f9faa4dfb67ff3a0223dc032b16cf2ac12d106c32a1d3ce8e719",
+      "hunks": [
+        {
+          "offset": 202,
+          "before": "",
+          "after": "\npub use crate::flight::{DispatchAction, DispatchOffer, DispatchRecord};\n"
+        }
+      ]
+    },
+    "freight/g02.rs": {
+      "beforeSHA256": "1e90d45a5187463588ed527c676f1a1a4a9ad900cdaf22519704aa88f398c26d",
+      "afterSHA256": "09baa3e6d83dd2b003e4d8854b20bd7c1ebdba212f536b889f431b64d5b70719",
+      "hunks": [
+        {
+          "offset": 11544,
+          "before": "    /// An original passenger transaction advances the account but does not change equipment fit.\n    pub(crate) fn prepare_passage_action(&self, delivered: bool) -> Result<Self, Error> {\n",
+          "after": "    /// An original station contract transaction advances the account but does not change equipment fit.\n    pub(crate) fn prepare_contract_action(&self, reward: u32) -> Result<Self, Error> {\n"
+        },
+        {
+          "offset": 11896,
+          "before": "        if delivered {\n            data.credits = data\n                .credits\n                .checked_add(crate::flight::PASSAGE_REWARD_TENTHS)\n                .ok_or(Error::CreditOverflow)?;\n        }\n",
+          "after": "        data.credits = data\n            .credits\n            .checked_add(reward)\n            .ok_or(Error::CreditOverflow)?;\n"
+        }
+      ]
+    },
+    "navigation/journal.rs": {
+      "beforeSHA256": "1da2ad0d4712fb6583ee9154648868784a62e9a1029719512d0fcd46200320ed",
+      "afterSHA256": "0536f8641a391c98ea3b888d140ead238a9ae49637edc6a96e47eb368863bf3d",
+      "hunks": [
+        {
+          "offset": 10304,
+          "before": "",
+          "after": "    }\n\n    pub(crate) fn flown_dispatch(\n        &self,\n        from: DockContext,\n        to: DockContext,\n        path: &[SystemId],\n    ) -> bool {\n        let cut = |d: DockContext| usize::try_from(d.visit().checked_sub(d.sequence())?).ok();\n        let (Some(start), Some(end)) = (cut(from), cut(to)) else {\n            return false;\n        };\n        let Some(legs) = self.legs.get(start..end) else {\n            return false;\n        };\n        let mut edges = path.windows(2).peekable();\n        for leg in legs {\n            if edges\n                .peek()\n                .is_some_and(|edge| edge[0] == leg.source && edge[1] == leg.destination)\n            {\n                edges.next();\n            }\n        }\n        edges.next().is_none() && path.last() == Some(&to.system())\n"
+        }
+      ]
+    }
+  }
+}

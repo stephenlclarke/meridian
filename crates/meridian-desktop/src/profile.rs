@@ -360,6 +360,17 @@ impl Profile {
                     "Owned laser fitted to the selected mount."
                 }
                 meridian_core::ModuleAction::Install { .. } => "Owned module fitted.",
+                meridian_core::ModuleAction::Dispatch(action) => match action {
+                    meridian_core::freight::DispatchAction::Collect(_) => {
+                        "Original sealed record aboard. Fly the quoted route."
+                    }
+                    meridian_core::freight::DispatchAction::Receive => {
+                        "Original record delivered. Quoted fee paid."
+                    }
+                    meridian_core::freight::DispatchAction::Abandon => {
+                        "Original record returned to the sender. No payment."
+                    }
+                },
                 meridian_core::ModuleAction::Passenger(action) => match action {
                     meridian_core::PassengerAction::RequestReplies => {
                         "Mira Talen and Oren Vey have replied. Review their current passage status."
@@ -1097,7 +1108,7 @@ pub(crate) mod tests {
         assert_eq!(reopened.world.snapshot(), restored.snapshot());
         assert_eq!(reopened.world.solar_snapshot(), restored.solar_snapshot());
     }
-    fn travel(profile: &mut Profile) {
+    pub(crate) fn travel(profile: &mut Profile) {
         action(profile, Action::Launch);
         profile
             .world

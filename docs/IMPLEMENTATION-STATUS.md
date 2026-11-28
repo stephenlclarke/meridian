@@ -44,7 +44,15 @@ The [solar fuel source candidate](SOLAR-FUEL-SCOOPS.md) adds the original near-s
 
 ## The Unwritten Route clue journal
 
-The [ordinary clue journal](../integration/unwritten-route/README.md) reads the existing first receipts for five playable source families against the original 64-clue catalogue. Shift+J opens the journal. Later trail instructions and the paid Medusa path follow the original quest prerequisites.
+The [ordinary clue journal](../integration/unwritten-route/README.md) reads the existing first receipts for the implemented source families against the original 64-clue catalogue. Shift+J opens the journal. Later trail instructions and the paid Medusa path follow the original quest prerequisites.
+
+## G01 sealed dispatch candidate
+
+The [contract board](SEALED-DISPATCH.md) issues a one-tonne original at Avenor, Renas or Lareria. The destination officer checks the actual flown legs and current berth. The first successful delivery earns a journal clue. Issuance, delivery and abandonment each use the existing save-before-commit station transaction.
+
+On Mac, the signed desktop at `d9ee5fa6` issued package 3 from a fresh Avenor profile. A new process restored the same held record. The stock ship spent 34 fuel units to Renas, where the receiving officer refused delivery, then 73 to Lareria. The Lareria handoff paid 500 CR once. A second cold restart showed 1,220 CR, an empty hold and one Sealed Dispatch Family Trace. On that source, Mac and Windows each passed five core cases, two desktop cases and strict workspace Clippy. The loss and abandonment cases were core tests.
+
+The board initially kept row three selected when collection replaced the three offers with two contacts. At `72e8ba85`, the Windows regression selected package 3 and verified that the next frame highlighted the receiving officer and displayed the original record. The full three-case Windows desktop dispatch suite also passed on that revision. Both real cold subprocesses ran within the board journey test.
 
 ## Passenger cabins and G04 source candidate
 

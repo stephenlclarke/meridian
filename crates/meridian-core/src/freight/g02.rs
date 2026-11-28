@@ -380,19 +380,17 @@ impl CommanderAccount {
     pub(crate) fn ammunition_revision(&self) -> u64 {
         self.data.ammunition_revision
     }
-    /// An original passenger transaction advances the account but does not change equipment fit.
-    pub(crate) fn prepare_passage_action(&self, delivered: bool) -> Result<Self, Error> {
+    /// An original station contract transaction advances the account but does not change equipment fit.
+    pub(crate) fn prepare_contract_action(&self, reward: u32) -> Result<Self, Error> {
         let mut data = self.data;
         data.revision = data
             .revision
             .checked_add(1)
             .ok_or(Error::SequenceExhausted)?;
-        if delivered {
-            data.credits = data
-                .credits
-                .checked_add(crate::flight::PASSAGE_REWARD_TENTHS)
-                .ok_or(Error::CreditOverflow)?;
-        }
+        data.credits = data
+            .credits
+            .checked_add(reward)
+            .ok_or(Error::CreditOverflow)?;
         Ok(Self { data })
     }
     pub(crate) fn revision(&self) -> u64 {

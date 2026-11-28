@@ -21,7 +21,7 @@ impl World {
         &self,
         command: Command,
     ) -> Result<(Reservations, Purpose), Error> {
-        let cabin_capacity = self.cabin_tonnes().map_err(Error::Service)?;
+        let cabin_capacity = self.contract_hold_tonnes().map_err(Error::Service)?;
         let mut reservations = self.navigation_trade.reservations();
         reservations.capacity += cabin_capacity;
         let cabin_only = Reservations {
@@ -95,7 +95,7 @@ impl World {
                     .ok_or(services::Error::InvalidAccount)?
                     .state,
             )?;
-        crate::flight::modular::add_cabin_mass(projection, self.cabin_tonnes()?)
+        crate::flight::modular::add_contract_hold_mass(projection, self.contract_hold_tonnes()?)
     }
     pub(in crate::flight) fn reserved_service_projection(
         &self,
@@ -222,9 +222,9 @@ impl State {
                     .state,
             )
             .map_err(Error::Service)?;
-        let after = crate::flight::modular::add_cabin_mass(
+        let after = crate::flight::modular::add_contract_hold_mass(
             after,
-            world.cabin_tonnes().map_err(Error::Service)?,
+            world.contract_hold_tonnes().map_err(Error::Service)?,
         )
         .map_err(Error::Service)?;
         let transaction = markets.transaction_revision();

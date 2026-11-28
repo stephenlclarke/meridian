@@ -65,7 +65,7 @@ impl World {
         let facts = self.current_service_facts(expected_tick)?;
         self.check_cargo_mount(command)?;
         let reserved_capacity = self.navigation_trade.reservations().capacity
-            + self.cabin_tonnes().map_err(MissionError::Service)?;
+            + self.contract_hold_tonnes().map_err(MissionError::Service)?;
         let account = self
             .commander_account
             .as_ref()
@@ -150,7 +150,7 @@ impl World {
                 command,
                 self.navigation_trade.reservations().capacity
                     + self
-                        .cabin_tonnes()
+                        .contract_hold_tonnes()
                         .map_err(|error| command_error(MissionError::Service(error)))?,
             )
             .map_err(|error| command_error(MissionError::Equipment(error)))?;

@@ -259,15 +259,15 @@ impl World {
         }
         Ok(())
     }
-    // Only implemented owners count: original G02, G04, T02, T01 and T04.
+    // Count each contract or lesson once through its owning service.
     pub(super) fn original_service_occupancy(&self) -> (usize, usize) {
         let (records, active) = self.flight_reception.occupancy();
         let (t04_records, t04_active) = self.navigation_trade.occupancy();
-        let (passenger_records, passenger_active) = self.modular.passenger_occupancy();
+        let (contract_records, contract_active) = self.modular.contract_occupancy();
         let practice_count = self.practice_history.len() + usize::from(self.practice.is_some());
         (
             records
-                + passenger_records
+                + contract_records
                 + t04_records
                 + practice_count
                 + self
@@ -275,7 +275,7 @@ impl World {
                     .as_ref()
                     .map_or(0, |s| s.state.retained_mission_records()),
             active
-                + passenger_active
+                + contract_active
                 + t04_active
                 + usize::from(self.active_freight_job().is_some())
                 + usize::from(self.practice.is_some_and(|p| !p.reception_is_terminal())),
