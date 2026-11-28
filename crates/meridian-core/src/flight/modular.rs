@@ -27,6 +27,7 @@ mod work;
 pub use scoops::{FittedFuelScoops, FuelScoopsSnapshot};
 pub const MINING_LASER_PRICE_TENTHS: u32 = 33_000;
 pub const MINING_LASER_REQUIRED_TL: u8 = 6;
+const DISPATCH_COLLECT_TAG: u8 = 28;
 const INVALID: SaveError = SaveError::InvalidState("modular equipment ownership or fitting");
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum ModuleKind {
@@ -1750,7 +1751,7 @@ impl State {
                     w.bool(restoring);
                 }
                 ModuleAction::Dispatch(DispatchAction::Collect(row)) => {
-                    w.u8(28);
+                    w.u8(DISPATCH_COLLECT_TAG);
                     w.u8(row);
                 }
                 ModuleAction::Dispatch(DispatchAction::Receive) => w.u8(29),
@@ -1828,7 +1829,11 @@ impl State {
             } else {
                 None
             };
-            let dispatch_row = if tag == 21 { Some(r.u8()?) } else { None };
+            let dispatch_row = if tag == DISPATCH_COLLECT_TAG {
+                Some(r.u8()?)
+            } else {
+                None
+            };
             let item = r.u64()?;
             let dock = DockContext::decode_save(r)?;
             let tick = r.u64()?;
@@ -1881,7 +1886,7 @@ impl State {
                 5 => ModuleAction::Passenger(PassengerAction::Board),
                 6 => ModuleAction::Passenger(PassengerAction::Receive),
                 7 => ModuleAction::Passenger(PassengerAction::Cancel),
-                28 => ModuleAction::Dispatch(DispatchAction::Collect(
+                DISPATCH_COLLECT_TAG => ModuleAction::Dispatch(DispatchAction::Collect(
                     dispatch_row.ok_or(SaveError::InvalidEncoding)?,
                 )),
                 29 => ModuleAction::Dispatch(DispatchAction::Receive),
