@@ -7,7 +7,7 @@
   "undoAfter": [],
   "kind": "inverse",
   "manifest": "integration/bonded-freight/PROTECTED-CORE-INVERSE.json",
-  "sha256": "a7e2d5055e82e9f74c3bf40bebc21eec894d7de040eb9ff3da8408e1e70e8b7b",
-  "base": "cfab2c02eaabd6bdea5b83eaced55dda3a56ef49",
+  "sha256": "8d02bab10e586236fd7ea5fbfb9ef50db80ca77a579a5a4b5b0bdcd0357e2e64",
+  "base": "f5fb65b53871e6dcffdeccb45494e2adcd271540",
   "label": "G03 bonded freight custody and workshop settlement"
 }

@@ -1802,7 +1802,7 @@ impl State {
                     w.bool(restoring);
                 }
                 ModuleAction::Dispatch(DispatchAction::Collect(row)) => {
-                    w.u8(21);
+                    w.u8(28);
                     w.u8(row);
                 }
                 ModuleAction::Bonded(BondedAction::Accept(tier)) => {
@@ -1812,7 +1812,7 @@ impl State {
                 ModuleAction::Bonded(BondedAction::ReceiveOne) => w.u8(25),
                 ModuleAction::Bonded(BondedAction::ReceiveAll) => w.u8(26),
                 ModuleAction::Bonded(BondedAction::Abandon) => w.u8(27),
-                ModuleAction::Dispatch(DispatchAction::Receive) => w.u8(22),
+                ModuleAction::Dispatch(DispatchAction::Receive) => w.u8(29),
                 ModuleAction::Dispatch(DispatchAction::Abandon) => w.u8(23),
                 ModuleAction::Store { .. } => w.u8(1),
                 ModuleAction::Install { replacing, .. } => {
@@ -1944,7 +1944,7 @@ impl State {
                 5 => ModuleAction::Passenger(PassengerAction::Board),
                 6 => ModuleAction::Passenger(PassengerAction::Receive),
                 7 => ModuleAction::Passenger(PassengerAction::Cancel),
-                21 => ModuleAction::Dispatch(DispatchAction::Collect(
+                28 => ModuleAction::Dispatch(DispatchAction::Collect(
                     board_row.ok_or(SaveError::InvalidEncoding)?,
                 )),
                 24 => ModuleAction::Bonded(BondedAction::Accept(
@@ -1953,7 +1953,7 @@ impl State {
                 25 => ModuleAction::Bonded(BondedAction::ReceiveOne),
                 26 => ModuleAction::Bonded(BondedAction::ReceiveAll),
                 27 => ModuleAction::Bonded(BondedAction::Abandon),
-                22 => ModuleAction::Dispatch(DispatchAction::Receive),
+                29 => ModuleAction::Dispatch(DispatchAction::Receive),
                 23 => ModuleAction::Dispatch(DispatchAction::Abandon),
                 _ => return Err(SaveError::InvalidEncoding),
             };
