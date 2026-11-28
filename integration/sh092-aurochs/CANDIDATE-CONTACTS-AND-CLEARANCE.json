@@ -1,0 +1,576 @@
+{
+  "metresPerSourceUnit": 9.476427386875148,
+  "scaleRatio": [
+    40000,
+    4221
+  ],
+  "faceCounts": {
+    "detailed": 2504,
+    "archivedNative": 720,
+    "candidateNative": 444
+  },
+  "contacts": {
+    "lost": [],
+    "retained": [
+      {
+        "parts": [
+          0,
+          12
+        ],
+        "names": [
+          "pods explicit member 0",
+          "engine_pair/negative side/connected support"
+        ],
+        "archivedOverlap": {
+          "pointMetres": [
+            -2.6814888,
+            0.2821185,
+            -11.7228019
+          ],
+          "hitCountsAboveBelow": [
+            [
+              1,
+              1
+            ],
+            [
+              1,
+              1
+            ]
+          ]
+        },
+        "candidateOverlap": {
+          "pointMetres": [
+            -2.7160489,
+            0.2317659,
+            -11.7661053
+          ],
+          "hitCountsAboveBelow": [
+            [
+              1,
+              1
+            ],
+            [
+              1,
+              1
+            ]
+          ]
+        }
+      },
+      {
+        "parts": [
+          0,
+          13
+        ],
+        "names": [
+          "pods explicit member 0",
+          "engine_pair/negative side/propulsion casing"
+        ],
+        "archivedOverlap": {
+          "pointMetres": [
+            -6.426444,
+            -1.5744195,
+            -15.5355783
+          ],
+          "hitCountsAboveBelow": [
+            [
+              1,
+              1
+            ],
+            [
+              1,
+              1
+            ]
+          ]
+        },
+        "candidateOverlap": {
+          "pointMetres": [
+            -4.9499059,
+            -1.0990081,
+            -16.1100068
+          ],
+          "hitCountsAboveBelow": [
+            [
+              1,
+              1
+            ],
+            [
+              1,
+              1
+            ]
+          ]
+        }
+      },
+      {
+        "parts": [
+          0,
+          14
+        ],
+        "names": [
+          "pods explicit member 0",
+          "engine_pair/negative side/propulsion luminous recess"
+        ],
+        "archivedOverlap": {
+          "pointMetres": [
+            -5.6143295,
+            -0.4801726,
+            -18.1420148
+          ],
+          "hitCountsAboveBelow": [
+            [
+              1,
+              1
+            ],
+            [
+              1,
+              1
+            ]
+          ]
+        },
+        "candidateOverlap": {
+          "pointMetres": [
+            -5.0744775,
+            -0.7448812,
+            -18.1441088
+          ],
+          "hitCountsAboveBelow": [
+            [
+              1,
+              1
+            ],
+            [
+              1,
+              1
+            ]
+          ]
+        }
+      },
+      {
+        "parts": [
+          0,
+          15
+        ],
+        "names": [
+          "pods explicit member 0",
+          "engine_pair/positive side/connected support"
+        ],
+        "archivedOverlap": {
+          "pointMetres": [
+            5.8966009,
+            -0.3636517,
+            -15.5335423
+          ],
+          "hitCountsAboveBelow": [
+            [
+              1,
+              1
+            ],
+            [
+              1,
+              1
+            ]
+          ]
+        },
+        "candidateOverlap": {
+          "pointMetres": [
+            0.9454398,
+            0.7055692,
+            -9.6825679
+          ],
+          "hitCountsAboveBelow": [
+            [
+              1,
+              1
+            ],
+            [
+              1,
+              1
+            ]
+          ]
+        }
+      },
+      {
+        "parts": [
+          0,
+          16
+        ],
+        "names": [
+          "pods explicit member 0",
+          "engine_pair/positive side/propulsion casing"
+        ],
+        "archivedOverlap": {
+          "pointMetres": [
+            4.2809713,
+            -1.5744195,
+            -15.5355783
+          ],
+          "hitCountsAboveBelow": [
+            [
+              1,
+              1
+            ],
+            [
+              1,
+              1
+            ]
+          ]
+        },
+        "candidateOverlap": {
+          "pointMetres": [
+            4.2809713,
+            -1.4526452,
+            -15.5355783
+          ],
+          "hitCountsAboveBelow": [
+            [
+              1,
+              1
+            ],
+            [
+              1,
+              1
+            ]
+          ]
+        }
+      },
+      {
+        "parts": [
+          0,
+          17
+        ],
+        "names": [
+          "pods explicit member 0",
+          "engine_pair/positive side/propulsion luminous recess"
+        ],
+        "archivedOverlap": {
+          "pointMetres": [
+            5.1347714,
+            -0.8101433,
+            -18.1153449
+          ],
+          "hitCountsAboveBelow": [
+            [
+              1,
+              1
+            ],
+            [
+              1,
+              1
+            ]
+          ]
+        },
+        "candidateOverlap": {
+          "pointMetres": [
+            5.1347714,
+            -0.7907662,
+            -18.1153449
+          ],
+          "hitCountsAboveBelow": [
+            [
+              1,
+              1
+            ],
+            [
+              1,
+              1
+            ]
+          ]
+        }
+      },
+      {
+        "parts": [
+          1,
+          16
+        ],
+        "names": [
+          "pods explicit member 0/service-well-0-0",
+          "engine_pair/positive side/propulsion casing"
+        ],
+        "archivedOverlap": {
+          "pointMetres": [
+            6.5241458,
+            -0.3844529,
+            -16.4965596
+          ],
+          "hitCountsAboveBelow": [
+            [
+              1,
+              1
+            ],
+            [
+              1,
+              1
+            ]
+          ]
+        },
+        "candidateOverlap": {
+          "pointMetres": [
+            6.5241458,
+            -0.3844529,
+            -16.4965596
+          ],
+          "hitCountsAboveBelow": [
+            [
+              1,
+              1
+            ],
+            [
+              1,
+              1
+            ]
+          ]
+        }
+      },
+      {
+        "parts": [
+          2,
+          13
+        ],
+        "names": [
+          "pods explicit member 0/service-well-1-0",
+          "engine_pair/negative side/propulsion casing"
+        ],
+        "archivedOverlap": {
+          "pointMetres": [
+            -6.5843043,
+            -0.3583748,
+            -15.9262374
+          ],
+          "hitCountsAboveBelow": [
+            [
+              1,
+              1
+            ],
+            [
+              1,
+              1
+            ]
+          ]
+        },
+        "candidateOverlap": {
+          "pointMetres": [
+            -6.5843043,
+            -0.3583748,
+            -15.9262374
+          ],
+          "hitCountsAboveBelow": [
+            [
+              1,
+              1
+            ],
+            [
+              1,
+              1
+            ]
+          ]
+        }
+      },
+      {
+        "parts": [
+          5,
+          10
+        ],
+        "names": [
+          "pods explicit member 1",
+          "cockpit glazing envelope"
+        ],
+        "archivedOverlap": {
+          "pointMetres": [
+            -1.884948,
+            5.6425718,
+            9.7493069
+          ],
+          "hitCountsAboveBelow": [
+            [
+              1,
+              1
+            ],
+            [
+              1,
+              1
+            ]
+          ]
+        },
+        "candidateOverlap": {
+          "pointMetres": [
+            -0.0214351,
+            5.7648418,
+            8.8041039
+          ],
+          "hitCountsAboveBelow": [
+            [
+              1,
+              1
+            ],
+            [
+              1,
+              1
+            ]
+          ]
+        }
+      },
+      {
+        "parts": [
+          10,
+          11
+        ],
+        "names": [
+          "cockpit glazing envelope",
+          "cockpit connected structural crossmember"
+        ],
+        "archivedOverlap": {
+          "pointMetres": [
+            2.2447387,
+            6.5280237,
+            9.3471095
+          ],
+          "hitCountsAboveBelow": [
+            [
+              1,
+              1
+            ],
+            [
+              1,
+              1
+            ]
+          ]
+        },
+        "candidateOverlap": {
+          "pointMetres": [
+            2.2447387,
+            6.5280237,
+            9.3471095
+          ],
+          "hitCountsAboveBelow": [
+            [
+              1,
+              1
+            ],
+            [
+              1,
+              1
+            ]
+          ]
+        }
+      },
+      {
+        "parts": [
+          12,
+          13
+        ],
+        "names": [
+          "engine_pair/negative side/connected support",
+          "engine_pair/negative side/propulsion casing"
+        ],
+        "archivedOverlap": {
+          "pointMetres": [
+            -5.9796072,
+            0.1460721,
+            -15.4521612
+          ],
+          "hitCountsAboveBelow": [
+            [
+              1,
+              1
+            ],
+            [
+              1,
+              1
+            ]
+          ]
+        },
+        "candidateOverlap": {
+          "pointMetres": [
+            -5.9796072,
+            0.1460721,
+            -15.4521612
+          ],
+          "hitCountsAboveBelow": [
+            [
+              1,
+              1
+            ],
+            [
+              1,
+              1
+            ]
+          ]
+        }
+      },
+      {
+        "parts": [
+          15,
+          16
+        ],
+        "names": [
+          "engine_pair/positive side/connected support",
+          "engine_pair/positive side/propulsion casing"
+        ],
+        "archivedOverlap": {
+          "pointMetres": [
+            6.0512501,
+            0.1860677,
+            -15.6644701
+          ],
+          "hitCountsAboveBelow": [
+            [
+              1,
+              1
+            ],
+            [
+              1,
+              1
+            ]
+          ]
+        },
+        "candidateOverlap": {
+          "pointMetres": [
+            6.0512501,
+            0.1860677,
+            -15.6644701
+          ],
+          "hitCountsAboveBelow": [
+            [
+              1,
+              1
+            ],
+            [
+              1,
+              1
+            ]
+          ]
+        }
+      }
+    ],
+    "unresolved": []
+  },
+  "routeClearanceMillimetres": {
+    "detailed": {
+      "dorsal": 1275,
+      "ventral": 1373,
+      "upper-aft-approach": 822,
+      "port-outboard": 1355,
+      "port-forward-between-capsule-heights": 779,
+      "starboard-outboard": 1355,
+      "starboard-forward-between-capsule-heights": 772
+    },
+    "archivedNative": {
+      "dorsal": 1275,
+      "ventral": 1638,
+      "upper-aft-approach": 822,
+      "port-outboard": 1355,
+      "port-forward-between-capsule-heights": 808,
+      "starboard-outboard": 1355,
+      "starboard-forward-between-capsule-heights": 801
+    },
+    "candidateNative": {
+      "dorsal": 1471,
+      "ventral": 2120,
+      "upper-aft-approach": 822,
+      "port-outboard": 1355,
+      "port-forward-between-capsule-heights": 808,
+      "starboard-outboard": 1355,
+      "starboard-forward-between-capsule-heights": 801
+    }
+  },
+  "nativeCargoCapsuleVerticalSeparationMillimetres": 284
+}

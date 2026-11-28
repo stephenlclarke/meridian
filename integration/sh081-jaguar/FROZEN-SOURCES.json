@@ -1,0 +1,72 @@
+{
+  "revision": "a11fe16924d87d06021816f9037952afcbac08db",
+  "tree": "68fec574df12ddf74acb14747e0dd6839f478642",
+  "paths": {
+    "resource.toml": {
+      "source": "Sources/L337Core/Resources/Ships/SH081.toml",
+      "blob": "46b54b0ddf2a16c9a8b1c01b8a52457c92667ce0",
+      "bytes": 760635,
+      "sha256": "316dcf7cc781814940c0785567089c2b61fc8733c3b7a6e3becb42de42f9a76e"
+    },
+    "native-export.json": {
+      "source": "Sources/L337Core/Resources/OriginalFleetShowroomModels/SH081.json",
+      "blob": "471e090c74d60331ec0d575f7550941f163e1a16",
+      "bytes": 41940,
+      "sha256": "f0d971f6591d7625ea9c89c617e9a2f731a329a551cef364fd8de0cf9667c3e1"
+    },
+    "contract.toml": {
+      "source": "docs/fleet-design-v2/ships/SH081.toml",
+      "blob": "2f304c45db11e90a869e32fdee6f7b511565367c",
+      "bytes": 2850,
+      "sha256": "57ea57735c368d832a43ed1bade04accf4bf71577dd3439a876a45f610f366f4"
+    },
+    "engineering.json": {
+      "source": "Sources/L337Core/Resources/OriginalFleetPhysical/SH081.json",
+      "blob": "23a75c53b154b6b14a5dbfbac3c590063d318a29",
+      "bytes": 46121,
+      "sha256": "2dbd5e4563126ab862778bb98930932001a4096d503e00459931dfcb7ffcd2f4"
+    },
+    "finite-dry-source.json": {
+      "source": "Sources/L337Core/Resources/JaguarPhysical/SH081-finite-dry-source.json",
+      "blob": "f29e351c3af302a51ca77848e7d0403ecfb3a587",
+      "bytes": 33272,
+      "sha256": "b636253a624d1d6b3f57ed7930c0cabb8c9cbabf6ee46dddbf3b24796bcd770f"
+    },
+    "LEGACY-FINITE-DRY.swift.txt": {
+      "source": "Sources/L337Core/OriginalJaguarPhysicalSource.swift",
+      "blob": "a1e979b0b1d953b5b08081a1acbae50a3e1e801d",
+      "bytes": 5561,
+      "sha256": "5d6011ecd53a0df7a30cbbc6ecb8ff0fb3728c75f2b58e145c9891783035595b"
+    },
+    "LEGACY-PHYSICAL-CONTRACT.swift.txt": {
+      "source": "Sources/L337Core/OriginalHullPhysicalContract.swift",
+      "blob": "476878f3752c54e9be86d2b016dec17582889c63",
+      "bytes": 31230,
+      "sha256": "2c68d8d51acdd469faa25124bcc19027aec1a8f747eb267da2e84e5a98e3c027"
+    },
+    "LICENSE": {
+      "source": "LICENSE",
+      "blob": "b27f022cea044295412849dec93512dad638f08e",
+      "bytes": 1071,
+      "sha256": "033b7058d73f22c3c6b8a5825eb866ca2d67088f3ee94dd5f3e46da59d624766"
+    },
+    "l337-patrol-diffuse.rgba": {
+      "source": "Sources/L337Core/Resources/OriginalShipTextures/l337-patrol-diffuse.rgba",
+      "blob": "e4afc5f105872431548b4707ea5055dad413a066",
+      "bytes": 4194304,
+      "sha256": "9699517d12b4fbbb28746e00bed9ee65c19a098d14402b1d5160280c6f6bfc54"
+    },
+    "l337-strike-diffuse.rgba": {
+      "source": "Sources/L337Core/Resources/OriginalShipTextures/l337-strike-diffuse.rgba",
+      "blob": "15de9d9bef17ca1920f55d14d95deb155a0fd928",
+      "bytes": 4194304,
+      "sha256": "e56f149228caf90237a652d720ae549768bde1056af3d903dc8a5c243ad26e97"
+    },
+    "l337-service-details.rgba": {
+      "source": "Sources/L337Core/Resources/OriginalShipTextures/l337-service-details.rgba",
+      "blob": "372a604db778f6bb545ba146c9bd85cbd5039a63",
+      "bytes": 4194304,
+      "sha256": "35edd84f6ce527195dd8a9bcc039521a6efc5aa2333452bbbc30217b8372103d"
+    }
+  }
+}

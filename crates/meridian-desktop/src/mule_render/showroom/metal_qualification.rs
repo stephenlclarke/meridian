@@ -25,7 +25,13 @@ const SAMPLES: u32 = 16;
 const POSES: [&str; 3] = ["front", "oblique", "upper"];
 const PHASE_SECONDS: f32 = std::f32::consts::PI / 0.7;
 
+mod authored_qualification;
 mod custom_qualification;
+mod kite_stock_qualification;
+mod peregrine_mk_i_qualification;
+mod peregrine_pair_qualification;
+mod sparrowhawk_stock_qualification;
+mod stag_stock_qualification;
 mod zebra_qualification;
 
 fn ok<T, E: std::fmt::Debug>(result: Result<T, E>) -> T {
@@ -585,6 +591,28 @@ fn metal_goshawk_custom_same_pose_shimmer() {
         "SH010",
         "Goshawk Mk II Custom",
         "MERIDIAN_SH010_EVIDENCE_DIR",
+    );
+}
+
+#[test]
+#[ignore = "Mac owner only: explicit production SH022 visual qualification"]
+fn metal_peregrine_mk_i_same_pose_shimmer() {
+    same_pose_shimmer(
+        Hull::PeregrineMkI,
+        "SH022",
+        "Peregrine Mk I",
+        "MERIDIAN_SH022_EVIDENCE_DIR",
+    );
+}
+
+#[test]
+#[ignore = "Mac owner only: explicit production SH023 visual qualification"]
+fn metal_peregrine_mk_iii_same_pose_shimmer() {
+    same_pose_shimmer(
+        Hull::PeregrineMkIII,
+        "SH023",
+        "Peregrine Mk III",
+        "MERIDIAN_SH023_EVIDENCE_DIR",
     );
 }
 

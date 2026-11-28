@@ -1,0 +1,14 @@
+{
+  "detailed": {
+    "mandatoryOppositeSourceVertex": 1680,
+    "nearestFace": 792,
+    "sampledMetres": 0.08999999999999986,
+    "strictLowerMillimetres": 88
+  },
+  "native": {
+    "mandatoryOppositeSourceVertex": 1515,
+    "nearestFace": 28,
+    "sampledMetres": 1.307737672263732,
+    "strictLowerMillimetres": 1306
+  }
+}

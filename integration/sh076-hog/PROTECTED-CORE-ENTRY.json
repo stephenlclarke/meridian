@@ -1,0 +1,12 @@
+{
+  "schema": 1,
+  "id": "sh076-hog",
+  "undoBefore": [
+    "sh075-dzo-mk-ii"
+  ],
+  "undoAfter": [],
+  "kind": "declaration",
+  "module": "hog",
+  "before": "pub mod hobby_fighter;\n",
+  "after": "pub mod hull_package;\n"
+}

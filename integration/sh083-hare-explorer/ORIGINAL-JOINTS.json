@@ -1,0 +1,272 @@
+[
+  {
+    "name": "canopy-to-hull",
+    "pointMetres": [
+      -0.6800000000000002,
+      2.8552,
+      2.4
+    ],
+    "originalFaces": {
+      "detailed": {
+        "canopy": {
+          "faceRange": [
+            1968,
+            2928
+          ],
+          "hitCountsAboveBelow": [
+            1,
+            1
+          ]
+        },
+        "central-hull": {
+          "faceRange": [
+            0,
+            384
+          ],
+          "hitCountsAboveBelow": [
+            1,
+            1
+          ]
+        }
+      },
+      "native": {
+        "canopy": {
+          "faceRange": [
+            176,
+            184
+          ],
+          "hitCountsAboveBelow": [
+            1,
+            1
+          ]
+        },
+        "central-hull": {
+          "faceRange": [
+            0,
+            32
+          ],
+          "hitCountsAboveBelow": [
+            1,
+            1
+          ]
+        }
+      }
+    }
+  },
+  {
+    "name": "port-wing-mount-to-hull",
+    "pointMetres": [
+      -3.59055728,
+      0.30000000000000004,
+      -2.11055728
+    ],
+    "originalFaces": {
+      "detailed": {
+        "port-wing-mount": {
+          "faceRange": [
+            396,
+            408
+          ],
+          "hitCountsAboveBelow": [
+            1,
+            1
+          ]
+        },
+        "central-hull": {
+          "faceRange": [
+            0,
+            384
+          ],
+          "hitCountsAboveBelow": [
+            1,
+            1
+          ]
+        }
+      },
+      "native": {
+        "port-wing-mount": {
+          "faceRange": [
+            44,
+            56
+          ],
+          "hitCountsAboveBelow": [
+            1,
+            1
+          ]
+        },
+        "central-hull": {
+          "faceRange": [
+            0,
+            32
+          ],
+          "hitCountsAboveBelow": [
+            1,
+            1
+          ]
+        }
+      }
+    }
+  },
+  {
+    "name": "port-wing-mount-to-wing",
+    "pointMetres": [
+      -7.87624612,
+      -0.4,
+      -4.0577708800000005
+    ],
+    "originalFaces": {
+      "detailed": {
+        "port-wing-mount": {
+          "faceRange": [
+            396,
+            408
+          ],
+          "hitCountsAboveBelow": [
+            1,
+            1
+          ]
+        },
+        "port-wing": {
+          "faceRange": [
+            384,
+            396
+          ],
+          "hitCountsAboveBelow": [
+            1,
+            1
+          ]
+        }
+      },
+      "native": {
+        "port-wing-mount": {
+          "faceRange": [
+            44,
+            56
+          ],
+          "hitCountsAboveBelow": [
+            1,
+            1
+          ]
+        },
+        "port-wing": {
+          "faceRange": [
+            32,
+            44
+          ],
+          "hitCountsAboveBelow": [
+            1,
+            1
+          ]
+        }
+      }
+    }
+  },
+  {
+    "name": "starboard-wing-mount-to-hull",
+    "pointMetres": [
+      2.07875388,
+      -0.4,
+      -1.3316718400000003
+    ],
+    "originalFaces": {
+      "detailed": {
+        "starboard-wing-mount": {
+          "faceRange": [
+            1188,
+            1200
+          ],
+          "hitCountsAboveBelow": [
+            1,
+            1
+          ]
+        },
+        "central-hull": {
+          "faceRange": [
+            0,
+            384
+          ],
+          "hitCountsAboveBelow": [
+            1,
+            1
+          ]
+        }
+      },
+      "native": {
+        "starboard-wing-mount": {
+          "faceRange": [
+            116,
+            128
+          ],
+          "hitCountsAboveBelow": [
+            1,
+            1
+          ]
+        },
+        "central-hull": {
+          "faceRange": [
+            0,
+            32
+          ],
+          "hitCountsAboveBelow": [
+            1,
+            1
+          ]
+        }
+      }
+    }
+  },
+  {
+    "name": "starboard-wing-mount-to-wing",
+    "pointMetres": [
+      5.09736068,
+      -0.4,
+      -2.8894427200000004
+    ],
+    "originalFaces": {
+      "detailed": {
+        "starboard-wing-mount": {
+          "faceRange": [
+            1188,
+            1200
+          ],
+          "hitCountsAboveBelow": [
+            1,
+            1
+          ]
+        },
+        "starboard-wing": {
+          "faceRange": [
+            1176,
+            1188
+          ],
+          "hitCountsAboveBelow": [
+            1,
+            1
+          ]
+        }
+      },
+      "native": {
+        "starboard-wing-mount": {
+          "faceRange": [
+            116,
+            128
+          ],
+          "hitCountsAboveBelow": [
+            1,
+            1
+          ]
+        },
+        "starboard-wing": {
+          "faceRange": [
+            104,
+            116
+          ],
+          "hitCountsAboveBelow": [
+            1,
+            1
+          ]
+        }
+      }
+    }
+  }
+]

@@ -4,8 +4,89 @@ use crate::station_services::{self as services, MarketSite};
 mod content;
 pub use content::{Definition, StationOffer, definition};
 
+pub(crate) const MEDUSA_HOLD_TONNES: u16 = 22;
+pub(crate) const MEDUSA_EXPANDED_HOLD_TONNES: u16 = 32;
 pub const STANDARD_HOLD_TONNES: u16 = 92;
 pub const EXPANDED_HOLD_TONNES: u16 = 127;
+
+/// Original fictional catalogue grades, ordered for inventory progression.
+#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]
+#[repr(u8)]
+pub enum TargetingTier {
+    Basic = 1,
+    Advanced,
+    Docking,
+    Identification,
+    Pirate,
+    Military,
+}
+
+impl TargetingTier {
+    pub const ALL: [Self; 6] = [
+        Self::Basic,
+        Self::Advanced,
+        Self::Docking,
+        Self::Identification,
+        Self::Pirate,
+        Self::Military,
+    ];
+    pub const fn label(self) -> &'static str {
+        match self {
+            Self::Basic => "Basic",
+            Self::Advanced => "Advanced",
+            Self::Docking => "Docking",
+            Self::Identification => "Identification",
+            Self::Pirate => "Pirate",
+            Self::Military => "Military",
+        }
+    }
+    pub const fn price_tenths(self) -> u32 {
+        [8_000, 20_000, 40_000, 60_000, 100_000, 120_000][self as usize - 1]
+    }
+    /// Displayed, one-based station technology levels.
+    pub const fn required_technology(self) -> u8 {
+        [4, 5, 7, 9, 10, 11][self as usize - 1]
+    }
+    pub const fn predecessor(self) -> Option<Self> {
+        match self {
+            Self::Basic => None,
+            Self::Advanced => Some(Self::Basic),
+            Self::Docking => Some(Self::Advanced),
+            Self::Identification => Some(Self::Docking),
+            Self::Pirate => Some(Self::Identification),
+            Self::Military => Some(Self::Pirate),
+        }
+    }
+}
+
+/// Usable work targeting requires both the independent fitted module and a fitted core.
+#[derive(Debug, Default, Clone, Copy, PartialEq, Eq)]
+pub struct WorkTargetingFit {
+    pub mining: bool,
+    pub salvage: bool,
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum WorkTargetId {
+    Asteroid(crate::mining::AsteroidId),
+    Ore(crate::mining::OreId),
+    Wreck(crate::traffic::NpcId),
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum WorkTargetRole {
+    RockHold,
+    OreTracking,
+    WreckTracking,
+}
+
+/// Guidance observation. This neither issues a work tool nor transfers custody.
+#[derive(Debug, Clone, Copy, PartialEq)]
+pub struct WorkTarget {
+    pub id: WorkTargetId,
+    pub role: WorkTargetRole,
+    pub position: crate::docking::Vec3,
+}
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub struct ItemId {
@@ -212,7 +293,7 @@ impl State {
             || p.account_revision == 0
             || p.account_revision > account_revision
             || p.paid != if p.xyzzy { 0 } else { declared.price_tenths }
-            || !declared.offer(p.site).purchase_available
+            || (!p.xyzzy && !declared.offer(p.site).purchase_available)
             || self.revision == 0
             || self.fitted != (self.revision % 2 == 1)
             || u128::from(p.account_revision) + u128::from(self.revision - 1)
@@ -363,6 +444,28 @@ mod tests {
             p.paid = 28000;
         }
         assert_eq!(grant.validate(21, 22, 2), Err(Error::InvalidState));
+    }
+    #[test]
+    fn secret_cargo_fit_at_each_berth_is_independent_of_local_shop_stock() {
+        for site in [MarketSite::Avenor, MarketSite::Renas, MarketSite::Lareria] {
+            let granted = State::default()
+                .grant_xyzzy(21, 22, 1, site)
+                .unwrap_or_else(|e| panic!("{e}"));
+            assert_eq!(granted.validate(21, 22, 2), Ok(()));
+            assert!(
+                granted
+                    .owned()
+                    .is_some_and(|item| item.xyzzy && item.fitted)
+            );
+            let paid = State::default().prepare(21, 22, 1, 0, site, Command::PurchaseCargoBay);
+            assert_eq!(
+                paid.is_ok(),
+                definition()
+                    .unwrap_or_else(|e| panic!("{e}"))
+                    .offer(site)
+                    .purchase_available
+            );
+        }
     }
     #[test]
     fn authentic_paid_state_keeps_hull_identity_and_usage_through_reversible_fit() {

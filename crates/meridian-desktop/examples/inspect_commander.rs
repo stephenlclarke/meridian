@@ -1,13 +1,13 @@
 //! Read-only qualification observer. Uses the real public World decoder, never a second codec.
-use meridian_core::{World, save::MAX_SAVE_BYTES};
+use meridian_core::{World, save::MAX_SAVE_FILE_BYTES};
 use std::{error::Error, fs::File, io::Read, path::Path};
 
 fn bounded_bytes(reader: impl Read) -> Result<Vec<u8>, Box<dyn Error>> {
     let mut bytes = Vec::new();
     reader
-        .take((MAX_SAVE_BYTES + 1) as u64)
+        .take((MAX_SAVE_FILE_BYTES + 1) as u64)
         .read_to_end(&mut bytes)?;
-    if bytes.len() > MAX_SAVE_BYTES {
+    if bytes.len() > MAX_SAVE_FILE_BYTES {
         return Err("Commander file exceeds the current save bound".into());
     }
     Ok(bytes)
@@ -128,10 +128,14 @@ mod tests {
 
     #[test]
     fn oversize_and_truncated_inputs_never_bypass_the_existing_world_decoder() {
-        assert!(bounded_bytes(std::io::Cursor::new(vec![0; MAX_SAVE_BYTES + 1])).is_err());
+        assert!(bounded_bytes(std::io::Cursor::new(vec![0; MAX_SAVE_FILE_BYTES + 1])).is_err());
         let slot = Slot::new();
         let path = slot.0.join("commander.meridian");
-        for bytes in [vec![], b"MERSAVE1".to_vec(), vec![0; MAX_SAVE_BYTES + 1]] {
+        for bytes in [
+            vec![],
+            b"MERSAVE1".to_vec(),
+            vec![0; MAX_SAVE_FILE_BYTES + 1],
+        ] {
             ok(fs::write(&path, &bytes));
             assert!(inspect(&path).is_err());
             assert_eq!(ok(fs::read(&path)), bytes);

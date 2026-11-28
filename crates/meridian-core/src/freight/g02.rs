@@ -203,6 +203,8 @@ fn validate_birth_ids(ids: FreshCommanderIds) -> Result<(), Error> {
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 struct AccountData {
+    // Reconstructed from the ordinary account’s XYZZY issue record.
+    medusa: bool,
     owner: u64,
     hull: u64,
     revision: u64,
@@ -211,6 +213,7 @@ struct AccountData {
     food_tonnes: u16,
     reserved_food_tonnes: u16,
     fuel_tenths: u16,
+    fuel_storage_count: u8,
     fit: Option<StarterFit>,
     other_commodities: [u64; 16],
     reserved_commodities: [u64; 16],
@@ -223,9 +226,21 @@ struct AccountData {
 }
 
 impl AccountData {
+    fn hold_capacity(&self) -> u16 {
+        if self.medusa {
+            if self.equipment.owned().is_some_and(|item| item.fitted) {
+                32
+            } else {
+                22
+            }
+        } else {
+            self.equipment.capacity()
+        }
+    }
+
     fn allows_stored_starter(&self, index: usize, item: OwnedStarterItem) -> bool {
         // The World separately requires the fit to match its retained modular ledger.
-        matches!(index, 1 | 2 | 4) && self.modular_revision > 0 && item.fitted_hull.is_none()
+        matches!(index, 0..=4) && self.modular_revision > 0 && item.fitted_hull.is_none()
     }
 }
 
@@ -251,6 +266,7 @@ impl CommanderAccount {
         });
         Ok(Self {
             data: AccountData {
+                medusa: false,
                 owner: ids.owner,
                 hull: ids.hull,
                 revision: 0,
@@ -259,6 +275,7 @@ impl CommanderAccount {
                 food_tonnes: 0,
                 reserved_food_tonnes: 0,
                 fuel_tenths: 130,
+                fuel_storage_count: 0,
                 other_commodities: [0; 16],
                 reserved_commodities: [0; 16],
                 legal: 0,
@@ -300,11 +317,22 @@ impl CommanderAccount {
     pub(crate) fn prepare_module(
         &self,
         paid: u32,
-        pulse_fitted: bool,
-        energy_fitted: bool,
-        navigation_fitted: bool,
+        [
+            pulse_fitted,
+            energy_fitted,
+            navigation_fitted,
+            drive_fitted,
+            shield_fitted,
+        ]: [bool; 5],
+        fuel_storage_count: u8,
     ) -> Result<Self, Error> {
         let mut data = self.data;
+        if fuel_storage_count > crate::navigation::MAX_FUEL_STORAGE_UNITS
+            || data.fuel_tenths > crate::navigation::fuel_capacity(fuel_storage_count)
+        {
+            return Err(Error::InvalidFit);
+        }
+        data.fuel_storage_count = fuel_storage_count;
         data.credits = data
             .credits
             .checked_sub(paid)
@@ -335,10 +363,37 @@ impl CommanderAccount {
             .and_then(|fit| fit.items[1].as_mut())
             .ok_or(Error::MissingEquipment)?;
         navigation.fitted_hull = navigation_fitted.then_some(data.hull);
+        let drive = data
+            .fit
+            .as_mut()
+            .and_then(|fit| fit.items[3].as_mut())
+            .ok_or(Error::MissingEquipment)?;
+        drive.fitted_hull = drive_fitted.then_some(data.hull);
+        let shield = data
+            .fit
+            .as_mut()
+            .and_then(|fit| fit.items[0].as_mut())
+            .ok_or(Error::MissingEquipment)?;
+        shield.fitted_hull = shield_fitted.then_some(data.hull);
         Ok(Self { data })
     }
     pub(crate) fn ammunition_revision(&self) -> u64 {
         self.data.ammunition_revision
+    }
+    /// An original passenger transaction advances the account but does not change equipment fit.
+    pub(crate) fn prepare_passage_action(&self, delivered: bool) -> Result<Self, Error> {
+        let mut data = self.data;
+        data.revision = data
+            .revision
+            .checked_add(1)
+            .ok_or(Error::SequenceExhausted)?;
+        if delivered {
+            data.credits = data
+                .credits
+                .checked_add(crate::flight::PASSAGE_REWARD_TENTHS)
+                .ok_or(Error::CreditOverflow)?;
+        }
+        Ok(Self { data })
     }
     pub(crate) fn revision(&self) -> u64 {
         self.data.revision
@@ -399,7 +454,7 @@ impl CommanderAccount {
             data.credits = crate::flight::STARTING_CREDITS_TENTHS;
         }
         if refill {
-            data.fuel_tenths = crate::navigation::FUEL_CAPACITY;
+            data.fuel_tenths = self.fuel_capacity();
         }
         data.xyzzy_active = true;
         data.xyzzy_unlimited_fuel = unlimited_fuel;
@@ -445,8 +500,16 @@ impl CommanderAccount {
     pub(crate) fn equipment_state(&self) -> crate::equipment::State {
         self.data.equipment
     }
+    pub(crate) fn equipment_definition(
+        &self,
+    ) -> Result<crate::equipment::Definition, crate::equipment::Error> {
+        Ok(crate::equipment::definition()?.for_player(self.data.medusa))
+    }
+    pub(crate) fn set_medusa(&mut self, medusa: bool) {
+        self.data.medusa = medusa;
+    }
     pub(crate) fn hold_capacity(&self) -> u16 {
-        self.data.equipment.capacity()
+        self.data.hold_capacity()
     }
     pub(crate) fn prepare_equipment(
         &self,
@@ -477,6 +540,12 @@ impl CommanderAccount {
             .used_tonnes
             .checked_add(reserved_capacity)
             .ok_or(EquipmentError::HoldFull)?;
+        if self.data.medusa
+            && matches!(command, crate::equipment::Command::UnfitCargoBay(_))
+            && used > 22
+        {
+            return Err(EquipmentError::HoldFull);
+        }
         let (equipment, event) = self.data.equipment.prepare(
             self.data.owner,
             self.data.hull,
@@ -508,6 +577,12 @@ impl CommanderAccount {
     pub(crate) fn fuel_tenths(&self) -> u16 {
         self.data.fuel_tenths
     }
+    pub(crate) fn fuel_storage_count(&self) -> u8 {
+        self.data.fuel_storage_count
+    }
+    pub(crate) fn fuel_capacity(&self) -> u16 {
+        crate::navigation::fuel_capacity(self.fuel_storage_count())
+    }
 
     /// Accounting only: World must first validate its actual shop/service request.
     /// No public reward/deposit function exists; G02 has no acceptance charge.
@@ -538,6 +613,7 @@ impl CommanderAccount {
             revision: self.data.revision,
             credits_tenths: self.data.credits,
             fuel_tenths: self.data.fuel_tenths,
+            fuel_capacity_tenths: self.fuel_capacity(),
             hold_capacity_tonnes: self.hold_capacity(),
             food_tonnes: self.data.food_tonnes,
             reserved_food_tonnes: self.data.reserved_food_tonnes,
@@ -546,6 +622,45 @@ impl CommanderAccount {
             used_tonnes: u16::try_from(occupied_tonnes(&freight.data, &self.data))
                 .map_err(|_| services::Error::InvalidAccount)?,
         })
+    }
+
+    /// Prospective single-unit lawful intake, without buying stock or changing cash.
+    /// Only an accepted physical source may publish this candidate and its receipt.
+    pub(crate) fn prepare_cargo_intake(
+        &self,
+        freight: &State,
+        commodity: services::CommodityId,
+        reservations: services::Reservations,
+    ) -> Result<Self, services::Error> {
+        use services::{CargoUnit, Error as ServiceError};
+        if commodity.departure_legal_weight() != 0 {
+            return Err(ServiceError::InvalidAccount);
+        }
+        let before = reservations.apply(self.service_projection(freight)?)?;
+        if commodity.unit() == CargoUnit::Tonne && before.used_tonnes >= before.hold_capacity_tonnes
+        {
+            return Err(ServiceError::HoldFull);
+        }
+        let mut candidate = Self { data: self.data };
+        candidate.data.revision = before
+            .revision
+            .checked_add(1)
+            .ok_or(ServiceError::SequenceExhausted)?;
+        if commodity == services::CommodityId::Food {
+            candidate.data.food_tonnes = candidate
+                .data
+                .food_tonnes
+                .checked_add(1)
+                .ok_or(ServiceError::QuantityLimit)?;
+        } else {
+            let held = &mut candidate.data.other_commodities[commodity.index() - 1];
+            *held = held
+                .checked_add(1)
+                .filter(|&n| n <= services::MAX_MARKET_QUANTITY)
+                .ok_or(ServiceError::QuantityLimit)?;
+        }
+        reservations.apply(candidate.service_projection(freight)?)?;
+        Ok(candidate)
     }
 
     #[cfg(test)]
@@ -607,6 +722,34 @@ impl CommanderAccount {
         Ok((candidate, change.market, change.event))
     }
 
+    pub(crate) fn prepare_commodity_trade(
+        &self,
+        freight: &State,
+        markets: &services::StationMarkets,
+        facts: services::ServiceFacts,
+        trade: services::CommodityTrade,
+        reservations: services::Reservations,
+    ) -> Result<
+        (
+            Self,
+            services::StationMarkets,
+            services::CommodityTradeEvent,
+        ),
+        services::Error,
+    > {
+        let before = reservations.apply(self.service_projection(freight)?)?;
+        let (market, after, event) = markets.prepare_commodity_trade(before, facts, trade)?;
+        let mut candidate = Self { data: self.data };
+        candidate.data.credits = after.credits_tenths;
+        candidate.data.revision = after.revision;
+        candidate.data.food_tonnes = after.food_tonnes;
+        candidate.data.other_commodities = after.other_commodities;
+        if reservations.apply(candidate.service_projection(freight)?)? != after {
+            return Err(services::Error::InvalidAccount);
+        }
+        Ok((candidate, market, event))
+    }
+
     /// World navigation, after its real passage checks, consumes normal owned fuel.
     pub(crate) fn debit_fuel(&mut self, amount: u16) -> Result<(), Error> {
         let fuel = self
@@ -625,6 +768,23 @@ impl CommanderAccount {
         }
         self.data.revision = revision;
         Ok(())
+    }
+    /// Only the flight's accepted solar exposure producer can add this unbought fuel.
+    pub(crate) fn prepare_solar_fuel(&self, units: u16) -> Result<Self, Error> {
+        if units == 0 {
+            return Err(Error::InvalidFit);
+        }
+        let mut data = self.data;
+        data.fuel_tenths = data
+            .fuel_tenths
+            .checked_add(units)
+            .filter(|&fuel| fuel <= self.fuel_capacity())
+            .ok_or(Error::InvalidFit)?;
+        data.revision = data
+            .revision
+            .checked_add(1)
+            .ok_or(Error::SequenceExhausted)?;
+        Ok(Self { data })
     }
 }
 
@@ -800,6 +960,8 @@ struct Job {
     delivered: u8,
     status: JobStatus,
     issue_sequence: u64,
+    issue_account_revision: Option<u64>,
+    abandoned_account_revision: Option<u64>,
     issuer: DockFacts,
     transfers: [Option<Transfer>; 8],
     transfer_count: u8,
@@ -823,6 +985,15 @@ pub struct State {
     data: Data,
     ui_sequence: u64,
     pending: Option<PendingReview>,
+}
+
+#[derive(Debug, Clone, Copy)]
+pub(crate) struct FreightMassEvent {
+    pub(crate) sequence: u64,
+    pub(crate) revision: Option<u64>,
+    pub(crate) delta: i16,
+    pub(crate) system: System,
+    pub(crate) dock_sequence: Option<u64>,
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -850,17 +1021,121 @@ pub(crate) struct Prepared {
 }
 
 impl State {
+    pub(crate) fn cargo_sequence(&self) -> u64 {
+        self.data.sequence
+    }
+
+    /// Every G02 custody transition in logical source order. Older issue/abandon records did
+    /// not retain account revisions; exact delivery receipts did.
+    pub(crate) fn cargo_mass_events(&self) -> Vec<FreightMassEvent> {
+        let mut events = Vec::new();
+        for job in self.data.jobs.iter().flatten() {
+            events.push(FreightMassEvent {
+                sequence: job.issue_sequence,
+                revision: job.issue_account_revision,
+                delta: 8,
+                system: job.issuer.system,
+                dock_sequence: Some(job.issuer.arrival_sequence),
+            });
+            let mut remaining = 8_i16;
+            let mut sequence = job.issue_sequence;
+            for transfer in job.transfers.iter().flatten() {
+                let amount = transfer.mask.count_ones() as i16;
+                remaining -= amount;
+                sequence = transfer.sequence;
+                events.push(FreightMassEvent {
+                    sequence,
+                    revision: Some(transfer.account_revision),
+                    delta: -amount,
+                    system: transfer.dock.system,
+                    dock_sequence: Some(transfer.dock.arrival_sequence),
+                });
+            }
+            if job.status == JobStatus::Abandoned {
+                events.push(FreightMassEvent {
+                    sequence: sequence.saturating_add(1),
+                    revision: job.abandoned_account_revision,
+                    delta: -remaining,
+                    system: AVENOR,
+                    dock_sequence: None,
+                });
+            }
+        }
+        events.sort_unstable_by_key(|event| event.sequence);
+        events
+    }
     pub(crate) fn account_events(&self) -> Vec<crate::flight::AccountEvent> {
+        use crate::flight::{AccountEffect, AccountEvent};
+        let mut events = Vec::new();
+        for job in self.data.jobs.iter().flatten() {
+            for revision in [job.issue_account_revision, job.abandoned_account_revision]
+                .into_iter()
+                .flatten()
+            {
+                events.push(AccountEvent {
+                    revision,
+                    effect: AccountEffect::Debit(0),
+                });
+            }
+            for transfer in job.transfers.iter().flatten() {
+                events.push(AccountEvent {
+                    revision: transfer.account_revision,
+                    effect: if job
+                        .completion
+                        .is_some_and(|c| c.account_revision == transfer.account_revision)
+                    {
+                        AccountEffect::Reward(REWARD_TENTHS)
+                    } else {
+                        AccountEffect::Debit(0)
+                    },
+                });
+            }
+        }
+        events
+    }
+    /// For legacy records without an exact issue or abandonment revision, require
+    /// independently retained berth/closure evidence before granting an exceptional fit.
+    pub(crate) fn custody_clear_at(&self, revision: u64, dock_sequence: u64) -> bool {
+        self.data.jobs.iter().flatten().all(|job| {
+            if job.issuer.arrival_sequence > dock_sequence
+                || job
+                    .issue_account_revision
+                    .is_some_and(|issue| issue > revision)
+            {
+                return true;
+            }
+            job.completion
+                .is_some_and(|receipt| receipt.account_revision < revision)
+                || job
+                    .abandoned_account_revision
+                    .is_some_and(|close| close < revision)
+        })
+    }
+    pub(crate) fn known_issue_revisions(&self) -> impl Iterator<Item = u64> + '_ {
         self.data
             .jobs
             .iter()
             .flatten()
-            .filter_map(|j| j.completion)
-            .map(|c| crate::flight::AccountEvent {
-                revision: c.account_revision,
-                effect: crate::flight::AccountEffect::Reward(REWARD_TENTHS),
-            })
-            .collect()
+            .filter_map(|job| job.issue_account_revision)
+    }
+    pub(crate) fn post_test_issues_have_markers(&self, first_test_dock_sequence: u64) -> bool {
+        self.data.jobs.iter().flatten().all(|job| {
+            job.issuer.arrival_sequence <= first_test_dock_sequence
+                || job.issue_account_revision.is_some()
+        })
+    }
+    #[cfg(test)]
+    pub(crate) fn forge_issue_revision_for_test(&mut self, revision: u64) {
+        if let Some(job) = self.data.jobs.iter_mut().flatten().last() {
+            job.issue_account_revision = Some(revision);
+        }
+    }
+    #[cfg(test)]
+    pub(crate) fn clear_last_custody_markers_for_test(&mut self) {
+        if let Some(job) = self.data.jobs.iter_mut().flatten().last() {
+            job.issue_account_revision = None;
+            job.abandoned_account_revision = None;
+        }
     }
 
     pub(crate) fn new_commander(owner: u64) -> Self {
@@ -1058,6 +1333,8 @@ impl State {
                             delivered: 0,
                             status: JobStatus::Active,
                             issue_sequence: plan.next.sequence,
+                            issue_account_revision: Some(plan.next_account.revision),
+                            abandoned_account_revision: None,
                             issuer: dock,
                             transfers: [None; 8],
                             transfer_count: 0,
@@ -1089,6 +1366,7 @@ impl State {
                         let removed = updated.held.count_ones() as u8;
                         updated.held = 0;
                         updated.status = JobStatus::Abandoned;
+                        updated.abandoned_account_revision = Some(plan.next_account.revision);
                         plan.next.jobs[id.ordinal as usize] = Some(updated);
                         plan.event = Event::Abandoned { job: id, removed };
                     }
@@ -1278,7 +1556,9 @@ fn validate_account(data: &Data, account: &AccountData) -> Result<(), Error> {
             return Err(Error::InvalidFit);
         }
     }
-    if fit.items[3].is_none_or(|item| item.fitted_hull != Some(account.hull)) {
+    if fit.items[3].is_none_or(|item| {
+        item.fitted_hull != Some(account.hull) && !account.allows_stored_starter(3, item)
+    }) {
         return Err(Error::MissingEquipment);
     }
     validate_cargo_and_utility(data, account, &fit)
@@ -1289,7 +1569,7 @@ fn validate_cargo_and_utility(
     account: &AccountData,
     fit: &StarterFit,
 ) -> Result<(), Error> {
-    // The modular ledger can store the born Basic Energy or front Pulse. Consumed
+    // The modular ledger can displace born foundations or front Pulse. Consumed
     // pylon rounds are absent. Other retained birth items must stay fitted.
     if account.equipment.owned().is_some()
         && fit.items.iter().enumerate().any(|(index, item)| {
@@ -1307,13 +1587,14 @@ fn validate_cargo_and_utility(
         .map_err(|_| Error::InvalidFit)?;
     if (account.xyzzy_unlimited_fuel && !account.xyzzy_active)
         || (account.equipment.is_xyzzy() && !account.xyzzy_active)
-        || account.fuel_tenths > 130
+        || account.fuel_storage_count > crate::navigation::MAX_FUEL_STORAGE_UNITS
+        || account.fuel_tenths > crate::navigation::fuel_capacity(account.fuel_storage_count)
     {
         return Err(Error::InvalidFit);
     }
     if !services::valid_native_quantities(account.other_commodities, account.reserved_commodities)
         || account.reserved_food_tonnes > account.food_tonnes
-        || occupied_tonnes(data, account) > u128::from(account.equipment.capacity())
+        || occupied_tonnes(data, account) > u128::from(account.hold_capacity())
     {
         return Err(Error::InvalidFit);
     }
@@ -1390,7 +1671,7 @@ fn require_acceptance(data: &Data, account: &AccountData) -> Result<(), Error> {
     if data.allocated >= 2 {
         return Err(Error::SourceExhausted);
     }
-    if occupied_tonnes(data, account) + 8 > u128::from(account.equipment.capacity()) {
+    if occupied_tonnes(data, account) + 8 > u128::from(account.hold_capacity()) {
         return Err(Error::HoldFull);
     }
     if account.fuel_tenths < DEPARTURE_FUEL_TENTHS {

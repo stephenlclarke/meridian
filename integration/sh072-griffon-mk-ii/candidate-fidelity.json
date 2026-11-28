@@ -1,0 +1,232 @@
+{
+  "exactParts": 13,
+  "allParts": 19,
+  "silhouette": {
+    "directionsPerOrthographicView": 16,
+    "againstArchivedNative": {
+      "axisExtremaAbsoluteDeltaMillimetres": [
+        [
+          0,
+          0
+        ],
+        [
+          186,
+          159
+        ],
+        [
+          0,
+          0
+        ]
+      ],
+      "maxSampledSilhouetteOffsetMillimetres": {
+        "xy": 186,
+        "xz": 0,
+        "yz": 258
+      }
+    },
+    "againstDetailed": {
+      "axisExtremaAbsoluteDeltaMillimetres": [
+        [
+          0,
+          0
+        ],
+        [
+          186,
+          159
+        ],
+        [
+          0,
+          0
+        ]
+      ],
+      "maxSampledSilhouetteOffsetMillimetres": {
+        "xy": 186,
+        "xz": 0,
+        "yz": 258
+      }
+    }
+  },
+  "fullUpperMillimetres": {
+    "candidateToArchive": 983,
+    "archiveToCandidate": 862,
+    "candidateToDetailed": 999,
+    "detailedToCandidate": 1739
+  },
+  "archivedOriginalComparisonUpperMillimetres": {
+    "archiveNativeToDetailed": 992,
+    "detailedToArchivedNative": 1633
+  },
+  "parts": [
+    {
+      "partIndex": 0,
+      "name": "gate longitudinal envelope",
+      "exactVerticesFacesMaterialsAndUV": true,
+      "boundsMillimetres": {
+        "candidateToArchive": 0,
+        "archiveToCandidate": 0
+      }
+    },
+    {
+      "partIndex": 1,
+      "name": "gate connected aft support",
+      "exactVerticesFacesMaterialsAndUV": true,
+      "boundsMillimetres": {
+        "candidateToArchive": 0,
+        "archiveToCandidate": 0
+      }
+    },
+    {
+      "partIndex": 2,
+      "name": "gate longitudinal envelope",
+      "exactVerticesFacesMaterialsAndUV": true,
+      "boundsMillimetres": {
+        "candidateToArchive": 0,
+        "archiveToCandidate": 0
+      }
+    },
+    {
+      "partIndex": 3,
+      "name": "gate connected aft support",
+      "exactVerticesFacesMaterialsAndUV": true,
+      "boundsMillimetres": {
+        "candidateToArchive": 0,
+        "archiveToCandidate": 0
+      }
+    },
+    {
+      "partIndex": 4,
+      "name": "gate forward cross bridge",
+      "exactVerticesFacesMaterialsAndUV": true,
+      "boundsMillimetres": {
+        "candidateToArchive": 0,
+        "archiveToCandidate": 0
+      }
+    },
+    {
+      "partIndex": 5,
+      "name": "aft transverse bridge",
+      "exactVerticesFacesMaterialsAndUV": true,
+      "boundsMillimetres": {
+        "candidateToArchive": 0,
+        "archiveToCandidate": 0
+      }
+    },
+    {
+      "partIndex": 6,
+      "name": "body primary pressure envelope",
+      "exactVerticesFacesMaterialsAndUV": false,
+      "boundsMillimetres": {
+        "candidateToArchive": 733,
+        "archiveToCandidate": 839
+      }
+    },
+    {
+      "partIndex": 7,
+      "name": "body primary pressure envelope/service-well-0-0",
+      "exactVerticesFacesMaterialsAndUV": true,
+      "boundsMillimetres": {
+        "candidateToArchive": 0,
+        "archiveToCandidate": 0
+      }
+    },
+    {
+      "partIndex": 8,
+      "name": "body primary pressure envelope/service-well-1-0",
+      "exactVerticesFacesMaterialsAndUV": true,
+      "boundsMillimetres": {
+        "candidateToArchive": 0,
+        "archiveToCandidate": 0
+      }
+    },
+    {
+      "partIndex": 9,
+      "name": "body primary pressure envelope/service-well-2-0",
+      "exactVerticesFacesMaterialsAndUV": true,
+      "boundsMillimetres": {
+        "candidateToArchive": 0,
+        "archiveToCandidate": 0
+      }
+    },
+    {
+      "partIndex": 10,
+      "name": "body primary pressure envelope/service-well-3-0",
+      "exactVerticesFacesMaterialsAndUV": true,
+      "boundsMillimetres": {
+        "candidateToArchive": 0,
+        "archiveToCandidate": 0
+      }
+    },
+    {
+      "partIndex": 11,
+      "name": "cockpit glazing envelope",
+      "exactVerticesFacesMaterialsAndUV": false,
+      "boundsMillimetres": {
+        "candidateToArchive": 916,
+        "archiveToCandidate": 820
+      }
+    },
+    {
+      "partIndex": 12,
+      "name": "cockpit connected structural crossmember",
+      "exactVerticesFacesMaterialsAndUV": true,
+      "boundsMillimetres": {
+        "candidateToArchive": 0,
+        "archiveToCandidate": 0
+      }
+    },
+    {
+      "partIndex": 13,
+      "name": "engine_pair/negative side/connected support",
+      "exactVerticesFacesMaterialsAndUV": true,
+      "boundsMillimetres": {
+        "candidateToArchive": 0,
+        "archiveToCandidate": 0
+      }
+    },
+    {
+      "partIndex": 14,
+      "name": "engine_pair/negative side/propulsion casing",
+      "exactVerticesFacesMaterialsAndUV": false,
+      "boundsMillimetres": {
+        "candidateToArchive": 983,
+        "archiveToCandidate": 862
+      }
+    },
+    {
+      "partIndex": 15,
+      "name": "engine_pair/negative side/propulsion luminous recess",
+      "exactVerticesFacesMaterialsAndUV": false,
+      "boundsMillimetres": {
+        "candidateToArchive": 798,
+        "archiveToCandidate": 798
+      }
+    },
+    {
+      "partIndex": 16,
+      "name": "engine_pair/positive side/connected support",
+      "exactVerticesFacesMaterialsAndUV": true,
+      "boundsMillimetres": {
+        "candidateToArchive": 0,
+        "archiveToCandidate": 0
+      }
+    },
+    {
+      "partIndex": 17,
+      "name": "engine_pair/positive side/propulsion casing",
+      "exactVerticesFacesMaterialsAndUV": false,
+      "boundsMillimetres": {
+        "candidateToArchive": 983,
+        "archiveToCandidate": 862
+      }
+    },
+    {
+      "partIndex": 18,
+      "name": "engine_pair/positive side/propulsion luminous recess",
+      "exactVerticesFacesMaterialsAndUV": false,
+      "boundsMillimetres": {
+        "candidateToArchive": 798,
+        "archiveToCandidate": 798
+      }
+    }
+  ]
+}

@@ -1,10 +1,12 @@
 # World save and continue
 
-The SH025 navigation source candidate reads and writes private format **17**. Qualification on the final combined source remains pending. The current reader requires exact completed-jump receipts from the initial commander state and rejects every previous format before replacing World.
+Only one open profile can own a save directory. Closing the profile releases its lock immediately, including when a concurrently starting process still holds a copy of the file descriptor.
+
+Preview 12 supports saves made by the current build, including a Peregrine commander who exchanges hulls at a berth and later continues in the Medusa. The reader checks format **17**, its content fingerprint and the command history before replacing the live world. Earlier builds have no compatibility guarantee. Open an earlier profile with its matching build or use a separate save directory for Preview 12.
 
 Ordinary startup presents Commander details. An empty slot creates a fresh Avenor commander in memory. A valid save shows its existing identity, ship, location and credits. The game holds the saved pose, mode and tick while Commander details is open. Press Enter to resume a saved flight. Station screens and launch require a valid berth. Pressing L resumes a paused docked commander only when World admits departure. If launch is refused, an immediate save still records the paused berth. Startup leaves the save slot untouched.
 
-An unreadable, corrupt or unsupported slot opens Commander recovery and reports the refusal. C retries load. Press N twice to confirm starting a replacement in memory. F5, normal save-and-quit, or a saved equipment transaction can publish the confirmed replacement. A failed live reload preserves the current World and the slot. Keep earlier binaries and their profile folders together, and select a separate folder with the launcher or `--save-dir` to keep playing an earlier version.
+An unreadable, corrupt or unsupported slot opens Commander recovery and reports the refusal. C retries load. Press N twice to confirm starting a replacement in memory. Ctrl+S, normal save-and-quit, or a saved equipment transaction can publish the confirmed replacement. A failed live reload preserves the current World and the slot. Keep earlier binaries and their profile folders together, and select a separate folder with the launcher or `--save-dir` to keep playing an earlier version.
 
 The current format has no migration checkpoint. All completed jumps carry ordered origin, destination, departure visit, arrival tick, fitted grade and exact catalogue fuel debit. Cold Continue validates the whole sequence from Avenor before publishing it. The literal V15 NPC and PR #44 V16 diagnostic files remain retained as historical evidence and refusal inputs. Their producing binaries and prior execution results retain their original identities.
 

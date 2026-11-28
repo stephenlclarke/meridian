@@ -5,12 +5,23 @@ on:
     branches: [main]
   pull_request:
   workflow_dispatch:
+    inputs:
+      coverage_trial:
+        description: Compare coverage schedules on this commit
+        type: choice
+        options: [normal, serial, parallel]
+        default: normal
+
+concurrency:
+  group: meridian-ci-${{ github.event_name == 'pull_request' && format('pr-{0}', github.event.pull_request.number) || format('run-{0}', github.run_id) }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
 
 permissions:
   contents: read
 
 jobs:
   rust:
+    if: github.event_name != 'workflow_dispatch' || inputs.coverage_trial == 'normal'
     name: Rust (${{ matrix.os }})
     runs-on: ${{ matrix.os }}
     strategy:
@@ -23,7 +34,7 @@ jobs:
           persist-credentials: false
       - name: Install Linux window dependencies
         if: runner.os == 'Linux'
-        run: sudo apt-get update && sudo apt-get install -y libxkbcommon-dev libx11-dev libwayland-dev pkg-config
+        run: sudo apt-get update && sudo apt-get install -y libxkbcommon-dev libx11-dev libwayland-dev libasound2-dev pkg-config
       - name: Install pinned Rust toolchain
         shell: bash
         run: rustup toolchain install 1.99.0 --profile minimal --component rustfmt --component clippy
@@ -41,6 +52,7 @@ jobs:
       - run: python -B -m unittest discover -s tools -p 'test_*.py' -v
 
   docs:
+    if: github.event_name != 'workflow_dispatch' || inputs.coverage_trial == 'normal'
     name: Documentation
     runs-on: ubuntu-latest
     steps:
@@ -62,7 +74,7 @@ jobs:
       - name: Install Linux window and software Vulkan dependencies
         run: |
           sudo apt-get update
-          sudo apt-get install -y libxkbcommon-dev libx11-dev libwayland-dev pkg-config \
+          sudo apt-get install -y libxkbcommon-dev libx11-dev libwayland-dev libasound2-dev pkg-config \
             xvfb xauth xdotool imagemagick libvulkan1 mesa-vulkan-drivers libxkbcommon-x11-0
       - name: Install pinned Rust toolchain
         run: rustup toolchain install 1.99.0 --profile minimal --component llvm-tools-preview --component clippy
@@ -78,48 +90,10 @@ jobs:
       - name: Install pinned Python coverage tooling
         run: |
           python -m pip install --require-hashes --only-binary :all: -r .github/requirements-coverage-ci.txt
-      - name: Rust unit and native window coverage
-        run: |
-          mkdir -p coverage
-          coverage_env=$(cargo llvm-cov show-env --sh)
-          eval "$coverage_env"
-          cargo llvm-cov clean --workspace
-          cargo test --workspace --locked
-          cargo build --locked -p meridian-desktop --bin meridian-desktop --example inspect_commander
-          target_dir="$CARGO_LLVM_COV_TARGET_DIR"
-          test "$target_dir" = "$PWD/target"
-          mapfile -t lavapipe < <(dpkg -L mesa-vulkan-drivers | grep -E '/lvp_icd(\.[^.]+)?\.json$')
-          test "${#lavapipe[@]}" -eq 1
-          test -f "${lavapipe[0]}"
-          VK_DRIVER_FILES="${lavapipe[0]}" VK_ICD_FILENAMES="${lavapipe[0]}" WINIT_X11_SCALE_FACTOR=1 \
-            xvfb-run --auto-servernum --server-args="-screen 0 1600x900x24 -dpi 96 -nolisten tcp" \
-            python -B -m coverage run --parallel-mode .github/scripts/native_coverage_smoke.py
-          llvm_bin="$(rustc --print target-libdir)/../bin"
-          "$llvm_bin/llvm-profdata" merge -sparse coverage/native/desktop-[0-9]*.profraw \
-            -o coverage/native/desktop.profdata
-          "$llvm_bin/llvm-cov" export "$target_dir/debug/meridian-desktop" \
-            -instr-profile=coverage/native/desktop.profdata -format=lcov > coverage/native/desktop.lcov
-          mule_profiles=(coverage/native/desktop-mule-*.profraw)
-          test "${#mule_profiles[@]}" -eq 1
-          test -s "${mule_profiles[0]}"
-          "$llvm_bin/llvm-profdata" merge -sparse "${mule_profiles[0]}" \
-            -o coverage/native/mule-desktop.profdata
-          "$llvm_bin/llvm-cov" export "$target_dir/debug/meridian-desktop" \
-            -instr-profile=coverage/native/mule-desktop.profdata -format=lcov > coverage/native/mule-desktop.lcov
-          set -o pipefail
-          python -B -m coverage run --parallel-mode .github/scripts/check_native_coverage.py \
-            | tee coverage/native/native-line-gates.txt
-          cp coverage/native/desktop-*.profraw "$(dirname "$LLVM_PROFILE_FILE")/"
-          cargo llvm-cov report --workspace --lcov --output-path coverage/lcov.info
-      - name: Clippy report
-        run: |
-          cargo clippy --workspace --all-targets --locked --message-format=json -- -D warnings > coverage/clippy.json
-      - name: Python coverage
-        run: |
-          python -B -m coverage run --parallel-mode -m unittest discover -s tools -p 'test_*.py' -v
-          python -m coverage combine
-          python -m coverage xml -o coverage/python.xml
-          python -m coverage report tools/measure_goshawk_surface_fit.py
+      - name: Collect Rust, native window and Python coverage
+        env:
+          COVERAGE_SCHEDULE: ${{ inputs.coverage_trial == 'serial' && 'serial' || 'parallel' }}
+        run: bash .github/scripts/collect_coverage.sh
       - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         if: always()
         with:

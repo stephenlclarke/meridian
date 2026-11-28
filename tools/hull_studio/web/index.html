@@ -1,0 +1,158 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Hull Studio · Meridian</title>
+  <link rel="stylesheet" href="./style.css">
+</head>
+<body>
+  <header class="toolbar">
+    <div class="brand">
+      <svg class="brand-icon" viewBox="0 0 48 48" aria-hidden="true"><path d="M24 3 44 14v22L24 46 4 35V14Zm0 0 0 43M4 14l40 22M44 14 4 35M4 14l20 10 20-10M4 35l20-11 20 12" fill="none" stroke="currentColor" stroke-width="1.25" stroke-linejoin="round"/></svg>
+      <div><h1>Hull Studio</h1><span>MERIDIAN</span></div>
+    </div>
+    <div class="document-title" id="document-title">No definition</div>
+    <div class="toolbar-actions" aria-label="Definition and package actions">
+      <button id="import-button" type="button">Import JSON</button>
+      <label for="import-file" hidden>Import JSON definition</label>
+      <input id="import-file" type="file" accept=".json,application/json" hidden>
+      <button id="save-button" type="button" disabled>Save definition</button>
+      <button id="build-button" type="button" class="primary" disabled>Build &amp; validate</button>
+      <button id="export-button" type="button" disabled>Export package</button>
+      <button id="showroom-button" type="button" disabled hidden>Open in Showroom</button>
+      <button id="quit-button" type="button">Quit Studio</button>
+    </div>
+  </header>
+
+  <main class="workspace">
+    <aside class="panel definition-panel" aria-labelledby="definition-title">
+      <h2 class="panel-title" id="definition-title">Definition</h2>
+      <div class="panel-body">
+        <form id="definition-form" autocomplete="off">
+          <label class="stacked-field" for="hull-id">Hull ID<input id="hull-id" type="text" disabled></label>
+          <label class="stacked-field" for="hull-name">Name<input id="hull-name" type="text" disabled></label>
+          <label class="inline-field" for="scale">Metres per unit<input id="scale" type="number" step="any" min="0" disabled></label>
+          <label class="inline-field" for="rounding">Rounding (m)<input id="rounding" type="number" step="any" min="0" disabled></label>
+          <label class="inline-field" for="speed">Max speed<input id="speed" type="number" step="any" min="0" placeholder="Unset" disabled></label>
+        </form>
+        <section class="definition-summary" aria-labelledby="mesh-summary-title">
+          <h3 id="mesh-summary-title">Mesh summary</h3>
+          <dl class="summary-list">
+            <div><dt>Detail mesh</dt><dd id="detail-summary">—</dd></div>
+            <div><dt>Native mesh</dt><dd id="native-summary">—</dd></div>
+            <div><dt>Materials</dt><dd id="material-summary">—</dd></div>
+            <div><dt>Clearance paths</dt><dd id="clearance-summary">—</dd></div>
+          </dl>
+        </section>
+        <section class="definition-details" aria-labelledby="groups-title">
+          <h3 id="groups-title">Envelope groups</h3>
+          <p id="group-summary" class="metric-caption">No groups loaded.</p>
+          <div class="group-fields">
+            <label for="group-source">Merge from<select id="group-source" disabled></select></label>
+            <label for="group-target">Into<select id="group-target" disabled></select></label>
+          </div>
+          <div class="group-actions">
+            <button id="merge-groups" type="button" disabled>Merge groups</button>
+            <button id="auto-groups" type="button" disabled>Auto by component</button>
+            <button id="undo-groups" type="button" disabled>Undo group edit</button>
+          </div>
+        </section>
+        <div class="definition-actions">
+          <button id="edit-json" type="button"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m8 5-7 7 7 7m8-14 7 7-7 7"/></svg> Edit JSON</button>
+          <button id="load-example" type="button">Load example</button>
+        </div>
+        <section class="definition-details" id="visual-details" hidden>
+          <h3>Source materials</h3>
+          <ul id="material-list" class="material-list"></ul>
+        </section>
+      </div>
+    </aside>
+
+    <section class="panel geometry-panel" aria-labelledby="geometry-title">
+      <h2 class="panel-title" id="geometry-title">Geometry</h2>
+      <div class="geometry-toolbar">
+        <div class="segmented" role="group" aria-label="Source mesh">
+          <button id="detail-mode" type="button" aria-pressed="true">Detail</button>
+          <button id="native-mode" type="button" aria-pressed="false">Native</button>
+        </div>
+        <div class="layer-control" role="group" aria-label="Visible layers">
+          <label><input id="layer-original" type="checkbox" checked> Original mesh</label>
+          <label><input id="layer-envelope" type="checkbox" checked> Generated envelope</label>
+          <label><input id="layer-points" type="checkbox"> Support points</label>
+          <label><input id="layer-clearances" type="checkbox" checked> Clearance paths</label>
+        </div>
+        <button id="reset-view" class="icon-button" title="Reset rotation and zoom" aria-label="Reset view" type="button"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20 7v6h-6M20 13a8 8 0 1 1-2-7"/></svg></button>
+      </div>
+      <div class="viewport" id="viewport">
+        <canvas id="hull-canvas" tabindex="0" aria-label="Interactive hull geometry. Drag to rotate, scroll to zoom. Arrow keys rotate; plus and minus zoom; Home resets the view."></canvas>
+        <div id="geometry-notice" class="geometry-notice" role="status">Load or import a hull definition to inspect its source mesh.</div>
+        <div class="viewport-hint">Drag to rotate · scroll to zoom</div>
+      </div>
+    </section>
+
+    <aside class="panel report-panel" aria-labelledby="report-title">
+      <h2 class="panel-title" id="report-title">Build report</h2>
+      <div class="report-body" aria-live="polite">
+        <div class="report-status" id="report-status"><span class="status-symbol"></span><span id="report-status-text">Not built / Not validated</span></div>
+        <dl class="metric-table">
+          <div><dt>Source groups</dt><dd id="source-groups">—</dd></div>
+          <div><dt>Envelope groups</dt><dd id="envelope-groups">—</dd></div>
+          <div><dt>Largest sampled gap</dt><dd id="maximum-gap">—</dd></div>
+          <div><dt>Clearance checks</dt><dd id="clearance-checks">—</dd></div>
+        </dl>
+        <p id="gap-note" class="metric-caption" hidden></p>
+        <section class="diagnostics" aria-labelledby="diagnostics-title">
+          <h3 id="diagnostics-title">Diagnostics</h3>
+          <ul id="diagnostics-list"></ul>
+        </section>
+        <section class="clearance-results" id="clearance-results" hidden>
+          <h3>Clearance paths</h3>
+          <ul id="clearance-result-list"></ul>
+        </section>
+      </div>
+      <section class="inspector">
+        <div class="tabs" role="tablist" aria-label="Inspector">
+          <button id="inspect-tab" role="tab" aria-selected="true" aria-controls="inspect-panel" type="button">Inspect JSON</button>
+          <button id="help-tab" role="tab" aria-selected="false" aria-controls="help-panel" type="button" tabindex="-1">Help</button>
+        </div>
+        <div id="inspect-panel" class="tab-content" role="tabpanel" aria-labelledby="inspect-tab">
+          <p>View the current hull definition (JSON) used by the builder.</p>
+          <div class="inspect-options" id="inspect-options" hidden><label for="inspect-select">Show <select id="inspect-select"><option value="definition">Definition</option><option value="report">Report</option><option value="package">Package</option></select></label></div>
+          <pre id="json-preview" aria-label="Current JSON preview">No definition loaded.</pre>
+        </div>
+        <div id="help-panel" class="tab-content" role="tabpanel" aria-labelledby="help-tab" hidden>
+          <p>Hull Studio builds and validates versioned ship packages from original source meshes. Source vertices stay in source units; clearance paths and generated envelope positions are in metres.</p>
+          <p>Use Edit JSON for geometry, groups or supports, material assignments, engineering, flight and clearance definitions. Unknown fields are retained.</p>
+          <p>Group IDs span both meshes. Merge changes the source ID to the target ID everywhere; Auto by component clears authored membership so the builder assigns connected components. A valid build resolves automatic IDs. The first merge adopts those IDs; Undo restores the previous source, including omitted membership.</p>
+          <p>Drag or use arrow keys to rotate. Shift-drag rolls the view. Scroll or use +/− to zoom; reset with Home.</p>
+          <p>A support-point view is not a generated surface. Unmeasured gaps and unsupported validation results are never inferred from the preview.</p>
+        </div>
+        <section class="usage">
+          <h3>Usage</h3>
+          <ul>
+            <li>Edit hull properties in Definition or Edit JSON.</li>
+            <li>Inspect source meshes, envelope and clearance paths.</li>
+            <li>Click Build &amp; validate to generate and check the package.</li>
+            <li>Validated schema 1 definitions can be exported. Schema 2 is for inspection only.</li>
+          </ul>
+        </section>
+      </section>
+    </aside>
+  </main>
+
+  <footer class="statusbar"><span>Source units → metres</span><span id="schema-status">Schema —</span><span class="state-label"><span id="state-dot" class="state-dot"></span><span id="status-text" role="status">Loading example…</span></span></footer>
+  <main id="closed-panel" class="closed-panel" tabindex="-1" hidden><h1>Hull Studio closed</h1><p>The local editor has stopped. You can close this browser tab.</p></main>
+
+  <dialog id="json-dialog" aria-labelledby="json-dialog-title">
+    <div class="dialog-title"><h2 id="json-dialog-title">Edit hull definition</h2><button id="close-dialog" class="icon-button" type="button" aria-label="Close editor"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m6 6 12 12M18 6 6 18"/></svg></button></div>
+    <p>Paste or edit the complete source JSON. Optional fields, materials, groups and provenance are preserved.</p>
+    <label class="sr-only" for="json-editor">Hull definition JSON</label>
+    <textarea id="json-editor" spellcheck="false" autocomplete="off"></textarea>
+    <p id="editor-error" class="editor-error" role="alert"></p>
+    <div class="dialog-actions"><button id="cancel-edit" type="button">Cancel</button><button id="apply-edit" type="button" class="primary">Apply definition</button></div>
+  </dialog>
+
+  <script type="module" src="./app.js"></script>
+</body>
+</html>

@@ -1,0 +1,21 @@
+{
+  "detailed": {
+    "vertex": 484,
+    "metres": 0.0,
+    "faces": [
+      1,
+      4,
+      5,
+      10
+    ],
+    "strictLowerMillimetres": null
+  },
+  "native": {
+    "vertex": 110,
+    "metres": 0.7553823311061656,
+    "faces": [
+      93
+    ],
+    "strictLowerMillimetres": 754
+  }
+}

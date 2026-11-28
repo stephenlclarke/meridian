@@ -1,0 +1,12 @@
+{
+  "schema": 1,
+  "id": "sh169-caracara-mk-i",
+  "undoBefore": [
+    "sh168-armadillo-miner"
+  ],
+  "undoAfter": [],
+  "kind": "declaration",
+  "module": "caracara_mk_i",
+  "before": "pub mod caracal_scout;\n",
+  "after": "pub mod cavy_racer;\n"
+}

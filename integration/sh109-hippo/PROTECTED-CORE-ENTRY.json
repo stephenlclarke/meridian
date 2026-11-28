@@ -1,0 +1,12 @@
+{
+  "schema": 1,
+  "id": "sh109-hippo",
+  "undoBefore": [
+    "sh107-magpie"
+  ],
+  "undoAfter": [],
+  "kind": "declaration",
+  "module": "hippo",
+  "before": "pub mod harpy_gunship;\n",
+  "after": "pub mod hobby_fighter;\n"
+}

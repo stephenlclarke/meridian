@@ -10,6 +10,10 @@ use crate::goshawk_custom::{
     GoshawkCustomHullSource,
 };
 use crate::mule::{SmoothPiece, rounded_maximum_origin_radius};
+use crate::peregrine_mk_i::{
+    PEREGRINE_I_CONTRACT_SHA256, PEREGRINE_I_MAX_SPEED_UNITS, PEREGRINE_I_PIECES,
+    PEREGRINE_I_RESOURCE_SHA256, PeregrineMkIHullSource,
+};
 use crate::station::{DISTANCE_PER_SPEED_UNIT, OriginalStationData, StationError};
 use crate::zebra::{
     ZEBRA_CONTRACT_SHA256, ZEBRA_MAX_SPEED_UNITS, ZEBRA_PIECES, ZEBRA_RESOURCE_SHA256,
@@ -43,6 +47,7 @@ pub type GoshawkApproachSnapshot =
     GoshawkHullApproachSnapshot<GOSHAWK_PIECES, &'static GoshawkEngineering>;
 pub type GoshawkCustomApproachSnapshot = GoshawkHullApproachSnapshot<CUSTOM_PIECES, ()>;
 pub type ZebraApproachSnapshot = GoshawkHullApproachSnapshot<ZEBRA_PIECES, ()>;
+pub type PeregrineMkIApproachSnapshot = GoshawkHullApproachSnapshot<PEREGRINE_I_PIECES, ()>;
 
 impl<const N: usize, E> GoshawkHullApproachSnapshot<N, E> {
     pub fn pose(&self) -> RigidPose {
@@ -86,6 +91,7 @@ enum HullSource {
     Explorer(GoshawkHullSource),
     Custom(GoshawkCustomHullSource),
     Zebra(ZebraHullSource),
+    PeregrineMkI(PeregrineMkIHullSource),
 }
 
 impl HullSource {
@@ -94,6 +100,7 @@ impl HullSource {
             Self::Explorer(source) => source.pieces().as_ref(),
             Self::Custom(source) => source.pieces(),
             Self::Zebra(source) => source.pieces(),
+            Self::PeregrineMkI(source) => source.pieces(),
         }
     }
 
@@ -102,6 +109,7 @@ impl HullSource {
             Self::Explorer(_) => GOSHAWK_MAX_SPEED_UNITS,
             Self::Custom(_) => CUSTOM_MAX_SPEED_UNITS,
             Self::Zebra(_) => ZEBRA_MAX_SPEED_UNITS,
+            Self::PeregrineMkI(_) => PEREGRINE_I_MAX_SPEED_UNITS,
         }
     }
 
@@ -110,6 +118,7 @@ impl HullSource {
             Self::Explorer(source) => data.goshawk_motion_clear(source, start, end, 0.0),
             Self::Custom(source) => data.goshawk_custom_motion_clear(source, start, end, 0.0),
             Self::Zebra(source) => data.zebra_motion_clear(source, start, end, 0.0),
+            Self::PeregrineMkI(source) => data.peregrine_mk_i_motion_clear(source, start, end, 0.0),
         }
     }
 
@@ -126,6 +135,9 @@ impl HullSource {
                 data.goshawk_custom_observer_clear(source, start, end, observer)
             }
             Self::Zebra(source) => data.zebra_observer_clear(source, start, end, observer),
+            Self::PeregrineMkI(source) => {
+                data.peregrine_mk_i_observer_clear(source, start, end, observer)
+            }
         }
     }
 
@@ -144,6 +156,9 @@ impl HullSource {
                 data.goshawk_custom_entry_conditions(source, start, end, speed, 0.0, 0.0)
             }
             Self::Zebra(source) => data.zebra_entry_conditions(source, start, end, speed, 0.0, 0.0),
+            Self::PeregrineMkI(source) => {
+                data.peregrine_mk_i_entry_conditions(source, start, end, speed, 0.0, 0.0)
+            }
         }
     }
 }
@@ -276,6 +291,15 @@ impl World {
         Self::goshawk_source_scenario(observer, approach, HullSource::Zebra(source))
     }
 
+    /// The separate SH022-only World approach. There is no ordinary player or fleet placement.
+    pub fn peregrine_mk_i_docking_validation_scenario(
+        observer: FlightStart,
+        approach: FlightStart,
+    ) -> Result<Self, StationError> {
+        let source = PeregrineMkIHullSource::bundled().map_err(|_| StationError::InvalidMesh)?;
+        Self::goshawk_source_scenario(observer, approach, HullSource::PeregrineMkI(source))
+    }
+
     fn goshawk_source_scenario(
         observer: FlightStart,
         approach: FlightStart,
@@ -354,6 +378,19 @@ impl World {
         ))
     }
 
+    pub fn peregrine_mk_i_approach_snapshot(&self) -> Option<PeregrineMkIApproachSnapshot> {
+        let approach = self.goshawk_validation.as_ref()?;
+        let HullSource::PeregrineMkI(source) = &approach.source else {
+            return None;
+        };
+        Some(approach.snapshot(
+            source.shared_pieces(),
+            self.state.tick,
+            (),
+            (PEREGRINE_I_RESOURCE_SHA256, PEREGRINE_I_CONTRACT_SHA256),
+        ))
+    }
+
     pub fn goshawk_snapshot_is_current(&self, frame: &GoshawkApproachSnapshot) -> bool {
         self.goshawk_validation.as_ref().is_some_and(|approach| {
             if let HullSource::Explorer(source) = &approach.source {
@@ -387,6 +424,16 @@ impl World {
         })
     }
 
+    pub fn peregrine_mk_i_snapshot_is_current(&self, frame: &PeregrineMkIApproachSnapshot) -> bool {
+        self.goshawk_validation.as_ref().is_some_and(|approach| {
+            if let HullSource::PeregrineMkI(source) = &approach.source {
+                approach.snapshot_current(frame, source.shared_pieces(), self.state.tick)
+            } else {
+                false
+            }
+        })
+    }
+
     pub fn goshawk_observer_pose(&self, frame: &GoshawkApproachSnapshot) -> Option<RigidPose> {
         if !self.goshawk_snapshot_is_current(frame) {
             return None;
@@ -406,6 +453,16 @@ impl World {
 
     pub fn zebra_observer_pose(&self, frame: &ZebraApproachSnapshot) -> Option<RigidPose> {
         if !self.zebra_snapshot_is_current(frame) {
+            return None;
+        }
+        flight_pose(self.state.position, self.state.orientation)
+    }
+
+    pub fn peregrine_mk_i_observer_pose(
+        &self,
+        frame: &PeregrineMkIApproachSnapshot,
+    ) -> Option<RigidPose> {
+        if !self.peregrine_mk_i_snapshot_is_current(frame) {
             return None;
         }
         flight_pose(self.state.position, self.state.orientation)

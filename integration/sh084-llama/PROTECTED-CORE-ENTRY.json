@@ -1,0 +1,12 @@
+{
+  "schema": 1,
+  "id": "sh084-llama",
+  "undoBefore": [
+    "sh083-hare-explorer"
+  ],
+  "undoAfter": [],
+  "kind": "declaration",
+  "module": "llama",
+  "before": "pub mod lanner;\n",
+  "after": "pub mod medusa;\n"
+}

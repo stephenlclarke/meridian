@@ -1,0 +1,222 @@
+{
+  "hull": "SH042",
+  "nominalPaddingMetres": 0.02,
+  "refinementTargetsMillimetres": {
+    "detailed": 450,
+    "native": 1600
+  },
+  "fullUpperMillimetres": {
+    "detailed": 448,
+    "native": 2106
+  },
+  "pieces": [
+    {
+      "piece": "forward-barrel",
+      "fanTriangles": 316,
+      "upperMillimetres": {
+        "detailed": 448,
+        "native": 1556
+      }
+    },
+    {
+      "piece": "upper-shroud",
+      "fanTriangles": 316,
+      "upperMillimetres": {
+        "detailed": 433,
+        "native": 1566
+      }
+    },
+    {
+      "piece": "upper-thrust-brace",
+      "fanTriangles": 12,
+      "upperMillimetres": {
+        "detailed": 440,
+        "native": 1304
+      }
+    },
+    {
+      "piece": "upper-drive",
+      "fanTriangles": 124,
+      "upperMillimetres": {
+        "detailed": 447,
+        "native": 1275
+      }
+    },
+    {
+      "piece": "left-shroud",
+      "fanTriangles": 316,
+      "upperMillimetres": {
+        "detailed": 430,
+        "native": 1475
+      }
+    },
+    {
+      "piece": "left-thrust-brace",
+      "fanTriangles": 12,
+      "upperMillimetres": {
+        "detailed": 440,
+        "native": 1304
+      }
+    },
+    {
+      "piece": "left-drive",
+      "fanTriangles": 124,
+      "upperMillimetres": {
+        "detailed": 447,
+        "native": 1530
+      }
+    },
+    {
+      "piece": "right-shroud",
+      "fanTriangles": 316,
+      "upperMillimetres": {
+        "detailed": 433,
+        "native": 1475
+      }
+    },
+    {
+      "piece": "right-thrust-brace",
+      "fanTriangles": 12,
+      "upperMillimetres": {
+        "detailed": 440,
+        "native": 1304
+      }
+    },
+    {
+      "piece": "right-drive",
+      "fanTriangles": 124,
+      "upperMillimetres": {
+        "detailed": 447,
+        "native": 1530
+      }
+    },
+    {
+      "piece": "pressure-canopy",
+      "fanTriangles": 960,
+      "upperMillimetres": {
+        "detailed": 378,
+        "native": 859
+      }
+    },
+    {
+      "piece": "canopy-centre-brace",
+      "fanTriangles": 12,
+      "upperMillimetres": {
+        "detailed": 340,
+        "native": 1053
+      }
+    },
+    {
+      "piece": "left-service-pipe",
+      "fanTriangles": 12,
+      "upperMillimetres": {
+        "detailed": 260,
+        "native": 1382
+      }
+    },
+    {
+      "piece": "left-instrument-housing",
+      "fanTriangles": 12,
+      "upperMillimetres": {
+        "detailed": 344,
+        "native": 2106
+      }
+    },
+    {
+      "piece": "left-louvre-0",
+      "fanTriangles": 12,
+      "upperMillimetres": {
+        "detailed": 241,
+        "native": 1569
+      }
+    },
+    {
+      "piece": "left-louvre-1",
+      "fanTriangles": 12,
+      "upperMillimetres": {
+        "detailed": 241,
+        "native": 1571
+      }
+    },
+    {
+      "piece": "left-louvre-2",
+      "fanTriangles": 12,
+      "upperMillimetres": {
+        "detailed": 241,
+        "native": 1573
+      }
+    },
+    {
+      "piece": "left-louvre-3",
+      "fanTriangles": 12,
+      "upperMillimetres": {
+        "detailed": 241,
+        "native": 1575
+      }
+    },
+    {
+      "piece": "left-louvre-4",
+      "fanTriangles": 12,
+      "upperMillimetres": {
+        "detailed": 241,
+        "native": 1577
+      }
+    },
+    {
+      "piece": "right-service-pipe",
+      "fanTriangles": 12,
+      "upperMillimetres": {
+        "detailed": 260,
+        "native": 1371
+      }
+    },
+    {
+      "piece": "right-instrument-housing",
+      "fanTriangles": 12,
+      "upperMillimetres": {
+        "detailed": 344,
+        "native": 2096
+      }
+    },
+    {
+      "piece": "right-louvre-0",
+      "fanTriangles": 12,
+      "upperMillimetres": {
+        "detailed": 241,
+        "native": 1553
+      }
+    },
+    {
+      "piece": "right-louvre-1",
+      "fanTriangles": 12,
+      "upperMillimetres": {
+        "detailed": 241,
+        "native": 1555
+      }
+    },
+    {
+      "piece": "right-louvre-2",
+      "fanTriangles": 12,
+      "upperMillimetres": {
+        "detailed": 241,
+        "native": 1557
+      }
+    },
+    {
+      "piece": "right-louvre-3",
+      "fanTriangles": 12,
+      "upperMillimetres": {
+        "detailed": 241,
+        "native": 1563
+      }
+    },
+    {
+      "piece": "right-louvre-4",
+      "fanTriangles": 12,
+      "upperMillimetres": {
+        "detailed": 241,
+        "native": 1576
+      }
+    }
+  ]
+}

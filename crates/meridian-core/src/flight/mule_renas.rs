@@ -4,6 +4,11 @@ use crate::docking::RigidPose;
 use crate::mule::MuleHullSource;
 use crate::traffic::mule_validation::State;
 
+pub(super) struct HistoricMuleCollider {
+    source: MuleHullSource,
+    pose: RigidPose,
+}
+
 impl World {
     fn renas_departure(
         &self,
@@ -63,7 +68,7 @@ impl World {
                 SystemId::RENAS,
                 actor.pose().position,
                 actor.pose().position,
-                actor.source().maximum_origin_radius(),
+                actor.source().maximum_origin_radius() * 2.0,
             )
         {
             return Err(StepError::UnsafeLaunch);
@@ -133,6 +138,66 @@ impl World {
                     )
                 })
             })
+    }
+
+    pub(super) fn historic_renas_mule_collider(
+        &self,
+        system: SystemId,
+        visit: u64,
+    ) -> Result<Option<HistoricMuleCollider>, StationError> {
+        let Some((owner, hull, _, arrival_visit)) = self
+            .freight_session
+            .as_ref()
+            .and_then(|session| session.state.snapshot().clue)
+            .and_then(|clue| clue.completion().renas_departure_binding())
+        else {
+            return Ok(None);
+        };
+        let Some(identity) = self.combat_identity() else {
+            return Ok(None);
+        };
+        if system != SystemId::RENAS
+            || arrival_visit.checked_add(1) != Some(visit)
+            || owner != identity.owner
+            || hull != identity.hull
+        {
+            return Ok(None);
+        }
+        let data = self
+            .station_data
+            .as_ref()
+            .ok_or(StationError::InvalidPose)?;
+        let source = MuleHullSource::bundled().map_err(|_| StationError::InvalidMesh)?;
+        let pose = data.renas_mule_berth(&source)?;
+        Ok(Some(HistoricMuleCollider { source, pose }))
+    }
+
+    pub(super) fn historic_renas_mule_motion_blocked(
+        &self,
+        collider: Option<&HistoricMuleCollider>,
+        before: RigidPose,
+        after: RigidPose,
+        angular_travel: f64,
+    ) -> Result<bool, StationError> {
+        let Some(collider) = collider else {
+            return Ok(false);
+        };
+        let data = self
+            .station_data
+            .as_ref()
+            .ok_or(StationError::InvalidPose)?;
+        // A genuine old overlapping save defers the collider until it is physically clear.
+        // A refused attempt must start at a clear pose before crossing the exact fixed hull.
+        Ok(
+            data.mule_ordinary_player_clear(&collider.source, collider.pose, before, before, 0.0)
+                && !data.mule_ordinary_player_clear(
+                    &collider.source,
+                    collider.pose,
+                    before,
+                    after,
+                    angular_travel,
+                ),
+        )
     }
 }
 

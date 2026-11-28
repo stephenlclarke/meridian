@@ -1,0 +1,12 @@
+{
+  "schema": 1,
+  "id": "sh128-boar-transport",
+  "undoBefore": [
+    "sh127-gaur-trader"
+  ],
+  "undoAfter": [],
+  "kind": "declaration",
+  "module": "boar_transport",
+  "before": "pub mod baza_mk_ii;\n",
+  "after": "pub mod carabao_freighter;\n"
+}

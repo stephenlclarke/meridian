@@ -1,0 +1,12 @@
+{
+  "schema": 1,
+  "id": "sh165-secretarybird",
+  "undoBefore": [
+    "sh163-lammergeier"
+  ],
+  "undoAfter": [],
+  "kind": "declaration",
+  "module": "secretarybird",
+  "before": "pub mod save;\n",
+  "after": "pub mod seriema_courier;\n"
+}

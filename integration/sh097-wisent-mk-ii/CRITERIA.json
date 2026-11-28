@@ -1,0 +1,215 @@
+{
+  "hull": "SH097 Wisent Mk II",
+  "scope": "Original catalogue inspection and geometry queries",
+  "source": "assets/fleet/sh097/SOURCE-GEOMETRY.json",
+  "frozenSources": "integration/sh097-wisent-mk-ii/FROZEN-SOURCES.json",
+  "sourceScaleMetresPerUnit": "30400/1863",
+  "faces": {
+    "detailed": 2600,
+    "archivedNative": 816,
+    "candidateNative": 488,
+    "candidateMaximum": 512
+  },
+  "originalAccess": {
+    "runtimeCatalogue": {
+      "playerFlyable": false,
+      "normalPurchaseEligible": false,
+      "purchasePolicy": "pendingFabrication"
+    },
+    "r3DesignContract": {
+      "playerFlyable": true,
+      "purchasePolicy": "blueprintFabrication"
+    }
+  },
+  "engineering": {
+    "sourceReference": "finite-intrinsic-empty-wisent-mk-ii",
+    "massKg": 220975
+  },
+  "supportGroups": 46,
+  "cargoBayBodyLateralSeparationMillimetres": 7760,
+  "minimumRouteClearanceMillimetres": 1469,
+  "sourceContactCounts": {
+    "overlap": 35
+  },
+  "standaloneCreatorReplay": "integration/sh097-wisent-mk-ii/CREATOR-REPLAY.json",
+  "fitUpperMillimetres": {
+    "detailed": 2596,
+    "archivedNative": 2592,
+    "candidateNative": 3245
+  },
+  "continuousCandidateFitMillimetres": {
+    "archiveToCandidate": {
+      "lowerFloor": 1404,
+      "upperCeiling": 1430
+    },
+    "candidateToArchive": {
+      "lowerFloor": 1341,
+      "upperCeiling": 1367
+    },
+    "detailedToCandidate": {
+      "lowerFloor": 2816,
+      "upperCeiling": 2821
+    },
+    "candidateToDetailed": {
+      "lowerFloor": 1384,
+      "upperCeiling": 1409
+    }
+  },
+  "hullStudio": {
+    "definition": "integration/sh097-wisent-mk-ii/WISENT-MK-II-STUDIO.json",
+    "bytes": 432409,
+    "sha256": "f910fe9e196f88505faed35348baf7502ac64f5e5d8499f9fffc3ec004eac98a",
+    "supports": 46,
+    "probes": 7,
+    "detail": "2,600 original detailed faces",
+    "native": "488 separate candidate faces",
+    "loaderRevision": "27121e66ba37a29781135b56924a9d6e7f38a70a",
+    "signedInstalledExport": {
+      "status": "PASS",
+      "scope": "Signed installed Studio offline original artwork import/export",
+      "bundleIdentifier": "io.xyzzy.meridian.hullstudio",
+      "bundleVersion": "0.0.0",
+      "codeDirectoryHash": "93938bda9242ebdff508bfb9e16b3cdf83c0a200",
+      "developerIdTeam": "4MEB7MUTAV",
+      "signatureVerification": "deep strict",
+      "definition": {
+        "bytes": 432409,
+        "sha256": "f910fe9e196f88505faed35348baf7502ac64f5e5d8499f9fffc3ec004eac98a"
+      },
+      "exportExitStatuses": [
+        0,
+        0
+      ],
+      "exportMatchesDefinitionExceptTrailingLf": true,
+      "valid": true,
+      "diagnostics": [],
+      "detailedTriangles": 2600,
+      "nativeTriangles": 488,
+      "supportGroups": 46,
+      "engineeringReference": "finite-intrinsic-empty-wisent-mk-ii",
+      "massKg": 220975,
+      "receiptFiles": {
+        "wisent-mk-ii.hull.json": {
+          "bytes": 432408,
+          "sha256": "1dcd8eb05465aa3a12935f4c149ece0753398ef581d997fecc546c0b41206177"
+        },
+        "wisent-mk-ii-repeat.hull.json": {
+          "bytes": 432408,
+          "sha256": "1dcd8eb05465aa3a12935f4c149ece0753398ef581d997fecc546c0b41206177"
+        },
+        "studio.stdout.json": {
+          "bytes": 112220,
+          "sha256": "4f98e9f5551b1c683472f863bf412d3b885747a4a1853d6ecd888caf1e6bcdc2"
+        },
+        "studio-repeat.stdout.json": {
+          "bytes": 112220,
+          "sha256": "4f98e9f5551b1c683472f863bf412d3b885747a4a1853d6ecd888caf1e6bcdc2"
+        },
+        "codesign.log": {
+          "bytes": 13038,
+          "sha256": "1604ef7205ed03891e88c7af2ec5f038b4f06a1d22078f41bdc37c9544d1ff7a"
+        },
+        "codesign-identity.log": {
+          "bytes": 988,
+          "sha256": "f6d772f29f9e72421e98a6d7243102b92b77b5995acbe6cda7ddb3bbfc3b1706"
+        }
+      },
+      "artworkProbeResults": [
+        {
+          "name": "dorsal",
+          "passed": true
+        },
+        {
+          "name": "ventral",
+          "passed": true
+        },
+        {
+          "name": "central-bay-lane",
+          "passed": true
+        },
+        {
+          "name": "between-aft-drive-walls",
+          "passed": true
+        },
+        {
+          "name": "through-dock-aperture",
+          "passed": true
+        },
+        {
+          "name": "port-outboard",
+          "passed": true
+        },
+        {
+          "name": "starboard-outboard",
+          "passed": true
+        }
+      ],
+      "triangleRoles": {
+        "detail": "original detailed visible",
+        "native": "derived native inspection candidate"
+      }
+    }
+  },
+  "byteReplay": {
+    "commands": [
+      "python3 -B tools/prepare_wisent_mk_ii.py --check",
+      "python3 -B tools/verify_wisent_mk_ii.py | cmp - integration/sh097-wisent-mk-ii/CONTACT-RESULT.json",
+      "python3 -B tools/measure_wisent_mk_ii.py | cmp - integration/sh097-wisent-mk-ii/SURFACE-FIT.json",
+      "python3 -B tools/measure_wisent_mk_ii.py --directions | cmp - integration/sh097-wisent-mk-ii/CANDIDATE-FIT-LOCALIZATION.json",
+      "python3 -B tools/measure_wisent_mk_ii.py --reference-directions | cmp - integration/sh097-wisent-mk-ii/REFERENCE-FIT-LOCALIZATION.json"
+    ],
+    "host": "SteveMBA",
+    "startedUtc": "2026-11-25T03:50:21Z",
+    "finishedUtc": "2026-11-25T03:50:54Z",
+    "log": {
+      "bytes": 577,
+      "sha256": "cb72d3785bb641df714fce04e80d67a44a8c771403c763baf93c8b09874d851e"
+    },
+    "fitDependencies": {
+      "python": "3.14.3",
+      "numpy": "2.5.5",
+      "scipy": "1.18.1",
+      "trimesh": "5.2.1",
+      "rtree": "1.4.1"
+    },
+    "originalCommit": "c0e853489ba5e92e9a03fd3fb21d90503a703810",
+    "historicalReplayPins": {
+      "tools/measure_banteng_geometry.py": "4b7d8d5d972e30d93bebf7f422be71e415d6e4a9c4b622582ecf6e30a6bb9235",
+      "tools/measure_lanner_geometry.py": "cabbaf17ff7efdbcbee9a1fba67c7edafd59dceb8e97f367824a51c134479992",
+      "tools/verify_eagle_cruiser_geometry.py": "c7926cb6e699ae5ffb445951ce9d4e98a64018a7ecb1db2e5e77a611d742a783"
+    }
+  },
+  "replayPins": {
+    "tools/fleet_hull_measurement.py": "3570747d9f650efc7d0e4f88352e9fd32e42ab394f4669100223fbac0c1be6b7",
+    "tools/directed_hull_fit.py": "dbd5d45e5052453646b752695815d6cb53c6ccb2c3ad6694451a4c7e19fa8bf7",
+    "integration/sh097-wisent-mk-ii/WISENT-MK-II-STUDIO.json": "f910fe9e196f88505faed35348baf7502ac64f5e5d8499f9fffc3ec004eac98a",
+    "integration/sh097-wisent-mk-ii/FROZEN-SOURCES.json": "845490e0d156b1c42c8d1ff5aac2b900ec80639d61fc288c3ecda46d1cc60d13",
+    "integration/sh097-wisent-mk-ii/CONTACT-CANDIDATE.json": "47ceedd73d3b108d677fed561a9f7188cb4d584e135967382a9e1ce63429502f",
+    "integration/sh097-wisent-mk-ii/CONTACT-RESULT.json": "42b97ff7639425c9cb21d7c946a5987667044ea006da6180a3f53d0f501ae832",
+    "integration/sh097-wisent-mk-ii/ORIGINAL-OWNERSHIP.json": "40739377a932af8957c18604ce8beb630186be536198f3d1ed952e4a41b3bce0",
+    "integration/sh097-wisent-mk-ii/CANDIDATE-CONTACTS-AND-CLEARANCE.json": "cf885e5239c60954f864e98f1e00ab1f32208c6bcb8efb4ea2d12a93d607530b",
+    "integration/sh097-wisent-mk-ii/CANDIDATE-FIDELITY.json": "b1f90725490c853d5c5e5f94804c7a4751df98fac50340e4e0ae18c2474a07bf",
+    "integration/sh097-wisent-mk-ii/SUPPORT-FAN.json": "5e8642bd9e3e3a5b39abe701fbe57a7cb483d9f55119b67a431ca8ae104c6b9a",
+    "integration/sh097-wisent-mk-ii/SURFACE-FIT.json": "026ad0c2d23d68c9b278a4f0ca12cc48b823e66c995a6f314a04223aedcb2a7f",
+    "integration/sh097-wisent-mk-ii/CREATOR-REPLAY.json": "517c042f0d4a238f31b463f654483ee9045e023a2ccdfbc426756adf51af3947",
+    "integration/sh097-wisent-mk-ii/CANDIDATE-TOPOLOGY-SURVEY.json": "5852e069910d626066c055e76b52977645289ec933bf954a6172c1ef44834f53",
+    "integration/sh097-wisent-mk-ii/CANDIDATE-FIT-LOCALIZATION.json": "ca4e50b0328a5369fee0beea8c73058525a5dc587695bb69001c4632860ec712",
+    "integration/sh097-wisent-mk-ii/REFERENCE-FIT-LOCALIZATION.json": "005ba55bca1421344658e9926b2b2648d4264c68af60f26fb41c8606d72138f9",
+    "tools/atomic_asset_output.py": "2d13803823645d3bdea7c855af958eb54d7ebe513ec1bcb0af34e82870164bf0",
+    "tools/banteng_art_mesh.py": "ef5c0f538510486238d69dc301da80026fc93326767b38c50a04756ab9890a09",
+    "tools/encode_goshawk_visual.py": "9e524e9a32a237d71d212c8b5c34ecf12cde5a8e08885b1d03991b95c278f61c",
+    "tools/import_goshawk_envelope_source.py": "14b530725629ee3eaa5b3fd69f01fe00fe371564a1a52cb398d3969142db977e",
+    "tools/measure_banteng_geometry.py": "9356864e227302598fcae4e833ecb706b1ed8a5e600cbb4076b7165dc1e54bea",
+    "tools/measure_goshawk_surface_fit.py": "5407ef1e5fad41810aa95444ca1338fe33a91e5c9857dcb752b4e4cf2fca6d0b",
+    "tools/measure_lanner_geometry.py": "55d13a28602e6ed791adecd85ff43f3c8a7fbe118cf0977272e1747422c2408d",
+    "tools/measure_wisent_mk_ii.py": "5f8f0d0e355def6fa0881a957769506610b72b7612cfdce9bd9595e14493d5ae",
+    "tools/prepare_eagle_cruiser_geometry.py": "a1ea3b5d72f35e1f2932da71afa3ff8a276a504f7309a1086a2b3df35988addc",
+    "tools/prepare_wisent_mk_ii.py": "23e730469d5794b7f48b84262ce647eb27a9a869f70ea226e6a48410e83ae1e3",
+    "tools/verify_eagle_cruiser_geometry.py": "cb053ee5873fee62ee456bb3776e98d29b2cbb44c7344599bc617a8579164d43",
+    "tools/verify_wisent_mk_ii.py": "5395933e0a99d34b476ff94ecf703e16fb5d3db4d18a731add88e90d58ddd6cf",
+    "tools/vulture_mk_i_exact_fit.py": "479b31f8714a198a82c0e2888b8d19efe46c7b4c43a576b83ab84c571ae738c6",
+    "assets/fleet/sh097/GENERATED-COLLISION.json": "b16513cb15778ec007d86b95b0cf46862c9849002ea17257c802afe153d7480e",
+    "assets/fleet/sh097/SOURCE-GEOMETRY.json": "dfecc70576fb220b974c87d511a39b95016f795fce4881139cdcc672b37fb216",
+    "tools/hull_contact_geometry.py": "07606202e6a298ad375a7504991fe6fb93da6a07f9b5cc4a22167bd570b07839"
+  }
+}

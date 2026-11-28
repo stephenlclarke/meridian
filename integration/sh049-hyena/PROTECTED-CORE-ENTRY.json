@@ -1,0 +1,12 @@
+{
+  "schema": 1,
+  "id": "sh049-hyena",
+  "undoBefore": [
+    "sh048-lanner"
+  ],
+  "undoAfter": [],
+  "kind": "declaration",
+  "module": "hyena",
+  "before": "pub mod harpy_gunship;\n",
+  "after": "pub mod lanner;\n"
+}

@@ -1,0 +1,226 @@
+{
+  "hull": "SH166 Camel Rescue",
+  "scope": "Original catalogue inspection and geometry queries",
+  "source": "assets/fleet/sh166/SOURCE-GEOMETRY.json",
+  "frozenSources": "integration/sh166-camel-rescue/FROZEN-SOURCES.json",
+  "sourceScaleMetresPerUnit": "9500/341",
+  "faces": {
+    "detailed": 3508,
+    "archivedNative": 988,
+    "candidateNative": 512,
+    "candidateMaximum": 512
+  },
+  "originalAccess": {
+    "runtimeCatalogue": {
+      "playerFlyable": false,
+      "normalPurchaseEligible": false,
+      "purchasePolicy": "pendingFabrication"
+    },
+    "r3DesignContract": {
+      "playerFlyable": true,
+      "purchasePolicy": "blueprintFabrication"
+    }
+  },
+  "engineering": {
+    "sourceReference": "finite-intrinsic-empty-camel-rescue",
+    "massKg": 264817
+  },
+  "supportGroups": 167,
+  "candidateComponentInventory": {
+    "originalPartsRepresented": 29,
+    "unalteredNativeParts": 9,
+    "recessedWells": 12,
+    "partsUsingSelectedOriginalVertices": 8,
+    "sampledArcSections": 0,
+    "arcSeamVertices": 0
+  },
+  "minimumRouteClearanceMillimetres": 410,
+  "sourceContactCounts": {
+    "overlap": 25,
+    "unchangedNativeParts": 9
+  },
+  "candidateRebuild": "tools/rebuild_camel_rescue.py",
+  "fitUpperMillimetres": {
+    "detailed": 2799,
+    "archivedNative": 3836,
+    "candidateNative": 4355
+  },
+  "continuousCandidateFitMillimetres": {
+    "archiveToCandidate": {
+      "lowerFloor": 2435,
+      "upperCeiling": 2436
+    },
+    "candidateToArchive": {
+      "lowerFloor": 891,
+      "upperCeiling": 917
+    },
+    "detailedToCandidate": {
+      "lowerFloor": 3750,
+      "upperCeiling": 3762
+    },
+    "candidateToDetailed": {
+      "lowerFloor": 2007,
+      "upperCeiling": 2033
+    }
+  },
+  "hullStudio": {
+    "definition": "integration/sh166-camel-rescue/CAMEL-RESCUE-STUDIO.json",
+    "bytes": 582978,
+    "sha256": "9cd9959a555996eaa35f2821652e2a7bcc1afc951e99bf3c5bd9c04b9e3b22b7",
+    "supports": 167,
+    "probes": 7,
+    "detail": "3,508 original detailed faces",
+    "native": "512 separate candidate faces",
+    "loaderRevision": "27121e66ba37a29781135b56924a9d6e7f38a70a",
+    "signedInstalledExport": {
+      "status": "PASS",
+      "scope": "Signed installed Studio offline original artwork import/export",
+      "bundleIdentifier": "io.xyzzy.meridian.hullstudio",
+      "bundleVersion": "0.0.0",
+      "codeDirectoryHash": "93938bda9242ebdff508bfb9e16b3cdf83c0a200",
+      "developerIdTeam": "4MEB7MUTAV",
+      "signatureVerification": "deep strict",
+      "definition": {
+        "bytes": 582978,
+        "sha256": "9cd9959a555996eaa35f2821652e2a7bcc1afc951e99bf3c5bd9c04b9e3b22b7"
+      },
+      "exportExitStatuses": [
+        0,
+        0
+      ],
+      "exportMatchesDefinitionExceptTrailingLf": true,
+      "valid": true,
+      "diagnostics": [],
+      "detailedTriangles": 3508,
+      "nativeTriangles": 512,
+      "supportGroups": 167,
+      "engineeringReference": "finite-intrinsic-empty-camel-rescue",
+      "massKg": 264817,
+      "receiptFiles": {
+        "camel-rescue.hull.json": {
+          "bytes": 582977,
+          "sha256": "478b76d152abafae72513738f1e3b01e5db1373fcdf21df74cf34556ab298e7d"
+        },
+        "camel-rescue-repeat.hull.json": {
+          "bytes": 582977,
+          "sha256": "478b76d152abafae72513738f1e3b01e5db1373fcdf21df74cf34556ab298e7d"
+        },
+        "studio.stdout.json": {
+          "bytes": 155871,
+          "sha256": "3fd6478cef77f02f736f782732f95eb5468fcc716c9f7a2857ef1b50f6973638"
+        },
+        "studio-repeat.stdout.json": {
+          "bytes": 155871,
+          "sha256": "3fd6478cef77f02f736f782732f95eb5468fcc716c9f7a2857ef1b50f6973638"
+        },
+        "codesign.log": {
+          "bytes": 13038,
+          "sha256": "efb2ac1cd0915ff05c8e7310c53ea5929b91126322a8b7745433478a97170396"
+        },
+        "codesign-identity.log": {
+          "bytes": 988,
+          "sha256": "f6d772f29f9e72421e98a6d7243102b92b77b5995acbe6cda7ddb3bbfc3b1706"
+        }
+      },
+      "artworkProbeResults": [
+        {
+          "name": "dorsal",
+          "passed": true
+        },
+        {
+          "name": "ventral",
+          "passed": true
+        },
+        {
+          "name": "port-outboard",
+          "passed": true
+        },
+        {
+          "name": "starboard-outboard",
+          "passed": true
+        },
+        {
+          "name": "through-forward-aperture",
+          "passed": true
+        },
+        {
+          "name": "above-port-lobe",
+          "passed": true
+        },
+        {
+          "name": "above-starboard-lobe",
+          "passed": true
+        }
+      ],
+      "triangleRoles": {
+        "detail": "original detailed visible",
+        "native": "derived native inspection candidate"
+      }
+    }
+  },
+  "byteReplay": {
+    "commands": [
+      "python3 -B tools/prepare_camel_rescue.py --check",
+      "python3 -B tools/rebuild_camel_rescue.py",
+      "python3 -B tools/verify_camel_rescue.py | cmp - integration/sh166-camel-rescue/CONTACT-RESULT.json",
+      "python3 -B tools/measure_camel_rescue.py | cmp - integration/sh166-camel-rescue/SURFACE-FIT.json",
+      "python3 -B tools/measure_camel_rescue.py --fidelity | cmp - integration/sh166-camel-rescue/CANDIDATE-FIDELITY.json",
+      "python3 -B tools/measure_camel_rescue.py --directions | cmp - integration/sh166-camel-rescue/CANDIDATE-FIT-LOCALIZATION.json",
+      "python3 -B tools/measure_camel_rescue.py --reference-directions | cmp - integration/sh166-camel-rescue/REFERENCE-FIT-LOCALIZATION.json"
+    ],
+    "host": "SteveMBA",
+    "startedUtc": "2026-11-25T08:49:54Z",
+    "finishedUtc": "2026-11-25T08:51:00Z",
+    "log": {
+      "bytes": 727,
+      "sha256": "e0d0113b0dc876bf676a1da25726cf5803740b2b182bf706e97c0a2e1b2f6032"
+    },
+    "fitDependencies": {
+      "python": "3.14.3",
+      "numpy": "2.5.5",
+      "scipy": "1.18.1",
+      "trimesh": "5.2.1",
+      "rtree": "1.4.1"
+    },
+    "originalCommit": "05ae9426435be803bdf334d048199d0f16aa48a3",
+    "historicalReplayPins": {
+      "tools/measure_banteng_geometry.py": "4b7d8d5d972e30d93bebf7f422be71e415d6e4a9c4b622582ecf6e30a6bb9235",
+      "tools/measure_lanner_geometry.py": "cabbaf17ff7efdbcbee9a1fba67c7edafd59dceb8e97f367824a51c134479992",
+      "tools/verify_eagle_cruiser_geometry.py": "c7926cb6e699ae5ffb445951ce9d4e98a64018a7ecb1db2e5e77a611d742a783"
+    }
+  },
+  "replayPins": {
+    "tools/fleet_hull_measurement.py": "3570747d9f650efc7d0e4f88352e9fd32e42ab394f4669100223fbac0c1be6b7",
+    "tools/directed_hull_fit.py": "dbd5d45e5052453646b752695815d6cb53c6ccb2c3ad6694451a4c7e19fa8bf7",
+    "integration/sh166-camel-rescue/CAMEL-RESCUE-STUDIO.json": "9cd9959a555996eaa35f2821652e2a7bcc1afc951e99bf3c5bd9c04b9e3b22b7",
+    "integration/sh166-camel-rescue/FROZEN-SOURCES.json": "4b6810f8ef33781b0c2e6caaee24685d31cb6e68675a9e4d2ead9bbe3deb4b0c",
+    "integration/sh166-camel-rescue/CONTACT-CANDIDATE.json": "07a6d7b8139f351f9b91b9fb1d089f9697823d1c8abc95cb3369821b443c175a",
+    "integration/sh166-camel-rescue/CONTACT-RESULT.json": "888a97a5d0132c4bead3a965e6c512243321bd4274eeae1d41f991f4dda95745",
+    "integration/sh166-camel-rescue/ORIGINAL-OWNERSHIP.json": "75d9262874760d662d35d0d1f69c5911be35e66a9cdf3967a15c6b4d98def806",
+    "integration/sh166-camel-rescue/RETAINED-OVERLAPS.json": "e6f908bbde2b48f06d0dcadc41aac29a5fff90e6039602b4f5e2ea5a6a311998",
+    "integration/sh166-camel-rescue/CANDIDATE-FIDELITY.json": "3d03305ff091a253abc43f1b1aa34883003efce1fadce58843f58072488d2a19",
+    "integration/sh166-camel-rescue/SUPPORT-FAN.json": "407a81c1372e97146ce2b3bf128895f2bd88af29454371100bd874ec9bbc8d19",
+    "integration/sh166-camel-rescue/SURFACE-FIT.json": "56df2e9e1415e86aa33d31e220962775c79778eaf903db82e92ee6014f137460",
+    "integration/sh166-camel-rescue/ARCHIVED-OVERLAPS.json": "b098dc5a0901a0892b631b51e46e41decb78307aee3508fb2a76fff493f3ca2c",
+    "integration/sh166-camel-rescue/CANDIDATE-TOPOLOGY-SURVEY.json": "55901f4ab8e5ff131fb2d2c4659ac8154649168dff25779dec1fe1c927b784ae",
+    "integration/sh166-camel-rescue/CANDIDATE-FIT-LOCALIZATION.json": "2c5a0820f12614b374404dfce50c123d7d9f71231e671ba2977559f9b1a541d3",
+    "integration/sh166-camel-rescue/REFERENCE-FIT-LOCALIZATION.json": "4c31f293cc3b613af8a6cde13577ba48b83eb392c53269f3af9e15997043996e",
+    "tools/atomic_asset_output.py": "2d13803823645d3bdea7c855af958eb54d7ebe513ec1bcb0af34e82870164bf0",
+    "tools/banteng_art_mesh.py": "ef5c0f538510486238d69dc301da80026fc93326767b38c50a04756ab9890a09",
+    "tools/encode_goshawk_visual.py": "9e524e9a32a237d71d212c8b5c34ecf12cde5a8e08885b1d03991b95c278f61c",
+    "tools/import_goshawk_envelope_source.py": "14b530725629ee3eaa5b3fd69f01fe00fe371564a1a52cb398d3969142db977e",
+    "tools/measure_banteng_geometry.py": "9356864e227302598fcae4e833ecb706b1ed8a5e600cbb4076b7165dc1e54bea",
+    "tools/measure_goshawk_surface_fit.py": "5407ef1e5fad41810aa95444ca1338fe33a91e5c9857dcb752b4e4cf2fca6d0b",
+    "tools/measure_lanner_geometry.py": "55d13a28602e6ed791adecd85ff43f3c8a7fbe118cf0977272e1747422c2408d",
+    "tools/measure_camel_rescue.py": "9ce91665695ab436c90d8593bd83ca3922fb6cfb1dfcb8dd105c87a944b92800",
+    "tools/prepare_eagle_cruiser_geometry.py": "a1ea3b5d72f35e1f2932da71afa3ff8a276a504f7309a1086a2b3df35988addc",
+    "tools/prepare_camel_rescue.py": "6b9fb0b6a98a85a79758a3a4d1ed8e353ddb20277af658646541038a479fdae5",
+    "tools/verify_eagle_cruiser_geometry.py": "cb053ee5873fee62ee456bb3776e98d29b2cbb44c7344599bc617a8579164d43",
+    "tools/rebuild_camel_rescue.py": "a017d4bbb9fa4dcfbbe5f521f08c5650a60a5a0aec730bf91f18b2ab6035bf23",
+    "tools/verify_camel_rescue.py": "a51a9129ee871092663a35ff1caeaabecffb7c8e08136f208e6fa556e5107a8c",
+    "tools/vulture_mk_i_exact_fit.py": "479b31f8714a198a82c0e2888b8d19efe46c7b4c43a576b83ab84c571ae738c6",
+    "assets/fleet/sh166/GENERATED-COLLISION.json": "59cea679423096b0b98154afd1202a0f5f36e28ba57e222520ab2a7d178878fb",
+    "assets/fleet/sh166/SOURCE-GEOMETRY.json": "0178c89b0e2643886644a1aa57e5c2ee35821c65bd9cd44dfd45bb131d640f93",
+    "tools/hull_contact_geometry.py": "07606202e6a298ad375a7504991fe6fb93da6a07f9b5cc4a22167bd570b07839"
+  }
+}

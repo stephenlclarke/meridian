@@ -1,0 +1,160 @@
+{
+  "roundingMetres": 0.02,
+  "fullUpperMillimetres": {
+    "detailed": 1580,
+    "archiveNative": 1580,
+    "candidateNative": 1580
+  },
+  "pieces": {
+    "body primary pressure envelope[1]": {
+      "detailed": 1106,
+      "archiveNative": 1018,
+      "candidateNative": 1063
+    },
+    "body primary pressure envelope/service-well-0-0[1]": {
+      "detailed": 1227,
+      "archiveNative": 1227,
+      "candidateNative": 1227
+    },
+    "body primary pressure envelope/service-well-0-1[1]": {
+      "detailed": 907,
+      "archiveNative": 721,
+      "candidateNative": 691
+    },
+    "body primary pressure envelope/service-well-0-2[1]": {
+      "detailed": 907,
+      "archiveNative": 1578,
+      "candidateNative": 1573
+    },
+    "body primary pressure envelope/service-well-1-0[1]": {
+      "detailed": 1227,
+      "archiveNative": 1227,
+      "candidateNative": 1227
+    },
+    "body primary pressure envelope/service-well-1-1[1]": {
+      "detailed": 1038,
+      "archiveNative": 879,
+      "candidateNative": 774
+    },
+    "body primary pressure envelope/service-well-1-2[1]": {
+      "detailed": 1038,
+      "archiveNative": 1578,
+      "candidateNative": 1574
+    },
+    "body primary pressure envelope/service-well-2-0[1]": {
+      "detailed": 1227,
+      "archiveNative": 1227,
+      "candidateNative": 1227
+    },
+    "body primary pressure envelope/service-well-2-1[1]": {
+      "detailed": 907,
+      "archiveNative": 723,
+      "candidateNative": 694
+    },
+    "body primary pressure envelope/service-well-2-2[1]": {
+      "detailed": 907,
+      "archiveNative": 726,
+      "candidateNative": 726
+    },
+    "body primary pressure envelope/service-well-3-0[1]": {
+      "detailed": 1227,
+      "archiveNative": 1227,
+      "candidateNative": 1227
+    },
+    "body primary pressure envelope/service-well-3-1[1]": {
+      "detailed": 1038,
+      "archiveNative": 877,
+      "candidateNative": 772
+    },
+    "body primary pressure envelope/service-well-3-2[1]": {
+      "detailed": 1038,
+      "archiveNative": 857,
+      "candidateNative": 800
+    },
+    "body primary pressure envelope/longitudinal-service-strut-0[1]": {
+      "detailed": 143,
+      "archiveNative": 346,
+      "candidateNative": 346
+    },
+    "body primary pressure envelope/longitudinal-service-strut-1[1]": {
+      "detailed": 143,
+      "archiveNative": 345,
+      "candidateNative": 345
+    },
+    "vertical blade rail[1]": {
+      "detailed": 1257,
+      "archiveNative": 1257,
+      "candidateNative": 1257
+    },
+    "cockpit glazing envelope[1]": {
+      "detailed": 535,
+      "archiveNative": 400,
+      "candidateNative": 729
+    },
+    "cockpit connected structural crossmember[1]": {
+      "detailed": 157,
+      "archiveNative": 157,
+      "candidateNative": 157
+    },
+    "engine_pair/negative side/connected support[1]": {
+      "detailed": 764,
+      "archiveNative": 764,
+      "candidateNative": 764
+    },
+    "engine_pair/negative side/propulsion casing[1]": {
+      "detailed": 1580,
+      "archiveNative": 1580,
+      "candidateNative": 1580
+    },
+    "engine_pair/negative side/propulsion luminous recess[1]": {
+      "detailed": 678,
+      "archiveNative": 850,
+      "candidateNative": 872
+    },
+    "engine_pair/positive side/connected support[1]": {
+      "detailed": 764,
+      "archiveNative": 764,
+      "candidateNative": 764
+    },
+    "engine_pair/positive side/propulsion casing[1]": {
+      "detailed": 1580,
+      "archiveNative": 1580,
+      "candidateNative": 1580
+    },
+    "engine_pair/positive side/propulsion luminous recess[1]": {
+      "detailed": 872,
+      "archiveNative": 850,
+      "candidateNative": 1031
+    },
+    "blade rail transverse support[1]": {
+      "detailed": 789,
+      "archiveNative": 789,
+      "candidateNative": 789
+    },
+    "blade rail transverse support[2]": {
+      "detailed": 789,
+      "archiveNative": 789,
+      "candidateNative": 789
+    },
+    "explicit military mount upright[1]": {
+      "detailed": 715,
+      "archiveNative": 715,
+      "candidateNative": 715
+    },
+    "explicit military mount longitudinal member[1]": {
+      "detailed": 492,
+      "archiveNative": 492,
+      "candidateNative": 492
+    },
+    "explicit military mount upright[2]": {
+      "detailed": 715,
+      "archiveNative": 715,
+      "candidateNative": 715
+    },
+    "explicit military mount longitudinal member[2]": {
+      "detailed": 492,
+      "archiveNative": 492,
+      "candidateNative": 492
+    }
+  }
+}

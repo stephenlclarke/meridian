@@ -31,6 +31,17 @@ pub struct StationOffer {
     pub purchase_available: bool,
 }
 impl Definition {
+    pub(crate) fn for_player(mut self, medusa: bool) -> Self {
+        if medusa {
+            self.hull = "SH171";
+            self.base_hold_tonnes = 22;
+            self.extra_hold_tonnes = 10;
+            self.utility_mounts_capacity = 4;
+            self.equipment_units_capacity = 13;
+        }
+        self
+    }
+
     pub fn offer(self, site: MarketSite) -> StationOffer {
         self.stations[match site {
             MarketSite::Avenor => 0,

@@ -1,0 +1,12 @@
+{
+  "schema": 1,
+  "id": "sh061-saiga",
+  "undoBefore": [
+    "sh060-wombat"
+  ],
+  "undoAfter": [],
+  "kind": "declaration",
+  "module": "saiga",
+  "before": "pub mod navigation;\n",
+  "after": "pub mod saker;\n"
+}

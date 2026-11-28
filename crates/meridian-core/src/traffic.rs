@@ -437,7 +437,8 @@ impl State {
             .flatten()
             .filter(|a| a.id.system == system && a.solid() && Some(a.id) != except)
             .filter_map(|a| {
-                data.player_beam_distance(a.pose(), origin, direction, range)
+                data.npc_geometry()
+                    .player_beam_distance(a.pose(), origin, direction, range)
                     .ok()
                     .flatten()
                     .map(|distance| TrafficContact {
@@ -457,13 +458,13 @@ impl State {
         system: SystemId,
         before: Vec3,
         after: Vec3,
-        radius: f64,
+        clearance: f64,
     ) -> bool {
         self.actors
             .iter()
             .flatten()
             .filter(|a| a.id.system == system && a.solid())
-            .all(|a| segment_distance(before, after, a.position) > radius * 2.0 + 1.0)
+            .all(|a| segment_distance(before, after, a.position) > clearance + 1.0)
     }
     fn actor_index(&self, id: NpcId) -> Option<usize> {
         self.actors

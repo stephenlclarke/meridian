@@ -1,0 +1,257 @@
+{
+  "hull": "SH155 Osprey Support",
+  "scope": "Original catalogue inspection and geometry queries",
+  "source": "assets/fleet/sh155/SOURCE-GEOMETRY.json",
+  "frozenSources": "integration/sh155-osprey-support/FROZEN-SOURCES.json",
+  "sourceScaleMetresPerUnit": "750000/101809",
+  "faces": {
+    "detailed": 4688,
+    "archivedNative": 1384,
+    "candidateNative": 512,
+    "candidateMaximum": 512
+  },
+  "originalAccess": {
+    "runtimeCatalogue": {
+      "playerFlyable": false,
+      "normalPurchaseEligible": false,
+      "purchasePolicy": "pendingFabrication"
+    },
+    "r3DesignContract": {
+      "playerFlyable": true,
+      "purchasePolicy": "blueprintFabrication"
+    }
+  },
+  "engineering": {
+    "sourceReference": "finite-intrinsic-empty-osprey-support",
+    "massKg": 27661
+  },
+  "supportGroups": 178,
+  "candidateComponentInventory": {
+    "originalPartsRepresented": 30,
+    "unalteredNativeParts": 8,
+    "recessedWells": 12,
+    "partsUsingSelectedOriginalVertices": 8,
+    "sampledArcSections": 2,
+    "arcSeamVertices": 240
+  },
+  "minimumRouteClearanceMillimetres": 451,
+  "sourceContactCounts": {
+    "overlap": 26,
+    "unchangedNativeParts": 8
+  },
+  "candidateRebuild": "tools/rebuild_osprey_support.py",
+  "fitUpperMillimetres": {
+    "detailed": 2798,
+    "archivedNative": 3640,
+    "candidateNative": 2535
+  },
+  "continuousCandidateFitMillimetres": {
+    "archiveToCandidate": {
+      "lowerFloor": 685,
+      "upperCeiling": 709
+    },
+    "candidateToArchive": {
+      "lowerFloor": 555,
+      "upperCeiling": 581
+    },
+    "detailedToCandidate": {
+      "lowerFloor": 930,
+      "upperCeiling": 953
+    },
+    "candidateToDetailed": {
+      "lowerFloor": 579,
+      "upperCeiling": 605
+    }
+  },
+  "hullStudio": {
+    "definition": "integration/sh155-osprey-support/OSPREY-SUPPORT-STUDIO.json",
+    "bytes": 772423,
+    "sha256": "167943248e70c01efed9a6c7a0df17af8f5bd4591dd7d5ce901eecd24bc42cd2",
+    "supports": 178,
+    "probes": 7,
+    "detail": "4,688 original detailed faces",
+    "native": "512 separate candidate faces",
+    "loaderRevision": "27121e66ba37a29781135b56924a9d6e7f38a70a",
+    "signedInstalledExport": {
+      "status": "PASS",
+      "scope": "Signed installed Studio offline original artwork import/export",
+      "bundleIdentifier": "io.xyzzy.meridian.hullstudio",
+      "bundleVersion": "0.0.0",
+      "codeDirectoryHash": "93938bda9242ebdff508bfb9e16b3cdf83c0a200",
+      "developerIdTeam": "4MEB7MUTAV",
+      "signatureVerification": "deep strict",
+      "definition": {
+        "bytes": 772423,
+        "sha256": "167943248e70c01efed9a6c7a0df17af8f5bd4591dd7d5ce901eecd24bc42cd2"
+      },
+      "exportExitStatuses": [
+        0,
+        0
+      ],
+      "exportMatchesDefinitionExceptTrailingLf": true,
+      "valid": true,
+      "diagnostics": [],
+      "detailedTriangles": 4688,
+      "nativeTriangles": 512,
+      "supportGroups": 178,
+      "engineeringReference": "finite-intrinsic-empty-osprey-support",
+      "massKg": 27661,
+      "receiptFiles": {
+        "osprey-support.hull.json": {
+          "bytes": 772422,
+          "sha256": "ac1b08578d2c9f0f065cd02ba622dc8081500c7ae9d6ce0a0a8b66dba02845ab"
+        },
+        "osprey-support-repeat.hull.json": {
+          "bytes": 772422,
+          "sha256": "ac1b08578d2c9f0f065cd02ba622dc8081500c7ae9d6ce0a0a8b66dba02845ab"
+        },
+        "studio.stdout.json": {
+          "bytes": 202231,
+          "sha256": "6208f8aeb68510fb2a8dc98833ea7a2eb8447164d3c578745e226ca4190689d2"
+        },
+        "studio-repeat.stdout.json": {
+          "bytes": 202231,
+          "sha256": "6208f8aeb68510fb2a8dc98833ea7a2eb8447164d3c578745e226ca4190689d2"
+        },
+        "codesign.log": {
+          "bytes": 13038,
+          "sha256": "bffebccfd038d424ffa6f80782f2425e64867b15510514a9a35044630a191510"
+        },
+        "codesign-identity.log": {
+          "bytes": 988,
+          "sha256": "f6d772f29f9e72421e98a6d7243102b92b77b5995acbe6cda7ddb3bbfc3b1706"
+        }
+      },
+      "artworkProbeResults": [
+        {
+          "name": "dorsal",
+          "passed": true
+        },
+        {
+          "name": "ventral",
+          "passed": true
+        },
+        {
+          "name": "port-outboard",
+          "passed": true
+        },
+        {
+          "name": "starboard-outboard",
+          "passed": true
+        },
+        {
+          "name": "between-aft-drives",
+          "passed": true
+        },
+        {
+          "name": "inside-port-boom",
+          "passed": true
+        },
+        {
+          "name": "inside-starboard-boom",
+          "passed": true
+        }
+      ],
+      "triangleRoles": {
+        "detail": "original detailed visible",
+        "native": "derived native inspection candidate"
+      }
+    }
+  },
+  "byteReplay": {
+    "commands": [
+      "python3 -B tools/prepare_osprey_support.py --check",
+      "python3 -B tools/rebuild_osprey_support.py",
+      "python3 -B tools/verify_osprey_support.py | cmp - integration/sh155-osprey-support/CONTACT-RESULT.json",
+      "python3 -B tools/measure_osprey_support.py | cmp - integration/sh155-osprey-support/SURFACE-FIT.json",
+      "python3 -B tools/measure_osprey_support.py --fidelity | cmp - integration/sh155-osprey-support/CANDIDATE-FIDELITY.json",
+      "python3 -B tools/measure_osprey_support.py --directions | cmp - integration/sh155-osprey-support/CANDIDATE-FIT-LOCALIZATION.json",
+      "python3 -B tools/measure_osprey_support.py --reference-directions | cmp - integration/sh155-osprey-support/REFERENCE-FIT-LOCALIZATION.json"
+    ],
+    "host": "SteveMBA",
+    "startedUtc": "2026-11-25T08:08:10Z",
+    "finishedUtc": "2026-11-25T08:09:49Z",
+    "log": {
+      "bytes": 943,
+      "sha256": "3c8af95072f22b858fc91c031868d3a85489d61dcc3f256b6d9d6ddcd08046db"
+    },
+    "fitDependencies": {
+      "python": "3.14.3",
+      "numpy": "2.5.5",
+      "scipy": "1.18.1",
+      "trimesh": "5.2.1",
+      "rtree": "1.4.1"
+    },
+    "originalCommit": "d5e15ca32685509c10b7074cc5b8860838fea95e",
+    "qualificationCorrection": "403e9b2d59eae237efa6e2c1e954a4e623ec493d",
+    "historicalReplayPins": {}
+  },
+  "sharedMeasurementInputs": {
+    "originalCommit": "d5e15ca32685509c10b7074cc5b8860838fea95e",
+    "historicalReplayPins": {
+      "tools/measure_lanner_geometry.py": "cabbaf17ff7efdbcbee9a1fba67c7edafd59dceb8e97f367824a51c134479992",
+      "tools/measure_banteng_geometry.py": "4b7d8d5d972e30d93bebf7f422be71e415d6e4a9c4b622582ecf6e30a6bb9235"
+    }
+  },
+  "textureSeams": {
+    "originalCommit": "d5e15ca32685509c10b7074cc5b8860838fea95e",
+    "originalRebuildSha256": "31f8d51fba27147be45d2921662d1a806d22de6d9dea1f52c37ccef287993ee8",
+    "captureSha256": "41b4960afaa465d724a28a55e1c3c3e04fe7f0a7399ec81a4cadd3f72ab14bb5",
+    "faces": [
+      {
+        "part": "pods explicit member 0",
+        "globalFace": 105,
+        "sourceFace": 4,
+        "sourceCorners": [
+          0,
+          1,
+          2
+        ]
+      },
+      {
+        "part": "pods explicit member 1",
+        "globalFace": 223,
+        "sourceFace": 111,
+        "sourceCorners": [
+          1,
+          1,
+          2
+        ]
+      }
+    ]
+  },
+  "replayPins": {
+    "tools/fleet_hull_measurement.py": "3570747d9f650efc7d0e4f88352e9fd32e42ab394f4669100223fbac0c1be6b7",
+    "tools/directed_hull_fit.py": "dbd5d45e5052453646b752695815d6cb53c6ccb2c3ad6694451a4c7e19fa8bf7",
+    "integration/sh155-osprey-support/OSPREY-SUPPORT-STUDIO.json": "167943248e70c01efed9a6c7a0df17af8f5bd4591dd7d5ce901eecd24bc42cd2",
+    "integration/sh155-osprey-support/FROZEN-SOURCES.json": "20799814617f88272949803472128d2c212347a531eaecd344f97550d9246705",
+    "integration/sh155-osprey-support/CONTACT-CANDIDATE.json": "35d7ea7e89cfa26750a4b8ee29acac3d7584ac7a68df29320cf4f497e30afd2f",
+    "integration/sh155-osprey-support/CONTACT-RESULT.json": "3ad5d71ca47e39790bdabe1d81c7b554939d8edc7cbc7103dea0cb92cfdf14bd",
+    "integration/sh155-osprey-support/ORIGINAL-OWNERSHIP.json": "b7286cc9d3164bf00906c2eafa7ca19c62c7f7369ae34070bff399cefe880029",
+    "integration/sh155-osprey-support/RETAINED-OVERLAPS.json": "d42ab6fff859673808e317d88834ecfe8153f177193a3e866793f7ec67d96851",
+    "integration/sh155-osprey-support/CANDIDATE-FIDELITY.json": "93d0f0f9f10861eddc9229fad3e09546c1c5d77f3766e74428c911372baaac59",
+    "integration/sh155-osprey-support/SUPPORT-FAN.json": "aa0bc4075579c33fc28d72b4008bde81713640840d7aa2b25d71d505106db1d6",
+    "integration/sh155-osprey-support/SURFACE-FIT.json": "a15821b6310e462b37524b2f69277df6a3d644be60cb8716ef7a13744f2795e1",
+    "integration/sh155-osprey-support/ARCHIVED-OVERLAPS.json": "4840c34153d9f36dbfc717085c3800308e19b066a0bcf3418020399ef75e3216",
+    "integration/sh155-osprey-support/CANDIDATE-TOPOLOGY-SURVEY.json": "bbf87042339f919075597dfdbb9f8b54fd7e1d682eb909d8ea6fd4108139ac6e",
+    "integration/sh155-osprey-support/CANDIDATE-FIT-LOCALIZATION.json": "8a8dca0c8c8bfaca7f6dcb6517ed9826f670c6f43f3144201781e1611da75398",
+    "integration/sh155-osprey-support/REFERENCE-FIT-LOCALIZATION.json": "a50428aa07581da5ba3ab904bdd1341d41208f04ab30f660d2c5fac267e9fdd4",
+    "tools/atomic_asset_output.py": "2d13803823645d3bdea7c855af958eb54d7ebe513ec1bcb0af34e82870164bf0",
+    "tools/banteng_art_mesh.py": "ef5c0f538510486238d69dc301da80026fc93326767b38c50a04756ab9890a09",
+    "tools/encode_goshawk_visual.py": "9e524e9a32a237d71d212c8b5c34ecf12cde5a8e08885b1d03991b95c278f61c",
+    "tools/import_goshawk_envelope_source.py": "14b530725629ee3eaa5b3fd69f01fe00fe371564a1a52cb398d3969142db977e",
+    "tools/measure_banteng_geometry.py": "9356864e227302598fcae4e833ecb706b1ed8a5e600cbb4076b7165dc1e54bea",
+    "tools/measure_goshawk_surface_fit.py": "5407ef1e5fad41810aa95444ca1338fe33a91e5c9857dcb752b4e4cf2fca6d0b",
+    "tools/measure_lanner_geometry.py": "55d13a28602e6ed791adecd85ff43f3c8a7fbe118cf0977272e1747422c2408d",
+    "tools/measure_osprey_support.py": "807c5dd6002a7f65c99dbad1e6725d94fe34e0bf2bd78458090c9c95be17b513",
+    "tools/prepare_eagle_cruiser_geometry.py": "a1ea3b5d72f35e1f2932da71afa3ff8a276a504f7309a1086a2b3df35988addc",
+    "tools/prepare_osprey_support.py": "0e657e32ea7ab11426508665f8d93c30dd75d2de305ee429d7e4b5e110f09568",
+    "tools/verify_eagle_cruiser_geometry.py": "cb053ee5873fee62ee456bb3776e98d29b2cbb44c7344599bc617a8579164d43",
+    "tools/rebuild_osprey_support.py": "2c4486829e0bd37844f6d7d407c771b8f90b6fd091a0229efab9050eeea304b3",
+    "tools/verify_osprey_support.py": "1ce782517c986204ea3500b9e5988c4436ece585dd4f5efe50ce23712e9a5200",
+    "tools/vulture_mk_i_exact_fit.py": "479b31f8714a198a82c0e2888b8d19efe46c7b4c43a576b83ab84c571ae738c6",
+    "assets/fleet/sh155/GENERATED-COLLISION.json": "369441cc14157dda44d4cf639a5bb09315c04f627bcc3fd63e914305b54b92eb",
+    "assets/fleet/sh155/SOURCE-GEOMETRY.json": "3487a004f1959de22edb27ef7eb857e2f469a7d8ea067add77520e3a616907a3",
+    "tools/hull_contact_geometry.py": "07606202e6a298ad375a7504991fe6fb93da6a07f9b5cc4a22167bd570b07839"
+  }
+}

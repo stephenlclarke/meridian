@@ -1,0 +1,105 @@
+{
+  "nominalPaddingMetres": 0.02,
+  "refinementTargetsMillimetres": {
+    "detailed": 1600,
+    "native": 2700
+  },
+  "fullUpperMillimetres": {
+    "detailed": 1522,
+    "native": 2444
+  },
+  "pieces": {
+    "central-hull": {
+      "detailed": 889,
+      "native": 2444
+    },
+    "port-wing": {
+      "detailed": 1015,
+      "native": 1015
+    },
+    "port-fin": {
+      "detailed": 1402,
+      "native": 1402
+    },
+    "port-pod": {
+      "detailed": 1522,
+      "native": 2145
+    },
+    "starboard-wing": {
+      "detailed": 1015,
+      "native": 1015
+    },
+    "starboard-fin": {
+      "detailed": 1402,
+      "native": 1402
+    },
+    "starboard-pod": {
+      "detailed": 1522,
+      "native": 2145
+    },
+    "canopy": {
+      "detailed": 384,
+      "native": 902
+    },
+    "canopy-rib": {
+      "detailed": 340,
+      "native": 1022
+    },
+    "port-service-pipe": {
+      "detailed": 260,
+      "native": 869
+    },
+    "port-instrument-housing": {
+      "detailed": 668,
+      "native": 1640
+    },
+    "port-louvre-1": {
+      "detailed": 231,
+      "native": 961
+    },
+    "port-louvre-2": {
+      "detailed": 231,
+      "native": 962
+    },
+    "port-louvre-3": {
+      "detailed": 231,
+      "native": 963
+    },
+    "port-louvre-4": {
+      "detailed": 231,
+      "native": 964
+    },
+    "port-louvre-5": {
+      "detailed": 231,
+      "native": 966
+    },
+    "starboard-service-pipe": {
+      "detailed": 260,
+      "native": 860
+    },
+    "starboard-instrument-housing": {
+      "detailed": 668,
+      "native": 1613
+    },
+    "starboard-louvre-1": {
+      "detailed": 231,
+      "native": 949
+    },
+    "starboard-louvre-2": {
+      "detailed": 231,
+      "native": 950
+    },
+    "starboard-louvre-3": {
+      "detailed": 231,
+      "native": 951
+    },
+    "starboard-louvre-4": {
+      "detailed": 231,
+      "native": 952
+    },
+    "starboard-louvre-5": {
+      "detailed": 231,
+      "native": 954
+    }
+  }
+}

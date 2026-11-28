@@ -1,0 +1,12 @@
+{
+  "schema": 1,
+  "id": "sh140-chimango",
+  "undoBefore": [
+    "sh139-falcon-mk-iv"
+  ],
+  "undoAfter": [],
+  "kind": "declaration",
+  "module": "chimango",
+  "before": "pub mod celestial;\n",
+  "after": "pub mod condor;\n"
+}

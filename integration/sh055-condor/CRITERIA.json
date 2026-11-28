@@ -1,0 +1,173 @@
+{
+  "hull": "SH055 Condor",
+  "scope": "Original catalogue inspection and geometry queries",
+  "source": "assets/fleet/sh055/SOURCE-GEOMETRY.json",
+  "frozenSources": "integration/sh055-condor/FROZEN-SOURCES.json",
+  "originalAccess": {
+    "runtimeCatalogue": {
+      "playerFlyable": false,
+      "normalPurchaseEligible": false
+    },
+    "r3DesignContract": {
+      "playerFlyable": true,
+      "purchasePolicy": "blueprintFabrication"
+    }
+  },
+  "faces": {
+    "detailed": 4504,
+    "native": 244,
+    "nativeMaximum": 512
+  },
+  "supportGroups": 26,
+  "fitUpperMillimetres": {
+    "detailed": 3596,
+    "native": 3596
+  },
+  "minimumRouteClearanceMillimetres": 793,
+  "engineering": {
+    "sourceReference": "finite-intrinsic-empty-condor",
+    "massKg": 34306
+  },
+  "replayPins": {
+    "integration/sh055-condor/CONTACT-CANDIDATE.json": "e07dced64f116148d5c827c4022742a1bae7287a68954294ea183de24e0df815",
+    "integration/sh055-condor/CONTACT-RESULT.json": "dd30e49a594f3e8e3c30c2903460c97d1c280ce82f65310cc35464b18e0d7b29",
+    "integration/sh055-condor/FROZEN-SOURCES.json": "ff98284a974a974297d84771d19f9f54476c8849cc6d444761c27ef6bb8616d8",
+    "integration/sh055-condor/CONDOR-STUDIO.json": "622593eca55220cba8b2b71192480464a95c5b1dc6d1ba9de6725231e4958993",
+    "integration/sh055-condor/ORIGINAL-DIFFERENCE.json": "4a1518b4a6390235760ac15c62e4f510b005cf1a8468348db61acdbd6ebf5d19",
+    "integration/sh055-condor/ORIGINAL-JOINTS.json": "2a2e57f9f64573993b004e8200902b3d86be07cef0d173e7522c6cac66ff8792",
+    "integration/sh055-condor/SUPPORT-FAN.json": "c43a7ae697f565e5e0cf87305133395cc27863081c42d722f2d51c8f900720d9",
+    "integration/sh055-condor/SURFACE-FIT.json": "c5032bd8231926e4ca90df2e4739e10db6bd1a0a7afe1e710eda5ccb30e51596",
+    "tools/atomic_asset_output.py": "2d13803823645d3bdea7c855af958eb54d7ebe513ec1bcb0af34e82870164bf0",
+    "tools/encode_goshawk_visual.py": "9e524e9a32a237d71d212c8b5c34ecf12cde5a8e08885b1d03991b95c278f61c",
+    "tools/import_goshawk_envelope_source.py": "14b530725629ee3eaa5b3fd69f01fe00fe371564a1a52cb398d3969142db977e",
+    "tools/measure_goshawk_surface_fit.py": "5407ef1e5fad41810aa95444ca1338fe33a91e5c9857dcb752b4e4cf2fca6d0b",
+    "tools/prepare_eagle_cruiser_geometry.py": "a1ea3b5d72f35e1f2932da71afa3ff8a276a504f7309a1086a2b3df35988addc",
+    "tools/verify_eagle_cruiser_geometry.py": "cb053ee5873fee62ee456bb3776e98d29b2cbb44c7344599bc617a8579164d43",
+    "tools/measure_condor.py": "1ab277aac50d65802c46a2bcefc6eb1178bab94d1f03d340c8a194140752cb14",
+    "tools/prepare_condor.py": "b5c9b1e89b1542c07f7d047f39cf56577dc3e909bfacff66a5b7211008a647ba",
+    "tools/verify_condor.py": "b1be1e62be2d2631e6500780ad99b6687817ec2b47393a1477d265954402eb0f",
+    "tools/vulture_mk_i_exact_fit.py": "479b31f8714a198a82c0e2888b8d19efe46c7b4c43a576b83ab84c571ae738c6",
+    "tools/verify_condor_collision.py": "b70403181ae6c5f54e9d5b55cf5de897447b70a0aa25702073fe2f065a690962",
+    "assets/fleet/sh055/COLLISION-PIECES.json": "049b4aecd1acd931bcea2d55f93676aa6d30863d91cba27e245500fa1ce986bc",
+    "assets/fleet/sh055/collision-piece-membership.bin": "e1b6e8074f59cd0d0ee71ff5e8d2cfaf7dd8050a043e3d10c94897cdb0bd7724",
+    "integration/sh055-condor/COLLISION-WING-FAN.json": "77b16501bb28fb50717a6fe3f14b719a23305c1d255787270341387a7a8806db",
+    "integration/sh055-condor/COLLISION-ROUTE-AXES.json": "5673cd7bdd756e417e75cd6d1703f006748988a1b8731d7eaa206a1a5ed816b4",
+    "integration/sh055-condor/COLLISION-CONTACT-RESULT.json": "5e439a5c447422e76e9bcd13550df98d192fb66e8dd3aaa7f500066df8b6f11c",
+    "integration/sh055-condor/COLLISION-FIT.json": "cd03e40965fe573ff26d90448be5e345fbdd3f822b1ec9abc1938601fc0b6f5c",
+    "integration/sh055-condor/WING-STANDOFF-WITNESSES.json": "9b904ddce733688ac63700c45bf84f7054fea17350d6e83186d5e3b93832b06a",
+    "tools/hull_contact_geometry.py": "07606202e6a298ad375a7504991fe6fb93da6a07f9b5cc4a22167bd570b07839"
+  },
+  "byteReplay": {
+    "host": "SteveMBA",
+    "startedUtc": "2026-11-24T18:35:46Z",
+    "finishedUtc": "2026-11-24T18:36:03Z",
+    "log": {
+      "bytes": 819,
+      "sha256": "52004d90b89e0e8f9a2a45cb4735500d7dbedc53b78893145b149a8f9f7fc762"
+    },
+    "fitDependencies": {
+      "python": "3.14.3",
+      "numpy": "2.5.5",
+      "scipy": "1.18.1",
+      "trimesh": "5.2.1",
+      "rtree": "1.4.1"
+    },
+    "commands": [
+      "python3 -B tools/prepare_condor.py --check",
+      "python3 -B tools/verify_condor.py | cmp - integration/sh055-condor/CONTACT-RESULT.json",
+      "python3 -B tools/measure_condor.py --difference | cmp - integration/sh055-condor/ORIGINAL-DIFFERENCE.json",
+      "python3 -B tools/measure_condor.py | cmp - integration/sh055-condor/SURFACE-FIT.json",
+      "python3 -B tools/verify_condor_collision.py | cmp - integration/sh055-condor/COLLISION-CONTACT-RESULT.json",
+      "python3 -B tools/measure_condor.py --collision | cmp - integration/sh055-condor/COLLISION-FIT.json"
+    ]
+  },
+  "hullStudio": {
+    "definition": "integration/sh055-condor/CONDOR-STUDIO.json",
+    "bytes": 598775,
+    "sha256": "622593eca55220cba8b2b71192480464a95c5b1dc6d1ba9de6725231e4958993",
+    "loaderRevision": "27121e66ba37a29781135b56924a9d6e7f38a70a",
+    "supports": 24,
+    "probes": 7,
+    "signedInstalledExport": {
+      "status": "PASS",
+      "scope": "Signed installed Studio offline artwork import and export",
+      "bundleIdentifier": "io.xyzzy.meridian.hullstudio",
+      "bundleVersion": "0.0.0",
+      "codeDirectoryHash": "93938bda9242ebdff508bfb9e16b3cdf83c0a200",
+      "developerIdTeam": "4MEB7MUTAV",
+      "signatureVerification": "deep strict",
+      "definition": {
+        "bytes": 598775,
+        "sha256": "622593eca55220cba8b2b71192480464a95c5b1dc6d1ba9de6725231e4958993"
+      },
+      "exportExitStatuses": [
+        0,
+        0
+      ],
+      "exportMatchesDefinitionExceptTrailingLf": true,
+      "valid": true,
+      "diagnostics": [],
+      "detailedTriangles": 4504,
+      "nativeTriangles": 244,
+      "supportGroups": 24,
+      "engineeringReference": "finite-intrinsic-empty-condor",
+      "massKg": 34306.0,
+      "receiptFiles": {
+        "CONDOR.hull.json": {
+          "bytes": 598774,
+          "sha256": "95e4c0542dfe65999008699c6697cabfdb325d88a86bdf581cd91b16bd8b6297"
+        },
+        "CONDOR-repeat.hull.json": {
+          "bytes": 598774,
+          "sha256": "95e4c0542dfe65999008699c6697cabfdb325d88a86bdf581cd91b16bd8b6297"
+        },
+        "studio.stdout.json": {
+          "bytes": 79041,
+          "sha256": "933a3eaa68c39c426a89f6fe867ea1fd8a050cb1d186804e54ee13afe36e8914"
+        },
+        "studio-repeat.stdout.json": {
+          "bytes": 79041,
+          "sha256": "933a3eaa68c39c426a89f6fe867ea1fd8a050cb1d186804e54ee13afe36e8914"
+        },
+        "codesign.log": {
+          "bytes": 14183,
+          "sha256": "75e632888e3a599319e422f811b441c48c2b9f1e147fda1f1e91c49a836e555c"
+        }
+      }
+    }
+  },
+  "wingSplit": {
+    "artworkSupportGroups": 24,
+    "collisionSupportGroups": 26,
+    "overlappingOriginalVertices": 56,
+    "sourceFacesCovered": {
+      "detailed": 4504,
+      "native": 244
+    },
+    "originalWingFacesCovered": {
+      "detailed": 1432,
+      "native": 72
+    },
+    "priorUpperMillimetres": {
+      "detailed": 6047,
+      "native": 6180
+    },
+    "priorStrictLowerMillimetres": {
+      "detailed": 5083,
+      "native": 5126
+    },
+    "collisionUpperMillimetres": {
+      "detailed": 3596,
+      "native": 3596
+    },
+    "guardedRoutesMillimetres": {
+      "central-dorsal": 1429,
+      "port-below-wing": 859,
+      "port-above-wing": 979,
+      "port-outboard-aft-pod": 793,
+      "starboard-below-wing": 859,
+      "starboard-above-wing": 979,
+      "starboard-outboard-aft-pod": 793
+    }
+  }
+}

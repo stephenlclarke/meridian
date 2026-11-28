@@ -1,0 +1,69 @@
+{
+  "status": "AUTHORED_JOINED_SHOWROOM;OWNED_PORTABLE_AND_METAL_EXECUTION_PENDING",
+  "sourceParentCommits": {
+    "SH022_PR86": "820b19f33e6f1f78344572d9ac15f41384dd0a3b",
+    "SH023_PR85": "3a3e6c0d0501d966902d9039cf73c943f6290865"
+  },
+  "originalDetailedVisuals": {
+    "SH022": {
+      "path": "assets/fleet/sh022/visual.bin",
+      "header": "SH022VZ1",
+      "corners": 10452,
+      "fnv1a64": "0259dab859ed15d8",
+      "sha256": "83a4e9aa8cc0a527bf3f44ae00dc06cb687c56da64d2f93d9964d16cd590997f"
+    },
+    "SH023": {
+      "path": "assets/fleet/sh023/visual.bin",
+      "header": "PRG3VIZ1",
+      "corners": 10452,
+      "fnv1a64": "09d8c8bd7b6a6a63",
+      "sha256": "3da7a631ea3f9c4361bf4bfc6972b6a84f94acf4a32adb8936caf53215f36150"
+    }
+  },
+  "portable": {
+    "workspace": "cargo test --locked --workspace",
+    "testInvocation": "cargo test --locked -p meridian-desktop <test> -- --nocapture",
+    "tests": [
+      "peregrine_mk_i_original_visual_and_all_local_supports_bind_to_its_own_shader",
+      "peregrine_mk_iii_original_visual_and_all_local_supports_bind_to_its_own_shader",
+      "peregrine_mk_i_and_mk_iii_refuse_actual_crossed_visual_payloads",
+      "selecting_peregrine_mk_i_routes_its_own_preview_without_granting_exchange",
+      "selecting_peregrine_mk_iii_does_not_select_peregrine_mk_i_or_its_geometry",
+      "original_peregrine_mk_i_fits_minimum_station_showroom_solo_and_compare",
+      "original_peregrine_mk_iii_fits_minimum_station_showroom_solo_and_compare",
+      "peregrine_siblings_pin_actual_station_compare_in_both_orders_and_duplicates",
+      "own_pane_and_full_union_reject_black_gutter_wrong_pane_and_rgb"
+    ],
+    "coreTests": [
+      "cargo test --locked -p meridian-core peregrine_mk_i::tests -- --nocapture",
+      "cargo test --locked -p meridian-core peregrine_mk3::tests -- --nocapture",
+      "cargo test --locked -p meridian-core flight::goshawk_validation::tests -- --nocapture"
+    ],
+    "acceptance": "Both actual bundled detailed streams pass their own authenticators and refuse crossed fingerprints and headers; SH023 native visual refuses as detailed; crossed source support encodings refuse. Ordinary search/Pin/Compare preserves exact model identities, SH025 default baseline, refusal of exchange and unchanged save bytes. Each model projects into its own minimum viewport pane, including duplicate different-pose controls."
+  },
+  "metal": {
+    "invocation": "Set each directory variable to a distinct new absolute directory and run cargo test --locked -p meridian-desktop <test> -- --ignored --exact --nocapture.",
+    "tests": [
+      {
+        "directoryVariable": "MERIDIAN_SH023_EVIDENCE_DIR",
+        "test": "mule_render::showroom::metal_qualification::metal_peregrine_mk_iii_same_pose_shimmer",
+        "verifier": "python3 -B tools/verify_goshawk_showroom_evidence.py <evidence-directory>"
+      },
+      {
+        "directoryVariable": "MERIDIAN_SH023_MINIMUM_DIR",
+        "test": "mule_render::showroom::metal_qualification::peregrine_pair_qualification::metal_peregrine_mk_iii_minimum_showroom_model_pass"
+      },
+      {
+        "directoryVariable": "MERIDIAN_SH022_SH023_CACHE_DIR",
+        "test": "mule_render::showroom::metal_qualification::peregrine_pair_qualification::metal_peregrine_sibling_cache_orders"
+      }
+    ],
+    "pinnedPaneOrders": [["SH022", "SH023"], ["SH023", "SH022"], ["SH022", "SH022"], ["SH023", "SH023"]],
+    "acceptance": "Distinct original solo full-target RGB and byte-identical return for both; the genuine pinned mixed orders use same poses and duplicate orders use different poses as renderer-only fixtures. Separate original pass references for both panes, including duplicate identities; each isolated pane is nonblack, gutter-confined and exactly matches its own direct reference; combined full-target RGB equals the exact union. No evidence from the parent source runs is transferred to this joined tree."
+  },
+  "limits": {
+    "SH022": "Original packaged native 964 faces exceeds 512; separate cached alternative is unqualified and geometry is absent. Adopted dry source engineering budget remains 103972 kg; existing controlled World only.",
+    "SH023": "Original active successor has 512 faces at the source limit; source engineering budget 101208 kg is not adopted runtime mass. No new ordinary or controlled World actor/flyability, native collision qualification, acquisition, paid equipment, hardware or loaded mass is introduced.",
+    "presentation": "Owned execution on the joined tree, actual GUI resizing, compositor behavior, GPU timing acceptance and release publication are separate."
+  }
+}

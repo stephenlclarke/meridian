@@ -28,52 +28,81 @@ pub struct FuelScoopsSnapshot {
     pub owned: Option<OwnedModule>,
     pub fitted: Option<FittedFuelScoops>,
     pub current_offer: Option<ModuleOffer>,
-    /// Actual implemented cargo-expansion and scoop mounts; other utility families are absent.
+    /// All fitted utilities sharing this hull's mount budget.
     pub utility_mounts_used: u16,
     pub utility_mounts_capacity: u16,
 }
+#[cfg(test)]
 fn validate_slots(
     definition: crate::equipment::Definition,
     items: &[OwnedModule],
     cargo_mounts: u16,
 ) -> Result<u16, ModuleError> {
-    if definition.hull != "SH025"
-        || items
-            .iter()
-            .any(|i| i.slot.is_some_and(|slot| slot != i.kind.slot()))
-    {
-        return Err(ModuleError::StaleOccupant);
-    }
-    let scoops = items
-        .iter()
-        .filter(|i| i.slot == Some(ModuleSlot::UtilityFuelScoops))
-        .count();
-    let used = cargo_mounts
-        .checked_add(u16::try_from(scoops).map_err(|_| ModuleError::Capacity)?)
-        .ok_or(ModuleError::Capacity)?;
+    let used = count_slots(definition, items, cargo_mounts)?;
     if used > definition.utility_mounts_capacity {
         return Err(ModuleError::Capacity);
     }
     Ok(used)
 }
-pub(super) fn validate_fit(
+fn count_slots(
+    definition: crate::equipment::Definition,
+    items: &[OwnedModule],
+    cargo_mounts: u16,
+) -> Result<u16, ModuleError> {
+    if !matches!(definition.hull, "SH025" | "SH171")
+        || items.iter().any(|i| {
+            i.slot.is_some_and(|slot| match slot {
+                ModuleSlot::FuelStorage(index) => {
+                    i.kind != ModuleKind::FuelStorage
+                        || index >= crate::navigation::MAX_FUEL_STORAGE_UNITS
+                }
+                ModuleSlot::LeftLaser | ModuleSlot::RightLaser | ModuleSlot::RearLaser => {
+                    definition.hull != "SH171" || i.kind.laser_profile().is_none()
+                }
+                _ => slot != i.kind.slot(),
+            })
+        })
+    {
+        return Err(ModuleError::StaleOccupant);
+    }
+    let scoops = items
+        .iter()
+        .filter(|i| {
+            matches!(
+                i.slot,
+                Some(
+                    ModuleSlot::UtilityFuelScoops
+                        | ModuleSlot::UtilitySalvageCutter
+                        | ModuleSlot::UtilityEcm
+                        | ModuleSlot::FuelStorage(_)
+                )
+            )
+        })
+        .count();
+    let used = cargo_mounts
+        .checked_add(u16::try_from(scoops).map_err(|_| ModuleError::Capacity)?)
+        .ok_or(ModuleError::Capacity)?;
+    Ok(used)
+}
+pub(super) fn mounts_used(
     items: &[OwnedModule],
     account: &CommanderAccount,
     emp_mounts: u16,
-) -> Result<(), ModuleError> {
-    validate_slots(
-        crate::equipment::definition().map_err(|_| ModuleError::BerthRequired)?,
+) -> Result<u16, ModuleError> {
+    count_slots(
+        account
+            .equipment_definition()
+            .map_err(|_| ModuleError::BerthRequired)?,
         items,
         account.equipment_state().units_used() + emp_mounts,
     )
-    .map(|_| ())
 }
 impl World {
     pub fn fuel_scoops_snapshot(&self) -> Option<FuelScoopsSnapshot> {
         let account = self.commander_account.as_ref()?;
         let ledger = self.modular.ledger(self, account).ok()?;
-        let definition = crate::equipment::definition().ok()?;
-        let utility_mounts_used = validate_slots(
+        let definition = account.equipment_definition().ok()?;
+        let utility_mounts_used = count_slots(
             definition,
             &ledger.items,
             account.equipment_state().units_used() + self.emp.utility_mounts(),

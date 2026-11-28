@@ -1,0 +1,12 @@
+{
+  "schema": 1,
+  "id": "sh063-seriema-courier",
+  "undoBefore": [
+    "sh062-moose-clipper"
+  ],
+  "undoAfter": [],
+  "kind": "declaration",
+  "module": "seriema_courier",
+  "before": "pub mod save;\n",
+  "after": "pub mod station;\n"
+}

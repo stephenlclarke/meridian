@@ -68,7 +68,13 @@ impl State {
             });
         }
     }
+    #[cfg(test)]
     pub(crate) fn decode(r: &mut Reader<'_>) -> Result<Self, SaveError> {
+        let value = Self::decode_base(r)?;
+        value.validate()?;
+        Ok(value)
+    }
+    pub(crate) fn decode_base(r: &mut Reader<'_>) -> Result<Self, SaveError> {
         let enabled = r.bool()?;
         let count = usize::from(r.u8()?);
         if count > BELT_BODY_COUNT * 8 {
@@ -125,8 +131,8 @@ impl State {
             enabled,
             strokes: Arc::new(strokes),
             expired,
+            collected: Arc::new(Vec::new()),
         };
-        value.validate()?;
         Ok(value)
     }
 }

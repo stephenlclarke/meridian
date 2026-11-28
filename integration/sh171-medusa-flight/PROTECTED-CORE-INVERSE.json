@@ -1,0 +1,71 @@
+{
+  "base": "9d82467c8062c0ed31edf37e4e29e485dbdc2359",
+  "files": {
+    "station.rs": {
+      "beforeSHA256": "186f6be460f99c34065000e4c7666884abad27190864942203703c6286ca4327",
+      "afterSHA256": "e1bb52ab6a475bf37012b51aaa547ff40d40e846733602bad1af310191581806",
+      "hunks": [
+        {
+          "offset": 274,
+          "before": "",
+          "after": "use crate::mule::{MULE_CLEARANCE_METRES, SmoothPiece};\n"
+        },
+        {
+          "offset": 366,
+          "before": "",
+          "after": "mod medusa;\n"
+        },
+        {
+          "offset": 7153,
+          "before": "",
+          "after": "    medusa: Option<Box<[SmoothPiece]>>,\n"
+        },
+        {
+          "offset": 7669,
+          "before": "",
+          "after": "        Self::from_pinned_parts(station, CollisionMesh::decode(hull)?, port, None)\n    }\n\n    fn from_pinned_parts(\n        station: &[u8],\n        hull: CollisionMesh,\n        port: &[u8],\n        medusa: Option<Box<[SmoothPiece]>>,\n    ) -> Result<Self, StationError> {\n"
+        },
+        {
+          "offset": 8718,
+          "before": "            hull: CollisionMesh::decode(hull)?,\n",
+          "after": "            hull,\n"
+        },
+        {
+          "offset": 8763,
+          "before": "",
+          "after": "            medusa,\n"
+        },
+        {
+          "offset": 9859,
+          "before": "",
+          "after": "        if let Some(pieces) = self.medusa_pieces() {\n            return self.rounded_station_launch_start(pieces);\n        }\n"
+        },
+        {
+          "offset": 13094,
+          "before": "        )\n",
+          "after": "        ) || self.medusa_pieces().is_some_and(|pieces| {\n            self.rounded_station_motion_clear(pieces, start, end, angular_travel)\n        })\n"
+        },
+        {
+          "offset": 16000,
+          "before": "",
+          "after": "        let rounding = if self.medusa.is_some() {\n            MULE_CLEARANCE_METRES * basis_stretch\n        } else {\n            0.0\n        };\n"
+        },
+        {
+          "offset": 16198,
+          "before": "",
+          "after": "            + rounding\n"
+        },
+        {
+          "offset": 16485,
+          "before": "        for vertex in &self.hull.vertices {\n",
+          "after": "        let support_points = self\n            .medusa_pieces()\n            .into_iter()\n            .flatten()\n            .flat_map(SmoothPiece::source_points);\n        for vertex in self.hull.vertices.iter().chain(support_points) {\n"
+        },
+        {
+          "offset": 18952,
+          "before": "",
+          "after": "        if let Some(pieces) = self.medusa_pieces() {\n            return self.rounded_station_entry_conditions(\n                pieces,\n                start,\n                end,\n                physical_speed,\n                roll_rate,\n                angular_travel,\n            ) && self.motion_clear(start, end, angular_travel);\n        }\n"
+        }
+      ]
+    }
+  }
+}

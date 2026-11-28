@@ -24,12 +24,16 @@ impl State {
             return Err(INVALID);
         }
         for e in prefix.equipment.iter() {
-            if e.dock.visit() >= scene.owner.visit
-                || world
-                    .damage
-                    .berth_clock(e.dock.sequence())
-                    .is_none_or(|c| c > scene.physical_tick)
-            {
+            let valid = if let Some(flight) = e.flight {
+                flight.visit <= scene.owner.visit && flight.clock <= scene.physical_tick
+            } else {
+                e.dock.visit() < scene.owner.visit
+                    && world
+                        .damage
+                        .berth_clock(e.dock.sequence())
+                        .is_some_and(|c| c <= scene.physical_tick)
+            };
+            if !valid {
                 return Err(INVALID);
             }
         }
@@ -60,7 +64,18 @@ impl State {
     ) -> Result<(), SaveError> {
         charge.start.validate(world, before)?;
         let item = self.item_at(world, &charge.start)?;
+        let begin = charge.start.physical_tick;
+        let end = charge.ended_at.unwrap_or(self.meter_clock);
         if charge.item != item.item
+            || world.ecm.activations().iter().any(|activation| {
+                let clock = activation.physical_tick;
+                activation.owner == charge.start.owner
+                    && if clock < begin {
+                        begin < clock.saturating_add(crate::ECM_FIELD_TICKS)
+                    } else {
+                        clock < end || (clock == end && charge.phase == EmpChargePhase::Charging)
+                    }
+            })
             || !State::recent_attack(
                 &world.traffic,
                 charge.start.owner,
@@ -369,13 +384,23 @@ impl State {
         let utilities = modules
             .items
             .iter()
-            .filter(|i| i.slot == Some(super::super::ModuleSlot::UtilityFuelScoops))
+            .filter(|i| {
+                matches!(
+                    i.slot,
+                    Some(
+                        super::super::ModuleSlot::UtilityFuelScoops
+                            | super::super::ModuleSlot::UtilitySalvageCutter
+                            | super::super::ModuleSlot::UtilityEcm
+                    )
+                )
+            })
             .count();
         if usize::from(account.equipment_state().units_used())
             + utilities
             + usize::from(item.fitted)
             > usize::from(
-                crate::equipment::definition()
+                account
+                    .equipment_definition()
                     .map_err(|_| INVALID)?
                     .utility_mounts_capacity,
             )

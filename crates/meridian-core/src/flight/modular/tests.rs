@@ -42,6 +42,128 @@ fn cold(w: &World) -> World {
     loaded
 }
 #[test]
+fn targeting_inventory_has_six_original_paid_grades() {
+    let mut w = funded(15901);
+    let kinds = TargetingTier::ALL.map(ModuleKind::Targeting);
+    let prices = [8_000, 20_000, 40_000, 60_000, 100_000, 120_000];
+    let technologies = [4, 5, 7, 9, 10, 11];
+    let dock = w.current_dock_context().unwrap();
+    let mut ledger = Ledger::born(15901).unwrap();
+    for (i, kind) in kinds.into_iter().enumerate() {
+        let offer = w
+            .module_offers()
+            .into_iter()
+            .find(|o| o.kind == kind)
+            .unwrap();
+        assert_eq!(
+            (
+                offer.price_tenths,
+                offer.required_technology,
+                offer.slot,
+                offer.equipment_units
+            ),
+            (prices[i], technologies[i], ModuleSlot::Targeting, 1)
+        );
+        assert_eq!(
+            offer.prerequisite,
+            i.checked_sub(1).map(|previous| kinds[previous])
+        );
+        assert_eq!(
+            validate_purchase(kind, technologies[i] - 1, prices[i]),
+            Err(ModuleError::TechnologyUnavailable)
+        );
+        assert_eq!(
+            validate_purchase(kind, technologies[i], prices[i] - 1),
+            Err(ModuleError::InsufficientCredits)
+        );
+        assert_eq!(ModuleKind::from_tag(kind.tag()).unwrap(), kind);
+        let id = 200_000 + i as u64;
+        ledger
+            .apply(
+                Event {
+                    xyzzy: false,
+                    action: ModuleAction::Purchase { kind },
+                    item: id,
+                    dock,
+                    tick: 0,
+                    revision: i as u64,
+                },
+                i as u32 + 1,
+            )
+            .unwrap();
+        assert_eq!(ledger.fitted(ModuleSlot::Targeting).unwrap().id, id);
+    }
+    let cash = w.credits_tenths().unwrap();
+    let buy = |kind| ModuleAction::Purchase { kind };
+    assert_eq!(w.targeting_tier(), None);
+    assert!(matches!(
+        w.review_module(buy(kinds[1]), w.snapshot().tick),
+        Err(ModuleError::MissingPrerequisite)
+    ));
+    let basic = apply(&mut w, buy(kinds[0]));
+    let advanced = apply(&mut w, buy(kinds[1]));
+    assert_eq!(w.credits_tenths(), Some(cash - prices[0] - prices[1]));
+    let before = w.save_bytes().unwrap();
+    assert!(matches!(
+        w.review_module(
+            ModuleAction::Install {
+                item: basic,
+                replacing: Some(advanced)
+            },
+            w.snapshot().tick
+        ),
+        Err(ModuleError::LowerTargetingGrade)
+    ));
+    assert_eq!(w.save_bytes().unwrap(), before);
+    apply(&mut w, ModuleAction::Store { item: advanced });
+    assert_eq!(w.targeting_tier(), None);
+    apply(
+        &mut w,
+        ModuleAction::Install {
+            item: basic,
+            replacing: None,
+        },
+    );
+    assert_eq!(cold(&w).targeting_tier(), Some(TargetingTier::Basic));
+}
+#[test]
+fn xyzzy_targeting_inventory_refits_same_maximum_item_without_another_grant() {
+    let mut w = World::new_commander(15902).unwrap();
+    let review = w.review_xyzzy(crate::XyzzyAction::Enter, 0).unwrap();
+    w.prepare_xyzzy(review, 0).unwrap().commit();
+    let maximum = snap(&w)
+        .items
+        .into_iter()
+        .find(|item| item.kind == ModuleKind::Targeting(TargetingTier::Military))
+        .unwrap();
+    assert!(matches!(maximum.provenance, ModuleProvenance::XYZzy { .. }));
+    assert_eq!(w.targeting_tier(), Some(TargetingTier::Military));
+    apply(&mut w, ModuleAction::Store { item: maximum.id });
+    apply(
+        &mut w,
+        ModuleAction::Purchase {
+            kind: ModuleKind::Targeting(TargetingTier::Basic),
+        },
+    );
+    let cash = w.credits_tenths();
+    let tick = w.snapshot().tick;
+    let review = w
+        .review_xyzzy(crate::XyzzyAction::MaximumSupportedHardware, tick)
+        .unwrap();
+    w.prepare_xyzzy(review, tick).unwrap().commit();
+    let restored = cold(&w);
+    assert_eq!(restored.credits_tenths(), cash);
+    assert_eq!(restored.targeting_tier(), Some(TargetingTier::Military));
+    assert_eq!(
+        snap(&restored)
+            .items
+            .into_iter()
+            .filter(|item| item.kind == maximum.kind)
+            .collect::<Vec<_>>(),
+        vec![maximum]
+    );
+}
+#[test]
 fn paid_mining_laser_uses_original_3300cr_tl6_and_stores_the_same_born_pulse() {
     let mut w = funded(9101);
     let cash = w.credits_tenths().unwrap();
@@ -59,7 +181,7 @@ fn paid_mining_laser_uses_original_3300cr_tl6_and_stores_the_same_born_pulse() {
     assert_eq!(item, 109112);
     assert_eq!(w.credits_tenths(), Some(cash - 33_000));
     let after = snap(&w);
-    assert_eq!(after.items.len(), 4);
+    assert_eq!(after.items.len(), 6);
     assert_eq!(after.fit_revision, 1);
     assert_eq!(
         after.items[1],
@@ -77,10 +199,10 @@ fn paid_mining_laser_uses_original_3300cr_tl6_and_stores_the_same_born_pulse() {
             ..pulse
         }
     );
-    assert_eq!(after.items[3].slot, Some(ModuleSlot::FrontLaser));
-    assert_eq!(after.items[3].kind, ModuleKind::MiningLaser);
+    assert_eq!(after.items[5].slot, Some(ModuleSlot::FrontLaser));
+    assert_eq!(after.items[5].kind, ModuleKind::MiningLaser);
     assert!(
-        matches!(after.items[3].provenance, ModuleProvenance::Paid { transaction: 1, dock, paid_tenths: 33_000, .. } if dock == berth)
+        matches!(after.items[5].provenance, ModuleProvenance::Paid { transaction: 1, dock, paid_tenths: 33_000, .. } if dock == berth)
     );
     assert_eq!(w.flight_resources_snapshot(), resources);
     assert_eq!(w.ammunition_snapshot(), ammo);
@@ -170,13 +292,13 @@ fn removing_and_reinstalling_exact_items_never_refunds_duplicates_or_resets_reso
     assert_eq!(w.fitted_mining_tool().unwrap().item, item);
     assert_eq!(w.credits_tenths(), cash);
     assert_eq!(w.flight_resources_snapshot(), resources);
-    assert_eq!(snap(&w).items.len(), 4);
+    assert_eq!(snap(&w).items.len(), 6);
     assert_eq!(
         snap(&w).items[0].provenance,
         ModuleProvenance::StandardBirth
     );
     assert!(matches!(
-        snap(&w).items[3].provenance,
+        snap(&w).items[5].provenance,
         ModuleProvenance::Paid {
             transaction: 1,
             paid_tenths: 33_000,
@@ -521,4 +643,86 @@ fn repeatable_beam_and_military_policy_counts_stored_examples_toward_the_four_it
         );
         assert_eq!(ledger.items.len(), 4);
     }
+}
+
+#[test]
+fn station_laser_mounts_keep_born_property_and_reject_unsupported_fits_atomically() {
+    use FlightView::{Front, Left, Rear, Right};
+
+    let mut w = funded(31817);
+    let tick = w.snapshot().tick;
+    let pulse = w.fitted_laser_item(Front).unwrap();
+    let purchase = ModuleAction::PurchaseLaser {
+        kind: ModuleKind::PulseLaser,
+        facing: Left,
+    };
+    let original = w.save_bytes().unwrap();
+    assert_eq!(w.review_module(purchase, tick), Err(ModuleError::Capacity));
+    assert_eq!(w.save_bytes().unwrap(), original);
+
+    let issue = w
+        .review_xyzzy(crate::XyzzyAction::ActivateMedusa, tick)
+        .unwrap();
+    w.prepare_xyzzy(issue, tick).unwrap().commit();
+    let [front, left, right, rear] =
+        [Front, Left, Right, Rear].map(|v| w.fitted_laser_item(v).unwrap());
+    let wallet = w.credits_tenths();
+    let wrong = ModuleAction::InstallLaser {
+        item: pulse.id,
+        replacing: Some(front.id),
+        facing: Left,
+    };
+    let original = w.save_bytes().unwrap();
+    assert_eq!(
+        w.review_module(wrong, tick),
+        Err(ModuleError::StaleOccupant)
+    );
+    let wrong_kind = ModuleAction::PurchaseLaser {
+        kind: ModuleKind::FuelStorage,
+        facing: Left,
+    };
+    assert_eq!(
+        w.review_module(wrong_kind, tick),
+        Err(ModuleError::Capacity)
+    );
+    let replace = ModuleAction::InstallLaser {
+        item: pulse.id,
+        replacing: Some(left.id),
+        facing: Left,
+    };
+    let review = w.review_module(replace, tick).unwrap();
+    assert_eq!(
+        w.prepare_module(review, tick)
+            .unwrap()
+            .publish_with(|_| Err(())),
+        Err(())
+    );
+    assert_eq!(w.save_bytes().unwrap(), original);
+
+    apply(&mut w, replace);
+    let mut w = cold(&w);
+    assert_eq!(
+        [Front, Right, Rear].map(|v| w.fitted_laser_item(v).unwrap()),
+        [front, right, rear]
+    );
+    assert_eq!(
+        w.fitted_laser_item(Left).unwrap(),
+        OwnedModule {
+            slot: Some(ModuleSlot::LeftLaser),
+            ..pulse
+        }
+    );
+    assert!(snap(&w).items.contains(&OwnedModule { slot: None, ..left }));
+    assert_eq!(w.credits_tenths(), wallet);
+    apply(&mut w, ModuleAction::Store { item: pulse.id });
+    apply(
+        &mut w,
+        ModuleAction::InstallLaser {
+            item: left.id,
+            replacing: None,
+            facing: Left,
+        },
+    );
+    assert_eq!(cold(&w).fitted_laser_item(Left), Some(left));
+    assert_eq!(w.credits_tenths(), wallet);
 }

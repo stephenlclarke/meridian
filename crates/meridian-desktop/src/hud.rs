@@ -58,6 +58,7 @@ pub(crate) fn glyph(character: char) -> [u8; 7] {
         '=' => [0, 0, 31, 0, 31, 0, 0],
         ',' => [0, 0, 0, 0, 4, 4, 8],
         '!' => [4, 4, 4, 4, 4, 0, 4],
+        '#' => [10, 10, 31, 10, 31, 10, 10],
         '|' => [4; 7],
         '[' => [14, 8, 8, 8, 8, 8, 14],
         ']' => [14, 2, 2, 2, 2, 2, 14],
@@ -110,10 +111,24 @@ pub fn vertices_with_cockpit(
     if width == 0 || height == 0 {
         return;
     }
+    if let Some(c) = cockpit
+        && let Some(placement) = c.notice_placement
+        && lines.len() <= 1
+    {
+        cockpit::append(c, width, height, output);
+        if let Some(message) = lines.first() {
+            placement.draw(message, width, height, output);
+        }
+        return;
+    }
     let size = [width as f32, height as f32];
     let scale = text_scale(width);
     let bottom = if cockpit.is_some() && width >= 320 && height >= 240 {
-        cockpit::Layout::new(width, height).top
+        if cockpit.is_some_and(|c| c.flight.mode != meridian_core::FlightMode::Docked) {
+            cockpit::flight_height(width, height)
+        } else {
+            cockpit::Layout::new(width, height).top
+        }
     } else {
         size[1]
     };
@@ -186,6 +201,7 @@ mod tests {
             assert_eq!(glyph(c), glyph(c.to_ascii_lowercase()));
         }
         assert_eq!(glyph(' '), [0; 7]);
+        assert_ne!(glyph('#'), glyph('?'), "target identity prefix");
         assert_eq!(glyph('\u{2603}'), glyph('?'));
     }
     #[test]

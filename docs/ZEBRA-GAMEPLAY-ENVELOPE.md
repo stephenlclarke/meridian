@@ -94,13 +94,15 @@ existing station controls; selecting Zebra does not grant exchange.
 SH020 Crow Prototype is a separate original; its selection cannot
 route Zebra geometry, and its implementation remains separately owned.
 
-The authored CPU and Mac-owner Metal checks bind the exact visual,
-source supports, minimum 640×360 logical projection, same-pose
-shimmer and actual direct full-target RGB identity/cache returns
-with Explorer and Custom in both pane orders. Rust, Metal and native
-exact collision execution remain pending, as do ordinary placement,
-acquisition, GPU timing and actual resizing/compositor. No published
-preview changes.
+On the earlier Zebra revision `aeefaeb1`, the Mac passed the controlled
+approach and Showroom cases and all three Metal checks. These covered the
+640×360 minimum view, shield shimmer and direct RGB comparison in both
+pane orders with Explorer and Custom. The private Mac build displayed
+both freight keels and the crosspieces. WSL2 and native Windows also
+passed the controlled approach and Showroom cases on that revision.
+See the [Zebra pull request](https://github.com/stephenlclarke/meridian/pull/83)
+for results by revision. Ordinary acquisition, qualification against
+the 512-face limit, GPU timing and live window resizing remain open.
 
 Run the importer and independent source checks with assertions and
 the existing pinned scientific dependencies:

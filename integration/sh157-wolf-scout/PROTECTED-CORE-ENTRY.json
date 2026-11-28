@@ -1,0 +1,12 @@
+{
+  "schema": 1,
+  "id": "sh157-wolf-scout",
+  "undoBefore": [
+    "sh155-osprey-support"
+  ],
+  "undoAfter": [],
+  "kind": "declaration",
+  "module": "wolf_scout",
+  "before": "pub mod wisent_mk_ii;\n",
+  "after": "pub mod wombat;\n"
+}

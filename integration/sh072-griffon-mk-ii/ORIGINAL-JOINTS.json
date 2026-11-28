@@ -1,0 +1,345 @@
+{
+  "port-gate-to-forward-cross-bridge": {
+    "pointMetres": [
+      -10.849589003858814,
+      -1.807798305381532,
+      12.14420585480946
+    ],
+    "parts": [
+      [
+        "gate longitudinal envelope",
+        1
+      ],
+      [
+        "gate forward cross bridge",
+        1
+      ]
+    ],
+    "hitCountsAboveBelow": {
+      "detailed": [
+        [
+          1,
+          1
+        ],
+        [
+          1,
+          1
+        ]
+      ],
+      "archivedVisibleNative": [
+        [
+          1,
+          1
+        ],
+        [
+          1,
+          1
+        ]
+      ],
+      "generatedCollision": [
+        [
+          1,
+          1
+        ],
+        [
+          1,
+          1
+        ]
+      ]
+    }
+  },
+  "starboard-gate-to-forward-cross-bridge": {
+    "pointMetres": [
+      8.808992929603635,
+      -1.807798305381532,
+      12.14420585480946
+    ],
+    "parts": [
+      [
+        "gate longitudinal envelope",
+        2
+      ],
+      [
+        "gate forward cross bridge",
+        1
+      ]
+    ],
+    "hitCountsAboveBelow": {
+      "detailed": [
+        [
+          1,
+          1
+        ],
+        [
+          1,
+          1
+        ]
+      ],
+      "archivedVisibleNative": [
+        [
+          1,
+          1
+        ],
+        [
+          1,
+          1
+        ]
+      ],
+      "generatedCollision": [
+        [
+          1,
+          1
+        ],
+        [
+          1,
+          1
+        ]
+      ]
+    }
+  },
+  "port-gate-to-aft-support": {
+    "pointMetres": [
+      -10.080744047794921,
+      -1.912767239242395,
+      -7.460192281315499
+    ],
+    "parts": [
+      [
+        "gate longitudinal envelope",
+        1
+      ],
+      [
+        "gate connected aft support",
+        1
+      ]
+    ],
+    "hitCountsAboveBelow": {
+      "detailed": [
+        [
+          1,
+          1
+        ],
+        [
+          1,
+          1
+        ]
+      ],
+      "archivedVisibleNative": [
+        [
+          1,
+          1
+        ],
+        [
+          1,
+          1
+        ]
+      ],
+      "generatedCollision": [
+        [
+          1,
+          1
+        ],
+        [
+          1,
+          1
+        ]
+      ]
+    }
+  },
+  "starboard-gate-to-aft-support": {
+    "pointMetres": [
+      8.791263676674534,
+      -1.912767239242395,
+      -7.460192281315499
+    ],
+    "parts": [
+      [
+        "gate longitudinal envelope",
+        2
+      ],
+      [
+        "gate connected aft support",
+        2
+      ]
+    ],
+    "hitCountsAboveBelow": {
+      "detailed": [
+        [
+          1,
+          1
+        ],
+        [
+          1,
+          1
+        ]
+      ],
+      "archivedVisibleNative": [
+        [
+          1,
+          1
+        ],
+        [
+          1,
+          1
+        ]
+      ],
+      "generatedCollision": [
+        [
+          1,
+          1
+        ],
+        [
+          1,
+          1
+        ]
+      ]
+    }
+  },
+  "port-engine-support-to-casing": {
+    "pointMetres": [
+      -9.415959461153253,
+      -0.24256221236568254,
+      -13.343473591526847
+    ],
+    "parts": [
+      [
+        "engine_pair/negative side/connected support",
+        1
+      ],
+      [
+        "engine_pair/negative side/propulsion casing",
+        1
+      ]
+    ],
+    "hitCountsAboveBelow": {
+      "detailed": [
+        [
+          1,
+          1
+        ],
+        [
+          1,
+          1
+        ]
+      ],
+      "archivedVisibleNative": [
+        [
+          1,
+          1
+        ],
+        [
+          1,
+          1
+        ]
+      ],
+      "generatedCollision": [
+        [
+          1,
+          1
+        ],
+        [
+          1,
+          1
+        ]
+      ]
+    }
+  },
+  "starboard-engine-support-to-casing": {
+    "pointMetres": [
+      8.049156640707979,
+      -0.24256221236568254,
+      -12.976740128332686
+    ],
+    "parts": [
+      [
+        "engine_pair/positive side/connected support",
+        1
+      ],
+      [
+        "engine_pair/positive side/propulsion casing",
+        1
+      ]
+    ],
+    "hitCountsAboveBelow": {
+      "detailed": [
+        [
+          1,
+          1
+        ],
+        [
+          1,
+          1
+        ]
+      ],
+      "archivedVisibleNative": [
+        [
+          1,
+          1
+        ],
+        [
+          1,
+          1
+        ]
+      ],
+      "generatedCollision": [
+        [
+          1,
+          1
+        ],
+        [
+          1,
+          1
+        ]
+      ]
+    }
+  },
+  "cockpit-crossmember-to-glazing": {
+    "pointMetres": [
+      -1.3680951046532495,
+      5.044340432758145,
+      1.0249633230769615
+    ],
+    "parts": [
+      [
+        "cockpit connected structural crossmember",
+        1
+      ],
+      [
+        "cockpit glazing envelope",
+        1
+      ]
+    ],
+    "hitCountsAboveBelow": {
+      "detailed": [
+        [
+          1,
+          1
+        ],
+        [
+          1,
+          1
+        ]
+      ],
+      "archivedVisibleNative": [
+        [
+          1,
+          1
+        ],
+        [
+          1,
+          1
+        ]
+      ],
+      "generatedCollision": [
+        [
+          1,
+          1
+        ],
+        [
+          1,
+          1
+        ]
+      ]
+    }
+  }
+}

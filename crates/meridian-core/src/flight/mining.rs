@@ -6,6 +6,7 @@ use crate::mining::{
     belt_destination,
 };
 use crate::navigation::SystemId;
+mod collection;
 mod persistence;
 
 impl World {
@@ -83,17 +84,52 @@ impl World {
         after: RigidPose,
         angular: f64,
     ) -> bool {
-        if !self.mining.enabled() {
+        let Some(identity) = self.combat_identity() else {
+            return true;
+        };
+        Self::mining_motion_clear_with(
+            self.station_data.as_ref(),
+            &self.mining,
+            identity.system,
+            before,
+            after,
+            angular,
+        )
+    }
+    pub(super) fn mining_motion_clear_at_step(
+        &self,
+        data: &crate::station::OriginalStationData,
+        system: SystemId,
+        tick: u64,
+        before: RigidPose,
+        after: RigidPose,
+        angular: f64,
+    ) -> bool {
+        if system != SystemId::AVENOR || !self.mining.enabled() {
             return true;
         }
-        if self
-            .combat_identity()
-            .is_none_or(|id| id.system != SystemId::AVENOR)
-        {
+        Self::mining_motion_clear_with(
+            Some(data),
+            &self.mining.at_step(tick),
+            system,
+            before,
+            after,
+            angular,
+        )
+    }
+    fn mining_motion_clear_with(
+        data: Option<&crate::station::OriginalStationData>,
+        mining: &crate::mining::State,
+        system: SystemId,
+        before: RigidPose,
+        after: RigidPose,
+        angular: f64,
+    ) -> bool {
+        if system != SystemId::AVENOR || !mining.enabled() {
             return true;
         }
-        self.station_data.as_ref().is_some_and(|data| {
-            self.mining
+        data.is_some_and(|data| {
+            mining
                 .bodies()
                 .into_iter()
                 .filter(|body| body.remaining_energy > 0.0)
@@ -147,12 +183,35 @@ impl World {
             scope: std::sync::Arc::downgrade(&self.mining_scope),
         })
     }
-    /// A genuine paid fitted tool emits only after the actual native first-contact query.
+    /// A manual designation never bends the beam to the selected rock.
+    pub fn request_manual_mining(&mut self) -> Result<MiningShot, MiningError> {
+        let tool = self.mining_tool_authority()?;
+        let Some(crate::equipment::WorkTargetId::Asteroid(id)) =
+            self.selected_work_target().map(|work| work.id)
+        else {
+            return Err(MiningError::NoTarget);
+        };
+        if !self.pilot_operates_selected_tool() {
+            return Err(MiningError::NoTarget);
+        }
+        self.mine(tool, self.state.tick, Some(id))
+    }
+
+    /// An actual owned fitted tool emits only after the native first-contact query.
     /// Damage releases finite pending ore; it does not credit cargo or a wallet.
     pub fn request_mining(
         &mut self,
         tool: MiningToolAuthority,
         tick: u64,
+    ) -> Result<MiningShot, MiningError> {
+        self.mine(tool, tick, None)
+    }
+
+    fn mine(
+        &mut self,
+        tool: MiningToolAuthority,
+        tick: u64,
+        selected: Option<crate::mining::AsteroidId>,
     ) -> Result<MiningShot, MiningError> {
         if tick != self.state.tick {
             return Err(MiningError::StaleCommand);
@@ -213,6 +272,7 @@ impl World {
         }
         let contact = self
             .mining_beam_contact(pose, MINING_RANGE)
+            .filter(|hit| selected.is_none_or(|id| id == hit.asteroid))
             .ok_or(MiningError::NoTarget)?;
         if !self.mining_contact_visible(pose, contact) {
             return Err(MiningError::Blocked);
@@ -268,22 +328,58 @@ impl World {
             tick,
         })
     }
-    /// Paid fitted equipment alone cannot replace an eligible original physical ore actor.
-    /// Pending descriptions never confer collection authority or cargo ownership.
-    pub fn request_collect_mined_ore(&mut self, tick: u64) -> Result<(), MiningError> {
-        if tick != self.state.tick {
-            return Err(MiningError::StaleCommand);
+    pub(in crate::flight) fn auto_mine_tick(
+        &mut self,
+        id: crate::mining::AsteroidId,
+    ) -> &'static str {
+        if !self.mining_selected(id) {
+            return "Target released";
         }
-        if self.is_paused() {
-            return Err(MiningError::Paused);
-        }
-        if self.state.mode != FlightMode::Flight {
-            return Err(MiningError::NotInFlight);
+        let Some(body) = self
+            .mining
+            .body(usize::from(id.ordinal()))
+            .filter(|b| b.id == id)
+        else {
+            return "Target unavailable";
+        };
+        if body.remaining_energy <= 0.0 {
+            return if self.mining_collection_target(id).is_some() {
+                "Ore ready"
+            } else {
+                "Mining complete"
+            };
         }
         if self.fitted_fuel_scoops().is_none() {
-            Err(MiningError::NoScoops)
-        } else {
-            Err(MiningError::NoEligibleOreBody)
+            return "Fit fuel scoops";
+        }
+        match self.prepare_mining_intake_account(body.commodity) {
+            Err(MiningError::HoldFull) => return "Cargo hold full",
+            Err(_) => return "Cargo unavailable",
+            Ok(_) => {}
+        }
+        if self
+            .mining_belt_snapshot()
+            .and_then(|belt| belt.front_contact)
+            .is_none_or(|contact| contact.asteroid != id)
+        {
+            return "Align mining laser";
+        }
+        match self.select_auto_mining_tool() {
+            Ok(()) => {}
+            Err(MiningError::NoCompatibleFittedTool) => return "Fit mining laser",
+            Err(MiningError::ProtectedActivity) => return "Protected activity",
+            Err(MiningError::Resources) => return "Mining recharging",
+            Err(_) => return "Mining unavailable",
+        }
+        let Ok(tool) = self.mining_tool_authority() else {
+            return "Fit mining laser";
+        };
+        match self.request_mining(tool, self.state.tick) {
+            Ok(shot) if shot.extracted_units > 0 => "Ore ready",
+            Ok(_) => "Mining pulse",
+            Err(MiningError::Resources) => "Mining recharging",
+            Err(MiningError::ProtectedActivity) => "Protected activity",
+            Err(_) => "Mining unavailable",
         }
     }
 }

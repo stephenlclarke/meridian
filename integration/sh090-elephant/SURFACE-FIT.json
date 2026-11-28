@@ -1,0 +1,355 @@
+{
+  "nominalPaddingMetres": 0.02,
+  "minimumRefinementTargetsMillimetres": {
+    "detailed": 3120,
+    "archivedNative": 3120,
+    "candidateNative": 3000
+  },
+  "fullUpperMillimetres": {
+    "detailed": 3031,
+    "archivedNative": 3110,
+    "candidateNative": 2999
+  },
+  "pieces": {
+    "body primary pressure envelope": {
+      "detailed": 3031,
+      "archivedNative": 3110,
+      "candidateNative": 2776
+    },
+    "body primary pressure envelope/service-well-0-0": {
+      "detailed": 2773,
+      "archivedNative": 2512,
+      "candidateNative": 2512
+    },
+    "body primary pressure envelope/service-well-0-1": {
+      "detailed": 2773,
+      "archivedNative": 1646,
+      "candidateNative": 2087
+    },
+    "body primary pressure envelope/service-well-0-2": {
+      "detailed": 2773,
+      "archivedNative": 1112,
+      "candidateNative": 2530
+    },
+    "body primary pressure envelope/service-well-1-0": {
+      "detailed": 2773,
+      "archivedNative": 2588,
+      "candidateNative": 2588
+    },
+    "body primary pressure envelope/service-well-1-1": {
+      "detailed": 2773,
+      "archivedNative": 2077,
+      "candidateNative": 2088
+    },
+    "body primary pressure envelope/service-well-1-2": {
+      "detailed": 2773,
+      "archivedNative": 2166,
+      "candidateNative": 2234
+    },
+    "body primary pressure envelope/service-well-2-0": {
+      "detailed": 2465,
+      "archivedNative": 2553,
+      "candidateNative": 2272
+    },
+    "body primary pressure envelope/service-well-2-1": {
+      "detailed": 2773,
+      "archivedNative": 1598,
+      "candidateNative": 2216
+    },
+    "body primary pressure envelope/service-well-2-2": {
+      "detailed": 2773,
+      "archivedNative": 1112,
+      "candidateNative": 2215
+    },
+    "body primary pressure envelope/service-well-3-0": {
+      "detailed": 2521,
+      "archivedNative": 2588,
+      "candidateNative": 2588
+    },
+    "body primary pressure envelope/service-well-3-1": {
+      "detailed": 2773,
+      "archivedNative": 2190,
+      "candidateNative": 2072
+    },
+    "body primary pressure envelope/service-well-3-2": {
+      "detailed": 2773,
+      "archivedNative": 2180,
+      "candidateNative": 2548
+    },
+    "body primary pressure envelope/longitudinal-service-strut-0": {
+      "detailed": 223,
+      "archivedNative": 2777,
+      "candidateNative": 2098
+    },
+    "body primary pressure envelope/longitudinal-service-strut-1": {
+      "detailed": 223,
+      "archivedNative": 790,
+      "candidateNative": 1154
+    },
+    "pods explicit member 0": {
+      "detailed": 1389,
+      "archivedNative": 2679,
+      "candidateNative": 2790
+    },
+    "pods explicit member 0/service-well-0-0": {
+      "detailed": 2773,
+      "archivedNative": 2862,
+      "candidateNative": 2589
+    },
+    "pods explicit member 0/service-well-0-1": {
+      "detailed": 2917,
+      "archivedNative": 2699,
+      "candidateNative": 1750
+    },
+    "pods explicit member 0/service-well-0-2": {
+      "detailed": 2891,
+      "archivedNative": 2898,
+      "candidateNative": 2511
+    },
+    "pods explicit member 0/service-well-1-0": {
+      "detailed": 2773,
+      "archivedNative": 2757,
+      "candidateNative": 2588
+    },
+    "pods explicit member 0/service-well-1-1": {
+      "detailed": 2773,
+      "archivedNative": 2415,
+      "candidateNative": 1948
+    },
+    "pods explicit member 0/service-well-1-2": {
+      "detailed": 2773,
+      "archivedNative": 2912,
+      "candidateNative": 2912
+    },
+    "pods explicit member 0/service-well-2-0": {
+      "detailed": 2773,
+      "archivedNative": 2760,
+      "candidateNative": 2760
+    },
+    "pods explicit member 0/service-well-2-1": {
+      "detailed": 2773,
+      "archivedNative": 2283,
+      "candidateNative": 2283
+    },
+    "pods explicit member 0/service-well-2-2": {
+      "detailed": 2773,
+      "archivedNative": 1255,
+      "candidateNative": 2443
+    },
+    "pods explicit member 0/service-well-3-0": {
+      "detailed": 2773,
+      "archivedNative": 2876,
+      "candidateNative": 2882
+    },
+    "pods explicit member 0/service-well-3-1": {
+      "detailed": 2911,
+      "archivedNative": 2639,
+      "candidateNative": 2752
+    },
+    "pods explicit member 0/service-well-3-2": {
+      "detailed": 2884,
+      "archivedNative": 2913,
+      "candidateNative": 1841
+    },
+    "pods explicit member 0/longitudinal-service-strut-0": {
+      "detailed": 223,
+      "archivedNative": 3052,
+      "candidateNative": 612
+    },
+    "pods explicit member 0/longitudinal-service-strut-1": {
+      "detailed": 223,
+      "archivedNative": 604,
+      "candidateNative": 1087
+    },
+    "pods explicit member 1": {
+      "detailed": 1389,
+      "archivedNative": 1477,
+      "candidateNative": 2662
+    },
+    "pods explicit member 1/service-well-0-0": {
+      "detailed": 2773,
+      "archivedNative": 2943,
+      "candidateNative": 2943
+    },
+    "pods explicit member 1/service-well-0-1": {
+      "detailed": 2917,
+      "archivedNative": 2699,
+      "candidateNative": 1846
+    },
+    "pods explicit member 1/service-well-0-2": {
+      "detailed": 2867,
+      "archivedNative": 2864,
+      "candidateNative": 2310
+    },
+    "pods explicit member 1/service-well-1-0": {
+      "detailed": 2773,
+      "archivedNative": 2931,
+      "candidateNative": 2931
+    },
+    "pods explicit member 1/service-well-1-1": {
+      "detailed": 2885,
+      "archivedNative": 2707,
+      "candidateNative": 2677
+    },
+    "pods explicit member 1/service-well-1-2": {
+      "detailed": 2888,
+      "archivedNative": 2906,
+      "candidateNative": 2807
+    },
+    "pods explicit member 1/service-well-2-0": {
+      "detailed": 2773,
+      "archivedNative": 2855,
+      "candidateNative": 2875
+    },
+    "pods explicit member 1/service-well-2-1": {
+      "detailed": 2891,
+      "archivedNative": 2692,
+      "candidateNative": 2971
+    },
+    "pods explicit member 1/service-well-2-2": {
+      "detailed": 2894,
+      "archivedNative": 2891,
+      "candidateNative": 1818
+    },
+    "pods explicit member 1/service-well-3-0": {
+      "detailed": 2773,
+      "archivedNative": 2876,
+      "candidateNative": 2895
+    },
+    "pods explicit member 1/service-well-3-1": {
+      "detailed": 2911,
+      "archivedNative": 2714,
+      "candidateNative": 2714
+    },
+    "pods explicit member 1/service-well-3-2": {
+      "detailed": 2884,
+      "archivedNative": 2913,
+      "candidateNative": 2913
+    },
+    "pods explicit member 1/longitudinal-service-strut-0": {
+      "detailed": 223,
+      "archivedNative": 2044,
+      "candidateNative": 2044
+    },
+    "pods explicit member 1/longitudinal-service-strut-1": {
+      "detailed": 223,
+      "archivedNative": 604,
+      "candidateNative": 1046
+    },
+    "pods explicit member 2": {
+      "detailed": 1389,
+      "archivedNative": 2409,
+      "candidateNative": 2583
+    },
+    "pods explicit member 2/service-well-0-0": {
+      "detailed": 2773,
+      "archivedNative": 2759,
+      "candidateNative": 2294
+    },
+    "pods explicit member 2/service-well-0-1": {
+      "detailed": 2773,
+      "archivedNative": 2276,
+      "candidateNative": 1846
+    },
+    "pods explicit member 2/service-well-0-2": {
+      "detailed": 2773,
+      "archivedNative": 2940,
+      "candidateNative": 2940
+    },
+    "pods explicit member 2/service-well-1-0": {
+      "detailed": 2773,
+      "archivedNative": 2869,
+      "candidateNative": 2589
+    },
+    "pods explicit member 2/service-well-1-1": {
+      "detailed": 2885,
+      "archivedNative": 2707,
+      "candidateNative": 2963
+    },
+    "pods explicit member 2/service-well-1-2": {
+      "detailed": 2888,
+      "archivedNative": 2906,
+      "candidateNative": 2906
+    },
+    "pods explicit member 2/service-well-2-0": {
+      "detailed": 2773,
+      "archivedNative": 2855,
+      "candidateNative": 2876
+    },
+    "pods explicit member 2/service-well-2-1": {
+      "detailed": 2891,
+      "archivedNative": 2692,
+      "candidateNative": 1853
+    },
+    "pods explicit member 2/service-well-2-2": {
+      "detailed": 2894,
+      "archivedNative": 2891,
+      "candidateNative": 2702
+    },
+    "pods explicit member 2/service-well-3-0": {
+      "detailed": 2773,
+      "archivedNative": 2755,
+      "candidateNative": 2588
+    },
+    "pods explicit member 2/service-well-3-1": {
+      "detailed": 2773,
+      "archivedNative": 1984,
+      "candidateNative": 1943
+    },
+    "pods explicit member 2/service-well-3-2": {
+      "detailed": 2773,
+      "archivedNative": 2151,
+      "candidateNative": 2425
+    },
+    "pods explicit member 2/longitudinal-service-strut-0": {
+      "detailed": 223,
+      "archivedNative": 2304,
+      "candidateNative": 743
+    },
+    "pods explicit member 2/longitudinal-service-strut-1": {
+      "detailed": 223,
+      "archivedNative": 604,
+      "candidateNative": 1477
+    },
+    "cockpit glazing envelope": {
+      "detailed": 756,
+      "archivedNative": 914,
+      "candidateNative": 2380
+    },
+    "cockpit connected structural crossmember": {
+      "detailed": 246,
+      "archivedNative": 246,
+      "candidateNative": 246
+    },
+    "engine_pair/negative side/connected support": {
+      "detailed": 1255,
+      "archivedNative": 1255,
+      "candidateNative": 1255
+    },
+    "engine_pair/negative side/propulsion casing": {
+      "detailed": 2999,
+      "archivedNative": 2999,
+      "candidateNative": 2183
+    },
+    "engine_pair/negative side/propulsion luminous recess": {
+      "detailed": 2630,
+      "archivedNative": 2703,
+      "candidateNative": 2703
+    },
+    "engine_pair/positive side/connected support": {
+      "detailed": 1255,
+      "archivedNative": 1255,
+      "candidateNative": 1255
+    },
+    "engine_pair/positive side/propulsion casing": {
+      "detailed": 2999,
+      "archivedNative": 2999,
+      "candidateNative": 2999
+    },
+    "engine_pair/positive side/propulsion luminous recess": {
+      "detailed": 2630,
+      "archivedNative": 2703,
+      "candidateNative": 1600
+    }
+  }
+}

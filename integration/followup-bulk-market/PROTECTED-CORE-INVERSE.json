@@ -1,0 +1,97 @@
+{
+  "base": "e5041c2fb6986b7606aa2d9f76160e0091342c28",
+  "files": {
+    "flight.rs": {
+      "beforeSHA256": "339e95b3de9e68d8febcfc37147623bb196d352f9c40d816604d8a427d1cfd2a",
+      "afterSHA256": "e36fd880c0177c3b03c913871e213eac66159eb19abc303c65805efa35a899b2",
+      "hunks": [
+        {
+          "offset": 1414,
+          "before": "    NavigationTradeTrace, PreparedNavigationTrade, PreparedStationService,\n",
+          "after": "    NavigationTradeTrace, PreparedCommodityTrade, PreparedNavigationTrade, PreparedStationService,\n"
+        }
+      ]
+    },
+    "flight/navigation_trade.rs": {
+      "beforeSHA256": "1af67cce39a03bf50985f0b9a9eca5bb11bdcc9136a0ca5dcfabe5369c4553e1",
+      "afterSHA256": "26ec5917144022a5d796ec7bcb483a64694582166a131c2540f3d3a408d5de77",
+      "hunks": [
+        {
+          "offset": 374,
+          "before": "",
+          "after": "pub use market::PreparedCommodityTrade;\n"
+        },
+        {
+          "offset": 1351,
+          "before": "",
+          "after": "    SingleUnitRequired,\n"
+        }
+      ]
+    },
+    "flight/navigation_trade/market.rs": {
+      "beforeSHA256": "0f712ea68c5f81f661a9f549b41948706280155fc2e18b1a291f1c8e77f4b752",
+      "afterSHA256": "c61854b97910a12b9ea0b1b32285f0f97ecb9e6a51af1209fbe1a8910a89ef93",
+      "hunks": [
+        {
+          "offset": 389,
+          "before": "",
+          "after": "\nmod quantities;\npub use quantities::PreparedCommodityTrade;\n"
+        }
+      ]
+    },
+    "flight/navigation_trade/tests.rs": {
+      "beforeSHA256": "34ecc5e24656cbdab34d7e09ce24a22766784ba00fe47d05fe6a3436a112e970",
+      "afterSHA256": "b1f389d33fac32acc4b81496117b75f281affde627b8b1aa09d86aef3fb37a6e",
+      "hunks": [
+        {
+          "offset": 2168,
+          "before": "",
+          "after": "}\n\n#[test]\nfn bulk_trade_cannot_consume_the_identified_t04_tonne_or_replace_its_single_receipt() {\n    use crate::station_services::{CommodityTrade, TradeSide};\n    let mut world = commander(61104);\n    plan(&mut world, Id::Food);\n    let tick = world.snapshot().tick;\n    let order = |side, quantity| CommodityTrade {\n        side,\n        commodity: Id::Food,\n        quantity,\n    };\n    let before = ok(world.save_bytes());\n    assert_eq!(\n        world.request_commodity_trade(order(TradeSide::Buy, 2), tick),\n        Err(MissionError::NavigationTrade(Error::SingleUnitRequired))\n    );\n    assert_eq!(ok(world.save_bytes()), before);\n    ok(world.request_commodity_trade(order(TradeSide::Buy, 1), tick));\n    assert_eq!(world.reserved_commodity_quantity(Id::Food), Some(1));\n    let lesson = snap(&world);\n    ok(world.request_commodity_trade(order(TradeSide::Buy, 2), tick));\n    assert_eq!(world.commodity_quantity(Id::Food), Some(3));\n    let before = ok(world.save_bytes());\n    assert!(\n        world\n            .request_commodity_trade(order(TradeSide::Sell, 3), tick)\n            .is_err()\n    );\n    assert_eq!(ok(world.save_bytes()), before);\n    ok(world.request_commodity_trade(order(TradeSide::Sell, 2), tick));\n    assert_eq!(world.commodity_quantity(Id::Food), Some(1));\n    assert_eq!(world.reserved_commodity_quantity(Id::Food), Some(1));\n    assert_eq!(snap(&world).attempts, lesson.attempts);\n    assert_eq!(cold(&world).reserved_commodity_quantity(Id::Food), Some(1));\n"
+        }
+      ]
+    },
+    "freight/g02.rs": {
+      "beforeSHA256": "0edc740812d6c45ee9280af924368a066624b1af1667383ac6c425a7db0254ad",
+      "afterSHA256": "a273becd4a69e7ad3a9fbfd89efd61490a614715fa4be8dc47141ca4c81ea6c2",
+      "hunks": [
+        {
+          "offset": 23584,
+          "before": "",
+          "after": "    }\n\n    pub(crate) fn prepare_commodity_trade(\n        &self,\n        freight: &State,\n        markets: &services::StationMarkets,\n        facts: services::ServiceFacts,\n        trade: services::CommodityTrade,\n        reservations: services::Reservations,\n    ) -> Result<\n        (\n            Self,\n            services::StationMarkets,\n            services::CommodityTradeEvent,\n        ),\n        services::Error,\n    > {\n        let before = reservations.apply(self.service_projection(freight)?)?;\n        let (market, after, event) = markets.prepare_commodity_trade(before, facts, trade)?;\n        let mut candidate = Self { data: self.data };\n        candidate.data.credits = after.credits_tenths;\n        candidate.data.revision = after.revision;\n        candidate.data.food_tonnes = after.food_tonnes;\n        candidate.data.other_commodities = after.other_commodities;\n        if reservations.apply(candidate.service_projection(freight)?)? != after {\n            return Err(services::Error::InvalidAccount);\n        }\n        Ok((candidate, market, event))\n"
+        }
+      ]
+    },
+    "lib.rs": {
+      "beforeSHA256": "b67b2de9bcd88044f683dd341b3316a27206fe92e1861bd65ff3e170aae625ab",
+      "afterSHA256": "27aaff871311e9a11d288ac0e31d24c666cb63d44ccf0f89a88b9a4826b6ebf6",
+      "hunks": [
+        {
+          "offset": 4286,
+          "before": "    NavigationTradeTrace, PreparedNavigationTrade, PreparedStationService,\n",
+          "after": "    NavigationTradeTrace, PreparedCommodityTrade, PreparedNavigationTrade, PreparedStationService,\n"
+        }
+      ]
+    },
+    "station_services.rs": {
+      "beforeSHA256": "53a4f0294b8f627b6a58fc2e0cfd81c8e4afab207a4a9fe69b42fa1c3d6ed7b7",
+      "afterSHA256": "4220651c337a8d7b1b4f783a1f76dc4369b0288aa645c8c8798c5f26f28b3636",
+      "hunks": [
+        {
+          "offset": 443,
+          "before": "",
+          "after": "mod quantities;\n"
+        },
+        {
+          "offset": 521,
+          "before": "",
+          "after": "pub use quantities::{CommodityTrade, CommodityTradeEvent, MAX_TRADE_QUANTITY, TradeSide};\n"
+        },
+        {
+          "offset": 1966,
+          "before": "",
+          "after": "    ZeroQuantity,\n    PriceOverflow,\n"
+        }
+      ]
+    }
+  }
+}

@@ -1,0 +1,190 @@
+{
+  "hull": "SH076 Hog",
+  "scope": "Original catalogue inspection and geometry queries",
+  "source": "assets/fleet/sh076/SOURCE-GEOMETRY.json",
+  "frozenSources": "integration/sh076-hog/FROZEN-SOURCES.json",
+  "sourceScaleMetresPerUnit": "55000/1347",
+  "faces": {
+    "detailed": 868,
+    "native": 448,
+    "nativeMaximum": 512
+  },
+  "originalAccess": {
+    "runtimeCatalogue": {
+      "playerFlyable": false,
+      "normalPurchaseEligible": false,
+      "purchasePolicy": "pendingFabrication"
+    },
+    "r3DesignContract": {
+      "playerFlyable": true,
+      "purchasePolicy": "blueprintFabrication"
+    }
+  },
+  "engineering": {
+    "sourceReference": "finite-intrinsic-empty-hog",
+    "massKg": 1011126
+  },
+  "supportGroups": 16,
+  "minimumRouteClearanceMillimetres": 1664,
+  "sourceContactCounts": {
+    "overlap": 9
+  },
+  "sourceAxisGapLowerMillimetres": {
+    "lower-interdeck-service-well": 3674,
+    "upper-interdeck-service-well": 3674,
+    "port-engine-casing-to-recess": 204,
+    "starboard-engine-casing-to-recess": 204,
+    "port-stack-brace-to-platform": 571,
+    "starboard-platform-to-stack-brace": 571
+  },
+  "fitUpperMillimetres": {
+    "detailed": 2598,
+    "native": 3297
+  },
+  "hullStudio": {
+    "definition": "integration/sh076-hog/HOG-STUDIO.json",
+    "bytes": 129509,
+    "sha256": "bf6c1ea6dd1472bf30cc042764da74a612c2d1041bb9b20402feffe902715e28",
+    "supports": 16,
+    "probes": 7,
+    "loaderRevision": "27121e66ba37a29781135b56924a9d6e7f38a70a",
+    "signedInstalledExport": {
+      "status": "PASS",
+      "scope": "Signed installed Studio offline original artwork import/export",
+      "bundleIdentifier": "io.xyzzy.meridian.hullstudio",
+      "bundleVersion": "0.0.0",
+      "codeDirectoryHash": "93938bda9242ebdff508bfb9e16b3cdf83c0a200",
+      "developerIdTeam": "4MEB7MUTAV",
+      "signatureVerification": "deep strict",
+      "definition": {
+        "bytes": 129509,
+        "sha256": "bf6c1ea6dd1472bf30cc042764da74a612c2d1041bb9b20402feffe902715e28"
+      },
+      "exportExitStatuses": [
+        0,
+        0
+      ],
+      "exportMatchesDefinitionExceptTrailingLf": true,
+      "valid": true,
+      "diagnostics": [],
+      "detailedTriangles": 868,
+      "nativeTriangles": 448,
+      "supportGroups": 16,
+      "engineeringReference": "finite-intrinsic-empty-hog",
+      "massKg": 1011126,
+      "receiptFiles": {
+        "HOG.hull.json": {
+          "bytes": 129508,
+          "sha256": "a2f283758a4b99fdc6ad2de1339f568d4cf6d578c72977ba371264c6af2793e7"
+        },
+        "HOG-repeat.hull.json": {
+          "bytes": 129508,
+          "sha256": "a2f283758a4b99fdc6ad2de1339f568d4cf6d578c72977ba371264c6af2793e7"
+        },
+        "studio.stdout.json": {
+          "bytes": 45996,
+          "sha256": "c21308bec96c86b5d1fdbb93e6d9fd6963311fcee1fa54cf4ac4bb14670297df"
+        },
+        "studio-repeat.stdout.json": {
+          "bytes": 45996,
+          "sha256": "c21308bec96c86b5d1fdbb93e6d9fd6963311fcee1fa54cf4ac4bb14670297df"
+        },
+        "codesign.log": {
+          "bytes": 13038,
+          "sha256": "a618c4678da3e10a14cc1023d4bc5ff7ca71d7a573da910d59cf9181a73202c6"
+        },
+        "codesign-details.log": {
+          "bytes": 1145,
+          "sha256": "46f22bef73c8eab385775b9c33eb76171b43a06b700a46282ba7683d72e141bb"
+        }
+      },
+      "artworkProbeResults": [
+        {
+          "name": "lower-interdeck",
+          "passed": true
+        },
+        {
+          "name": "upper-interdeck",
+          "passed": true
+        },
+        {
+          "name": "dorsal-exterior",
+          "passed": true
+        },
+        {
+          "name": "ventral-exterior",
+          "passed": true
+        },
+        {
+          "name": "port-exterior",
+          "passed": true
+        },
+        {
+          "name": "starboard-exterior",
+          "passed": true
+        },
+        {
+          "name": "fore-deck-exterior",
+          "passed": true
+        }
+      ],
+      "triangleRoles": {
+        "detail": "original detailed visible",
+        "native": "original native visible"
+      }
+    }
+  },
+  "byteReplay": {
+    "commands": [
+      "python3 -B tools/prepare_hog.py --check",
+      "python3 -B tools/verify_hog.py | cmp - integration/sh076-hog/CONTACT-RESULT.json",
+      "python3 -B tools/measure_hog.py --difference | cmp - integration/sh076-hog/ORIGINAL-DIFFERENCE.json",
+      "python3 -B tools/measure_hog.py | cmp - integration/sh076-hog/SURFACE-FIT.json"
+    ],
+    "host": "SteveMBA",
+    "startedUtc": "2026-11-24T23:16:36Z",
+    "finishedUtc": "2026-11-24T23:16:46Z",
+    "log": {
+      "bytes": 482,
+      "sha256": "ac4bb5adcc060476641eb6647e45ebf5d83205297797d5b04514a822b7d65c40"
+    },
+    "fitDependencies": {
+      "python": "3.14.3",
+      "numpy": "2.5.5",
+      "scipy": "1.18.1",
+      "trimesh": "5.2.1",
+      "rtree": "1.4.1"
+    },
+    "originalCommit": "d2453326c8ee2a53dfec5d4397f82d4a349cd2c8",
+    "historicalReplayPins": {
+      "tools/measure_banteng_geometry.py": "4b7d8d5d972e30d93bebf7f422be71e415d6e4a9c4b622582ecf6e30a6bb9235",
+      "tools/measure_lanner_geometry.py": "cabbaf17ff7efdbcbee9a1fba67c7edafd59dceb8e97f367824a51c134479992",
+      "tools/verify_eagle_cruiser_geometry.py": "c7926cb6e699ae5ffb445951ce9d4e98a64018a7ecb1db2e5e77a611d742a783"
+    }
+  },
+  "replayPins": {
+    "integration/sh076-hog/HOG-STUDIO.json": "bf6c1ea6dd1472bf30cc042764da74a612c2d1041bb9b20402feffe902715e28",
+    "integration/sh076-hog/FROZEN-SOURCES.json": "f6fd9a1383fa5f96b2b7b9503dfc62c7c5598fc4eeb7a0a3f9e032dd0c2c679c",
+    "integration/sh076-hog/ORIGINAL-OWNERSHIP.json": "225d89aad33691cb344dfe34975f9c1da108931fcde79bc1aa0427bbcadc380a",
+    "integration/sh076-hog/CONTACT-CANDIDATE.json": "68f802f1ab856a021c29c679386583b61ed5846fb9bdc4513864deaa5afab2ec",
+    "integration/sh076-hog/CONTACT-RESULT.json": "7c20bb14f38250ec206fc9ddfbb143e7318aedbabd0f3dfd2cc5e2846ab1a0a0",
+    "integration/sh076-hog/ORIGINAL-DIFFERENCE.json": "de5ad7b437b25e67280bff321d6a042468d0d9a60f85fb6be7eefec72784d192",
+    "integration/sh076-hog/ORIGINAL-JOINTS.json": "22321178878f518c7c45e5f7bc5b522d3e3655f03e965504d159e451f356263f",
+    "integration/sh076-hog/SUPPORT-FAN.json": "151dfe37968917d128a0d3a815aad0f491e2ec31cb1108b8ddc3001b772a85fb",
+    "integration/sh076-hog/SURFACE-FIT.json": "d33cdc422c0e49d8f0b8318752eecc7ba8ec063b984d6eaa79d653571eb4330b",
+    "tools/atomic_asset_output.py": "2d13803823645d3bdea7c855af958eb54d7ebe513ec1bcb0af34e82870164bf0",
+    "tools/banteng_art_mesh.py": "ef5c0f538510486238d69dc301da80026fc93326767b38c50a04756ab9890a09",
+    "tools/encode_goshawk_visual.py": "9e524e9a32a237d71d212c8b5c34ecf12cde5a8e08885b1d03991b95c278f61c",
+    "tools/import_goshawk_envelope_source.py": "14b530725629ee3eaa5b3fd69f01fe00fe371564a1a52cb398d3969142db977e",
+    "tools/measure_banteng_geometry.py": "9356864e227302598fcae4e833ecb706b1ed8a5e600cbb4076b7165dc1e54bea",
+    "tools/measure_goshawk_surface_fit.py": "5407ef1e5fad41810aa95444ca1338fe33a91e5c9857dcb752b4e4cf2fca6d0b",
+    "tools/measure_lanner_geometry.py": "55d13a28602e6ed791adecd85ff43f3c8a7fbe118cf0977272e1747422c2408d",
+    "tools/measure_hog.py": "c989796806a2e4fe3904f627a01096ff906ceac219ccb2e43a5a61145f444644",
+    "tools/prepare_eagle_cruiser_geometry.py": "a1ea3b5d72f35e1f2932da71afa3ff8a276a504f7309a1086a2b3df35988addc",
+    "tools/prepare_hog.py": "cfcf4e1263f9b87b2d894910ed9e35279f3119fc1413f292683300c9ac6bbf4d",
+    "tools/verify_eagle_cruiser_geometry.py": "cb053ee5873fee62ee456bb3776e98d29b2cbb44c7344599bc617a8579164d43",
+    "tools/verify_hog.py": "439ccf8c09925289de741900aa9dd1b9b71d51714e9ff3f41875537b7c9969a0",
+    "tools/vulture_mk_i_exact_fit.py": "479b31f8714a198a82c0e2888b8d19efe46c7b4c43a576b83ab84c571ae738c6",
+    "tools/hull_contact_geometry.py": "07606202e6a298ad375a7504991fe6fb93da6a07f9b5cc4a22167bd570b07839"
+  }
+}

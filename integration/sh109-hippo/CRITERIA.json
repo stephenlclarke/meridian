@@ -1,0 +1,187 @@
+{
+  "hull": "SH109 Hippo",
+  "scope": "Original catalogue inspection and geometry queries",
+  "source": "assets/fleet/sh109/SOURCE-GEOMETRY.json",
+  "frozenSources": "integration/sh109-hippo/FROZEN-SOURCES.json",
+  "sourceMetresPerUnit": 1,
+  "faces": {
+    "detailed": 3072,
+    "native": 180,
+    "nativeMaximum": 512
+  },
+  "originalAccess": {
+    "runtimeCatalogue": {
+      "playerFlyable": false,
+      "normalPurchaseEligible": false,
+      "purchasePolicy": "pendingFabrication"
+    },
+    "r3DesignContract": {
+      "playerFlyable": true,
+      "purchasePolicy": "blueprintFabrication"
+    }
+  },
+  "engineering": {
+    "sourceReference": "finite-intrinsic-empty-hippo",
+    "massKg": 50041
+  },
+  "supportGroups": 22,
+  "minimumRouteClearanceMillimetres": 578,
+  "sourceContactCounts": {
+    "design": 39,
+    "nativeDesign": 8
+  },
+  "sharedOverlapCount": 8,
+  "detailedOnlyOverlapCount": 31,
+  "fitUpperMillimetres": {
+    "detailed": 2375,
+    "native": 4483
+  },
+  "hullStudio": {
+    "definition": "integration/sh109-hippo/HIPPO-STUDIO.json",
+    "bytes": 399111,
+    "sha256": "b8ffbe688e15066a7d35c62536a72da806bb3dc5e9ec037e6dc1fdd773627e8f",
+    "supports": 22,
+    "probes": 7,
+    "detail": "3072 original detailed faces",
+    "native": "180 original native faces",
+    "loaderRevision": "27121e66ba37a29781135b56924a9d6e7f38a70a",
+    "signedInstalledExport": {
+      "status": "PASS",
+      "scope": "Signed installed Studio offline original artwork import/export",
+      "bundleIdentifier": "io.xyzzy.meridian.hullstudio",
+      "bundleVersion": "0.0.0",
+      "codeDirectoryHash": "93938bda9242ebdff508bfb9e16b3cdf83c0a200",
+      "developerIdTeam": "4MEB7MUTAV",
+      "signatureVerification": "deep strict",
+      "definition": {
+        "bytes": 399111,
+        "sha256": "b8ffbe688e15066a7d35c62536a72da806bb3dc5e9ec037e6dc1fdd773627e8f"
+      },
+      "exportExitStatuses": [
+        0,
+        0
+      ],
+      "exportMatchesDefinitionExceptTrailingLf": true,
+      "valid": true,
+      "diagnostics": [],
+      "detailedTriangles": 3072,
+      "nativeTriangles": 180,
+      "supportGroups": 22,
+      "engineeringReference": "finite-intrinsic-empty-hippo",
+      "massKg": 50041,
+      "receiptFiles": {
+        "hippo.hull.json": {
+          "bytes": 399110,
+          "sha256": "a73e49fcdfbf99666a0e2f54f1263445b81739d8b8a7f1ee66f22ad8a4aa7655"
+        },
+        "hippo-repeat.hull.json": {
+          "bytes": 399110,
+          "sha256": "a73e49fcdfbf99666a0e2f54f1263445b81739d8b8a7f1ee66f22ad8a4aa7655"
+        },
+        "studio.stdout.json": {
+          "bytes": 53218,
+          "sha256": "208c04b2ed2fc3932ea54fe0092e769b414c5156b276c1ca9003bea5d3b747ad"
+        },
+        "studio-repeat.stdout.json": {
+          "bytes": 53218,
+          "sha256": "208c04b2ed2fc3932ea54fe0092e769b414c5156b276c1ca9003bea5d3b747ad"
+        },
+        "codesign.log": {
+          "bytes": 13038,
+          "sha256": "29e7a62d8f5440a1dc6809bdcd70a770efd88f82a8fcd2faee349ad399ffc185"
+        },
+        "codesign-identity.log": {
+          "bytes": 988,
+          "sha256": "f6d772f29f9e72421e98a6d7243102b92b77b5995acbe6cda7ddb3bbfc3b1706"
+        }
+      },
+      "artworkProbeResults": [
+        {
+          "name": "dorsal",
+          "passed": true
+        },
+        {
+          "name": "ventral",
+          "passed": true
+        },
+        {
+          "name": "between-aft-drives",
+          "passed": true
+        },
+        {
+          "name": "port-outboard",
+          "passed": true
+        },
+        {
+          "name": "starboard-outboard",
+          "passed": true
+        },
+        {
+          "name": "over-port-drive",
+          "passed": true
+        },
+        {
+          "name": "over-starboard-drive",
+          "passed": true
+        }
+      ],
+      "triangleRoles": {
+        "detail": "original detailed visible",
+        "native": "original native visible"
+      }
+    }
+  },
+  "byteReplay": {
+    "commands": [
+      "python3 -B tools/prepare_hippo.py --check",
+      "python3 -B tools/verify_hippo.py | cmp - integration/sh109-hippo/CONTACT-RESULT.json",
+      "python3 -B tools/measure_hippo.py | cmp - integration/sh109-hippo/SURFACE-FIT.json",
+      "python3 -B tools/measure_hippo.py --difference | cmp - integration/sh109-hippo/LOD-DIFFERENCE.json"
+    ],
+    "host": "SteveMBA",
+    "startedUtc": "2026-11-25T05:08:03Z",
+    "finishedUtc": "2026-11-25T05:08:14Z",
+    "log": {
+      "bytes": 408,
+      "sha256": "ef39c668ac0189bee11e19c81b4089964394c01c910bf1ec3f4103fac326e7ab"
+    },
+    "fitDependencies": {
+      "python": "3.14.3",
+      "numpy": "2.5.5",
+      "scipy": "1.18.1",
+      "trimesh": "5.2.1",
+      "rtree": "1.4.1"
+    },
+    "originalCommit": "4c211c8afb0588d3aaf884656c39bfe80e37a414",
+    "historicalReplayPins": {
+      "tools/measure_banteng_geometry.py": "4b7d8d5d972e30d93bebf7f422be71e415d6e4a9c4b622582ecf6e30a6bb9235",
+      "tools/measure_lanner_geometry.py": "cabbaf17ff7efdbcbee9a1fba67c7edafd59dceb8e97f367824a51c134479992",
+      "tools/verify_eagle_cruiser_geometry.py": "c7926cb6e699ae5ffb445951ce9d4e98a64018a7ecb1db2e5e77a611d742a783"
+    }
+  },
+  "replayPins": {
+    "assets/fleet/sh109/SOURCE-GEOMETRY.json": "faf320400dcb86a97e1368910b72faef125c08ea15cc6f2caaa6314126f5cc78",
+    "integration/sh109-hippo/HIPPO-STUDIO.json": "b8ffbe688e15066a7d35c62536a72da806bb3dc5e9ec037e6dc1fdd773627e8f",
+    "integration/sh109-hippo/FROZEN-SOURCES.json": "dfb7b00e4387e2922f16c2e2373b6e5c6652ac86af2cf47cd33e000babda8cea",
+    "integration/sh109-hippo/CONTACT-CANDIDATE.json": "1cec5dd46dc5e31d7f45561a915c278997985945f2c3e5ff75d5f493c46fd404",
+    "integration/sh109-hippo/CONTACT-RESULT.json": "a575b34164ca9926d2b058a3bbed6c249f879e4fb1793a99d096cfbb61287d90",
+    "integration/sh109-hippo/ORIGINAL-OVERLAPS.json": "9c6004162d1ad222e9d4f0cddf525f34512fdc177993f7fb4add3231b6c21418",
+    "integration/sh109-hippo/LOD-DIFFERENCE.json": "a0771695a5b0a0bee8a4b69453919a8988c33d09944060c879cb0dcbc455ea68",
+    "integration/sh109-hippo/SUPPORT-FAN.json": "6699d485cf460583d6505fb107dd9b4d09a3ad880a268943b6d178e6824e45fd",
+    "integration/sh109-hippo/SURFACE-FIT.json": "27626906fe871ca8077c4774c8754c6496e3558ee91c6e0f9e02613cc4044d2b",
+    "tools/atomic_asset_output.py": "2d13803823645d3bdea7c855af958eb54d7ebe513ec1bcb0af34e82870164bf0",
+    "tools/banteng_art_mesh.py": "ef5c0f538510486238d69dc301da80026fc93326767b38c50a04756ab9890a09",
+    "tools/encode_goshawk_visual.py": "9e524e9a32a237d71d212c8b5c34ecf12cde5a8e08885b1d03991b95c278f61c",
+    "tools/import_goshawk_envelope_source.py": "14b530725629ee3eaa5b3fd69f01fe00fe371564a1a52cb398d3969142db977e",
+    "tools/measure_banteng_geometry.py": "9356864e227302598fcae4e833ecb706b1ed8a5e600cbb4076b7165dc1e54bea",
+    "tools/measure_goshawk_surface_fit.py": "5407ef1e5fad41810aa95444ca1338fe33a91e5c9857dcb752b4e4cf2fca6d0b",
+    "tools/measure_lanner_geometry.py": "55d13a28602e6ed791adecd85ff43f3c8a7fbe118cf0977272e1747422c2408d",
+    "tools/measure_hippo.py": "324d4d9b8d2403f02e2a6b85cdb2baf624a18882936a1536108e972dc907bdeb",
+    "tools/prepare_eagle_cruiser_geometry.py": "a1ea3b5d72f35e1f2932da71afa3ff8a276a504f7309a1086a2b3df35988addc",
+    "tools/prepare_hippo.py": "4034204bc83ceb3475c85f44d7b9dd51cc965dfc0977455fe5b31c9d98ca1d3a",
+    "tools/verify_eagle_cruiser_geometry.py": "cb053ee5873fee62ee456bb3776e98d29b2cbb44c7344599bc617a8579164d43",
+    "tools/verify_hippo.py": "2446e2c65c9a13281f76c7c1cc2cb665bc012f27bd8ae175b12fa5a89d6cef45",
+    "tools/vulture_mk_i_exact_fit.py": "479b31f8714a198a82c0e2888b8d19efe46c7b4c43a576b83ab84c571ae738c6",
+    "tools/hull_contact_geometry.py": "07606202e6a298ad375a7504991fe6fb93da6a07f9b5cc4a22167bd570b07839"
+  }
+}

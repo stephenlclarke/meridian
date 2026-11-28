@@ -1,0 +1,12 @@
+{
+  "schema": 1,
+  "id": "sh142-buzzard-mk-ii",
+  "undoBefore": [
+    "sh140-chimango"
+  ],
+  "undoAfter": [],
+  "kind": "declaration",
+  "module": "buzzard_mk_ii",
+  "before": "pub mod boar_transport;\n",
+  "after": "pub mod carabao_freighter;\n"
+}

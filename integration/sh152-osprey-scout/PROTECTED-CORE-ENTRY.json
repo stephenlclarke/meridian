@@ -1,0 +1,12 @@
+{
+  "schema": 1,
+  "id": "sh152-osprey-scout",
+  "undoBefore": [
+    "sh151-lynx-escort"
+  ],
+  "undoAfter": [],
+  "kind": "declaration",
+  "module": "osprey_scout",
+  "before": "pub mod oryx_voyager;\n",
+  "after": "pub mod owlet_mk_ii;\n"
+}

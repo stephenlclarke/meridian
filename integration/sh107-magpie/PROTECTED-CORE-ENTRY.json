@@ -1,0 +1,12 @@
+{
+  "schema": 1,
+  "id": "sh107-magpie",
+  "undoBefore": [
+    "sh106-tapir-mk-ii"
+  ],
+  "undoAfter": [],
+  "kind": "declaration",
+  "module": "magpie",
+  "before": "pub mod llama;\n",
+  "after": "pub mod medusa;\n"
+}

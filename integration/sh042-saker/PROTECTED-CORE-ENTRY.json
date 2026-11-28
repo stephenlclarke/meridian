@@ -1,0 +1,12 @@
+{
+  "schema": 1,
+  "id": "sh042-saker",
+  "undoBefore": [
+    "equipment-flight-computer"
+  ],
+  "undoAfter": [],
+  "kind": "declaration",
+  "module": "saker",
+  "before": "pub mod navigation;\n",
+  "after": ""
+}

@@ -2,9 +2,11 @@
 //! The native LOD is an explicit bounded collision representation, not full display equivalence.
 
 use crate::docking::{Basis3, DockingPort, HullMesh, RigidPose, StationPose, Vec3};
+use crate::mule::{MULE_CLEARANCE_METRES, SmoothPiece};
 use core::fmt;
 
 pub(crate) mod beam;
+mod medusa;
 mod mule;
 
 const STATION_BYTES: &[u8] = include_bytes!("../../../assets/legacy/sh028.physics");
@@ -215,9 +217,25 @@ pub struct OriginalStationData {
     station: CollisionMesh,
     hull: CollisionMesh,
     port: DockingPort,
+    medusa: Option<Box<[SmoothPiece]>>,
+    npc_geometry: Option<Box<Self>>,
 }
 
 impl OriginalStationData {
+    /// Local traffic actors always use the stock SH025 mesh and station launch geometry.
+    pub(crate) fn npc_geometry(&self) -> &Self {
+        self.npc_geometry.as_deref().unwrap_or(self)
+    }
+    pub(crate) fn player_npc_clearance(&self) -> f64 {
+        self.player_clearance_radius() + self.npc_geometry().player_clearance_radius()
+    }
+    pub(crate) fn player_geometry_at(&self, visit: u64, issue_berth: Option<u64>) -> &Self {
+        if issue_berth.is_some_and(|berth| visit <= berth) {
+            self.npc_geometry()
+        } else {
+            self
+        }
+    }
     pub(crate) fn player_radius(&self) -> f64 {
         self.hull.radius
     }
@@ -229,6 +247,15 @@ impl OriginalStationData {
         if station != STATION_BYTES || hull != HULL_BYTES || port != PORT_BYTES {
             return Err(StationError::ContentMismatch);
         }
+        Self::from_pinned_parts(station, CollisionMesh::decode(hull)?, port, None)
+    }
+
+    fn from_pinned_parts(
+        station: &[u8],
+        hull: CollisionMesh,
+        port: &[u8],
+        medusa: Option<Box<[SmoothPiece]>>,
+    ) -> Result<Self, StationError> {
         if port.get(..8) != Some(b"MPORT001") {
             return Err(StationError::InvalidPort);
         }
@@ -250,8 +277,10 @@ impl OriginalStationData {
         .map_err(|_| StationError::InvalidPort)?;
         let result = Self {
             station: CollisionMesh::decode(station)?,
-            hull: CollisionMesh::decode(hull)?,
+            hull,
             port: docking,
+            medusa,
+            npc_geometry: None,
         };
         if !result
             .port
@@ -285,6 +314,9 @@ impl OriginalStationData {
     }
     /// NativeStationGeometry.exit: complete station support - actual hull rear +1000.
     pub fn launch_start(&self) -> Result<FlightStart, StationError> {
+        if let Some(pieces) = self.medusa_pieces() {
+            return self.rounded_station_launch_start(pieces);
+        }
         let z = self.station.maximum.z - self.hull.minimum.z + 1000.0;
         let rounded = z as f32;
         // Round outward, never inward, when publishing the f32 presentation/flight pose.
@@ -363,7 +395,9 @@ impl OriginalStationData {
                     self.station.vertices[face[2]],
                 ]
             }),
-        )
+        ) || self.medusa_pieces().is_some_and(|pieces| {
+            self.rounded_station_motion_clear(pieces, start, end, angular_travel)
+        })
     }
     pub(crate) fn asteroid_motion_clear(
         &self,
@@ -435,11 +469,22 @@ impl OriginalStationData {
             return false;
         }
         let basis_stretch = (1.0001_f64.powi(2) + 2.0 * 0.0001).sqrt();
+        let rounding = if self.medusa.is_some() {
+            MULE_CLEARANCE_METRES * basis_stretch
+        } else {
+            0.0
+        };
         let padding = self.numeric_margin(start, end)
+            + rounding
             + self.hull.radius * basis_stretch * (angular_travel + angular_roundoff).min(2.0);
         let mut low = Vec3::new(f64::INFINITY, f64::INFINITY, f64::INFINITY);
         let mut high = Vec3::new(f64::NEG_INFINITY, f64::NEG_INFINITY, f64::NEG_INFINITY);
-        for vertex in &self.hull.vertices {
+        let support_points = self
+            .medusa_pieces()
+            .into_iter()
+            .flatten()
+            .flat_map(SmoothPiece::source_points);
+        for vertex in self.hull.vertices.iter().chain(support_points) {
             let v = start.orientation.apply(*vertex);
             low = Vec3::new(low.x.min(v.x), low.y.min(v.y), low.z.min(v.z));
             high = Vec3::new(high.x.max(v.x), high.y.max(v.y), high.z.max(v.z));
@@ -501,6 +546,16 @@ impl OriginalStationData {
         roll_rate: f64,
         angular_travel: f64,
     ) -> bool {
+        if let Some(pieces) = self.medusa_pieces() {
+            return self.rounded_station_entry_conditions(
+                pieces,
+                start,
+                end,
+                physical_speed,
+                roll_rate,
+                angular_travel,
+            ) && self.motion_clear(start, end, angular_travel);
+        }
         let old = self.depth(start);
         let depth = self.depth(end);
         if !(old > 0.0 && depth <= 0.0 && depth > -self.port.tunnel_depth())

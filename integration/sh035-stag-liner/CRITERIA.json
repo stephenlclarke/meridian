@@ -1,0 +1,178 @@
+{
+  "hull": "SH035 Stag Liner",
+  "status": "AUTHORED_CONTROLLED_SOURCE;OWNED_RUST_AND_NATIVE_PENDING",
+  "source": "assets/fleet/sh035/SOURCE-GEOMETRY.json",
+  "geometryTests": [
+    "stag_liner_original_detailed_and_native_faces_share_complete_local_supports",
+    "stag_liner_tower_and_gallery_passages_clear_and_solid_sources_contact",
+    "stag_liner_original_sh028_aligned_crossing_clears_before_offset_native_lip_contact"
+  ],
+  "originalVisualCorners": {
+    "detailed": 10476,
+    "native": 648
+  },
+  "originalUnmappedFaces": {
+    "detailed": 1240,
+    "native": 40,
+    "selector": 4294967295
+  },
+  "originalTextures": {
+    "assets/fleet/sh001/l337-patrol-diffuse.rgba": {
+      "bytes": 4194304,
+      "sha256": "9699517d12b4fbbb28746e00bed9ee65c19a098d14402b1d5160280c6f6bfc54",
+      "source": "Sources/L337Core/Resources/OriginalShipTextures/l337-patrol-diffuse.rgba",
+      "license": "MIT"
+    },
+    "assets/fleet/sh001/l337-strike-diffuse.rgba": {
+      "bytes": 4194304,
+      "sha256": "e56f149228caf90237a652d720ae549768bde1056af3d903dc8a5c243ad26e97",
+      "source": "Sources/L337Core/Resources/OriginalShipTextures/l337-strike-diffuse.rgba",
+      "license": "MIT"
+    },
+    "assets/fleet/sh001/l337-service-details.rgba": {
+      "bytes": 4194304,
+      "sha256": "35edd84f6ce527195dd8a9bcc039521a6efc5aa2333452bbbc30217b8372103d",
+      "source": "Sources/L337Core/Resources/OriginalShipTextures/l337-service-details.rgba",
+      "license": "MIT"
+    }
+  },
+  "nativeFaceCompliance": {
+    "sourceFaces": 216,
+    "contractMaximum": 512,
+    "state": "ORIGINAL_WITHIN_CONTRACT_LIMIT"
+  },
+  "legacyMetreAuthority": {
+    "revision": "a11fe16924d87d06021816f9037952afcbac08db",
+    "files": [
+      {
+        "path": "Sources/L337Core/OriginalStagLinerActivation.swift",
+        "artifact": "integration/sh035-stag-liner/LEGACY-ACTIVATION.swift.txt",
+        "sha256": "5f1c18ae0f64fe7c552200255572d78bb0997419967c7c60acfcabe4aaa9173c"
+      },
+      {
+        "path": "Sources/L337Core/OriginalHullPhysicalContract.swift",
+        "artifact": "integration/sh035-stag-liner/LEGACY-PHYSICAL-CONTRACT.swift.txt",
+        "sha256": "2c68d8d51acdd469faa25124bcc19027aec1a8f747eb267da2e84e5a98e3c027"
+      }
+    ]
+  },
+  "stockMass": "UNASSIGNED",
+  "air": {
+    "hostname": "SteveMBA",
+    "topologyUtc": "2026-11-19T10:29:25Z",
+    "fitStartUtc": "2026-11-19T10:33:14Z",
+    "fitEndUtc": "2026-11-19T10:33:24Z",
+    "witnessStartUtc": "2026-11-19T10:34:16Z",
+    "witnessEndUtc": "2026-11-19T10:34:16Z",
+    "reports": {
+      "SURFACE-FIT.json": "463d640fda2d13317eea409a4e8efd3554bd385857a71a51c7a9bf30dc8ce369",
+      "CONTACT-RESULT.json": "ea9b33ae82a1fb19e8e787424fad42abde605672e3b2c4d93815d8a8cc2d36fd",
+      "ORIGINAL-DIFFERENCE.json": "f5cdb811f680adf7b5445af8c7edd92f627bfff7f877ebb31c360ba8d057cc79"
+    }
+  },
+  "independentReplay": {
+    "tools": {
+      "tools/measure_stag_liner_air.py": "854e1cdbc41e501bad88dfd65055d06568ec8af9a56a6b504b3db863f8d2492c",
+      "tools/measure_goshawk_surface_fit.py": "5407ef1e5fad41810aa95444ca1338fe33a91e5c9857dcb752b4e4cf2fca6d0b",
+      "tools/prepare_stag_liner_geometry.py": "9fe2c68530bbc6d60e38e640247226f86c91680cef4f1884da49de60063158f0",
+      "tools/verify_stag_liner_geometry.py": "42846d06ccc91e94386fdbe9e5fb0d385cf899e979c6001b629ac78ff0ec8841",
+      "tools/hull_contact_geometry.py": "07606202e6a298ad375a7504991fe6fb93da6a07f9b5cc4a22167bd570b07839",
+      "tools/encode_goshawk_visual.py": "9e524e9a32a237d71d212c8b5c34ecf12cde5a8e08885b1d03991b95c278f61c",
+      "tools/import_goshawk_envelope_source.py": "14b530725629ee3eaa5b3fd69f01fe00fe371564a1a52cb398d3969142db977e",
+      "tools/prepare_stag_liner_studio.py": "823fbd89b2c72722d877f801aba9dbcc68a61cbe5cc08b57cc9269971e2e09bf"
+    },
+    "fixtures": {
+      "integration/sh035-stag-liner/FIXTURES.json": "06136d6e0e01df76ee1dbcacf94076f1edcf9335a52b03e2c678b69ac322f121"
+    },
+    "reproduce": [
+      "python3 -B tools/measure_stag_liner_air.py | cmp - integration/sh035-stag-liner/SURFACE-FIT.json",
+      "python3 -B tools/measure_stag_liner_air.py --difference | cmp - integration/sh035-stag-liner/ORIGINAL-DIFFERENCE.json",
+      "python3 -B tools/verify_stag_liner_geometry.py | cmp - integration/sh035-stag-liner/CONTACT-RESULT.json",
+      "python3 -B tools/prepare_stag_liner_studio.py --check"
+    ],
+    "fitDependencies": {
+      "python": "3.14.3 (assertions enabled)",
+      "numpy": "2.5.5",
+      "scipy": "1.18.1",
+      "trimesh": "5.2.1",
+      "rtree": "1.4.1"
+    },
+    "hostContactPython": "3.14.3",
+    "byteReplay": {
+      "hostname": "SteveMBA",
+      "startedUtc": "2026-11-19T10:34:17Z",
+      "finishedUtc": "2026-11-19T10:34:29Z",
+      "logSha256": "20dcbe458348d74690104d3c55ff9a1d9f498e28cf4ea9ad25ceb52e05110e4e"
+    }
+  },
+  "hullStudio": {
+    "definition": "integration/sh035-stag-liner/STAG-LINER-STUDIO.json",
+    "sha256": "1bb8a6d4e0f1a4bc0a184914153d054f490a17ee5f9ecfbac128ddabba44e290",
+    "schema": 1,
+    "probeCount": 7,
+    "probeRadiusMetres": 0.1,
+    "loaderRevision": "1789030980e0d2a7897c2dc48518fad728c9bbf2",
+    "loaderSource": "tools/hull_studio/definitions.py",
+    "loaderSha256": "f68ea0f442267b793338af6ebec6a937f9e1ee3946dc9be96e58db3e2a796e43",
+    "state": "INSTALLED_SIGNED_STUDIO_EXPORT_PASS;CONTROLLED_HULL_RUST_AND_SHOWROOM_PENDING",
+    "installedExport": {
+      "testedConfigurationGitRevision": "e43312c21acffea765d0fb63eca9c47f66325e78",
+      "toolSourceHead": "1789030980e0d2a7897c2dc48518fad728c9bbf2",
+      "toolSourceTree": "fb22a072408e94b4553ea9c5e586916ff7e6ecae",
+      "studioSha256": "ee1e6e307707a385c7ad24e00cbcce589f5ab0762e31b474720715f62c146f9f",
+      "validatorSha256": "8800efb734ca5b8123ae88b1ab06aa62f1e22f37975cd6230f88581f69cf76e7",
+      "startedUtc": "2026-11-19T10:36:34.615696+00:00",
+      "finishedUtc": "2026-11-19T10:36:34.751244+00:00",
+      "supportGroups": 26,
+      "clearances": [
+        {
+          "name": "left-under-diagonal-bridge",
+          "passed": true
+        },
+        {
+          "name": "left-inboard-tower-shoulder",
+          "passed": true
+        },
+        {
+          "name": "left-outboard-tower-shoulder",
+          "passed": true
+        },
+        {
+          "name": "right-under-diagonal-bridge",
+          "passed": true
+        },
+        {
+          "name": "right-inboard-tower-shoulder",
+          "passed": true
+        },
+        {
+          "name": "right-outboard-tower-shoulder",
+          "passed": true
+        },
+        {
+          "name": "centre-tower-aisle",
+          "passed": true
+        }
+      ],
+      "comparison": "Export matches the source bytes after removing its final LF; report support points and rounding match the exact definition.",
+      "packetEntries": {
+        "studio/ACTUAL-START.json": {
+          "bytes": 1229,
+          "sha256": "fa2536a83a4b23779376a22f4788f79eb1468ee5efbeea938bc0b27bba23e660"
+        },
+        "studio/STAG-LINER-EXPORT-REPORT.json": {
+          "bytes": 61456,
+          "sha256": "3b93dadd14454bc34499f25d5f5fee05e009184a40684b5117e4f46e07dfcdb5"
+        },
+        "studio/STAG-LINER.hull.json": {
+          "bytes": 451470,
+          "sha256": "af8869d0257765db542aefa69b50055d6b6b849389801c8a6362d0b546168653"
+        },
+        "studio/TERMINAL.json": {
+          "bytes": 2582,
+          "sha256": "b823e25b306a917281d27bc3181fa65230595a0c45b94a250f0e1cc1384c4789"
+        }
+      }
+    }
+  }
+}

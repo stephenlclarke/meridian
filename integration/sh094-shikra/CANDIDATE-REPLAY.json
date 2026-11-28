@@ -1,0 +1,45 @@
+{
+  "host": "SteveMBA",
+  "python": "3.14.3",
+  "numpy": "2.5.5",
+  "scipy": "1.18.1",
+  "trimesh": "5.2.1",
+  "rtree": "1.4.1",
+  "method": "Keep eleven exact solid parts and allocate the remaining face budget among original-vertex subsets while retaining exact interior overlap witnesses.",
+  "candidateCounts": {
+    "vertices": 338,
+    "faces": 512,
+    "parts": 41,
+    "exactParts": 11
+  },
+  "reproducedByteForByte": [
+    "SH094-candidate.json",
+    "RETAINED-OVERLAPS.json"
+  ],
+  "receipts": {
+    "build_shikra_candidate.py": {
+      "bytes": 7668,
+      "sha256": "8b6c3388b86f78c880d93d259037edbb2d224c0cca3edba8c1783b2c6dedfbcf"
+    },
+    "ARCHIVED-OVERLAPS.json": {
+      "bytes": 5134,
+      "sha256": "4061c9141873fb1df7a0551c7e045c171bc8528d5bf00c48ee3639986b9d4bcf"
+    },
+    "ORIGINAL-OWNERSHIP.json": {
+      "bytes": 179700,
+      "sha256": "994a952631b79d91f284e7e2561555265c779f2f87c275f8f57fa19821b81b80"
+    },
+    "CANDIDATE-REBUILD.log": {
+      "bytes": 494,
+      "sha256": "4219ad99524417b29613f8635c55f46eab9308a48d638bd3ad8cab6fd7a05e4e"
+    },
+    "SH094-candidate.json": {
+      "bytes": 66466,
+      "sha256": "f2e7df5acfd78cf223e6815dd71924630b1639a0531add97ca9cd84f68209706"
+    },
+    "RETAINED-OVERLAPS.json": {
+      "bytes": 6458,
+      "sha256": "6eb78f0656a514178cc9cccf347d7b448eec6f6d0871a8a9c2ba27a0b4cab9a2"
+    }
+  }
+}

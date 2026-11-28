@@ -1,0 +1,12 @@
+{
+  "schema": 1,
+  "id": "sh053-caracal-scout",
+  "undoBefore": [
+    "sh052-banteng"
+  ],
+  "undoAfter": [],
+  "kind": "declaration",
+  "module": "caracal_scout",
+  "before": "pub mod banteng;\n",
+  "after": "pub mod celestial;\n"
+}

@@ -92,11 +92,12 @@ pub(in crate::flight) fn aim_at(world: &mut World, target: Vec3) {
     let pose = flight_pose(snapshot.position, snapshot.orientation).unwrap();
     let aim = (target.x - pose.position.x).atan2(target.z - pose.position.z);
     let yaw = (aim - pose.orientation.z.x.atan2(pose.orientation.z.z)) as f32;
-    let ticks = (yaw.abs() / (0.65 / 60.0)).ceil() as u16;
+    let yaw_per_tick = world.player_hull_kind().flight_rates().3 / 60.0;
+    let ticks = (yaw.abs() / yaw_per_tick).ceil() as u16;
     for _ in 0..ticks {
         world
             .step(FlightInput {
-                yaw: yaw / (0.65 / 60.0) / f32::from(ticks),
+                yaw: yaw / yaw_per_tick / f32::from(ticks),
                 ..FlightInput::default()
             })
             .unwrap();
