@@ -1,5 +1,15 @@
 # Implementation and validation status
 
+## Published Preview 12
+
+Meridian `v0.12.0-preview.1` was published on 28 November 2026 at 04:10 UTC. Its annotated tag points to protected main `83ceae733d6e4f9cffc81c517fabb3eb7b39fba8`. All four public assets passed download verification. The Mac archive was compiled at the tagged commit. The Windows archive was compiled at `af8e64272e403d670d0a5f2f460ec07e4fc889ce`. Both revisions have Git tree `cc0d4d1caa4e69cc98db5498af91e834eb11e5e9`. All six exact-main CI jobs passed, including the Sonar quality gate. Sonar analysis `855e276d-b1f4-431a-9038-660dfd04b480` records the tagged commit as both revision and project version. [Release and checksums](https://github.com/stephenlclarke/meridian/releases/tag/v0.12.0-preview.1) · [Exact-main CI](https://github.com/stephenlclarke/meridian/actions/runs/46095731143)
+
+| Environment | Verified scope |
+| --- | --- |
+| Final Mac archive | Fleet, Medusa and Hull Studio passed strict signature, notarisation ticket and Gatekeeper checks. Both games started on Metal with separate disposable profiles and exited normally. Studio validated its reference, exported it byte for byte and displayed a native nested Showroom frame. Final Fleet archive testing covered startup and exit. A full manual flight remains unverified on that archive. |
+| Final Windows archive | On the locked Dell, both launchers saved and cold-reopened separate profiles. Studio passed offline reference export and headless browser Help checks. The game windows remained in graphics initialisation and the Studio helper returned HTTP 503. Native gameplay, interactive Fleet refit, in-game Continue and a Showroom frame remain unverified. |
+| Earlier Linux visual run | Xvfb captures on `0eaf3fb8` showed the instrument footer, upper-right placement and fallback to the footer under target guidance. The later change at `af8e6427` affected one test assertion. |
+
 The current desktop uses the [number row and Control shortcuts](../README.md#controls) for missiles, training, saves and fullscreen. Earlier qualification entries record the keys used by their named builds.
 
 PR #232 merged the flyable Medusa, Hull Studio, 115 selectable Showroom models and bulk trading. The local Mac build at `78bb0eba` passed Developer ID, notarisation and Gatekeeper checks for all three apps. The Medusa flight test retained its original hull, speed and expanded hold after a cold restart. Native Windows reproduced all 288 hull measurements across 104 hull directories. [Player guide](PREVIEW-RELEASES.md#fleet-medusa-and-hull-studio)
@@ -370,7 +380,7 @@ PR 52 merged at `22715d60604acc57ac6acad99e3be54a6085a618` on 18 November 2026 a
 
 Source `51b9a9e` corrects the redundant test closure found by strict Clippy on `f5acd97`. Each designated Mac, Linux and native Windows continuation passed strict Clippy first, then 32 importer cases, three observer cases, both release builds, actual CLI Unicode-path conversion, all five independent reference outputs, notice/producer verification, corrupt-reference refusal and the release consumer. The release consumer repeat is separate from the 35 fresh cases. The 628 byte-unchanged core, compatibility and desktop cases, 99 Python checks, 50 Markdown files and locked all-target check retain their explicit `f5acd97` attribution: 663 covered Rust cases per platform, not a fresh full 663-case run. Original Clippy failures remain retained. The current importer has no production GPU/window dependency, does not admit new ships and is not in Preview 8. PR 52 is integrated; the current exact-main outcome and remaining method-reference finding are recorded above.
 
-## Published Preview 8: current delivered checkpoint
+## Published Preview 8 checkpoint
 
 Preview 8 adds an owned EMP utility to the single World, with paid purchase/fit/store/grade transactions, a separate initially empty bank and electrical pool, exact 80-percent transfer, a 600-tick held charge and shared heat/cooldown cost. It queries the actual native SH025 collision scene and drains the facing shield then independent electrical reserve. It preserves fatal hull energy, actor identity, cargo and the one source crew member. Zero electrical power blocks engines/weapons, keeps physical coasting and recovers strictly after 1800 accepted physical ticks. No capsule, bounty or reward is fabricated.
 
@@ -558,7 +568,7 @@ Bounded actual signed Metal qualification passed all five pages, keyboard/mouse 
 
 The HUD implementation integrated through PR 34, followed by corrections in PRs 35 and 36. The callback correction still needs final protected integration, exact-main CI/Sonar and new canonical package/download verification. The existing public v0.4 preview and all previous installed previews/profiles remain separate. Following development includes quantity trading, physical mining, energy/laser equipment, explicit XYZZY/Commander Clarke, further authored hulls and all seven requested NPC populations. Changed source tests remain unrun until their own owning execution. New missions follow core gameplay.
 
-## Latest installed and published preview
+## Published Flight Lesson Preview 3
 
 [Flight Lesson Preview v0.3.0-preview.1](https://github.com/stephenlclarke/meridian/releases/tag/v0.3.0-preview.1) is published for macOS arm64 and Windows x64. Its immutable annotated tag resolves to main `a583b61e4e4536003414ee9f5448131744f62eb2`, tree `ab0530464560eccb23bba6adee62189a1b2148f0`. The compiled source is `152ac26ba848e2ac0c8cb63efec016a10b383155`, tree `a0bb78afde77f3e0298c1e99224fdf90621b229d`: 136 of 139 tracked blobs match, and only README, this status document and the flight guide differ. The trees are distinct; this does not claim a main rebuild. Mac, Linux and native Windows each passed 175 core plus 56 desktop tests (231 top-level Rust cases), 74 Python tests (54 importers plus 20 publisher), formatting, strict Clippy and release builds on that compiled source. Nested subprocess summaries are excluded. [Exact-main CI 43897133293](https://github.com/stephenlclarke/meridian/actions/runs/43897133293) passed all six jobs, including exact-SHA Sonar with Previous version policy and zero open findings.
 
