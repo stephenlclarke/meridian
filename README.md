@@ -32,6 +32,8 @@ Medusa (SH171) can be inspected in the station Showroom. The source package pres
 
 Preview 12 offers 115 selectable stock previews in the ordinary station Showroom. This includes 109 validated Hull Studio schema-1 fleet packages and six original stock models. Cheetah (SH082) and the 22 outstanding entries in the final fleet intake remain outside the preview registry. These are catalogue previews, not new ships for purchase or flight. [Hull Studio](docs/HULL-STUDIO.md) also opens a local or archived preview in a disposable Showroom session without changing the player's ship. The earlier 37-preview Mac build passed the stock loader and station Showroom tests; the final Mac package displayed a native nested Showroom frame. Interactive Windows Showroom rendering remains unverified. [Outstanding fleet scope](docs/IMPLEMENTATION-STATUS.md#outstanding-fleet-inspection-scope)
 
+The development build adds [Redtail Mk III (SH103)](docs/REDTAIL-MK-III-INSPECTION.md) to the station Showroom. Its original 2,328-face detailed mesh and 140-face native mesh use the source calibration of one metre per unit.
+
 The separate [Medusa player flight preview](integration/sh171-medusa-preview/README.md) uses a dedicated profile and the admitted reduced flight geometry. On signed Mac build `5a924315`, the original SH171 artwork was visible in actual flight at 50.30/50.30. A cold restart restored the same ship, speed and expanded 32 t hold. Native docking return and fit-limit refusal were not observed in that run. Ordinary progression, fabrication and exchange do not grant the Medusa. See the [Preview 12 validation record](docs/IMPLEMENTATION-STATUS.md#published-preview-12) for final-package checks.
 
 ## Internal Mule docking validation
