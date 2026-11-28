@@ -1,0 +1,32 @@
+{
+  "pieces": [
+    "command-backbone",
+    "left-shoulder",
+    "left-hangar-wall",
+    "left-cross-support",
+    "left-sensor-rampart",
+    "left-drive",
+    "right-shoulder",
+    "right-hangar-wall",
+    "right-cross-support",
+    "right-sensor-rampart",
+    "right-drive",
+    "bridge-canopy",
+    "bridge-centre-brace",
+    "left-service-pipe",
+    "left-instrument-housing",
+    "left-louvre-0",
+    "left-louvre-1",
+    "left-louvre-2",
+    "left-louvre-3",
+    "left-louvre-4",
+    "right-service-pipe",
+    "right-instrument-housing",
+    "right-louvre-0",
+    "right-louvre-1",
+    "right-louvre-2",
+    "right-louvre-3",
+    "right-louvre-4"
+  ],
+  "roundingMetres": 0.02
+}

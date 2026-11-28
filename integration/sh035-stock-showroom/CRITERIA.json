@@ -1,0 +1,35 @@
+{
+  "status": "AUTHORED_STAG_STOCK_SHOWROOM;OWNED_PORTABLE_AND_METAL_PENDING",
+  "sourceParents": {
+    "sharedStockRegistry": "1136f6724d9e7d626a6ac49e879e48d266f3db73",
+    "reviewedStagSourcePR101": "8c36bb795ffa4483d4c849a1d3ef7cc6488b81f5"
+  },
+  "identity": {"object": "SH035", "geometryKey": "integration/sh035-stag-liner/STAG-LINER-STUDIO.json", "localInspection": "LOCAL:SH035"},
+  "packageSha256": "1bb8a6d4e0f1a4bc0a184914153d054f490a17ee5f9ecfbac128ddabba44e290",
+  "packageFnv1a64": "42eff6ef984e79ae",
+  "qualifiedExportSha256": "af8869d0257765db542aefa69b50055d6b6b849389801c8a6362d0b546168653",
+  "qualifiedExportFnv1a64": "8004d37cb9babc90",
+  "qualifiedExportBytes": 451470,
+  "qualifiedExportRule": "Authenticate exact reviewed source with final LF, remove exactly that LF, authenticate installed-qualified export projection and parse the projection with the shared core loader.",
+  "originalDetailedPackedSha256": "838cdcf3427e23baeef11c23a9b6a2c58c7d1f932a96d92811cda69307e1bd9f",
+  "detailCorners": 10476,
+  "unmappedFaces": 1240,
+  "supportGroups": 26,
+  "portableTests": [
+    "stock_stag_binds_qualified_export_original_corners_own_pieces_and_refuses_peer_payloads",
+    "stock_and_explicit_local_stag_remain_independent_from_all_stock_peers",
+    "selecting_stock_stag_routes_its_original_preview_without_granting_exchange",
+    "ordinary_game_entry_switches_stock_stag_all_stock_peers_and_owned_baseline",
+    "stock_stag_original_fits_actual_minimum_station_showroom_panes",
+    "stock_stag_pins_with_each_stock_peer_in_both_orders_and_duplicates"
+  ],
+  "portableInvocations": ["cargo test --locked -p meridian-desktop stag", "cargo test --locked -p meridian-desktop kite", "cargo test --locked -p meridian-desktop sparrowhawk", "cargo test --locked -p meridian-core stag_liner"],
+  "metal": [
+    {"directoryVariable": "MERIDIAN_SH035_STOCK_SHOWROOM_DIR", "test": "mule_render::showroom::metal_qualification::stag_stock_qualification::metal_stock_stag_normal_showroom", "acceptance": "Actual stock solo and SH025/SH035 minimum front, oblique, upper panes; independent exact RGB, nonblack own gutter, exact full-target isolated union and different orientation RGB."},
+    {"directoryVariable": "MERIDIAN_SH035_SH030_STOCK_CACHE_DIR", "test": "mule_render::showroom::metal_qualification::stag_stock_qualification::metal_stock_stag_sparrowhawk_cache_comparison", "acceptance": "Actual pinned SH035/SH030 both orders, duplicate different-pose panes, independent references, exact RGB, full-target own union and exact distinct solo returns."},
+    {"directoryVariable": "MERIDIAN_SH035_SH031_STOCK_CACHE_DIR", "test": "mule_render::showroom::metal_qualification::stag_stock_qualification::metal_stock_stag_kite_cache_comparison", "acceptance": "Actual pinned SH035/SH031 both orders, duplicate different-pose panes, independent references, exact RGB, full-target own union and exact distinct solo returns."}
+  ],
+  "metalInvocation": "Set the directory variable to a fresh absolute path and run cargo test --locked -p meridian-desktop <test> -- --ignored --exact --nocapture.",
+  "priorPrivateInspection": {"signedAppCommit": "eef206f", "status": "VISIBLE_COMPARE_AND_SOLO_SEPARATE_PRIVATE_QUALIFICATION_NOT_REPEATED"},
+  "limits": "No paid ownership, fabrication, stock mass, World spawn, campaign encounter, shield-shimmer or release acceptance. The prior private inspection and installed export keep separate execution identities."
+}

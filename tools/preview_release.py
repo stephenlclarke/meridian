@@ -8,6 +8,7 @@ import subprocess
 import tempfile
 import tomllib
 from pathlib import Path
+import preview12_policy
 
 REPOSITORY = "stephenlclarke/meridian"
 CODESIGN = "/usr/bin/codesign"
@@ -195,9 +196,16 @@ def publish(args):
         return
     macos, windows, notes, receipt_path = package_files(args.package)
     verify_checks(commit)
-    verify_macos(macos)
+    approval = None
+    approved_archives = None
+    if tag == preview12_policy.TAG:
+        approval, approved_archives = preview12_policy.verify(macos, windows, commit, run)
+    else:
+        verify_macos(macos)
     archives = [macos, windows]
     expected = {p.name: digest(p) for p in archives}
+    if approved_archives is not None and expected != approved_archives:
+        raise ValueError("Preview 12 archive changed after independent approval")
     with notes.open() as stream:
         content = stream.read()
     with tempfile.TemporaryDirectory(prefix="meridian-release-upload-") as temporary:
@@ -210,7 +218,10 @@ def publish(args):
         verify_downloads(tag, expected)
         receipt = api(f"repos/{REPOSITORY}/releases/tags/{tag}")
         with receipt_path.open("x") as stream:
-            json.dump({"release": receipt, "verifiedDownloads": expected}, stream, indent=2)
+            evidence = {"release": receipt, "verifiedDownloads": expected}
+            if approval is not None:
+                evidence["preview12ApprovalSHA256"] = approval
+            json.dump(evidence, stream, indent=2)
             stream.write("\n")
             stream.flush()
             os.fsync(stream.fileno())

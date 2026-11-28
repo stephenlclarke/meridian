@@ -1,0 +1,12 @@
+{
+  "schema": 1,
+  "id": "sh171-medusa",
+  "undoBefore": [
+    "equipment-solar-scoops"
+  ],
+  "undoAfter": [],
+  "kind": "declaration",
+  "module": "medusa",
+  "before": "pub mod lanner;\n",
+  "after": "pub mod mining;\n"
+}

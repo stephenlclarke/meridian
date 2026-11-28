@@ -1,0 +1,1017 @@
+{
+  "base": "b99b703964f68812abdaac095c2918a66174e803",
+  "files": {
+    "flight.rs": {
+      "beforeSHA256": "71b2a3e50951c5a032d99df633f51196a06d619ba0af25e978b6e4be4445aa4a",
+      "afterSHA256": "62471ae9a52e13e16a239900827724e3fe155dd39ef16024497466d4a26320d5",
+      "hunks": [
+        {
+          "offset": 9934,
+          "before": "        snapshot.navigation = self\n            .navigation\n            .zip(self.commander_account.as_ref())\n            .map(|(navigation, account)| navigation.snapshot(account.fuel_tenths()));\n",
+          "after": "        snapshot.navigation =\n            self.navigation\n                .zip(self.commander_account.as_ref())\n                .map(|(navigation, account)| {\n                    navigation\n                        .snapshot_with_capacity(account.fuel_tenths(), account.fuel_capacity())\n                });\n"
+        }
+      ]
+    },
+    "flight/emp.rs": {
+      "beforeSHA256": "d950fe5202e5cbd0668268216274f9fbd45a160eea7985c8ed2b842ef9ed55dc",
+      "afterSHA256": "3fe0ed6be975fbefa59c097a96aef3c8b7d7d4701fbd848b96a31ec0e572fb97",
+      "hunks": [
+        {
+          "offset": 7760,
+          "before": "",
+          "after": "    pub(super) fn utility_mounts_at_revision(&self, revision: u64) -> u16 {\n        let mut fitted = false;\n        for event in self\n            .equipment\n            .iter()\n            .take_while(|event| event.revision <= revision)\n        {\n            match event.action {\n                EmpEquipmentAction::Purchase | EmpEquipmentAction::Fit { .. } => fitted = true,\n                EmpEquipmentAction::Store { .. } => fitted = false,\n                EmpEquipmentAction::Upgrade { .. } => {}\n            }\n        }\n        u16::from(fitted)\n    }\n"
+        }
+      ]
+    },
+    "flight/equipment.rs": {
+      "beforeSHA256": "106432e1ab98497ec661eea43f29c215d243efc49596c36a8baa23eb1b203916",
+      "afterSHA256": "713a79675f0805cb841a013ef7164aef33b72cb1cf22d5bfe5aca9c301347ad2",
+      "hunks": [
+        {
+          "offset": 191,
+          "before": "",
+          "after": "    fn check_cargo_mount(&self, command: Command) -> Result<(), MissionError> {\n        let account = self\n            .commander_account\n            .as_ref()\n            .ok_or(MissionError::NoCommander)?;\n        let owned = account.equipment_state().owned();\n        let adds = match command {\n            Command::PurchaseCargoBay => owned.is_none(),\n            Command::FitCargoBay(id) => owned.is_some_and(|i| i.id == id && !i.fitted),\n            Command::UnfitCargoBay(_) => false,\n        };\n        if adds {\n            let fit = self\n                .modular_equipment_snapshot()\n                .ok_or(MissionError::Equipment(equipment::Error::InvalidState))?;\n            if fit.utility_mounts_used >= fit.utility_mounts_capacity\n                || fit.equipment_units_used >= fit.equipment_units_capacity\n            {\n                return Err(MissionError::Equipment(equipment::Error::Unavailable));\n            }\n        }\n        Ok(())\n    }\n"
+        },
+        {
+          "offset": 2246,
+          "before": "",
+          "after": "        self.check_cargo_mount(command)?;\n"
+        },
+        {
+          "offset": 2425,
+          "before": "            .as_mut()\n",
+          "after": "            .as_ref()\n"
+        },
+        {
+          "offset": 2621,
+          "before": "        account\n            .execute_equipment(&session.state, facts, command, reserved_capacity)\n            .map_err(MissionError::Equipment)\n",
+          "after": "        let (account, event) = account\n            .prepare_equipment(&session.state, facts, command, reserved_capacity)\n            .map_err(MissionError::Equipment)?;\n        if self.modular.has_test_cargo_history() {\n            let dock = self.current_dock_context().ok_or(MissionError::NotDocked)?;\n            self.modular\n                .record_test_cargo_fit(&account, dock, expected_tick)\n                .map_err(|_| MissionError::SequenceExhausted)?;\n        }\n        self.commander_account = Some(account);\n        Ok(event)\n"
+        },
+        {
+          "offset": 3408,
+          "before": "",
+          "after": "    modular: super::modular::State,\n"
+        },
+        {
+          "offset": 4184,
+          "before": "",
+          "after": "        self.world.modular = self.modular;\n"
+        },
+        {
+          "offset": 4571,
+          "before": "",
+          "after": "        self.check_cargo_mount(command).map_err(command_error)?;\n"
+        },
+        {
+          "offset": 5242,
+          "before": "",
+          "after": "        let mut modular = self.modular.clone();\n        if modular.has_test_cargo_history() {\n            let dock = self\n                .current_dock_context()\n                .ok_or_else(|| command_error(MissionError::NotDocked))?;\n            modular\n                .record_test_cargo_fit(&account, dock, tick)\n                .map_err(EquipmentPreparationError::Save)?;\n        }\n"
+        },
+        {
+          "offset": 5653,
+          "before": "            .save_bytes_with_modules(&account, &self.modular)\n",
+          "after": "            .save_bytes_with_modules(&account, &modular)\n"
+        },
+        {
+          "offset": 5843,
+          "before": "",
+          "after": "            modular,\n"
+        }
+      ]
+    },
+    "flight/mission.rs": {
+      "beforeSHA256": "a6128370c0520ecd266dfe6600f1d7a68bf16b1f3a3e1266276d7271052e938d",
+      "afterSHA256": "459fc142365978d14067abf4e00e443b1f479278c6d501482a10de4c9a644360",
+      "hunks": [
+        {
+          "offset": 1196,
+          "before": "",
+          "after": "    TestFit,\n"
+        },
+        {
+          "offset": 2156,
+          "before": "",
+          "after": "            Self::TestFit => f.write_str(\"Store test-only fuel tanks until the ordinary hull fit is legal before accepting custody\"),\n"
+        },
+        {
+          "offset": 9669,
+          "before": "",
+          "after": "        if matches!(\n            command,\n            g02::Command::Confirm {\n                choice: g02::Choice::Accept,\n                ..\n            }\n        ) && self.test_tank_overfit()\n        {\n            return Err(MissionError::TestFit);\n        }\n"
+        }
+      ]
+    },
+    "flight/modular.rs": {
+      "beforeSHA256": "3cb9e48d28ce7b144161bc3f31e1432d625b5c6d65933291e52784ef9916de70",
+      "afterSHA256": "6ebaa1a887aa4f3c4240ed55e42e17af071a4320935f5264f99e24e618af97ca",
+      "hunks": [
+        {
+          "offset": 360,
+          "before": "",
+          "after": "mod fuel_history;\n"
+        },
+        {
+          "offset": 953,
+          "before": "",
+          "after": "    FuelStorage,\n"
+        },
+        {
+          "offset": 1469,
+          "before": "",
+          "after": "            Self::FuelStorage => \"fuel-storage\",\n"
+        },
+        {
+          "offset": 3104,
+          "before": "",
+          "after": "            Self::FuelStorage => \"Fuel Storage Unit\",\n"
+        },
+        {
+          "offset": 5107,
+          "before": "",
+          "after": "            Self::FuelStorage => ModuleSlot::FuelStorage(0),\n"
+        },
+        {
+          "offset": 6531,
+          "before": "",
+          "after": "                | Self::FuelStorage\n"
+        },
+        {
+          "offset": 7304,
+          "before": "",
+          "after": "            Self::FuelStorage => 1,\n"
+        },
+        {
+          "offset": 7581,
+          "before": "",
+          "after": "            Self::FuelStorage => Some((20_000, 1)),\n"
+        },
+        {
+          "offset": 9961,
+          "before": "",
+          "after": "            Self::FuelStorage => usize::from(crate::navigation::MAX_FUEL_STORAGE_UNITS),\n"
+        },
+        {
+          "offset": 10990,
+          "before": "",
+          "after": "            Self::FuelStorage => 31,\n"
+        },
+        {
+          "offset": 12102,
+          "before": "",
+          "after": "            31 => Ok(Self::FuelStorage),\n"
+        },
+        {
+          "offset": 12329,
+          "before": "",
+          "after": "    FuelStorage(u8),\n"
+        },
+        {
+          "offset": 14995,
+          "before": "",
+          "after": "    FuelCapacityOccupied,\n"
+        },
+        {
+          "offset": 15765,
+          "before": "",
+          "after": "    cargo_fit_history: Vec<fuel_history::CargoFit>,\n"
+        },
+        {
+          "offset": 17188,
+          "before": "",
+          "after": "    test_tank_items: Vec<u64>,\n"
+        },
+        {
+          "offset": 19811,
+          "before": "",
+          "after": "    pub(super) fn fuel_storage_count(&self) -> u8 {\n        self.items\n            .iter()\n            .filter(|item| matches!(item.slot, Some(ModuleSlot::FuelStorage(_))))\n            .count() as u8\n    }\n    fn mark_test_tanks(&mut self) {\n        self.test_tank_items = self\n            .items\n            .iter()\n            .filter(|item| matches!(item.slot, Some(ModuleSlot::FuelStorage(_))))\n            .map(|item| item.id)\n            .collect();\n    }\n    pub(super) fn test_tank_count(&self) -> u16 {\n        self.test_tank_items.len() as u16\n    }\n    fn budget_usage(\n        &self,\n        account: &CommanderAccount,\n        emp_mounts: u16,\n    ) -> Result<(u16, u16), ModuleError> {\n        Ok((\n            self.fitted_units() + account.equipment_state().units_used(),\n            scoops::mounts_used(&self.items, account, emp_mounts)?,\n        ))\n    }\n    fn validate_budgets(\n        &self,\n        account: &CommanderAccount,\n        emp_mounts: u16,\n        allowance: u16,\n    ) -> Result<(), ModuleError> {\n        let definition = crate::equipment::definition().map_err(|_| ModuleError::BerthRequired)?;\n        let (units, mounts) = self.budget_usage(account, emp_mounts)?;\n        if units.saturating_sub(allowance) > definition.equipment_units_capacity\n            || mounts.saturating_sub(allowance) > definition.utility_mounts_capacity\n        {\n            return Err(ModuleError::Capacity);\n        }\n        Ok(())\n    }\n"
+        },
+        {
+          "offset": 21359,
+          "before": "        let slot = self.items[index].kind.slot();\n",
+          "after": "        let slot = if self.items[index].kind == ModuleKind::FuelStorage {\n            if replacing.is_some() {\n                return Err(ModuleError::StaleOccupant);\n            }\n            (0..crate::navigation::MAX_FUEL_STORAGE_UNITS)\n                .map(ModuleSlot::FuelStorage)\n                .find(|&slot| self.fitted(slot).is_none())\n                .ok_or(ModuleError::Capacity)?\n        } else {\n            self.items[index].kind.slot()\n        };\n"
+        },
+        {
+          "offset": 24098,
+          "before": "            let replacing = self.fitted(kind.slot()).map(|i| i.id);\n",
+          "after": "            let replacing = if kind == ModuleKind::FuelStorage {\n                None\n            } else {\n                self.fitted(kind.slot()).map(|i| i.id)\n            };\n"
+        },
+        {
+          "offset": 26039,
+          "before": "",
+          "after": "                    self.test_tank_items.retain(|&id| id != item);\n"
+        },
+        {
+          "offset": 28314,
+          "before": "    pub(super) fn account_events(&self) -> Vec<super::AccountEvent> {\n        self.events\n",
+          "after": "    pub(super) fn fuel_capacity_at_revision(\n        &self,\n        owner: u64,\n        revision: u64,\n    ) -> Result<u16, SaveError> {\n        let mut ledger = Ledger::born(owner)?;\n        let mut counters = [0; 2];\n        for event in self\n            .events\n"
+        },
+        {
+          "offset": 28599,
+          "before": "            .filter_map(|e| {\n                e.action.purchase_kind().map(|kind| super::AccountEvent {\n                    revision: e.revision,\n                    effect: super::AccountEffect::Debit(if e.xyzzy {\n                        0\n                    } else {\n                        kind.shop().map_or(0, |s| s.0)\n                    }),\n                })\n            })\n            .collect()\n",
+          "after": "            .take_while(|event| event.revision <= revision)\n        {\n            ledger.replay(*event, &mut counters).map_err(|_| INVALID)?;\n        }\n        Ok(crate::navigation::fuel_capacity(\n            ledger.fuel_storage_count(),\n        ))\n    }\n    pub(super) fn storage_count_possible_at_visit(\n        &self,\n        owner: u64,\n        visit: u64,\n        count: u8,\n    ) -> Result<bool, SaveError> {\n        let mut ledger = Ledger::born(owner)?;\n        let mut counters = [0; 2];\n        let mut possible = false;\n        for event in self\n            .events\n            .iter()\n            .take_while(|event| event.dock.visit() <= visit)\n        {\n            if event.dock.visit() == visit && ledger.fuel_storage_count() == count {\n                possible = true;\n            }\n            ledger.replay(*event, &mut counters).map_err(|_| INVALID)?;\n        }\n        Ok(possible || ledger.fuel_storage_count() == count)\n    }\n    pub(super) fn account_events(&self, owner: u64) -> Result<Vec<super::AccountEvent>, SaveError> {\n        let mut ledger = Ledger::born(owner)?;\n        let mut counters = [0; 2];\n        let mut events = Vec::new();\n        for e in &self.events {\n            let previous = ledger.fuel_storage_count();\n            ledger.replay(*e, &mut counters).map_err(|_| INVALID)?;\n            let count = ledger.fuel_storage_count();\n            let paid = e.action.purchase_kind().map(|kind| {\n                if e.xyzzy {\n                    0\n                } else {\n                    kind.shop().map_or(0, |s| s.0)\n                }\n            });\n            let effect = if previous != count {\n                super::AccountEffect::TankFit {\n                    count,\n                    paid: paid.unwrap_or(0),\n                }\n            } else if let Some(paid) = paid {\n                super::AccountEffect::Debit(paid)\n            } else {\n                continue;\n            };\n            events.push(super::AccountEvent {\n                revision: e.revision,\n                effect,\n            });\n        }\n        events.extend(self.cargo_account_events());\n        Ok(events)\n"
+        },
+        {
+          "offset": 33381,
+          "before": "",
+          "after": "                    ModuleKind::FuelStorage => {\n                        world.xyzzy.authorizes_max_tanks(e.dock, e.tick, e.revision)\n                    }\n"
+        },
+        {
+          "offset": 34350,
+          "before": "",
+          "after": "            let previous_tanks = ledger.fuel_storage_count();\n"
+        },
+        {
+          "offset": 34649,
+          "before": "            if grade != previous_grade || Some(drive) != previous_drive {\n",
+          "after": "            let tanks = ledger.fuel_storage_count();\n            if tanks > previous_tanks {\n                if world.xyzzy.authorizes_max_tanks(e.dock, e.tick, e.revision) {\n                    if !e.xyzzy && !matches!(e.action, ModuleAction::Install { .. }) {\n                        return Err(INVALID);\n                    }\n                    ledger.mark_test_tanks();\n                } else {\n                    let budget = crate::equipment::definition().map_err(|_| INVALID)?;\n                    if u16::from(tanks)\n                        + u16::from(ledger.fitted(ModuleSlot::UtilityFuelScoops).is_some())\n                        > budget.utility_mounts_capacity\n                    {\n                        return Err(INVALID);\n                    }\n                }\n            }\n            if grade != previous_grade || Some(drive) != previous_drive || tanks != previous_tanks {\n"
+        },
+        {
+          "offset": 35747,
+          "before": "",
+          "after": "                    fuel_storage_count: tanks,\n"
+        },
+        {
+          "offset": 37087,
+          "before": "        let budget = crate::equipment::definition().map_err(|_| INVALID)?;\n        if ledger.fitted_units() + account.equipment_state().units_used()\n            > budget.equipment_units_capacity\n        {\n",
+          "after": "        if ledger.fuel_storage_count() != account.fuel_storage_count() {\n"
+        },
+        {
+          "offset": 37203,
+          "before": "        scoops::validate_fit(&ledger.items, account, world.emp.utility_mounts())\n",
+          "after": "        let allowance = if world.test_tank_custody_clear() {\n            ledger.test_tank_count()\n        } else {\n            0\n        };\n        ledger\n            .validate_budgets(account, world.emp.utility_mounts(), allowance)\n"
+        },
+        {
+          "offset": 38597,
+          "before": "        w.u32(self.events.len() as u32);\n",
+          "after": "        w.u32(\n            self.events.len() as u32\n                | if self.cargo_fit_history.is_empty() {\n                    0\n                } else {\n                    1 << 31\n                },\n        );\n"
+        },
+        {
+          "offset": 39538,
+          "before": "",
+          "after": "        if !self.cargo_fit_history.is_empty() {\n            self.encode_cargo_history(w);\n        }\n"
+        },
+        {
+          "offset": 39847,
+          "before": "        let count = r.u32()? as usize;\n",
+          "after": "        let raw_count = r.u32()?;\n        let count = (raw_count & !(1 << 31)) as usize;\n"
+        },
+        {
+          "offset": 41522,
+          "before": "        Ok(Self { events })\n",
+          "after": "        let cargo_fit_history = if raw_count & (1 << 31) != 0 {\n            Self::decode_cargo_history(r)?\n        } else {\n            Vec::new()\n        };\n        Ok(Self {\n            events,\n            cargo_fit_history,\n        })\n"
+        },
+        {
+          "offset": 41781,
+          "before": "",
+          "after": "    pub(super) fn test_tank_overfit(&self) -> bool {\n        let Some(account) = self.commander_account.as_ref() else {\n            return false;\n        };\n        self.modular.ledger(self, account).is_ok_and(|ledger| {\n            ledger.test_tank_count() > 0\n                && ledger\n                    .validate_budgets(account, self.emp.utility_mounts(), 0)\n                    .is_err()\n        })\n    }\n"
+        },
+        {
+          "offset": 43257,
+          "before": "            utility_mounts_used: account.equipment_state().units_used() + self.emp.utility_mounts(),\n",
+          "after": "            utility_mounts_used: scoops::mounts_used(\n                &ledger.items,\n                account,\n                self.emp.utility_mounts(),\n            )\n            .ok()?,\n"
+        },
+        {
+          "offset": 44431,
+          "before": "",
+          "after": "            ModuleKind::FuelStorage,\n"
+        },
+        {
+          "offset": 51678,
+          "before": "",
+          "after": "        let was_outside_ordinary_budget = ledger\n            .validate_budgets(account, self.emp.utility_mounts(), 0)\n            .is_err();\n"
+        },
+        {
+          "offset": 52072,
+          "before": "        scoops::validate_fit(&ledger.items, account, self.emp.utility_mounts())?;\n",
+          "after": "        let allowance =\n            if was_outside_ordinary_budget && matches!(action, ModuleAction::Store { .. }) {\n                ledger.test_tank_count()\n            } else {\n                0\n            };\n        ledger.validate_budgets(account, self.emp.utility_mounts(), allowance)?;\n        if account.fuel_tenths() > crate::navigation::fuel_capacity(ledger.fuel_storage_count()) {\n            return Err(ModuleError::FuelCapacityOccupied);\n        }\n"
+        },
+        {
+          "offset": 53078,
+          "before": "        {\n            return Err(ModuleError::Capacity);\n        }\n        let budget = crate::equipment::definition().map_err(|_| ModuleError::BerthRequired)?;\n        if ledger.fitted_units() + account.equipment_state().units_used()\n            > budget.equipment_units_capacity\n",
+          "after": ""
+        },
+        {
+          "offset": 55938,
+          "before": "                pulse_fitted,\n                energy_fitted,\n                navigation_fitted,\n                drive_fitted,\n                shield_fitted,\n",
+          "after": "                [\n                    pulse_fitted,\n                    energy_fitted,\n                    navigation_fitted,\n                    drive_fitted,\n                    shield_fitted,\n                ],\n                ledger.fuel_storage_count(),\n"
+        },
+        {
+          "offset": 57020,
+          "before": "",
+          "after": "#[cfg(test)]\nmod fuel_storage_tests;\n"
+        },
+        {
+          "offset": 59011,
+          "before": "        let existing = ledger.items.iter().find(|item| item.kind == kind).copied();\n        if existing.is_some_and(|item| item.slot == Some(kind.slot())) {\n",
+          "after": "        let tank = kind == ModuleKind::FuelStorage;\n        if tank && ledger.fuel_storage_count() == crate::navigation::MAX_FUEL_STORAGE_UNITS {\n            return Ok(());\n        }\n        let existing = ledger\n            .items\n            .iter()\n            .find(|item| item.kind == kind && (!tank || item.slot.is_none()))\n            .copied();\n        if !tank && existing.is_some_and(|item| item.slot == Some(kind.slot())) {\n"
+        },
+        {
+          "offset": 59799,
+          "before": "                    replacing: ledger.fitted(kind.slot()).map(|item| item.id),\n",
+          "after": "                    replacing: if tank {\n                        None\n                    } else {\n                        ledger.fitted(kind.slot()).map(|item| item.id)\n                    },\n"
+        },
+        {
+          "offset": 60903,
+          "before": "                born_fitted(ModuleSlot::FrontLaser, 7),\n                born_fitted(ModuleSlot::Energy, 5),\n                born_fitted(ModuleSlot::Navigation, 4),\n                born_fitted(ModuleSlot::Drive, 6),\n                born_fitted(ModuleSlot::Shield, 3),\n",
+          "after": "                [\n                    born_fitted(ModuleSlot::FrontLaser, 7),\n                    born_fitted(ModuleSlot::Energy, 5),\n                    born_fitted(ModuleSlot::Navigation, 4),\n                    born_fitted(ModuleSlot::Drive, 6),\n                    born_fitted(ModuleSlot::Shield, 3),\n                ],\n                ledger.fuel_storage_count(),\n"
+        }
+      ]
+    },
+    "flight/modular/scoops.rs": {
+      "beforeSHA256": "230e66ef14665e51a35df6db0285dc07c0c0a5cabf75c89ff9ad3d17f6b70ffa",
+      "afterSHA256": "91a34dc7d3d4289a70fe995ecff90af52e950d5415aba0b34ea71a30fdfe9e5e",
+      "hunks": [
+        {
+          "offset": 1246,
+          "before": "",
+          "after": "#[cfg(test)]\n"
+        },
+        {
+          "offset": 1406,
+          "before": "",
+          "after": "    let used = count_slots(definition, items, cargo_mounts)?;\n    if used > definition.utility_mounts_capacity {\n        return Err(ModuleError::Capacity);\n    }\n    Ok(used)\n}\nfn count_slots(\n    definition: crate::equipment::Definition,\n    items: &[OwnedModule],\n    cargo_mounts: u16,\n) -> Result<u16, ModuleError> {\n"
+        },
+        {
+          "offset": 1761,
+          "before": "        || items\n            .iter()\n            .any(|i| i.slot.is_some_and(|slot| slot != i.kind.slot()))\n",
+          "after": "        || items.iter().any(|i| {\n            i.slot.is_some_and(|slot| match slot {\n                ModuleSlot::FuelStorage(index) => {\n                    i.kind != ModuleKind::FuelStorage\n                        || index >= crate::navigation::MAX_FUEL_STORAGE_UNITS\n                }\n                _ => slot != i.kind.slot(),\n            })\n        })\n"
+        },
+        {
+          "offset": 2217,
+          "before": "        .filter(|i| i.slot == Some(ModuleSlot::UtilityFuelScoops))\n",
+          "after": "        .filter(|i| {\n            matches!(\n                i.slot,\n                Some(ModuleSlot::UtilityFuelScoops | ModuleSlot::FuelStorage(_))\n            )\n        })\n"
+        },
+        {
+          "offset": 2557,
+          "before": "    if used > definition.utility_mounts_capacity {\n        return Err(ModuleError::Capacity);\n    }\n",
+          "after": ""
+        },
+        {
+          "offset": 2572,
+          "before": "pub(super) fn validate_fit(\n",
+          "after": "pub(super) fn mounts_used(\n"
+        },
+        {
+          "offset": 2679,
+          "before": ") -> Result<(), ModuleError> {\n    validate_slots(\n",
+          "after": ") -> Result<u16, ModuleError> {\n    count_slots(\n"
+        },
+        {
+          "offset": 2891,
+          "before": "    .map(|_| ())\n",
+          "after": ""
+        },
+        {
+          "offset": 3159,
+          "before": "        let utility_mounts_used = validate_slots(\n",
+          "after": "        let utility_mounts_used = count_slots(\n"
+        }
+      ]
+    },
+    "flight/navigation_trade.rs": {
+      "beforeSHA256": "6d2458793883e891cf31db0888fc8d0f190b6eb5f609d9b009c8e0610b730070",
+      "afterSHA256": "8b524af61f17f1751e7327fea82d83389fc72b80b5c5772e7cf4b74e4fd131ee",
+      "hunks": [
+        {
+          "offset": 1220,
+          "before": "",
+          "after": "    TestFit,\n"
+        },
+        {
+          "offset": 6486,
+          "before": "",
+          "after": "    account_revision: Option<u64>,\n"
+        },
+        {
+          "offset": 6622,
+          "before": "",
+          "after": "    accepted_account_revision: Option<u64>,\n"
+        },
+        {
+          "offset": 7192,
+          "before": "",
+          "after": "    }\n    /// T04 consent/closure do not advance the account or simulation tick; only\n    /// a strictly interior retained tick proves a prior active interval.\n    pub(super) fn known_active_at(&self, tick: u64, revision: u64) -> bool {\n        self.attempts.iter().any(|attempt| {\n            if let Some(accepted) = attempt.accepted_account_revision {\n                accepted < revision\n                    && attempt.terminal.is_none_or(|terminal| {\n                        terminal\n                            .account_revision\n                            .map_or(terminal.tick > tick, |closed| closed >= revision)\n                    })\n            } else {\n                attempt.accepted_tick < tick\n                    && attempt.terminal.is_none_or(|terminal| terminal.tick > tick)\n            }\n        })\n    }\n    pub(super) fn known_acceptance_revisions(&self) -> impl Iterator<Item = u64> + '_ {\n        self.attempts\n            .iter()\n            .filter_map(|attempt| attempt.accepted_account_revision)\n    }\n    pub(super) fn post_test_acceptances_have_markers(\n        &self,\n        first_dock_sequence: u64,\n        first_tick: u64,\n    ) -> bool {\n        self.attempts.iter().all(|attempt| {\n            let demonstrably_later =\n                attempt.dock.sequence() > first_dock_sequence || attempt.accepted_tick > first_tick;\n            !demonstrably_later\n                || (attempt.accepted_account_revision.is_some()\n                    && attempt\n                        .terminal\n                        .is_none_or(|terminal| terminal.account_revision.is_some()))\n        })\n    }\n    #[cfg(test)]\n    pub(super) fn clear_last_custody_markers_for_test(&mut self) {\n        if let Some(attempt) = self.attempts.last_mut() {\n            attempt.accepted_account_revision = None;\n            if let Some(terminal) = attempt.terminal.as_mut() {\n                terminal.account_revision = None;\n            }\n        }\n"
+        }
+      ]
+    },
+    "flight/navigation_trade/actions.rs": {
+      "beforeSHA256": "36ea4de066bfb02a9ae5f0ef664bee5f7e26220c5da7f2f8fca013ffd8a9406b",
+      "afterSHA256": "5d2eba3511defe5fcfc685166b101ba01aca53c179a2cadc19faf98d1056ec05",
+      "hunks": [
+        {
+          "offset": 1850,
+          "before": "",
+          "after": "                if self.test_tank_overfit() {\n                    return Err(Error::TestFit);\n                }\n"
+        },
+        {
+          "offset": 7622,
+          "before": "",
+          "after": "                accepted_account_revision: Some(\n                    self.commander_account\n                        .as_ref()\n                        .ok_or(Error::NoCommander)?\n                        .revision(),\n                ),\n"
+        },
+        {
+          "offset": 8911,
+          "before": "",
+          "after": "                    account_revision: Some(\n                        self.commander_account\n                            .as_ref()\n                            .ok_or(Error::NoCommander)?\n                            .revision(),\n                    ),\n"
+        }
+      ]
+    },
+    "flight/navigation_trade/persistence.rs": {
+      "beforeSHA256": "6255bdd38bd8c58430dd87b5ac65e3692d7f0330aac6a2f1aa646793255a14f2",
+      "afterSHA256": "f16b44ab00d509dbdf352adda66bd792b4721b0a43a21fc79d215d2917d69205",
+      "hunks": [
+        {
+          "offset": 4276,
+          "before": "",
+          "after": "        || t.account_revision\n            .zip(next.accepted_account_revision)\n            .is_some_and(|(closed, accepted)| closed > accepted)\n"
+        },
+        {
+          "offset": 4914,
+          "before": "        if self.accepted_tick < self.dock.tick() || self.accepted_tick > c.world.state.tick {\n",
+          "after": "        let current_revision = c.commerce.account.ok_or(INVALID)?.revision();\n        if self.accepted_tick >= 1 << 63\n            || self.accepted_tick < self.dock.tick()\n            || self.accepted_tick > c.world.state.tick\n            || self.accepted_account_revision.is_some_and(|revision| {\n                revision > current_revision\n                    || self\n                        .plan\n                        .is_some_and(|plan| plan.account_revision < revision)\n            })\n        {\n"
+        },
+        {
+          "offset": 7908,
+          "before": "            || end.fuel > 130\n",
+          "after": "            || end.fuel > crate::navigation::MAX_FUEL_CAPACITY\n"
+        },
+        {
+          "offset": 8254,
+          "before": "            return Err(INVALID);\n",
+          "after": "            let terminal = self.terminal.ok_or(INVALID)?;\n            let later = c.world.xyzzy.refills_after_terminal(\n                terminal.dock,\n                terminal.tick,\n                terminal.account_revision,\n            );\n            if u64::from(end.fuel).checked_add(later) != Some(u64::from(current.fuel)) {\n                return Err(INVALID);\n            }\n"
+        },
+        {
+          "offset": 11184,
+          "before": "        if t.fuel.fuel > 130\n",
+          "after": "        if t.fuel.fuel > crate::navigation::MAX_FUEL_CAPACITY\n"
+        },
+        {
+          "offset": 11391,
+          "before": "",
+          "after": "            return Err(INVALID);\n        }\n        if let Some(revision) = t.account_revision {\n            if revision > c.commerce.account.ok_or(INVALID)?.revision()\n                || self\n                    .accepted_account_revision\n                    .is_some_and(|accepted| accepted > revision)\n                || self\n                    .plan\n                    .is_some_and(|plan| plan.account_revision > revision)\n                || self.buy.is_some_and(|buy| buy.account_revision > revision)\n                || self\n                    .sale\n                    .is_some_and(|sale| sale.account_revision > revision)\n                || self\n                    .fuel\n                    .iter()\n                    .any(|fuel| fuel.account_revision > revision)\n                || self\n                    .journeys\n                    .iter()\n                    .any(|journey| journey.account_revision > revision)\n                || t.dock.visit().checked_sub(t.dock.sequence()) != Some(t.fuel.jump)\n                || c.world.xyzzy.historical_fuel(\n                    c.world,\n                    c.commerce.markets.ok_or(INVALID)?,\n                    t.dock,\n                    t.tick,\n                    revision,\n                )? != (t.fuel.refilled_units, t.fuel.fuel)\n            {\n                return Err(INVALID);\n            }\n        } else if self.accepted_account_revision.is_some() {\n"
+        },
+        {
+          "offset": 13666,
+          "before": "        w.u64(self.accepted_tick);\n",
+          "after": "        w.u64(\n            self.accepted_tick\n                | if self.accepted_account_revision.is_some() {\n                    1 << 63\n                } else {\n                    0\n                },\n        );\n        if let Some(revision) = self.accepted_account_revision {\n            w.u64(revision);\n        }\n"
+        },
+        {
+          "offset": 14598,
+          "before": "            });\n",
+          "after": "            } | if t.account_revision.is_some() { 2 } else { 0 });\n"
+        },
+        {
+          "offset": 14695,
+          "before": "",
+          "after": "            if let Some(revision) = t.account_revision {\n                w.u64(revision);\n            }\n"
+        },
+        {
+          "offset": 14929,
+          "before": "        let accepted_tick = r.u64()?;\n",
+          "after": "        let raw_tick = r.u64()?;\n        let accepted_tick = raw_tick & !(1 << 63);\n        let accepted_account_revision = if raw_tick & (1 << 63) != 0 {\n            Some(r.u64()?)\n        } else {\n            None\n        };\n"
+        },
+        {
+          "offset": 15512,
+          "before": "            let outcome = match r.u8()? {\n                0 => Outcome::Complete,\n                1 => Outcome::Abandoned,\n",
+          "after": "            let tag = r.u8()?;\n            let outcome = match tag {\n                0 | 2 => Outcome::Complete,\n                1 | 3 => Outcome::Abandoned,\n"
+        },
+        {
+          "offset": 15727,
+          "before": "",
+          "after": "            let fuel = FuelAnchor::decode(r)?;\n"
+        },
+        {
+          "offset": 15869,
+          "before": "                fuel: FuelAnchor::decode(r)?,\n",
+          "after": "                fuel,\n                account_revision: if tag & 2 != 0 { Some(r.u64()?) } else { None },\n"
+        },
+        {
+          "offset": 16066,
+          "before": "",
+          "after": "            accepted_account_revision,\n"
+        },
+        {
+          "offset": 20139,
+          "before": "            || self.fuel_at_plan > 130\n",
+          "after": "            || self.fuel_at_plan\n                > c.commerce\n                    .modular\n                    .fuel_capacity_at_revision(c.nav.owner, self.account_revision)?\n"
+        },
+        {
+          "offset": 24581,
+          "before": "            || self.fuel_at_trade > 130\n",
+          "after": "            || self.fuel_at_trade\n                > c.commerce\n                    .modular\n                    .fuel_capacity_at_revision(c.nav.owner, self.account_revision)?\n"
+        },
+        {
+          "offset": 30209,
+          "before": "            || self.fuel_before > 130\n",
+          "after": "            || self.fuel_before\n                > c.commerce\n                    .modular\n                    .fuel_capacity_at_revision(c.nav.owner, self.account_revision)?\n"
+        },
+        {
+          "offset": 31880,
+          "before": "",
+          "after": "        let capacity = c\n            .commerce\n            .modular\n            .fuel_capacity_at_revision(c.nav.owner, self.account_revision)?;\n"
+        },
+        {
+          "offset": 32488,
+          "before": "            || self.units_before >= 130\n            || self.units_after != 130\n            || self.paid != u32::from(130 - self.units_before) * 2\n",
+          "after": "            || self.units_before >= capacity\n            || self.units_after != capacity\n            || self.paid != u32::from(capacity - self.units_before) * 2\n"
+        }
+      ]
+    },
+    "flight/navigation_trade/tests.rs": {
+      "beforeSHA256": "42a2a9ed3a2fd94180e600a46552f7807f6694c3af6227f1c3393faa680ef915",
+      "afterSHA256": "34ecc5e24656cbdab34d7e09ce24a22766784ba00fe47d05fe6a3436a112e970",
+      "hunks": [
+        {
+          "offset": 6625,
+          "before": "",
+          "after": "}\n\n#[test]\nfn abandoned_and_completed_fuel_anchors_survive_later_explicit_max_supply() {\n    use crate::XyzzyAction;\n    for (index, completed) in [false, true].into_iter().enumerate() {\n        let mut world = commander(18880 + index as u64);\n        if completed {\n            complete(&mut world, Id::Food);\n        } else {\n            plan(&mut world, Id::Food);\n            confirm(&mut world, Action::Cancel);\n        }\n        let past = snap(&world);\n        let anchor = *world\n            .navigation_trade\n            .attempts\n            .last()\n            .and_then(|a| a.terminal.as_ref())\n            .unwrap_or_else(|| panic!(\"terminal\"));\n        let mut legacy = cold(&world);\n        let old = legacy\n            .navigation_trade\n            .attempts\n            .last_mut()\n            .unwrap_or_else(|| panic!(\"attempt\"));\n        old.accepted_account_revision = None;\n        if let Some(terminal) = old.terminal.as_mut() {\n            terminal.account_revision = None;\n        }\n        for candidate in [&mut world, &mut legacy] {\n            let tick = candidate.snapshot().tick;\n            let review = ok(candidate.review_xyzzy(XyzzyAction::MaximumFuelStorage, tick));\n            ok(candidate.prepare_xyzzy(review, tick)).commit();\n            assert_eq!(some(candidate.snapshot().navigation).fuel_units, 410);\n            let loaded = cold(candidate);\n            assert_eq!(snap(&loaded).attempts, past.attempts);\n            let retained = loaded\n                .navigation_trade\n                .attempts\n                .last()\n                .and_then(|a| a.terminal)\n                .unwrap_or_else(|| panic!(\"terminal\"));\n            assert_eq!(retained.fuel, anchor.fuel);\n            assert_eq!(retained.tick, anchor.tick);\n        }\n        reject(&mut world, |invalid| {\n            let terminal = invalid\n                .navigation_trade\n                .attempts\n                .last_mut()\n                .and_then(|a| a.terminal.as_mut())\n                .unwrap_or_else(|| panic!(\"terminal\"));\n            terminal.fuel.fuel -= 1;\n        });\n    }\n"
+        }
+      ]
+    },
+    "flight/persistence.rs": {
+      "beforeSHA256": "94e37569697a792ad63262039727a6f2cf671ae4f2b8ad3f32992fae2b446a7f",
+      "afterSHA256": "69f972ef162a618a50a3ce7e295702a5cf3c4afe99ff99abfbe85eb19978f70e",
+      "hunks": [
+        {
+          "offset": 26245,
+          "before": "",
+          "after": "        commerce.modular.validate_test_custody_history(\n            self,\n            account,\n            commerce.emp,\n            commerce.lesson,\n        )?;\n"
+        }
+      ]
+    },
+    "flight/xyzzy.rs": {
+      "beforeSHA256": "0c2016a2dfbb7446df0879d752506c4e3718b81e3d0e674ee254e250d03e04a3",
+      "afterSHA256": "ace092b9d6f4fa7dd0963ea00e70c16a5906f47f61f33c288344830e47ee9949",
+      "hunks": [
+        {
+          "offset": 853,
+          "before": "",
+          "after": "    /// Separately labelled maximum test fit, including the original four-tank exception.\n    MaximumFuelStorage,\n"
+        },
+        {
+          "offset": 1054,
+          "before": "            Self::Enter | Self::MaximumSupportedHardware | Self::RestoreStarter\n",
+          "after": "            Self::Enter\n                | Self::MaximumSupportedHardware\n                | Self::RestoreStarter\n                | Self::MaximumFuelStorage\n"
+        },
+        {
+          "offset": 1715,
+          "before": "",
+          "after": "            Self::MaximumFuelStorage => 11,\n"
+        },
+        {
+          "offset": 2103,
+          "before": "",
+          "after": "            11 => Ok(Self::MaximumFuelStorage),\n"
+        },
+        {
+          "offset": 2389,
+          "before": "",
+          "after": "    ActiveContractCustody,\n"
+        },
+        {
+          "offset": 4846,
+          "before": "",
+          "after": "    pub(super) fn authorizes_max_tanks(&self, dock: DockContext, tick: u64, revision: u64) -> bool {\n        self.records.iter().any(|record| {\n            record.action == XyzzyAction::MaximumFuelStorage\n                && record.dock == dock\n                && record.tick == tick\n                && revision > record.revision\n                && revision <= record.end_revision\n        })\n    }\n    pub(super) fn max_tank_intervals(\n        &self,\n    ) -> impl Iterator<Item = (u64, u64, DockContext, u64)> + '_ {\n        self.records\n            .iter()\n            .filter(|record| record.action == XyzzyAction::MaximumFuelStorage)\n            .map(|record| {\n                (\n                    record.revision,\n                    record.end_revision,\n                    record.dock,\n                    record.tick,\n                )\n            })\n    }\n    /// The exact retained fuel prefix at a T04 terminal, independent of later\n    /// explicit supply. The full account validator still checks every receipt.\n    pub(super) fn historical_fuel(\n        &self,\n        world: &World,\n        markets: &crate::station_services::StationMarkets,\n        dock: DockContext,\n        tick: u64,\n        revision: u64,\n    ) -> Result<(u64, u16), SaveError> {\n        let spent = world.jump_journal.spent_at(dock, tick)?;\n        let mut journal_spent = 0_u64;\n        let mut jumps = 0_u64;\n        for event in world\n            .jump_journal\n            .account_events()\n            .into_iter()\n            .filter(|event| event.revision <= revision)\n        {\n            if let AccountEffect::Jump(debit) = event.effect {\n                journal_spent = journal_spent.checked_add(u64::from(debit)).ok_or(INVALID)?;\n                jumps = jumps.checked_add(1).ok_or(INVALID)?;\n            }\n        }\n        if journal_spent != spent || dock.visit().checked_sub(dock.sequence()) != Some(jumps) {\n            return Err(INVALID);\n        }\n        let mut refilled = 0_u64;\n        for event in markets\n            .account_events()\n            .into_iter()\n            .filter(|event| event.revision <= revision)\n        {\n            if let AccountEffect::Refill { units, .. } = event.effect {\n                refilled = refilled.checked_add(u64::from(units)).ok_or(INVALID)?;\n            }\n        }\n        let mut supplied = 0_u64;\n        let mut previous: Option<Record> = None;\n        for record in self\n            .records\n            .iter()\n            .take_while(|record| record.revision <= revision)\n        {\n            if record.end_revision > revision || record.fuel_spent > spent {\n                return Err(INVALID);\n            }\n            if let Some(prior) = previous\n                && prior.unlimited_fuel\n            {\n                supplied = supplied\n                    .checked_add(\n                        record\n                            .fuel_spent\n                            .checked_sub(prior.fuel_spent)\n                            .ok_or(INVALID)?,\n                    )\n                    .ok_or(INVALID)?;\n            }\n            supplied = supplied\n                .checked_add(u64::from(record.fuel_added))\n                .ok_or(INVALID)?;\n            previous = Some(*record);\n        }\n        if let Some(prior) = previous\n            && prior.unlimited_fuel\n        {\n            supplied = supplied\n                .checked_add(spent.checked_sub(prior.fuel_spent).ok_or(INVALID)?)\n                .ok_or(INVALID)?;\n        }\n        let fuel = u64::from(crate::navigation::FUEL_CAPACITY)\n            .checked_add(refilled)\n            .and_then(|value| value.checked_add(supplied))\n            .and_then(|value| value.checked_sub(spent))\n            .ok_or(INVALID)?;\n        Ok((refilled, u16::try_from(fuel).map_err(|_| INVALID)?))\n    }\n    pub(super) fn refills_after_terminal(\n        &self,\n        dock: DockContext,\n        tick: u64,\n        revision: Option<u64>,\n    ) -> u64 {\n        self.records\n            .iter()\n            .filter(|record| match revision {\n                Some(revision) => record.revision > revision,\n                None => {\n                    record.dock.sequence() > dock.sequence()\n                        || (record.dock.sequence() == dock.sequence()\n                            && (record.tick > tick\n                                || (record.tick == tick\n                                    && record.action == XyzzyAction::MaximumFuelStorage)))\n                }\n            })\n            .map(|record| u64::from(record.fuel_added))\n            .sum()\n    }\n"
+        },
+        {
+          "offset": 10537,
+          "before": "            if (i == 0 && r.action != XyzzyAction::Enter)\n",
+          "after": "            if (i == 0\n                && !matches!(\n                    r.action,\n                    XyzzyAction::Enter | XyzzyAction::MaximumFuelStorage\n                ))\n"
+        },
+        {
+          "offset": 11041,
+          "before": "                || r.fuel_added > crate::navigation::FUEL_CAPACITY\n",
+          "after": "                || r.fuel_added > crate::navigation::MAX_FUEL_CAPACITY\n"
+        },
+        {
+          "offset": 11537,
+          "before": "",
+          "after": "            }\n            if r.action == XyzzyAction::MaximumFuelStorage {\n                if r.end_revision <= r.revision\n                    || !world\n                        .freight_session\n                        .as_ref()\n                        .ok_or(INVALID)?\n                        .state\n                        .custody_clear_at(r.revision, r.dock.sequence())\n                    || commerce.lesson.known_active_at(r.tick, r.revision)\n                    || commerce\n                        .modular\n                        .fuel_capacity_at_revision(r.dock.owner().seed(), r.end_revision)?\n                        != crate::navigation::MAX_FUEL_CAPACITY\n                {\n                    return Err(INVALID);\n                }\n                terms.revisions = terms.revisions.checked_add(1).ok_or(INVALID)?;\n"
+        },
+        {
+          "offset": 12987,
+          "before": "        terms.revisions = self.records.len() as u64;\n",
+          "after": "        terms.revisions = terms\n            .revisions\n            .checked_add(self.records.len() as u64)\n            .ok_or(INVALID)?;\n"
+        },
+        {
+          "offset": 15615,
+          "before": "",
+          "after": "    pub(super) fn test_tank_custody_clear(&self) -> bool {\n        self.active_freight_job().is_none() && self.navigation_trade.occupancy().1 == 0\n    }\n    fn xyzzy_has_free_ordinary_utility_mount(&self) -> Result<bool, SaveError> {\n        let fit = self.fuel_scoops_snapshot().ok_or(INVALID)?;\n        Ok(fit.utility_mounts_used < fit.utility_mounts_capacity)\n    }\n"
+        },
+        {
+          "offset": 17386,
+          "before": "        if action != XyzzyAction::Enter && !self.xyzzy.active() {\n",
+          "after": "        if !matches!(action, XyzzyAction::Enter | XyzzyAction::MaximumFuelStorage)\n            && !self.xyzzy.active()\n        {\n"
+        },
+        {
+          "offset": 17829,
+          "before": "",
+          "after": "        if action == XyzzyAction::MaximumFuelStorage && !self.test_tank_custody_clear() {\n            return Err(XyzzyError::ActiveContractCustody);\n        }\n"
+        },
+        {
+          "offset": 18159,
+          "before": "",
+          "after": "        if action == XyzzyAction::MaximumFuelStorage\n            && !self\n                .freight_session\n                .as_ref()\n                .ok_or(XyzzyError::NoCommander)?\n                .state\n                .custody_clear_at(\n                    account\n                        .revision()\n                        .checked_add(1)\n                        .ok_or(XyzzyError::Save(INVALID))?,\n                    dock.sequence(),\n                )\n        {\n            return Err(XyzzyError::ActiveContractCustody);\n        }\n"
+        },
+        {
+          "offset": 20336,
+          "before": "",
+          "after": "        let max_tanks = review.action == XyzzyAction::MaximumFuelStorage;\n"
+        },
+        {
+          "offset": 20827,
+          "before": "                130_u16.checked_sub(current.fuel_tenths()).ok_or(INVALID)?\n",
+          "after": "                (if max_tanks {\n                    crate::navigation::MAX_FUEL_CAPACITY\n                } else {\n                    current.fuel_capacity()\n                })\n                .checked_sub(current.fuel_tenths())\n                .ok_or(INVALID)?\n"
+        },
+        {
+          "offset": 21288,
+          "before": "            .prepare_xyzzy(first, refill, mode)\n",
+          "after": "            .prepare_xyzzy(first, refill && !max_tanks, mode)\n"
+        },
+        {
+          "offset": 21475,
+          "before": "",
+          "after": "        if max_tanks {\n            for _ in 0..crate::navigation::MAX_FUEL_STORAGE_UNITS {\n                self.grant_xyzzy_module(\n                    review.dock,\n                    review.tick,\n                    super::modular::ModuleKind::FuelStorage,\n                )?;\n            }\n        }\n"
+        },
+        {
+          "offset": 22478,
+          "before": "",
+          "after": "                if kind == super::modular::ModuleKind::FuelScoops\n                    && !max_tanks\n                    && self.fitted_fuel_scoops().is_none()\n                    && !self.xyzzy_has_free_ordinary_utility_mount()?\n                {\n                    continue;\n                }\n"
+        },
+        {
+          "offset": 22861,
+          "before": "            self.grant_xyzzy_emp(review.dock, review.tick)?;\n",
+          "after": "            if max_tanks\n                || self.owned_emp().is_some_and(|item| item.fitted)\n                || self.xyzzy_has_free_ordinary_utility_mount()?\n            {\n                self.grant_xyzzy_emp(review.dock, review.tick)?;\n            }\n"
+        },
+        {
+          "offset": 23178,
+          "before": "            let account = self\n",
+          "after": "            let cargo_fitted = self\n"
+        },
+        {
+          "offset": 23308,
+          "before": "                .grant_xyzzy_cargo_bay(\n                    super::services::service_site(review.dock.system()).ok_or(INVALID)?,\n                )\n                .map_err(|_| INVALID)?;\n            self.commander_account = Some(account);\n",
+          "after": "                .equipment_state()\n                .units_used()\n                != 0;\n            if max_tanks || cargo_fitted || self.xyzzy_has_free_ordinary_utility_mount()? {\n                let prior = self.commander_account.as_ref().ok_or(INVALID)?;\n                let previous_cargo_revision = prior.equipment_state().revision();\n                let account = prior\n                    .grant_xyzzy_cargo_bay(\n                        super::services::service_site(review.dock.system()).ok_or(INVALID)?,\n                    )\n                    .map_err(|_| INVALID)?;\n                if self.modular.has_test_cargo_history()\n                    && account.equipment_state().revision() != previous_cargo_revision\n                {\n                    self.modular\n                        .record_test_cargo_fit(&account, review.dock, review.tick)?;\n                }\n                self.commander_account = Some(account);\n            }\n"
+        },
+        {
+          "offset": 24700,
+          "before": "",
+          "after": "        if max_tanks {\n            let account = self\n                .commander_account\n                .as_ref()\n                .ok_or(INVALID)?\n                .prepare_xyzzy(false, true, mode)\n                .map_err(|_| INVALID)?;\n            self.commander_account = Some(account);\n        }\n"
+        },
+        {
+          "offset": 25162,
+          "before": "",
+          "after": "        if max_tanks && !self.modular.has_test_cargo_history() {\n            self.modular.record_test_cargo_fit(\n                self.commander_account.as_ref().ok_or(INVALID)?,\n                review.dock,\n                review.tick,\n            )?;\n        }\n"
+        }
+      ]
+    },
+    "flight/xyzzy/history.rs": {
+      "beforeSHA256": "6c47eac07a06d568e1b73b27ea171b66c00666c49ce12e10b39f531a0c93b4d0",
+      "afterSHA256": "54363d66d816d992144a7109e7683613c37465c18ac89d7b2b78a1a877e5cf29",
+      "hunks": [
+        {
+          "offset": 524,
+          "before": "",
+          "after": "    TankFit { count: u8, paid: u32 },\n"
+        },
+        {
+          "offset": 596,
+          "before": "",
+          "after": "    SecretRefill(usize),\n"
+        },
+        {
+          "offset": 772,
+          "before": "",
+          "after": "        capacity: u16,\n"
+        },
+        {
+          "offset": 982,
+          "before": "        let refill = r.action.refills(r.unlimited_fuel);\n",
+          "after": "        let deferred = r.action == super::XyzzyAction::MaximumFuelStorage;\n        let refill = r.action.refills(r.unlimited_fuel) && !deferred;\n"
+        },
+        {
+          "offset": 1168,
+          "before": "            crate::navigation::FUEL_CAPACITY\n                .checked_sub(*fuel)\n                .ok_or(INVALID)?\n",
+          "after": "            capacity.checked_sub(*fuel).ok_or(INVALID)?\n"
+        },
+        {
+          "offset": 1345,
+          "before": "            || r.fuel_added != expected_added\n",
+          "after": "            || (!deferred && r.fuel_added != expected_added)\n"
+        },
+        {
+          "offset": 1624,
+          "before": "            *fuel = crate::navigation::FUEL_CAPACITY;\n",
+          "after": "            *fuel = capacity;\n"
+        },
+        {
+          "offset": 1979,
+          "before": "        events.extend(commerce.modular.account_events());\n",
+          "after": "        events.extend(\n            commerce\n                .modular\n                .account_events(world.combat_identity().ok_or(INVALID)?.owner)?,\n        );\n"
+        },
+        {
+          "offset": 2513,
+          "before": "",
+          "after": "        );\n        events.extend(\n            self.records\n                .iter()\n                .enumerate()\n                .filter(|(_, record)| record.action == super::XyzzyAction::MaximumFuelStorage)\n                .map(|(index, record)| AccountEvent {\n                    revision: record.end_revision,\n                    effect: AccountEffect::SecretRefill(index),\n                }),\n"
+        },
+        {
+          "offset": 3412,
+          "before": "",
+          "after": "        let mut capacity = crate::navigation::FUEL_CAPACITY;\n"
+        },
+        {
+          "offset": 4302,
+          "before": "                    if units\n                        != crate::navigation::FUEL_CAPACITY\n                            .checked_sub(fuel)\n                            .ok_or(INVALID)?\n",
+          "after": "                    if units != capacity.checked_sub(fuel).ok_or(INVALID)?\n"
+        },
+        {
+          "offset": 4630,
+          "before": "                    fuel = crate::navigation::FUEL_CAPACITY;\n",
+          "after": "                    fuel = capacity;\n                }\n                AccountEffect::TankFit { count, paid } => {\n                    capacity = crate::navigation::fuel_capacity(count);\n                    if fuel > capacity {\n                        return Err(INVALID);\n                    }\n                    cash = cash.checked_sub(paid).ok_or(INVALID)?;\n"
+        },
+        {
+          "offset": 5409,
+          "before": "                    unlimited =\n                        self.apply_secret_prefix(index, world, &mut cash, &mut fuel, spent)?;\n",
+          "after": "                    unlimited = self\n                        .apply_secret_prefix(index, world, &mut cash, &mut fuel, capacity, spent)?;\n                }\n                AccountEffect::SecretRefill(index) => {\n                    let record = self.records.get(index).ok_or(INVALID)?;\n                    if capacity != crate::navigation::MAX_FUEL_CAPACITY\n                        || record.fuel_added != capacity.checked_sub(fuel).ok_or(INVALID)?\n                    {\n                        return Err(INVALID);\n                    }\n                    fuel = capacity;\n"
+        },
+        {
+          "offset": 6153,
+          "before": "",
+          "after": "            || capacity != account.fuel_capacity()\n"
+        }
+      ]
+    },
+    "freight/g02.rs": {
+      "beforeSHA256": "fd22d210af0582d0e78eda26338f000190fc70645439bcb1079b924c8e4338bd",
+      "afterSHA256": "46579e4bc58a110a3b8f61f6a6e287728e857c551baa6730cf883c26e11ed898",
+      "hunks": [
+        {
+          "offset": 5754,
+          "before": "",
+          "after": "    fuel_storage_count: u8,\n"
+        },
+        {
+          "offset": 7480,
+          "before": "",
+          "after": "                fuel_storage_count: 0,\n"
+        },
+        {
+          "offset": 8935,
+          "before": "        pulse_fitted: bool,\n        energy_fitted: bool,\n        navigation_fitted: bool,\n        drive_fitted: bool,\n        shield_fitted: bool,\n",
+          "after": "        [\n            pulse_fitted,\n            energy_fitted,\n            navigation_fitted,\n            drive_fitted,\n            shield_fitted,\n        ]: [bool; 5],\n        fuel_storage_count: u8,\n"
+        },
+        {
+          "offset": 9201,
+          "before": "",
+          "after": "        if fuel_storage_count > crate::navigation::MAX_FUEL_STORAGE_UNITS\n            || data.fuel_tenths > crate::navigation::fuel_capacity(fuel_storage_count)\n        {\n            return Err(Error::InvalidFit);\n        }\n        data.fuel_storage_count = fuel_storage_count;\n"
+        },
+        {
+          "offset": 12994,
+          "before": "            data.fuel_tenths = crate::navigation::FUEL_CAPACITY;\n",
+          "after": "            data.fuel_tenths = self.fuel_capacity();\n"
+        },
+        {
+          "offset": 17008,
+          "before": "",
+          "after": "    pub(crate) fn fuel_storage_count(&self) -> u8 {\n        self.data.fuel_storage_count\n    }\n    pub(crate) fn fuel_capacity(&self) -> u16 {\n        crate::navigation::fuel_capacity(self.fuel_storage_count())\n    }\n"
+        },
+        {
+          "offset": 18315,
+          "before": "",
+          "after": "            fuel_capacity_tenths: self.fuel_capacity(),\n"
+        },
+        {
+          "offset": 25846,
+          "before": "",
+          "after": "    issue_account_revision: Option<u64>,\n    abandoned_account_revision: Option<u64>,\n"
+        },
+        {
+          "offset": 27305,
+          "before": "",
+          "after": "        use crate::flight::{AccountEffect, AccountEvent};\n        let mut events = Vec::new();\n        for job in self.data.jobs.iter().flatten() {\n            for revision in [job.issue_account_revision, job.abandoned_account_revision]\n                .into_iter()\n                .flatten()\n            {\n                events.push(AccountEvent {\n                    revision,\n                    effect: AccountEffect::Debit(0),\n                });\n            }\n            for transfer in job.transfers.iter().flatten() {\n                events.push(AccountEvent {\n                    revision: transfer.account_revision,\n                    effect: if job\n                        .completion\n                        .is_some_and(|c| c.account_revision == transfer.account_revision)\n                    {\n                        AccountEffect::Reward(REWARD_TENTHS)\n                    } else {\n                        AccountEffect::Debit(0)\n                    },\n                });\n            }\n        }\n        events\n    }\n    /// For legacy records without an exact issue or abandonment revision, require\n    /// independently retained berth/closure evidence before granting an exceptional fit.\n    pub(crate) fn custody_clear_at(&self, revision: u64, dock_sequence: u64) -> bool {\n        self.data.jobs.iter().flatten().all(|job| {\n            if job.issuer.arrival_sequence > dock_sequence\n                || job\n                    .issue_account_revision\n                    .is_some_and(|issue| issue > revision)\n            {\n                return true;\n            }\n            job.completion\n                .is_some_and(|receipt| receipt.account_revision < revision)\n                || job\n                    .abandoned_account_revision\n                    .is_some_and(|close| close < revision)\n        })\n    }\n    pub(crate) fn known_issue_revisions(&self) -> impl Iterator<Item = u64> + '_ {\n"
+        },
+        {
+          "offset": 29308,
+          "before": "            .filter_map(|j| j.completion)\n            .map(|c| crate::flight::AccountEvent {\n                revision: c.account_revision,\n                effect: crate::flight::AccountEffect::Reward(REWARD_TENTHS),\n            })\n            .collect()\n",
+          "after": "            .filter_map(|job| job.issue_account_revision)\n    }\n    pub(crate) fn post_test_issues_have_markers(&self, first_test_dock_sequence: u64) -> bool {\n        self.data.jobs.iter().flatten().all(|job| {\n            job.issuer.arrival_sequence <= first_test_dock_sequence\n                || job.issue_account_revision.is_some()\n        })\n    }\n    #[cfg(test)]\n    pub(crate) fn forge_issue_revision_for_test(&mut self, revision: u64) {\n        if let Some(job) = self.data.jobs.iter_mut().flatten().last() {\n            job.issue_account_revision = Some(revision);\n        }\n    }\n    #[cfg(test)]\n    pub(crate) fn clear_last_custody_markers_for_test(&mut self) {\n        if let Some(job) = self.data.jobs.iter_mut().flatten().last() {\n            job.issue_account_revision = None;\n            job.abandoned_account_revision = None;\n        }\n"
+        },
+        {
+          "offset": 37401,
+          "before": "",
+          "after": "                            issue_account_revision: Some(plan.next_account.revision),\n                            abandoned_account_revision: None,\n"
+        },
+        {
+          "offset": 39037,
+          "before": "",
+          "after": "                        updated.abandoned_account_revision = Some(plan.next_account.revision);\n"
+        },
+        {
+          "offset": 46346,
+          "before": "        || account.fuel_tenths > 130\n",
+          "after": "        || account.fuel_storage_count > crate::navigation::MAX_FUEL_STORAGE_UNITS\n        || account.fuel_tenths > crate::navigation::fuel_capacity(account.fuel_storage_count)\n"
+        }
+      ]
+    },
+    "freight/g02/persistence.rs": {
+      "beforeSHA256": "d878d77ba04844846ea262d268e146131969a19db1f96250ce8b42568d43b8ab",
+      "afterSHA256": "b1a068c6c9a1c463766a459372b100e1e12ebef2fc34ed9500729a15c7b19489",
+      "hunks": [
+        {
+          "offset": 4610,
+          "before": "        w.u16(d.fuel_tenths);\n",
+          "after": "        w.u16(crate::navigation::pack_fuel(\n            d.fuel_tenths,\n            d.fuel_storage_count,\n        ));\n"
+        },
+        {
+          "offset": 5734,
+          "before": "",
+          "after": "        let owner = r.u64()?;\n        let hull = r.u64()?;\n        let revision = r.u64()?;\n        let credits = r.u32()?;\n        let other_tonnes = r.u16()?;\n        let food_tonnes = r.u16()?;\n        let reserved_food_tonnes = r.u16()?;\n        let (fuel_tenths, fuel_storage_count) = crate::navigation::unpack_fuel(r.u16()?)?;\n"
+        },
+        {
+          "offset": 6132,
+          "before": "                owner: r.u64()?,\n                hull: r.u64()?,\n                revision: r.u64()?,\n                credits: r.u32()?,\n                other_tonnes: r.u16()?,\n                food_tonnes: r.u16()?,\n                reserved_food_tonnes: r.u16()?,\n                fuel_tenths: r.u16()?,\n",
+          "after": "                owner,\n                hull,\n                revision,\n                credits,\n                other_tonnes,\n                food_tonnes,\n                reserved_food_tonnes,\n                fuel_tenths,\n                fuel_storage_count,\n"
+        },
+        {
+          "offset": 9486,
+          "before": "",
+          "after": "        if state.data.jobs.iter().flatten().any(|job| {\n            [job.issue_account_revision, job.abandoned_account_revision]\n                .into_iter()\n                .flatten()\n                .any(|revision| revision == 0 || revision > self.data.revision)\n                || job\n                    .issue_account_revision\n                    .zip(job.abandoned_account_revision)\n                    .is_some_and(|(issue, close)| issue >= close)\n                || job.transfers.iter().flatten().any(|transfer| {\n                    job.issue_account_revision\n                        .is_some_and(|issue| issue >= transfer.account_revision)\n                        || job\n                            .abandoned_account_revision\n                            .is_some_and(|close| close <= transfer.account_revision)\n                })\n                || (job.status != JobStatus::Abandoned && job.abandoned_account_revision.is_some())\n                || (job.status == JobStatus::Abandoned\n                    && job.issue_account_revision.is_some()\n                    && job.abandoned_account_revision.is_none())\n        }) {\n            return Err(SaveError::InvalidState(\n                \"freight custody account chronology\",\n            ));\n        }\n"
+        },
+        {
+          "offset": 11788,
+          "before": "    w.u64(j.issue_sequence);\n",
+          "after": "    let extended = j.issue_account_revision.is_some() || j.abandoned_account_revision.is_some();\n    w.u64(j.issue_sequence | if extended { 1 << 63 } else { 0 });\n    if extended {\n        w.option(j.issue_account_revision.as_ref(), |w, r| w.u64(*r));\n        w.option(j.abandoned_account_revision.as_ref(), |w, r| w.u64(*r));\n    }\n"
+        },
+        {
+          "offset": 12958,
+          "before": "",
+          "after": "    let sequence = r.u64()?;\n    let extended = sequence & (1 << 63) != 0;\n    let (issue_account_revision, abandoned_account_revision) = if extended {\n        let values = (r.option(|r| r.u64())?, r.option(|r| r.u64())?);\n        if values == (None, None) {\n            return Err(SaveError::InvalidEncoding);\n        }\n        values\n    } else {\n        (None, None)\n    };\n"
+        },
+        {
+          "offset": 13425,
+          "before": "        issue_sequence: r.u64()?,\n",
+          "after": "        issue_sequence: sequence & !(1 << 63),\n        issue_account_revision,\n        abandoned_account_revision,\n"
+        }
+      ]
+    },
+    "navigation.rs": {
+      "beforeSHA256": "bb3c5d55f3314a6d9e2a652791ada5fcea72b68c8de5c9872767ecca19b891d6",
+      "afterSHA256": "11745ab22969f49368642386fa9ad2707c0a8506504ec98e503dc12434d2f2ed",
+      "hunks": [
+        {
+          "offset": 758,
+          "before": "",
+          "after": "pub const FUEL_STORAGE_UNIT_CAPACITY: u16 = 70;\npub const MAX_FUEL_STORAGE_UNITS: u8 = 4;\npub const MAX_FUEL_CAPACITY: u16 = fuel_capacity(MAX_FUEL_STORAGE_UNITS);\npub const fn fuel_capacity(storage_units: u8) -> u16 {\n    FUEL_CAPACITY + FUEL_STORAGE_UNIT_CAPACITY * storage_units as u16\n}\n\n// Retain the existing two-byte stock save field. Fuel occupies nine bits; the\n// next three carry the installed count, and the remaining bits are reserved.\npub(crate) const fn pack_fuel(units: u16, storage_units: u8) -> u16 {\n    units | ((storage_units as u16) << 9)\n}\npub(crate) fn unpack_fuel(encoded: u16) -> Result<(u16, u8), crate::save::SaveError> {\n    let units = encoded & 511;\n    let count = (encoded >> 9) as u8;\n    if count > MAX_FUEL_STORAGE_UNITS || units > fuel_capacity(count) {\n        return Err(crate::save::SaveError::InvalidEncoding);\n    }\n    Ok((units, count))\n}\n"
+        },
+        {
+          "offset": 11016,
+          "before": "",
+          "after": "    pub fuel_capacity_units: u16,\n"
+        },
+        {
+          "offset": 14944,
+          "before": "",
+          "after": "        self.snapshot_with_capacity(fuel, FUEL_CAPACITY)\n    }\n    pub(crate) fn snapshot_with_capacity(self, fuel: u16, capacity: u16) -> NavigationSnapshot {\n"
+        },
+        {
+          "offset": 15196,
+          "before": "",
+          "after": "            fuel_capacity_units: capacity,\n"
+        },
+        {
+          "offset": 30681,
+          "before": "",
+          "after": "                fuel_capacity_units: FUEL_CAPACITY,\n"
+        }
+      ]
+    },
+    "navigation/journal.rs": {
+      "beforeSHA256": "f1d8738709338bce71336e06ed7d5fb3f7855905fefa7337736bfdd48bbb54db",
+      "afterSHA256": "6a016326b6e5ea87a0762c5727b69be780b78ce39e5777f0ed78d766592c259d",
+      "hunks": [
+        {
+          "offset": 875,
+          "before": "        let tank = f64::from(FUEL_CAPACITY) / 10.0;\n",
+          "after": "        self.planning_radius_with_capacity(FUEL_CAPACITY)\n    }\n    pub fn planning_radius_with_capacity(self, capacity: u16) -> Option<f64> {\n        let tank = f64::from(capacity) / 10.0;\n"
+        },
+        {
+          "offset": 2480,
+          "before": "",
+          "after": "    pub(crate) fuel_storage_count: u8,\n"
+        },
+        {
+          "offset": 8872,
+          "before": "",
+          "after": "        let mut tank = FUEL_CAPACITY;\n"
+        },
+        {
+          "offset": 10542,
+          "before": "",
+          "after": "                tank = super::fuel_capacity(change.fuel_storage_count);\n"
+        },
+        {
+          "offset": 11868,
+          "before": "                || distance > grade.reach_ly().min(f64::from(FUEL_CAPACITY) / 10.0)\n",
+          "after": "                || distance > grade.reach_ly().min(f64::from(tank) / 10.0)\n"
+        },
+        {
+          "offset": 14476,
+          "before": "",
+          "after": "            fuel_storage_count: 0,\n"
+        },
+        {
+          "offset": 16022,
+          "before": "",
+          "after": "            fuel_storage_count: 0,\n"
+        }
+      ]
+    },
+    "navigation/persistence.rs": {
+      "beforeSHA256": "065cb0669c5a1b493e8877a51b17a3da30433746752aba98e0a052cdac920a04",
+      "afterSHA256": "9ba7fa3ec75ba83b033b978e8f5a387fe0d9c38633c9f7f3ce7da31704ebcdc5",
+      "hunks": [
+        {
+          "offset": 6437,
+          "before": "            || u128::from(self.fuel_spent) > u128::from(self.completed_jumps) * u128::from(super::FUEL_CAPACITY)\n",
+          "after": "            || u128::from(self.fuel_spent) > u128::from(self.completed_jumps) * u128::from(super::MAX_FUEL_CAPACITY)\n"
+        }
+      ]
+    },
+    "station_services.rs": {
+      "beforeSHA256": "06bd7a7db6a9585ddeebe57ab812bb5f0778ee321082daa4e378a255fba8f399",
+      "afterSHA256": "2b4df3af565b0c88825103b4b0122f43783a63a1720fdf5def20e17a489216fb",
+      "hunks": [
+        {
+          "offset": 587,
+          "before": "const STOCK_FUEL_TENTHS: u16 = 130;\npub(crate) const FUEL_PRICE_TENTHS: u32 = 2;\n",
+          "after": "/// Station fuel price in tenths of a credit for each tenth of a light-year.\npub const FUEL_PRICE_TENTHS: u32 = 2;\n"
+        },
+        {
+          "offset": 2462,
+          "before": "",
+          "after": "    pub(crate) fuel_capacity_tenths: u16,\n"
+        },
+        {
+          "offset": 11214,
+          "before": "                let missing = STOCK_FUEL_TENTHS - account.fuel_tenths;\n",
+          "after": "                let missing = account.fuel_capacity_tenths - account.fuel_tenths;\n"
+        },
+        {
+          "offset": 11549,
+          "before": "                next_account.fuel_tenths = STOCK_FUEL_TENTHS;\n",
+          "after": "                next_account.fuel_tenths = account.fuel_capacity_tenths;\n"
+        },
+        {
+          "offset": 16325,
+          "before": "        || account.fuel_tenths > STOCK_FUEL_TENTHS\n",
+          "after": "        || account.fuel_tenths > account.fuel_capacity_tenths\n        || !(0..=crate::navigation::MAX_FUEL_STORAGE_UNITS)\n            .any(|count| crate::navigation::fuel_capacity(count) == account.fuel_capacity_tenths)\n"
+        },
+        {
+          "offset": 18855,
+          "before": "",
+          "after": "            fuel_capacity_tenths: crate::navigation::FUEL_CAPACITY,\n"
+        }
+      ]
+    },
+    "station_services/commodity_tests.rs": {
+      "beforeSHA256": "ef02cb8373da6a515e78bda8e29d9d47c4ce807bf81d385817fcdc05f28c493d",
+      "afterSHA256": "9df3e46341287ee317f8be83ebec9a57910ac68d2cc20543957bf85a271e87b2",
+      "hunks": [
+        {
+          "offset": 368,
+          "before": "",
+          "after": "        fuel_capacity_tenths: crate::navigation::FUEL_CAPACITY,\n"
+        }
+      ]
+    },
+    "station_services/history.rs": {
+      "beforeSHA256": "30de7128095189f2bf7f08d3ef0a71e74b8b1f6980a1d1a0c41167f84c581d59",
+      "afterSHA256": "b1501914f1e3f61048d6d7c6de74f3b3c76d88d5cfced84d9d793831fd3eab2f",
+      "hunks": [
+        {
+          "offset": 90,
+          "before": "use super::{\n    CommodityId, Event, FUEL_PRICE_TENTHS, MarketSite, STOCK_FUEL_TENTHS, StationMarkets,\n    record_accounting,\n};\n",
+          "after": "use super::{CommodityId, Event, FUEL_PRICE_TENTHS, MarketSite, StationMarkets, record_accounting};\n"
+        },
+        {
+          "offset": 3309,
+          "before": "                    if added_fuel_tenths > STOCK_FUEL_TENTHS\n",
+          "after": "                    if added_fuel_tenths > crate::navigation::MAX_FUEL_CAPACITY\n"
+        }
+      ]
+    },
+    "station_services/persistence.rs": {
+      "beforeSHA256": "14200c4e812a1765a5740343590c13d0b5ea55b3a48a3f70270a90eefb033a57",
+      "afterSHA256": "788333d0ae6e39df30c3e3db5665010b05387a49300951d4c750cb8e53c87b89",
+      "hunks": [
+        {
+          "offset": 109,
+          "before": "    MarketSite, SEEDS, STOCK_FUEL_TENTHS, StationMarkets, commodities, read_seeds,\n",
+          "after": "    MarketSite, SEEDS, StationMarkets, commodities, read_seeds,\n"
+        },
+        {
+          "offset": 4749,
+          "before": "                > u128::from(self.data.refills) * u128::from(STOCK_FUEL_TENTHS)\n",
+          "after": "                > u128::from(self.data.refills) * u128::from(crate::navigation::MAX_FUEL_CAPACITY)\n"
+        }
+      ]
+    }
+  }
+}

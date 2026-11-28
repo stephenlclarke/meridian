@@ -1,0 +1,184 @@
+{
+  "hull": "SH052 Banteng",
+  "scope": "Original catalogue inspection and geometry queries",
+  "frozenSources": "integration/sh052-banteng/FROZEN-SOURCES.json",
+  "source": "assets/fleet/sh052/SOURCE-GEOMETRY.json",
+  "originalAccess": {
+    "runtimeCatalogue": {
+      "playerFlyable": false,
+      "normalPurchaseEligible": false
+    },
+    "r3DesignContract": {
+      "playerFlyable": true,
+      "purchasePolicy": "blueprintFabrication"
+    }
+  },
+  "originalScaleRatio": [
+    20000,
+    1661
+  ],
+  "archivedDetailed": {
+    "vertices": 3192,
+    "faces": 5324,
+    "parts": 265
+  },
+  "archivedNative": {
+    "vertices": 736,
+    "faces": 1332,
+    "parts": 35,
+    "budgetAccepted": false
+  },
+  "nativeCandidate": {
+    "source": "assets/fleet/sh052/SH052-project-candidate.json",
+    "bytes": 56904,
+    "sha256": "d850f1efe806473afc7412bd44ccf1bd9532f770d4671e786c59133ecff88ed5",
+    "vertices": 288,
+    "faces": 484,
+    "parts": 23,
+    "faceLimit": 512,
+    "byteExactOriginalParts": 13,
+    "resampledCurvedParts": 10,
+    "omittedBlindWellParts": 12,
+    "archiveToCandidateUpperMillimetres": 1587,
+    "candidateToArchiveUpperMillimetres": 1481,
+    "recipeOrigin": "project-authored",
+    "recipe": "tools/prepare_banteng_candidate.py",
+    "originalLongitudinalStationsKept": true
+  },
+  "supportGroups": 85,
+  "minimumRouteClearanceMillimetres": 472,
+  "fitUpperMillimetres": {
+    "detailed": 1723,
+    "archiveNative": 1966,
+    "candidateNative": 2545
+  },
+  "referenceTriangulation": {
+    "path": "integration/sh052-banteng/REFERENCE-FANS.json",
+    "scope": "Derived whole reference triangulation for exact replay; no original artwork or stored numerical bounds",
+    "sourceTree": "225c29ea1a640468eab54b93e524a839ea36532e",
+    "sourceSnapshotCommit": "7c4d393c12170c41b016db4bce7f20572b715e65",
+    "sourceMeasurementSha256": "4b7d8d5d972e30d93bebf7f422be71e415d6e4a9c4b622582ecf6e30a6bb9235",
+    "originalSharedMeasurementSha256": "cabbaf17ff7efdbcbee9a1fba67c7edafd59dceb8e97f367824a51c134479992",
+    "sourceSharedMeasurementSha256": "55d13a28602e6ed791adecd85ff43f3c8a7fbe118cf0977272e1747422c2408d",
+    "sourceSharedDependencyNote": "The original and source make_fan function ASTs are identical; the reviewed source tree uses the corrected shared measurement script.",
+    "sourceDiagnosticScriptSha256": "b6e958217f83897dcdfd64514c5758f333d7bc51203e7cf252768013109c4e9a",
+    "sourceDiagnosticOutputSha256": "39b4ae6ee60347289f5556c39a7359a01ab34de4ff3b341e3f0b09a1e4867b84",
+    "certificateExtractionScriptSha256": "0366a5683fbffc94a10420223558518e0ac3aacf42fde36fab554a9bbab1b0e6",
+    "sourceEnvironment": {"platform": "macOS arm64", "python": "3.14.7", "numpy": "2.5.5", "scipy": "1.18.1", "trimesh": "5.2.1"},
+    "archive": {"supports": 85, "triangles": 2924, "supportPointIndices": 3928},
+    "candidate": {"supports": 85, "triangles": 2780, "supportPointIndices": 3480},
+    "validation": "Bind complete scaled point streams, memberships and support-local indices, then use the shared original outward fan and unchanged radial proof before recomputing every adaptive bound."
+  },
+  "engineering": {
+    "sourceReference": "finite-intrinsic-empty-banteng",
+    "massKg": 70185
+  },
+  "replayPins": {
+    "integration/sh052-banteng/FROZEN-SOURCES.json": "5c192296723fe63d8571baf524ae36e531a3c8c4b87526875bee5a1c297e30da",
+    "integration/sh052-banteng/ORIGINAL-OWNERSHIP.json": "2345b4e5f585a564e6dab623a10226208b3797135705229f9757a0646e27ed7a",
+    "integration/sh052-banteng/ARCHIVE-SUPPORT-PREFLIGHT.json": "b1e53de95c40329ba49a38c014d0aa0a36c2bfbd1b8a212b7184bbd2918059bd",
+    "integration/sh052-banteng/candidate-support.json": "0fe078cf5dedeb115072a0046148271e1c257f5f88f1bd1b7da50b78bcdd605d",
+    "integration/sh052-banteng/BANTENG-STUDIO.json": "efe069cb753cdcc20755d70f69b9ffacf54ff22c485ae7ba8fb2f787d9b2b074",
+    "integration/sh052-banteng/CONTACT-RESULT.json": "cc6228ad18660d0995b5ef413fb3362009e89fd604b1a7e59ea5c2918f4ccefc",
+    "integration/sh052-banteng/ARCHIVE-FIT.json": "c3c6dd1492d98c2c32537de9cce3720309865a4ae24e2e16b1fcefa0ce23afc7",
+    "integration/sh052-banteng/candidate-fit.json": "90d166b18fbd42a82bdc784fade8b353525b77ce576bc6cba1e08a5d868b1dc6",
+    "integration/sh052-banteng/candidate-fidelity.json": "ecde175722f543dc0c0a09e78552f1a40ede46adf38b4754939e2eb20a3a60b9",
+    "integration/sh052-banteng/REFERENCE-FANS.json": "7c6f7a1c939a55aae2afa6d0b45afed830265f9bf0e757d9cfab0801180c97f5",
+    "tools/atomic_asset_output.py": "2d13803823645d3bdea7c855af958eb54d7ebe513ec1bcb0af34e82870164bf0",
+    "tools/prepare_eagle_cruiser_geometry.py": "a1ea3b5d72f35e1f2932da71afa3ff8a276a504f7309a1086a2b3df35988addc",
+    "tools/encode_goshawk_visual.py": "9e524e9a32a237d71d212c8b5c34ecf12cde5a8e08885b1d03991b95c278f61c",
+    "tools/import_goshawk_envelope_source.py": "14b530725629ee3eaa5b3fd69f01fe00fe371564a1a52cb398d3969142db977e",
+    "tools/measure_goshawk_surface_fit.py": "5407ef1e5fad41810aa95444ca1338fe33a91e5c9857dcb752b4e4cf2fca6d0b",
+    "tools/vulture_mk_i_exact_fit.py": "479b31f8714a198a82c0e2888b8d19efe46c7b4c43a576b83ab84c571ae738c6",
+    "tools/verify_eagle_cruiser_geometry.py": "cb053ee5873fee62ee456bb3776e98d29b2cbb44c7344599bc617a8579164d43",
+    "tools/lanner_art_mesh.py": "f5cb59dcc0940ee02e039ba5218eb42c638ba0fed692f4b2216699620aba334b",
+    "tools/prepare_lanner_geometry.py": "3e1dc0ba15e493f8d53f385c7e2e166420e0082228b355547b3810fb028cdbc8",
+    "tools/measure_lanner_geometry.py": "55d13a28602e6ed791adecd85ff43f3c8a7fbe118cf0977272e1747422c2408d",
+    "tools/banteng_art_mesh.py": "ef5c0f538510486238d69dc301da80026fc93326767b38c50a04756ab9890a09",
+    "tools/prepare_banteng_geometry.py": "30366a23a0deff7856d45719267e8cf57cfed24b1cea7e3655d998253afec972",
+    "tools/verify_banteng_geometry.py": "b12c8b597d0c7918a39bfa323bd47022be59ca69a59c39612992b30c47de8b14",
+    "tools/measure_banteng_geometry.py": "9356864e227302598fcae4e833ecb706b1ed8a5e600cbb4076b7165dc1e54bea",
+    "tools/prepare_banteng_candidate.py": "451ce0cae1007b6258cf1a5ec2387f06cb0d38b5da8546398c3c97e275efb8cf",
+    "tools/hull_contact_geometry.py": "07606202e6a298ad375a7504991fe6fb93da6a07f9b5cc4a22167bd570b07839"
+  },
+  "byteReplay": {
+    "host": "SteveMBA",
+    "startedUtc": "2026-11-24T18:00:28Z",
+    "finishedUtc": "2026-11-24T18:01:00Z",
+    "log": {
+      "bytes": 701,
+      "sha256": "c57aac8b2b910dcdf3695b19e55ddf14372f0d7d2e51bae4cb86ca28beb316f4"
+    },
+    "fitDependencies": {
+      "python": "3.14.3",
+      "numpy": "2.5.5",
+      "scipy": "1.18.1",
+      "trimesh": "5.2.1",
+      "rtree": "1.4.1"
+    },
+    "commands": [
+      "python3 -B tools/prepare_banteng_candidate.py --check",
+      "python3 -B tools/prepare_banteng_geometry.py --check",
+      "python3 -B tools/verify_banteng_geometry.py | cmp - integration/sh052-banteng/CONTACT-RESULT.json",
+      "python3 -B tools/measure_banteng_geometry.py archive-fit | cmp - integration/sh052-banteng/ARCHIVE-FIT.json",
+      "python3 -B tools/measure_banteng_geometry.py candidate-fit | cmp - integration/sh052-banteng/candidate-fit.json",
+      "python3 -B tools/measure_banteng_geometry.py candidate-fidelity | cmp - integration/sh052-banteng/candidate-fidelity.json"
+    ]
+  },
+  "hullStudio": {
+    "definition": "integration/sh052-banteng/BANTENG-STUDIO.json",
+    "bytes": 754358,
+    "sha256": "efe069cb753cdcc20755d70f69b9ffacf54ff22c485ae7ba8fb2f787d9b2b074",
+    "loaderRevision": "27121e66ba37a29781135b56924a9d6e7f38a70a",
+    "supports": 85,
+    "probes": 7,
+    "signedInstalledExport": {
+      "status": "PASS",
+      "scope": "Signed installed Studio offline visual artwork export",
+      "bundleIdentifier": "io.xyzzy.meridian.hullstudio",
+      "bundleVersion": "0.0.0",
+      "codeDirectoryHash": "93938bda9242ebdff508bfb9e16b3cdf83c0a200",
+      "developerIdTeam": "4MEB7MUTAV",
+      "signatureVerification": "deep strict",
+      "definition": {
+        "bytes": 754358,
+        "sha256": "efe069cb753cdcc20755d70f69b9ffacf54ff22c485ae7ba8fb2f787d9b2b074"
+      },
+      "exportExitStatuses": [
+        0,
+        0
+      ],
+      "exportMatchesDefinitionExceptTrailingLf": true,
+      "detailedTriangles": 5324,
+      "candidateNativeTriangles": 484,
+      "archivedNativeTriangles": 1332,
+      "candidateRecipeOrigin": "project-authored",
+      "originalScaleRatio": [
+        20000,
+        1661
+      ],
+      "receiptFiles": {
+        "BANTENG.hull.json": {
+          "bytes": 754357,
+          "sha256": "53c418bf8e108e3cfc3fcd03cb4a9978577cf466d97e2533106068084b9c1407"
+        },
+        "BANTENG-repeat.hull.json": {
+          "bytes": 754357,
+          "sha256": "53c418bf8e108e3cfc3fcd03cb4a9978577cf466d97e2533106068084b9c1407"
+        },
+        "studio.stdout.json": {
+          "bytes": 218191,
+          "sha256": "587d65b9434a0600e03cf1ead04bccf42665ada6a3ceeb6ac30afa53787dc30b"
+        },
+        "studio-repeat.stdout.json": {
+          "bytes": 218191,
+          "sha256": "587d65b9434a0600e03cf1ead04bccf42665ada6a3ceeb6ac30afa53787dc30b"
+        },
+        "codesign.log": {
+          "bytes": 14189,
+          "sha256": "8cdb72c46118b48f530ba59e56627a0e7337ecb5ed796487ff9711a0eed0b2c6"
+        }
+      }
+    }
+  }
+}

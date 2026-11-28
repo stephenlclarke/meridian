@@ -1,0 +1,138 @@
+{
+  "hull": "SH044 Harpy Assault",
+  "scope": "Original catalogue inspection and geometry queries",
+  "source": "assets/fleet/sh044/SOURCE-GEOMETRY.json",
+  "frozenSources": "integration/sh044-harpy-assault/FROZEN-SOURCES.json",
+  "originalAccess": {
+    "runtimeCatalogue": {
+      "playerFlyable": false,
+      "normalPurchaseEligible": false
+    },
+    "r3DesignContract": {
+      "playerFlyable": true,
+      "purchasePolicy": "blueprintFabrication"
+    }
+  },
+  "faces": {
+    "detailed": 3516,
+    "native": 248,
+    "nativeMaximum": 512
+  },
+  "supportGroups": 28,
+  "fitUpperMillimetres": {
+    "detailed": 847,
+    "native": 1642
+  },
+  "minimumRouteClearanceMillimetres": 229,
+  "engineering": {
+    "sourceReference": "finite-intrinsic-empty-harpy",
+    "massKg": 47408
+  },
+  "replayPins": {
+    "integration/sh044-harpy-assault/CONTACT-CANDIDATE.json": "99ee6853c619797b5a1e4526e4a469e16a8e51732e82a156c46a27a72ca2a4c9",
+    "integration/sh044-harpy-assault/CONTACT-RESULT.json": "1f4e76863e4b71975ecbad94e2672f315ff134163ca2c2663782b1b3c8bb5c14",
+    "integration/sh044-harpy-assault/FROZEN-SOURCES.json": "0ac38adf84b666887919c19dc4fa2992b7685fc01bf03393d59ff59446167bf0",
+    "integration/sh044-harpy-assault/HARPY-ASSAULT-STUDIO.json": "c763bab847a6a5a5d69dd76645285d0758bcbe92415442783bb8a0ad06975b57",
+    "integration/sh044-harpy-assault/ORIGINAL-DIFFERENCE.json": "852fa1644040fe65c69b0bcdcfcdce7774bb5f340c9c8c9cac2024c14fe432f0",
+    "integration/sh044-harpy-assault/ORIGINAL-JOINTS.json": "3dc6006e4e6809b9d3316872be6f79bdd95ac1e4469a12882f392bda12a0bdce",
+    "integration/sh044-harpy-assault/SUPPORT-FAN.json": "c0e113315c5388433b5d30523be33d65c0dc7135fc56ad8c4b132ab0e395e8bd",
+    "integration/sh044-harpy-assault/SURFACE-FIT.json": "a4ca2d729fac3c46c96b4452e7cabe310b253d860776615736968a76a4a51ace",
+    "tools/atomic_asset_output.py": "2d13803823645d3bdea7c855af958eb54d7ebe513ec1bcb0af34e82870164bf0",
+    "tools/encode_goshawk_visual.py": "9e524e9a32a237d71d212c8b5c34ecf12cde5a8e08885b1d03991b95c278f61c",
+    "tools/import_goshawk_envelope_source.py": "14b530725629ee3eaa5b3fd69f01fe00fe371564a1a52cb398d3969142db977e",
+    "tools/measure_goshawk_surface_fit.py": "5407ef1e5fad41810aa95444ca1338fe33a91e5c9857dcb752b4e4cf2fca6d0b",
+    "tools/prepare_eagle_cruiser_geometry.py": "a1ea3b5d72f35e1f2932da71afa3ff8a276a504f7309a1086a2b3df35988addc",
+    "tools/verify_eagle_cruiser_geometry.py": "cb053ee5873fee62ee456bb3776e98d29b2cbb44c7344599bc617a8579164d43",
+    "tools/measure_harpy_assault.py": "4d888f59b4cf3020967b40c707741d83fdb9380d1872d4bf3c8675c4437b1098",
+    "tools/prepare_harpy_assault.py": "20523c8e786a8ba6f30cde6483c4f7f1dd840c53602167579d03d48912343d93",
+    "tools/verify_harpy_assault.py": "df3c847f351aa89dcee3f69027980df25636ff8264d170defba52c0531faeed7",
+    "tools/vulture_mk_i_exact_fit.py": "479b31f8714a198a82c0e2888b8d19efe46c7b4c43a576b83ab84c571ae738c6",
+    "tools/hull_contact_geometry.py": "07606202e6a298ad375a7504991fe6fb93da6a07f9b5cc4a22167bd570b07839"
+  },
+  "byteReplay": {
+    "host": "SteveMBA",
+    "startedUtc": "2026-11-24T17:25:11Z",
+    "finishedUtc": "2026-11-24T17:25:21Z",
+    "log": {
+      "bytes": 609,
+      "sha256": "996550ddfc3d9ab927003e452ddfe88f1014deb31f79cd02c75334a158688b11"
+    },
+    "fitDependencies": {
+      "python": "3.14.3",
+      "numpy": "2.5.5",
+      "scipy": "1.18.1",
+      "trimesh": "5.2.1",
+      "rtree": "1.4.1"
+    },
+    "commands": [
+      "python3 -B tools/prepare_harpy_assault.py --check",
+      "python3 -B tools/verify_harpy_assault.py | cmp - integration/sh044-harpy-assault/CONTACT-RESULT.json",
+      "python3 -B tools/measure_harpy_assault.py --difference | cmp - integration/sh044-harpy-assault/ORIGINAL-DIFFERENCE.json",
+      "python3 -B tools/measure_harpy_assault.py | cmp - integration/sh044-harpy-assault/SURFACE-FIT.json"
+    ]
+  },
+  "hullStudio": {
+    "definition": "integration/sh044-harpy-assault/HARPY-ASSAULT-STUDIO.json",
+    "bytes": 455798,
+    "sha256": "c763bab847a6a5a5d69dd76645285d0758bcbe92415442783bb8a0ad06975b57",
+    "loaderRevision": "27121e66ba37a29781135b56924a9d6e7f38a70a",
+    "supports": 28,
+    "probes": 7,
+    "signedInstalledExport": {
+      "status": "PASS",
+      "scope": "Signed installed Studio offline catalogue import and export",
+      "bundleIdentifier": "io.xyzzy.meridian.hullstudio",
+      "bundleVersion": "0.0.0",
+      "codeDirectoryHash": "93938bda9242ebdff508bfb9e16b3cdf83c0a200",
+      "developerIdTeam": "4MEB7MUTAV",
+      "signatureVerification": "deep strict",
+      "definition": {
+        "bytes": 455798,
+        "sha256": "c763bab847a6a5a5d69dd76645285d0758bcbe92415442783bb8a0ad06975b57"
+      },
+      "exportExitStatuses": [
+        0,
+        0
+      ],
+      "exportMatchesDefinitionExceptTrailingLf": true,
+      "valid": true,
+      "diagnostics": [],
+      "detailedTriangles": 3516,
+      "nativeTriangles": 248,
+      "supportGroups": 28,
+      "passedCatalogueProbes": [
+        "below-forward-ventral-keel",
+        "port-between-forward-keels",
+        "port-below-shoulder",
+        "port-upper-aft-channel",
+        "starboard-between-forward-keels",
+        "starboard-below-shoulder",
+        "starboard-upper-aft-channel"
+      ],
+      "engineeringReference": "finite-intrinsic-empty-harpy",
+      "massKg": 47408.0,
+      "receiptFiles": {
+        "HARPY-ASSAULT.hull.json": {
+          "bytes": 455797,
+          "sha256": "3ee3f015c796db93da5ddde4749e90748bbf1315482b097c5db0694061deea67"
+        },
+        "HARPY-ASSAULT-repeat.hull.json": {
+          "bytes": 455797,
+          "sha256": "3ee3f015c796db93da5ddde4749e90748bbf1315482b097c5db0694061deea67"
+        },
+        "studio.stdout.json": {
+          "bytes": 61213,
+          "sha256": "a2ae92292399d225620fed97c652083b964cca8fc1474eed0be06dbd454da736"
+        },
+        "studio-repeat.stdout.json": {
+          "bytes": 61213,
+          "sha256": "a2ae92292399d225620fed97c652083b964cca8fc1474eed0be06dbd454da736"
+        },
+        "codesign.log": {
+          "bytes": 14189,
+          "sha256": "b381837330eeeb9d8e66368e85c49e4f4cc50261ca0539cb9519dc10e4c85465"
+        }
+      }
+    }
+  }
+}

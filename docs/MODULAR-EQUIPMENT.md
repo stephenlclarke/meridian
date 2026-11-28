@@ -14,7 +14,7 @@ SH025 declares all four combat laser facings, but its workTools list contains on
 
 The canonical family is `laser`, with nodes named Pulse Laser and Mining Laser. The original Mining Laser node allows at most five owned examples, including stored items. Each paid purchase creates a fresh deterministic owner-local item and transaction, debits the actual existing wallet and stores the previous front occupant without deleting or refunding it. The born Pulse retains its original ID and standard provenance. The account's birth-fitting mirror and World module ledger must agree about whether that Pulse is fitted or stored. Installation requires the exact current occupant ID, so a stale slot cannot be silently replaced.
 
-Laser gear costs zero utility/equipment-budget units in the original; it consumes its actual laser position. Stored gear still counts as owned ordinary inventory. The source 256 ordinary-item bound, reserved stock-drive exception, actual cargo bay and finite ammo are checked together. Existing 3-active/128-record service limits and 65,536-byte complete-save bound remain. No new stock quantity, wallet, cargo owner, hull or asset permission is introduced.
+Laser gear costs zero utility/equipment-budget units in the original; it consumes its actual laser position. Stored gear still counts as owned ordinary inventory. The source 256 ordinary-item bound, reserved stock-drive exception, actual cargo bay and finite ammo are checked together. Existing 3-active/128-record service limits and 65,536-byte ordinary save-base bound remain. No new stock quantity, wallet, cargo owner, hull or asset permission is introduced.
 
 ## Actual core API
 

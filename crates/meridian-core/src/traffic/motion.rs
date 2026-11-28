@@ -51,7 +51,7 @@ impl State {
             &opening,
             &mut next.actors,
             system,
-            data.player_clearance_radius(),
+            data.npc_geometry().player_clearance_radius(),
         );
         for actor in
             next.actors.iter_mut().flatten().filter(|a| {
@@ -158,7 +158,8 @@ fn move_actor(
         yaw,
     );
     let before = actor.pose();
-    let radius = data.player_clearance_radius();
+    let npc = data.npc_geometry();
+    let radius = npc.player_clearance_radius();
     let peers_clear = opening
         .iter()
         .flatten()
@@ -170,14 +171,14 @@ fn move_actor(
         sub(before.position, player_before.position),
         sub(after.position, player_after.position),
         Vec3::new(0.0, 0.0, 0.0),
-    ) > radius * 2.0 + 1.0;
+    ) > radius + data.player_clearance_radius() + 1.0;
     let entry = actor.id.serial == 1
         && actor.phase == NpcPhase::Inbound
-        && data.crosses_aperture(before, after);
+        && npc.crosses_aperture(before, after);
     let station_clear = if entry {
-        data.entry_clear(before, after, velocity * 18.0, 0.0, turn.abs())
+        npc.entry_clear(before, after, velocity * 18.0, 0.0, turn.abs())
     } else {
-        data.motion_clear(before, after, turn.abs())
+        npc.motion_clear(before, after, turn.abs())
     };
     let arrival_clear = segment_distance(
         before.position,
@@ -262,12 +263,12 @@ fn movement_goal(
         && actor.resources.energy >= 9500
     {
         let target_pose = if player_goal.is_some() {
-            Some(player_after)
+            Some((player_after, data))
         } else {
-            target(actor, opening).map(Actor::pose)
+            target(actor, opening).map(|actor| (actor.pose(), data.npc_geometry()))
         };
-        if let Some(target_pose) = target_pose
-            && let Some(point) = data
+        if let Some((target_pose, hull)) = target_pose
+            && let Some(point) = hull
                 .player_planar_aimpoint(target_pose, actor.position)
                 .map_err(|_| TrafficError::InvalidState)?
         {

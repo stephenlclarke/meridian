@@ -8,13 +8,15 @@ mod commodities;
 pub use commodities::{CargoUnit, CommodityDefinition, CommodityId, CommodityQuote};
 mod history;
 mod persistence;
+mod quantities;
 mod traffic;
 pub(crate) use persistence::SavedServiceSummary;
+pub use quantities::{CommodityTrade, CommodityTradeEvent, MAX_TRADE_QUANTITY, TradeSide};
 
 const SEEDS: &[u8] = include_bytes!("../../../assets/legacy/g01-food.markets");
 
-const STOCK_FUEL_TENTHS: u16 = 130;
-pub(crate) const FUEL_PRICE_TENTHS: u32 = 2;
+/// Station fuel price in tenths of a credit for each tenth of a light-year.
+pub const FUEL_PRICE_TENTHS: u32 = 2;
 // Swift's supported 64-bit Int.max/17 quantity bound, not the immutable initial stock.
 pub(crate) const MAX_MARKET_QUANTITY: u64 = i64::MAX as u64 / 17;
 
@@ -65,6 +67,8 @@ pub enum Error {
     HoldFull,
     NoSellableCargo,
     QuantityLimit,
+    ZeroQuantity,
+    PriceOverflow,
     SequenceExhausted,
 }
 
@@ -85,12 +89,25 @@ pub(crate) struct AccountProjection {
     pub(crate) revision: u64,
     pub(crate) credits_tenths: u32,
     pub(crate) fuel_tenths: u16,
+    pub(crate) fuel_capacity_tenths: u16,
     pub(crate) food_tonnes: u16,
     pub(crate) reserved_food_tonnes: u16,
     pub(crate) used_tonnes: u16,
     pub(crate) hold_capacity_tonnes: u16,
     pub(crate) other_commodities: [u64; 16],
     pub(crate) reserved_commodities: [u64; 16],
+}
+
+/// One native unit acquired through a separately validated physical source.
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub(crate) struct CargoIntake {
+    pub(crate) revision: u64,
+    pub(crate) commodity: CommodityId,
+}
+impl CargoIntake {
+    pub(crate) fn mass_event(self) -> Option<(u64, i16)> {
+        (self.commodity.unit() == CargoUnit::Tonne).then_some((self.revision, 1))
+    }
 }
 
 /// Ephemeral World-owned tutorial reservations, over the sole actual account projection.
@@ -338,13 +355,13 @@ impl StationMarkets {
                 commodities::sell(&mut next, &mut next_account, facts.site, id)?
             }
             Command::RefillFuel => {
-                let missing = STOCK_FUEL_TENTHS - account.fuel_tenths;
+                let missing = account.fuel_capacity_tenths - account.fuel_tenths;
                 let price = u32::from(missing) * FUEL_PRICE_TENTHS;
                 next_account.credits_tenths = account
                     .credits_tenths
                     .checked_sub(price)
                     .ok_or(Error::InsufficientFunds)?;
-                next_account.fuel_tenths = STOCK_FUEL_TENTHS;
+                next_account.fuel_tenths = account.fuel_capacity_tenths;
                 Event::Refuelled {
                     site: facts.site,
                     added_fuel_tenths: missing,
@@ -488,13 +505,17 @@ fn validate_account(account: AccountProjection) -> Result<(), Error> {
     if account.owner == 0
         || account.hull == 0
         || account.owner == account.hull
-        || account.fuel_tenths > STOCK_FUEL_TENTHS
+        || account.fuel_tenths > account.fuel_capacity_tenths
+        || !(0..=crate::navigation::MAX_FUEL_STORAGE_UNITS)
+            .any(|count| crate::navigation::fuel_capacity(count) == account.fuel_capacity_tenths)
         || account.reserved_food_tonnes > account.food_tonnes
         || account.food_tonnes > account.used_tonnes
         || account.used_tonnes > account.hold_capacity_tonnes
         || ![
             crate::equipment::STANDARD_HOLD_TONNES,
             crate::equipment::EXPANDED_HOLD_TONNES,
+            crate::equipment::MEDUSA_HOLD_TONNES,
+            crate::equipment::MEDUSA_EXPANDED_HOLD_TONNES,
         ]
         .contains(&account.hold_capacity_tonnes)
         || !valid_native_quantities(account.other_commodities, account.reserved_commodities)
@@ -554,6 +575,7 @@ mod tests {
             revision: 0,
             credits_tenths: 7200,
             fuel_tenths: 96,
+            fuel_capacity_tenths: crate::navigation::FUEL_CAPACITY,
             food_tonnes: 0,
             reserved_food_tonnes: 0,
             used_tonnes: 8,

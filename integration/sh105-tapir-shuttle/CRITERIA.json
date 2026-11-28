@@ -1,0 +1,224 @@
+{
+  "hull": "SH105 Tapir Shuttle",
+  "scope": "Original catalogue inspection and geometry queries",
+  "source": "assets/fleet/sh105/SOURCE-GEOMETRY.json",
+  "frozenSources": "integration/sh105-tapir-shuttle/FROZEN-SOURCES.json",
+  "sourceScaleMetresPerUnit": "1900/61",
+  "faces": {
+    "detailed": 2724,
+    "archivedNative": 908,
+    "candidateNative": 512,
+    "candidateMaximum": 512
+  },
+  "originalAccess": {
+    "runtimeCatalogue": {
+      "playerFlyable": false,
+      "normalPurchaseEligible": false,
+      "purchasePolicy": "pendingFabrication"
+    },
+    "r3DesignContract": {
+      "playerFlyable": true,
+      "purchasePolicy": "blueprintFabrication"
+    }
+  },
+  "engineering": {
+    "sourceReference": "finite-intrinsic-empty-tapir-shuttle",
+    "massKg": 209283
+  },
+  "supportGroups": 47,
+  "loop": {
+    "genus": 1,
+    "candidateFaces": 192,
+    "supportSpans": 24,
+    "dualMembershipVertices": 576
+  },
+  "minimumRouteClearanceMillimetres": 894,
+  "sourceContactCounts": {
+    "overlap": 7,
+    "unchangedNativeParts": 7
+  },
+  "candidateRebuild": "tools/rebuild_tapir_shuttle.py",
+  "fitUpperMillimetres": {
+    "detailed": 4748,
+    "archivedNative": 4712,
+    "candidateNative": 4749
+  },
+  "continuousCandidateFitMillimetres": {
+    "archiveToCandidate": {
+      "lowerFloor": 1277,
+      "upperCeiling": 1299
+    },
+    "candidateToArchive": {
+      "lowerFloor": 1179,
+      "upperCeiling": 1198
+    },
+    "detailedToCandidate": {
+      "lowerFloor": 3954,
+      "upperCeiling": 3955
+    },
+    "candidateToDetailed": {
+      "lowerFloor": 2454,
+      "upperCeiling": 2479
+    }
+  },
+  "hullStudio": {
+    "definition": "integration/sh105-tapir-shuttle/TAPIR-SHUTTLE-STUDIO.json",
+    "bytes": 459127,
+    "sha256": "c73448de0580d0ad1f2b3b14426c0eaec9863932996e6ac5f56b9341c1caba5d",
+    "supports": 47,
+    "probes": 7,
+    "detail": "2,724 original detailed faces",
+    "native": "512 separate candidate faces",
+    "loaderRevision": "27121e66ba37a29781135b56924a9d6e7f38a70a",
+    "signedInstalledExport": {
+      "status": "PASS",
+      "scope": "Signed installed Studio offline original artwork import/export",
+      "bundleIdentifier": "io.xyzzy.meridian.hullstudio",
+      "bundleVersion": "0.0.0",
+      "codeDirectoryHash": "93938bda9242ebdff508bfb9e16b3cdf83c0a200",
+      "developerIdTeam": "4MEB7MUTAV",
+      "signatureVerification": "deep strict",
+      "definition": {
+        "bytes": 459127,
+        "sha256": "c73448de0580d0ad1f2b3b14426c0eaec9863932996e6ac5f56b9341c1caba5d"
+      },
+      "exportExitStatuses": [
+        0,
+        0
+      ],
+      "exportMatchesDefinitionExceptTrailingLf": true,
+      "valid": true,
+      "diagnostics": [],
+      "detailedTriangles": 2724,
+      "nativeTriangles": 512,
+      "supportGroups": 47,
+      "engineeringReference": "finite-intrinsic-empty-tapir-shuttle",
+      "massKg": 209283,
+      "receiptFiles": {
+        "tapir-shuttle.hull.json": {
+          "bytes": 459126,
+          "sha256": "fc776ef7d45125a4c6f7f923269036c0ddddf0f197b8596f0fcd102cce201bee"
+        },
+        "tapir-shuttle-repeat.hull.json": {
+          "bytes": 459126,
+          "sha256": "fc776ef7d45125a4c6f7f923269036c0ddddf0f197b8596f0fcd102cce201bee"
+        },
+        "studio.stdout.json": {
+          "bytes": 129150,
+          "sha256": "93dc26c24dbd24cdeecc4855d2528f9b527eb29e493d72fd6a775ae6cd5d1b0e"
+        },
+        "studio-repeat.stdout.json": {
+          "bytes": 129150,
+          "sha256": "93dc26c24dbd24cdeecc4855d2528f9b527eb29e493d72fd6a775ae6cd5d1b0e"
+        },
+        "codesign.log": {
+          "bytes": 13038,
+          "sha256": "f0d6345a22589c53a173e14620fd80c1b079fd232327e43807bb706843eba1cc"
+        },
+        "codesign-identity.log": {
+          "bytes": 988,
+          "sha256": "f6d772f29f9e72421e98a6d7243102b92b77b5995acbe6cda7ddb3bbfc3b1706"
+        }
+      },
+      "artworkProbeResults": [
+        {
+          "name": "dorsal",
+          "passed": true
+        },
+        {
+          "name": "ventral",
+          "passed": true
+        },
+        {
+          "name": "port-outboard",
+          "passed": true
+        },
+        {
+          "name": "starboard-outboard",
+          "passed": true
+        },
+        {
+          "name": "through-upper-loop",
+          "passed": true
+        },
+        {
+          "name": "through-port-loop",
+          "passed": true
+        },
+        {
+          "name": "through-starboard-loop",
+          "passed": true
+        }
+      ],
+      "triangleRoles": {
+        "detail": "original detailed visible",
+        "native": "derived native inspection candidate"
+      }
+    }
+  },
+  "byteReplay": {
+    "commands": [
+      "python3 -B tools/prepare_tapir_shuttle.py --check",
+      "python3 -B tools/rebuild_tapir_shuttle.py",
+      "python3 -B tools/verify_tapir_shuttle.py | cmp - integration/sh105-tapir-shuttle/CONTACT-RESULT.json",
+      "python3 -B tools/measure_tapir_shuttle.py | cmp - integration/sh105-tapir-shuttle/SURFACE-FIT.json",
+      "python3 -B tools/measure_tapir_shuttle.py --fidelity | cmp - integration/sh105-tapir-shuttle/CANDIDATE-FIDELITY.json",
+      "python3 -B tools/measure_tapir_shuttle.py --directions | cmp - integration/sh105-tapir-shuttle/CANDIDATE-FIT-LOCALIZATION.json",
+      "python3 -B tools/measure_tapir_shuttle.py --reference-directions | cmp - integration/sh105-tapir-shuttle/REFERENCE-FIT-LOCALIZATION.json"
+    ],
+    "host": "SteveMBA",
+    "startedUtc": "2026-11-25T04:49:54Z",
+    "finishedUtc": "2026-11-25T04:50:22Z",
+    "log": {
+      "bytes": 886,
+      "sha256": "dffe04d3796fadbf60c843d5d5db8ab3556e9f03c1571c9e708504365b51d9ff"
+    },
+    "fitDependencies": {
+      "python": "3.14.3",
+      "numpy": "2.5.5",
+      "scipy": "1.18.1",
+      "trimesh": "5.2.1",
+      "rtree": "1.4.1"
+    },
+    "originalCommit": "1b09955c2446567d938fb7eb21e060c2fdb30ee1",
+    "historicalReplayPins": {
+      "tools/measure_banteng_geometry.py": "4b7d8d5d972e30d93bebf7f422be71e415d6e4a9c4b622582ecf6e30a6bb9235",
+      "tools/measure_lanner_geometry.py": "cabbaf17ff7efdbcbee9a1fba67c7edafd59dceb8e97f367824a51c134479992",
+      "tools/verify_eagle_cruiser_geometry.py": "c7926cb6e699ae5ffb445951ce9d4e98a64018a7ecb1db2e5e77a611d742a783"
+    }
+  },
+  "replayPins": {
+    "tools/fleet_hull_measurement.py": "3570747d9f650efc7d0e4f88352e9fd32e42ab394f4669100223fbac0c1be6b7",
+    "tools/directed_hull_fit.py": "dbd5d45e5052453646b752695815d6cb53c6ccb2c3ad6694451a4c7e19fa8bf7",
+    "integration/sh105-tapir-shuttle/TAPIR-SHUTTLE-STUDIO.json": "c73448de0580d0ad1f2b3b14426c0eaec9863932996e6ac5f56b9341c1caba5d",
+    "integration/sh105-tapir-shuttle/FROZEN-SOURCES.json": "dd6d2203c818cb2861b0529260c3a55c29a4fb5d430c9c11cbea883e5840f79b",
+    "integration/sh105-tapir-shuttle/CONTACT-CANDIDATE.json": "11b007a849e3b560e10b485249c7af09d28bbc861bd588e0a21a66bb12309ae9",
+    "integration/sh105-tapir-shuttle/CONTACT-RESULT.json": "e88b17db8e360909fa9f56434a80e282205b8708a0d09abce91de1d2f2714dde",
+    "integration/sh105-tapir-shuttle/ORIGINAL-OWNERSHIP.json": "cf07abbc396a3d65644a1f231d467278057b97256ab114e41f4f1c652da85dcb",
+    "integration/sh105-tapir-shuttle/RETAINED-OVERLAPS.json": "842ccce6a0adcea88f645df2b4d5875f7fa8d20bb2ddaa1edaac8a5ad7d84122",
+    "integration/sh105-tapir-shuttle/CANDIDATE-FIDELITY.json": "851b6f06389c50c58212aece5c81220b96ac11352116bbb3fb57c6c817e49194",
+    "integration/sh105-tapir-shuttle/SUPPORT-FAN.json": "fe2ba55af4faacd2b210e5c463bd92f882d84a36ad3c4a0cc45529cdbc4927d1",
+    "integration/sh105-tapir-shuttle/SURFACE-FIT.json": "2c9f2cb0a869d084a96c1b0658d87c827fc9523b3ffbff7af58ca50fb4af55ab",
+    "integration/sh105-tapir-shuttle/ARCHIVED-OVERLAPS.json": "6b5a6474ec1762c1250a60a548c525e1f3784977698a6b71336528059d5f5aa8",
+    "integration/sh105-tapir-shuttle/CANDIDATE-TOPOLOGY-SURVEY.json": "da8f7dae2d5331f4ccc1288dde783790b39ee38ebdedd22646bf2f08d8d893ca",
+    "integration/sh105-tapir-shuttle/CANDIDATE-FIT-LOCALIZATION.json": "dfa42b5da446dcb7ddccd6d4e6c21ea95c76ba52d05539df3cf6282861c9dff0",
+    "integration/sh105-tapir-shuttle/REFERENCE-FIT-LOCALIZATION.json": "36fdd48c87de2bf455a25bdcd96ef24590fb15d0240d9af631ec4602626122e2",
+    "tools/atomic_asset_output.py": "2d13803823645d3bdea7c855af958eb54d7ebe513ec1bcb0af34e82870164bf0",
+    "tools/banteng_art_mesh.py": "ef5c0f538510486238d69dc301da80026fc93326767b38c50a04756ab9890a09",
+    "tools/encode_goshawk_visual.py": "9e524e9a32a237d71d212c8b5c34ecf12cde5a8e08885b1d03991b95c278f61c",
+    "tools/import_goshawk_envelope_source.py": "14b530725629ee3eaa5b3fd69f01fe00fe371564a1a52cb398d3969142db977e",
+    "tools/measure_banteng_geometry.py": "9356864e227302598fcae4e833ecb706b1ed8a5e600cbb4076b7165dc1e54bea",
+    "tools/measure_goshawk_surface_fit.py": "5407ef1e5fad41810aa95444ca1338fe33a91e5c9857dcb752b4e4cf2fca6d0b",
+    "tools/measure_lanner_geometry.py": "55d13a28602e6ed791adecd85ff43f3c8a7fbe118cf0977272e1747422c2408d",
+    "tools/measure_tapir_shuttle.py": "41c55c2f29d79bbbbb760f704682d5edcdd438abfaffd8a1895249e46d24e5a9",
+    "tools/prepare_eagle_cruiser_geometry.py": "a1ea3b5d72f35e1f2932da71afa3ff8a276a504f7309a1086a2b3df35988addc",
+    "tools/prepare_tapir_shuttle.py": "93b4e2c719e1872f117d2a24b72d13320ee27c75302ec299bf27da97ced1ea55",
+    "tools/verify_eagle_cruiser_geometry.py": "cb053ee5873fee62ee456bb3776e98d29b2cbb44c7344599bc617a8579164d43",
+    "tools/rebuild_tapir_shuttle.py": "b61c7817ae869b1665bc9c450e99a734b52ab8c0201c646a3c1074880040eff3",
+    "tools/verify_tapir_shuttle.py": "253f72cb396107fafb31c39a21189a06ac1fde29d153353a385a797b77aa9886",
+    "tools/vulture_mk_i_exact_fit.py": "479b31f8714a198a82c0e2888b8d19efe46c7b4c43a576b83ab84c571ae738c6",
+    "assets/fleet/sh105/GENERATED-COLLISION.json": "eddf423a8a217d7866b33812e52124a6be5ae222d3fa7e20058ddded676ec95a",
+    "assets/fleet/sh105/SOURCE-GEOMETRY.json": "4c5c68c3e4941cf4f3131f84a6aa23fffbd19583d90a62788a33adb514aa4e46",
+    "tools/hull_contact_geometry.py": "07606202e6a298ad375a7504991fe6fb93da6a07f9b5cc4a22167bd570b07839"
+  }
+}

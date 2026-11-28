@@ -290,19 +290,154 @@ fn current_system_planet_preview_uses_actual_world_recipe_and_never_a_foreign_wo
 
 #[test]
 fn selecting_goshawk_routes_the_original_preview_without_granting_exchange() {
-    assert_goshawk_preview("Goshawk Explorer", "SH008", "assets/fleet/sh008/visual.bin");
+    assert_inspection_preview("Goshawk Explorer", "SH008", "assets/fleet/sh008/visual.bin");
 }
 
 #[test]
 fn selecting_mk_ii_custom_routes_its_own_preview_without_granting_exchange() {
-    assert_goshawk_preview(
+    assert_inspection_preview(
         "Goshawk Mk II Custom",
         "SH010",
         "assets/fleet/sh010/visual.bin",
     );
 }
 
+#[test]
+fn selecting_medusa_routes_the_original_preview_without_granting_exchange() {
+    assert_inspection_preview("Medusa", "SH171", "assets/fleet/sh171/visual.bin");
+}
+
+fn assert_inspection_preview(name: &str, id: &str, key: &str) {
+    assert_original_preview(name, id, key, crate::mule_render::showroom::matches);
+}
+
+#[test]
+fn selecting_peregrine_mk_i_routes_its_own_preview_without_granting_exchange() {
+    assert_goshawk_preview("Peregrine Mk I", "SH022", "assets/fleet/sh022/visual.bin");
+}
+
+#[test]
+fn selecting_peregrine_mk_iii_does_not_select_peregrine_mk_i_or_its_geometry() {
+    assert_goshawk_preview("Peregrine Mk III", "SH023", "assets/fleet/sh023/visual.bin");
+    use crate::docked_screens::{Catalogue, DockedScreens, Input, Key, Outcome, Screen, Viewport};
+    let world = meridian_core::World::new_commander(95006).unwrap_or_else(|e| panic!("{e}"));
+    let catalogue = Catalogue::bundled().unwrap_or_else(|e| panic!("{e}"));
+    let ctx = context(&world, &catalogue);
+    let viewport = Viewport::new(1280.0, 720.0).unwrap_or_else(|| panic!("viewport"));
+    let mut ui = DockedScreens::new(meridian_core::navigation::SystemId::AVENOR, "SH025");
+    ui.open(Screen::Showroom);
+    let save = world.save_bytes().unwrap_or_else(|e| panic!("{e}"));
+    for (name, id, key, peer) in [
+        (
+            "Peregrine Mk I",
+            "SH022",
+            "assets/fleet/sh022/visual.bin",
+            "SH023",
+        ),
+        (
+            "Peregrine Mk III",
+            "SH023",
+            "assets/fleet/sh023/visual.bin",
+            "SH022",
+        ),
+        (
+            "Peregrine Mk I",
+            "SH022",
+            "assets/fleet/sh022/visual.bin",
+            "SH023",
+        ),
+    ] {
+        for action in [
+            Input::Key(Key::Search),
+            Input::Key(Key::ClearSearch),
+            Input::Text(name.into()),
+            Input::Key(Key::Confirm),
+        ] {
+            let frame = ui.frame(&ctx, viewport);
+            assert!(matches!(ui.handle(action, &frame, &ctx), Outcome::Updated));
+        }
+        assert_eq!(ui.selected_ship(), id);
+        let frame = ui.frame(&ctx, viewport);
+        let [baseline, selected] = frame.models.as_slice() else {
+            panic!("expected default Compare");
+        };
+        assert_eq!(baseline.object, "SH025");
+        assert_eq!(selected.object, id);
+        assert_eq!(selected.geometry_key, key);
+        assert!(crate::mule_render::showroom::matches(selected));
+        assert!(frame.models.iter().all(|model| model.object != peer));
+        assert!(matches!(
+            ui.handle(Input::Key(Key::Exchange), &frame, &ctx),
+            Outcome::Refused(_)
+        ));
+    }
+    assert_eq!(world.save_bytes().unwrap_or_else(|e| panic!("{e}")), save);
+}
+
 fn assert_goshawk_preview(name: &str, id: &str, key: &str) {
+    assert_original_preview(name, id, key, crate::mule_render::showroom::matches);
+}
+
+#[test]
+fn selecting_stock_sparrowhawk_routes_its_original_preview_without_granting_exchange() {
+    assert_original_preview(
+        "Sparrowhawk",
+        "SH030",
+        crate::authored_hull::SPARROWHAWK_GEOMETRY_KEY,
+        |model| {
+            crate::authored_hull::stock_visual_for(model)
+                .unwrap_or_else(|error| panic!("{error}"))
+                .is_some()
+        },
+    );
+}
+
+#[test]
+fn selecting_stock_kite_routes_its_original_preview_without_granting_exchange() {
+    assert_original_preview(
+        "Kite Interceptor",
+        "SH031",
+        crate::authored_hull::KITE_GEOMETRY_KEY,
+        |model| {
+            crate::authored_hull::stock_visual_for(model)
+                .unwrap_or_else(|error| panic!("{error}"))
+                .is_some()
+        },
+    );
+}
+
+#[test]
+fn selecting_stock_stag_routes_its_original_preview_without_granting_exchange() {
+    assert_original_preview(
+        "Stag Liner",
+        "SH035",
+        crate::authored_hull::STAG_GEOMETRY_KEY,
+        |model| {
+            crate::authored_hull::stock_visual_for(model)
+                .unwrap_or_else(|error| panic!("{error}"))
+                .is_some()
+        },
+    );
+}
+
+#[test]
+fn every_admitted_stock_hull_routes_through_the_station_showroom_without_exchange() {
+    for stock in crate::authored_hull::STOCK_MODELS {
+        assert_original_preview(
+            stock.object,
+            stock.object,
+            stock.geometry_key,
+            crate::authored_hull::stock_matches,
+        );
+    }
+}
+
+fn assert_original_preview(
+    name: &str,
+    id: &str,
+    key: &str,
+    matches: impl Fn(&ModelPreview) -> bool,
+) {
     use crate::docked_screens::{Catalogue, DockedScreens, Input, Key, Outcome, Screen, Viewport};
     let world = meridian_core::World::new_commander(95006).unwrap_or_else(|e| panic!("{e}"));
     let save = world.save_bytes().unwrap_or_else(|e| panic!("{e}"));
@@ -342,7 +477,7 @@ fn assert_goshawk_preview(name: &str, id: &str, key: &str) {
     assert!(current_model.matches(baseline));
     assert_eq!(selected.object, id);
     assert_eq!(selected.geometry_key, key);
-    assert!(crate::mule_render::showroom::matches(selected));
+    assert!(matches(selected));
     assert!(baseline.bounds.x + baseline.bounds.width <= selected.bounds.x);
     let mut geometry = Geometry::with_capacity();
     geometry
@@ -364,7 +499,39 @@ fn assert_goshawk_preview(name: &str, id: &str, key: &str) {
     };
     assert_eq!(solo.object, selected.object);
     assert_eq!(solo.geometry_key, selected.geometry_key);
-    assert!(crate::mule_render::showroom::matches(solo));
+    assert!(matches(solo));
+    if id == "SH171" {
+        assert!(
+            frame
+                .labels
+                .iter()
+                .any(|label| label.text == "Inspection only. Flight unavailable.")
+        );
+        assert!(
+            frame
+                .labels
+                .iter()
+                .any(|label| label.text == "PLUGH fabrication is unavailable.")
+        );
+        assert!(
+            !frame
+                .labels
+                .iter()
+                .any(|label| label.text.contains("Authored flyable hull"))
+        );
+        assert!(
+            frame
+                .labels
+                .iter()
+                .any(|label| label.text == "Empty stock dry mass: 40712 kg")
+        );
+        assert!(
+            frame
+                .labels
+                .iter()
+                .any(|label| label.text == "Stock figures exclude paid upgrades.")
+        );
+    }
     assert!(solo.bounds.width > selected.bounds.width);
     assert!(
         frame

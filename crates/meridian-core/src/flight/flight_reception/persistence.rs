@@ -58,7 +58,9 @@ impl State {
     ) -> Result<(), SaveError> {
         let (own_records, own_active) = self.occupancy();
         let (t04_records, t04_active) = world.navigation_trade.occupancy();
+        let (passenger_records, passenger_active) = world.modular.passenger_occupancy();
         let records = own_records
+            + passenger_records
             + t04_records
             + history.len()
             + usize::from(practice.is_some())
@@ -67,6 +69,7 @@ impl State {
                 .as_ref()
                 .map_or(0, |s| s.state.retained_mission_records());
         let active = own_active
+            + passenger_active
             + t04_active
             + usize::from(practice.is_some_and(|p| !p.reception_is_terminal()))
             + usize::from(world.active_freight_job().is_some());
@@ -312,7 +315,7 @@ impl Reading {
             return Err(INVALID);
         }
         for (sample, end_boundary) in [(self.first, false), (self.last, true)] {
-            validate_flight(&sample.flight)?;
+            validate_flight(world, &sample.flight)?;
             if sample.flight.station.is_some()
                 || sample.flight.navigation.is_some()
                 || sample.flight.tick > world.state.tick

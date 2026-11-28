@@ -1,12 +1,40 @@
 # Meridian
 
-Preview 10 opens on Commander Details. Press H or ? for the current screen’s controls and station navigation. Its docked exterior and flight HUD leave the view above the instruments clear at rest. [Download Preview 10 for macOS arm64 or Windows x64](https://github.com/stephenlclarke/meridian/releases/tag/v0.10.0-preview.1) · [Preview guide](docs/PREVIEW-RELEASES.md)
+[Download Meridian Preview 12 for macOS arm64 or Windows x64](https://github.com/stephenlclarke/meridian/releases/tag/v0.12.0-preview.1). Published 28 November 2026 from protected main `83ceae733d6e4f9cffc81c517fabb3eb7b39fba8`. The archive contains Fleet, the standalone Medusa and Hull Studio. [Installation and platform checks](docs/PREVIEW-RELEASES.md#fleet-medusa-and-hull-studio)
+
+Start **Fleet** to fly your commander. At a station, press **3** to inspect 115 Showroom models. To fly a fully fitted SH171 Medusa in your Fleet save, use the XYZZY refit described below. The standalone **Medusa Preview** uses a separate save. Fleet and Medusa require macOS 14 or later on Apple silicon. Hull Studio requires macOS 27 or later. The Windows x64 package is unsigned. Interactive Windows gameplay and Showroom rendering remain unverified.
+
+At a station, open **5 Equipment** to buy, store or refit the Fleet Medusa’s front, aft, port and starboard lasers independently. In flight, use **0–3** to select a view and hold **Z** to fire its fitted weapon. [Fleet Medusa laser controls](docs/FLEET-MEDUSA-LASERS.md)
+
+The centre sight identifies the active laser or work tool. Press **H**, then **I**, for Flight Status. Press **N** on that card to choose where notices appear. [Cockpit instruments](docs/COCKPIT-HUD.md)
+
+SH018 Onager has a source-defined 26-piece collision shield for controlled station sweeps. [Onager geometry and clearances](docs/ONAGER-GAMEPLAY-ENVELOPE.md)
+
+The ordinary-drive development candidate adds the Basic, Intermediate and Advanced hyperspace drive slot to Equipment. Paid upgrades change the actual jump countdown and station mass lock; explicit XYZZY maximum fitting uses the Advanced drive. The [equipment implementation and testing ledger](docs/EQUIPMENT-PLAYABLE.md) records all catalogue grades, remaining gameplay paths and Medusa compatibility constraints. This candidate is not part of Preview 10 and awaits owned validation.
+
+The stock-shield development candidate adds seven independently testable shield grades, an actual finite bank capacity for each grade, four ordinary paid upgrades and a dedicated XYZZY test selector. It preserves the original maximum outfit and the distinct unresolved Elite-rank and PLUGH-only acquisition paths. [Shield source, fitting and test controls](docs/SHIELD-GRADES.md). Owned validation is pending.
+
+The [fuel storage development candidate](docs/FUEL-STORAGE.md) adds four separately owned repeatable units, actual paid refuelling and capacity changes. SH025 has three shared normal utility mounts; the explicitly labelled four-tank test maximum uses a guarded exception. Owned validation is pending.
+
+The [solar fuel development candidate](docs/SOLAR-FUEL-SCOOPS.md) adds actual near-sun fuel collection with fitted scoops, independent cabin-temperature danger and retained collection receipts. Physical cargo and ore intake remain separate. Owned validation is pending.
+
+The passenger-cabin development candidate offers all six original paid cabin layouts, with real five-tonne fit costs and separate Avenor-to-Renas G04 passenger consent, boarding and reception. See [passenger cabins and G04 controls](docs/PASSENGER-CABINS.md). Owned validation is pending.
+
+In Preview 12, press **Tab** to mark the nearest contact. Press again to move through the others by distance. **F** switches between hand flight and the assistance your equipment provides. You can aim and fire at ships, fly a docking approach, mine or salvage by hand. [Flight controls and required equipment](docs/AUTOMATIC-WORK.md)
+
+In a normal Fleet commander slot, dock and press **Ctrl+Shift+X**. Choose **Activate / refit SH171 Medusa**, press **Enter** to review, then **Enter** to confirm. Launch from that berth to fly the issued ship. Its 32-tonne expanded hold, five loaded missile positions and fitted equipment travel with the commander through Save and Continue. Existing CLARKE commanders use the same row and keep their current credits. [Medusa test outfit and limits](docs/EQUIPMENT-PLAYABLE.md#fleet-xyzzy-medusa)
 
 ## Goshawk Explorer in the Ship Showroom
 
 In Preview 10, press 3 at a station and search for Goshawk Explorer. Compare shows the Peregrine Mk V beside the Goshawk for a new commander. Press C for a single-ship view. Mac testing verified the original dark green hull, silver cross-member, open wishbone and refusal of an unavailable exchange. Preview 9 predates this ship. [Goshawk geometry and Showroom controls](docs/GOSHAWK-GAMEPLAY-ENVELOPE.md)
 
 The development source also provides a separate Goshawk Mk II Custom Showroom and collision candidate. Its original detailed appearance, four lower mounts and SH028 fit evidence are in the [SH010 hull guide](docs/GOSHAWK-MK-II-CUSTOM.md). Owned native validation is pending.
+
+Medusa (SH171) can be inspected in the station Showroom. The source package preserves both original meshes and the inspection shield. The Showroom lists the verified empty stock dry mass. [Medusa inspection and flight limits](integration/sh171-medusa/README.md)
+
+Preview 12 offers 115 selectable stock previews in the ordinary station Showroom. This includes 109 validated Hull Studio schema-1 fleet packages and six original stock models. Cheetah (SH082) and the 22 outstanding entries in the final fleet intake remain outside the preview registry. These are catalogue previews, not new ships for purchase or flight. [Hull Studio](docs/HULL-STUDIO.md) also opens a local or archived preview in a disposable Showroom session without changing the player's ship. The earlier 37-preview Mac build passed the stock loader and station Showroom tests; the final Mac package displayed a native nested Showroom frame. Interactive Windows Showroom rendering remains unverified. [Outstanding fleet scope](docs/IMPLEMENTATION-STATUS.md#outstanding-fleet-inspection-scope)
+
+The separate [Medusa player flight preview](integration/sh171-medusa-preview/README.md) uses a dedicated profile and the admitted reduced flight geometry. On signed Mac build `5a924315`, the original SH171 artwork was visible in actual flight at 50.30/50.30. A cold restart restored the same ship, speed and expanded 32 t hold. Native docking return and fit-limit refusal were not observed in that run. Ordinary progression, fabrication and exchange do not grant the Medusa. See the [Preview 12 validation record](docs/IMPLEMENTATION-STATUS.md#published-preview-12) for final-package checks.
 
 ## Internal Mule docking validation
 
@@ -34,12 +62,12 @@ The internal SH001 Mule scene uses the original SH028 station. On Mac build `ffb
 [![Rust 1.99](https://img.shields.io/badge/Rust-1.99.0-000000?logo=rust)](rust-toolchain.toml)
 [![Preview platforms](https://img.shields.io/badge/preview%20platforms-macOS%20%7C%20Windows-blue)](docs/PREVIEW-RELEASES.md)
 [![macOS signing](https://img.shields.io/badge/macOS%20signing-Developer%20ID-green)](docs/PREVIEW-RELEASES.md)
-[![Preview 8 notarization](https://img.shields.io/badge/Preview%208%20Mac-notarized%20%2B%20stapled-green)](docs/PREVIEW-RELEASES.md)
+[![Preview 12 notarisation](https://img.shields.io/badge/Preview%2012%20Mac-notarized%20%2B%20stapled-green)](docs/PREVIEW-RELEASES.md)
 [![Source-visible license](https://img.shields.io/badge/license-proprietary%20%2F%20source--visible-blue)](LICENSE)
 
 Meridian is a Rust reimplementation of the original L337 project, with direct wgpu graphics, one authoritative World and traceable original content. New code is [proprietary/source-visible](LICENSE); imported original content retains its own notices. Original Elite/Oolite assets are excluded.
 
-The current [Preview 8 EMP utility](docs/EMP.md) is published for macOS arm64 and Windows x64. It adds paid purchase, fitting, storage and power/capacity/recharge upgrades, a held-U pulse and electrical disablement that preserves hull, crew and cargo custody. Mac, Linux and native Windows qualification passed 631 Rust tests, 99 Python tests and 49 Markdown checks per platform, strict Clippy and locked release builds. The release uses corrected source `2d5f4a5`; the full earlier EMP native journey retains its separate `5e3e98a` identity. See [implementation status](docs/IMPLEMENTATION-STATUS.md) for the exact evidence and open limits.
+The earlier [Preview 8 EMP utility](docs/EMP.md) is published for macOS arm64 and Windows x64. It adds paid purchase, fitting, storage and power/capacity/recharge upgrades, a held-U pulse and electrical disablement that preserves hull, crew and cargo custody. Mac, Linux and native Windows qualification passed 631 Rust tests, 99 Python tests and 49 Markdown checks per platform, strict Clippy and locked release builds. The release uses corrected source `2d5f4a5`; the full earlier EMP native journey retains its separate `5e3e98a` identity. See [implementation status](docs/IMPLEMENTATION-STATUS.md) for the exact evidence and open limits.
 
 ## Previews and validation
 
@@ -47,7 +75,7 @@ Download qualified macOS arm64 and Windows x64 prereleases from [GitHub Releases
 
 The Preview 8 Mac app is Developer ID signed, notarized and stapled. Apple accepted the new EMP submission; the actual public download passed strict signature, ticket and Gatekeeper checks. No older ticket was reused. Windows remains unsigned and requires the external Microsoft Visual C++ x64 runtime; no DLL is bundled. Native Windows interactive gameplay remains unobserved. Notarization does not establish commercial content clearance or broader gameplay acceptance.
 
-## Current Rust checkpoint
+## Preview 8 Rust checkpoint
 
 [Preview 8 v0.8.0-preview.1](https://github.com/stephenlclarke/meridian/releases/tag/v0.8.0-preview.1) was published on 18 November 2026 at 07:26 UTC from protected main `bf31ab7`, compiled source `2d5f4a5`. All 300 committed files and modes are identical between those revisions. It retains contextual H/? Help and explicit Ctrl+Shift+X XYZZY testing, and adds the paid EMP utility. All six exact-main CI checks passed. Sonar uses that exact commit as revision and project version: zero unresolved findings, 98.8% new coverage, zero new duplication and 100% hotspot review.
 
@@ -85,29 +113,44 @@ A separate explicitly prepared public-core setup supplied four nonfatal contacts
 
 ## Play
 
+Open the [Unwritten Route clue journal](integration/unwritten-route/README.md) with **Shift+J** to see the source clues your commander has earned.
+
 The current desktop source opens **Commander details** on startup. An empty slot starts a fresh commander at Avenor in memory. A valid slot shows the existing commander at the saved location before simulation resumes. Press **L** to launch from a station or **Enter** to resume a saved flight. Station services use **1–5** at a valid berth, and **0** returns to Commander details when docked. Use **H** or **?** for the current controls.
 
 Preview 8 uses the earlier startup controls. N starts a commander; C continues a current-format V17 save with the supported EMP content fingerprint. Unsupported formats/content refuse without changing the file. Use the download’s isolated profile: `Meridian EMP Sonar Preview/saves-current-emp-2d5f4a5` under macOS Application Support, or adjacent `saves-emp-2d5f4a5` on Windows. A second N confirms replacing the current commander, and the old disk file remains until an explicit save or normal saved quit. Click the window for keyboard focus.
 
 H or ? opens a dismissible help popup for the current screen, including station details and transaction reviews. Every station popup lists 1 Galaxy, 2 System, 3 Showroom, 4 Market, 5 Equipment, Tab/Shift+Tab and Escape/back. Escape, H or ? closes help and retains the screen, selection, search and review. Gameplay and underlying actions wait while help is open. During galaxy text search, H remains a typed letter and ? opens help.
 
+### Controls
+
+The table describes the current source. Use the number row for views, training and missiles. Press the equals or minus key without Shift for missile launch or safe/unlock. Hold Control for save, reload and fullscreen.
+
 | Controls | Action |
 | --- | --- |
 | H / ? | Context help; Escape, H or ? dismisses |
+| Ctrl+Shift+M | Toggle generated sound (session-local); status in Help |
 | Ctrl+Shift+X when docked | Explicit XYZZY testing menu; Enter reviews then confirms |
 | 0 when docked (current source) | Commander details |
 | 1 / 2 / 3 / 4 / 5 when docked | Galaxy / System / Ships / Market / Equipment |
+| P on the station Galaxy chart (development) | Toggle the best-profit scan with commodity quantities and live quote estimates; P in flight still pauses |
+| R, then D in a station route review (development) | Inspect estimated trade per leg; D, B or Enter closes details without installing a route |
 | L; W/S; arrows; A/D; Q/E; Space | Launch; thrust; pitch; yaw; roll; brake |
-| J; T; R; Enter; B; F | Travel; select contact; review; confirm; cancel; buy fuel |
-| M; [ / ]; G / Shift+G | Market; commodity selection; buy/sell one native unit |
+| N in flight (development) | Engage the fitted navigation computer for docking, or cancel the approach |
+| Tab / F / Delete / Shift+I in flight (development) | Cycle scanner contacts by distance / switch between assisted and manual targeting / release target / show target details |
+| J; T (docked); R; Enter; B; F (docked) | Travel; select contact; review; confirm; cancel; buy fuel |
+| M; [ / ]; Left/Right; Shift+Left/Right; G / Shift+G | Market; commodity selection; adjust quantity by 1 / 10; review buy/sell |
 | O; K; U; Y | Equipment panel; buy/fit cargo bay; store when docked; refit |
 | Hold U in active flight | Charge the fitted EMP for 600 accepted ticks; early release cancels |
 | I; V; X | Mission details; review all held freight deliveries; review abandonment |
-| F1; F2; F3; F4 | Next ship/practice lock; arm/safe; launch one missile; safe/unlock |
-| F7; F8; F10 | Review attempt closure; reception; fresh consent |
-| F6; F12; C; 0/1/2/3 | Flight lesson consent/reception; cancellation; details; view direction |
-| P; F11; F5; F9 | Pause; fullscreen; save; reload the current qualified save |
+| T in flight; 8; 9; =; - | Lock the selected ship for missiles; next ship/practice lock; arm/safe; launch one missile; safe/unlock |
+| Shift+5; Shift+4; Shift+3 | Review attempt closure; reception; fresh consent |
+| Shift+1; Shift+2; C; 0/1/2/3 | Flight lesson consent/reception; cancellation; details; view direction |
+| P; Ctrl+Enter; Ctrl+S; Ctrl+R | Pause; fullscreen; save; reload the current qualified save |
 | Escape / window close | Save before exit; failure keeps the app open |
+
+The [station trade estimate details](integration/followup-trade-detail/README.md) show the current finite commodity allocation behind the chart scan and route estimates. They do not purchase, sell or install a route.
+
+The [atomic market quantity controls](integration/followup-bulk-market/README.md) review and settle all requested native units together or refuse the entire purchase or sale. They retain the existing per-unit receipts and save format.
 
 The freight journey requires eight identified one-tonne deliveries and awards 730 CR plus the trusted clue once. Markets use finite stock and the same account as mission and equipment transactions. Invalid saves refuse without migration, repair or fallback.
 
@@ -116,6 +159,66 @@ The freight journey requires eight identified one-tonne deliveries and awards 73
 The workspace pins Rust and dependencies in [rust-toolchain.toml](rust-toolchain.toml) and [Cargo.lock](Cargo.lock). Use `make ci` for documentation, formatting, importers, compilation, tests and strict Clippy. `make run` starts the desktop app in an owned graphics session. G1 owns Mac compilation/native validation; Dell owns Linux/native Windows validation; MBA retains its existing fleet work.
 
 - [Development and repository maintenance](docs/DEVELOPMENT.md)
+- [Saker source envelope and Hull Studio definition](docs/SAKER-GAMEPLAY-ENVELOPE.md)
+- [Eagle Cruiser source envelope and Hull Studio definition](docs/EAGLE-CRUISER-SOURCE.md)
+- [Harpy Assault source envelope and Hull Studio definition](docs/HARPY-ASSAULT-SOURCE.md)
+- [Erne Corvette source envelope and Hull Studio definition](docs/ERNE-CORVETTE-SOURCE.md)
+- [Harpy Dropship source envelope and Hull Studio definition](docs/HARPY-DROPSHIP-SOURCE.md)
+- [Harpy Gunship source envelope and Hull Studio definition](docs/HARPY-GUNSHIP-SOURCE.md)
+- [Lanner source envelope and Hull Studio definition](docs/LANNER-SOURCE.md)
+- [Hyena source envelope and Hull Studio definition](docs/HYENA-SOURCE.md)
+- [Yak source envelope and Hull Studio definition](docs/YAK-SOURCE.md)
+- [Jackal source envelope and Hull Studio definition](docs/JACKAL-SOURCE.md)
+- [Banteng source envelope and Hull Studio definition](docs/BANTENG-SOURCE.md)
+- [Caracal Scout source envelope and Hull Studio definition](docs/CARACAL-SCOUT-SOURCE.md)
+- [Hobby Fighter source envelope and Hull Studio definition](docs/HOBBY-FIGHTER-SOURCE.md)
+- [Condor source envelope and Hull Studio definition](docs/CONDOR-SOURCE.md)
+- [Aplomado Interceptor source envelope and Hull Studio definition](docs/APLOMADO-INTERCEPTOR-SOURCE.md)
+- [Falconet source envelope and Hull Studio definition](docs/FALCONET-SOURCE.md)
+- [Muskox source envelope and Hull Studio definition](docs/MUSKOX-SOURCE.md)
+- [Barbary source envelope and Hull Studio definition](docs/BARBARY-SOURCE.md)
+- [Wombat source envelope and Hull Studio definition](docs/WOMBAT-SOURCE.md)
+- [Saiga source envelope and Hull Studio definition](docs/SAIGA-SOURCE.md)
+- [Moose Clipper source envelope and Hull Studio definition](docs/MOOSE-CLIPPER-SOURCE.md)
+- [Seriema Courier source envelope and Hull Studio definition](docs/SERIEMA-COURIER-SOURCE.md)
+- [Arna Cutter source envelope and Hull Studio definition](docs/ARNA-CUTTER-SOURCE.md)
+- [Vulture Raider source envelope and Hull Studio definition](docs/VULTURE-RAIDER-SOURCE.md)
+- [Rabbit Explorer source envelope and Hull Studio definition](docs/RABBIT-EXPLORER-SOURCE.md)
+- [Rhinoceros Trader source envelope and Hull Studio definition](docs/RHINOCEROS-TRADER-SOURCE.md)
+- [Badger source envelope and Hull Studio definition](docs/BADGER-SOURCE.md)
+- [Baza Fighter source envelope and Hull Studio definition](docs/BAZA-FIGHTER-SOURCE.md)
+- [Baza Mk II source envelope and Hull Studio definition](docs/BAZA-MK-II-SOURCE.md)
+- [Griffon source envelope and Hull Studio definition](docs/GRIFFON-SOURCE.md)
+- [Griffon Mk II source envelope and Hull Studio definition](docs/GRIFFON-MK-II-SOURCE.md)
+- [Griffon Spectre source envelope and Hull Studio definition](docs/GRIFFON-SPECTRE-SOURCE.md)
+- [Dzo source envelope and Hull Studio definition](docs/DZO-SOURCE.md)
+- [Dzo Mk II source envelope and Hull Studio definition](docs/DZO-MK-II-SOURCE.md)
+- [Hog source envelope and Hull Studio definition](docs/HOG-SOURCE.md)
+- [Tamaraw source envelope and Hull Studio definition](docs/TAMARAW-SOURCE.md)
+- [Oryx Voyager source envelope and Hull Studio definition](docs/ORYX-VOYAGER-SOURCE.md)
+- [Carabao Freighter source envelope and Hull Studio definition](docs/CARABAO-FREIGHTER-SOURCE.md)
+- [Carabao Highliner source envelope and Hull Studio definition](docs/CARABAO-HIGHLINER-SOURCE.md)
+- [Jaguar source envelope and Hull Studio definition](docs/JAGUAR-SOURCE.md)
+- [Hare Explorer source envelope and Hull Studio definition](docs/HARE-EXPLORER-SOURCE.md)
+- [Llama source envelope and Hull Studio definition](docs/LLAMA-SOURCE.md)
+- [Laggar source envelope and Hull Studio definition](docs/LAGGAR-SOURCE.md)
+- [Alpaca source envelope and Hull Studio definition](docs/ALPACA-SOURCE.md)
+- [Elk source envelope and Hull Studio definition](docs/ELK-SOURCE.md)
+- [Springbok Starliner source envelope and Hull Studio definition](docs/SPRINGBOK-STARLINER-SOURCE.md)
+- [Antelope source envelope and Hull Studio definition](docs/ANTELOPE-SOURCE.md)
+- [Gopher source envelope and Hull Studio definition](docs/GOPHER-SOURCE.md)
+- [Elephant source envelope and Hull Studio definition](docs/ELEPHANT-SOURCE.md)
+- [Aurochs source envelope and Hull Studio definition](docs/AUROCHS-SOURCE.md)
+- [Giraffe Liner source envelope and Hull Studio definition](docs/GIRAFFE-LINER-SOURCE.md)
+- [Shikra source envelope and Hull Studio definition](docs/SHIKRA-SOURCE.md)
+- [Shikra Interdictor source envelope and Hull Studio definition](docs/SHIKRA-INTERDICTOR-SOURCE.md)
+- [Wisent source envelope and Hull Studio definition](docs/WISENT-SOURCE.md)
+- [Wisent Mk II source envelope and Hull Studio definition](docs/WISENT-MK-II-SOURCE.md)
+- [Anoa source envelope and Hull Studio definition](docs/ANOA-SOURCE.md)
+- [Ox source envelope and Hull Studio definition](docs/OX-SOURCE.md)
+- [Ox Mk II source envelope and Hull Studio definition](docs/OX-MK-II-SOURCE.md)
+- [Cavy Racer source envelope and Hull Studio definition](docs/CAVY-RACER-SOURCE.md)
+- [Stag Liner source envelope and Hull Studio definition](docs/STAG-LINER-GAMEPLAY-ENVELOPE.md)
 - [Architecture](docs/ARCHITECTURE.md) and [core API](crates/meridian-core/README.md)
 - [First playable criteria](docs/FIRST-PLAYABLE.md) and [source-grounded roadmap](docs/LEGACY-MILESTONES.md)
 - [Content provenance and reuse](docs/LEGACY-REUSE.md)
@@ -139,7 +242,7 @@ Fleet construction is a separate M4 lane. Its current changed original-five run 
 
 Preview 8 retains screen-specific H/? help with explicit [XYZZY testing](docs/XYZZY.md). Every station help popup explains how to reach Galaxy, System, Showroom, Market and Equipment. Help pauses host stepping and preserves the current screen, selection, search and review. Press H or ? for flight controls or station navigation. The current desktop source clears routine text from above the instruments in idle flight and at the docked exterior. Command feedback and requested reviews still appear there. The development build also gives the Lion Citadel blue-grey plating and amber lights, with four small joins around its docking entrance. [Station exterior](docs/DOCKED-PREVIEW.md#sh028-aperture-crosspieces)
 
-At a station berth, **Ctrl+Shift+X** opens the labelled XYZZY testing menu. Use Up/Down to choose, Enter to review, then Enter again to confirm and save; Escape/B cancels the review or closes the menu. H/? opens help above the menu. First activation changes the current commander to CLARKE and sets cash to 1,000,000 CR once. It grants/refits the supported SH025 outfit with explicit secret provenance; missiles and cargo stay finite. The menu shows actual cash, current jump reach, unlimited-fuel state and missing-system limits. Reading or closing it grants nothing. Other profiles are unchanged.
+At a station berth, **Ctrl+Shift+X** opens the labelled XYZZY testing menu. Use Up/Down to choose, Enter to review, then Enter again to confirm and save. The menu stays open on the selected action. Use the arrow keys to choose another action or Escape/B to leave. H/? opens help above the menu. First activation changes the current commander to CLARKE and sets cash to 1,000,000 CR once. It grants/refits the supported SH025 outfit with explicit secret provenance; missiles and cargo stay finite. The menu shows cash, current jump reach, fuel mode, the fitted targeting grade and the three EMP grades. Reading or closing it grants nothing. Other profiles are unchanged.
 
 Source `c98fc86` passed Mac qualification: 603 top-level Rust tests (378 core, two compatibility integrations, 220 desktop and three explicit observer cases), 94 Python tests, 48 Markdown checks, formatting, all-target checks, strict Clippy and locked release. The signed isolated app passed supported native checks of all five station Help cards, navigation, blocked controls, hidden search with nested testing Help, explicit activation, visible grant provenance and a real paid Food purchase. Repeating activation preserved 999,977.4 CR and the purchased tonne. Accounted fuel was switched off, flight Help displayed the fitted Naval Laser, manual pause survived Help, and actual Save/Quit/new-process Continue retained CLARKE and the same cash, cargo and fuel mode. Precise native clock, OS exit status and a Lareria docking/refill journey were not measured. Independent native acceptance and artifact audit passed. Dell Linux and native Windows also passed the same 603 Rust and 94 Python tests, strict Clippy and locked release; native Windows importer checks used native Python. The [36-action inventory](docs/XYZZY-ACTIONS.json) retains every unsupported or partial original action. Preview 7 now publishes these features using the corrected binary described below.
 

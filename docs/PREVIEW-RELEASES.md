@@ -1,5 +1,26 @@
 # GitHub preview releases
 
+## Fleet, Medusa and Hull Studio
+
+Preview 12 (`v0.12.0-preview.1`) was published on 28 November 2026 from protected main `83ceae733d6e4f9cffc81c517fabb3eb7b39fba8`. Download the ZIP for your platform and extract the whole archive. The release includes `SHA256SUMS.txt` and `preview.json`. [Preview 12 downloads and release notes](https://github.com/stephenlclarke/meridian/releases/tag/v0.12.0-preview.1)
+
+| Platform | Start Fleet | Start the standalone Medusa | Start Hull Studio |
+| --- | --- | --- | --- |
+| Apple silicon | Meridian Fleet Preview.app | Meridian Medusa Preview.app | Meridian Hull Studio.app |
+| Windows x64 | Launch Meridian.cmd | Launch Medusa Preview.cmd | Launch Hull Studio.cmd |
+
+In **Fleet**, press **3** at a berth to inspect the 115 Showroom models. To fly the fully fitted Medusa in your Fleet save, press **Ctrl+Shift+X**, choose **Activate / refit SH171 Medusa**, and press **Enter** twice to review and confirm. Close the menu and press **L** to launch. The standalone Medusa launcher opens a separate profile. **Ctrl+S** saves and **Ctrl+R** reloads. [Keyboard controls](../README.md#controls)
+
+**macOS.** Fleet and Medusa require macOS 14 or later. Hull Studio requires macOS 27 or later. All three extracted apps passed Developer ID signature, notarisation ticket and Gatekeeper checks. Both games started and exited normally on Metal. Hull Studio validated and exported its reference package and displayed a native Showroom frame.
+
+**Windows.** The unsigned executables require the Microsoft Visual C++ x64 Redistributable. On the locked Dell, both launchers saved and reopened their separate profiles. Hull Studio passed offline export and headless Help checks. The game windows stayed in graphics initialisation. Interactive gameplay, Fleet refit, in-game Continue and the Studio Showroom frame remain unverified on Windows. [Runtime download](https://learn.microsoft.com/en-us/cpp/windows/latest-supported-vc-redist/) · [Validation record](IMPLEMENTATION-STATUS.md#published-preview-12)
+
+## Scanner Preview 11
+
+[Download Scanner Preview 11 for macOS arm64 or Windows x64](https://github.com/stephenlclarke/meridian/releases/tag/v0.11.0-preview.1). Published 26 November 2026 from protected main `ea72afdd2db452be73e4b60b7a197a56eab8c263`. All four public downloads passed verification. The Mac app is Developer ID signed, notarised and stapled. On Windows, extract the whole archive and open **Launch Meridian.cmd**. The unsigned executable requires the Microsoft Visual C++ x64 runtime. On the locked Dell it opened a Vulkan window and exited normally. Interactive Windows rendering remains unverified.
+
+Use **Tab** to select a scanner contact, **F** to switch assistance, **N** to start or cancel auto-docking and **T** to lock the selected ship for missiles. Press **H** for the controls available with your equipment. Medusa is available for inspection in the station Showroom in this release.
+
 ## Published Preview 10
 
 [Download Preview 10 for macOS arm64 or Windows x64](https://github.com/stephenlclarke/meridian/releases/tag/v0.10.0-preview.1). Released 19 November 2026 at 02:37 UTC from protected commit `201e9f9f1ecfd73a20ba27dcebc00f70ac3457fe`. All four public downloads passed verification. The macOS archive contains the original notarized app built at `f3cf5b8` and a corrected guide alongside it. The unsigned Windows executable was built at `993035e` and requires the Microsoft Visual C++ x64 runtime.
@@ -57,6 +78,18 @@ make preview-plan PREVIEW_COMMIT=EXACT_40_CHARACTER_MAIN_SHA
 ```
 
 After owner packaging, independent review, qualification and verified retained notice bindings for authorized internal testing, prepare one directory under `~/.local/share/meridian-preview-releases/`, for example `durable-v8`. It must contain `Meridian-macos-arm64.zip`, `Meridian-windows-x64.zip` and `RELEASE-NOTES.md`. Copy only the identified qualified packages and public notes into that directory. Package identifiers permit lowercase letters, digits and hyphens. Symlinked directories/files and paths outside release staging refuse. The publisher writes its new `release-receipt.json` there with exclusive creation; it never accepts arbitrary read/write paths from CLI arguments.
+
+### Preview 12 publication gate
+
+The published tag `v0.12.0-preview.1` alone selects the multi-app policy. Scanner Preview 11 and other managed previews retain the existing single-app publication check. Preview 12 requires the fixed wrapper `Meridian Preview 12/` on both platforms.
+
+The Mac archive contains exactly three separate top-level apps: `Meridian Fleet Preview.app`, `Meridian Medusa Preview.app` and `Meridian Hull Studio.app`. Studio contains one nested `Contents/Helpers/Meridian Hull Showroom.app`. The publisher checks each bundle's exact identifier, executable, hardened Developer ID signature and source binding. The actual native executable and Studio runtime Mach-O headers must identify thin arm64 code. Each of the three top-level apps must have a separate accepted notarization submission, validated staple and accepted Gatekeeper assessment. The nested Showroom must pass its own strict signature and remain inside the signed, notarized Studio bundle. All three game copies retain the full current source notice set; the publisher independently derives every current source notice path and byte pin from immutable Git blobs for the selected protected commit.
+
+The Windows archive contains exactly the ordinary and embedded Showroom copies of the qualified game executable, the Studio executable and its native validator. The three exact CRLF launchers select the ordinary isolated profile, the separate Medusa profile and Studio respectively. The two game profile directories must be empty. The gate pins the 13 measured Studio runtime DLL/PYD paths, also requires each in the exact source-bound Studio runtime manifest with source and notice binding, and rejects additions or omissions. The external Visual C++ runtime is not redistributed. No runtime DLL or PYD is permitted in the ordinary game directory. The publisher verifies the PE architecture, exact executable paths and current source notices.
+
+The independent release auditor supplies `PREVIEW12-APPROVED-INVENTORY.json` beside the two staged ZIPs after actual platform qualification and receipt review. It contains schema 1, `source` (protected release SHA), `tree` and `platforms` with `macos` and `windows`. Each platform identifies its `compiledSource` with the same Git tree, `archiveSha256` and a complete `members` array. Each raw ZIP member has `path`, `kind` (`file`, `directory` or `symlink`), `size`, `mode` (raw ZIP external-attribute high 16 bits) and `sha256` (null for directories). AppleDouble metadata and Studio's contained symlinks are included. The separate packaged `STUDIO-RUNTIME-MANIFEST.json` uses wrapper-relative runtime paths and `bytes` rather than `size`.
+
+The publisher compares both archives to that exact approval, checks the explicit layout and platform identities, then proceeds through the existing release gates. The approval digest is retained in `release-receipt.json`; the local approval file is not uploaded. The public release still contains only the two ZIPs, `SHA256SUMS.txt` and `preview.json`. Do not publish an unqualified candidate or generate an approval simply from an unreviewed ZIP.
 
 ```sh
 make preview-release PREVIEW_COMMIT=EXACT_40_CHARACTER_MAIN_SHA PREVIEW_PACKAGE=durable-v8

@@ -1,0 +1,248 @@
+{
+  "originalArchivedNativeFaces": 928,
+  "candidateNativeFaces": 480,
+  "archiveWithin512FaceBudget": false,
+  "nativeCandidateWithin512FaceBudget": true,
+  "parts": [
+    {
+      "index": 0,
+      "name": "pods explicit member 0",
+      "originalFaces": 116,
+      "candidateFaces": 36,
+      "verifiedUpperMillimetres": {
+        "candidateToArchive": 846,
+        "archiveToCandidate": 965
+      }
+    },
+    {
+      "index": 1,
+      "name": "pods explicit member 0/service-well-0-0",
+      "originalFaces": 20,
+      "candidateFaces": 20,
+      "verifiedUpperMillimetres": {
+        "candidateToArchive": 0,
+        "archiveToCandidate": 0
+      }
+    },
+    {
+      "index": 2,
+      "name": "pods explicit member 0/service-well-1-0",
+      "originalFaces": 20,
+      "candidateFaces": 20,
+      "verifiedUpperMillimetres": {
+        "candidateToArchive": 0,
+        "archiveToCandidate": 0
+      }
+    },
+    {
+      "index": 3,
+      "name": "pods explicit member 0/service-well-2-0",
+      "originalFaces": 20,
+      "candidateFaces": 20,
+      "verifiedUpperMillimetres": {
+        "candidateToArchive": 0,
+        "archiveToCandidate": 0
+      }
+    },
+    {
+      "index": 4,
+      "name": "pods explicit member 0/service-well-3-0",
+      "originalFaces": 20,
+      "candidateFaces": 20,
+      "verifiedUpperMillimetres": {
+        "candidateToArchive": 0,
+        "archiveToCandidate": 0
+      }
+    },
+    {
+      "index": 5,
+      "name": "pods explicit member 1",
+      "originalFaces": 116,
+      "candidateFaces": 36,
+      "verifiedUpperMillimetres": {
+        "candidateToArchive": 846,
+        "archiveToCandidate": 965
+      }
+    },
+    {
+      "index": 6,
+      "name": "pods explicit member 1/service-well-0-0",
+      "originalFaces": 20,
+      "candidateFaces": 20,
+      "verifiedUpperMillimetres": {
+        "candidateToArchive": 0,
+        "archiveToCandidate": 0
+      }
+    },
+    {
+      "index": 7,
+      "name": "pods explicit member 1/service-well-1-0",
+      "originalFaces": 20,
+      "candidateFaces": 20,
+      "verifiedUpperMillimetres": {
+        "candidateToArchive": 0,
+        "archiveToCandidate": 0
+      }
+    },
+    {
+      "index": 8,
+      "name": "pods explicit member 1/service-well-2-0",
+      "originalFaces": 20,
+      "candidateFaces": 20,
+      "verifiedUpperMillimetres": {
+        "candidateToArchive": 0,
+        "archiveToCandidate": 0
+      }
+    },
+    {
+      "index": 9,
+      "name": "pods explicit member 1/service-well-3-0",
+      "originalFaces": 20,
+      "candidateFaces": 20,
+      "verifiedUpperMillimetres": {
+        "candidateToArchive": 0,
+        "archiveToCandidate": 0
+      }
+    },
+    {
+      "index": 10,
+      "name": "pods explicit member 2",
+      "originalFaces": 116,
+      "candidateFaces": 36,
+      "verifiedUpperMillimetres": {
+        "candidateToArchive": 846,
+        "archiveToCandidate": 965
+      }
+    },
+    {
+      "index": 11,
+      "name": "pods explicit member 2/service-well-0-0",
+      "originalFaces": 20,
+      "candidateFaces": 20,
+      "verifiedUpperMillimetres": {
+        "candidateToArchive": 0,
+        "archiveToCandidate": 0
+      }
+    },
+    {
+      "index": 12,
+      "name": "pods explicit member 2/service-well-1-0",
+      "originalFaces": 20,
+      "candidateFaces": 20,
+      "verifiedUpperMillimetres": {
+        "candidateToArchive": 0,
+        "archiveToCandidate": 0
+      }
+    },
+    {
+      "index": 13,
+      "name": "pods explicit member 2/service-well-2-0",
+      "originalFaces": 20,
+      "candidateFaces": 20,
+      "verifiedUpperMillimetres": {
+        "candidateToArchive": 0,
+        "archiveToCandidate": 0
+      }
+    },
+    {
+      "index": 14,
+      "name": "pods explicit member 2/service-well-3-0",
+      "originalFaces": 20,
+      "candidateFaces": 20,
+      "verifiedUpperMillimetres": {
+        "candidateToArchive": 0,
+        "archiveToCandidate": 0
+      }
+    },
+    {
+      "index": 15,
+      "name": "side stack structural spine",
+      "originalFaces": 12,
+      "candidateFaces": 12,
+      "verifiedUpperMillimetres": {
+        "candidateToArchive": 0,
+        "archiveToCandidate": 0
+      }
+    },
+    {
+      "index": 16,
+      "name": "cockpit glazing envelope",
+      "originalFaces": 116,
+      "candidateFaces": 36,
+      "verifiedUpperMillimetres": {
+        "candidateToArchive": 496,
+        "archiveToCandidate": 579
+      }
+    },
+    {
+      "index": 17,
+      "name": "cockpit connected structural crossmember",
+      "originalFaces": 12,
+      "candidateFaces": 12,
+      "verifiedUpperMillimetres": {
+        "candidateToArchive": 0,
+        "archiveToCandidate": 0
+      }
+    },
+    {
+      "index": 18,
+      "name": "engine_pair/negative side/connected support",
+      "originalFaces": 12,
+      "candidateFaces": 12,
+      "verifiedUpperMillimetres": {
+        "candidateToArchive": 0,
+        "archiveToCandidate": 0
+      }
+    },
+    {
+      "index": 19,
+      "name": "engine_pair/negative side/propulsion casing",
+      "originalFaces": 44,
+      "candidateFaces": 12,
+      "verifiedUpperMillimetres": {
+        "candidateToArchive": 799,
+        "archiveToCandidate": 1169
+      }
+    },
+    {
+      "index": 20,
+      "name": "engine_pair/negative side/propulsion luminous recess",
+      "originalFaces": 44,
+      "candidateFaces": 12,
+      "verifiedUpperMillimetres": {
+        "candidateToArchive": 499,
+        "archiveToCandidate": 517
+      }
+    },
+    {
+      "index": 21,
+      "name": "engine_pair/positive side/connected support",
+      "originalFaces": 12,
+      "candidateFaces": 12,
+      "verifiedUpperMillimetres": {
+        "candidateToArchive": 0,
+        "archiveToCandidate": 0
+      }
+    },
+    {
+      "index": 22,
+      "name": "engine_pair/positive side/propulsion casing",
+      "originalFaces": 44,
+      "candidateFaces": 12,
+      "verifiedUpperMillimetres": {
+        "candidateToArchive": 799,
+        "archiveToCandidate": 1169
+      }
+    },
+    {
+      "index": 23,
+      "name": "engine_pair/positive side/propulsion luminous recess",
+      "originalFaces": 44,
+      "candidateFaces": 12,
+      "verifiedUpperMillimetres": {
+        "candidateToArchive": 499,
+        "archiveToCandidate": 517
+      }
+    }
+  ]
+}

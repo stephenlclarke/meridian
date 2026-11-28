@@ -1,0 +1,192 @@
+{
+  "exactParts": 7,
+  "allParts": 14,
+  "arcEndcapLateralSeparationLowerMillimetres": {
+    "archiveNative": 4486,
+    "candidateNative": 4486,
+    "detailed": 4486
+  },
+  "silhouette": {
+    "directionsPerOrthographicView": 16,
+    "againstArchivedNative": {
+      "axisExtremaAbsoluteDeltaMillimetres": [
+        [
+          99,
+          99
+        ],
+        [
+          0,
+          0
+        ],
+        [
+          0,
+          0
+        ]
+      ],
+      "maxSampledSilhouetteOffsetMillimetres": {
+        "xy": 577,
+        "xz": 229,
+        "yz": 490
+      }
+    },
+    "againstDetailed": {
+      "axisExtremaAbsoluteDeltaMillimetres": [
+        [
+          99,
+          99
+        ],
+        [
+          0,
+          0
+        ],
+        [
+          0,
+          0
+        ]
+      ],
+      "maxSampledSilhouetteOffsetMillimetres": {
+        "xy": 517,
+        "xz": 229,
+        "yz": 640
+      }
+    }
+  },
+  "fullUpperMillimetres": {
+    "candidateToArchive": 1249,
+    "archiveToCandidate": 1355,
+    "candidateToDetailed": 1249,
+    "detailedToCandidate": 2500
+  },
+  "archivedOriginalComparisonUpperMillimetres": {
+    "archiveNativeToDetailed": 1249,
+    "detailedToArchivedNative": 2233
+  },
+  "parts": [
+    {
+      "partIndex": 0,
+      "name": "open curved loop",
+      "exactVerticesFacesMaterialsAndUV": false,
+      "boundsMillimetres": {
+        "candidateToArchive": 1249,
+        "archiveToCandidate": 1355
+      }
+    },
+    {
+      "partIndex": 1,
+      "name": "body primary pressure envelope",
+      "exactVerticesFacesMaterialsAndUV": false,
+      "boundsMillimetres": {
+        "candidateToArchive": 745,
+        "archiveToCandidate": 952
+      }
+    },
+    {
+      "partIndex": 2,
+      "name": "body primary pressure envelope/service-well-0-0",
+      "exactVerticesFacesMaterialsAndUV": true,
+      "boundsMillimetres": {
+        "candidateToArchive": 0,
+        "archiveToCandidate": 0
+      }
+    },
+    {
+      "partIndex": 3,
+      "name": "body primary pressure envelope/service-well-1-0",
+      "exactVerticesFacesMaterialsAndUV": true,
+      "boundsMillimetres": {
+        "candidateToArchive": 0,
+        "archiveToCandidate": 0
+      }
+    },
+    {
+      "partIndex": 4,
+      "name": "body primary pressure envelope/service-well-2-0",
+      "exactVerticesFacesMaterialsAndUV": true,
+      "boundsMillimetres": {
+        "candidateToArchive": 0,
+        "archiveToCandidate": 0
+      }
+    },
+    {
+      "partIndex": 5,
+      "name": "body primary pressure envelope/service-well-3-0",
+      "exactVerticesFacesMaterialsAndUV": true,
+      "boundsMillimetres": {
+        "candidateToArchive": 0,
+        "archiveToCandidate": 0
+      }
+    },
+    {
+      "partIndex": 6,
+      "name": "cockpit glazing envelope",
+      "exactVerticesFacesMaterialsAndUV": false,
+      "boundsMillimetres": {
+        "candidateToArchive": 709,
+        "archiveToCandidate": 708
+      }
+    },
+    {
+      "partIndex": 7,
+      "name": "cockpit connected structural crossmember",
+      "exactVerticesFacesMaterialsAndUV": true,
+      "boundsMillimetres": {
+        "candidateToArchive": 0,
+        "archiveToCandidate": 0
+      }
+    },
+    {
+      "partIndex": 8,
+      "name": "engine_pair/negative side/connected support",
+      "exactVerticesFacesMaterialsAndUV": true,
+      "boundsMillimetres": {
+        "candidateToArchive": 0,
+        "archiveToCandidate": 0
+      }
+    },
+    {
+      "partIndex": 9,
+      "name": "engine_pair/negative side/propulsion casing",
+      "exactVerticesFacesMaterialsAndUV": false,
+      "boundsMillimetres": {
+        "candidateToArchive": 680,
+        "archiveToCandidate": 680
+      }
+    },
+    {
+      "partIndex": 10,
+      "name": "engine_pair/negative side/propulsion luminous recess",
+      "exactVerticesFacesMaterialsAndUV": false,
+      "boundsMillimetres": {
+        "candidateToArchive": 723,
+        "archiveToCandidate": 429
+      }
+    },
+    {
+      "partIndex": 11,
+      "name": "engine_pair/positive side/connected support",
+      "exactVerticesFacesMaterialsAndUV": true,
+      "boundsMillimetres": {
+        "candidateToArchive": 0,
+        "archiveToCandidate": 0
+      }
+    },
+    {
+      "partIndex": 12,
+      "name": "engine_pair/positive side/propulsion casing",
+      "exactVerticesFacesMaterialsAndUV": false,
+      "boundsMillimetres": {
+        "candidateToArchive": 680,
+        "archiveToCandidate": 680
+      }
+    },
+    {
+      "partIndex": 13,
+      "name": "engine_pair/positive side/propulsion luminous recess",
+      "exactVerticesFacesMaterialsAndUV": false,
+      "boundsMillimetres": {
+        "candidateToArchive": 723,
+        "archiveToCandidate": 429
+      }
+    }
+  ]
+}

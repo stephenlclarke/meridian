@@ -38,4 +38,4 @@ python3 -B tools/verify_onager_geometry.py
 cargo test --locked -p meridian-core onager::tests:: -- --nocapture
 ```
 
-The four Rust cases await owned execution. Meridian renderer routing, ordinary placement, admission and stock mass remain open.
+All four Rust cases passed on Mac, WSL2 and native Windows at `6083f3c3`. Meridian renderer routing, ordinary placement, admission and stock mass remain open.

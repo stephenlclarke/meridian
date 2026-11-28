@@ -1,0 +1,13 @@
+{
+  "schema": 1,
+  "id": "sh171-medusa-flight",
+  "undoBefore": [
+    "scanner-preview"
+  ],
+  "undoAfter": [],
+  "kind": "inverse",
+  "manifest": "integration/sh171-medusa-flight/PROTECTED-CORE-INVERSE.json",
+  "sha256": "b79e35d37b61b0368c870726256ef813554c8200f17c48cc5b8e48dd850ea7ed",
+  "base": "9d82467c8062c0ed31edf37e4e29e485dbdc2359",
+  "label": "Medusa flight geometry"
+}

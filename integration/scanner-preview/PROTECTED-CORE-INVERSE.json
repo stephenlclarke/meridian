@@ -1,0 +1,1535 @@
+{
+  "base": "344b2bf1b46bcf7c2ab62094e7200f8abc7da9c3",
+  "files": {
+    "flight.rs": {
+      "beforeSHA256": "112b71f642d08fc678b630a985698fdb2d0397f34d078d1a5751c4b6fe5c349e",
+      "afterSHA256": "3a7c020b4eef43b6c4a7ccf8db5cdb0e126451b3d94117cbfcfc460acbcc1365",
+      "hunks": [
+        {
+          "offset": 939,
+          "before": "",
+          "after": "mod occupied_salvage;\n"
+        },
+        {
+          "offset": 1351,
+          "before": "",
+          "after": "};\npub use occupied_salvage::{\n    OccupiedCutContact, OccupiedCutError, OccupiedCutReview, PreparedOccupiedCut,\n"
+        },
+        {
+          "offset": 1935,
+          "before": "    FittedFuelScoops, FittedMiningTool, FuelScoopsSnapshot, ModularEquipmentSnapshot, ModuleAction,\n    ModuleError, ModuleKind, ModuleOffer, ModuleProvenance, ModuleReview, ModuleSlot, OwnedModule,\n",
+          "after": "    CABIN_TONNES, CabinGrade, CabinStatus, FittedFuelScoops, FittedMiningTool, FuelScoopsSnapshot,\n    ModularEquipmentSnapshot, ModuleAction, ModuleError, ModuleKind, ModuleOffer, ModuleProvenance,\n    ModuleReview, ModuleSlot, OwnedModule, PASSAGE_CLUE_ID, PASSAGE_REWARD_TENTHS, PassageStatus,\n    PassageTerminalReceipt, PassengerAction, PassengerIdentity, PassengerJourneySnapshot,\n"
+        },
+        {
+          "offset": 8417,
+          "before": "",
+          "after": "    occupied_salvage: occupied_salvage::State,\n"
+        },
+        {
+          "offset": 10316,
+          "before": "",
+          "after": "            occupied_salvage: occupied_salvage::State::default(),\n"
+        },
+        {
+          "offset": 23846,
+          "before": "",
+          "after": "        let occupied_motion = self.occupied_motion_opening();\n"
+        },
+        {
+          "offset": 24137,
+          "before": "        } else if self.state.mode != FlightMode::Flight || self.state.motion_refusal.is_some() {\n            // An accepted stop must release every computer controller, not just docking.\n            // Otherwise selected work guidance resumes thrust on the next idle tick.\n            self.cancel_targeting();\n            self.cancel_auto_docking();\n",
+          "after": "        } else {\n            self.occupied_salvage.before_motion = occupied_motion;\n            if self.state.mode != FlightMode::Flight || self.state.motion_refusal.is_some() {\n                self.cancel_targeting();\n                self.cancel_auto_docking();\n            }\n            // A stop releases guidance and returns temporarily selected equipment on\n            // the accepted tick, including when no further flight input follows.\n            self.advance_selected_work();\n"
+        },
+        {
+          "offset": 38058,
+          "before": "",
+          "after": "        if entry && !self.modular.has_berth_room() {\n            return Err(StepError::TickOverflow);\n        }\n"
+        },
+        {
+          "offset": 40340,
+          "before": "",
+          "after": "        if entry && let Some(dock) = navigation.and_then(NavigationState::dock) {\n            self.modular.record_berth(dock);\n        }\n"
+        }
+      ]
+    },
+    "flight/damage.rs": {
+      "beforeSHA256": "f70da0bf0dafe537f579d62b9551dc2d4035042e1dac843a4ca7d8e9c02ec799",
+      "afterSHA256": "9b3aa8b3803a55aa39e5fa15f7b211a7f5cf325cac80f7b5cf9b3bbaafe43614",
+      "hunks": [
+        {
+          "offset": 9000,
+          "before": "                        .front_at_physical(world, event.clock)\n",
+          "after": "                        .front_at_physical(world, event.clock, next_emission)\n"
+        }
+      ]
+    },
+    "flight/damage/capacity.rs": {
+      "beforeSHA256": "f1d880b2ae842b4fb2d3d3465a26d182a70bb527121273db0e17f631ee5a5325",
+      "afterSHA256": "6775979a7fc221c1f8df17c1e820a360eeea8aaeb23f27375409d0846e15753c",
+      "hunks": [
+        {
+          "offset": 5874,
+          "before": "",
+          "after": "            if self.modular.history_active() {\n                total = total\n                    .checked_add(size(|w| dock.encode_save(w)))\n                    .ok_or(SaveError::TooLarge)?;\n            }\n"
+        }
+      ]
+    },
+    "flight/emp.rs": {
+      "beforeSHA256": "3fe0ed6be975fbefa59c097a96aef3c8b7d7d4701fbd848b96a31ec0e572fb97",
+      "afterSHA256": "fae66cbc0f7068ffa6e8c8dc3e436268b852642054a56696b71c96254230271a",
+      "hunks": [
+        {
+          "offset": 2407,
+          "before": "",
+          "after": "    flight: Option<SalvageHandover>,\n}\n#[derive(Debug, Clone, Copy, PartialEq, Eq)]\nstruct SalvageHandover {\n    cutter: u64,\n    visit: u64,\n    clock: u64,\n}\n\n#[derive(Debug, Clone, Copy, PartialEq, Eq)]\npub(in crate::flight) struct SalvageEmpLink {\n    pub(crate) item: u64,\n    pub(crate) cutter: u64,\n    pub(crate) revision: u64,\n    pub(crate) tick: u64,\n    pub(crate) visit: u64,\n    pub(crate) clock: u64,\n    pub(crate) restoring: bool,\n"
+        },
+        {
+          "offset": 4204,
+          "before": "",
+          "after": "        let mut suspended = false;\n"
+        },
+        {
+          "offset": 4284,
+          "before": "",
+          "after": "            if event.flight.is_some() {\n                match event.action {\n                    EmpEquipmentAction::Store { .. } if !suspended => suspended = true,\n                    EmpEquipmentAction::Fit { .. } if suspended => suspended = false,\n                    _ => return Err(INVALID),\n                }\n            } else if suspended {\n                return Err(INVALID);\n            }\n"
+        },
+        {
+          "offset": 7719,
+          "before": "",
+          "after": "            if let Some(flight) = event.flight {\n                let (item, restoring) = match event.action {\n                    EmpEquipmentAction::Store { item } => (item, false),\n                    EmpEquipmentAction::Fit { item } => (item, true),\n                    _ => return Err(INVALID),\n                };\n                if event.secret\n                    || flight.clock == 0\n                    || flight.clock > world.combat.physical_tick()\n                    || flight.clock > event.tick\n                    || flight.visit <= event.dock.visit()\n                    || previous.is_none_or(|prior| prior.dock != event.dock)\n                    || self.salvage_charge_overlaps(flight.clock)\n                    || !world.modular.matches_salvage_emp_event(SalvageEmpLink {\n                        item,\n                        cutter: flight.cutter,\n                        revision: event.revision,\n                        tick: event.tick,\n                        visit: flight.visit,\n                        clock: flight.clock,\n                        restoring,\n                    })\n                {\n                    return Err(INVALID);\n                }\n            }\n"
+        },
+        {
+          "offset": 10391,
+          "before": "",
+          "after": "    }\n\n    fn salvage_charge_overlaps(&self, clock: u64) -> bool {\n        self.charge.as_ref().is_some_and(|charge| {\n            charge.start.physical_tick <= clock && charge.ended_at.is_none_or(|end| end >= clock)\n        }) || self.pulses.iter().any(|pulse| {\n            pulse.charge.start.physical_tick <= clock && pulse.release.physical_tick >= clock\n        })\n    }\n\n    pub(in crate::flight) fn prepare_salvage_handover(\n        &self,\n        link: SalvageEmpLink,\n    ) -> Result<Self, SaveError> {\n        let SalvageEmpLink {\n            item,\n            cutter,\n            revision,\n            tick,\n            visit,\n            clock,\n            restoring,\n        } = link;\n        let dock = self.equipment.last().ok_or(INVALID)?.dock;\n        if self.equipment.len() >= MAX_EQUIPMENT_EVENTS\n            || self.input_blocked()\n            || self.salvage_charge_overlaps(clock)\n            || self\n                .owned()?\n                .is_none_or(|owned| owned.item != item || owned.fitted == restoring)\n        {\n            return Err(INVALID);\n        }\n        let mut next = self.clone();\n        Arc::make_mut(&mut next.equipment).push(EquipmentEvent {\n            secret: false,\n            action: if restoring {\n                EmpEquipmentAction::Fit { item }\n            } else {\n                EmpEquipmentAction::Store { item }\n            },\n            dock,\n            tick,\n            revision,\n            flight: Some(SalvageHandover {\n                cutter,\n                visit,\n                clock,\n            }),\n        });\n        next.owned()?;\n        Ok(next)\n    }\n\n    pub(in crate::flight) fn matches_salvage_handover(&self, link: SalvageEmpLink) -> bool {\n        let SalvageEmpLink {\n            item,\n            cutter,\n            revision,\n            tick,\n            visit,\n            clock,\n            restoring,\n        } = link;\n        self.equipment.iter().any(|event| {\n            event.revision == revision\n                && event.tick == tick\n                && !event.secret\n                && event.action\n                    == if restoring {\n                        EmpEquipmentAction::Fit { item }\n                    } else {\n                        EmpEquipmentAction::Store { item }\n                    }\n                && event.flight\n                    == Some(SalvageHandover {\n                        cutter,\n                        visit,\n                        clock,\n                    })\n        })\n"
+        }
+      ]
+    },
+    "flight/emp/equipment.rs": {
+      "beforeSHA256": "4beca3f8ea8d7af03120b4bcfe1e6399cc9d7209b06028f9bc684219568d41d3",
+      "afterSHA256": "f9926ff582004339a8055d523dcf13b0401efe138e3ba61af74beadcdcb4e450",
+      "hunks": [
+        {
+          "offset": 1693,
+          "before": "",
+          "after": "        if self.modular.salvage_exchange_pending() {\n            return Err(EmpError::UtilityCapacity);\n        }\n"
+        },
+        {
+          "offset": 6628,
+          "before": "",
+          "after": "            flight: None,\n"
+        },
+        {
+          "offset": 8861,
+          "before": "",
+          "after": "            flight: None,\n"
+        }
+      ]
+    },
+    "flight/emp/persistence.rs": {
+      "beforeSHA256": "de56cee1bed403a15e71c7d499652d489d5f25b647be9d3b12c19094f9d42829",
+      "afterSHA256": "8888c43ca7a233fa3daf41d5f9ec1de03ea538d405a403f6eaf7af8d937b9c22",
+      "hunks": [
+        {
+          "offset": 196,
+          "before": "    INVALID, MAX_EQUIPMENT_EVENTS, MAX_PULSES, Reader, SaveError, State, Writer, meter, runtime,\n    scene,\n",
+          "after": "    INVALID, MAX_EQUIPMENT_EVENTS, MAX_PULSES, Reader, SalvageHandover, SaveError, State, Writer,\n    meter, runtime, scene,\n"
+        },
+        {
+          "offset": 739,
+          "before": "                    w.u8(1);\n",
+          "after": "                    w.u8(if e.flight.is_some() { 4 } else { 1 });\n"
+        },
+        {
+          "offset": 912,
+          "before": "                    w.u8(2);\n",
+          "after": "                    w.u8(if e.flight.is_some() { 5 } else { 2 });\n"
+        },
+        {
+          "offset": 1376,
+          "before": "",
+          "after": "            }\n            if let Some(flight) = e.flight {\n                w.u64(flight.cutter);\n                w.u64(flight.visit);\n                w.u64(flight.clock);\n"
+        },
+        {
+          "offset": 3287,
+          "before": "            let action = match r.u8()? {\n",
+          "after": "            let tag = r.u8()?;\n            let action = match tag {\n"
+        },
+        {
+          "offset": 3406,
+          "before": "                1 => EmpEquipmentAction::Fit { item: r.u64()? },\n                2 => EmpEquipmentAction::Store { item: r.u64()? },\n",
+          "after": "                1 | 4 => EmpEquipmentAction::Fit { item: r.u64()? },\n                2 | 5 => EmpEquipmentAction::Store { item: r.u64()? },\n"
+        },
+        {
+          "offset": 3965,
+          "before": "",
+          "after": "            let flight = if matches!(tag, 4 | 5) {\n                Some(SalvageHandover {\n                    cutter: r.u64()?,\n                    visit: r.u64()?,\n                    clock: r.u64()?,\n                })\n            } else {\n                None\n            };\n"
+        },
+        {
+          "offset": 4455,
+          "before": "",
+          "after": "                flight,\n"
+        }
+      ]
+    },
+    "flight/emp/replay.rs": {
+      "beforeSHA256": "7f87762c7c740e83abeaa4206f7630b2529ebe87d2ea11d24c52e6ea35a50388",
+      "afterSHA256": "2afccbfdf9833ebaed55af856256a53bb3946f8b40384258e812b22010b5d797",
+      "hunks": [
+        {
+          "offset": 5616,
+          "before": "            let clock = world\n                .damage\n                .berth_clock(event.dock.sequence())\n                .ok_or(INVALID)?;\n",
+          "after": "            let clock = if let Some(flight) = event.flight {\n                flight.clock\n            } else {\n                world\n                    .damage\n                    .berth_clock(event.dock.sequence())\n                    .ok_or(INVALID)?\n            };\n"
+        }
+      ]
+    },
+    "flight/emp/tests.rs": {
+      "beforeSHA256": "a54c4d2586a1bff8bdf24b8ed49759b13bfc3427bf99b9a3585f4f0b292ab6bf",
+      "afterSHA256": "fa0952492c31518165f8591524d6deb2ed4ad6b47b348e6d8d6ae14db4d328c2",
+      "hunks": [
+        {
+          "offset": 24305,
+          "before": "",
+          "after": "        occupied_salvage: w.occupied_salvage.clone(),\n"
+        },
+        {
+          "offset": 47339,
+          "before": "",
+          "after": "    disabled_native_target_with_fit(|_| {})\n}\nfn disabled_native_target_with_fit(\n    configure: impl FnOnce(&mut World),\n) -> (World, crate::traffic::NpcId) {\n"
+        },
+        {
+          "offset": 47774,
+          "before": "",
+          "after": "    configure(&mut w);\n"
+        },
+        {
+          "offset": 50112,
+          "before": "",
+          "after": "}\n\n#[test]\nfn manual_scanner_occupied_review_without_computers_requires_safe_hold_and_consent() {\n    use crate::equipment::{WorkTarget, WorkTargetId, WorkTargetRole};\n    use crate::{ModuleAction, ModuleKind, ModuleSlot, OccupiedCutError};\n    let (mut pilot, target) = disabled_native_target_with_fit(|world| {\n        let tick = world.snapshot().tick;\n        let bay = world.equipment_snapshot().unwrap().owned.unwrap();\n        world\n            .request_equipment(crate::equipment::Command::UnfitCargoBay(bay.id), tick)\n            .unwrap();\n        for slot in [\n            ModuleSlot::MiningTargeting,\n            ModuleSlot::SalvageTargeting,\n            ModuleSlot::Targeting,\n            ModuleSlot::Navigation,\n        ] {\n            if let Some(item) = world\n                .modular_equipment_snapshot()\n                .unwrap()\n                .items\n                .into_iter()\n                .find(|i| i.slot == Some(slot))\n            {\n                let review = world\n                    .review_module(ModuleAction::Store { item: item.id }, tick)\n                    .unwrap();\n                world.prepare_module(review, tick).unwrap().commit();\n            }\n        }\n        if world.fitted_fuel_scoops().is_none() {\n            let review = world\n                .review_module(ModuleAction::PurchaseFuelScoops, tick)\n                .unwrap();\n            world.prepare_module(review, tick).unwrap().commit();\n        }\n        let review = world\n            .review_module(\n                ModuleAction::Purchase {\n                    kind: ModuleKind::SalvageCutter,\n                },\n                tick,\n            )\n            .unwrap();\n        world.prepare_module(review, tick).unwrap().commit();\n    });\n    pilot\n        .request_emp_trigger(false, pilot.snapshot().tick)\n        .unwrap();\n    assert_eq!(pilot.targeting_tier(), None);\n    for _ in pilot.scanner_targets() {\n        pilot\n            .cycle_scanner_target(pilot.snapshot().tick, [1280, 720])\n            .unwrap();\n        if pilot.selected_disabled_salvage_target() == Some(target) {\n            break;\n        }\n    }\n    assert!(pilot.pilot_operates_selected_tool());\n    let opening = pilot.snapshot().tick;\n    assert!(pilot.review_occupied_cut(target, opening).is_err());\n    let review = loop {\n        let tick = pilot.snapshot().tick;\n        assert!(\n            tick < opening + 1600,\n            \"hand-flown cutter never reached the surface\"\n        );\n        match pilot.review_occupied_cut(target, tick) {\n            Ok(review) => break review,\n            Err(OccupiedCutError::UnsafeHold | OccupiedCutError::ContactUnavailable) => {}\n            Err(e) => panic!(\"unexpected manual review refusal: {e}\"),\n        }\n        let position = pilot\n            .traffic_snapshot()\n            .unwrap()\n            .actors\n            .into_iter()\n            .find(|a| a.id == target)\n            .unwrap()\n            .pose\n            .position;\n        let work = WorkTarget {\n            id: WorkTargetId::Wreck(target),\n            role: WorkTargetRole::WreckTracking,\n            position,\n        };\n        let controls = pilot.work_hold_input(work, steer_to_real_point(&pilot, position));\n        pilot.step(controls).unwrap();\n        assert_eq!(pilot.snapshot().motion_refusal, None);\n    };\n    let before = pilot.save_bytes().unwrap();\n    review.cancel();\n    assert_eq!(before, pilot.save_bytes().unwrap());\n    let review = pilot\n        .review_occupied_cut(target, pilot.snapshot().tick)\n        .unwrap();\n    let hold = pilot.service_snapshot();\n    let cash = pilot.credits_tenths();\n    let contact = pilot.prepare_occupied_cut(review).unwrap().commit();\n    assert_eq!(contact.target, target);\n    let loaded = cold(&pilot);\n    assert_eq!(\n        loaded.occupied_cut_contacts().collect::<Vec<_>>(),\n        vec![contact]\n    );\n    assert_eq!(loaded.service_snapshot(), hold);\n    assert_eq!(loaded.credits_tenths(), cash);\n}\n\nfn occupied_fixture(full_mounts: bool) -> (World, crate::traffic::NpcId, u64) {\n    use crate::equipment::TargetingTier;\n    use crate::{ModuleAction, ModuleKind, TargetingViewport};\n    fn buy(world: &mut World, kind: ModuleKind) {\n        let tick = world.snapshot().tick;\n        let action = if kind == ModuleKind::FuelScoops {\n            ModuleAction::PurchaseFuelScoops\n        } else {\n            ModuleAction::Purchase { kind }\n        };\n        let review = world.review_module(action, tick).unwrap();\n        world.prepare_module(review, tick).unwrap().commit();\n    }\n    let (mut world, target) = disabled_native_target_with_fit(|world| {\n        let bay = world.equipment_snapshot().unwrap().owned.unwrap();\n        // The three existing utility mounts are occupied. Use the normal berth\n        // equipment action before departure; never remove cargo capacity in flight.\n        world\n            .request_equipment(\n                crate::equipment::Command::UnfitCargoBay(bay.id),\n                world.snapshot().tick,\n            )\n            .unwrap();\n        if world.targeting_tier().is_none() {\n            buy(world, ModuleKind::Targeting(TargetingTier::Basic));\n        }\n        if !world.work_targeting_fit().salvage {\n            buy(world, ModuleKind::SalvageTargeting);\n        }\n        if world.fitted_fuel_scoops().is_none() {\n            buy(world, ModuleKind::FuelScoops);\n        }\n        buy(world, ModuleKind::SalvageCutter);\n        let cutter = world.fitted_salvage_cutter().unwrap();\n        let tick = world.snapshot().tick;\n        let review = world\n            .review_module(ModuleAction::Store { item: cutter.id }, tick)\n            .unwrap();\n        world.prepare_module(review, tick).unwrap().commit();\n        if full_mounts {\n            world\n                .request_equipment(\n                    crate::equipment::Command::FitCargoBay(bay.id),\n                    world.snapshot().tick,\n                )\n                .unwrap();\n        }\n    });\n    let cutter = world\n        .modular_equipment_snapshot()\n        .unwrap()\n        .items\n        .into_iter()\n        .find(|item| item.kind == ModuleKind::SalvageCutter)\n        .unwrap();\n    assert!(cutter.slot.is_none());\n    let cutter = cutter.id;\n    world\n        .request_emp_trigger(false, world.snapshot().tick)\n        .unwrap();\n    world.step(FlightInput::default()).unwrap();\n    let tick = world.snapshot().tick;\n    assert!(\n        world\n            .cycle_targeting(\n                tick,\n                TargetingViewport {\n                    size: [1280, 720],\n                    front: vec![target]\n                }\n            )\n            .unwrap()\n    );\n    for _ in 0..4 {\n        if world.selected_disabled_salvage_target() == Some(target) {\n            break;\n        }\n        world\n            .cycle_targeting(\n                tick,\n                TargetingViewport {\n                    size: [1280, 720],\n                    front: vec![target],\n                },\n            )\n            .unwrap();\n    }\n    assert_eq!(world.selected_disabled_salvage_target(), Some(target));\n    (world, target, cutter)\n}\n\n#[test]\nfn occupied_cut_requires_explicit_review_and_retains_actual_finite_game_contact() {\n    use crate::OccupiedCutError;\n    let (mut world, target, cutter) = occupied_fixture(false);\n    let tick = world.snapshot().tick;\n    // Readiness includes the actual working hold, so advance the ordinary guidance\n    // until the same review shown to the pilot becomes available.\n    let review = loop {\n        let now = world.snapshot().tick;\n        assert!(now - tick < 1600, \"occupied hold did not settle\");\n        match world.review_occupied_cut(target, now) {\n            Ok(review) => break review,\n            Err(\n                OccupiedCutError::UnsafeHold\n                | OccupiedCutError::ContactUnavailable\n                | OccupiedCutError::MissingFit,\n            ) => {\n                world.step(FlightInput::default()).unwrap();\n            }\n            Err(error) => panic!(\"unexpected occupied review refusal: {error}\"),\n        }\n    };\n    let before = world.save_bytes().unwrap();\n    assert!(world.modular.salvage_exchange_source() == Some(target));\n    assert_eq!(world.fitted_salvage_cutter().unwrap().id, cutter);\n    assert!(review.warning().contains(\"OCCUPIED / CLAIMED\"));\n    review.cancel();\n    assert_eq!(world.save_bytes().unwrap(), before);\n    let stale = world\n        .review_occupied_cut(target, world.snapshot().tick)\n        .unwrap();\n    world.step(FlightInput::default()).unwrap();\n    assert!(matches!(\n        world.prepare_occupied_cut(stale),\n        Err(OccupiedCutError::StaleReview)\n    ));\n    // The composed guidance owns the actual hold. Do not inject an actor, pose or cargo.\n    let contact = loop {\n        assert!(\n            world.snapshot().tick - tick < 1600,\n            \"actual occupied hold did not settle before recovery\"\n        );\n        let now = world.snapshot().tick;\n        let review = match world.review_occupied_cut(target, now) {\n            Ok(review) => review,\n            Err(OccupiedCutError::UnsafeHold | OccupiedCutError::ContactUnavailable) => {\n                world.step(FlightInput::default()).unwrap();\n                continue;\n            }\n            Err(error) => panic!(\"unexpected occupied review refusal: {error}\"),\n        };\n        let actor_before = world.traffic_snapshot().unwrap().actors;\n        let account = world.service_snapshot();\n        let credits = world.credits_tenths();\n        let receipt_count = world.occupied_cut_contacts().count();\n        match world.prepare_occupied_cut(review) {\n            Ok(prepared) => {\n                assert_eq!(\n                    prepared.publish_with(|_| Err::<(), _>(\"writer\")),\n                    Err(\"writer\")\n                );\n                assert_eq!(world.occupied_cut_contacts().count(), receipt_count);\n                let opening = world.save_bytes().unwrap();\n                let again = world.review_occupied_cut(target, now).unwrap();\n                let prepared = world.prepare_occupied_cut(again).unwrap();\n                let cold = World::from_save_bytes(prepared.bytes()).unwrap();\n                let contact = prepared.commit();\n                assert_ne!(world.save_bytes().unwrap(), opening);\n                assert_eq!(contact.cutter_item, cutter);\n                assert_eq!(contact.target, target);\n                assert_eq!(cold.occupied_cut_contacts().collect::<Vec<_>>(), [contact]);\n                assert_eq!(world.traffic_snapshot().unwrap().actors, actor_before);\n                assert_eq!(world.service_snapshot(), account);\n                assert_eq!(world.credits_tenths(), credits);\n                assert!(matches!(\n                    world.review_occupied_cut(target, now),\n                    Err(OccupiedCutError::Cooldown)\n                ));\n                break contact;\n            }\n            Err(OccupiedCutError::UnsafeHold | OccupiedCutError::ContactUnavailable) => {\n                assert_eq!(world.occupied_cut_contacts().count(), receipt_count);\n                world.step(FlightInput::default()).unwrap();\n            }\n            Err(error) => panic!(\"unexpected occupied hold refusal: {error}\"),\n        }\n    };\n    assert_eq!(world.occupied_cut_contacts().collect::<Vec<_>>(), [contact]);\n    let retained = world.save_bytes().unwrap();\n    let marker = retained\n        .windows(8)\n        .position(|part| part == b\"MCUT0002\")\n        .unwrap();\n    let mut erased = retained[..marker].to_vec();\n    erased.extend(crate::save::checksum(&erased).to_le_bytes());\n    assert!(World::from_save_bytes(&erased).is_err());\n    assert!(world.restore_bytes(&erased).is_err());\n    assert_eq!(world.save_bytes().unwrap(), retained);\n    world.cancel_targeting();\n    world.step(FlightInput::default()).unwrap();\n    assert!(world.fitted_salvage_cutter().is_none());\n    assert!(world.modular.salvage_exchange_source().is_none());\n    let durable = world.save_bytes().unwrap();\n    let mut cold = World::from_save_bytes(&durable).unwrap();\n    assert_eq!(cold.occupied_cut_contacts().collect::<Vec<_>>(), [contact]);\n    assert!(cold.fitted_salvage_cutter().is_none());\n    // This tiny historical mutation still passes the relative-speed envelope;\n    // only the independently retained preceding traffic movement rejects it.\n    let radius = cold\n        .station_data\n        .as_ref()\n        .unwrap()\n        .player_clearance_radius();\n    cold.occupied_salvage\n        .alter_first_target_speed_for_test(0.01, radius);\n    assert!(cold.save_bytes().is_err());\n    let forged = cold.unchecked_test_save().unwrap();\n    assert!(World::from_save_bytes(&forged).is_err());\n    assert!(world.restore_bytes(&forged).is_err());\n    assert_eq!(world.save_bytes().unwrap(), durable);\n}\n\n#[test]\nfn occupied_cut_with_all_mounts_committed_preserves_crew_and_equipment() {\n    let (mut world, target, _) = occupied_fixture(true);\n    let emp = world.owned_emp().unwrap();\n    let bay = world.equipment_snapshot().unwrap().owned.unwrap();\n    let scoops = world.fitted_fuel_scoops().unwrap().item;\n    assert!(emp.fitted && bay.fitted);\n    world.step(FlightInput::default()).unwrap();\n    assert_eq!(world.automatic_work_status(), Some(\"No free cutter mount\"));\n    assert!(matches!(\n        world.review_occupied_cut(target, world.snapshot().tick),\n        Err(crate::OccupiedCutError::MissingFit)\n    ));\n    assert_eq!(world.owned_emp(), Some(emp));\n    assert_eq!(world.equipment_snapshot().unwrap().owned, Some(bay));\n    assert_eq!(world.fitted_fuel_scoops().unwrap().item, scoops);\n    assert!(world.fitted_salvage_cutter().is_none());\n    assert!(world.modular.salvage_exchange_source().is_none());\n    assert_eq!(world.occupied_cut_contacts().count(), 0);\n    assert!(World::from_save_bytes(&world.save_bytes().unwrap()).is_ok());\n"
+        }
+      ]
+    },
+    "flight/emp/validation.rs": {
+      "beforeSHA256": "7fd4526c6dbf9d210ed92271ca21a0bdd292ded7f76f38730abf21a147777ab4",
+      "afterSHA256": "023730d48acca990555e97f3890022d65743661b674631ec8f8a9de2354d89f6",
+      "hunks": [
+        {
+          "offset": 1008,
+          "before": "            if e.dock.visit() >= scene.owner.visit\n                || world\n                    .damage\n                    .berth_clock(e.dock.sequence())\n                    .is_none_or(|c| c > scene.physical_tick)\n            {\n",
+          "after": "            let valid = if let Some(flight) = e.flight {\n                flight.visit <= scene.owner.visit && flight.clock <= scene.physical_tick\n            } else {\n                e.dock.visit() < scene.owner.visit\n                    && world\n                        .damage\n                        .berth_clock(e.dock.sequence())\n                        .is_some_and(|c| c <= scene.physical_tick)\n            };\n            if !valid {\n"
+        },
+        {
+          "offset": 15347,
+          "before": "",
+          "after": "                            | super::super::ModuleSlot::UtilitySalvageCutter\n"
+        }
+      ]
+    },
+    "flight/equipment.rs": {
+      "beforeSHA256": "713a79675f0805cb841a013ef7164aef33b72cb1cf22d5bfe5aca9c301347ad2",
+      "afterSHA256": "1d7aa717ee2bf796159db5341023241eab1107ee77495c247be032d57bff341a",
+      "hunks": [
+        {
+          "offset": 271,
+          "before": "",
+          "after": "        if self.modular.salvage_exchange_pending() {\n            return Err(MissionError::Equipment(equipment::Error::Unavailable));\n        }\n"
+        },
+        {
+          "offset": 2325,
+          "before": "",
+          "after": "        if self.modular.history_active() {\n            return self\n                .prepare_equipment(command, expected_tick)\n                .map(PreparedEquipment::commit)\n                .map_err(|error| match error {\n                    EquipmentPreparationError::Command(error) => error,\n                    EquipmentPreparationError::Save(_) => {\n                        MissionError::Equipment(equipment::Error::InvalidState)\n                    }\n                });\n        }\n"
+        },
+        {
+          "offset": 2916,
+          "before": "        let reserved_capacity = self.navigation_trade.reservations().capacity;\n",
+          "after": "        let reserved_capacity = self.navigation_trade.reservations().capacity\n            + self.cabin_tonnes().map_err(MissionError::Service)?;\n"
+        },
+        {
+          "offset": 5781,
+          "before": "                self.navigation_trade.reservations().capacity,\n",
+          "after": "                self.navigation_trade.reservations().capacity\n                    + self\n                        .cabin_tonnes()\n                        .map_err(|error| command_error(MissionError::Service(error)))?,\n"
+        },
+        {
+          "offset": 6138,
+          "before": "",
+          "after": "        let dock = self\n            .current_dock_context()\n            .ok_or_else(|| command_error(MissionError::NotDocked))?;\n"
+        },
+        {
+          "offset": 6313,
+          "before": "            let dock = self\n                .current_dock_context()\n                .ok_or_else(|| command_error(MissionError::NotDocked))?;\n",
+          "after": ""
+        },
+        {
+          "offset": 6464,
+          "before": "",
+          "after": "        modular.record_bay(&account, dock);\n"
+        }
+      ]
+    },
+    "flight/flight_reception.rs": {
+      "beforeSHA256": "da8439d39ef2142c84c998262c8996be84d8ab49278ff7eeb37c39ec3908c501",
+      "afterSHA256": "d2c6ac3b7f0f7d353de9017d70b4b6ccff04d0a320622eb797773abb072f7b75",
+      "hunks": [
+        {
+          "offset": 7518,
+          "before": "    // Only implemented owners count: original G02, T02, T01 and T04.\n",
+          "after": "    // Only implemented owners count: original G02, G04, T02, T01 and T04.\n"
+        },
+        {
+          "offset": 7807,
+          "before": "",
+          "after": "        let (passenger_records, passenger_active) = self.modular.passenger_occupancy();\n"
+        },
+        {
+          "offset": 8022,
+          "before": "",
+          "after": "                + passenger_records\n"
+        },
+        {
+          "offset": 8302,
+          "before": "",
+          "after": "                + passenger_active\n"
+        }
+      ]
+    },
+    "flight/flight_reception/persistence.rs": {
+      "beforeSHA256": "56280f5795f765306171297fc394e6852319d2ed6b5a0c5038400bcfbdd201c7",
+      "afterSHA256": "10f65a16d585475c279d21c93442bfbea20f2d799dbd26b7b94a7352911d2f78",
+      "hunks": [
+        {
+          "offset": 2094,
+          "before": "",
+          "after": "        let (passenger_records, passenger_active) = world.modular.passenger_occupancy();\n"
+        },
+        {
+          "offset": 2217,
+          "before": "",
+          "after": "            + passenger_records\n"
+        },
+        {
+          "offset": 2528,
+          "before": "",
+          "after": "            + passenger_active\n"
+        }
+      ]
+    },
+    "flight/mining.rs": {
+      "beforeSHA256": "0adb85d84d4db6783fec3dff02cdb66a1ebeafc26d7637be43d56e8a9930cbdf",
+      "afterSHA256": "159aa6934240088087db935838b6b06d5a7b3070c5ebd94d4ffc06f0c3054b8a",
+      "hunks": [
+        {
+          "offset": 332,
+          "before": "",
+          "after": "mod collection;\n"
+        },
+        {
+          "offset": 6528,
+          "before": "    /// A genuine paid fitted tool emits only after the actual native first-contact query.\n",
+          "after": "    /// A manual designation never bends the beam to the selected rock.\n    pub fn request_manual_mining(&mut self) -> Result<MiningShot, MiningError> {\n        let tool = self.mining_tool_authority()?;\n        let Some(crate::equipment::WorkTargetId::Asteroid(id)) =\n            self.selected_work_target().map(|work| work.id)\n        else {\n            return Err(MiningError::NoTarget);\n        };\n        if !self.pilot_operates_selected_tool() {\n            return Err(MiningError::NoTarget);\n        }\n        self.mine(tool, self.state.tick, Some(id))\n    }\n\n    /// An actual owned fitted tool emits only after the native first-contact query.\n"
+        },
+        {
+          "offset": 7361,
+          "before": "",
+          "after": "    ) -> Result<MiningShot, MiningError> {\n        self.mine(tool, tick, None)\n    }\n\n    fn mine(\n        &mut self,\n        tool: MiningToolAuthority,\n        tick: u64,\n        selected: Option<crate::mining::AsteroidId>,\n"
+        },
+        {
+          "offset": 9706,
+          "before": "",
+          "after": "            .filter(|hit| selected.is_none_or(|id| id == hit.asteroid))\n"
+        },
+        {
+          "offset": 11917,
+          "before": "    /// Paid fitted equipment alone cannot replace an eligible original physical ore actor.\n    /// Pending descriptions never confer collection authority or cargo ownership.\n    pub fn request_collect_mined_ore(&mut self, tick: u64) -> Result<(), MiningError> {\n        if tick != self.state.tick {\n            return Err(MiningError::StaleCommand);\n",
+          "after": "    pub(in crate::flight) fn auto_mine_tick(\n        &mut self,\n        id: crate::mining::AsteroidId,\n    ) -> &'static str {\n        if !self.mining_selected(id) {\n            return \"Target released\";\n"
+        },
+        {
+          "offset": 12131,
+          "before": "        if self.is_paused() {\n            return Err(MiningError::Paused);\n        }\n        if self.state.mode != FlightMode::Flight {\n            return Err(MiningError::NotInFlight);\n",
+          "after": "        let Some(body) = self\n            .mining\n            .body(usize::from(id.ordinal()))\n            .filter(|b| b.id == id)\n        else {\n            return \"Target unavailable\";\n        };\n        if body.remaining_energy <= 0.0 {\n            return if self.mining_collection_target(id).is_some() {\n                \"Ore ready\"\n            } else {\n                \"Mining complete\"\n            };\n"
+        },
+        {
+          "offset": 12596,
+          "before": "            Err(MiningError::NoScoops)\n        } else {\n            Err(MiningError::NoEligibleOreBody)\n",
+          "after": "            return \"Fit fuel scoops\";\n        }\n        match self.prepare_mining_intake_account(body.commodity) {\n            Err(MiningError::HoldFull) => return \"Cargo hold full\",\n            Err(_) => return \"Cargo unavailable\",\n            Ok(_) => {}\n        }\n        if self\n            .mining_belt_snapshot()\n            .and_then(|belt| belt.front_contact)\n            .is_none_or(|contact| contact.asteroid != id)\n        {\n            return \"Align mining laser\";\n        }\n        match self.select_auto_mining_tool() {\n            Ok(()) => {}\n            Err(MiningError::NoCompatibleFittedTool) => return \"Fit mining laser\",\n            Err(MiningError::ProtectedActivity) => return \"Protected activity\",\n            Err(MiningError::Resources) => return \"Mining recharging\",\n            Err(_) => return \"Mining unavailable\",\n        }\n        let Ok(tool) = self.mining_tool_authority() else {\n            return \"Fit mining laser\";\n        };\n        match self.request_mining(tool, self.state.tick) {\n            Ok(shot) if shot.extracted_units > 0 => \"Ore ready\",\n            Ok(_) => \"Mining pulse\",\n            Err(MiningError::Resources) => \"Mining recharging\",\n            Err(MiningError::ProtectedActivity) => \"Protected activity\",\n            Err(_) => \"Mining unavailable\",\n"
+        }
+      ]
+    },
+    "flight/mining/persistence.rs": {
+      "beforeSHA256": "ead28490b90682e5d10eaafa9144b3225dd21337048e2dd09112109384d65e3b",
+      "afterSHA256": "bb89cd2d613a6452f256a13fbb7377fc5041d82e23aa9e4f5ddf528c6b443417",
+      "hunks": [
+        {
+          "offset": 4905,
+          "before": "        // Without an eligible original ore-body/intake producer, there is no cargo credit,\n        // market/revision adjustment or collected receipt to synthesize during load.\n",
+          "after": "        for receipt in self.mining.collections() {\n            if receipt.owner.owner != owner.owner\n                || receipt.owner.hull != owner.hull\n                || receipt.owner.visit > owner.visit\n                || receipt.world_tick > self.state.tick\n                || receipt.physical_tick > self.combat.physical_tick()\n                || self\n                    .jump_journal\n                    .system_at_visit(receipt.owner.visit, receipt.world_tick)?\n                    != receipt.owner.system\n                || self\n                    .commander_account\n                    .as_ref()\n                    .is_none_or(|a| receipt.revision > a.revision())\n                || !modules.scoop_was_fitted_for_collection(receipt)\n                || (receipt.world_tick == self.state.tick\n                    && (flight_pose(self.state.position, self.state.orientation)\n                        != Some(receipt.pose)\n                        || self.state.speed != receipt.speed))\n            {\n                return Err(invalid);\n            }\n            let (jumps, arrival) = self.jump_journal.visit_origin(receipt.owner.visit);\n            let launch = receipt\n                .owner\n                .visit\n                .checked_sub(1)\n                .and_then(|v| v.checked_sub(jumps))\n                .ok_or(invalid)?;\n            let berth = self.damage.berth_clock(launch).ok_or(invalid)?;\n            if arrival.map_or(receipt.physical_tick <= berth, |arrival| {\n                receipt.physical_tick < arrival\n            }) || self\n                .damage\n                .berth_clock(launch.checked_add(1).ok_or(invalid)?)\n                .is_some_and(|next| receipt.physical_tick >= next)\n            {\n                return Err(invalid);\n            }\n        }\n"
+        },
+        {
+          "offset": 7404,
+          "before": "        let Some(data) = &self.station_data else {\n            return false;\n        };\n        original\n            .bodies()\n            .into_iter()\n            .filter(|body| body.remaining_energy > 0.0)\n            .all(|body| {\n                !body.contains_point(pose.position)\n                    && data.asteroid_motion_clear(pose, pose, 0.0, body)\n            })\n",
+          "after": "        self.mining_motion_clear_with(\n            &original,\n            crate::navigation::SystemId::AVENOR,\n            pose,\n            pose,\n            0.0,\n        )\n"
+        }
+      ]
+    },
+    "flight/mining/tests.rs": {
+      "beforeSHA256": "9f1eb512ae11cf9f688236e4529e4d48006bb3e5a97609b3aee7ff0c6ea144a8",
+      "afterSHA256": "b248399997fcca376ce1430e8610e4b920a9679ee128268436d9c9483be83424",
+      "hunks": [
+        {
+          "offset": 3194,
+          "before": "",
+          "after": "}\n\n#[test]\nfn paid_scoops_take_one_physical_fragment_once_and_sell_it_after_cold_continue() {\n    paid_fragment_journey(false);\n}\n\n#[test]\nfn manual_scanner_laser_and_scoop_use_actual_hardware_without_computers() {\n    paid_fragment_journey(true);\n}\n\nfn designate(world: &mut World, id: crate::equipment::WorkTargetId) {\n    for _ in world.scanner_targets() {\n        assert!(ok(\n            world.cycle_scanner_target(world.snapshot().tick, [1280, 720])\n        ));\n        if world\n            .selected_work_target()\n            .is_some_and(|work| work.id == id)\n        {\n            return;\n        }\n    }\n    panic!(\"scanner did not offer {id:?}\");\n}\n\n#[test]\nfn manual_mining_accepts_basic_alignment_without_mining_targeting() {\n    use crate::{\n        ModuleKind,\n        equipment::{TargetingTier, WorkTargetId},\n    };\n    let (mut world, _) = paid(12005);\n    module(\n        &mut world,\n        ModuleAction::Purchase {\n            kind: ModuleKind::Targeting(TargetingTier::Basic),\n        },\n    );\n    approach(&mut world);\n    let contact = some(some(world.mining_belt_snapshot()).front_contact);\n    designate(&mut world, WorkTargetId::Asteroid(contact.asteroid));\n    assert!(!world.manual_scanner_target());\n    assert!(!world.work_targeting_fit().mining);\n    assert!(world.pilot_operates_selected_tool());\n    assert_eq!(\n        ok(world.request_manual_mining()).contact.asteroid,\n        contact.asteroid\n    );\n}\n\nfn paid_fragment_journey(manual: bool) {\n    use crate::equipment::WorkTargetId;\n    let (mut world, _) = paid(12005);\n    module(&mut world, ModuleAction::PurchaseFuelScoops);\n    approach(&mut world);\n    let cash = world.credits_tenths();\n    if manual {\n        assert_eq!(world.targeting_tier(), None);\n        let belt = some(world.mining_belt_snapshot());\n        let rock = some(belt.front_contact).asteroid;\n        let other = some(belt.bodies.iter().find(|body| body.id != rock)).id;\n        designate(&mut world, WorkTargetId::Asteroid(other));\n        let before = ok(world.save_bytes());\n        assert!(matches!(\n            world.request_manual_mining(),\n            Err(MiningError::NoTarget)\n        ));\n        assert_eq!(ok(world.save_bytes()), before);\n        designate(&mut world, WorkTargetId::Asteroid(rock));\n        ok(world.request_manual_mining());\n    } else {\n        work(&mut world);\n    }\n    steps(&mut world, 18);\n    let shot = if manual {\n        ok(world.request_manual_mining())\n    } else {\n        work(&mut world)\n    };\n    if manual {\n        let ore = some(world.mining_collection_target(shot.contact.asteroid));\n        designate(&mut world, WorkTargetId::Ore(ore.id));\n        assert_eq!(\n            world.request_manual_ore_collection(),\n            Err(MiningError::NoEligibleOreBody)\n        );\n    }\n    let t = world.snapshot().tick;\n    let before = ok(world.save_bytes());\n    assert_eq!(\n        world.request_collect_mined_ore(t - 1),\n        Err(MiningError::StaleCommand)\n    );\n    assert_eq!(\n        world.request_collect_mined_ore(t),\n        Err(MiningError::NoEligibleOreBody)\n    );\n    assert_eq!(ok(world.save_bytes()), before);\n\n    // Real flight controls only. Approach the drifting source horizontally, then rotate\n    // the lower-forward aperture towards the fragment while stopped.\n    for _ in 0..2200 {\n        let ore = some(world.mining_collection_target(shot.contact.asteroid));\n        let player = some(flight_pose(\n            world.snapshot().position,\n            world.snapshot().orientation,\n        ));\n        let horizontal =\n            (ore.position.x - player.position.x).hypot(ore.position.z - player.position.z);\n        let speed = world.snapshot().speed;\n        // The source never stops moving. Waiting for both exact zero ship speed and a\n        // moving projected standoff can chase it forever while it climbs beyond the aperture.\n        // Brake as soon as the real player is inside the standoff at a low closing speed.\n        if horizontal < 70.0 && speed <= 0.7 {\n            break;\n        }\n        let desired = ((2.0 * 9.1 * (horizontal - 58.0).max(0.0) / 18.0).sqrt() as f32).min(30.0);\n        ok(world.step(FlightInput {\n            throttle: ((desired - speed) / (9.1 / 60.0)).clamp(-1.0, 1.0),\n            ..FlightInput::default()\n        }));\n        assert_eq!(world.snapshot().motion_refusal, None);\n    }\n    stop(&mut world);\n    let ore = some(world.mining_collection_target(shot.contact.asteroid));\n    let player = some(flight_pose(\n        world.snapshot().position,\n        world.snapshot().orientation,\n    ));\n    let delta = crate::docking::Vec3::new(\n        ore.position.x - player.position.x,\n        ore.position.y - player.position.y,\n        ore.position.z - player.position.z,\n    );\n    assert!(\n        delta.dot(delta).sqrt() < 85.0,\n        \"public approach failed to enter aperture range: player={player:?} ore={ore:?} delta={delta:?}\"\n    );\n    let mut collected = false;\n    let mut pitch_ticks = 0;\n    for _ in 0..100 {\n        let tick = world.snapshot().tick;\n        match if manual {\n            world.request_manual_ore_collection()\n        } else {\n            world.request_collect_mined_ore(tick)\n        } {\n            Ok(()) => {\n                collected = true;\n                break;\n            }\n            Err(MiningError::NoEligibleOreBody) => {}\n            Err(error) => panic!(\"unexpected actual scoop refusal: {error:?}\"),\n        }\n        ok(world.step(FlightInput {\n            pitch: 1.0,\n            ..FlightInput::default()\n        }));\n        pitch_ticks += 1;\n    }\n    assert!(\n        collected,\n        \"physical controls never reached the lower-forward fragment: final player={:?} ore={:?}\",\n        flight_pose(world.snapshot().position, world.snapshot().orientation),\n        world.mining_collection_target(shot.contact.asteroid)\n    );\n    assert_eq!(world.credits_tenths(), cash);\n    assert_eq!(world.commodity_quantity(shot.commodity), Some(1));\n    assert!(some(world.mining_belt_snapshot()).pending_ore.is_empty());\n    let mut loaded = cold(&world);\n    assert_eq!(loaded.commodity_quantity(shot.commodity), Some(1));\n    let before = ok(loaded.save_bytes());\n    let tick = loaded.snapshot().tick;\n    assert_eq!(\n        loaded.request_collect_mined_ore(tick),\n        Err(MiningError::NoEligibleOreBody)\n    );\n    assert_eq!(ok(loaded.save_bytes()), before);\n    // Route away from the empty source with public controls before a normal station sale.\n    // Returning the pitch to horizontal avoids a vertical drift on the dock helper.\n    for _ in 0..pitch_ticks {\n        ok(loaded.step(FlightInput {\n            pitch: -1.0,\n            ..FlightInput::default()\n        }));\n    }\n    fly_axis(&mut loaded, 0, 0.0, 10.0);\n    dock(&mut loaded);\n    let tick = loaded.snapshot().tick;\n    ok(loaded.request_station_service(\n        crate::station_services::Command::SellCommodity(shot.commodity),\n        tick,\n    ));\n    assert_eq!(loaded.commodity_quantity(shot.commodity), Some(0));\n    assert!(some(loaded.credits_tenths()) > some(cash));\n    let _ = cold(&loaded);\n}\n\n#[test]\nfn explicit_max_owns_stored_mining_tool_and_reversible_exchange_preserves_shared_pools() {\n    use crate::{ModuleKind, ModuleSlot, XyzzyAction};\n    let mut world = ok(World::new_commander(12005));\n    let review = ok(world.review_xyzzy(XyzzyAction::Enter, 0));\n    ok(world.prepare_xyzzy(review, 0)).commit();\n    let items = some(world.modular_equipment_snapshot()).items;\n    let mining = some(\n        items\n            .iter()\n            .find(|i| i.kind == ModuleKind::MiningLaser)\n            .copied(),\n    );\n    let naval = some(\n        items\n            .iter()\n            .find(|i| i.kind == ModuleKind::NavalLaser)\n            .copied(),\n    );\n    assert_eq!(mining.slot, None);\n    assert_eq!(naval.slot, Some(ModuleSlot::FrontLaser));\n    use crate::station_services::{CargoUnit, Command, CommodityId};\n    for commodity in CommodityId::ALL\n        .into_iter()\n        .filter(|id| id.unit() == CargoUnit::Tonne && id.departure_legal_weight() == 0)\n    {\n        loop {\n            let service = some(world.service_snapshot());\n            if service.used_tonnes == service.hold_capacity_tonnes\n                || some(world.commodity_quote(commodity)).stock == 0\n            {\n                break;\n            }\n            let tick = world.snapshot().tick;\n            ok(world.request_station_service(Command::BuyCommodity(commodity), tick));\n        }\n    }\n    let full = some(world.service_snapshot());\n    assert_eq!(full.used_tonnes, full.hold_capacity_tonnes);\n    let unchanged = ok(world.save_bytes());\n    assert_eq!(\n        world.prepare_mining_intake_account(CommodityId::Alloys),\n        Err(MiningError::HoldFull)\n    );\n    assert!(\n        world\n            .prepare_mining_intake_account(CommodityId::Gold)\n            .is_ok()\n    );\n    assert_eq!(ok(world.save_bytes()), unchanged);\n    launch(&mut world);\n    stop(&mut world);\n    let target = some(world.mining_belt_snapshot()).bodies[0].id;\n    ok(world.cycle_target_filter());\n    let tick = world.snapshot().tick;\n    ok(world.cycle_targeting_with_work(\n        tick,\n        crate::TargetingViewport {\n            size: [800, 600],\n            front: Vec::new(),\n        },\n        &[crate::equipment::WorkTargetId::Asteroid(target)],\n    ));\n    let cash = world.credits_tenths();\n    let pools = world.flight_resources_snapshot();\n    ok(world.select_auto_mining_tool());\n    assert_eq!(some(world.fitted_mining_tool()).item, mining.id);\n    assert_eq!(world.credits_tenths(), cash);\n    assert_eq!(world.flight_resources_snapshot(), pools);\n    let before = ok(world.save_bytes());\n    assert_eq!(world.auto_mine_tick(target), \"Cargo hold full\");\n    assert_eq!(ok(world.save_bytes()), before);\n    let mut cold_world = cold(&world);\n    world.cancel_targeting();\n    assert_eq!(world.auto_mine_tick(target), \"Target released\");\n    assert_eq!(ok(world.save_bytes()), before);\n    ok(world.restore_auto_mining_tool());\n    ok(cold_world.restore_auto_mining_tool());\n    for restored in [&mut world, &mut cold_world] {\n        let fit = some(restored.modular_equipment_snapshot());\n        assert_eq!(\n            some(fit.items.iter().find(|item| item.id == naval.id)).slot,\n            Some(ModuleSlot::FrontLaser)\n        );\n        assert_eq!(\n            some(fit.items.iter().find(|item| item.id == mining.id)).slot,\n            None\n        );\n        let before = ok(restored.save_bytes());\n        ok(restored.restore_auto_mining_tool());\n        assert_eq!(ok(restored.save_bytes()), before);\n        assert_eq!(restored.flight_resources_snapshot(), pools);\n        assert_eq!(restored.credits_tenths(), cash);\n    }\n    let _ = cold(&world);\n"
+        }
+      ]
+    },
+    "flight/missiles/persistence.rs": {
+      "beforeSHA256": "2e718d247213f6781d000647881db3ff8e5874f4a9b81ca270d3b3a8e8f80cd2",
+      "afterSHA256": "492d9bd87244d79317fe79d8f74fa83755f0685250b659a6b8161ba42b122f7f",
+      "hunks": [
+        {
+          "offset": 52367,
+          "before": "                .front_weapon_at_tick(shot.fitted_item_id, shot.tick)\n",
+          "after": "                .front_weapon_at_tick(shot.fitted_item_id, shot.tick, emission)\n"
+        }
+      ]
+    },
+    "flight/mission.rs": {
+      "beforeSHA256": "459fc142365978d14067abf4e00e443b1f479278c6d501482a10de4c9a644360",
+      "afterSHA256": "8a27c24221dbac7ba45953cc81b57507f1a78784c650a46594d9377ac9bbc5f3",
+      "hunks": [
+        {
+          "offset": 10723,
+          "before": "",
+          "after": "        let cargo_dock = self.current_dock_context().ok_or(MissionError::NotDocked)?;\n"
+        },
+        {
+          "offset": 11202,
+          "before": "        session\n",
+          "after": "        let sequence = session.state.cargo_sequence();\n        let event = session\n"
+        },
+        {
+          "offset": 11347,
+          "before": "            .map_err(MissionError::Freight)\n",
+          "after": "            .map_err(MissionError::Freight)?;\n        if session.state.cargo_sequence() != sequence {\n            self.modular.record_freight(\n                account.revision(),\n                session.state.cargo_sequence(),\n                cargo_dock,\n            );\n        }\n        Ok(event)\n"
+        }
+      ]
+    },
+    "flight/modular.rs": {
+      "beforeSHA256": "41fdf96e06b0f88ad0357ef7915bae79778402b8a944469186840d6ceb803602",
+      "afterSHA256": "271c8afc708a475b106eac5999f64a757fe83de5e0814f6477a9bed90b948133",
+      "hunks": [
+        {
+          "offset": 360,
+          "before": "",
+          "after": "mod cabins;\n"
+        },
+        {
+          "offset": 390,
+          "before": "",
+          "after": "mod history;\nmod salvage;\npub(super) use cabins::add_cabin_mass;\npub use cabins::{\n    CABIN_TONNES, CabinGrade, CabinStatus, PASSAGE_CLUE_ID, PASSAGE_REWARD_TENTHS, PassageStatus,\n    PassageTerminalReceipt, PassengerAction, PassengerIdentity, PassengerJourneySnapshot,\n};\n"
+        },
+        {
+          "offset": 1239,
+          "before": "",
+          "after": "    SalvageCutter,\n"
+        },
+        {
+          "offset": 1478,
+          "before": "",
+          "after": "    Cabin(CabinGrade),\n"
+        },
+        {
+          "offset": 1806,
+          "before": "",
+          "after": "            Self::SalvageCutter => \"utility-salvageCutter\",\n"
+        },
+        {
+          "offset": 2355,
+          "before": "",
+          "after": "            Self::Cabin(_) => \"passenger-cabins\",\n"
+        },
+        {
+          "offset": 3591,
+          "before": "",
+          "after": "            Self::SalvageCutter => \"Salvage Cutter\",\n"
+        },
+        {
+          "offset": 4155,
+          "before": "",
+          "after": "            Self::Cabin(grade) => grade.name(),\n"
+        },
+        {
+          "offset": 5737,
+          "before": "",
+          "after": "            Self::SalvageCutter => ModuleSlot::UtilitySalvageCutter,\n"
+        },
+        {
+          "offset": 6357,
+          "before": "",
+          "after": "            Self::Cabin(_) => ModuleSlot::PassengerCabin,\n"
+        },
+        {
+          "offset": 7259,
+          "before": "",
+          "after": "                | Self::MiningLaser\n"
+        },
+        {
+          "offset": 7373,
+          "before": "",
+          "after": "                | Self::SalvageCutter\n"
+        },
+        {
+          "offset": 8212,
+          "before": "            Self::FuelStorage | Self::Ecm => 1,\n",
+          "after": "            Self::FuelStorage | Self::Ecm | Self::SalvageCutter => 1,\n"
+        },
+        {
+          "offset": 8342,
+          "before": "",
+          "after": "            Self::Cabin(_) => 1,\n"
+        },
+        {
+          "offset": 8556,
+          "before": "",
+          "after": "            Self::SalvageCutter => Some((25_000, 7)),\n"
+        },
+        {
+          "offset": 9901,
+          "before": "",
+          "after": "            Self::Cabin(grade) => Some((grade.price_tenths(), 1)),\n"
+        },
+        {
+          "offset": 11190,
+          "before": "",
+          "after": "            // The shared inventory limit is stricter than the legacy ownership cap.\n            Self::Cabin(_) => 256,\n"
+        },
+        {
+          "offset": 12316,
+          "before": "",
+          "after": "            Self::SalvageCutter => 33,\n            Self::Cabin(grade) => 40 + grade as u8,\n"
+        },
+        {
+          "offset": 13556,
+          "before": "",
+          "after": "            33 => Ok(Self::SalvageCutter),\n            40..=45 => Ok(Self::Cabin(CabinGrade::ALL[usize::from(tag - 40)])),\n"
+        },
+        {
+          "offset": 13865,
+          "before": "",
+          "after": "    UtilitySalvageCutter,\n"
+        },
+        {
+          "offset": 14025,
+          "before": "",
+          "after": "    PassengerCabin,\n"
+        },
+        {
+          "offset": 15352,
+          "before": "    Purchase { kind: ModuleKind },\n",
+          "after": "    Purchase {\n        kind: ModuleKind,\n    },\n"
+        },
+        {
+          "offset": 15424,
+          "before": "    Store { item: u64 },\n    Install { item: u64, replacing: Option<u64> },\n",
+          "after": "    /// Reserved for the explicit XYZZY outfit; ordinary reviews refuse it.\n    GrantStoredSalvageCutter,\n    /// Internal reversible utility placement for an admitted external recovery.\n    FlightSalvageExchange {\n        source: crate::traffic::NpcId,\n        cutter: u64,\n        displaced_emp: Option<u64>,\n        visit: u64,\n        clock: u64,\n        restoring: bool,\n    },\n    Store {\n        item: u64,\n    },\n    Install {\n        item: u64,\n        replacing: Option<u64>,\n    },\n    Passenger(PassengerAction),\n    #[doc(hidden)]\n    GrantStoredMiningLaser,\n    #[doc(hidden)]\n    FlightLaserExchange {\n        item: u64,\n        replacing: u64,\n        visit: u64,\n        clock: u64,\n        emission: u64,\n        restoring: bool,\n    },\n"
+        },
+        {
+          "offset": 16343,
+          "before": "            Self::PurchaseMiningLaser => Some(ModuleKind::MiningLaser),\n",
+          "after": "            Self::GrantStoredSalvageCutter => Some(ModuleKind::SalvageCutter),\n            Self::PurchaseMiningLaser | Self::GrantStoredMiningLaser => {\n                Some(ModuleKind::MiningLaser)\n            }\n"
+        },
+        {
+          "offset": 17452,
+          "before": "",
+          "after": "    CabinOccupied,\n    PassageConsent,\n    PassageClosed,\n    PassageHistory,\n"
+        },
+        {
+          "offset": 18326,
+          "before": "",
+          "after": "    history: history::History,\n    salvage: salvage::State,\n"
+        },
+        {
+          "offset": 19788,
+          "before": "",
+          "after": "    passage: cabins::Passage,\n    auto_return: Option<u64>,\n    salvage_return: Option<salvage::Exchange>,\n"
+        },
+        {
+          "offset": 19911,
+          "before": "",
+          "after": "    pub(super) fn passenger_totals(&self) -> (u32, u64) {\n        (self.passage.reward(), self.passage.events)\n    }\n"
+        },
+        {
+          "offset": 22615,
+          "before": "",
+          "after": "    fn awake_cabin_count(&self) -> usize {\n        self.items\n            .iter()\n            .filter(|item| cabins::fitted_cabin(item).is_some_and(CabinGrade::supports_awake))\n            .count()\n    }\n"
+        },
+        {
+          "offset": 24829,
+          "before": "",
+          "after": "        // A cabin is a separate physical module; fitting one never ejects another.\n        if slot == ModuleSlot::PassengerCabin {\n            if replacing.is_some() {\n                return Err(ModuleError::StaleOccupant);\n            }\n            self.items[index].slot = Some(slot);\n            return Ok(());\n        }\n"
+        },
+        {
+          "offset": 26911,
+          "before": "",
+          "after": "        if self.salvage_return.is_some()\n            && !matches!(event.action, ModuleAction::FlightSalvageExchange { .. })\n        {\n            return Err(ModuleError::Capacity);\n        }\n        if let ModuleAction::FlightLaserExchange {\n            item,\n            replacing,\n            restoring,\n            ..\n        } = event.action\n        {\n            if event.xyzzy\n                || event.item != item\n                || self.front().is_none_or(|front| front.id != replacing)\n            {\n                return Err(ModuleError::StaleOccupant);\n            }\n            let index = self\n                .items\n                .iter()\n                .position(|i| i.id == item && i.slot.is_none())\n                .ok_or(ModuleError::MissingItem)?;\n            let current = self.front().ok_or(ModuleError::MissingItem)?;\n            let target = self.items[index];\n            let combat = |kind| {\n                kind != ModuleKind::MiningLaser\n                    && super::OrdinaryWeapon::from_module(kind).is_some()\n            };\n            let adopting = !restoring\n                && current.kind == ModuleKind::MiningLaser\n                && combat(target.kind)\n                && self.auto_return.is_none();\n            if adopting {\n                self.auto_return = Some(item);\n            } else if !restoring\n                && target.kind == ModuleKind::MiningLaser\n                && combat(current.kind)\n                && self.auto_return.is_none()\n            {\n                self.auto_return = Some(replacing);\n            } else if restoring\n                && current.kind == ModuleKind::MiningLaser\n                && combat(target.kind)\n                && self.auto_return == Some(item)\n            {\n                self.auto_return = None;\n            } else {\n                return Err(ModuleError::StaleOccupant);\n            }\n            if !adopting {\n                self.install(index, Some(replacing))?;\n            }\n            self.revision = self\n                .revision\n                .checked_add(1)\n                .ok_or(ModuleError::SequenceExhausted)?;\n            return Ok(());\n        }\n        if matches!(\n            event.action,\n            ModuleAction::GrantStoredMiningLaser | ModuleAction::GrantStoredSalvageCutter\n        ) && !event.xyzzy\n        {\n            return Err(ModuleError::NotForSale);\n        }\n"
+        },
+        {
+          "offset": 29827,
+          "before": "            let replacing = if kind == ModuleKind::FuelStorage {\n                None\n            } else {\n                self.fitted(kind.slot()).map(|i| i.id)\n            };\n",
+          "after": "            let replacing =\n                if kind == ModuleKind::FuelStorage || kind.slot() == ModuleSlot::PassengerCabin {\n                    None\n                } else {\n                    self.fitted(kind.slot()).map(|i| i.id)\n                };\n"
+        },
+        {
+          "offset": 30854,
+          "before": "            self.install(self.items.len() - 1, replacing)?;\n",
+          "after": "            if !matches!(\n                event.action,\n                ModuleAction::GrantStoredMiningLaser | ModuleAction::GrantStoredSalvageCutter\n            ) {\n                self.install(self.items.len() - 1, replacing)?;\n                if kind.slot() == ModuleSlot::FrontLaser {\n                    self.auto_return = None;\n                }\n            }\n"
+        },
+        {
+          "offset": 31444,
+          "before": "",
+          "after": "                ModuleAction::FlightSalvageExchange { .. } => self.apply_salvage_exchange(event)?,\n"
+        },
+        {
+          "offset": 31593,
+          "before": "",
+          "after": "                    if self\n                        .salvage_return\n                        .is_some_and(|exchange| exchange.cutter == item)\n                    {\n                        return Err(ModuleError::Capacity);\n                    }\n                    if self.passage.occupied(item) {\n                        return Err(ModuleError::CabinOccupied);\n                    }\n"
+        },
+        {
+          "offset": 32598,
+          "before": "",
+          "after": "                    if i.slot == Some(ModuleSlot::FrontLaser) {\n                        self.auto_return = None;\n                    }\n"
+        },
+        {
+          "offset": 33319,
+          "before": "",
+          "after": "                    if self.items[index].kind.slot() == ModuleSlot::FrontLaser {\n                        self.auto_return = None;\n                    }\n"
+        },
+        {
+          "offset": 33539,
+          "before": "",
+          "after": "                | ModuleAction::GrantStoredMiningLaser\n                | ModuleAction::FlightLaserExchange { .. }\n"
+        },
+        {
+          "offset": 33704,
+          "before": "",
+          "after": "                | ModuleAction::GrantStoredSalvageCutter\n"
+        },
+        {
+          "offset": 33889,
+          "before": "",
+          "after": "                ModuleAction::Passenger(action) => return self.apply_passage(event, action),\n"
+        },
+        {
+          "offset": 38069,
+          "before": "",
+          "after": "            } else if let ModuleAction::Passenger(action) = e.action {\n                match action {\n                    PassengerAction::RequestReplies | PassengerAction::Board => {\n                        super::AccountEffect::ObserveFuel(\n                            cabins::receipt_fuel(e.item).ok_or(INVALID)?,\n                        )\n                    }\n                    PassengerAction::Receive => super::AccountEffect::Reward(PASSAGE_REWARD_TENTHS),\n                    PassengerAction::Cancel => super::AccountEffect::Debit(0),\n                }\n            } else if matches!(\n                e.action,\n                ModuleAction::FlightSalvageExchange { .. }\n                    | ModuleAction::FlightLaserExchange { .. }\n            ) || (self.history.tracks_revision(e.revision)\n                && matches!(\n                    e.action,\n                    ModuleAction::Store { .. } | ModuleAction::Install { .. }\n                ))\n            {\n                super::AccountEffect::Debit(0)\n"
+        },
+        {
+          "offset": 39355,
+          "before": "",
+          "after": "    }\n\n    pub(super) fn passenger_occupancy(&self) -> (usize, usize) {\n        let boarded = self\n            .events\n            .iter()\n            .any(|e| e.action == ModuleAction::Passenger(PassengerAction::Board));\n        let ended = self.events.iter().any(|e| {\n            matches!(\n                e.action,\n                ModuleAction::Passenger(PassengerAction::Receive | PassengerAction::Cancel)\n            )\n        });\n        (usize::from(boarded), usize::from(boarded && !ended))\n    }\n\n    pub(super) fn passenger_aboard_at(&self, revision: u64) -> bool {\n        let mut aboard = false;\n        for event in self\n            .events\n            .iter()\n            .take_while(|event| event.revision <= revision)\n        {\n            match event.action {\n                ModuleAction::Passenger(PassengerAction::Board) => aboard = true,\n                ModuleAction::Passenger(PassengerAction::Receive | PassengerAction::Cancel) => {\n                    aboard = false\n                }\n                _ => {}\n            }\n        }\n        aboard\n"
+        },
+        {
+          "offset": 40922,
+          "before": "        for e in self.events.iter().filter(|e| e.tick <= hit.world_tick) {\n",
+          "after": "        for e in self\n            .events\n            .iter()\n            .filter(|e| e.revision <= hit.account_revision)\n        {\n"
+        },
+        {
+          "offset": 41224,
+          "before": "                || e.revision > hit.account_revision\n",
+          "after": "                || e.tick > hit.world_tick\n"
+        },
+        {
+          "offset": 41561,
+          "before": "                && matches!(i.provenance, ModuleProvenance::Paid { .. })\n",
+          "after": "                && matches!(\n                    i.provenance,\n                    ModuleProvenance::Paid { .. } | ModuleProvenance::XYZzy { .. }\n                )\n"
+        },
+        {
+          "offset": 42459,
+          "before": "",
+          "after": "        let mut previous_exchange: Option<(u64, u64, u64)> = None;\n        let budget = crate::equipment::definition().map_err(|_| INVALID)?;\n"
+        },
+        {
+          "offset": 42901,
+          "before": "",
+          "after": "            if let ModuleAction::FlightLaserExchange {\n                visit,\n                clock,\n                emission,\n                restoring,\n                ..\n            } = e.action\n            {\n                let prior_dock = previous.map(|event| event.dock).ok_or(INVALID)?;\n                let system = world.jump_journal.system_at_visit(visit, e.tick)?;\n                let (jumps, arrival) = world.jump_journal.visit_origin(visit);\n                let launch = visit\n                    .checked_sub(1)\n                    .and_then(|v| v.checked_sub(jumps))\n                    .ok_or(INVALID)?;\n                let berth = world.damage.berth_clock(launch).ok_or(INVALID)?;\n                if e.dock != prior_dock\n                    || visit <= e.dock.visit()\n                    || visit > world.combat_identity().ok_or(INVALID)?.visit\n                    || clock == 0\n                    || clock > world.combat.physical_tick()\n                    || clock > e.tick\n                    || emission > world.combat.emissions\n                    || (e.tick - clock)\n                        > world\n                            .state\n                            .tick\n                            .checked_sub(world.combat.physical_tick())\n                            .ok_or(INVALID)?\n                    || (!restoring\n                        && (system != crate::navigation::SystemId::AVENOR\n                            || ledger.fitted(ModuleSlot::MiningTargeting).is_none()\n                            || ledger.fitted(ModuleSlot::Targeting).is_none()))\n                    || arrival.map_or(clock <= berth, |arrival| clock < arrival)\n                    || world\n                        .damage\n                        .berth_clock(launch.checked_add(1).ok_or(INVALID)?)\n                        .is_some_and(|next| clock > next || (!restoring && clock == next))\n                    || previous_exchange.is_some_and(\n                        |(prior_visit, prior_clock, prior_emission)| {\n                            visit < prior_visit || clock < prior_clock || emission < prior_emission\n                        },\n                    )\n                {\n                    return Err(INVALID);\n                }\n                previous_exchange = Some((visit, clock, emission));\n            }\n            if let Some(exchange) = salvage::Exchange::from_action(e.action) {\n                self.validate_salvage_exchange(world, account, *e, previous, exchange)?;\n            }\n"
+        },
+        {
+          "offset": 45635,
+          "before": "",
+          "after": "                if kind == ModuleKind::MiningLaser\n                    && e.action != ModuleAction::GrantStoredMiningLaser\n                {\n                    return Err(INVALID);\n                }\n"
+        },
+        {
+          "offset": 47153,
+          "before": "",
+          "after": "            if let ModuleAction::Passenger(action) = e.action {\n                world\n                    .jump_journal\n                    .validate_passenger_berth(e.dock, e.tick)?;\n                if !self.history.owns_berth(e.dock) {\n                    return Err(INVALID);\n                }\n                if matches!(\n                    action,\n                    PassengerAction::RequestReplies | PassengerAction::Board\n                ) && cabins::receipt_epoch(e.item)\n                    > world.freight_session.as_ref().ok_or(INVALID)?.epoch()\n                {\n                    return Err(INVALID);\n                }\n                if matches!(\n                    action,\n                    PassengerAction::RequestReplies | PassengerAction::Board\n                ) {\n                    let cargo = self.history.bay_fitted_at(e.revision).ok_or(INVALID)?;\n                    let mounts = u16::from(ledger.fuel_storage_count())\n                        + u16::from(ledger.fitted(ModuleSlot::UtilityFuelScoops).is_some())\n                        + u16::from(ledger.fitted(ModuleSlot::UtilitySalvageCutter).is_some())\n                        + u16::from(ledger.fitted(ModuleSlot::UtilityEcm).is_some())\n                        + cargo\n                        + world.emp.utility_mounts_at_revision(e.revision);\n                    let ordinary = mounts <= budget.utility_mounts_capacity\n                        && ledger.fitted_units() + cargo <= budget.equipment_units_capacity;\n                    if !ordinary\n                        && (action == PassengerAction::Board || ledger.awake_cabin_count() >= 2)\n                    {\n                        return Err(INVALID);\n                    }\n                }\n            }\n"
+        },
+        {
+          "offset": 49930,
+          "before": "",
+          "after": "                        + u16::from(ledger.fitted(ModuleSlot::UtilitySalvageCutter).is_some())\n"
+        },
+        {
+          "offset": 50274,
+          "before": "",
+          "after": "            }\n            let allowance = if self.passenger_aboard_at(e.revision) {\n                0\n            } else {\n                ledger.test_tank_count()\n            };\n            if ledger.fitted(ModuleSlot::UtilitySalvageCutter).is_some() {\n                let cargo = self.known_cargo_mounts_at(account, e.revision);\n                let mounts = u16::from(tanks)\n                    + u16::from(ledger.fitted(ModuleSlot::UtilityFuelScoops).is_some())\n                    + u16::from(ledger.fitted(ModuleSlot::UtilityEcm).is_some())\n                    + 1\n                    + cargo\n                    + world.emp.utility_mounts_at_revision(e.revision);\n                if mounts.saturating_sub(allowance) > budget.utility_mounts_capacity {\n                    return Err(INVALID);\n                }\n            }\n            if ledger.fitted_units().saturating_sub(allowance) > budget.equipment_units_capacity\n                || ledger.cabin_tonnes() > crate::equipment::EXPANDED_HOLD_TONNES\n            {\n                return Err(INVALID);\n"
+        },
+        {
+          "offset": 53105,
+          "before": "        let allowance = if world.test_tank_custody_clear() {\n",
+          "after": "        let allowance = if world.test_tank_custody_clear() && self.passenger_occupancy().1 == 0 {\n"
+        },
+        {
+          "offset": 53503,
+          "before": "",
+          "after": "        }\n        if self.cabin_tonnes().map_err(|_| INVALID)? != ledger.cabin_tonnes() {\n            return Err(INVALID);\n        }\n        if ledger.cabin_tonnes() != 0 {\n            let projection = account\n                .service_projection(&world.freight_session.as_ref().ok_or(INVALID)?.state)\n                .map_err(|_| INVALID)?;\n            add_cabin_mass(projection, ledger.cabin_tonnes()).map_err(|_| INVALID)?;\n"
+        },
+        {
+          "offset": 55112,
+          "before": "",
+          "after": "    pub(in crate::flight) fn scoop_was_fitted_for_collection(\n        &self,\n        receipt: &crate::mining::Collection,\n    ) -> bool {\n        self.ledger_at_revision(receipt.owner.owner, receipt.revision.saturating_sub(1))\n            .ok()\n            .and_then(|ledger| ledger.fitted(ModuleSlot::UtilityFuelScoops))\n            .is_some_and(|item| item.id == receipt.item)\n            && self\n                .scoop_item_at(receipt.owner.owner, receipt.world_tick, receipt.owner.visit)\n                .is_some_and(|item| item.id == receipt.item)\n    }\n"
+        },
+        {
+          "offset": 55856,
+          "before": "",
+          "after": "    }\n    pub(super) fn salvage_cut_fit_at(\n        &self,\n        owner: u64,\n        tick: u64,\n        visit: u64,\n        target: crate::traffic::NpcId,\n    ) -> Option<OwnedModule> {\n        let ledger = self.ledger_at(owner, tick, visit)?;\n        if ledger\n            .salvage_return\n            .is_some_and(|exchange| exchange.source != target)\n        {\n            return None;\n        }\n        ledger.fitted(ModuleSlot::UtilityFuelScoops)?;\n        ledger.fitted(ModuleSlot::UtilitySalvageCutter)\n"
+        },
+        {
+          "offset": 58161,
+          "before": "",
+          "after": "            + u16::from(\n                after_ledger\n                    .fitted(ModuleSlot::UtilitySalvageCutter)\n                    .is_some(),\n            )\n"
+        },
+        {
+          "offset": 59111,
+          "before": "        w.u32(\n            self.events.len() as u32\n                | if self.cargo_fit_history.is_empty() {\n                    0\n                } else {\n                    1 << 31\n                },\n        );\n",
+          "after": "        let flags = (u32::from(!self.cargo_fit_history.is_empty()) << 31)\n            | (u32::from(self.history.active()) << 30)\n            | (u32::from(!self.salvage.is_empty()) << 29);\n        w.u32(self.events.len() as u32 | flags);\n"
+        },
+        {
+          "offset": 59471,
+          "before": "",
+          "after": "                ModuleAction::GrantStoredMiningLaser => w.u8(19),\n                ModuleAction::FlightLaserExchange {\n                    replacing,\n                    visit,\n                    clock,\n                    emission,\n                    restoring,\n                    ..\n                } => {\n                    w.u8(18);\n                    for value in [replacing, visit, clock, emission] {\n                        w.u64(value);\n                    }\n                    w.bool(restoring);\n                }\n"
+        },
+        {
+          "offset": 60199,
+          "before": "",
+          "after": "                ModuleAction::GrantStoredSalvageCutter => w.u8(17),\n                ModuleAction::FlightSalvageExchange {\n                    source,\n                    displaced_emp,\n                    visit,\n                    clock,\n                    restoring,\n                    ..\n                } => {\n                    w.u8(20);\n                    source.encode(w);\n                    w.option(displaced_emp.as_ref(), |w, item| w.u64(*item));\n                    w.u64(visit);\n                    w.u64(clock);\n                    w.bool(restoring);\n                }\n"
+        },
+        {
+          "offset": 61017,
+          "before": "",
+          "after": "                ModuleAction::Passenger(action) => w.u8(match action {\n                    PassengerAction::RequestReplies => 4,\n                    PassengerAction::Board => 5,\n                    PassengerAction::Receive => 6,\n                    PassengerAction::Cancel => 7,\n                }),\n"
+        },
+        {
+          "offset": 61589,
+          "before": "",
+          "after": "        self.history.encode(w);\n        if !self.salvage.is_empty() {\n            self.salvage.encode(w);\n        }\n"
+        },
+        {
+          "offset": 61948,
+          "before": "        let count = (raw_count & !(1 << 31)) as usize;\n",
+          "after": "        let count = (raw_count & 0x1fff_ffff) as usize;\n"
+        },
+        {
+          "offset": 62696,
+          "before": "",
+          "after": "            let exchange = if tag == 18 {\n                Some((r.u64()?, r.u64()?, r.u64()?, r.u64()?, r.bool()?))\n            } else {\n                None\n            };\n            let salvage_exchange = if tag == 20 {\n                Some((\n                    crate::traffic::NpcId::decode(r)?,\n                    r.option(|r| r.u64())?,\n                    r.u64()?,\n                    r.u64()?,\n                    r.bool()?,\n                ))\n            } else {\n                None\n            };\n"
+        },
+        {
+          "offset": 63492,
+          "before": "",
+          "after": "                19 => ModuleAction::GrantStoredMiningLaser,\n                18 => {\n                    let (replacing, visit, clock, emission, restoring) =\n                        exchange.ok_or(SaveError::InvalidEncoding)?;\n                    ModuleAction::FlightLaserExchange {\n                        item,\n                        replacing,\n                        visit,\n                        clock,\n                        emission,\n                        restoring,\n                    }\n                }\n"
+        },
+        {
+          "offset": 64083,
+          "before": "",
+          "after": "                17 => ModuleAction::GrantStoredSalvageCutter,\n                20 => {\n                    let (source, displaced_emp, visit, clock, restoring) =\n                        salvage_exchange.ok_or(SaveError::InvalidEncoding)?;\n                    ModuleAction::FlightSalvageExchange {\n                        source,\n                        cutter: item,\n                        displaced_emp,\n                        visit,\n                        clock,\n                        restoring,\n                    }\n                }\n"
+        },
+        {
+          "offset": 64889,
+          "before": "",
+          "after": "                4 => ModuleAction::Passenger(PassengerAction::RequestReplies),\n                5 => ModuleAction::Passenger(PassengerAction::Board),\n                6 => ModuleAction::Passenger(PassengerAction::Receive),\n                7 => ModuleAction::Passenger(PassengerAction::Cancel),\n"
+        },
+        {
+          "offset": 65612,
+          "before": "",
+          "after": "        let history = if raw_count & (1 << 30) != 0 {\n            history::History::decode(r)?\n        } else {\n            history::History::default()\n        };\n        let salvage = if raw_count & (1 << 29) != 0 {\n            salvage::State::decode(r)?\n        } else {\n            salvage::State::default()\n        };\n        if events\n            .iter()\n            .any(|event| history::requires_history(event.action))\n            != history.active()\n        {\n            return Err(SaveError::InvalidEncoding);\n        }\n"
+        },
+        {
+          "offset": 66211,
+          "before": "",
+          "after": "            history,\n            salvage,\n"
+        },
+        {
+          "offset": 68972,
+          "before": "",
+          "after": "            ModuleKind::SalvageCutter,\n"
+        },
+        {
+          "offset": 69822,
+          "before": "",
+          "after": "            ModuleKind::Cabin(CabinGrade::PackedStasis),\n            ModuleKind::Cabin(CabinGrade::Economy),\n            ModuleKind::Cabin(CabinGrade::Standard),\n            ModuleKind::Cabin(CabinGrade::Luxury),\n            ModuleKind::Cabin(CabinGrade::SingleStateroom),\n            ModuleKind::Cabin(CabinGrade::DoubleStateroom),\n"
+        },
+        {
+          "offset": 72201,
+          "before": "                && matches!(i.provenance, ModuleProvenance::Paid { .. })\n",
+          "after": "                && matches!(\n                    i.provenance,\n                    ModuleProvenance::Paid { .. } | ModuleProvenance::XYZzy { .. }\n                )\n"
+        },
+        {
+          "offset": 73722,
+          "before": "    pub(crate) fn paid_fitted_mining_item(&self) -> Option<u64> {\n",
+          "after": "    fn owned_fitted_mining_item(&self) -> Option<u64> {\n"
+        },
+        {
+          "offset": 73950,
+          "before": "            .paid_fitted_mining_item()\n",
+          "after": "            .owned_fitted_mining_item()\n"
+        },
+        {
+          "offset": 74256,
+          "before": "",
+          "after": "        if matches!(\n            action,\n            ModuleAction::GrantStoredSalvageCutter\n                | ModuleAction::GrantStoredMiningLaser\n                | ModuleAction::FlightLaserExchange { .. }\n                | ModuleAction::FlightSalvageExchange { .. }\n        ) {\n            return Err(ModuleError::NotForSale);\n        }\n        if self.modular.salvage_exchange_pending() {\n            return Err(ModuleError::Capacity);\n        }\n"
+        },
+        {
+          "offset": 77500,
+          "before": "",
+          "after": "        if history::requires_history(action) && !self.modular.history.active() {\n            let mut history = history::History::default();\n            history.activate(self, account, dock)?;\n        }\n        if matches!(action, ModuleAction::Passenger(PassengerAction::Board))\n            && !self.original_service_has_capacity()\n        {\n            return Err(ModuleError::Capacity);\n        }\n        let item = match action {\n            ModuleAction::Passenger(action) => cabins::receipt_data(self, action)?,\n            _ => 0,\n        };\n"
+        },
+        {
+          "offset": 78144,
+          "before": "                item: 0,\n",
+          "after": "                item,\n"
+        },
+        {
+          "offset": 78298,
+          "before": "        let allowance =\n            if was_outside_ordinary_budget && matches!(action, ModuleAction::Store { .. }) {\n                ledger.test_tank_count()\n            } else {\n                0\n            };\n",
+          "after": "        let allowance = if was_outside_ordinary_budget\n            && (matches!(action, ModuleAction::Store { .. })\n                || (action == ModuleAction::Passenger(PassengerAction::RequestReplies)\n                    && ledger.awake_cabin_count() < 2))\n        {\n            ledger.test_tank_count()\n        } else {\n            0\n        };\n"
+        },
+        {
+          "offset": 79497,
+          "before": "",
+          "after": "        }\n        if ledger.cabin_tonnes() != 0 {\n            let projection = account\n                .service_projection(\n                    &self\n                        .freight_session\n                        .as_ref()\n                        .ok_or(ModuleError::NoCommander)?\n                        .state,\n                )\n                .map_err(|_| ModuleError::Capacity)?;\n            let projection = add_cabin_mass(projection, ledger.cabin_tonnes())\n                .map_err(|_| ModuleError::Capacity)?;\n            self.navigation_trade\n                .reservations()\n                .apply(projection)\n                .map_err(|_| ModuleError::Capacity)?;\n"
+        },
+        {
+          "offset": 81307,
+          "before": "",
+          "after": "                ModuleAction::Passenger(action) => cabins::receipt_data(self, action)?,\n"
+        },
+        {
+          "offset": 82982,
+          "before": "        let account = current\n            .prepare_module(\n",
+          "after": "        let account = if let ModuleAction::Passenger(action) = review.action {\n            current.prepare_passage_action(action == PassengerAction::Receive)\n        } else {\n            current.prepare_module(\n"
+        },
+        {
+          "offset": 83488,
+          "before": "            .map_err(|_| ModuleError::SequenceExhausted)?;\n",
+          "after": "        }\n        .map_err(|_| ModuleError::SequenceExhausted)?;\n"
+        },
+        {
+          "offset": 83599,
+          "before": "",
+          "after": "        if history::requires_history(review.action) {\n            state.history.activate(self, current, review.dock)?;\n        }\n"
+        },
+        {
+          "offset": 84364,
+          "before": "            item,\n",
+          "after": "            // Passage changes have a receipt, not an issued physical equipment item.\n            item: if matches!(review.action, ModuleAction::Passenger(_)) {\n                0\n            } else {\n                item\n            },\n"
+        },
+        {
+          "offset": 84620,
+          "before": "",
+          "after": "#[cfg(test)]\nmod cabin_tests;\n"
+        },
+        {
+          "offset": 84821,
+          "before": "    pub(super) fn front_at_physical(&self, world: &World, clock: u64) -> Option<OwnedModule> {\n",
+          "after": "    pub(super) fn front_at_physical(\n        &self,\n        world: &World,\n        clock: u64,\n        firing_emission: u64,\n    ) -> Option<OwnedModule> {\n"
+        },
+        {
+          "offset": 85125,
+          "before": "            let at = world.damage.berth_clock(event.dock.sequence())?;\n            if at > clock {\n",
+          "after": "            if let ModuleAction::FlightLaserExchange {\n                clock: at,\n                emission,\n                ..\n            } = event.action\n            {\n                if at > clock || (at == clock && emission >= firing_emission) {\n                    break;\n                }\n            } else if world.damage.berth_clock(event.dock.sequence())? > clock {\n"
+        },
+        {
+          "offset": 85649,
+          "before": "    fn historical_front_at_tick(&self, tick: u64) -> Option<OwnedModule> {\n",
+          "after": "    fn historical_front_at_tick(&self, tick: u64, firing_emission: u64) -> Option<OwnedModule> {\n"
+        },
+        {
+          "offset": 86002,
+          "before": "",
+          "after": "            if matches!(event.action, ModuleAction::FlightLaserExchange { emission, .. } if event.tick == tick && emission >= firing_emission)\n            {\n                break;\n            }\n"
+        },
+        {
+          "offset": 86384,
+          "before": "",
+          "after": "        emission: u64,\n"
+        },
+        {
+          "offset": 86448,
+          "before": "        let fitted = self.historical_front_at_tick(tick)?;\n",
+          "after": "        let fitted = self.historical_front_at_tick(tick, emission)?;\n"
+        },
+        {
+          "offset": 86719,
+          "before": "        super::OrdinaryWeapon::from_module(self.historical_front_at_tick(tick)?.kind)\n",
+          "after": "        super::OrdinaryWeapon::from_module(self.historical_front_at_tick(tick, u64::MAX)?.kind)\n"
+        },
+        {
+          "offset": 86893,
+          "before": "",
+          "after": "    /// Select an actual owned work tool in the original front laser mount. No purchase,\n    /// new item, resource refill or extra mount is implied by selecting a rock.\n    pub(in crate::flight) fn select_auto_mining_tool(\n        &mut self,\n    ) -> Result<(), crate::mining::MiningError> {\n        use crate::mining::MiningError;\n        if self.state.mode != super::FlightMode::Flight || self.is_paused() || !self.pulse.alive() {\n            return Err(MiningError::NotInFlight);\n        }\n        if self.emp.input_blocked() {\n            return Err(MiningError::Resources);\n        }\n        if self\n            .selected_work_target()\n            .is_none_or(|target| !matches!(target.id, crate::equipment::WorkTargetId::Asteroid(_)))\n        {\n            return Err(MiningError::NoTarget);\n        }\n        if self.flight_reception.occupancy().1 > 0\n            || self.navigation_trade.occupancy().1 > 0\n            || self.practice.is_some_and(|p| !p.reception_is_terminal())\n            || self\n                .mission_snapshot()\n                .is_some_and(|s| s.freight.held_tonnes > 0)\n        {\n            return Err(MiningError::ProtectedActivity);\n        }\n        let account = self\n            .commander_account\n            .as_ref()\n            .ok_or(MiningError::NoCommander)?;\n        let ledger = self\n            .modular\n            .ledger(self, account)\n            .map_err(|_| MiningError::InvalidState)?;\n        let front = ledger.front().ok_or(MiningError::NoCompatibleFittedTool)?;\n        if front.kind == ModuleKind::MiningLaser {\n            if ledger.auto_return.is_some() {\n                return Ok(());\n            }\n            let combat = ledger\n                .items\n                .iter()\n                .filter(|i| {\n                    i.slot.is_none()\n                        && i.kind != ModuleKind::MiningLaser\n                        && super::OrdinaryWeapon::from_module(i.kind).is_some()\n                })\n                .max_by_key(|i| {\n                    (\n                        super::OrdinaryWeapon::from_module(i.kind).map(|w| w.damage_hundredths()),\n                        i.id,\n                    )\n                })\n                .copied();\n            return if let Some(combat) = combat {\n                self.exchange_auto_mining_tool(ledger, front, combat, false)\n            } else {\n                Ok(())\n            };\n        }\n        let mining = ledger\n            .items\n            .iter()\n            .find(|i| {\n                i.slot.is_none()\n                    && i.kind == ModuleKind::MiningLaser\n                    && matches!(\n                        i.provenance,\n                        ModuleProvenance::Paid { .. } | ModuleProvenance::XYZzy { .. }\n                    )\n            })\n            .copied()\n            .ok_or(MiningError::NoCompatibleFittedTool)?;\n        self.exchange_auto_mining_tool(ledger, front, mining, false)\n    }\n\n    pub(in crate::flight) fn restore_auto_mining_tool(\n        &mut self,\n    ) -> Result<(), crate::mining::MiningError> {\n        use crate::mining::MiningError;\n        // No full ledger replay on ordinary flight before automatic mining is used.\n        if !self\n            .modular\n            .events\n            .iter()\n            .rev()\n            .find_map(|e| match e.action {\n                ModuleAction::FlightLaserExchange { restoring, .. } => Some(!restoring),\n                _ => None,\n            })\n            .unwrap_or(false)\n        {\n            return Ok(());\n        }\n        let account = self\n            .commander_account\n            .as_ref()\n            .ok_or(MiningError::NoCommander)?;\n        let ledger = self\n            .modular\n            .ledger(self, account)\n            .map_err(|_| MiningError::InvalidState)?;\n        let Some(item) = ledger.auto_return else {\n            return Ok(());\n        };\n        if self.is_paused() || self.emp.input_blocked() || !self.pulse.alive() {\n            return Err(MiningError::Resources);\n        }\n        let front = ledger.front().ok_or(MiningError::InvalidState)?;\n        let combat = ledger\n            .items\n            .iter()\n            .find(|i| i.id == item && i.slot.is_none())\n            .copied()\n            .ok_or(MiningError::InvalidState)?;\n        self.exchange_auto_mining_tool(ledger, front, combat, true)\n    }\n\n    fn exchange_auto_mining_tool(\n        &mut self,\n        mut ledger: Ledger,\n        front: OwnedModule,\n        next: OwnedModule,\n        restoring: bool,\n    ) -> Result<(), crate::mining::MiningError> {\n        use crate::mining::MiningError;\n        let owner = self.combat_identity().ok_or(MiningError::NoCommander)?;\n        let current = self\n            .commander_account\n            .as_ref()\n            .ok_or(MiningError::NoCommander)?;\n        let dock = self\n            .modular\n            .events\n            .last()\n            .ok_or(MiningError::InvalidState)?\n            .dock;\n        let event = Event {\n            xyzzy: false,\n            action: ModuleAction::FlightLaserExchange {\n                item: next.id,\n                replacing: front.id,\n                visit: owner.visit,\n                clock: self.combat.physical_tick(),\n                emission: self.combat.emissions,\n                restoring,\n            },\n            item: next.id,\n            dock,\n            tick: self.state.tick,\n            revision: current\n                .revision()\n                .checked_add(1)\n                .ok_or(MiningError::ProofCapacity)?,\n        };\n        ledger\n            .apply(event, 0)\n            .map_err(|_| MiningError::InvalidState)?;\n        let allowance = if self.test_tank_custody_clear() {\n            ledger.test_tank_count()\n        } else {\n            0\n        };\n        ledger\n            .validate_budgets(current, self.emp.utility_mounts(), allowance)\n            .map_err(|_| MiningError::InvalidState)?;\n        let born = |slot, offset| {\n            ledger\n                .fitted(slot)\n                .is_some_and(|item| item.id == owner.owner + offset)\n        };\n        let account = current\n            .prepare_module(\n                0,\n                [\n                    born(ModuleSlot::FrontLaser, 7),\n                    born(ModuleSlot::Energy, 5),\n                    born(ModuleSlot::Navigation, 4),\n                    born(ModuleSlot::Drive, 6),\n                    born(ModuleSlot::Shield, 3),\n                ],\n                ledger.fuel_storage_count(),\n            )\n            .map_err(|_| MiningError::InvalidState)?;\n        let mut modules = self.modular.clone();\n        modules.events.push(event);\n        self.save_bytes_with_modules(&account, &modules)\n            .map_err(|_| MiningError::ProofCapacity)?;\n        self.modular = modules;\n        self.commander_account = Some(account);\n        Ok(())\n    }\n\n"
+        },
+        {
+          "offset": 94522,
+          "before": "",
+          "after": "        let cutter_stored = if kind == ModuleKind::SalvageCutter {\n            let definition = crate::equipment::definition().map_err(|_| INVALID)?;\n            let (units, mounts) = ledger\n                .budget_usage(current, self.emp.utility_mounts())\n                .map_err(|_| INVALID)?;\n            units >= definition.equipment_units_capacity\n                || mounts >= definition.utility_mounts_capacity\n        } else {\n            false\n        };\n        if (cutter_stored || kind == ModuleKind::MiningLaser) && existing.is_some() {\n            return Ok(());\n        }\n"
+        },
+        {
+          "offset": 95849,
+          "before": "                ModuleAction::Purchase { kind },\n",
+          "after": "                if cutter_stored {\n                    ModuleAction::GrantStoredSalvageCutter\n                } else if kind == ModuleKind::MiningLaser {\n                    ModuleAction::GrantStoredMiningLaser\n                } else {\n                    ModuleAction::Purchase { kind }\n                },\n"
+        }
+      ]
+    },
+    "flight/modular/scoops.rs": {
+      "beforeSHA256": "c5176dd7df6d8709283e34d9a499166d4939128cc1e77a05aef70b8a334b42a0",
+      "afterSHA256": "8c114b556cf50accdc4cf23ab978a61971c25c7b90bf3b20e396eab4137d2ffa",
+      "hunks": [
+        {
+          "offset": 2324,
+          "before": "",
+          "after": "                        | ModuleSlot::UtilitySalvageCutter\n"
+        }
+      ]
+    },
+    "flight/navigation_trade.rs": {
+      "beforeSHA256": "8b524af61f17f1751e7327fea82d83389fc72b80b5c5772e7cf4b74e4fd131ee",
+      "afterSHA256": "1af67cce39a03bf50985f0b9a9eca5bb11bdcc9136a0ca5dcfabe5369c4553e1",
+      "hunks": [
+        {
+          "offset": 6945,
+          "before": "",
+          "after": "\n#[derive(Debug, Clone, Copy)]\npub(in crate::flight) struct ReservationInterval {\n    pub start: u64,\n    pub end_exclusive: Option<u64>,\n    pub cargo_at_plan: u16,\n    pub capacity_at_plan: u16,\n}\n\nimpl ReservationInterval {\n    pub fn contains(self, revision: u64) -> bool {\n        revision >= self.start && self.end_exclusive.is_none_or(|end| revision < end)\n    }\n}\n"
+        },
+        {
+          "offset": 7330,
+          "before": "",
+          "after": "    #[cfg(test)]\n    pub(in crate::flight) fn omit_last_reservation_release_for_test(&mut self) -> bool {\n        self.attempts\n            .last_mut()\n            .and_then(|attempt| attempt.terminal.as_mut())\n            .and_then(|terminal| terminal.account_revision.take())\n            .is_some()\n    }\n    /// Plans reserve one tonne after their confirmed account prefix. Purchase transfers the\n    /// reservation into actual cargo in the same transaction; cancellation releases it only\n    /// after its recorded prefix, including any cargo or fit operation at that revision.\n    pub(in crate::flight) fn reservation_intervals(\n        &self,\n        anchor_tick: u64,\n    ) -> Result<Vec<ReservationInterval>, crate::save::SaveError> {\n        let mut intervals = Vec::new();\n        for attempt in &self.attempts {\n            let Some(plan) = attempt.plan else {\n                continue;\n            };\n            let end_exclusive = if let Some(buy) = attempt.buy {\n                Some(buy.account_revision)\n            } else if let Some(terminal) = attempt.terminal {\n                match terminal.account_revision {\n                    Some(revision) => Some(\n                        revision\n                            .checked_add(1)\n                            .ok_or(crate::save::SaveError::SequenceExhausted)?,\n                    ),\n                    None if terminal.tick < anchor_tick => continue,\n                    None => {\n                        return Err(crate::save::SaveError::InvalidState(\n                            \"unbound historical T04 reservation release\",\n                        ));\n                    }\n                }\n            } else {\n                None\n            };\n            intervals.push(ReservationInterval {\n                start: plan.account_revision,\n                end_exclusive,\n                cargo_at_plan: plan.cargo,\n                capacity_at_plan: plan.capacity,\n            });\n        }\n        Ok(intervals)\n    }\n"
+        }
+      ]
+    },
+    "flight/navigation_trade/actions.rs": {
+      "beforeSHA256": "5d2eba3511defe5fcfc685166b101ba01aca53c179a2cadc19faf98d1056ec05",
+      "afterSHA256": "9d5d53cd45c1e0370601eadc40617191d7ef84617e1c67de9ada1d9071f473e1",
+      "hunks": [
+        {
+          "offset": 4464,
+          "before": "        let account = self.commander_account.as_ref().ok_or(Error::NoCommander)?;\n        let p = account\n            .service_projection(\n                &self\n                    .freight_session\n                    .as_ref()\n                    .ok_or(Error::NoCommander)?\n                    .state,\n            )\n            .map_err(Error::Service)?;\n",
+          "after": "        let p = self.raw_service_projection().map_err(Error::Service)?;\n"
+        }
+      ]
+    },
+    "flight/navigation_trade/market.rs": {
+      "beforeSHA256": "fb508983d8f3a8d99cb2237731c7ea2372ebb646e9ca1420165b482cc097e533",
+      "afterSHA256": "0f712ea68c5f81f661a9f549b41948706280155fc2e18b1a291f1c8e77f4b752",
+      "hunks": [
+        {
+          "offset": 636,
+          "before": "        let reservations = self.navigation_trade.reservations();\n",
+          "after": "        let cabin_capacity = self.cabin_tonnes().map_err(Error::Service)?;\n        let mut reservations = self.navigation_trade.reservations();\n        reservations.capacity += cabin_capacity;\n        let cabin_only = Reservations {\n            capacity: cabin_capacity,\n            commodity: None,\n        };\n"
+        },
+        {
+          "offset": 2416,
+          "before": "            return Ok((Reservations::default(), Purpose::Buy));\n",
+          "after": "            return Ok((cabin_only, Purpose::Buy));\n"
+        },
+        {
+          "offset": 3228,
+          "before": "                return Ok((Reservations::default(), Purpose::Sell));\n",
+          "after": "                return Ok((cabin_only, Purpose::Sell));\n"
+        },
+        {
+          "offset": 3492,
+          "before": "        self.commander_account\n",
+          "after": "        let projection = self\n            .commander_account\n"
+        },
+        {
+          "offset": 3839,
+          "before": "            )\n",
+          "after": "            )?;\n        crate::flight::modular::add_cabin_mass(projection, self.cabin_tonnes()?)\n"
+        },
+        {
+          "offset": 8409,
+          "before": "",
+          "after": "        let after = crate::flight::modular::add_cabin_mass(\n            after,\n            world.cabin_tonnes().map_err(Error::Service)?,\n        )\n        .map_err(Error::Service)?;\n"
+        }
+      ]
+    },
+    "flight/navigation_trade/persistence.rs": {
+      "beforeSHA256": "53f29630f33377b27a7f275157d55a35299a2fa1f0c850ce149f39175caa42e0",
+      "afterSHA256": "4fb04e53706e337d1c364a3a44aaa2941ea86ed66d0928023d3f5b14cf2c9dec",
+      "hunks": [
+        {
+          "offset": 900,
+          "before": "",
+          "after": "        let (passenger_records, passenger_active) = commerce.modular.passenger_occupancy();\n"
+        },
+        {
+          "offset": 1034,
+          "before": "",
+          "after": "            + passenger_records\n"
+        },
+        {
+          "offset": 1311,
+          "before": "",
+          "after": "            + passenger_active\n"
+        },
+        {
+          "offset": 1825,
+          "before": "",
+          "after": "            .map_err(|_| INVALID)?;\n        let cabin_tonnes = commerce.modular.cabin_tonnes().map_err(|_| INVALID)?;\n        let projection = crate::flight::modular::add_cabin_mass(projection, cabin_tonnes)\n"
+        }
+      ]
+    },
+    "flight/persistence.rs": {
+      "beforeSHA256": "cd09d67bfb9040a0331f28d3382a60e45bdec627205d5c2e6a493907e7aad8d4",
+      "afterSHA256": "fec2a139acd3ebd64998363f0c82047eb777cfc7bb8ed9e20010255d0d66f487",
+      "hunks": [
+        {
+          "offset": 1055,
+          "before": "",
+          "after": "const MINING_INTAKE_EXTENSION: &[u8; 8] = b\"MINT0001\";\nconst OCCUPIED_CUT_EXTENSION: &[u8; 8] = b\"MCUT0002\";\n"
+        },
+        {
+          "offset": 4037,
+          "before": "",
+          "after": "    checksum(&bytes)\n}\n\nfn occupied_cut_fingerprint(base: u64) -> u64 {\n    let mut bytes = base.to_le_bytes().to_vec();\n    bytes.extend(b\"occupied-salvage-contact/v2-motion-witness\");\n"
+        },
+        {
+          "offset": 13489,
+          "before": "        w.u64(if self.ecm.is_empty() {\n",
+          "after": "        let fingerprint = if self.ecm.is_empty() {\n"
+        },
+        {
+          "offset": 13670,
+          "before": "",
+          "after": "        };\n        w.u64(if self.occupied_salvage.is_empty() {\n            fingerprint\n        } else {\n            occupied_cut_fingerprint(fingerprint)\n"
+        },
+        {
+          "offset": 15194,
+          "before": "",
+          "after": "        if !self.mining.collections().is_empty() {\n            w.bytes.extend(MINING_INTAKE_EXTENSION);\n            self.mining.encode_collections(&mut w);\n        }\n"
+        },
+        {
+          "offset": 15743,
+          "before": "",
+          "after": "        }\n        if !self.occupied_salvage.is_empty() {\n            w.bytes.extend(OCCUPIED_CUT_EXTENSION);\n            self.occupied_salvage.encode(&mut w);\n"
+        },
+        {
+          "offset": 18818,
+          "before": "",
+          "after": "        let (fingerprint, cut_expected) = [\n            compiled_content_fingerprint(CONTENT),\n            solar_content_fingerprint(true),\n            solar_content_fingerprint(false),\n        ]\n        .into_iter()\n        .flat_map(|base| {\n            [\n                base,\n                ecm_content_fingerprint(base, false),\n                ecm_content_fingerprint(base, true),\n            ]\n        })\n        .find(|&base| occupied_cut_fingerprint(base) == fingerprint)\n        .map_or((fingerprint, false), |base| (base, true));\n"
+        },
+        {
+          "offset": 23400,
+          "before": "",
+          "after": "            occupied_salvage: super::occupied_salvage::State::default(),\n"
+        },
+        {
+          "offset": 24377,
+          "before": "        candidate.mining = crate::mining::State::decode(&mut r)?;\n",
+          "after": "        candidate.mining = crate::mining::State::decode_base(&mut r)?;\n"
+        },
+        {
+          "offset": 24530,
+          "before": "        if !r.finished() {\n            let tag = r.fixed::<8>().map_err(|_| SaveError::InvalidEncoding)?;\n            if tag == *ROUTE_EXTENSION {\n                candidate.navigation_route =\n                    Some(crate::navigation::RoutePlan::decode_save(&mut r)?);\n                if let Some(field) = ecm_version {\n                    if r.fixed::<8>()? != *ecm_tag {\n                        return Err(SaveError::InvalidEncoding);\n                    }\n                    candidate.ecm = super::ecm::State::decode(&mut r, field)?;\n                }\n            } else if let Some(field) = ecm_version\n                && tag == *ecm_tag\n            {\n                candidate.ecm = super::ecm::State::decode(&mut r, field)?;\n",
+          "after": "        let next_tag = |reader: &mut Reader<'_>| {\n            if reader.finished() {\n                Ok(None)\n"
+        },
+        {
+          "offset": 24662,
+          "before": "",
+          "after": "                reader\n                    .fixed::<8>()\n                    .map(Some)\n                    .map_err(|_| SaveError::InvalidEncoding)\n            }\n        };\n        let mut tag = next_tag(&mut r)?;\n        if tag == Some(*MINING_INTAKE_EXTENSION) {\n            candidate.mining.decode_collections(&mut r)?;\n            tag = next_tag(&mut r)?;\n        }\n        if tag == Some(*ROUTE_EXTENSION) {\n            candidate.navigation_route = Some(crate::navigation::RoutePlan::decode_save(&mut r)?);\n            tag = next_tag(&mut r)?;\n        }\n        if let Some(field) = ecm_version {\n            if tag != Some(*ecm_tag) {\n"
+        },
+        {
+          "offset": 25374,
+          "before": "",
+          "after": "            candidate.ecm = super::ecm::State::decode(&mut r, field)?;\n            tag = next_tag(&mut r)?;\n"
+        },
+        {
+          "offset": 25492,
+          "before": "        if !r.finished() || ecm_expected == candidate.ecm.is_empty() {\n",
+          "after": "        if cut_expected {\n            if tag != Some(*OCCUPIED_CUT_EXTENSION) {\n                return Err(SaveError::InvalidEncoding);\n            }\n            candidate.occupied_salvage = super::occupied_salvage::State::decode(&mut r)?;\n            tag = None;\n        }\n        if tag.is_some()\n            || !r.finished()\n            || ecm_expected == candidate.ecm.is_empty()\n            || cut_expected == candidate.occupied_salvage.is_empty()\n        {\n"
+        },
+        {
+          "offset": 33547,
+          "before": "",
+          "after": "        self.occupied_salvage.validate(self, commerce.modular)?;\n"
+        },
+        {
+          "offset": 34136,
+          "before": "        let services = if self.traffic.enabled() {\n            markets.validate_save_with_traffic(\n                nav.owner,\n                account.hold_capacity(),\n                account.equipment_state().historical_capacity(),\n                self.traffic.flows(),\n            )?\n        } else {\n            markets.validate_save(\n                nav.owner,\n                account.hold_capacity(),\n                account.equipment_state().historical_capacity(),\n            )?\n        };\n",
+          "after": "        let intakes = self.cargo_intakes(commerce.modular);\n        let services = markets.validate_save_with_intakes(\n            nav.owner,\n            account.hold_capacity(),\n            account.equipment_state().historical_capacity(),\n            if self.traffic.enabled() {\n                self.traffic.flows()\n            } else {\n                crate::traffic::Flows::default()\n            },\n            &intakes,\n        )?;\n"
+        },
+        {
+          "offset": 34647,
+          "before": "",
+          "after": "        commerce.modular.validate_salvage(self, account)?;\n        commerce\n            .modular\n            .validate_capacity_history(self, account, markets, commerce.lesson)?;\n"
+        },
+        {
+          "offset": 35127,
+          "before": "            nav.jumps,\n            nav.fuel_spent,\n",
+          "after": "            nav,\n"
+        },
+        {
+          "offset": 35181,
+          "before": "",
+          "after": "            intakes.len() as u64,\n"
+        },
+        {
+          "offset": 35587,
+          "before": "",
+          "after": "                    .and_then(|revisions| revisions.checked_add(modular.passenger_totals().1))\n"
+        },
+        {
+          "offset": 35813,
+          "before": "",
+          "after": "                modular.passenger_totals().0,\n"
+        },
+        {
+          "offset": 37263,
+          "before": "    jumps: u64,\n    fuel_spent: u64,\n",
+          "after": "    nav: crate::navigation::SavedNavigationSummary,\n"
+        },
+        {
+          "offset": 37334,
+          "before": "    ammunition: (u32, u64),\n",
+          "after": "    intake_revisions: u64,\n    equipment_and_passage: (u32, u64, u32),\n"
+        },
+        {
+          "offset": 37490,
+          "before": "    let (ammunition_paid, ammunition_revisions) = ammunition;\n",
+          "after": "    let (ammunition_paid, ammunition_revisions, passenger_reward) = equipment_and_passage;\n"
+        },
+        {
+          "offset": 37608,
+          "before": "",
+          "after": "        + u128::from(passenger_reward)\n"
+        },
+        {
+          "offset": 37966,
+          "before": "",
+          "after": "        + u128::from(passenger_reward)\n"
+        },
+        {
+          "offset": 38571,
+          "before": "        || fuel < u128::from(fuel_spent)\n        || fuel - u128::from(fuel_spent) != u128::from(d.fuel)\n",
+          "after": "        || fuel < u128::from(nav.fuel_spent)\n        || fuel - u128::from(nav.fuel_spent) != u128::from(d.fuel)\n"
+        },
+        {
+          "offset": 39065,
+          "before": "",
+          "after": "                + u128::from(intake_revisions)\n"
+        },
+        {
+          "offset": 39153,
+          "before": "                + u128::from(jumps)\n",
+          "after": "                + u128::from(nav.jumps)\n"
+        }
+      ]
+    },
+    "flight/practice/lifecycle.rs": {
+      "beforeSHA256": "fcb3322ad417e8a758122efd75ea2c21d27ebb563192790982a1ec9bb255d35d",
+      "afterSHA256": "98cf06271767559ef2f5c4ecfc96b43e95f6bff94df7f18a9f28487d24364de0",
+      "hunks": [
+        {
+          "offset": 8589,
+          "before": "",
+          "after": "        let (passenger_records, passenger_active) = self.modular.passenger_occupancy();\n"
+        },
+        {
+          "offset": 8979,
+          "before": "            records + history.len() + usize::from(current.is_some()) + t01_records + t04_records,\n            active + t01_active + t04_active,\n",
+          "after": "            records\n                + history.len()\n                + usize::from(current.is_some())\n                + t01_records\n                + t04_records\n                + passenger_records,\n            active + t01_active + t04_active + passenger_active,\n"
+        }
+      ]
+    },
+    "flight/traffic.rs": {
+      "beforeSHA256": "6fb44a0b0f2d078323a8645921c289db055cbf5e06e8bd8132523ffa53ee21ad",
+      "afterSHA256": "dbc2d0baaea33c2b95deb87abad343c7b7a2f85c7e03b4043f3accbddd480af8",
+      "hunks": [
+        {
+          "offset": 795,
+          "before": "                BeamSource::Player { item, .. }\n                    if self.front_weapon_at_tick(item, shot.world_tick) != Some(shot.weapon) =>\n",
+          "after": "                BeamSource::Player { item, emission, .. }\n                    if self.front_weapon_at_tick(item, shot.world_tick, emission)\n                        != Some(shot.weapon) =>\n"
+        },
+        {
+          "offset": 4678,
+          "before": "        self.traffic.snapshot(self.combat_identity()?.system)\n",
+          "after": "        let system = self.combat_identity()?.system;\n        let mut snapshot = self.traffic.snapshot(system)?;\n        snapshot.verified_crimes = snapshot\n            .verified_crimes\n            .saturating_add(self.occupied_salvage.crimes());\n        if self.occupied_salvage.crime_in(system) {\n            snapshot.police_required_hull = Some(\"SH031\");\n        }\n        Some(snapshot)\n"
+        }
+      ]
+    },
+    "flight/xyzzy.rs": {
+      "beforeSHA256": "fa03592b9057951235e952efcb738e35505884faf2feae1c96740af1f55d3f2f",
+      "afterSHA256": "04ca9973164108e94a06339fb7977c2b8869db1dc98d9df01ad501e0d1ffc08b",
+      "hunks": [
+        {
+          "offset": 14806,
+          "before": "",
+          "after": "                    || commerce.modular.passenger_aboard_at(r.revision)\n"
+        },
+        {
+          "offset": 18936,
+          "before": "        self.active_freight_job().is_none() && self.navigation_trade.occupancy().1 == 0\n",
+          "after": "        self.active_freight_job().is_none()\n            && self.navigation_trade.occupancy().1 == 0\n            && self.modular.passenger_occupancy().1 == 0\n"
+        },
+        {
+          "offset": 26249,
+          "before": "",
+          "after": "                super::modular::ModuleKind::MiningLaser,\n"
+        },
+        {
+          "offset": 28532,
+          "before": "",
+          "after": "                if account.equipment_state().revision() != previous_cargo_revision {\n                    self.modular.record_bay(&account, review.dock);\n                }\n"
+        },
+        {
+          "offset": 28773,
+          "before": "",
+          "after": "            self.grant_xyzzy_module(review.dock, review.tick, super::ModuleKind::SalvageCutter)?;\n"
+        }
+      ]
+    },
+    "flight/xyzzy/history.rs": {
+      "beforeSHA256": "68f7d801fa4a6f6a69f2d930ac2d899c5c085b5c2aad85bc4d2636b9fe135549",
+      "afterSHA256": "5609a93205ac96bc02866070ba5cc2c307becfb9e3e70cf5c37d153d4b751e47",
+      "hunks": [
+        {
+          "offset": 448,
+          "before": "",
+          "after": "    ObserveFuel(u16),\n"
+        },
+        {
+          "offset": 2063,
+          "before": "",
+          "after": "            world\n                .cargo_intakes(commerce.modular)\n                .into_iter()\n                .map(|entry| AccountEvent {\n                    revision: entry.revision,\n                    effect: AccountEffect::Debit(0),\n                }),\n        );\n        events.extend(\n"
+        },
+        {
+          "offset": 2483,
+          "before": "",
+          "after": "        );\n        events.extend(\n            commerce.modular.extra_capacity_account_events(\n                &world.freight_session.as_ref().ok_or(INVALID)?.state,\n            ),\n"
+        },
+        {
+          "offset": 5187,
+          "before": "",
+          "after": "                AccountEffect::ObserveFuel(observed) => {\n                    if observed != fuel {\n                        return Err(INVALID);\n                    }\n                }\n"
+        }
+      ]
+    },
+    "freight/g02.rs": {
+      "beforeSHA256": "799ebc2a49420fc4ee5f80412fecb82a722deb86286159ad693d8889ae6c1798",
+      "afterSHA256": "0edc740812d6c45ee9280af924368a066624b1af1667383ac6c425a7db0254ad",
+      "hunks": [
+        {
+          "offset": 11145,
+          "before": "",
+          "after": "    /// An original passenger transaction advances the account but does not change equipment fit.\n    pub(crate) fn prepare_passage_action(&self, delivered: bool) -> Result<Self, Error> {\n        let mut data = self.data;\n        data.revision = data\n            .revision\n            .checked_add(1)\n            .ok_or(Error::SequenceExhausted)?;\n        if delivered {\n            data.credits = data\n                .credits\n                .checked_add(crate::flight::PASSAGE_REWARD_TENTHS)\n                .ok_or(Error::CreditOverflow)?;\n        }\n        Ok(Self { data })\n    }\n"
+        },
+        {
+          "offset": 19410,
+          "before": "",
+          "after": "    }\n\n    /// Prospective single-unit lawful intake, without buying stock or changing cash.\n    /// Only an accepted physical source may publish this candidate and its receipt.\n    pub(crate) fn prepare_cargo_intake(\n        &self,\n        freight: &State,\n        commodity: services::CommodityId,\n        reservations: services::Reservations,\n    ) -> Result<Self, services::Error> {\n        use services::{CargoUnit, Error as ServiceError};\n        if commodity.departure_legal_weight() != 0 {\n            return Err(ServiceError::InvalidAccount);\n        }\n        let before = reservations.apply(self.service_projection(freight)?)?;\n        if commodity.unit() == CargoUnit::Tonne && before.used_tonnes >= before.hold_capacity_tonnes\n        {\n            return Err(ServiceError::HoldFull);\n        }\n        let mut candidate = Self { data: self.data };\n        candidate.data.revision = before\n            .revision\n            .checked_add(1)\n            .ok_or(ServiceError::SequenceExhausted)?;\n        if commodity == services::CommodityId::Food {\n            candidate.data.food_tonnes = candidate\n                .data\n                .food_tonnes\n                .checked_add(1)\n                .ok_or(ServiceError::QuantityLimit)?;\n        } else {\n            let held = &mut candidate.data.other_commodities[commodity.index() - 1];\n            *held = held\n                .checked_add(1)\n                .filter(|&n| n <= services::MAX_MARKET_QUANTITY)\n                .ok_or(ServiceError::QuantityLimit)?;\n        }\n        reservations.apply(candidate.service_projection(freight)?)?;\n        Ok(candidate)\n"
+        },
+        {
+          "offset": 29377,
+          "before": "",
+          "after": "#[derive(Debug, Clone, Copy)]\npub(crate) struct FreightMassEvent {\n    pub(crate) sequence: u64,\n    pub(crate) revision: Option<u64>,\n    pub(crate) delta: i16,\n    pub(crate) system: System,\n    pub(crate) dock_sequence: Option<u64>,\n}\n\n"
+        },
+        {
+          "offset": 30303,
+          "before": "",
+          "after": "    pub(crate) fn cargo_sequence(&self) -> u64 {\n        self.data.sequence\n    }\n\n    /// Every G02 custody transition in logical source order. Older issue/abandon records did\n    /// not retain account revisions; exact delivery receipts did.\n    pub(crate) fn cargo_mass_events(&self) -> Vec<FreightMassEvent> {\n        let mut events = Vec::new();\n        for job in self.data.jobs.iter().flatten() {\n            events.push(FreightMassEvent {\n                sequence: job.issue_sequence,\n                revision: job.issue_account_revision,\n                delta: 8,\n                system: job.issuer.system,\n                dock_sequence: Some(job.issuer.arrival_sequence),\n            });\n            let mut remaining = 8_i16;\n            let mut sequence = job.issue_sequence;\n            for transfer in job.transfers.iter().flatten() {\n                let amount = transfer.mask.count_ones() as i16;\n                remaining -= amount;\n                sequence = transfer.sequence;\n                events.push(FreightMassEvent {\n                    sequence,\n                    revision: Some(transfer.account_revision),\n                    delta: -amount,\n                    system: transfer.dock.system,\n                    dock_sequence: Some(transfer.dock.arrival_sequence),\n                });\n            }\n            if job.status == JobStatus::Abandoned {\n                events.push(FreightMassEvent {\n                    sequence: sequence.saturating_add(1),\n                    revision: job.abandoned_account_revision,\n                    delta: -remaining,\n                    system: AVENOR,\n                    dock_sequence: None,\n                });\n            }\n        }\n        events.sort_unstable_by_key(|event| event.sequence);\n        events\n    }\n"
+        }
+      ]
+    },
+    "lib.rs": {
+      "beforeSHA256": "fd519c9b3decc5725b28d493118823ed43a1f68a73fec279ba591822b1020a61",
+      "afterSHA256": "955fb67afbfe6bfcb2678ebb1a0aeb3e2aaff03afadd3edb662a95157d55bce4",
+      "hunks": [
+        {
+          "offset": 832,
+          "before": "",
+          "after": "pub mod unwritten_route;\n"
+        },
+        {
+          "offset": 2376,
+          "before": "",
+          "after": "pub use flight::{OccupiedCutContact, OccupiedCutError, OccupiedCutReview, PreparedOccupiedCut};\n"
+        },
+        {
+          "offset": 3705,
+          "before": "    FittedFuelScoops, FittedMiningTool, FuelScoopsSnapshot, ModularEquipmentSnapshot, ModuleAction,\n    ModuleError, ModuleKind, ModuleOffer, ModuleProvenance, ModuleReview, ModuleSlot, OwnedModule,\n",
+          "after": "    CABIN_TONNES, CabinGrade, CabinStatus, FittedFuelScoops, FittedMiningTool, FuelScoopsSnapshot,\n    ModularEquipmentSnapshot, ModuleAction, ModuleError, ModuleKind, ModuleOffer, ModuleProvenance,\n    ModuleReview, ModuleSlot, OwnedModule, PASSAGE_CLUE_ID, PASSAGE_REWARD_TENTHS, PassageStatus,\n    PassageTerminalReceipt, PassengerAction, PassengerIdentity, PassengerJourneySnapshot,\n"
+        }
+      ]
+    },
+    "mining.rs": {
+      "beforeSHA256": "6b8278efa71647548b317bedf352b9026eefbcdc1c7e738717f7df6da58ed798",
+      "afterSHA256": "9b91c21045f2eb465154e69f532d95c4b9f460801336833b2c035a8ffce251e9",
+      "hunks": [
+        {
+          "offset": 438,
+          "before": "pub use ore::{OreId, OreSnapshot};\n",
+          "after": "pub(crate) use ore::Collection;\npub use ore::{OreId, OreSnapshot, SCOOP_DISTANCE, SCOOP_MAX_RELATIVE_SPEED};\n"
+        },
+        {
+          "offset": 5672,
+          "before": "/// can produce it, after checking genuine paid ownership, mining compatibility and actual fit.\n",
+          "after": "/// can produce it, after checking actual paid or explicit maximum-owned equipment and fit.\n"
+        },
+        {
+          "offset": 7215,
+          "before": "",
+          "after": "    collected: Arc<Vec<Collection>>,\n"
+        },
+        {
+          "offset": 7437,
+          "before": "",
+          "after": "            collected: Arc::new(Vec::new()),\n"
+        }
+      ]
+    },
+    "mining/ledger.rs": {
+      "beforeSHA256": "eafb563854a8f89e2a7e12a3dc3a1730896e5178dac51118b003df2846b87f80",
+      "afterSHA256": "81dceb0c44ff22bd6e8db5565732f7daaf6032fa6b2fecf52a39d3be003e65ca",
+      "hunks": [
+        {
+          "offset": 999,
+          "before": "",
+          "after": "            && Arc::ptr_eq(&self.collected, &other.collected)\n"
+        },
+        {
+          "offset": 1442,
+          "before": "",
+          "after": "            collected: Arc::clone(&self.collected),\n"
+        },
+        {
+          "offset": 1871,
+          "before": "",
+          "after": "            collected: Arc::clone(&self.collected),\n"
+        },
+        {
+          "offset": 4147,
+          "before": "            return if self.strokes.is_empty() && self.expired == [None; BELT_BODY_COUNT] {\n",
+          "after": "            return if self.strokes.is_empty()\n                && self.collected.is_empty()\n                && self.expired == [None; BELT_BODY_COUNT]\n            {\n"
+        },
+        {
+          "offset": 4829,
+          "before": "",
+          "after": "            collected: Arc::clone(&self.collected),\n"
+        },
+        {
+          "offset": 6796,
+          "before": "                    .map(|b| usize::from(b.extracted_units))\n",
+          "after": "                    .map(|b| {\n                        usize::from(b.extracted_units).saturating_sub(\n                            self.collected\n                                .iter()\n                                .filter(|c| {\n                                    c.id.asteroid() == b.id && c.world_tick < hit.world_tick\n                                })\n                                .count(),\n                        )\n                    })\n"
+        },
+        {
+          "offset": 8031,
+          "before": "        Ok(())\n",
+          "after": "        self.validate_collections()\n"
+        }
+      ]
+    },
+    "mining/ore.rs": {
+      "beforeSHA256": "bfa604ac6206259de6aee39b5c4784bd27e85a63472f02b6fda5cb758aac9704",
+      "afterSHA256": "13743527e29e8bef8bd9524372b11c511c15d25df9d4dde1812857f9a65c04c7",
+      "hunks": [
+        {
+          "offset": 87,
+          "before": "use super::{AsteroidId, CommodityId, State, Vec3, add, scale};\n",
+          "after": "use super::{\n    AsteroidId, CommodityId, INVALID, MiningError, Reader, RigidPose, SaveError, State, Vec3,\n    Writer, add, scale,\n};\nuse crate::{CombatIdentity, station_services::CargoIntake};\nuse std::sync::Arc;\n\npub const SCOOP_DISTANCE: f64 = 85.0;\npub const SCOOP_MAX_RELATIVE_SPEED: f64 = 15.0;\nconst MAX_COLLECTIONS: usize = 277;\n"
+        },
+        {
+          "offset": 935,
+          "before": "",
+          "after": "impl OreSnapshot {\n    /// World vertices shared by the Meridian fragment mesh and full-aperture scoop checks.\n    pub fn vertices(self) -> [Vec3; 6] {\n        [\n            Vec3::new(7.0, 1.0, -2.0),\n            Vec3::new(-5.0, -1.0, 2.0),\n            Vec3::new(1.0, 10.0, 1.0),\n            Vec3::new(-2.0, -6.0, -1.0),\n            Vec3::new(2.0, 3.0, 6.0),\n            Vec3::new(-1.0, 0.0, -8.0),\n        ]\n        .map(|offset| add(self.position, offset))\n    }\n    pub(crate) fn scoop_admissible(self, pose: RigidPose, speed: f32, full_aperture: bool) -> bool {\n        let displacement = |p: Vec3| {\n            Vec3::new(\n                p.x - pose.position.x,\n                p.y - pose.position.y,\n                p.z - pose.position.z,\n            )\n        };\n        let centre = displacement(self.position);\n        if !pose.orientation.is_valid_rotation()\n            || !super::finite(pose.position)\n            || !speed.is_finite()\n            || !(0.0..=crate::flight::MAX_SPEED).contains(&speed)\n            || centre.dot(centre) >= SCOOP_DISTANCE * SCOOP_DISTANCE\n            || centre.dot(pose.orientation.y) >= 0.0\n            || centre.dot(pose.orientation.z) <= 0.0\n        {\n            return false;\n        }\n        if !full_aperture {\n            return true;\n        }\n        let ship_speed = f64::from(speed * crate::station::DISTANCE_PER_SPEED_UNIT);\n        let relative = add(self.velocity, scale(pose.orientation.z, -ship_speed));\n        relative.dot(relative) <= SCOOP_MAX_RELATIVE_SPEED * SCOOP_MAX_RELATIVE_SPEED\n            && self.vertices().into_iter().all(|p| {\n                let point = displacement(p);\n                point.dot(pose.orientation.y) < 0.0\n                    && point.dot(pose.orientation.z) > 0.0\n                    && point.dot(point) < SCOOP_DISTANCE * SCOOP_DISTANCE\n            })\n    }\n}\n\n#[derive(Debug, Clone, Copy, PartialEq)]\npub(crate) struct Collection {\n    pub(crate) id: OreId,\n    pub(crate) owner: CombatIdentity,\n    pub(crate) item: u64,\n    pub(crate) revision: u64,\n    pub(crate) world_tick: u64,\n    pub(crate) physical_tick: u64,\n    pub(crate) pose: RigidPose,\n    pub(crate) speed: f32,\n    pub(crate) full_aperture: bool,\n}\n"
+        },
+        {
+          "offset": 3388,
+          "before": "            .sum()\n",
+          "after": "            .sum::<usize>()\n            .saturating_sub(\n                self.collected\n                    .iter()\n                    .filter(|c| self.expired[usize::from(c.id.asteroid.ordinal)].is_none())\n                    .count(),\n            )\n"
+        },
+        {
+          "offset": 3964,
+          "before": "            let Some(release) = self.terminal_stroke(slot) else {\n",
+          "after": "            if self.terminal_stroke(slot).is_none() {\n"
+        },
+        {
+          "offset": 4044,
+          "before": "            };\n            let elapsed = physical_tick.saturating_sub(release.physical_tick) as f64 / 60.0;\n            let columns = body.initial_units.min(5);\n            let rows = body.initial_units / columns;\n",
+          "after": "            }\n"
+        },
+        {
+          "offset": 4110,
+          "before": "                // Original MiningLedger.yield grid: cargo fallback radius48 => spacing112.\n                let center = Vec3::new(\n                    f64::from(columns - 1) * 6.0,\n                    f64::from(rows - 1) * 6.0,\n                    10.0,\n                );\n                let offset = Vec3::new(\n                    (f64::from(fragment % columns) - f64::from(columns - 1) / 2.0) * 112.0,\n                    (f64::from(fragment / columns) - f64::from(rows - 1) / 2.0) * 112.0,\n                    0.0,\n                );\n                let velocity = Vec3::new(f64::from(fragment % 5), 2.0, 3.0);\n                ore.push(OreSnapshot {\n                    id: OreId {\n                        asteroid: body.id,\n                        fragment,\n                    },\n                    commodity: body.commodity,\n                    quantity: 1,\n                    position: add(\n                        add(body.position, add(center, offset)),\n                        scale(velocity, elapsed),\n                    ),\n                    velocity,\n                    released_tick: release.world_tick,\n                    released_physical_tick: release.physical_tick,\n                });\n",
+          "after": "                let id = OreId {\n                    asteroid: body.id,\n                    fragment,\n                };\n                if self.collected.iter().any(|c| c.id == id) {\n                    continue;\n                }\n                if let Some(snapshot) = self.fragment_at(id, physical_tick) {\n                    ore.push(snapshot);\n                }\n"
+        },
+        {
+          "offset": 4520,
+          "before": "",
+          "after": "    fn fragment_at(&self, id: OreId, physical_tick: u64) -> Option<OreSnapshot> {\n        let body = self.body(usize::from(id.asteroid.ordinal))?;\n        let release = self.terminal_stroke(usize::from(id.asteroid.ordinal))?;\n        if body.id != id.asteroid\n            || id.fragment >= body.initial_units\n            || physical_tick < release.physical_tick\n        {\n            return None;\n        }\n        let elapsed = (physical_tick - release.physical_tick) as f64 / 60.0;\n        let columns = body.initial_units.min(5);\n        let rows = body.initial_units / columns;\n        let fragment = id.fragment;\n        // Original MiningLedger.yield grid: cargo fallback radius48 => spacing112.\n        let center = Vec3::new(\n            f64::from(columns - 1) * 6.0,\n            f64::from(rows - 1) * 6.0,\n            10.0,\n        );\n        let offset = Vec3::new(\n            (f64::from(fragment % columns) - f64::from(columns - 1) / 2.0) * 112.0,\n            (f64::from(fragment / columns) - f64::from(rows - 1) / 2.0) * 112.0,\n            0.0,\n        );\n        let velocity = Vec3::new(f64::from(fragment % 5), 2.0, 3.0);\n        Some(OreSnapshot {\n            id,\n            commodity: body.commodity,\n            quantity: 1,\n            position: add(\n                add(body.position, add(center, offset)),\n                scale(velocity, elapsed),\n            ),\n            velocity,\n            released_tick: release.world_tick,\n            released_physical_tick: release.physical_tick,\n        })\n    }\n    pub(crate) fn collections(&self) -> &[Collection] {\n        &self.collected\n    }\n    pub(crate) fn cargo_intakes(&self) -> impl Iterator<Item = CargoIntake> + '_ {\n        self.collected.iter().filter_map(|receipt| {\n            self.body(usize::from(receipt.id.asteroid.ordinal))\n                .map(|body| CargoIntake {\n                    revision: receipt.revision,\n                    commodity: body.commodity,\n                })\n        })\n    }\n    pub(crate) fn prepare_collection(&self, collection: Collection) -> Result<Self, MiningError> {\n        let mut candidate = self.clone();\n        Arc::make_mut(&mut candidate.collected).push(collection);\n        candidate\n            .validate_collections()\n            .map_err(|_| MiningError::InvalidState)?;\n        Ok(candidate)\n    }\n    pub(super) fn validate_collections(&self) -> Result<(), SaveError> {\n        if self.collected.len() > MAX_COLLECTIONS {\n            return Err(INVALID);\n        }\n        let mut previous: Option<&Collection> = None;\n        for (index, receipt) in self.collected.iter().enumerate() {\n            let terminal = self\n                .terminal_stroke(usize::from(receipt.id.asteroid.ordinal))\n                .ok_or(INVALID)?;\n            let ore = self\n                .fragment_at(receipt.id, receipt.physical_tick)\n                .ok_or(INVALID)?;\n            if receipt.owner.owner != terminal.owner.owner\n                || receipt.owner.hull != terminal.owner.hull\n                || receipt.owner.system != terminal.owner.system\n                || receipt.owner.visit < terminal.owner.visit\n                || receipt.item == 0\n                || receipt.revision <= terminal.account_revision\n                || receipt.world_tick < terminal.world_tick\n                || receipt.physical_tick > receipt.world_tick\n                || receipt.physical_tick - terminal.physical_tick\n                    > receipt.world_tick - terminal.world_tick\n                || self.expired[usize::from(receipt.id.asteroid.ordinal)]\n                    .is_some_and(|(tick, _)| receipt.world_tick >= tick)\n                || self.collected[..index]\n                    .iter()\n                    .any(|old| old.id == receipt.id)\n                || previous.is_some_and(|old| {\n                    old.revision >= receipt.revision\n                        || old.world_tick > receipt.world_tick\n                        || old.physical_tick > receipt.physical_tick\n                })\n                || !ore.scoop_admissible(receipt.pose, receipt.speed, receipt.full_aperture)\n            {\n                return Err(INVALID);\n            }\n            previous = Some(receipt);\n        }\n        Ok(())\n    }\n    pub(crate) fn encode_collections(&self, w: &mut Writer) {\n        w.u16(self.collected.len() as u16);\n        for c in self.collected.iter() {\n            w.u8(c.id.asteroid.ordinal);\n            w.u8(c.id.fragment);\n            for value in [\n                c.owner.owner,\n                c.owner.hull,\n                c.owner.visit,\n                c.item,\n                c.revision,\n                c.world_tick,\n                c.physical_tick,\n            ] {\n                w.u64(value);\n            }\n            super::persistence::rigid(w, c.pose);\n            w.f32(c.speed);\n            w.bool(c.full_aperture);\n        }\n    }\n    pub(crate) fn decode_collections(&mut self, r: &mut Reader<'_>) -> Result<(), SaveError> {\n        let count = usize::from(r.u16()?);\n        if count == 0 || count > MAX_COLLECTIONS {\n            return Err(INVALID);\n        }\n        let mut receipts = Vec::with_capacity(count);\n        for _ in 0..count {\n            let id = OreId {\n                asteroid: AsteroidId::from_ordinal(r.u8()?)?,\n                fragment: r.u8()?,\n            };\n            let owner = CombatIdentity {\n                owner: r.u64()?,\n                hull: r.u64()?,\n                visit: r.u64()?,\n                system: id.asteroid.system(),\n            };\n            receipts.push(Collection {\n                id,\n                owner,\n                item: r.u64()?,\n                revision: r.u64()?,\n                world_tick: r.u64()?,\n                physical_tick: r.u64()?,\n                pose: super::persistence::read_rigid(r)?,\n                speed: r.f32()?,\n                full_aperture: r.bool()?,\n            });\n        }\n        self.collected = Arc::new(receipts);\n        self.validate()\n    }\n"
+        }
+      ]
+    },
+    "mining/persistence.rs": {
+      "beforeSHA256": "086e4acc99fda02a148eb9b54058861da504f72c962b4b55756f13f2be6b53d7",
+      "afterSHA256": "5db46cbb51bfcff28ee37ee5a4e29a23cf814102bc72ca8ad1530e3482a839bd",
+      "hunks": [
+        {
+          "offset": 2137,
+          "before": "",
+          "after": "    #[cfg(test)]\n"
+        },
+        {
+          "offset": 2228,
+          "before": "",
+          "after": "        let value = Self::decode_base(r)?;\n        value.validate()?;\n        Ok(value)\n    }\n    pub(crate) fn decode_base(r: &mut Reader<'_>) -> Result<Self, SaveError> {\n"
+        },
+        {
+          "offset": 4327,
+          "before": "",
+          "after": "            collected: Arc::new(Vec::new()),\n"
+        },
+        {
+          "offset": 4383,
+          "before": "        value.validate()?;\n",
+          "after": ""
+        }
+      ]
+    },
+    "mining/tests.rs": {
+      "beforeSHA256": "ec6bed51ec6c10c182bdbd463021e47c8d830bd19b89e3215c53d9a29c39e13a",
+      "afterSHA256": "8d4ad383f7b4fd36fe60607de7dba006ed757c470b99e8ed8cd3a17979dbc54c",
+      "hunks": [
+        {
+          "offset": 3694,
+          "before": "",
+          "after": "}\n\n#[test]\nfn moving_authored_shard_has_outward_faces_and_once_only_lower_forward_intake() {\n    let mut state = State::default();\n    for sequence in 1..=2 {\n        state = ok(state.prepare_work(component_stroke(&state, 0, sequence, 2))).0;\n    }\n    let ore = state.pending_ore(97)[0];\n    let vertices = ore.vertices();\n    let offset = |p: Vec3| {\n        Vec3::new(\n            p.x - ore.position.x,\n            p.y - ore.position.y,\n            p.z - ore.position.z,\n        )\n    };\n    for face in ASTEROID_FACES {\n        let [a, b, c] = face.map(|i| offset(vertices[i]));\n        let ab = Vec3::new(b.x - a.x, b.y - a.y, b.z - a.z);\n        let ac = Vec3::new(c.x - a.x, c.y - a.y, c.z - a.z);\n        let cross = Vec3::new(\n            ab.y * ac.z - ab.z * ac.y,\n            ab.z * ac.x - ab.x * ac.z,\n            ab.x * ac.y - ab.y * ac.x,\n        );\n        assert!(\n            cross.dot(a) > 0.0,\n            \"authored shard has inward or degenerate face\"\n        );\n    }\n    let pose = RigidPose {\n        position: add(ore.position, Vec3::new(0.0, 45.0, -55.0)),\n        orientation: crate::docking::Basis3::IDENTITY,\n    };\n    assert!(ore.scoop_admissible(pose, 0.0, true));\n    assert!(!ore.scoop_admissible(pose, 2.0, true));\n    assert!(ore.scoop_admissible(pose, 2.0, false));\n    let above = RigidPose {\n        position: add(ore.position, Vec3::new(0.0, -45.0, -55.0)),\n        ..pose\n    };\n    assert!(!ore.scoop_admissible(above, 0.0, false));\n    let receipt = Collection {\n        id: ore.id,\n        owner: state.strokes()[1].owner,\n        item: 123,\n        revision: 3,\n        world_tick: 97,\n        physical_tick: 97,\n        pose,\n        speed: 0.0,\n        full_aperture: true,\n    };\n    let collected = ok(state.prepare_collection(receipt));\n    assert!(collected.pending_ore(98).is_empty());\n    assert!(collected.prepare_collection(receipt).is_err());\n    assert_eq!(\n        collected.cargo_intakes().collect::<Vec<_>>(),\n        vec![crate::station_services::CargoIntake {\n            revision: 3,\n            commodity: ore.commodity\n        }]\n    );\n    let mut base = Writer::new();\n    collected.encode(&mut base);\n    let mut trailer = Writer::new();\n    collected.encode_collections(&mut trailer);\n    let mut restored = ok(State::decode_base(&mut Reader::new(&base.bytes)));\n    ok(restored.decode_collections(&mut Reader::new(&trailer.bytes)));\n    assert_eq!(restored, collected);\n"
+        }
+      ]
+    },
+    "navigation/journal.rs": {
+      "beforeSHA256": "3cdba7e822cfff8483865eb751e39ad91adb3806d6cfcd34ac11ec1ba43cc5a0",
+      "afterSHA256": "1da2ad0d4712fb6583ee9154648868784a62e9a1029719512d0fcd46200320ed",
+      "hunks": [
+        {
+          "offset": 13117,
+          "before": "",
+          "after": "    /// Bind a retained passenger reception to the actual system travelled to before its berth.\n    pub(crate) fn validate_passenger_berth(\n        &self,\n        dock: DockContext,\n        tick: u64,\n    ) -> Result<(), SaveError> {\n        self.spent_at(dock, tick)?;\n        let count = usize::try_from(dock.visit().checked_sub(dock.sequence()).ok_or(INVALID)?)\n            .map_err(|_| INVALID)?;\n        let system = if count == 0 {\n            SystemId::AVENOR\n        } else {\n            self.legs.get(count - 1).ok_or(INVALID)?.destination\n        };\n        if dock.system() != system {\n            return Err(INVALID);\n        }\n        Ok(())\n    }\n\n"
+        }
+      ]
+    },
+    "station_services.rs": {
+      "beforeSHA256": "2b4df3af565b0c88825103b4b0122f43783a63a1720fdf5def20e17a489216fb",
+      "afterSHA256": "53a4f0294b8f627b6a58fc2e0cfd81c8e4afab207a4a9fe69b42fa1c3d6ed7b7",
+      "hunks": [
+        {
+          "offset": 2747,
+          "before": "",
+          "after": "}\n\n/// One native unit acquired through a separately validated physical source.\n#[derive(Debug, Clone, Copy, PartialEq, Eq)]\npub(crate) struct CargoIntake {\n    pub(crate) revision: u64,\n    pub(crate) commodity: CommodityId,\n}\nimpl CargoIntake {\n    pub(crate) fn mass_event(self) -> Option<(u64, i16)> {\n        (self.commodity.unit() == CargoUnit::Tonne).then_some((self.revision, 1))\n    }\n"
+        }
+      ]
+    },
+    "station_services/history.rs": {
+      "beforeSHA256": "b1501914f1e3f61048d6d7c6de74f3b3c76d88d5cfced84d9d793831fd3eab2f",
+      "afterSHA256": "dd40198c402f047a1406d2710e43cfac958b324bf457a12d0d3f513d8a3219df",
+      "hunks": [
+        {
+          "offset": 502,
+          "before": "",
+          "after": "    pub(crate) fn cargo_mass_events(&self) -> Vec<(u64, i16)> {\n        self.receipts\n            .iter()\n            .filter_map(|r| {\n                let (commodity, delta) = match r.event {\n                    Event::BoughtFood { .. } => (CommodityId::Food, 1),\n                    Event::SoldFood { .. } => (CommodityId::Food, -1),\n                    Event::BoughtCommodity { commodity, .. } => (commodity, 1),\n                    Event::SoldCommodity { commodity, .. } => (commodity, -1),\n                    Event::Refuelled { .. } => return None,\n                };\n                (commodity.unit() == super::CargoUnit::Tonne).then_some((r.revision, delta))\n            })\n            .collect()\n    }\n    #[cfg(test)]\n    pub(crate) fn move_cargo_revision_for_test(&mut self, from: u64, to: u64) -> bool {\n        let Some(receipt) = std::sync::Arc::make_mut(&mut self.receipts)\n            .iter_mut()\n            .find(|receipt| receipt.revision == from)\n        else {\n            return false;\n        };\n        receipt.revision = to;\n        true\n    }\n"
+        },
+        {
+          "offset": 2847,
+          "before": "    pub(super) fn validate_receipts(&self) -> Result<(), SaveError> {\n",
+          "after": "    pub(super) fn validate_receipts(\n        &self,\n        intakes: &[super::CargoIntake],\n    ) -> Result<(), SaveError> {\n"
+        },
+        {
+          "offset": 3374,
+          "before": "",
+          "after": "        let mut incoming = intakes.to_vec();\n        incoming.sort_unstable_by_key(|entry| entry.revision);\n        if incoming\n            .iter()\n            .any(|entry| entry.revision == 0 || entry.commodity.departure_legal_weight() != 0)\n            || incoming\n                .windows(2)\n                .any(|entries| entries[0].revision == entries[1].revision)\n        {\n            return Err(invalid);\n        }\n        let mut incoming = incoming.into_iter().peekable();\n"
+        },
+        {
+          "offset": 3949,
+          "before": "",
+          "after": "                return Err(invalid);\n            }\n            while let Some(entry) = incoming.next_if(|entry| entry.revision < receipt.revision) {\n                let slot = &mut held[entry.commodity.index()];\n                *slot = slot\n                    .checked_add(1)\n                    .filter(|&n| n <= super::MAX_MARKET_QUANTITY)\n                    .ok_or(invalid)?;\n            }\n            if incoming\n                .peek()\n                .is_some_and(|entry| entry.revision == receipt.revision)\n            {\n"
+        }
+      ]
+    },
+    "station_services/persistence.rs": {
+      "beforeSHA256": "788333d0ae6e39df30c3e3db5665010b05387a49300951d4c750cb8e53c87b89",
+      "afterSHA256": "5addbf2dabf0ede765bc592b9d97eb602609d63fc8d1a3311292782cb05cee03",
+      "hunks": [
+        {
+          "offset": 2938,
+          "before": "",
+          "after": "    #[cfg(test)]\n"
+        },
+        {
+          "offset": 3307,
+          "before": "",
+          "after": "    #[cfg(test)]\n"
+        },
+        {
+          "offset": 3552,
+          "before": "",
+          "after": "        self.validate_save_with_intakes(owner, capacity, historical_capacity, traffic, &[])\n    }\n    pub(crate) fn validate_save_with_intakes(\n        &self,\n        owner: u64,\n        capacity: u16,\n        historical_capacity: u16,\n        traffic: crate::traffic::Flows,\n        intakes: &[super::CargoIntake],\n    ) -> Result<SavedServiceSummary, SaveError> {\n"
+        },
+        {
+          "offset": 4090,
+          "before": "        self.validate_receipts()?;\n        let food_summary = validate_food_markets(&self.data, capacity, traffic)?;\n",
+          "after": "        self.validate_receipts(intakes)?;\n        let mut incoming = [0_u128; 17];\n        for entry in intakes {\n            incoming[entry.commodity.index()] += 1;\n        }\n        let food_summary = validate_food_markets(&self.data, capacity, traffic, incoming[0])?;\n"
+        },
+        {
+          "offset": 4670,
+          "before": "        let other = validate_other_markets(&self.data, historical_capacity, traffic)?;\n",
+          "after": "        let other = validate_other_markets(&self.data, historical_capacity, traffic, incoming)?;\n"
+        },
+        {
+          "offset": 5141,
+          "before": "        if sold > bought\n",
+          "after": "        if sold > bought + intakes.len() as u128\n"
+        },
+        {
+          "offset": 6561,
+          "before": "",
+          "after": "    incoming: [u128; 17],\n"
+        },
+        {
+          "offset": 8120,
+          "before": "        let held = commodity_bought\n",
+          "after": "        let held = (commodity_bought + incoming[id.index()])\n"
+        },
+        {
+          "offset": 9814,
+          "before": "",
+          "after": "    incoming: u128,\n"
+        },
+        {
+          "offset": 10927,
+          "before": "    let food = bought.checked_sub(sold).ok_or(invalid)?;\n",
+          "after": "    let food = (bought + incoming).checked_sub(sold).ok_or(invalid)?;\n"
+        }
+      ]
+    },
+    "traffic/emp.rs": {
+      "beforeSHA256": "9ad534a894e0df7dada15596a2956ee7d7b4e9ecfecb3f387ddf63fbf14249ff",
+      "afterSHA256": "51fbe18dc9c25a57cabbfe9003d7faa1d1c98936eda80951083f36036680877a",
+      "hunks": [
+        {
+          "offset": 10120,
+          "before": "",
+          "after": "\n    /// Check the retained game actor's actual resource state at a command witness.\n    pub(crate) fn occupied_disabled_at(\n        &self,\n        id: NpcId,\n        scene: &MissileScene,\n    ) -> Result<super::Population, SaveError> {\n        let actor = self.actors[self.actor_index(id).ok_or(INVALID)?].ok_or(INVALID)?;\n        if scene.target(id).is_none() || id.system() != scene.system {\n            return Err(INVALID);\n        }\n        let resources =\n            self.resources_at(actor, scene.local_tick, scene.world_tick, scene.stage)?;\n        if resources.energy == 0\n            || !resources\n                .electrical\n                .is_some_and(|pool| pool.disabled && pool.crew_aboard == 1)\n        {\n            return Err(INVALID);\n        }\n        Ok(actor.snapshot().population)\n    }\n\n    /// A temporary game-tool selection needs an independently retained disabled,\n    /// occupied actor at that command tick, even after that actor recovers or leaves.\n    pub(crate) fn occupied_disabled_at_tick(&self, id: NpcId, tick: u64) -> bool {\n        let Some(actor) = self.actor_index(id).and_then(|i| self.actors[i]) else {\n            return false;\n        };\n        if actor.born_world_tick > tick || actor.sold_world_tick.is_some_and(|t| t <= tick) {\n            return false;\n        }\n        let Some(emp_clock) = self\n            .emp_events\n            .iter()\n            .filter(|e| e.victim == id && e.world_tick <= tick)\n            .map(|e| e.local_tick)\n            .max()\n        else {\n            return false;\n        };\n        let clock = self\n            .shots\n            .iter()\n            .filter(|h| {\n                h.world_tick <= tick && (h.victim == id || h.source == super::BeamSource::Npc(id))\n            })\n            .map(|h| h.local_tick)\n            .chain(\n                self.missile_hits\n                    .iter()\n                    .filter(|h| h.victim == id && h.world_tick <= tick)\n                    .map(|h| h.local_tick),\n            )\n            .chain(\n                self.player_hits\n                    .iter()\n                    .filter(|h| h.attacker == id && h.world_tick <= tick)\n                    .map(|h| h.local_tick),\n            )\n            .fold(emp_clock, u64::max);\n        self.resources_at(actor, clock, tick, SceneStage::Command(u64::MAX))\n            .is_ok_and(|r| {\n                r.energy != 0\n                    && r.electrical\n                        .is_some_and(|p| p.disabled && p.crew_aboard == 1)\n            })\n    }\n"
+        }
+      ]
+    }
+  }
+}

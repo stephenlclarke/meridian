@@ -1,0 +1,12 @@
+{
+  "schema": 1,
+  "id": "sh100-ox-mk-ii",
+  "undoBefore": [
+    "sh099-ox"
+  ],
+  "undoAfter": [],
+  "kind": "declaration",
+  "module": "ox_mk_ii",
+  "before": "pub mod ox;\n",
+  "after": "pub mod peregrine_mk3;\n"
+}

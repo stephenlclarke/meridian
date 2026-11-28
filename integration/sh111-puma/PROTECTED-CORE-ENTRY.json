@@ -1,0 +1,12 @@
+{
+  "schema": 1,
+  "id": "sh111-puma",
+  "undoBefore": [
+    "sh110-leopard-fighter"
+  ],
+  "undoAfter": [],
+  "kind": "declaration",
+  "module": "puma",
+  "before": "pub mod peregrine_mk_i;\n",
+  "after": "pub mod rabbit_explorer;\n"
+}

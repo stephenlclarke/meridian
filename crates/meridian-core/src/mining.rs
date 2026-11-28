@@ -9,7 +9,8 @@ use crate::navigation::SystemId;
 use crate::save::{Reader, SaveError, Writer};
 use crate::station_services::CommodityId;
 pub(crate) use ledger::MiningStroke;
-pub use ore::{OreId, OreSnapshot};
+pub(crate) use ore::Collection;
+pub use ore::{OreId, OreSnapshot, SCOOP_DISTANCE, SCOOP_MAX_RELATIVE_SPEED};
 
 pub const BELT_BODY_COUNT: usize = 12;
 pub const MINING_RANGE: f64 = 6000.0;
@@ -172,7 +173,7 @@ pub struct MiningShot {
     pub tick: u64,
 }
 /// A one-account-revision work capability. Only the account/equipment integration inside core
-/// can produce it, after checking genuine paid ownership, mining compatibility and actual fit.
+/// can produce it, after checking actual paid or explicit maximum-owned equipment and fit.
 /// No constructor, decoding, UI-selected item or caller-supplied availability flag exists.
 #[derive(Debug)]
 pub struct MiningToolAuthority {
@@ -223,6 +224,7 @@ pub(crate) struct State {
     enabled: bool,
     strokes: Arc<Vec<MiningStroke>>,
     expired: [Option<(u64, u64)>; BELT_BODY_COUNT],
+    collected: Arc<Vec<Collection>>,
 }
 impl Default for State {
     fn default() -> Self {
@@ -230,6 +232,7 @@ impl Default for State {
             enabled: true,
             strokes: Arc::new(Vec::new()),
             expired: [None; BELT_BODY_COUNT],
+            collected: Arc::new(Vec::new()),
         }
     }
 }

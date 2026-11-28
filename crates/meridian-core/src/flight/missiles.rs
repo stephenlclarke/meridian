@@ -12,6 +12,8 @@ pub(super) struct RetainedBeam<'a> {
     pub(super) world_tick: u64,
     pub(super) physical_tick: u64,
     pub(super) command_emission: Option<u64>,
+    /// EMP scene (start/release) or a physical step precedes a same-clock manual ECM.
+    pub(super) ecm_after_scene: bool,
     pub(super) ray: crate::docking::RigidPose,
     pub(super) point: Vec3,
     pub(super) bodies: &'a [(ProjectileId, crate::docking::RigidPose)],
@@ -103,6 +105,7 @@ pub enum MissileEnd {
     TargetLost,
     Culled,
     Intercepted,
+    Ecm,
 }
 #[derive(Debug, Clone, Copy, PartialEq)]
 pub enum MissileContact {
@@ -223,6 +226,9 @@ impl Default for State {
     }
 }
 impl State {
+    pub(super) fn laser_interceptions(&self) -> impl Iterator<Item = (u64, &super::PulseShot)> {
+        self.beams.iter().flatten().map(|b| (b.emission, &b.shot))
+    }
     pub(super) fn resource_emissions(&self) -> impl Iterator<Item = (u64, u64)> + '_ {
         self.projectiles
             .iter()
@@ -562,21 +568,30 @@ impl World {
         let old_combat = self.combat;
         let old_missiles = self.missiles.clone();
         let old_practice = self.practice;
+        let old_ecm = self.ecm.clone();
         self.combat = combat;
         self.missiles.extend_for_launch(index);
         self.missiles.projectiles[index] = Some(projectile);
         self.missiles.npc_launches[index] = npc_launch;
         self.missiles.armed = false;
         self.missiles.cooldown = MISSILE_COOLDOWN_TICKS;
+        let terminated = self.ecm.terminate_live(
+            &mut self.missiles,
+            owner,
+            tick,
+            origin.physical_tick,
+            emission,
+        );
         if let Some(p) = &mut self.practice {
             p.pending_missiles = self.missiles.pending_for_lesson(*p);
             p.observe_discharge(tick);
         }
-        if self.save_bytes().is_err() {
+        if terminated.is_err() || self.save_bytes().is_err() {
             self.commander_account = old_account;
             self.combat = old_combat;
             self.missiles = old_missiles;
             self.practice = old_practice;
+            self.ecm = old_ecm;
             return Err(MissileError::SaveRefused);
         }
         Ok(origin)
@@ -612,11 +627,14 @@ impl World {
             legal: self.legal_value().unwrap_or(0),
             traffic: traffic.clone(),
         };
-        prepared.combat.advance(self.state.mode, next.mode);
+        prepared
+            .combat
+            .advance(self.state.mode, next.mode, self.xyzzy_medusa_active());
         prepared.pulse.advance(
             self.state.mode,
             next.mode,
-            self.energy_recharge_hundredths(),
+            self.step_energy_recharge(self.energy_recharge_hundredths()),
+            self.energy_capacity(),
         );
         if self.state.mode != FlightMode::Docked {
             prepared.missiles.cooldown = prepared.missiles.cooldown.saturating_sub(1);

@@ -1,0 +1,184 @@
+{
+  "hull": "SH068 Badger",
+  "scope": "Original catalogue inspection and geometry queries",
+  "source": "assets/fleet/sh068/SOURCE-GEOMETRY.json",
+  "frozenSources": "integration/sh068-badger/FROZEN-SOURCES.json",
+  "sourceScaleMetresPerUnit": "1",
+  "faces": {
+    "detailed": 5912,
+    "native": 284,
+    "nativeMaximum": 512
+  },
+  "originalAccess": {
+    "runtimeCatalogue": {
+      "playerFlyable": false,
+      "normalPurchaseEligible": false,
+      "purchasePolicy": "pendingFabrication"
+    },
+    "r3DesignContract": {
+      "playerFlyable": true,
+      "purchasePolicy": "blueprintFabrication"
+    }
+  },
+  "engineering": {
+    "sourceReference": "finite-intrinsic-empty-badger",
+    "massKg": 33622
+  },
+  "supportGroups": 26,
+  "minimumRouteClearanceMillimetres": 633,
+  "sourceContactCounts": {
+    "overlap": 4
+  },
+  "collarCentresOccupied": true,
+  "collarSupports": {
+    "selected": "intact",
+    "alternatives": "integration/sh068-badger/COLLAR-OPTIONS.json"
+  },
+  "fitUpperMillimetres": {
+    "detailed": 2431,
+    "native": 3757
+  },
+  "hullStudio": {
+    "definition": "integration/sh068-badger/BADGER-STUDIO.json",
+    "bytes": 801547,
+    "sha256": "0858d42d8378bd399ab47087da18c3c51229fca1a6cc975837829c1f7f09fab9",
+    "supports": 26,
+    "probes": 7,
+    "loaderRevision": "27121e66ba37a29781135b56924a9d6e7f38a70a",
+    "signedInstalledExport": {
+      "status": "PASS",
+      "scope": "Signed installed Studio offline artwork import and export",
+      "bundleIdentifier": "io.xyzzy.meridian.hullstudio",
+      "bundleVersion": "0.0.0",
+      "codeDirectoryHash": "93938bda9242ebdff508bfb9e16b3cdf83c0a200",
+      "developerIdTeam": "4MEB7MUTAV",
+      "signatureVerification": "deep strict",
+      "definition": {
+        "bytes": 801547,
+        "sha256": "0858d42d8378bd399ab47087da18c3c51229fca1a6cc975837829c1f7f09fab9"
+      },
+      "exportExitStatuses": [
+        0,
+        0
+      ],
+      "exportMatchesDefinitionExceptTrailingLf": true,
+      "valid": true,
+      "diagnostics": [],
+      "detailedTriangles": 5912,
+      "nativeTriangles": 284,
+      "supportGroups": 26,
+      "engineeringReference": "finite-intrinsic-empty-badger",
+      "massKg": 33622,
+      "receiptFiles": {
+        "BADGER.hull.json": {
+          "bytes": 801546,
+          "sha256": "66246cac8a5cb608302a3ad2c15935d9df28270c128b76a6d53a7bc7b0ff9f0b"
+        },
+        "BADGER-repeat.hull.json": {
+          "bytes": 801546,
+          "sha256": "66246cac8a5cb608302a3ad2c15935d9df28270c128b76a6d53a7bc7b0ff9f0b"
+        },
+        "studio.stdout.json": {
+          "bytes": 102972,
+          "sha256": "1b3b8bc7fa3b977de9db43ed527566fb5336566adb9ddf22147676762d6704d7"
+        },
+        "studio-repeat.stdout.json": {
+          "bytes": 102972,
+          "sha256": "1b3b8bc7fa3b977de9db43ed527566fb5336566adb9ddf22147676762d6704d7"
+        },
+        "codesign.log": {
+          "bytes": 13038,
+          "sha256": "7ed835e97c657448b0a861f439b6748f1ac7f5b3a25a054e90805e26e6d7f4f6"
+        },
+        "codesign-details.log": {
+          "bytes": 1145,
+          "sha256": "46f22bef73c8eab385775b9c33eb76171b43a06b700a46282ba7683d72e141bb"
+        }
+      },
+      "artworkProbeResults": [
+        {
+          "name": "central-between-forward-pods",
+          "passed": true
+        },
+        {
+          "name": "port-outside-forward-collar",
+          "passed": true
+        },
+        {
+          "name": "port-above-cross-wing",
+          "passed": true
+        },
+        {
+          "name": "port-outside-engine",
+          "passed": true
+        },
+        {
+          "name": "starboard-outside-forward-collar",
+          "passed": true
+        },
+        {
+          "name": "starboard-above-cross-wing",
+          "passed": true
+        },
+        {
+          "name": "starboard-outside-engine",
+          "passed": true
+        }
+      ]
+    }
+  },
+  "byteReplay": {
+    "commands": [
+      "python3 -B tools/prepare_badger.py --check",
+      "python3 -B tools/verify_badger.py | cmp - integration/sh068-badger/CONTACT-RESULT.json",
+      "python3 -B tools/measure_badger.py --difference | cmp - integration/sh068-badger/ORIGINAL-DIFFERENCE.json",
+      "python3 -B tools/measure_badger.py | cmp - integration/sh068-badger/SURFACE-FIT.json",
+      "python3 -B tools/measure_badger.py --collar-options | cmp - integration/sh068-badger/COLLAR-OPTIONS.json"
+    ],
+    "host": "SteveMBA",
+    "startedUtc": "2026-11-24T20:11:18Z",
+    "finishedUtc": "2026-11-24T20:11:44Z",
+    "log": {
+      "bytes": 602,
+      "sha256": "9f38ffd926a7c12291968d8c949b26515ebc59e975efc124cc73d219b44236e8"
+    },
+    "fitDependencies": {
+      "python": "3.14.3",
+      "numpy": "2.5.5",
+      "scipy": "1.18.1",
+      "trimesh": "5.2.1",
+      "rtree": "1.4.1"
+    },
+    "originalCommit": "a7ce36a98909429539d8de76f5ad4d8d94f04465",
+    "historicalReplayPins": {
+      "tools/measure_banteng_geometry.py": "4b7d8d5d972e30d93bebf7f422be71e415d6e4a9c4b622582ecf6e30a6bb9235",
+      "tools/measure_lanner_geometry.py": "cabbaf17ff7efdbcbee9a1fba67c7edafd59dceb8e97f367824a51c134479992",
+      "tools/verify_eagle_cruiser_geometry.py": "c7926cb6e699ae5ffb445951ce9d4e98a64018a7ecb1db2e5e77a611d742a783"
+    }
+  },
+  "replayPins": {
+    "integration/sh068-badger/BADGER-STUDIO.json": "0858d42d8378bd399ab47087da18c3c51229fca1a6cc975837829c1f7f09fab9",
+    "integration/sh068-badger/FROZEN-SOURCES.json": "c9ff74e73d73699c78233ae0e9c2d0204ea8bbdf8ea17154829568bf7c225e01",
+    "integration/sh068-badger/COLLAR-OPTIONS.json": "32599f00a29ac21b0107a8a01712b2065bc65842e40c8604d1b446e067c53d7c",
+    "integration/sh068-badger/CONTACT-CANDIDATE.json": "3c26731dd06d08ff403e4575073a6d2ab9dee82510859f64f7509c8f4458376b",
+    "integration/sh068-badger/CONTACT-RESULT.json": "97e534b1c25c1c21ddc8688b9492ffd5663009d1cde93919d6f670c332d7afae",
+    "integration/sh068-badger/ORIGINAL-DIFFERENCE.json": "a73f6e4eb9048e70faff4668552fb1bb41e5c19e433828d9fad0e9446238de64",
+    "integration/sh068-badger/ORIGINAL-JOINTS.json": "7b3cd0b19073d3171b7f979396eb595931a40a360fcc4decade0858cd5d0a9e8",
+    "integration/sh068-badger/SUPPORT-FAN.json": "c79c704b44a6924f5316c2f368b107ad3286c4d442c26e8c958479b5e6577780",
+    "integration/sh068-badger/SURFACE-FIT.json": "a29a5b8da1da4ea3a2432456b5dba9f971212227a862299ccf3826259be1461c",
+    "tools/atomic_asset_output.py": "2d13803823645d3bdea7c855af958eb54d7ebe513ec1bcb0af34e82870164bf0",
+    "tools/banteng_art_mesh.py": "ef5c0f538510486238d69dc301da80026fc93326767b38c50a04756ab9890a09",
+    "tools/encode_goshawk_visual.py": "9e524e9a32a237d71d212c8b5c34ecf12cde5a8e08885b1d03991b95c278f61c",
+    "tools/import_goshawk_envelope_source.py": "14b530725629ee3eaa5b3fd69f01fe00fe371564a1a52cb398d3969142db977e",
+    "tools/measure_banteng_geometry.py": "9356864e227302598fcae4e833ecb706b1ed8a5e600cbb4076b7165dc1e54bea",
+    "tools/measure_goshawk_surface_fit.py": "5407ef1e5fad41810aa95444ca1338fe33a91e5c9857dcb752b4e4cf2fca6d0b",
+    "tools/measure_lanner_geometry.py": "55d13a28602e6ed791adecd85ff43f3c8a7fbe118cf0977272e1747422c2408d",
+    "tools/measure_badger.py": "3dc98e986f35e11814dd444fce31e5a0ebe5ece089fb6c31fe6f9536c9979c13",
+    "tools/prepare_eagle_cruiser_geometry.py": "a1ea3b5d72f35e1f2932da71afa3ff8a276a504f7309a1086a2b3df35988addc",
+    "tools/prepare_badger.py": "f075c3e9fdee0533c6b7cddf378bcf98f3412c2b40333c172c363def03096ab6",
+    "tools/verify_eagle_cruiser_geometry.py": "cb053ee5873fee62ee456bb3776e98d29b2cbb44c7344599bc617a8579164d43",
+    "tools/verify_badger.py": "ff4cceab42acbbfdcb591f36d5f1cc6bf06b27a472fd74e4e8eb138d2bd087ee",
+    "tools/vulture_mk_i_exact_fit.py": "479b31f8714a198a82c0e2888b8d19efe46c7b4c43a576b83ab84c571ae738c6",
+    "tools/hull_contact_geometry.py": "07606202e6a298ad375a7504991fe6fb93da6a07f9b5cc4a22167bd570b07839"
+  }
+}

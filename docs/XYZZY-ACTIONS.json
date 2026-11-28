@@ -28,7 +28,7 @@
       "key": "2",
       "legacyBehavior": "Maximum hardware and refill current hull.",
       "state": "PARTIAL_CORE",
-      "dependency": "Actual Elite Energy, front Naval Laser, Advanced Navigation (21 LY), Fuel Scoops fitting, cargo bay, finite nine-pylon fill and 130-unit refill. Missing maximum components remain listed below."
+      "dependency": "Actual Elite Energy and Elite Shield, front Naval Laser, Advanced Navigation (21 LY), Advanced Hyperspace Drive, Fuel Scoops fitting, cargo bay, finite nine-pylon fill and actual current-capacity refill. Separate TEST MAX exercises the guarded four-tank exception; missing maximum components remain listed below."
     },
     {
       "key": "C",
@@ -87,8 +87,8 @@
     {
       "key": "E",
       "legacyBehavior": "Toggle automatic ECM.",
-      "state": "DEPENDENCY",
-      "dependency": "Actual ECM hardware, charge/cooldown, missile effects and automatic threat controller; EMP remains separate."
+      "state": "PARTIAL_CORE",
+      "dependency": "Guarded durable automatic intent; stock manual field and hardware are separate from EMP. No NPC incoming missile producer or automatic interception yet."
     },
     {
       "key": "B",
@@ -106,7 +106,7 @@
       "key": "F",
       "legacyBehavior": "Fit Fuel Scoops with xyzzy provenance.",
       "state": "PARTIAL_CORE",
-      "dependency": "MaximumSupportedHardware grants/refits a real Fuel Scoops item. Dedicated F-only host dispatch/action and physical collection remain dependencies."
+      "dependency": "Explicit FitFuelScoops action grants/refits only the real owned item in an eligible ordinary mount; no fuel, cash or other equipment grant. Solar collection requires actual flight."
     },
     {
       "key": "arrows/pageup/pagedown",
@@ -129,8 +129,8 @@
     {
       "key": "max/shield",
       "legacyBehavior": "Elite Shield Module.",
-      "state": "DEPENDENCY",
-      "dependency": "Actual shield-grade capacity and widened shield scalar, fit effects/resource fractions."
+      "state": "IMPLEMENTED_SOURCE",
+      "dependency": "Actual Elite Shield Module, 2760 units per bank on SH025, unchanged recharge, proportional fit and historical damage replay. The dedicated Meridian test selector can independently exercise all seven grades; no ordinary earned or PLUGH receipt is fabricated."
     },
     {
       "key": "max/navigation",
@@ -141,32 +141,32 @@
     {
       "key": "max/drive",
       "legacyBehavior": "Advanced hyperspace drive.",
-      "state": "DEPENDENCY",
-      "dependency": "Actual drive custody/spool/fuel/galaxy rules."
+      "state": "IMPLEMENTED_SOURCE",
+      "dependency": "Actual Advanced Hyperspace Drive item, one-second spool and 360-unit station mass lock; held paid item is reused. Ordinary route/fuel checks remain. Broader celestial/body mass lock, alien immediate drive and inter-galaxy travel remain separate."
     },
     {
       "key": "max/targeting",
       "legacyBehavior": "Military targeting core plus Mining/Salvage specialist modules.",
-      "state": "DEPENDENCY",
-      "dependency": "Real targeting modules and specialist control authority, not UI availability flags."
+      "state": "PARTIAL_CORE",
+      "dependency": "Development source fits the Military targeting core and both independent Mining and Salvage targeting modules. Their operation depends on the work target and available tools."
     },
     {
       "key": "max/lasers",
       "legacyBehavior": "Naval Laser on every supported combat facing.",
       "state": "PARTIAL_CORE",
-      "dependency": "Real front Naval Laser, damage6400 hundredths and cadence6 ticks, shared finite energy/heat and historical item proof. Other supported combat facings need real slot/firing owners."
+      "dependency": "The Peregrine has one front mount. The Fleet Medusa maximum outfit fits an owned Naval Laser on each of its four combat mounts. Station Equipment supports individual paid replacements and stored-item refits."
     },
     {
       "key": "max/Fuel Scoops",
       "legacyBehavior": "Fuel Scoops utility.",
-      "state": "IMPLEMENTED_FITTING_ONLY",
-      "dependency": "Real secret Fuel Scoops item, slot, utility budget and fitted readout. Physical fuel/cargo/ore collection remains unavailable."
+      "state": "PARTIAL_CORE",
+      "dependency": "Real secret Fuel Scoops item, slot, ordinary utility budget and source solar fuel/thermal effect. Physical cargo and ore intake remain unavailable."
     },
     {
       "key": "max/E.C.M. System",
       "legacyBehavior": "ECM utility.",
-      "state": "DEPENDENCY",
-      "dependency": "Real ECM charge/cooldown and missile defense effects."
+      "state": "PARTIAL_CORE",
+      "dependency": "Dedicated guarded FitEcm action only, with real free ordinary mount and actual manual local standard-projectile termination; maximum full-mount refit and incoming missile interaction remain open."
     },
     {
       "key": "max/Escape Pod",
@@ -195,14 +195,14 @@
     {
       "key": "max/Salvage Cutter",
       "legacyBehavior": "Salvage Cutter when native work tool supports it.",
-      "state": "DEPENDENCY",
-      "dependency": "MC1 actual salvage work target/source/cargo/resource controller and compatible fit."
+      "state": "PARTIAL_CORE",
+      "dependency": "One compatible SH025 owned cutter; fit only when actual capacity permits, otherwise store it. No occupied-hull or cargo-claim authority follows from this grant."
     },
     {
       "key": "max/EMP Pirate Blaster",
       "legacyBehavior": "EMP utility.",
       "state": "PARTIAL_CORE",
-      "dependency": "Distinct source-only EMP item with empty bank, grades, held charge, finite transfer/debit, native self-defence drain and local disable/recovery. Paid base keeps identity/provenance; secret base does not unlock paid grades. Desktop controls and owner qualification pending; civilian law, qualified occupied Newt release and off-system disabled custody remain unavailable."
+      "dependency": "A confirmed outfit fits the EMP and grants missing power, capacity and recharge grades through grade 3. Each granted grade costs zero and retains its outfit receipt. Existing charge, item identity and paid history are preserved. Civilian law, qualified occupied Newt release and off-system disabled custody remain unavailable."
     },
     {
       "key": "max/mining-utility",
@@ -213,8 +213,8 @@
     {
       "key": "max/fuel-storage",
       "legacyBehavior": "Grant four Fuel Storage Units,70 fuel units each.",
-      "state": "DEPENDENCY",
-      "dependency": "Actual four owned tank slots/compatibility/utility budget/capacity and save accounting; current tank remains130."
+      "state": "PARTIAL_CORE",
+      "dependency": "Separate explicit TEST MAX fits all four identified units and refills 410, with real G02 and T04 custody guards. Ordinary SH025 retains three shared mounts. Broader passenger and other contract owners are still unavailable."
     },
     {
       "key": "max/missiles",
@@ -228,7 +228,10 @@
     "Enter",
     "MaximumSupportedHardware",
     "RestoreStarter",
-    "ToggleUnlimitedFuel"
+    "ToggleUnlimitedFuel",
+    "FitShield(ShieldGrade)",
+    "MaximumFuelStorage",
+    "FitFuelScoops"
   ],
   "execution": "Whole current core+host composition authored, compilation/tests/native/publication unrun.",
   "hostBinding": "Explicit Ctrl+Shift+X testing menu; original menu numbering not preserved; whole composition authored/unrun."

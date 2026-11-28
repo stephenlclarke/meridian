@@ -98,6 +98,15 @@ fn secret(w: &mut World) {
     let review = w.review_xyzzy(XyzzyAction::Enter, tick).unwrap();
     w.prepare_xyzzy(review, tick).unwrap().commit();
 }
+fn legacy_funded_paid_base() -> World {
+    let w = World::from_save_bytes(include_bytes!(
+        "../../../tests/fixtures/xyzzy-paid-base-v17.bin"
+    ))
+    .unwrap();
+    assert_eq!(w.owned_emp().unwrap().grades, EmpGrades::default());
+    assert_eq!(w.credits_tenths(), Some(10_000_000));
+    w
+}
 fn steps(w: &mut World, count: usize) {
     for _ in 0..count {
         w.step(FlightInput::default()).unwrap();
@@ -219,14 +228,60 @@ fn stored_clock_gap_requires_a_real_refit_interval_and_capacity_upgrade_does_not
     cold(&w);
 }
 #[test]
-fn secret_grant_reuses_paid_emp_and_secret_only_base_cannot_buy_grades() {
-    let mut w = paid();
-    let old = w.owned_emp().unwrap();
-    secret(&mut w);
+fn xyzzy_maxes_paid_or_granted_emp_at_lower_tech_berths_and_preserves_custody() {
+    let max = EmpGrades {
+        power: 3,
+        capacity: 3,
+        recharge: 3,
+    };
+    let mut w = legacy_funded_paid_base();
+    let mut old = w.owned_emp().unwrap();
+    for _ in 0..2 {
+        equipment(
+            &mut w,
+            EmpEquipmentAction::Upgrade {
+                item: old.item,
+                axis: EmpAxis::Capacity,
+            },
+        );
+    }
+    let paid_history = Arc::clone(&w.emp.equipment);
+    assert_eq!(
+        w.review_emp_equipment(
+            EmpEquipmentAction::Upgrade {
+                item: old.item,
+                axis: EmpAxis::Capacity
+            },
+            w.snapshot().tick
+        ),
+        Err(EmpError::TechnologyUnavailable)
+    );
+    equipment(&mut w, EmpEquipmentAction::Store { item: old.item });
+    let balance = w.credits_tenths();
+    let tick = w.snapshot().tick;
+    let review = w
+        .review_xyzzy(XyzzyAction::MaximumSupportedHardware, tick)
+        .unwrap();
+    w.prepare_xyzzy(review, tick).unwrap().commit();
+    old.grades = max;
     assert_eq!(w.owned_emp(), Some(old));
+    assert_eq!(w.credits_tenths(), balance);
+    assert!(w.emp.equipment.starts_with(&paid_history));
+    assert!(
+        w.emp
+            .equipment
+            .iter()
+            .skip(paid_history.len() + 1)
+            .all(|e| e.secret)
+    );
+    let count = w.emp.equipment.len();
+    secret(&mut w);
+    assert_eq!(w.emp.equipment.len(), count);
+    cold(&w);
     let mut granted = World::new_commander(16102).unwrap();
     secret(&mut granted);
     let item = granted.owned_emp().unwrap();
+    assert_eq!(item.grades, max);
     assert_eq!(item.provenance, EmpProvenance::Xyzzy);
     assert_eq!(item.paid_tenths, 0);
     assert_eq!(granted.emp.meter.bank, 0);
@@ -240,7 +295,9 @@ fn secret_grant_reuses_paid_emp_and_secret_only_base_cannot_buy_grades() {
         ),
         Err(EmpError::PaidBaseRequired)
     );
-    cold(&granted);
+    let mut live = cold(&granted);
+    Arc::make_mut(&mut granted.emp.equipment)[1].secret = false;
+    poison_refuses(&granted, &mut live);
 }
 #[test]
 fn altered_bank_and_coordinated_transfer_totals_refuse_without_replacing_live_world() {
@@ -600,12 +657,18 @@ fn actual_secret_base_release_spends_once_drains_shield_and_preserves_hull_cargo
         mule_renas: None,
         state: w.state,
         traffic: w.traffic.clone(),
+        targeting: w.targeting.clone(),
+        auto_docking: w.auto_docking,
         mining: w.mining.clone(),
         mining_scope: Arc::clone(&w.mining_scope),
         damage: w.damage.clone(),
+        solar: w.solar.clone(),
+        occupied_salvage: w.occupied_salvage.clone(),
         station_data: decoded.station_data,
+        medusa_preview_fit: decoded.medusa_preview_fit,
         navigation_catalogue: decoded.navigation_catalogue,
         navigation: w.navigation,
+        navigation_route: decoded.navigation_route,
         jump_journal: decoded.jump_journal,
         commander_account: decoded.commander_account,
         freight_session: decoded.freight_session,
@@ -617,6 +680,7 @@ fn actual_secret_base_release_spends_once_drains_shield_and_preserves_hull_cargo
         modular: w.modular.clone(),
         xyzzy: w.xyzzy.clone(),
         emp: w.emp.clone(),
+        ecm: w.ecm.clone(),
         navigation_trade: w.navigation_trade.clone(),
         flight_reception: w.flight_reception.clone(),
         practice: w.practice,
@@ -657,6 +721,7 @@ fn actual_secret_base_release_spends_once_drains_shield_and_preserves_hull_cargo
         "actual target-centred splash must include the nearby firing hull; {}",
         self_splash_failure_evidence(&w, target)
     );
+    super::replay::verify_ecm_disabled_fixture(w.emp.pulses[0].clone()).unwrap();
     let after = w.traffic.emp_resources(target).unwrap();
     assert_eq!(after.0, before.0, "EMP must not be fatal hull damage");
     assert!(after.1 < before.1 || after.2 < before.2);
@@ -666,6 +731,15 @@ fn actual_secret_base_release_spends_once_drains_shield_and_preserves_hull_cargo
         w.commodity_quantity(crate::station_services::CommodityId::Food),
         cargo
     );
+    // A solar terminal effect occurs after this actual admitted release. It must not
+    // generate a second FinalDeath special event or suppress its accepted discharge.
+    // The cross-phase marker is intentionally an isolated ordering fixture; solar's
+    // real fatal-flight test separately proves full cold publication with fitted EMP.
+    let previous_solar = w.solar.clone();
+    w.solar = crate::flight::solar::State::phase_fixture(&w).unwrap();
+    assert!(w.damage.alive_before_emp_step(&w).unwrap());
+    w.emp.replay_meter(&w, &w.modular).unwrap();
+    w.solar = previous_solar;
     hold(&mut w, target, 100);
     assert_eq!(w.emp.pulses.len(), 1, "held input must not rearm");
     cold(&w);
@@ -703,10 +777,7 @@ fn cold_continue_does_not_restore_held_input_and_early_release_has_no_discharge(
 #[test]
 fn actual_paid_upgraded_emp_disables_native_attacker_then_recovers_without_loot_or_hull_replacement()
  {
-    let mut w = paid();
-    // The base is bought with earned market cash. Explicit XYZZY supplies later grade funds and
-    // Elite energy; this is not a claim of a wholly ordinary high-grade acquisition journey.
-    secret(&mut w);
+    let mut w = legacy_funded_paid_base();
     let item = w.owned_emp().unwrap().item;
     for axis in [EmpAxis::Power, EmpAxis::Capacity, EmpAxis::Recharge] {
         for _ in 0..2 {
@@ -1021,6 +1092,45 @@ fn real_charge_blocks_both_laser_commands_but_preserves_fitted_snapshot_and_canc
     assert_eq!(w.front_laser_snapshot(), Some(fit));
     cold(&w);
 }
+
+#[test]
+fn real_manual_ecm_cancels_an_unfinished_emp_without_a_discharge_and_cold_retains_field() {
+    let mut w = World::new_commander(12001).unwrap();
+    secret(&mut w);
+    let scoop = w.fitted_fuel_scoops().unwrap();
+    let tick = w.snapshot().tick;
+    let review = w
+        .review_module(crate::ModuleAction::Store { item: scoop.item }, tick)
+        .unwrap();
+    w.prepare_module(review, tick).unwrap().commit();
+    let review = w.review_xyzzy(XyzzyAction::FitEcm, tick).unwrap();
+    w.prepare_xyzzy(review, tick).unwrap().commit();
+    let (mut w, target) = defender(w);
+    start_charge(&mut w, target);
+    let tick = w.snapshot().tick;
+    let before = w.flight_resources_snapshot().unwrap();
+    let activation = w.request_ecm(tick).unwrap();
+    let after = w.flight_resources_snapshot().unwrap();
+    assert_eq!(after.energy_hundredths, before.energy_hundredths - 2200);
+    assert_eq!(
+        w.emp.charge.as_ref().unwrap().phase,
+        EmpChargePhase::Cancelled
+    );
+    assert_eq!(
+        w.emp.charge.as_ref().unwrap().ended_at,
+        Some(activation.physical_tick)
+    );
+    assert_eq!(w.emp.meter.bank_spent, 0);
+    assert!(w.emp.pulses.is_empty());
+    assert_eq!(w.request_emp_trigger(true, tick), Err(EmpError::Resources));
+    let mut loaded = cold(&w);
+    let mut expected = w.ecm_snapshot().unwrap();
+    expected.active = None;
+    assert_eq!(loaded.ecm_snapshot(), Some(expected));
+    loaded.emp.charge.as_mut().unwrap().phase = EmpChargePhase::Charging;
+    loaded.emp.charge.as_mut().unwrap().ended_at = None;
+    assert!(loaded.save_bytes().is_err());
+}
 #[test]
 fn isolated_electrical_disable_blocks_both_lasers_with_positive_fatal_energy_and_truthful_fit() {
     let mut w = World::new_commander(16105).unwrap();
@@ -1143,16 +1253,19 @@ fn start_real_3d_charge(w: &mut World, target: crate::traffic::NpcId) {
     panic!("actual three-dimensional EMP aim never admitted its native attacker");
 }
 fn disabled_native_target() -> (World, crate::traffic::NpcId) {
-    let mut w = paid();
-    // As in the retained World case, the base is paid with earned cash; later funds/Elite
-    // energy are an explicit XYZZY test setup, not an ordinary progression acceptance.
-    secret(&mut w);
+    disabled_native_target_with_fit(|_| {})
+}
+fn disabled_native_target_with_fit(
+    configure: impl FnOnce(&mut World),
+) -> (World, crate::traffic::NpcId) {
+    let mut w = legacy_funded_paid_base();
     let item = w.owned_emp().unwrap().item;
     for axis in [EmpAxis::Power, EmpAxis::Capacity, EmpAxis::Recharge] {
         for _ in 0..2 {
             equipment(&mut w, EmpEquipmentAction::Upgrade { item, axis });
         }
     }
+    configure(&mut w);
     let (mut w, target) = defender(w);
     leave_native_npc_beam_plane(&mut w);
     let mut shield_shots = 0;
@@ -1210,6 +1323,345 @@ fn disabled_native_target() -> (World, crate::traffic::NpcId) {
         w.step(track_real_target(&w, target)).unwrap();
     }
     panic!("actual aimed paid EMP releases did not disable the real recent attacker");
+}
+
+#[test]
+fn manual_scanner_occupied_review_without_computers_requires_safe_hold_and_consent() {
+    use crate::equipment::{WorkTarget, WorkTargetId, WorkTargetRole};
+    use crate::{ModuleAction, ModuleKind, ModuleSlot, OccupiedCutError};
+    let (mut pilot, target) = disabled_native_target_with_fit(|world| {
+        let tick = world.snapshot().tick;
+        let bay = world.equipment_snapshot().unwrap().owned.unwrap();
+        world
+            .request_equipment(crate::equipment::Command::UnfitCargoBay(bay.id), tick)
+            .unwrap();
+        for slot in [
+            ModuleSlot::MiningTargeting,
+            ModuleSlot::SalvageTargeting,
+            ModuleSlot::Targeting,
+            ModuleSlot::Navigation,
+        ] {
+            if let Some(item) = world
+                .modular_equipment_snapshot()
+                .unwrap()
+                .items
+                .into_iter()
+                .find(|i| i.slot == Some(slot))
+            {
+                let review = world
+                    .review_module(ModuleAction::Store { item: item.id }, tick)
+                    .unwrap();
+                world.prepare_module(review, tick).unwrap().commit();
+            }
+        }
+        if world.fitted_fuel_scoops().is_none() {
+            let review = world
+                .review_module(ModuleAction::PurchaseFuelScoops, tick)
+                .unwrap();
+            world.prepare_module(review, tick).unwrap().commit();
+        }
+        let review = world
+            .review_module(
+                ModuleAction::Purchase {
+                    kind: ModuleKind::SalvageCutter,
+                },
+                tick,
+            )
+            .unwrap();
+        world.prepare_module(review, tick).unwrap().commit();
+    });
+    pilot
+        .request_emp_trigger(false, pilot.snapshot().tick)
+        .unwrap();
+    assert_eq!(pilot.targeting_tier(), None);
+    for _ in pilot.scanner_targets() {
+        pilot
+            .cycle_scanner_target(pilot.snapshot().tick, [1280, 720])
+            .unwrap();
+        if pilot.selected_disabled_salvage_target() == Some(target) {
+            break;
+        }
+    }
+    assert!(pilot.pilot_operates_selected_tool());
+    let opening = pilot.snapshot().tick;
+    assert!(pilot.review_occupied_cut(target, opening).is_err());
+    let review = loop {
+        let tick = pilot.snapshot().tick;
+        assert!(
+            tick < opening + 1600,
+            "hand-flown cutter never reached the surface"
+        );
+        match pilot.review_occupied_cut(target, tick) {
+            Ok(review) => break review,
+            Err(OccupiedCutError::UnsafeHold | OccupiedCutError::ContactUnavailable) => {}
+            Err(e) => panic!("unexpected manual review refusal: {e}"),
+        }
+        let position = pilot
+            .traffic_snapshot()
+            .unwrap()
+            .actors
+            .into_iter()
+            .find(|a| a.id == target)
+            .unwrap()
+            .pose
+            .position;
+        let work = WorkTarget {
+            id: WorkTargetId::Wreck(target),
+            role: WorkTargetRole::WreckTracking,
+            position,
+        };
+        let controls = pilot.work_hold_input(work, steer_to_real_point(&pilot, position));
+        pilot.step(controls).unwrap();
+        assert_eq!(pilot.snapshot().motion_refusal, None);
+    };
+    let before = pilot.save_bytes().unwrap();
+    review.cancel();
+    assert_eq!(before, pilot.save_bytes().unwrap());
+    let review = pilot
+        .review_occupied_cut(target, pilot.snapshot().tick)
+        .unwrap();
+    let hold = pilot.service_snapshot();
+    let cash = pilot.credits_tenths();
+    let contact = pilot.prepare_occupied_cut(review).unwrap().commit();
+    assert_eq!(contact.target, target);
+    let loaded = cold(&pilot);
+    assert_eq!(
+        loaded.occupied_cut_contacts().collect::<Vec<_>>(),
+        vec![contact]
+    );
+    assert_eq!(loaded.service_snapshot(), hold);
+    assert_eq!(loaded.credits_tenths(), cash);
+}
+
+fn occupied_fixture(full_mounts: bool) -> (World, crate::traffic::NpcId, u64) {
+    use crate::equipment::TargetingTier;
+    use crate::{ModuleAction, ModuleKind, TargetingViewport};
+    fn buy(world: &mut World, kind: ModuleKind) {
+        let tick = world.snapshot().tick;
+        let action = if kind == ModuleKind::FuelScoops {
+            ModuleAction::PurchaseFuelScoops
+        } else {
+            ModuleAction::Purchase { kind }
+        };
+        let review = world.review_module(action, tick).unwrap();
+        world.prepare_module(review, tick).unwrap().commit();
+    }
+    let (mut world, target) = disabled_native_target_with_fit(|world| {
+        let bay = world.equipment_snapshot().unwrap().owned.unwrap();
+        // The three existing utility mounts are occupied. Use the normal berth
+        // equipment action before departure; never remove cargo capacity in flight.
+        world
+            .request_equipment(
+                crate::equipment::Command::UnfitCargoBay(bay.id),
+                world.snapshot().tick,
+            )
+            .unwrap();
+        if world.targeting_tier().is_none() {
+            buy(world, ModuleKind::Targeting(TargetingTier::Basic));
+        }
+        if !world.work_targeting_fit().salvage {
+            buy(world, ModuleKind::SalvageTargeting);
+        }
+        if world.fitted_fuel_scoops().is_none() {
+            buy(world, ModuleKind::FuelScoops);
+        }
+        buy(world, ModuleKind::SalvageCutter);
+        let cutter = world.fitted_salvage_cutter().unwrap();
+        let tick = world.snapshot().tick;
+        let review = world
+            .review_module(ModuleAction::Store { item: cutter.id }, tick)
+            .unwrap();
+        world.prepare_module(review, tick).unwrap().commit();
+        if full_mounts {
+            world
+                .request_equipment(
+                    crate::equipment::Command::FitCargoBay(bay.id),
+                    world.snapshot().tick,
+                )
+                .unwrap();
+        }
+    });
+    let cutter = world
+        .modular_equipment_snapshot()
+        .unwrap()
+        .items
+        .into_iter()
+        .find(|item| item.kind == ModuleKind::SalvageCutter)
+        .unwrap();
+    assert!(cutter.slot.is_none());
+    let cutter = cutter.id;
+    world
+        .request_emp_trigger(false, world.snapshot().tick)
+        .unwrap();
+    world.step(FlightInput::default()).unwrap();
+    let tick = world.snapshot().tick;
+    assert!(
+        world
+            .cycle_targeting(
+                tick,
+                TargetingViewport {
+                    size: [1280, 720],
+                    front: vec![target]
+                }
+            )
+            .unwrap()
+    );
+    for _ in 0..4 {
+        if world.selected_disabled_salvage_target() == Some(target) {
+            break;
+        }
+        world
+            .cycle_targeting(
+                tick,
+                TargetingViewport {
+                    size: [1280, 720],
+                    front: vec![target],
+                },
+            )
+            .unwrap();
+    }
+    assert_eq!(world.selected_disabled_salvage_target(), Some(target));
+    (world, target, cutter)
+}
+
+#[test]
+fn occupied_cut_requires_explicit_review_and_retains_actual_finite_game_contact() {
+    use crate::OccupiedCutError;
+    let (mut world, target, cutter) = occupied_fixture(false);
+    let tick = world.snapshot().tick;
+    // Readiness includes the actual working hold, so advance the ordinary guidance
+    // until the same review shown to the pilot becomes available.
+    let review = loop {
+        let now = world.snapshot().tick;
+        assert!(now - tick < 1600, "occupied hold did not settle");
+        match world.review_occupied_cut(target, now) {
+            Ok(review) => break review,
+            Err(
+                OccupiedCutError::UnsafeHold
+                | OccupiedCutError::ContactUnavailable
+                | OccupiedCutError::MissingFit,
+            ) => {
+                world.step(FlightInput::default()).unwrap();
+            }
+            Err(error) => panic!("unexpected occupied review refusal: {error}"),
+        }
+    };
+    let before = world.save_bytes().unwrap();
+    assert!(world.modular.salvage_exchange_source() == Some(target));
+    assert_eq!(world.fitted_salvage_cutter().unwrap().id, cutter);
+    assert!(review.warning().contains("OCCUPIED / CLAIMED"));
+    review.cancel();
+    assert_eq!(world.save_bytes().unwrap(), before);
+    let stale = world
+        .review_occupied_cut(target, world.snapshot().tick)
+        .unwrap();
+    world.step(FlightInput::default()).unwrap();
+    assert!(matches!(
+        world.prepare_occupied_cut(stale),
+        Err(OccupiedCutError::StaleReview)
+    ));
+    // The composed guidance owns the actual hold. Do not inject an actor, pose or cargo.
+    let contact = loop {
+        assert!(
+            world.snapshot().tick - tick < 1600,
+            "actual occupied hold did not settle before recovery"
+        );
+        let now = world.snapshot().tick;
+        let review = match world.review_occupied_cut(target, now) {
+            Ok(review) => review,
+            Err(OccupiedCutError::UnsafeHold | OccupiedCutError::ContactUnavailable) => {
+                world.step(FlightInput::default()).unwrap();
+                continue;
+            }
+            Err(error) => panic!("unexpected occupied review refusal: {error}"),
+        };
+        let actor_before = world.traffic_snapshot().unwrap().actors;
+        let account = world.service_snapshot();
+        let credits = world.credits_tenths();
+        let receipt_count = world.occupied_cut_contacts().count();
+        match world.prepare_occupied_cut(review) {
+            Ok(prepared) => {
+                assert_eq!(
+                    prepared.publish_with(|_| Err::<(), _>("writer")),
+                    Err("writer")
+                );
+                assert_eq!(world.occupied_cut_contacts().count(), receipt_count);
+                let opening = world.save_bytes().unwrap();
+                let again = world.review_occupied_cut(target, now).unwrap();
+                let prepared = world.prepare_occupied_cut(again).unwrap();
+                let cold = World::from_save_bytes(prepared.bytes()).unwrap();
+                let contact = prepared.commit();
+                assert_ne!(world.save_bytes().unwrap(), opening);
+                assert_eq!(contact.cutter_item, cutter);
+                assert_eq!(contact.target, target);
+                assert_eq!(cold.occupied_cut_contacts().collect::<Vec<_>>(), [contact]);
+                assert_eq!(world.traffic_snapshot().unwrap().actors, actor_before);
+                assert_eq!(world.service_snapshot(), account);
+                assert_eq!(world.credits_tenths(), credits);
+                assert!(matches!(
+                    world.review_occupied_cut(target, now),
+                    Err(OccupiedCutError::Cooldown)
+                ));
+                break contact;
+            }
+            Err(OccupiedCutError::UnsafeHold | OccupiedCutError::ContactUnavailable) => {
+                assert_eq!(world.occupied_cut_contacts().count(), receipt_count);
+                world.step(FlightInput::default()).unwrap();
+            }
+            Err(error) => panic!("unexpected occupied hold refusal: {error}"),
+        }
+    };
+    assert_eq!(world.occupied_cut_contacts().collect::<Vec<_>>(), [contact]);
+    let retained = world.save_bytes().unwrap();
+    let marker = retained
+        .windows(8)
+        .position(|part| part == b"MCUT0002")
+        .unwrap();
+    let mut erased = retained[..marker].to_vec();
+    erased.extend(crate::save::checksum(&erased).to_le_bytes());
+    assert!(World::from_save_bytes(&erased).is_err());
+    assert!(world.restore_bytes(&erased).is_err());
+    assert_eq!(world.save_bytes().unwrap(), retained);
+    world.cancel_targeting();
+    world.step(FlightInput::default()).unwrap();
+    assert!(world.fitted_salvage_cutter().is_none());
+    assert!(world.modular.salvage_exchange_source().is_none());
+    let durable = world.save_bytes().unwrap();
+    let mut cold = World::from_save_bytes(&durable).unwrap();
+    assert_eq!(cold.occupied_cut_contacts().collect::<Vec<_>>(), [contact]);
+    assert!(cold.fitted_salvage_cutter().is_none());
+    // This tiny historical mutation still passes the relative-speed envelope;
+    // only the independently retained preceding traffic movement rejects it.
+    let standoff = cold.station_data.as_ref().unwrap().wreck_work_standoff();
+    cold.occupied_salvage
+        .alter_first_target_speed_for_test(0.01, standoff);
+    assert!(cold.save_bytes().is_err());
+    let forged = cold.unchecked_test_save().unwrap();
+    assert!(World::from_save_bytes(&forged).is_err());
+    assert!(world.restore_bytes(&forged).is_err());
+    assert_eq!(world.save_bytes().unwrap(), durable);
+}
+
+#[test]
+fn occupied_cut_with_all_mounts_committed_preserves_crew_and_equipment() {
+    let (mut world, target, _) = occupied_fixture(true);
+    let emp = world.owned_emp().unwrap();
+    let bay = world.equipment_snapshot().unwrap().owned.unwrap();
+    let scoops = world.fitted_fuel_scoops().unwrap().item;
+    assert!(emp.fitted && bay.fitted);
+    world.step(FlightInput::default()).unwrap();
+    assert_eq!(world.automatic_work_status(), Some("No free cutter mount"));
+    assert!(matches!(
+        world.review_occupied_cut(target, world.snapshot().tick),
+        Err(crate::OccupiedCutError::MissingFit)
+    ));
+    assert_eq!(world.owned_emp(), Some(emp));
+    assert_eq!(world.equipment_snapshot().unwrap().owned, Some(bay));
+    assert_eq!(world.fitted_fuel_scoops().unwrap().item, scoops);
+    assert!(world.fitted_salvage_cutter().is_none());
+    assert!(world.modular.salvage_exchange_source().is_none());
+    assert_eq!(world.occupied_cut_contacts().count(), 0);
+    assert!(World::from_save_bytes(&world.save_bytes().unwrap()).is_ok());
 }
 fn native_facing_budget(w: &World, target: crate::traffic::NpcId) -> Option<u32> {
     let p = w.snapshot();
@@ -1365,4 +1817,34 @@ fn native_death_before_recovery_stays_dead_and_refuses_recovery_without_resource
     assert_eq!(loaded.traffic.emp_resources(target).unwrap().0, 0);
     assert!(loaded.emp.episodes.last().unwrap().recovered_at.is_none());
     cold(&loaded);
+}
+
+#[test]
+fn medusa_exchange_preserves_real_emp_target_and_peregrine_self_splash() {
+    let mut world = World::new_commander(12001).unwrap();
+    secret(&mut world);
+    let (mut world, target) = defender(world);
+    start_charge(&mut world, target);
+    hold(&mut world, target, 600);
+    let profile = world
+        .owned_emp()
+        .unwrap()
+        .grades
+        .profile(super::State::energy_stage(&world).unwrap())
+        .unwrap();
+    let pulse = world.emp.pulses[0].clone();
+    assert!(
+        pulse
+            .contacts
+            .iter()
+            .any(|contact| contact.victim == scene::Victim::Player)
+    );
+    world
+        .request_emp_trigger(false, world.snapshot().tick)
+        .unwrap();
+    crate::flight::missiles::tests::issue_medusa_at_renas(&mut world);
+    let loaded = cold(&world);
+    assert_eq!(loaded.emp.pulses[0], pulse);
+    let contacts = pulse.release.contacts(&loaded, profile, target).unwrap();
+    assert_eq!(contacts, pulse.contacts);
 }

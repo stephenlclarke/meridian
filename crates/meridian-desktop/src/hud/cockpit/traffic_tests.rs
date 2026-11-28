@@ -1,12 +1,13 @@
 //! Public World positives; altered projections below are labelled scanner geometry fixtures.
 use super::{
-    BLUE, CYAN, Cockpit, GREEN, Layout, MAX_CONTACTS, MAX_VERTICES, NPC_CONTACT_START, RED, YELLOW,
-    append, fill_traffic_contacts, relative, scanner,
+    BLUE, CYAN, Cockpit, GREEN, Layout, MAX_CONTACTS, MAX_SCANNER_TARGETS, MAX_VERTICES,
+    NPC_CONTACT_START, RED, YELLOW, append, fill_traffic_contacts, relative, scanner,
+    selected_scanner_identity,
 };
 use crate::mesh::Vertex;
 use meridian_core::docking::Vec3;
 use meridian_core::traffic::{MAX_TRAFFIC_ACTORS, NpcPhase, Population, TrafficSnapshot};
-use meridian_core::{FlightInput, FlightMode, FlightView, Snapshot, World};
+use meridian_core::{FlightInput, FlightMode, FlightView, Snapshot, TargetIdentity, World};
 use std::sync::OnceLock;
 
 fn ok<T, E: core::fmt::Debug>(v: Result<T, E>) -> T {
@@ -65,28 +66,38 @@ fn actual_world_contacts_bind_both_poses_and_security_without_changing_save_or_g
         .unwrap_or_else(|| panic!("traffic"));
     let cockpit = ok(Cockpit::capture(&world, flight));
     assert_eq!(traffic.actors.len(), 2);
-    for (index, actor) in traffic.actors.iter().enumerate() {
-        let (position, color) = cockpit.contacts[NPC_CONTACT_START + index]
-            .unwrap_or_else(|| panic!("missing actual NPC"));
-        close(position, relative(flight, actor.pose.position));
+    for actor in &traffic.actors {
+        let contact = cockpit
+            .scanner_targets
+            .iter()
+            .find(|contact| contact.identity == TargetIdentity::Ship(actor.id))
+            .unwrap_or_else(|| panic!("missing actual selectable NPC"));
+        close(contact.position, relative(flight, actor.pose.position));
         assert_eq!(actor.hull_id, "SH025");
         match actor.population {
             Population::Trader => {
                 assert_eq!(actor.wanted, 0);
-                assert_eq!(color, YELLOW);
+                assert_eq!(contact.color, YELLOW);
             }
             Population::Pirate => {
                 assert!(actor.wanted > 0);
-                assert_eq!(color, RED);
+                assert_eq!(contact.color, RED);
             }
             _ => panic!("unadmitted population"),
         }
     }
     assert!(
-        cockpit.contacts[NPC_CONTACT_START + 2..]
+        cockpit.contacts[NPC_CONTACT_START..]
             .iter()
             .all(Option::is_none)
     );
+    let admitted = world.scanner_targets();
+    assert_eq!(cockpit.scanner_targets.len(), admitted.len());
+    for (contact, (id, point)) in cockpit.scanner_targets.iter().zip(admitted) {
+        assert_eq!(contact.identity, id);
+        close(contact.position, relative(flight, point));
+        assert!(!contact.selected);
+    }
     assert_eq!(cockpit.shield, [Some(1.0); 2]);
     assert_eq!(cockpit.energy, Some(1.0));
     assert_eq!(cockpit.heat, Some(0.0));
@@ -148,6 +159,7 @@ fn all_four_selected_views_keep_original_front_ship_scanner_basis_and_real_conta
         let cockpit = ok(Cockpit::capture(&world, world.snapshot()));
         assert_eq!(cockpit.view, view);
         assert_eq!(cockpit.contacts, opening.contacts);
+        assert_eq!(cockpit.scanner_targets, opening.scanner_targets);
         let mut output = Vec::new();
         scanner(
             &mut output,
@@ -255,10 +267,18 @@ fn actual_station_practice_and_launched_projectile_keep_original_slots_and_color
     let saved = ok(world.save_bytes());
     let cockpit = ok(Cockpit::capture(&world, flight));
     let station = flight.station.unwrap_or_else(|| panic!("station"));
+    assert_eq!(cockpit.contacts[0], None);
+    let selectable_station = cockpit
+        .scanner_targets
+        .iter()
+        .filter(|contact| matches!(contact.identity, TargetIdentity::Station { .. }))
+        .collect::<Vec<_>>();
+    assert_eq!(selectable_station.len(), 1);
     assert_eq!(
-        cockpit.contacts[0],
-        Some((relative(flight, station.pose.position), GREEN))
+        selectable_station[0].position,
+        relative(flight, station.pose.position)
     );
+    assert_eq!(selectable_station[0].color, GREEN);
     for (index, beacon) in beacons.iter().enumerate() {
         assert_eq!(
             cockpit.contacts[index + 1],
@@ -328,6 +348,17 @@ fn maximum_contact_geometry_and_npc_elevation_fit_existing_reused_hud_buffers() 
         *contact = Some(([i as f32 * 100.0 - 13000.0, 6000.0, -8000.0], YELLOW));
     }
     assert_eq!(MAX_CONTACTS, NPC_CONTACT_START + MAX_TRAFFIC_ACTORS);
+    let sample = *cockpit
+        .scanner_targets
+        .first()
+        .unwrap_or_else(|| panic!("scanner target"));
+    cockpit.scanner_targets = (0..MAX_SCANNER_TARGETS)
+        .map(|i| super::ScannerTarget {
+            position: [i as f32 * 100.0 - 13000.0, 6000.0, -8000.0],
+            selected: i == 0,
+            ..sample
+        })
+        .collect();
     let mut output = Vec::with_capacity(MAX_VERTICES);
     let capacity = output.capacity();
     for [width, height] in [[320, 240], [640, 360], [1280, 720], [2560, 1600]] {
@@ -342,4 +373,101 @@ fn maximum_contact_geometry_and_npc_elevation_fit_existing_reused_hud_buffers() 
                 .all(|n| n.is_finite() && n.abs() <= 1.000001)
         );
     }
+}
+
+#[test]
+fn no_core_scanner_shows_real_work_and_one_selected_contact_not_context_markers() {
+    let mut world = traffic_world();
+    assert!(world.targeting_tier().is_none());
+    let admitted = world.scanner_targets();
+    assert!(admitted.iter().any(|(identity, _)| matches!(
+        identity,
+        TargetIdentity::Work(meridian_core::equipment::WorkTargetId::Asteroid(_))
+    )));
+    let tick = world.snapshot().tick;
+    ok(world.cycle_scanner_target(tick, [1280, 720]));
+    let selected = world
+        .targeting_snapshot()
+        .unwrap_or_else(|| panic!("manual mark"))
+        .identity;
+    assert!(world.manual_scanner_target());
+    let cockpit = ok(Cockpit::capture(&world, world.snapshot()));
+    let marked = cockpit
+        .scanner_targets
+        .iter()
+        .filter(|contact| contact.selected)
+        .collect::<Vec<_>>();
+    assert_eq!(marked.len(), 1);
+    assert_eq!(marked[0].identity, selected);
+    assert_eq!(
+        cockpit
+            .scanner_targets
+            .iter()
+            .map(|contact| contact.identity)
+            .collect::<Vec<_>>(),
+        admitted
+            .iter()
+            .map(|(identity, _)| *identity)
+            .collect::<Vec<_>>()
+    );
+
+    // A synthetic projection comparison of marker geometry only, never a manufactured
+    // World target. A selectable bar, contextual cross and selected bracket differ.
+    let mut sample = *marked[0];
+    let mut display = cockpit;
+    display.contacts.fill(None);
+    sample.position = [100.0, 200.0, 300.0];
+    sample.selected = false;
+    display.scanner_targets = vec![sample];
+    let mut bar = Vec::new();
+    scanner(&mut bar, &display, Layout::new(1280, 720), [1280.0, 720.0]);
+    display.scanner_targets[0].selected = true;
+    let mut bracket = Vec::new();
+    scanner(
+        &mut bracket,
+        &display,
+        Layout::new(1280, 720),
+        [1280.0, 720.0],
+    );
+    assert_eq!(bracket.len(), bar.len() + 24);
+    display.scanner_targets.clear();
+    display.contacts[1] = Some((sample.position, sample.color));
+    let mut cross = Vec::new();
+    scanner(
+        &mut cross,
+        &display,
+        Layout::new(1280, 720),
+        [1280.0, 720.0],
+    );
+    assert_eq!(cross.len(), bar.len() + 6);
+}
+
+#[test]
+fn selected_marker_follows_tracked_identity_when_logical_contact_leaves_projection() {
+    // Projection-only fixture: use three real, distinct admitted identities as stand-ins
+    // for the logical parent, its tracked fragment and an unrelated contact. The core's
+    // physical ore lifecycle tests establish the actual parent/fragment relationship.
+    // This test does not create ore, alter a World, or claim an automatic work success.
+    let world = traffic_world();
+    let actual = world.scanner_targets();
+    let [parent, fragment, other, ..] = actual.as_slice() else {
+        panic!("expected three distinct actual scanner contacts");
+    };
+    assert_ne!(parent.0, fragment.0);
+    assert_ne!(parent.0, other.0);
+    assert_ne!(fragment.0, other.0);
+    let mark = |projected: &[(TargetIdentity, Vec3)], tracked| {
+        selected_scanner_identity(projected, parent.0, tracked)
+    };
+    assert_eq!(
+        mark(&[*fragment, *other, *parent], Some(fragment.0)),
+        Some(parent.0)
+    );
+    assert_eq!(
+        mark(&[*other, *fragment], Some(fragment.0)),
+        Some(fragment.0)
+    );
+    assert_eq!(mark(&[*other, *fragment], None), None);
+    assert_eq!(mark(&[*other], Some(fragment.0)), None);
+    assert_eq!(mark(&[], Some(fragment.0)), None);
 }

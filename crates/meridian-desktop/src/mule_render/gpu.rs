@@ -67,6 +67,8 @@ impl Pass {
                 uniform_size: size_of::<Uniforms>() as u64,
                 points: &points,
                 visual: &visual()?,
+                authored_materials: false,
+                display_paint: true,
             },
         )?;
         Ok(Self {
@@ -135,6 +137,25 @@ pub(super) struct Inputs<'a> {
     pub(super) uniform_size: u64,
     pub(super) points: &'a [Triangle],
     pub(super) visual: &'a [VisualVertex],
+    pub(super) authored_materials: bool,
+    pub(super) display_paint: bool,
+}
+
+fn visual_upload(
+    visual: &[VisualVertex],
+    display_paint: bool,
+) -> std::borrow::Cow<'_, [VisualVertex]> {
+    if display_paint {
+        std::borrow::Cow::Owned(
+            visual
+                .iter()
+                .copied()
+                .map(VisualVertex::with_display_paint)
+                .collect(),
+        )
+    } else {
+        std::borrow::Cow::Borrowed(visual)
+    }
 }
 
 impl Hardware {
@@ -149,6 +170,8 @@ impl Hardware {
             uniform_size,
             points,
             visual,
+            authored_materials,
+            display_paint,
         } = inputs;
         let shader = device.create_shader_module(wgpu::ShaderModuleDescriptor {
             label: Some("Original hull material and source-rounded union"),
@@ -314,6 +337,8 @@ impl Hardware {
                     module: &shader,
                     entry_point: Some(if shimmer {
                         "union_vertex"
+                    } else if authored_materials {
+                        "authored_vertex"
                     } else {
                         "solid_vertex"
                     }),
@@ -324,6 +349,8 @@ impl Hardware {
                     module: &shader,
                     entry_point: Some(if shimmer {
                         "union_fragment"
+                    } else if authored_materials {
+                        "authored_fragment"
                     } else {
                         "solid_fragment"
                     }),
@@ -332,6 +359,8 @@ impl Hardware {
                         format,
                         blend: if shimmer {
                             Some(wgpu::BlendState::PREMULTIPLIED_ALPHA_BLENDING)
+                        } else if authored_materials {
+                            Some(wgpu::BlendState::ALPHA_BLENDING)
                         } else {
                             None
                         },
@@ -353,9 +382,12 @@ impl Hardware {
         };
         let solid = pipeline(false);
         let shimmer = pipeline(true);
+        // Only stock presentation owns the display finish. The editor must show the
+        // exact palette authored in a local package, not silently recolour it.
+        let upload = visual_upload(visual, display_paint);
         let vertices = device.create_buffer_init(&wgpu::util::BufferInitDescriptor {
             label: Some("Original detailed triangles, materials and UVs"),
-            contents: bytemuck::cast_slice(visual),
+            contents: bytemuck::cast_slice(upload.as_ref()),
             usage: wgpu::BufferUsages::VERTEX,
         });
         Ok(Self {
@@ -365,5 +397,36 @@ impl Hardware {
             group,
             vertices,
         })
+    }
+}
+
+#[cfg(test)]
+mod paint_tests {
+    use super::*;
+
+    #[test]
+    fn local_author_palette_is_unchanged_and_only_stock_upload_is_painted() {
+        let raw = VisualVertex {
+            position: [1.0, 2.0, 3.0],
+            normal: [0.0, 1.0, 0.0],
+            color: [214.0 / 255.0, 217.0 / 255.0, 211.0 / 255.0, 0.5],
+            uv: [0.25, 0.75],
+            texture: 1,
+            emissive: 1,
+        };
+        let original = [raw];
+        let local = visual_upload(&original, false);
+        assert!(matches!(&local, std::borrow::Cow::Borrowed(_)));
+        assert_eq!(bytemuck::bytes_of(&local[0]), bytemuck::bytes_of(&raw));
+        let stock = visual_upload(&original, true);
+        assert_eq!(
+            stock[0].color,
+            [45.0 / 255.0, 112.0 / 255.0, 124.0 / 255.0, 0.5]
+        );
+        assert_eq!(stock[0].position, raw.position);
+        assert_eq!(stock[0].normal, raw.normal);
+        assert_eq!(stock[0].uv, raw.uv);
+        assert_eq!(stock[0].texture, raw.texture);
+        assert_eq!(stock[0].emissive, raw.emissive);
     }
 }

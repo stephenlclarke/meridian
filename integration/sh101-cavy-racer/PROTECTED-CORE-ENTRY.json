@@ -1,0 +1,12 @@
+{
+  "schema": 1,
+  "id": "sh101-cavy-racer",
+  "undoBefore": [
+    "sh100-ox-mk-ii"
+  ],
+  "undoAfter": [],
+  "kind": "declaration",
+  "module": "cavy_racer",
+  "before": "pub mod caracal_scout;\n",
+  "after": "pub mod celestial;\n"
+}

@@ -1,0 +1,12 @@
+{
+  "schema": 1,
+  "id": "sh055-condor",
+  "undoBefore": [
+    "sh054-hobby-fighter"
+  ],
+  "undoAfter": [],
+  "kind": "declaration",
+  "module": "condor",
+  "before": "pub mod celestial;\n",
+  "after": "pub mod docking;\n"
+}

@@ -177,6 +177,7 @@ impl State {
             };
             let direction = actor.pose().orientation.z;
             let Some(point) = data
+                .npc_geometry()
                 .player_planar_aimpoint(target.pose(), actor.position)
                 .map_err(|_| TrafficError::InvalidState)?
             else {

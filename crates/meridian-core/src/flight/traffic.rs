@@ -14,8 +14,9 @@ impl World {
                 BeamSource::Npc(_) if shot.weapon != super::OrdinaryWeapon::FrontPulseLaser => {
                     return Err(invalid);
                 }
-                BeamSource::Player { item, .. }
-                    if self.front_weapon_at_tick(item, shot.world_tick) != Some(shot.weapon) =>
+                BeamSource::Player { item, emission, .. }
+                    if self.laser_weapon_at_tick(item, shot.world_tick, emission)
+                        != Some(shot.weapon) =>
                 {
                     return Err(invalid);
                 }
@@ -37,7 +38,7 @@ impl World {
             }
         }
         for hit in self.traffic.player_hits() {
-            self.missiles.validate_npc_beam_scene(hit)?;
+            self.missiles.validate_npc_beam_scene(&self.ecm, hit)?;
             let system = self
                 .navigation_catalogue
                 .as_ref()
@@ -111,7 +112,15 @@ impl World {
         self.traffic.wreck_manifest(source)
     }
     pub fn traffic_snapshot(&self) -> Option<TrafficSnapshot> {
-        self.traffic.snapshot(self.combat_identity()?.system)
+        let system = self.combat_identity()?.system;
+        let mut snapshot = self.traffic.snapshot(system)?;
+        snapshot.verified_crimes = snapshot
+            .verified_crimes
+            .saturating_add(self.occupied_salvage.crimes());
+        if self.occupied_salvage.crime_in(system) {
+            snapshot.police_required_hull = Some("SH031");
+        }
+        Some(snapshot)
     }
     pub(super) fn traffic_beam_contact(
         &self,
@@ -135,7 +144,7 @@ impl World {
                 identity.system,
                 before.position,
                 after.position,
-                data.player_clearance_radius(),
+                data.player_npc_clearance(),
             )
         })
     }
@@ -289,10 +298,7 @@ impl World {
                     .as_ref()
                     .ok_or(FireError::InvalidGeometry)?,
                 traffic::PlayerBeamInput {
-                    weapon: self
-                        .fitted_front_laser()
-                        .ok_or(FireError::NoFittedFrontLaser)?
-                        .1,
+                    weapon: self.selected_fit().ok_or(FireError::NoFittedFrontLaser)?.1,
                     system: owner.system,
                     source: BeamSource::Player {
                         owner: owner.owner,

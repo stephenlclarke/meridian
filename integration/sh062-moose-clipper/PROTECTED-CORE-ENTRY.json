@@ -1,0 +1,12 @@
+{
+  "schema": 1,
+  "id": "sh062-moose-clipper",
+  "undoBefore": [
+    "sh061-saiga"
+  ],
+  "undoAfter": [],
+  "kind": "declaration",
+  "module": "moose_clipper",
+  "before": "pub mod mining;\n",
+  "after": "pub mod mule;\n"
+}

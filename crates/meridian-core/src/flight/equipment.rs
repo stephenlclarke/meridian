@@ -2,10 +2,36 @@
 use super::{MissionError, World};
 use crate::equipment::{self, Command, Event, Snapshot};
 impl World {
+    fn check_cargo_mount(&self, command: Command) -> Result<(), MissionError> {
+        if self.modular.salvage_exchange_pending() {
+            return Err(MissionError::Equipment(equipment::Error::Unavailable));
+        }
+        let account = self
+            .commander_account
+            .as_ref()
+            .ok_or(MissionError::NoCommander)?;
+        let owned = account.equipment_state().owned();
+        let adds = match command {
+            Command::PurchaseCargoBay => owned.is_none(),
+            Command::FitCargoBay(id) => owned.is_some_and(|i| i.id == id && !i.fitted),
+            Command::UnfitCargoBay(_) => false,
+        };
+        if adds {
+            let fit = self
+                .modular_equipment_snapshot()
+                .ok_or(MissionError::Equipment(equipment::Error::InvalidState))?;
+            if fit.utility_mounts_used >= fit.utility_mounts_capacity
+                || fit.equipment_units_used >= fit.equipment_units_capacity
+            {
+                return Err(MissionError::Equipment(equipment::Error::Unavailable));
+            }
+        }
+        Ok(())
+    }
     pub fn equipment_snapshot(&self) -> Option<Snapshot> {
         let account = self.commander_account.as_ref()?;
         let projection = self.reserved_service_projection().ok()?;
-        let definition = equipment::definition().ok()?;
+        let definition = account.equipment_definition().ok()?;
         let site = self
             .current_dock_context()
             .and_then(|dock| super::services::service_site(dock.system()));
@@ -25,19 +51,40 @@ impl World {
         command: Command,
         expected_tick: u64,
     ) -> Result<Event, MissionError> {
+        if self.modular.history_active() {
+            return self
+                .prepare_equipment(command, expected_tick)
+                .map(PreparedEquipment::commit)
+                .map_err(|error| match error {
+                    EquipmentPreparationError::Command(error) => error,
+                    EquipmentPreparationError::Save(_) => {
+                        MissionError::Equipment(equipment::Error::InvalidState)
+                    }
+                });
+        }
         let facts = self.current_service_facts(expected_tick)?;
-        let reserved_capacity = self.navigation_trade.reservations().capacity;
+        self.check_cargo_mount(command)?;
+        let reserved_capacity = self.navigation_trade.reservations().capacity
+            + self.cabin_tonnes().map_err(MissionError::Service)?;
         let account = self
             .commander_account
-            .as_mut()
+            .as_ref()
             .ok_or(MissionError::NoCommander)?;
         let session = self
             .freight_session
             .as_ref()
             .ok_or(MissionError::NoCommander)?;
-        account
-            .execute_equipment(&session.state, facts, command, reserved_capacity)
-            .map_err(MissionError::Equipment)
+        let (account, event) = account
+            .prepare_equipment(&session.state, facts, command, reserved_capacity)
+            .map_err(MissionError::Equipment)?;
+        if self.modular.has_test_cargo_history() {
+            let dock = self.current_dock_context().ok_or(MissionError::NotDocked)?;
+            self.modular
+                .record_test_cargo_fit(&account, dock, expected_tick)
+                .map_err(|_| MissionError::SequenceExhausted)?;
+        }
+        self.commander_account = Some(account);
+        Ok(event)
     }
 }
 
@@ -48,6 +95,7 @@ pub(super) mod tests;
 pub struct PreparedEquipment<'a> {
     world: &'a mut World,
     account: crate::freight::g02::CommanderAccount,
+    modular: super::modular::State,
     event: Event,
     bytes: Vec<u8>,
 }
@@ -74,6 +122,7 @@ impl PreparedEquipment<'_> {
     }
     pub fn commit(self) -> Event {
         self.world.commander_account = Some(self.account);
+        self.world.modular = self.modular;
         self.event
     }
 }
@@ -85,6 +134,7 @@ impl World {
     ) -> Result<PreparedEquipment<'_>, EquipmentPreparationError> {
         let command_error = EquipmentPreparationError::Command;
         let facts = self.current_service_facts(tick).map_err(command_error)?;
+        self.check_cargo_mount(command).map_err(command_error)?;
         let account = self
             .commander_account
             .as_ref()
@@ -98,15 +148,29 @@ impl World {
                 &session.state,
                 facts,
                 command,
-                self.navigation_trade.reservations().capacity,
+                self.navigation_trade.reservations().capacity
+                    + self
+                        .cabin_tonnes()
+                        .map_err(|error| command_error(MissionError::Service(error)))?,
             )
             .map_err(|error| command_error(MissionError::Equipment(error)))?;
+        let mut modular = self.modular.clone();
+        let dock = self
+            .current_dock_context()
+            .ok_or_else(|| command_error(MissionError::NotDocked))?;
+        if modular.has_test_cargo_history() {
+            modular
+                .record_test_cargo_fit(&account, dock, tick)
+                .map_err(EquipmentPreparationError::Save)?;
+        }
+        modular.record_bay(&account, dock);
         let bytes = self
-            .save_bytes_with_modules(&account, &self.modular)
+            .save_bytes_with_modules(&account, &modular)
             .map_err(EquipmentPreparationError::Save)?;
         Ok(PreparedEquipment {
             world: self,
             account,
+            modular,
             event,
             bytes,
         })

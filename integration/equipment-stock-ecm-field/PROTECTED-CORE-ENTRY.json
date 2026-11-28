@@ -1,0 +1,13 @@
+{
+  "schema": 1,
+  "id": "equipment-stock-ecm-field",
+  "undoBefore": [
+    "equipment-stock-ecm"
+  ],
+  "undoAfter": [],
+  "kind": "inverse",
+  "manifest": "integration/sh001-mule/STOCK-ECM-FIELD-INVERSE.json",
+  "sha256": "beaf93a35300d439024d6073312bfdcf99687e77d9581d42d073155a004ab07d",
+  "base": "1068fc7b96f44e6acb259b75ad69a87e8701b306",
+  "label": "stock ECM field"
+}

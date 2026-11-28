@@ -20,6 +20,7 @@ fn docked_display(vertices: &[Vertex]) -> Vec<Vertex> {
             .station_port()
             .unwrap_or_else(|| panic!("original port")),
         docked: true,
+        medusa_preview: false,
     };
     let mut output = Vec::new();
     ok(frame_vertices(&snapshot, &[], Some(station), &mut output));

@@ -1,0 +1,380 @@
+[
+  {
+    "name": "canopy-to-central-hull",
+    "pointMetres": [
+      0.19,
+      1.47,
+      2.81
+    ],
+    "originalFaces": {
+      "detailed": {
+        "canopy": {
+          "faceRange": [
+            1968,
+            2928
+          ],
+          "hitCountsAboveBelow": [
+            1,
+            1
+          ]
+        },
+        "central-hull": {
+          "faceRange": [
+            0,
+            384
+          ],
+          "hitCountsAboveBelow": [
+            1,
+            1
+          ]
+        }
+      },
+      "native": {
+        "canopy": {
+          "faceRange": [
+            176,
+            184
+          ],
+          "hitCountsAboveBelow": [
+            1,
+            1
+          ]
+        },
+        "central-hull": {
+          "faceRange": [
+            0,
+            32
+          ],
+          "hitCountsAboveBelow": [
+            1,
+            1
+          ]
+        }
+      }
+    }
+  },
+  {
+    "name": "port-forward-strut-to-central-hull",
+    "pointMetres": [
+      -2.03,
+      -1.13,
+      4.09
+    ],
+    "originalFaces": {
+      "detailed": {
+        "port-forward-strut": {
+          "faceRange": [
+            384,
+            396
+          ],
+          "hitCountsAboveBelow": [
+            1,
+            1
+          ]
+        },
+        "central-hull": {
+          "faceRange": [
+            0,
+            384
+          ],
+          "hitCountsAboveBelow": [
+            1,
+            1
+          ]
+        }
+      },
+      "native": {
+        "port-forward-strut": {
+          "faceRange": [
+            32,
+            44
+          ],
+          "hitCountsAboveBelow": [
+            1,
+            1
+          ]
+        },
+        "central-hull": {
+          "faceRange": [
+            0,
+            32
+          ],
+          "hitCountsAboveBelow": [
+            1,
+            1
+          ]
+        }
+      }
+    }
+  },
+  {
+    "name": "port-forward-rail-to-strut",
+    "pointMetres": [
+      -5.91,
+      -1.13,
+      5.27
+    ],
+    "originalFaces": {
+      "detailed": {
+        "port-forward-rail": {
+          "faceRange": [
+            396,
+            780
+          ],
+          "hitCountsAboveBelow": [
+            1,
+            1
+          ]
+        },
+        "port-forward-strut": {
+          "faceRange": [
+            384,
+            396
+          ],
+          "hitCountsAboveBelow": [
+            1,
+            1
+          ]
+        }
+      },
+      "native": {
+        "port-forward-rail": {
+          "faceRange": [
+            44,
+            76
+          ],
+          "hitCountsAboveBelow": [
+            1,
+            1
+          ]
+        },
+        "port-forward-strut": {
+          "faceRange": [
+            32,
+            44
+          ],
+          "hitCountsAboveBelow": [
+            1,
+            1
+          ]
+        }
+      }
+    }
+  },
+  {
+    "name": "port-aft-strut-to-central-hull",
+    "pointMetres": [
+      -1.83,
+      1.43,
+      -3.13
+    ],
+    "originalFaces": {
+      "detailed": {
+        "port-aft-strut": {
+          "faceRange": [
+            780,
+            792
+          ],
+          "hitCountsAboveBelow": [
+            1,
+            1
+          ]
+        },
+        "central-hull": {
+          "faceRange": [
+            0,
+            384
+          ],
+          "hitCountsAboveBelow": [
+            1,
+            1
+          ]
+        }
+      },
+      "native": {
+        "port-aft-strut": {
+          "faceRange": [
+            76,
+            88
+          ],
+          "hitCountsAboveBelow": [
+            1,
+            1
+          ]
+        },
+        "central-hull": {
+          "faceRange": [
+            0,
+            32
+          ],
+          "hitCountsAboveBelow": [
+            1,
+            1
+          ]
+        }
+      }
+    }
+  },
+  {
+    "name": "starboard-forward-strut-to-central-hull",
+    "pointMetres": [
+      2.03,
+      -1.13,
+      4.09
+    ],
+    "originalFaces": {
+      "detailed": {
+        "starboard-forward-strut": {
+          "faceRange": [
+            1176,
+            1188
+          ],
+          "hitCountsAboveBelow": [
+            1,
+            1
+          ]
+        },
+        "central-hull": {
+          "faceRange": [
+            0,
+            384
+          ],
+          "hitCountsAboveBelow": [
+            1,
+            1
+          ]
+        }
+      },
+      "native": {
+        "starboard-forward-strut": {
+          "faceRange": [
+            104,
+            116
+          ],
+          "hitCountsAboveBelow": [
+            1,
+            1
+          ]
+        },
+        "central-hull": {
+          "faceRange": [
+            0,
+            32
+          ],
+          "hitCountsAboveBelow": [
+            1,
+            1
+          ]
+        }
+      }
+    }
+  },
+  {
+    "name": "starboard-forward-rail-to-strut",
+    "pointMetres": [
+      5.91,
+      -1.13,
+      5.27
+    ],
+    "originalFaces": {
+      "detailed": {
+        "starboard-forward-rail": {
+          "faceRange": [
+            1188,
+            1572
+          ],
+          "hitCountsAboveBelow": [
+            1,
+            1
+          ]
+        },
+        "starboard-forward-strut": {
+          "faceRange": [
+            1176,
+            1188
+          ],
+          "hitCountsAboveBelow": [
+            1,
+            1
+          ]
+        }
+      },
+      "native": {
+        "starboard-forward-rail": {
+          "faceRange": [
+            116,
+            148
+          ],
+          "hitCountsAboveBelow": [
+            1,
+            1
+          ]
+        },
+        "starboard-forward-strut": {
+          "faceRange": [
+            104,
+            116
+          ],
+          "hitCountsAboveBelow": [
+            1,
+            1
+          ]
+        }
+      }
+    }
+  },
+  {
+    "name": "starboard-aft-strut-to-central-hull",
+    "pointMetres": [
+      1.83,
+      1.43,
+      -3.13
+    ],
+    "originalFaces": {
+      "detailed": {
+        "starboard-aft-strut": {
+          "faceRange": [
+            1572,
+            1584
+          ],
+          "hitCountsAboveBelow": [
+            1,
+            1
+          ]
+        },
+        "central-hull": {
+          "faceRange": [
+            0,
+            384
+          ],
+          "hitCountsAboveBelow": [
+            1,
+            1
+          ]
+        }
+      },
+      "native": {
+        "starboard-aft-strut": {
+          "faceRange": [
+            148,
+            160
+          ],
+          "hitCountsAboveBelow": [
+            1,
+            1
+          ]
+        },
+        "central-hull": {
+          "faceRange": [
+            0,
+            32
+          ],
+          "hitCountsAboveBelow": [
+            1,
+            1
+          ]
+        }
+      }
+    }
+  }
+]

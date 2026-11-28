@@ -1,0 +1,12 @@
+{
+  "schema": 1,
+  "id": "sh057-falconet",
+  "undoBefore": [
+    "sh056-aplomado-interceptor"
+  ],
+  "undoAfter": [],
+  "kind": "declaration",
+  "module": "falconet",
+  "before": "pub mod erne_corvette;\n",
+  "after": "mod flight;\n"
+}

@@ -1,0 +1,12 @@
+{
+  "schema": 1,
+  "id": "sh080-carabao-highliner",
+  "undoBefore": [
+    "sh079-carabao-freighter"
+  ],
+  "undoAfter": [],
+  "kind": "declaration",
+  "module": "carabao_highliner",
+  "before": "pub mod carabao_freighter;\n",
+  "after": "pub mod caracal_scout;\n"
+}

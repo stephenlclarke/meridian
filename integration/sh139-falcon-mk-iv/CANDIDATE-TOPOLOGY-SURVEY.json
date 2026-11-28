@@ -1,0 +1,220 @@
+{
+  "candidateTopology": {
+    "componentCount": 21,
+    "surfaceTriangles": 512,
+    "interiorOverlaps": [
+      {
+        "parts": [
+          0,
+          15
+        ],
+        "pointMetres": [
+          -0.2767792,
+          4.3676434,
+          5.6767228
+        ],
+        "hitCountsAboveBelow": [
+          [
+            1,
+            1
+          ],
+          [
+            1,
+            1
+          ]
+        ]
+      },
+      {
+        "parts": [
+          5,
+          6
+        ],
+        "pointMetres": [
+          -4.9281517,
+          -2.4583997,
+          -4.9183864
+        ],
+        "hitCountsAboveBelow": [
+          [
+            1,
+            1
+          ],
+          [
+            1,
+            1
+          ]
+        ]
+      },
+      {
+        "parts": [
+          5,
+          7
+        ],
+        "pointMetres": [
+          -4.9281517,
+          -2.7836528,
+          -13.9608014
+        ],
+        "hitCountsAboveBelow": [
+          [
+            1,
+            1
+          ],
+          [
+            1,
+            1
+          ]
+        ]
+      },
+      {
+        "parts": [
+          5,
+          17
+        ],
+        "pointMetres": [
+          -4.9013116,
+          -2.7335822,
+          7.2352721
+        ],
+        "hitCountsAboveBelow": [
+          [
+            1,
+            1
+          ],
+          [
+            1,
+            1
+          ]
+        ]
+      },
+      {
+        "parts": [
+          10,
+          11
+        ],
+        "pointMetres": [
+          6.8016873,
+          -2.4583997,
+          -4.9183864
+        ],
+        "hitCountsAboveBelow": [
+          [
+            1,
+            1
+          ],
+          [
+            1,
+            1
+          ]
+        ]
+      },
+      {
+        "parts": [
+          10,
+          12
+        ],
+        "pointMetres": [
+          6.8016873,
+          -2.7836528,
+          -13.9608014
+        ],
+        "hitCountsAboveBelow": [
+          [
+            1,
+            1
+          ],
+          [
+            1,
+            1
+          ]
+        ]
+      },
+      {
+        "parts": [
+          10,
+          19
+        ],
+        "pointMetres": [
+          4.9787167,
+          -2.7335822,
+          7.2352721
+        ],
+        "hitCountsAboveBelow": [
+          [
+            1,
+            1
+          ],
+          [
+            1,
+            1
+          ]
+        ]
+      },
+      {
+        "parts": [
+          15,
+          16
+        ],
+        "pointMetres": [
+          1.7517558,
+          5.0271898,
+          6.6284354
+        ],
+        "hitCountsAboveBelow": [
+          [
+            1,
+            1
+          ],
+          [
+            1,
+            1
+          ]
+        ]
+      },
+      {
+        "parts": [
+          17,
+          18
+        ],
+        "pointMetres": [
+          -4.1213842,
+          -3.9650739,
+          7.2352721
+        ],
+        "hitCountsAboveBelow": [
+          [
+            1,
+            1
+          ],
+          [
+            1,
+            1
+          ]
+        ]
+      },
+      {
+        "parts": [
+          19,
+          20
+        ],
+        "pointMetres": [
+          4.7771216,
+          -3.9650739,
+          7.2352721
+        ],
+        "hitCountsAboveBelow": [
+          [
+            1,
+            1
+          ],
+          [
+            1,
+            1
+          ]
+        ]
+      }
+    ]
+  },
+  "additionalMeasuredOverlaps": [],
+  "missingMeasuredOverlaps": []
+}

@@ -18,7 +18,7 @@ impl OriginalStationData {
         self.rounded_station_motion_clear(source.pieces().as_ref(), start, end, angular_travel)
     }
 
-    fn rounded_station_motion_clear(
+    pub(super) fn rounded_station_motion_clear(
         &self,
         pieces: &[SmoothPiece],
         start: RigidPose,
@@ -40,7 +40,7 @@ impl OriginalStationData {
         self.rounded_station_launch_start(source.pieces().as_ref())
     }
 
-    fn rounded_station_launch_start(
+    pub(super) fn rounded_station_launch_start(
         &self,
         pieces: &[SmoothPiece],
     ) -> Result<FlightStart, StationError> {
@@ -121,7 +121,7 @@ impl OriginalStationData {
         )
     }
 
-    fn rounded_station_entry_conditions(
+    pub(super) fn rounded_station_entry_conditions(
         &self,
         pieces: &[SmoothPiece],
         start: RigidPose,
@@ -233,6 +233,17 @@ impl OriginalStationData {
         self.rounded_observer_clear(source.pieces().as_ref(), start, end, observer)
     }
 
+    /// Controlled SH023 motion against the original SH028 mesh.
+    pub fn peregrine_mk3_motion_clear(
+        &self,
+        source: &crate::peregrine_mk3::PeregrineMk3HullSource,
+        start: RigidPose,
+        end: RigidPose,
+        angular_travel: f64,
+    ) -> bool {
+        self.rounded_station_motion_clear(source.pieces(), start, end, angular_travel)
+    }
+
     fn rounded_observer_clear(
         &self,
         pieces: &[SmoothPiece],
@@ -333,6 +344,17 @@ impl OriginalStationData {
         )
     }
 
+    /// Qualifies explicit SH035 motion against the original SH028 source triangles.
+    pub fn stag_liner_motion_clear(
+        &self,
+        source: &crate::stag_liner::StagLinerHullSource,
+        start: RigidPose,
+        end: RigidPose,
+        angular_travel: f64,
+    ) -> bool {
+        self.rounded_station_motion_clear(source.pieces(), start, end, angular_travel)
+    }
+
     pub(crate) fn goshawk_custom_observer_clear(
         &self,
         source: &crate::goshawk_custom::GoshawkCustomHullSource,
@@ -345,6 +367,82 @@ impl OriginalStationData {
 }
 
 impl OriginalStationData {
+    /// Qualifies explicit SH042 motion against the original SH028 source triangles.
+    pub fn saker_motion_clear(
+        &self,
+        source: &crate::saker::SakerHullSource,
+        start: RigidPose,
+        end: RigidPose,
+        angular_travel: f64,
+    ) -> bool {
+        self.rounded_station_motion_clear(source.pieces(), start, end, angular_travel)
+    }
+
+    pub fn peregrine_mk_i_launch_start(
+        &self,
+        source: &crate::peregrine_mk_i::PeregrineMkIHullSource,
+    ) -> Result<FlightStart, StationError> {
+        self.rounded_station_launch_start(source.pieces())
+    }
+
+    pub fn peregrine_mk_i_motion_clear(
+        &self,
+        source: &crate::peregrine_mk_i::PeregrineMkIHullSource,
+        start: RigidPose,
+        end: RigidPose,
+        angular_travel: f64,
+    ) -> bool {
+        self.rounded_station_motion_clear(source.pieces(), start, end, angular_travel)
+    }
+
+    /// Test SH022 against the actual SH028 aperture, admission conditions and station triangles.
+    pub fn peregrine_mk_i_entry_clear(
+        &self,
+        source: &crate::peregrine_mk_i::PeregrineMkIHullSource,
+        start: RigidPose,
+        end: RigidPose,
+        physical_speed: f64,
+        roll_rate: f64,
+        angular_travel: f64,
+    ) -> bool {
+        self.peregrine_mk_i_entry_conditions(
+            source,
+            start,
+            end,
+            physical_speed,
+            roll_rate,
+            angular_travel,
+        ) && self.peregrine_mk_i_motion_clear(source, start, end, angular_travel)
+    }
+
+    pub(crate) fn peregrine_mk_i_entry_conditions(
+        &self,
+        source: &crate::peregrine_mk_i::PeregrineMkIHullSource,
+        start: RigidPose,
+        end: RigidPose,
+        physical_speed: f64,
+        roll_rate: f64,
+        angular_travel: f64,
+    ) -> bool {
+        self.rounded_station_entry_conditions(
+            source.pieces(),
+            start,
+            end,
+            physical_speed,
+            roll_rate,
+            angular_travel,
+        )
+    }
+
+    pub(crate) fn peregrine_mk_i_observer_clear(
+        &self,
+        source: &crate::peregrine_mk_i::PeregrineMkIHullSource,
+        start: RigidPose,
+        end: RigidPose,
+        observer: RigidPose,
+    ) -> bool {
+        self.rounded_observer_clear(source.pieces(), start, end, observer)
+    }
     /// Controlled validation only: the stationary observer retains its real SH025 mesh.
     /// Initial noncontainment is established by the World constructor, then every
     /// continuous Mule step checks the same frozen observer's complete native surface.
@@ -371,6 +469,17 @@ impl OriginalStationData {
 }
 
 impl OriginalStationData {
+    /// Qualifies explicit SH031 motion against the original SH028 source triangles.
+    pub fn kite_interceptor_motion_clear(
+        &self,
+        source: &crate::kite_interceptor::KiteInterceptorHullSource,
+        start: RigidPose,
+        end: RigidPose,
+        angular_travel: f64,
+    ) -> bool {
+        self.rounded_station_motion_clear(source.pieces(), start, end, angular_travel)
+    }
+
     /// A stationary authored courier outside the station-facing launch corridor.
     pub(crate) fn renas_mule_berth(
         &self,
@@ -390,6 +499,17 @@ impl OriginalStationData {
             return Err(StationError::UnsafeLaunch);
         }
         Ok(pose)
+    }
+
+    /// Qualifies explicit SH030 motion against the original SH028 source triangles.
+    pub fn sparrowhawk_motion_clear(
+        &self,
+        source: &crate::sparrowhawk::SparrowhawkHullSource,
+        start: RigidPose,
+        end: RigidPose,
+        angular_travel: f64,
+    ) -> bool {
+        self.rounded_station_motion_clear(source.pieces(), start, end, angular_travel)
     }
 
     /// In the player's translating frame, the stationary Mule sweeps against the

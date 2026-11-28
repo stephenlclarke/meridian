@@ -1,0 +1,12 @@
+{
+  "schema": 1,
+  "id": "sh136-falcon-mk-i",
+  "undoBefore": [
+    "sh135-javelina"
+  ],
+  "undoAfter": [],
+  "kind": "declaration",
+  "module": "falcon_mk_i",
+  "before": "pub mod erne_corvette;\n",
+  "after": "pub mod falconet;\n"
+}

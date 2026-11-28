@@ -1,0 +1,13 @@
+{
+  "schema": 1,
+  "id": "equipment-solar-scoops",
+  "undoBefore": [
+    "equipment-fuel-storage"
+  ],
+  "undoAfter": [],
+  "kind": "inverse",
+  "manifest": "integration/sh001-mule/SOLAR-SCOOPS-INVERSE.json",
+  "sha256": "0c68577f581d05cf490cbdfaa1488bdc361d712b30751f68300f1eb23da7ba67",
+  "base": "641dfc9b2f1834412cff3831d1b2eb5296dec507",
+  "label": "solar scoops"
+}

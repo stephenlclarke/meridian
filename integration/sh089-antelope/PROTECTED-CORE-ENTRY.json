@@ -1,0 +1,12 @@
+{
+  "schema": 1,
+  "id": "sh089-antelope",
+  "undoBefore": [
+    "sh088-springbok-starliner"
+  ],
+  "undoAfter": [],
+  "kind": "declaration",
+  "module": "antelope",
+  "before": "pub mod alpaca;\n",
+  "after": "pub mod aplomado_interceptor;\n"
+}

@@ -67,6 +67,15 @@ struct VisualVertex {
     texture: u32,
     emissive: u32,
 }
+impl VisualVertex {
+    fn with_display_paint(mut self) -> Self {
+        let [r, g, b, alpha] = self.color;
+        let paint = crate::mesh::paint::ship_srgb([r, g, b].map(|v| (255.0 * v).round() as u8));
+        let [r, g, b] = paint.map(|v| f32::from(v) / 255.0);
+        self.color = [r, g, b, alpha];
+        self
+    }
+}
 const VISUAL: &[u8] = include_bytes!("../../../assets/fleet/sh001/visual.bin");
 const VERTEX_COUNT: usize = 7236 * 3;
 const MAX_POINTS: usize = 5344;
@@ -79,6 +88,17 @@ const TEXTURES: [&[u8]; 3] = [
 
 fn visual() -> Result<Vec<VisualVertex>, &'static str> {
     decode_visual(VISUAL, b"MULEVIS1", VERTEX_COUNT)
+}
+
+/// CPU projection of the same detailed visual triangles used by the ordinary SH001 pass.
+pub(crate) fn targeting_vertices() -> Result<Vec<crate::mesh::Vertex>, &'static str> {
+    Ok(visual()?
+        .into_iter()
+        .map(|v| crate::mesh::Vertex {
+            position: v.position,
+            color: [v.color[0], v.color[1], v.color[2]],
+        })
+        .collect())
 }
 fn decode_visual(
     bytes: &[u8],
@@ -106,7 +126,7 @@ fn decode_visual(
             .chain(&v.color)
             .chain(&v.uv)
             .any(|x| !x.is_finite())
-            || v.texture >= 3
+            || (v.texture >= 3 && v.texture != u32::MAX)
             || v.emissive > 1
     }) {
         return Err("Invalid detailed visual attributes");
