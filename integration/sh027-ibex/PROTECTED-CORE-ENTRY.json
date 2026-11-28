@@ -1,0 +1,13 @@
+{
+  "schema": 1,
+  "id": "sh027-ibex",
+  "undoBefore": [
+    "sh171-medusa-preview",
+    "sh170-caracara-mk-ii"
+  ],
+  "undoAfter": [],
+  "kind": "declaration",
+  "module": "ibex",
+  "before": "pub mod hyena;\n",
+  "after": "pub mod jackal;\n"
+}

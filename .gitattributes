@@ -698,3 +698,10 @@ tools/measure_okapi_air.py text eol=lf
 tools/prepare_okapi_geometry.py text eol=lf
 tools/prepare_okapi_studio.py text eol=lf
 tools/verify_okapi_geometry.py text eol=lf
+
+# Ibex numerical and source certificate inputs use canonical bytes.
+tools/measure_ibex.py text eol=lf
+tools/measure_ibex_air.py text eol=lf
+tools/prepare_ibex_geometry.py text eol=lf
+tools/prepare_ibex_studio.py text eol=lf
+tools/verify_ibex_geometry.py text eol=lf

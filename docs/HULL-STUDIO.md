@@ -139,3 +139,7 @@ Search for **SH032** or **Panther Explorer** in the station Showroom. The forest
 ## Okapi stock inspection
 
 Search for **SH029** or **Okapi** in the station Showroom. The slate-and-orange trader retains its three pallets, raised top rails and original 120-face native mesh. Its [geometry record](OKAPI-GAMEPLAY-ENVELOPE.md) gives the measured clearances and the source of its empty-hull mass reference.
+
+## Ibex stock inspection
+
+Search for **SH027** or **Ibex** in the station Showroom. Its forest-and-ivory hull has two cargo keels, a cross bridge and a central trench. The [Ibex geometry record](IBEX-GAMEPLAY-ENVELOPE.md) gives the source meshes, channel clearances and station contact evidence.

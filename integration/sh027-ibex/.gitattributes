@@ -1,0 +1,12 @@
+# Source proofs and replay reports have published byte hashes.
+CONTACT-RESULT.json text eol=lf
+FIXTURES.json text eol=lf
+LEGACY-ACTIVATION.swift.txt text eol=lf
+LEGACY-PHYSICAL-CONTRACT.swift.txt text eol=lf
+ORIGINAL-DIFFERENCE.json text eol=lf
+SURFACE-FIT.json text eol=lf
+
+IBEX-STUDIO.json -text
+CERTIFIED-*.json -text
+SUPPORT-FAN.json -text
+CRITERIA.json -text
