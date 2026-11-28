@@ -58,19 +58,21 @@ SH171 is available for catalogue inspection with the original detailed artwork a
 
 ## Combined Showroom and Hull Studio source candidate
 
-The ordinary station Showroom has 115 selectable stock previews: 109 authenticated schema-1 packages and six original stock models. The final fleet intake adds 78 authored stock packages from SH070 through SH170. The Showroom keeps the linked source identities, engineering readouts and inspection-only exchange rules. The combined source also restores the Studio launcher, including explicit inspection of schema-2 archives. Stock ship and station finishes are display-only; local authored material colours remain exact. Mac build `5a924315` passed 647 core unit tests, 382 desktop unit tests and 13 core integration tests; 20 desktop tests were ignored. The desktop tests checked all 31 schema-package previews on that 37-preview build. The MacBook Air's exact final 50-hull source packet at `e10ab45b` passed 259 Python tests and 107 focused Rust tests with 210 matching replay receipts. Final compiler checks and native presentation acceptance of the 115-preview registry remain separate.
+Preview 12 shipped 115 selectable stock previews: 109 authenticated schema-1 packages and six original stock models. The final fleet intake adds 78 authored stock packages from SH070 through SH170. The Showroom keeps the linked source identities, engineering readouts and inspection-only exchange rules. The combined source also restores the Studio launcher, including explicit inspection of schema-2 archives. Stock ship and station finishes are display-only; local authored material colours remain exact. Mac build `5a924315` passed 647 core unit tests, 382 desktop unit tests and 13 core integration tests; 20 desktop tests were ignored. The desktop tests checked all 31 schema-package previews on that 37-preview build. The MacBook Air's exact final 50-hull source packet at `e10ab45b` passed 259 Python tests and 107 focused Rust tests with 210 matching replay receipts. Final compiler checks and native presentation acceptance of the 115-preview registry remain separate.
+
+The development build adds [Cheetah (SH082)](CHEETAH-SHIELD.md) to the station Showroom. Its 512-face native candidate retains the 24 measured original contacts, including the four service-well contacts lost in the earlier candidate.
 
 The separate [Medusa player preview](../integration/sh171-medusa-preview/README.md) connects the active World hull identity to the original detailed flight rendering. The renderer retains the Peregrine model for ordinary players and existing traffic. It does not use the archived 729-piece inspection shield or reduced contact hull as flight artwork. On the signed Mac build `5a924315` (tree `61214e3e28f6b2830cfd5c71d52482e049f29ef3`), the Orchestrator saw the original Medusa in flight at 50.30/50.30. The isolated pilot fitted the cargo expansion, launched, saved and cold-restarted. The new process restored FLIGHT, 50.30 and the expanded 32 t hold. The 69-byte save remained byte-identical through both process exits and the ordinary decoder refused it. Core tests at that source passed the actual launch/return, rear-side save and fit-limit cases; native docking return and fit-limit refusal were not observed in that run. This evidence is not publication or full final-build acceptance.
 
 ### Outstanding fleet inspection scope
 
-Cheetah (SH082) remains outside the rendered stock registry because its candidate loses four required contacts. The final intake also excludes the following 22 entries in SH099–SH170:
+Preview 12 held Cheetah (SH082) because its first candidate lost four required contacts. That release also excluded the following 22 entries in SH099–SH170:
 
 - SH102 Dhole Haven, SH103 Redtail Mk III, SH108 Besra, SH161 Wolf Citadel, SH162 Larvaal Probe and SH164 Toad Drug Factory: original source is outstanding in the queue.
 - SH112 Larvaal Warden, SH113 Larvaal Ravager, SH114 Larvaal Sentinel, SH115 Larvaal Lancer, SH116 Larvaal Broodlord, SH117 Larvaal Provoker, SH118 Larvaal Reaver, SH119 Larvaal Wraith, SH120 Larvaal Seeker, SH121 Larvaal Mender, SH122 Larvaal Harvester, SH123 Larvaal Sovereign, SH124 Larvaal Warship and SH125 Larvaal Drone: original finite-dry record is outstanding. SH123 also has unresolved engineering.
 - SH141 Salamander Station and SH156 Lion Bastion: no authored inspection packet is in the queued refs.
 
-These are outstanding content requirements, not an admission or acquisition decision. No placeholder artwork is registered for them.
+The release used no placeholder artwork for these entries. The development update above records the subsequent Cheetah inspection work.
 
 ## Station chart best-profit scan source candidate
 
