@@ -5,6 +5,7 @@ use meridian_core::{ShieldGrade, World, XyzzyAction};
 pub fn provenance(value: meridian_core::ModuleProvenance) -> &'static str {
     match value {
         meridian_core::ModuleProvenance::StandardBirth => "Born module",
+        meridian_core::ModuleProvenance::MedusaIssue { .. } => "Issued with Fleet Medusa",
         meridian_core::ModuleProvenance::Paid { .. } => "Paid module; original receipt retained",
         meridian_core::ModuleProvenance::XYZzy { .. } => "XYZZY grant; no paid purchase",
     }
@@ -18,17 +19,14 @@ pub struct Menu {
 }
 
 const ACTIONS: [(XyzzyAction, &str); 5] = [
-    (
-        XyzzyAction::Enter,
-        "Activate CLARKE and fit maximum equipment",
-    ),
+    (XyzzyAction::ActivateMedusa, "Activate / refit SH171 Medusa"),
     (
         XyzzyAction::MaximumSupportedHardware,
         "Refill and fit maximum equipment",
     ),
     (
         XyzzyAction::RestoreStarter,
-        "Refill / refit current SH025 starter outfit",
+        "Refill / refit current equipment",
     ),
     (
         XyzzyAction::ToggleUnlimitedFuel,
@@ -150,8 +148,8 @@ impl Menu {
         }
         lines.push(
             match self.action() {
-                XyzzyAction::Enter if snapshot.is_some_and(|s| !s.active) => {
-                    "Sets cash to 1,000,000 CR once and fits maximum compatible equipment."
+                XyzzyAction::ActivateMedusa if snapshot.is_some_and(|s| !s.active) => {
+                    "Issue a test Medusa. First activation sets cash to 1,000,000 CR."
                 }
                 XyzzyAction::ToggleUnlimitedFuel => "Switch between normal and unlimited fuel.",
                 XyzzyAction::FitShield(_) => {
@@ -200,9 +198,9 @@ impl Menu {
                 "Escape / B cancels a review, then closes this testing menu",
                 "Actions publish the exact save before replacing the live commander",
                 "First activation names CLARKE and SETS cash to 1,000,000 CR once",
-                "Activation fits maximum compatible equipment at any station berth",
+                "Activate / refit: SH171 Medusa, 5 missiles, 32 t hold, any berth",
                 "Test shield: Left / Right chooses one grade; no paid or earned receipt",
-                "TEST MAX fits 4 tanks beyond normal SH025 mounts; no active custody",
+                "TEST MAX: separate four-tank test; active contracts and fitted ECM block it",
                 "Store test tanks to meet ordinary fitting limits before contracts",
                 "Limited outfits keep tanks; E.C.M. needs a free mount or an existing fit",
                 "Auto E.C.M. setting only; incoming NPC missiles remain unavailable",

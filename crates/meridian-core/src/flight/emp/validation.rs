@@ -399,7 +399,8 @@ impl State {
             + utilities
             + usize::from(item.fitted)
             > usize::from(
-                crate::equipment::definition()
+                account
+                    .equipment_definition()
                     .map_err(|_| INVALID)?
                     .utility_mounts_capacity,
             )

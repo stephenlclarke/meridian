@@ -6,6 +6,7 @@ use core::fmt;
 
 pub const PULSE_RANGE: f64 = 6000.0;
 pub const PULSE_COOLDOWN_TICKS: u8 = 18;
+pub(super) const MEDUSA_ENERGY: u16 = 41_000;
 pub const ENERGY_CAPACITY_HUNDREDTHS: u16 = 38_000;
 const ENERGY_COST_HUNDREDTHS: u16 = 100;
 pub(super) const ENERGY_RECHARGE_HUNDREDTHS: u16 = 7;
@@ -35,7 +36,7 @@ impl fmt::Display for FireError {
             Self::Paused => "World is paused",
             Self::NoCommander => "An owned commander profile is required",
             Self::NotInFlight => "The front Pulse Laser requires active flight",
-            Self::NoFittedFrontLaser => "No owned compatible front laser is fitted",
+            Self::NoFittedFrontLaser => "No compatible laser is fitted to this mount",
             Self::NoCompatibleMiningTool => "Fit a paid compatible mining laser",
             Self::NoFittedFrontPulseLaser => "No owned front Pulse Laser is fitted",
             Self::CoolingDown => "Pulse Laser is cooling down",
@@ -125,33 +126,57 @@ impl Default for PulseResources {
         }
     }
 }
+/// Recharge in whole hundredths between two physics ticks. Keep the fractional
+/// part across ticks so the Medusa's original 4.7 energy/s is exact over a second.
+fn recovered_energy(start: u64, elapsed: u64, peregrine_rate: u16, capacity: u16) -> u64 {
+    if capacity != MEDUSA_ENERGY {
+        return elapsed.saturating_mul(u64::from(peregrine_rate));
+    }
+    let per_second = u128::from(peregrine_rate / ENERGY_RECHARGE_HUNDREDTHS) * 470;
+    let phase = u128::from(start % 60);
+    let amount = ((phase + u128::from(elapsed)) * per_second) / 60 - phase * per_second / 60;
+    u64::try_from(amount).unwrap_or(u64::MAX)
+}
+
 impl PulseResources {
     #[cfg(test)]
     pub(super) fn replay_advance(&mut self, elapsed: u64) {
-        self.replay_advance_with_rate(elapsed, 7);
+        self.replay_advance_with_rate(0, elapsed, 7, ENERGY_CAPACITY_HUNDREDTHS);
     }
-    pub(super) fn replay_advance_with_rate(&mut self, elapsed: u64, recharge: u16) {
+    pub(super) fn replay_advance_with_rate(
+        &mut self,
+        start: u64,
+        elapsed: u64,
+        recharge: u16,
+        capacity: u16,
+    ) {
         self.energy = u64::from(self.energy)
-            .saturating_add(elapsed.saturating_mul(u64::from(recharge)))
-            .min(38000) as u16;
+            .saturating_add(recovered_energy(start, elapsed, recharge, capacity))
+            .min(u64::from(capacity)) as u16;
         self.heat = u64::from(self.heat).saturating_sub(elapsed) as u16;
         self.cooldown = u64::from(self.cooldown).saturating_sub(elapsed) as u8;
     }
-    pub(super) fn replay_berth(&mut self) {
-        self.energy = 38000;
+    pub(super) fn replay_berth(&mut self, capacity: u16) {
+        self.energy = capacity;
         self.heat = 0;
     }
-    pub(super) fn advance(&mut self, opening: FlightMode, next: FlightMode, recharge: u16) {
+    pub(super) fn advance(
+        &mut self,
+        opening: FlightMode,
+        next: FlightMode,
+        recharge: u16,
+        capacity: u16,
+    ) {
         if opening == FlightMode::Docked {
             return;
         }
         self.cooldown = self.cooldown.saturating_sub(1);
         if next == FlightMode::Docked {
             // Source docking resets energy and heat, retaining laser cooldown.
-            self.energy = ENERGY_CAPACITY_HUNDREDTHS;
+            self.energy = capacity;
             self.heat = 0;
         } else {
-            self.energy = (self.energy + recharge).min(ENERGY_CAPACITY_HUNDREDTHS);
+            self.energy = (self.energy + recharge).min(capacity);
             self.heat = self.heat.saturating_sub(1);
         }
     }
@@ -362,6 +387,13 @@ impl World {
         &self,
         pose: crate::docking::RigidPose,
     ) -> Result<(Option<super::practice::Practice>, PulseContact, f64), FireError> {
+        self.pulse_scene_facing(pose, super::FlightView::Front)
+    }
+    pub(super) fn pulse_scene_facing(
+        &self,
+        pose: crate::docking::RigidPose,
+        facing: super::FlightView,
+    ) -> Result<(Option<super::practice::Practice>, PulseContact, f64), FireError> {
         let station = self.state.station.ok_or(FireError::InvalidGeometry)?;
         let distance = self
             .station_data
@@ -382,9 +414,16 @@ impl World {
             .filter(|(_, d)| solid.is_none_or(|wall| *d < wall));
         let cap = projectile.map_or(PULSE_RANGE, |(_, d)| d);
         let mut practice = self.practice;
-        let hit = practice
-            .as_mut()
-            .and_then(|p| p.contact_limited(self.state, pose, cap, solid));
+        let hit = practice.as_mut().and_then(|p| {
+            p.contact_limited(
+                self.state,
+                pose,
+                cap,
+                solid,
+                facing,
+                self.combat.emissions.checked_add(1)?,
+            )
+        });
         if let Some((id, distance, first_hit)) = hit {
             return Ok((
                 practice,
@@ -454,11 +493,27 @@ impl World {
             .map(|(item, _)| item)
     }
 
+    pub(super) fn step_energy_recharge(&self, nominal: u16) -> u16 {
+        recovered_energy(
+            self.combat.physical_tick(),
+            1,
+            nominal,
+            self.energy_capacity(),
+        ) as u16
+    }
+    pub(super) fn energy_capacity(&self) -> u16 {
+        if self.xyzzy_medusa_active() {
+            MEDUSA_ENERGY
+        } else {
+            ENERGY_CAPACITY_HUNDREDTHS
+        }
+    }
     pub fn flight_resources_snapshot(&self) -> Option<FlightResourcesSnapshot> {
         self.commander_account.as_ref()?;
+        let nominal = self.energy_recharge_hundredths();
         Some(FlightResourcesSnapshot {
-            energy_capacity_hundredths: ENERGY_CAPACITY_HUNDREDTHS,
-            energy_recharge_hundredths_per_tick: self.energy_recharge_hundredths(),
+            energy_capacity_hundredths: self.energy_capacity(),
+            energy_recharge_hundredths_per_tick: self.step_energy_recharge(nominal),
             energy_hundredths: self.pulse.energy,
             heat_fifths: self.pulse.heat,
             cooldown_ticks: self.pulse.cooldown,
@@ -470,14 +525,7 @@ impl World {
         Some((item.id, weapon))
     }
     pub fn front_laser_snapshot(&self) -> Option<FrontLaserSnapshot> {
-        let (fitted_item_id, weapon) = self.fitted_front_laser()?;
-        Some(FrontLaserSnapshot {
-            fitted_item_id,
-            weapon,
-            damage_hundredths: weapon.damage_hundredths(),
-            range: 6000,
-            cooldown_ticks_per_shot: weapon.cooldown_ticks(),
-        })
+        self.laser_mount_snapshot(super::FlightView::Front)
     }
 
     pub fn pulse_laser_snapshot(&self) -> Option<PulseLaserSnapshot> {
@@ -497,10 +545,27 @@ impl World {
     pub fn request_fire_front_laser(&mut self, expected_tick: u64) -> Result<PulseShot, FireError> {
         self.request_front_discharge(expected_tick, false)
     }
+    pub fn request_fire_selected_laser(
+        &mut self,
+        expected_tick: u64,
+    ) -> Result<PulseShot, FireError> {
+        self.request_discharge(expected_tick, false, self.selected_laser_view())
+    }
     fn request_front_discharge(
         &mut self,
         expected_tick: u64,
         pulse_only: bool,
+    ) -> Result<PulseShot, FireError> {
+        if self.selected_laser_view() != super::FlightView::Front {
+            return Err(FireError::StaleCommand);
+        }
+        self.request_discharge(expected_tick, pulse_only, super::FlightView::Front)
+    }
+    fn request_discharge(
+        &mut self,
+        expected_tick: u64,
+        pulse_only: bool,
+        facing: super::FlightView,
     ) -> Result<PulseShot, FireError> {
         if expected_tick != self.state.tick {
             return Err(FireError::StaleCommand);
@@ -517,7 +582,7 @@ impl World {
         if self.emp.input_blocked() {
             return Err(FireError::InsufficientEnergy);
         }
-        let (fitted_item_id, weapon) = self.fitted_front_laser().ok_or(if pulse_only {
+        let (fitted_item_id, weapon) = self.selected_fit().ok_or(if pulse_only {
             FireError::NoFittedFrontPulseLaser
         } else {
             FireError::NoFittedFrontLaser
@@ -528,9 +593,10 @@ impl World {
         self.pulse.prepare_laser_discharge(weapon)?;
         let pose = flight_pose(self.state.position, self.state.orientation)
             .ok_or(FireError::InvalidGeometry)?;
+        let pose = facing.laser_ray(pose);
         let origin = pose.position;
         let direction = pose.orientation.z;
-        let (mut practice, contact, end_distance) = self.pulse_scene(pose)?;
+        let (mut practice, contact, end_distance) = self.pulse_scene_facing(pose, facing)?;
         let end = Vec3::new(
             origin.x + direction.x * end_distance,
             origin.y + direction.y * end_distance,

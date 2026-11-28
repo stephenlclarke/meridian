@@ -154,7 +154,7 @@
       "key": "max/lasers",
       "legacyBehavior": "Naval Laser on every supported combat facing.",
       "state": "PARTIAL_CORE",
-      "dependency": "Real front Naval Laser, damage6400 hundredths and cadence6 ticks, shared finite energy/heat and historical item proof. Other supported combat facings need real slot/firing owners."
+      "dependency": "The Peregrine has one front mount. The Fleet Medusa maximum outfit fits an owned Naval Laser on each of its four combat mounts. Station Equipment supports individual paid replacements and stored-item refits."
     },
     {
       "key": "max/Fuel Scoops",

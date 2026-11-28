@@ -1,7 +1,5 @@
 //! Independent accepted berth and combined accommodation/cargo history.
-use super::{
-    CommanderAccount, INVALID, Ledger, ModuleAction, ModuleError, ModuleKind, State, World,
-};
+use super::{CommanderAccount, INVALID, ModuleAction, ModuleError, ModuleKind, State, World};
 use crate::{
     flight::navigation_trade::{ReservationInterval, State as TradeState},
     navigation::DockContext,
@@ -456,7 +454,7 @@ impl State {
         if old_freight != 0 || !last_exact {
             return Err(INVALID);
         }
-        let mut ledger = Ledger::born(first.dock.owner().seed())?;
+        let mut ledger = self.born_ledger(first.dock.owner().seed())?;
         let mut counters = [0; 2];
         let mut fitted_units = 0;
         let mut cabin_mass = 0;
@@ -512,9 +510,7 @@ impl State {
             }
         }
         let mut bay_sequence = anchor.bay_revision;
-        let budget = crate::equipment::definition()
-            .map_err(|_| INVALID)?
-            .equipment_units_capacity;
+        let stock = crate::equipment::definition().map_err(|_| INVALID)?;
         let mut previous = anchor.revision;
         check_prefix(
             anchor.revision,
@@ -522,7 +518,7 @@ impl State {
             cabin_mass,
             fitted_units,
             bay_sequence,
-            budget,
+            stock.for_player(world.xyzzy.medusa_at(anchor.revision)),
             &intervals,
         )?;
         let mut bonded_active = false;
@@ -555,7 +551,7 @@ impl State {
                 cabin_mass,
                 fitted_units,
                 bay_sequence,
-                budget,
+                stock.for_player(world.xyzzy.medusa_at(revision)),
                 &intervals,
             )?;
         }
@@ -607,17 +603,17 @@ fn check_fit(
     cabin_mass: u16,
     units: u16,
     bay_sequence: u64,
-    budget: u16,
+    definition: crate::equipment::Definition,
 ) -> Result<(), SaveError> {
     let bay = bay_sequence % 2 == 1;
     let capacity = if bay {
-        crate::equipment::EXPANDED_HOLD_TONNES
+        definition.base_hold_tonnes + definition.extra_hold_tonnes
     } else {
-        crate::equipment::STANDARD_HOLD_TONNES
+        definition.base_hold_tonnes
     };
     if cargo < 0
         || u32::from(cabin_mass) + u32::from(cargo as u16) > u32::from(capacity)
-        || units + u16::from(bay) > budget
+        || units + u16::from(bay) > definition.equipment_units_capacity
     {
         return Err(INVALID);
     }
@@ -630,7 +626,7 @@ fn check_prefix(
     cabin_mass: u16,
     units: u16,
     bay_sequence: u64,
-    budget: u16,
+    definition: crate::equipment::Definition,
     intervals: &[ReservationInterval],
 ) -> Result<(), SaveError> {
     let raw_mass = u16::try_from(cargo)
@@ -638,9 +634,9 @@ fn check_prefix(
         .and_then(|cargo| cargo.checked_add(cabin_mass))
         .ok_or(INVALID)?;
     let capacity = if bay_sequence % 2 == 1 {
-        crate::equipment::EXPANDED_HOLD_TONNES
+        definition.base_hold_tonnes + definition.extra_hold_tonnes
     } else {
-        crate::equipment::STANDARD_HOLD_TONNES
+        definition.base_hold_tonnes
     };
     for interval in intervals
         .iter()
@@ -656,7 +652,7 @@ fn check_prefix(
         cabin_mass,
         units,
         bay_sequence,
-        budget,
+        definition,
     )
 }
 
@@ -677,11 +673,13 @@ mod tests {
 
     #[test]
     fn every_prefix_must_fit_even_when_a_later_action_releases_capacity() {
-        assert_eq!(check_fit(0, 90, 18, 0, 24), Ok(()));
-        assert_eq!(check_fit(0, 95, 19, 0, 24), Err(INVALID));
-        assert_eq!(check_fit(0, 125, 25, 1, 24), Err(INVALID));
-        assert_eq!(check_fit(2, 120, 24, 1, 24), Err(INVALID));
-        assert_eq!(check_fit(2, 115, 23, 1, 24), Ok(()));
+        let stock =
+            crate::equipment::definition().unwrap_or_else(|e| panic!("stock equipment: {e:?}"));
+        assert_eq!(check_fit(0, 90, 18, 0, stock), Ok(()));
+        assert_eq!(check_fit(0, 95, 19, 0, stock), Err(INVALID));
+        assert_eq!(check_fit(0, 125, 25, 1, stock), Err(INVALID));
+        assert_eq!(check_fit(2, 120, 24, 1, stock), Err(INVALID));
+        assert_eq!(check_fit(2, 115, 23, 1, stock), Ok(()));
     }
 
     #[test]

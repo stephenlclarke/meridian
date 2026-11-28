@@ -1049,7 +1049,7 @@ impl State {
         }
         let player =
             super::super::flight_pose(m.flight.position, m.flight.orientation).ok_or(INVALID)?;
-        let data = world.station_data.as_ref().ok_or(INVALID)?;
+        let data = world.station_at_visit(o.owner.visit).ok_or(INVALID)?;
         let cleared = m.cleared
             || length(sub(m.position, player.position)) > data.player_clearance_radius() + 1e-6;
         let travel = (MISSILE_SPEED / 60.0).min((MISSILE_RANGE - m.travel).max(0.0));
@@ -1173,7 +1173,7 @@ impl State {
         motion_tick: u64,
     ) -> Result<(), SaveError> {
         let o = p.origin;
-        super::super::persistence::validate_flight(&m.flight)?;
+        super::super::persistence::validate_flight(world, &m.flight)?;
         if m.flight.tick != motion_tick
             || m.flight.mode != FlightMode::Flight
             || m.age.checked_add(1) != Some(p.age_ticks)
@@ -1429,7 +1429,7 @@ impl State {
             || emission <= p.origin.emission
             || shot.tick != p.last_tick
             || world
-                .front_weapon_at_tick(shot.fitted_item_id, shot.tick, emission)
+                .laser_weapon_at_tick(shot.fitted_item_id, shot.tick, emission)
                 .is_none()
             || id != p.origin.projectile
             || !valid_vector(shot.origin)

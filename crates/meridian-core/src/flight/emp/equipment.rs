@@ -107,7 +107,9 @@ impl World {
                 (0, 0)
             }
         };
-        let definition = crate::equipment::definition().map_err(|_| EmpError::BerthRequired)?;
+        let definition = account
+            .equipment_definition()
+            .map_err(|_| EmpError::BerthRequired)?;
         let site =
             super::super::services::service_site(dock.system()).ok_or(EmpError::BerthRequired)?;
         if definition.offer(site).technology < technology {

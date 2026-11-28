@@ -36,7 +36,7 @@ Authored new tests: source offers, cash/technology refusal, earned Intermediate 
 | Navigation: Basic, Intermediate (Advanced saved key), Advanced (Military saved key) | Born / two paid grades | Ready: 7/14/21 LY module reach with hull floor, actual fit and route history | Advanced; full original world/station scope remains |
 | Targeting: Basic, Advanced, Docking, Identification, Pirate, Military | Six paid grades and stored identities | Partial: docking and work/target controller exist; verify each tier's distinct source effect and native controls | Military; original automatic options remain open |
 | Mining and Salvage Targeting | Two independent paid modules require fitted core | Partial: rock hold, ore/wreck guidance; no positive complete salvage or ore intake | Both granted; custody and work closure open |
-| Lasers: Pulse, Beam, Mining, Military, Naval | Pulse born; four repeatable ordinary shop/held definitions; Naval reward or paid PLUGH-only listing | Partial: real front paths; other facings and dedicated native Mining utility open | Naval front; not all supported native facings |
+| Lasers: Pulse, Beam, Mining, Military, Naval | Pulse born; four repeatable ordinary shop/held definitions; Naval reward or paid PLUGH-only listing | Peregrine front and all four issued Medusa combat mounts accept individual fits. Asteroid extraction uses the front Mining Laser | Medusa issues four Naval Lasers that can be stored and refitted |
 | Ammunition: Standard Missile, Alien Seeker Missile | Standard paid and finite nine pylons on SH025; Alien Seeker requires recovered research then repeat procurement | Standard ready; alien round, salvage variants and compatible hull pylon count open | Finite standard refill only; no virtual infinite inventory |
 | Large Cargo Bay | Paid unique hull-bound expansion | Ready: actual SH025 92→127 t; full-hold removal refuses | Actual item granted; other hull expansion and unlimited cargo open |
 | Fuel Scoops | Paid unique fitted utility; source F-only test fit | Candidate: real solar fuel and cabin thermal effect; physical ore/cargo intake owner still open | Maximum and separate scoop-only action; [solar source and acceptance](SOLAR-FUEL-SCOOPS.md) |
@@ -54,6 +54,23 @@ Authored new tests: source offers, cash/technology refusal, earned Intermediate 
 | Lerr Isolation Programmer, Torenran Inspection Kit, Tow Interface Reference, Assembly Reference Instrument, Atlas Reference Watcher | Five acquisition-only physical mission loans, not retail or permanent personal equipment | Open: actual issuer, item custody, capacity and return | Never a generic secret grant |
 
 Basic fuel remains ordinary paid station service. Additional research recipes, physical salvage features, custom component tuning, passenger service, ordinary earned items and quest issue policies require their own source-to-runtime closure. The [existing XYZZY action inventory](XYZZY-ACTIONS.json) tracks non-equipment menu actions separately.
+
+## Fleet XYZZY Medusa
+
+In the ordinary Fleet game, open **Ctrl+Shift+X** at a berth. Review and confirm **Activate / refit SH171 Medusa**. The normal commander slot records the first test issue, uses the SH171 mesh and collision supports, and applies its flight controls. The 50.3 top speed and 18.0 acceleration come from the stock hull. **Continue** restores the issued hull and equipment. A pre-existing XYZZY commander keeps their cash, paid receipts and stored items. A first-time activation uses the existing once-only cash grant.
+
+| System | Issued configuration |
+| --- | --- |
+| Hull and cargo | 22 t stock hold and 10 t expansion. The issue checks actual cargo and outstanding reservations against the 32 t hold. |
+| Reactor and shields | 410 energy, Elite Energy Unit, Elite shields. The 4.7 energy/s base becomes 18.8/s with Elite fitted. The 300-unit base banks use the existing Elite shield multiplier. |
+| Flight computers | Advanced navigation and hyperspace drive, Military targeting, Mining and Salvage Targeting Modules. |
+| Tools and utilities | Individually replaceable Naval Lasers on all four facings, a stored Mining Laser for front tool work, Fuel Scoops, maximum-grade EMP and stock E.C.M. The Salvage Cutter uses the existing tool exchange when the mounts are occupied. |
+| Ammunition and fuel | Five loaded standard missiles. A former nine-pylon commander retains surplus rounds in storage under their original identities. The refit stores fitted auxiliary tanks and the cutter under their existing item IDs. It fills the 13.0 LY base tank. If more than 13.0 LY is aboard, the menu shows how much fuel to use before returning. |
+| Ownership | Paid items keep their receipts. New items and the hull use XYZZY provenance. The quest and PLUGH purchase have separate acquisition paths. |
+
+For wreck recovery, the targeting computer stops with the wreck’s near face inside the 85 m scoop reach and ahead of the lower-forward aperture. Manual recovery uses the same distance and requires a settled ship. Continue checks the transfer against the hull flown at the time.
+
+The frozen [SH171 flagship contract](../integration/sh171-medusa/MEDUSA-FLAGSHIP.json) records four laser facings, four utility mounts and 13 stock equipment units. Select front, rear, port or starboard with 0–3. All four draw from the same energy pool and share heat and cooldown. Survey gear, rescue and salvage beams, Alien Seeker ammunition and the source-specific alien attachment do not have ordinary Fleet equipment implementations here. The proposed 32 equipment units and candidate performance figures have no adopted fitting contract.
 
 ## SH171 Medusa compatibility
 

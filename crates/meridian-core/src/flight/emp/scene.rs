@@ -74,8 +74,7 @@ impl Scene {
         include_player: bool,
     ) -> Result<Option<(Victim, Vec3, f64)>, EmpError> {
         let data = world
-            .station_data
-            .as_ref()
+            .station_at_visit(self.owner.visit)
             .ok_or(EmpError::InvalidContact)?;
         let mut contacts = Vec::new();
         for body in &self.bodies {
@@ -83,6 +82,7 @@ impl Scene {
                 continue;
             }
             if let Some(distance) = data
+                .npc_geometry()
                 .player_beam_distance(body.pose, origin, direction, range)
                 .map_err(|_| EmpError::InvalidContact)?
             {
@@ -205,8 +205,7 @@ impl Scene {
         // The model centre can be the native fore/aft opening. Select a real hull
         // triangle, then retain the same nearest-surface, range and occlusion query.
         let player_surface = world
-            .station_data
-            .as_ref()
+            .station_at_visit(self.owner.visit)
             .ok_or(EmpError::InvalidContact)?
             .player_missile_aimpoint(self.player, primary.1)
             .map_err(|_| EmpError::InvalidContact)?;
@@ -272,7 +271,7 @@ impl Scene {
         {
             return Err(INVALID);
         }
-        let data = world.station_data.as_ref().ok_or(INVALID)?;
+        let data = world.station_at_visit(self.owner.visit).ok_or(INVALID)?;
         world.traffic.validate_emp_scene(
             &crate::traffic::MissileScene {
                 system: self.owner.system,
@@ -309,6 +308,57 @@ impl Scene {
                 bodies: &self.missiles,
             },
         )?;
+        Ok(())
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn live_medusa_emp_scene_uses_each_victims_own_surface()
+    -> Result<(), Box<dyn std::error::Error>> {
+        let mut world = World::new_commander(12005)?;
+        let review = world.review_xyzzy(crate::XyzzyAction::ActivateMedusa, 0)?;
+        world.prepare_xyzzy(review, 0)?.commit();
+        crate::flight::practice::tests::launch(&mut world);
+        for _ in 0..700 {
+            world.step(crate::FlightInput {
+                throttle: 1.0,
+                ..Default::default()
+            })?;
+        }
+        let state = world.snapshot();
+        let player =
+            crate::station::flight_pose(state.position, state.orientation).ok_or("player pose")?;
+        let owner = world.combat_identity().ok_or("commander")?;
+        let scene = Scene::capture(
+            &world.traffic,
+            &world.missiles,
+            world.combat.emissions,
+            owner,
+            player,
+            state.tick,
+            world.combat.physical_tick(),
+        )?;
+        let actor = scene.bodies.first().ok_or("traffic birth")?;
+        let geometry = world.station_data.as_ref().ok_or("station")?;
+        for (victim, pose, hull) in [
+            (Victim::Npc(actor.id), actor.pose, geometry.npc_geometry()),
+            (Victim::Player, player, geometry),
+        ] {
+            let origin = add(pose.position, Vec3::new(0.0, 500.0, 0.0));
+            let point = hull.player_missile_aimpoint(pose, origin)?;
+            let ray = unit(sub(point, origin)).ok_or("aim")?;
+            let distance = hull
+                .player_beam_distance(pose, origin, ray, 1000.0)?
+                .ok_or("native surface")?;
+            let contact = scene
+                .nearest(&world, origin, ray, 1000.0, None, true)?
+                .ok_or("EMP contact")?;
+            assert_eq!((contact.0, contact.2), (victim, distance));
+        }
         Ok(())
     }
 }

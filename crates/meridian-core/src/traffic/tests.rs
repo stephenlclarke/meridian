@@ -169,6 +169,15 @@ fn exact_native_ray_and_conservative_sweep_use_the_existing_sh025_physical_mesh(
     )));
     assert_eq!(contact.distance, exact);
     assert_eq!(contact.id, actor.id);
+    let medusa = ok(OriginalStationData::medusa_bundled());
+    assert_ne!(
+        ok(medusa.player_beam_distance(actor.pose(), origin, direction, 2000.0)),
+        Some(exact)
+    );
+    assert_eq!(
+        state.beam(&medusa, SystemId::AVENOR, origin, direction, 2000.0),
+        Some(contact)
+    );
     assert!(
         state
             .beam(&data, SystemId::RENAS, origin, direction, 2000.0)
@@ -178,13 +187,13 @@ fn exact_native_ray_and_conservative_sweep_use_the_existing_sh025_physical_mesh(
         SystemId::AVENOR,
         origin,
         add(actor.position, Vec3::new(0.0, 0.0, 1000.0)),
-        data.player_clearance_radius()
+        data.player_npc_clearance()
     ));
     assert!(state.player_motion_clear(
         SystemId::RENAS,
         origin,
         actor.position,
-        data.player_clearance_radius()
+        data.player_npc_clearance()
     ));
 }
 #[test]

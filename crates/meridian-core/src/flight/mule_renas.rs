@@ -68,7 +68,7 @@ impl World {
                 SystemId::RENAS,
                 actor.pose().position,
                 actor.pose().position,
-                actor.source().maximum_origin_radius(),
+                actor.source().maximum_origin_radius() * 2.0,
             )
         {
             return Err(StepError::UnsafeLaunch);

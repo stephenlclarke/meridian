@@ -4,6 +4,8 @@ use crate::station_services::{self as services, MarketSite};
 mod content;
 pub use content::{Definition, StationOffer, definition};
 
+pub(crate) const MEDUSA_HOLD_TONNES: u16 = 22;
+pub(crate) const MEDUSA_EXPANDED_HOLD_TONNES: u16 = 32;
 pub const STANDARD_HOLD_TONNES: u16 = 92;
 pub const EXPANDED_HOLD_TONNES: u16 = 127;
 

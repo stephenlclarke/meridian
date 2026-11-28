@@ -15,6 +15,7 @@ enum Kind {
     EcmLocalFlight,
     Pulse,
     Laser(super::OrdinaryWeapon),
+    FacingLaser(super::FlightView, super::OrdinaryWeapon),
     Mining(u8),
 }
 impl Kind {
@@ -78,10 +79,25 @@ impl State {
         self.append(clock, Kind::Laser(weapon))
             .map_err(|()| FireError::SequenceExhausted)
     }
+    pub(super) fn facing_laser(
+        &self,
+        clock: u64,
+        weapon: super::OrdinaryWeapon,
+        facing: super::FlightView,
+    ) -> Result<Self, FireError> {
+        if facing == super::FlightView::Front {
+            return self.laser(clock, weapon);
+        }
+        if !self.enabled || !weapon.is_laser() {
+            return Err(FireError::InvalidGeometry);
+        }
+        self.append(clock, Kind::FacingLaser(facing, weapon))
+            .map_err(|()| FireError::SequenceExhausted)
+    }
     pub(super) fn has_rapid_spend(&self) -> bool {
-        self.events
-            .iter()
-            .any(|event| matches!(event.kind, Kind::Laser(weapon) if weapon.cooldown_ticks() == 6))
+        self.events.iter().any(|event| {
+            matches!(event.kind, Kind::Laser(weapon) | Kind::FacingLaser(_, weapon) if weapon.cooldown_ticks() == 6)
+        })
     }
     pub(super) fn quiet_since(&self, tick: u64, anchor: u64, physical: u64) -> bool {
         let Some(elapsed) = tick.checked_sub(anchor) else {
@@ -164,6 +180,11 @@ impl State {
                 Kind::EcmLocalFlight => 8,
                 Kind::Pulse => 1,
                 Kind::Laser(weapon) => weapon.tag() + 1,
+                // Keep the original three Naval tags for saves from the first hull issue.
+                Kind::FacingLaser(view, super::OrdinaryWeapon::FrontNavalLaser) => {
+                    view.integral_tag(64)
+                }
+                Kind::FacingLaser(view, weapon) => view.integral_tag(67 + 3 * weapon.tag()),
                 Kind::Mining(body) => 32 + body,
             });
         }
@@ -184,6 +205,17 @@ impl State {
                 8 if version >= 17 => Kind::EcmLocalFlight,
                 tag @ 3..=6 if version >= 16 => {
                     Kind::Laser(super::OrdinaryWeapon::from_tag(tag - 1)?)
+                }
+                tag @ 64..=66 if version >= 17 => Kind::FacingLaser(
+                    super::medusa_lasers::INTEGRAL[usize::from(tag - 64)],
+                    super::OrdinaryWeapon::FrontNavalLaser,
+                ),
+                tag @ (67..=69 | 73..=81) if version >= 17 => {
+                    let offset = tag - 67;
+                    Kind::FacingLaser(
+                        super::medusa_lasers::INTEGRAL[usize::from(offset % 3)],
+                        super::OrdinaryWeapon::from_tag(offset / 3)?,
+                    )
                 }
                 tag @ 32..=43 if version >= 16 => Kind::Mining(tag - 32),
                 _ => return Err(INVALID),
@@ -246,14 +278,18 @@ impl State {
                     Effect::Mining
                 }
                 kind => {
-                    let weapon = match kind {
-                        Kind::Pulse => super::OrdinaryWeapon::FrontPulseLaser,
-                        Kind::Laser(weapon) => weapon,
+                    let (facing, weapon) = match kind {
+                        Kind::Pulse => (
+                            super::FlightView::Front,
+                            super::OrdinaryWeapon::FrontPulseLaser,
+                        ),
+                        Kind::Laser(weapon) => (super::FlightView::Front, weapon),
+                        Kind::FacingLaser(facing, weapon) => (facing, weapon),
                         _ => return Err(INVALID),
                     };
                     let fitted = world
                         .modular
-                        .front_at_physical(world, event.clock, next_emission)
+                        .laser_at_physical(world, facing, event.clock, next_emission)
                         .ok_or(INVALID)?;
                     if super::OrdinaryWeapon::from_module(fitted.kind) != Some(weapon) {
                         return Err(INVALID);
@@ -402,6 +438,10 @@ impl State {
             }
             events.push((clock, 4, 0, Effect::SolarFatal));
         }
+        if let Some((dock, _, _)) = world.xyzzy_medusa_issue() {
+            let clock = self.berth_clock(dock.sequence()).ok_or(INVALID)?;
+            events.push((clock, 0, u64::MAX, Effect::MedusaIssue));
+        }
         events.sort_by_key(|&(clock, phase, sequence, _)| (clock, phase, sequence));
         Ok(events)
     }
@@ -496,6 +536,39 @@ fn validate_laser_receipts(
         ordinary.clone(),
         player_beams.clone().map(|(_, _, emission)| emission),
     )?;
+    let mut practice_emissions = std::collections::BTreeSet::new();
+    for (tick, facing, emission) in world
+        .practice
+        .iter()
+        .chain(&world.practice_history)
+        .flat_map(|p| p.integral_hits())
+    {
+        let shot = spend(emission)?;
+        if world.laser_fit_at_tick(facing, tick, emission) != Some((shot.item, shot.weapon))
+            || shot.clock > tick
+            || end.checked_sub(shot.clock).ok_or(INVALID)?
+                > world.state.tick.checked_sub(tick).ok_or(INVALID)?
+            || !practice_emissions.insert(emission)
+            || ordinary.clone().any(|hit| hit.emission == emission)
+            || player_beams.clone().any(|(_, _, e)| e == emission)
+            || world
+                .missiles
+                .laser_interceptions()
+                .any(|(e, _)| e == emission)
+        {
+            return Err(INVALID);
+        }
+    }
+    for (emission, receipt) in world.missiles.laser_interceptions() {
+        let shot = spend(emission)?;
+        if shot.item != receipt.fitted_item_id
+            || shot.clock > receipt.tick
+            || end.checked_sub(shot.clock).ok_or(INVALID)?
+                > world.state.tick.checked_sub(receipt.tick).ok_or(INVALID)?
+        {
+            return Err(INVALID);
+        }
+    }
     for hit in ordinary {
         if hit.weapon.is_laser() {
             let shot = spend(hit.emission)?;
@@ -548,6 +621,7 @@ fn validate_exclusive_laser_targets(
 
 #[derive(Debug, Clone, Copy)]
 enum Effect {
+    MedusaIssue,
     Berth,
     ShieldFit(ShieldGrade),
     Laser(super::OrdinaryWeapon),
@@ -571,12 +645,23 @@ fn replay(events: &[ResourceEvent], end: u64) -> Result<Pools, SaveError> {
     };
     let mut clock = 0;
     let mut recharge = 7;
+    let mut capacity = super::weapons::ENERGY_CAPACITY_HUNDREDTHS;
     for &(at, phase, _, effect) in events {
-        advance_with_rate(&mut pools, at.checked_sub(clock).ok_or(INVALID)?, recharge);
+        advance_with_rate(
+            &mut pools,
+            clock,
+            at.checked_sub(clock).ok_or(INVALID)?,
+            recharge,
+            capacity,
+        );
         match effect {
             Effect::Berth => {
-                pools.pulse.replay_berth();
+                pools.pulse.replay_berth(capacity);
                 pools.shields.fill();
+            }
+            Effect::MedusaIssue => {
+                capacity = super::weapons::MEDUSA_ENERGY;
+                pools.pulse.replay_berth(capacity);
             }
             Effect::ShieldFit(grade) => pools.shields.refit(grade),
             Effect::Laser(weapon) => {
@@ -620,12 +705,22 @@ fn replay(events: &[ResourceEvent], end: u64) -> Result<Pools, SaveError> {
         }
         clock = at;
     }
-    advance_with_rate(&mut pools, end.checked_sub(clock).ok_or(INVALID)?, recharge);
+    advance_with_rate(
+        &mut pools,
+        clock,
+        end.checked_sub(clock).ok_or(INVALID)?,
+        recharge,
+        capacity,
+    );
     Ok(pools)
 }
-fn advance_with_rate(pools: &mut Pools, elapsed: u64, recharge: u16) {
-    pools.pulse.replay_advance_with_rate(elapsed, recharge);
-    pools.shields.advance(elapsed);
+fn advance_with_rate(pools: &mut Pools, start: u64, elapsed: u64, recharge: u16, capacity: u16) {
+    pools
+        .pulse
+        .replay_advance_with_rate(start, elapsed, recharge, capacity);
+    pools
+        .shields
+        .advance_for_hull(start, elapsed, capacity == super::weapons::MEDUSA_ENERGY);
 }
 
 #[cfg(test)]
@@ -633,7 +728,13 @@ mod tests;
 
 #[cfg(test)]
 fn advance(pools: &mut Pools, elapsed: u64) {
-    advance_with_rate(pools, elapsed, 7);
+    advance_with_rate(
+        pools,
+        0,
+        elapsed,
+        7,
+        super::weapons::ENERGY_CAPACITY_HUNDREDTHS,
+    );
 }
 
 #[cfg(test)]

@@ -218,9 +218,24 @@ pub struct OriginalStationData {
     hull: CollisionMesh,
     port: DockingPort,
     medusa: Option<Box<[SmoothPiece]>>,
+    npc_geometry: Option<Box<Self>>,
 }
 
 impl OriginalStationData {
+    /// Local traffic actors always use the stock SH025 mesh and station launch geometry.
+    pub(crate) fn npc_geometry(&self) -> &Self {
+        self.npc_geometry.as_deref().unwrap_or(self)
+    }
+    pub(crate) fn player_npc_clearance(&self) -> f64 {
+        self.player_clearance_radius() + self.npc_geometry().player_clearance_radius()
+    }
+    pub(crate) fn player_geometry_at(&self, visit: u64, issue_berth: Option<u64>) -> &Self {
+        if issue_berth.is_some_and(|berth| visit <= berth) {
+            self.npc_geometry()
+        } else {
+            self
+        }
+    }
     pub(crate) fn player_radius(&self) -> f64 {
         self.hull.radius
     }
@@ -265,6 +280,7 @@ impl OriginalStationData {
             hull,
             port: docking,
             medusa,
+            npc_geometry: None,
         };
         if !result
             .port

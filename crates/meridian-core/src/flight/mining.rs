@@ -87,10 +87,18 @@ impl World {
         let Some(identity) = self.combat_identity() else {
             return true;
         };
-        self.mining_motion_clear_with(&self.mining, identity.system, before, after, angular)
+        Self::mining_motion_clear_with(
+            self.station_data.as_ref(),
+            &self.mining,
+            identity.system,
+            before,
+            after,
+            angular,
+        )
     }
     pub(super) fn mining_motion_clear_at_step(
         &self,
+        data: &crate::station::OriginalStationData,
         system: SystemId,
         tick: u64,
         before: RigidPose,
@@ -100,10 +108,17 @@ impl World {
         if system != SystemId::AVENOR || !self.mining.enabled() {
             return true;
         }
-        self.mining_motion_clear_with(&self.mining.at_step(tick), system, before, after, angular)
+        Self::mining_motion_clear_with(
+            Some(data),
+            &self.mining.at_step(tick),
+            system,
+            before,
+            after,
+            angular,
+        )
     }
     fn mining_motion_clear_with(
-        &self,
+        data: Option<&crate::station::OriginalStationData>,
         mining: &crate::mining::State,
         system: SystemId,
         before: RigidPose,
@@ -113,7 +128,7 @@ impl World {
         if system != SystemId::AVENOR || !mining.enabled() {
             return true;
         }
-        self.station_data.as_ref().is_some_and(|data| {
+        data.is_some_and(|data| {
             mining
                 .bodies()
                 .into_iter()

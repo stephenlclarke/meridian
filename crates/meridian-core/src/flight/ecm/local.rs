@@ -549,8 +549,7 @@ impl Local {
         steps: &[LaunchStep],
     ) -> Result<Option<u64>, SaveError> {
         let start = world
-            .station_data
-            .as_ref()
+            .station_at_visit(v.owner.visit)
             .ok_or(INVALID)?
             .launch_start()
             .map_err(|_| INVALID)?;
