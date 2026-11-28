@@ -456,6 +456,12 @@ const DESCRIPTORS: &[StockDescriptor] = &[
         0xe495_9d18_e239_9d2d
     ),
     stock_package!(
+        "SH108",
+        "Besra",
+        "integration/sh108-besra/BESRA-STUDIO.json",
+        0xd534_016b_efc4_950c
+    ),
+    stock_package!(
         "SH109",
         "Hippo",
         "integration/sh109-hippo/HIPPO-STUDIO.json",
@@ -815,11 +821,11 @@ mod tests {
     #[test]
     fn every_stock_descriptor_authenticates_its_own_source_and_real_preview() {
         let catalogue = ok(crate::docked_screens::Catalogue::bundled());
-        assert_eq!(STOCK_MODELS.len(), 109);
+        assert_eq!(STOCK_MODELS.len(), 110);
         for held in [
-            "SH082", "SH102", "SH103", "SH108", "SH112", "SH113", "SH114", "SH115", "SH116",
-            "SH117", "SH118", "SH119", "SH120", "SH121", "SH122", "SH123", "SH124", "SH125",
-            "SH141", "SH156", "SH161", "SH162", "SH164",
+            "SH082", "SH102", "SH103", "SH112", "SH113", "SH114", "SH115", "SH116", "SH117",
+            "SH118", "SH119", "SH120", "SH121", "SH122", "SH123", "SH124", "SH125", "SH141",
+            "SH156", "SH161", "SH162", "SH164",
         ] {
             assert!(
                 !STOCK_MODELS.iter().any(|model| model.object == held),
@@ -1020,6 +1026,15 @@ mod tests {
         stock.object = "SH023".into();
         stock.geometry_key = SPARROWHAWK_GEOMETRY_KEY.into();
         assert!(ok(stock_visual_for(&stock)).is_none());
+    }
+
+    #[test]
+    fn besra_keeps_its_original_meshes_in_stock_and_local_inspection() {
+        let entry = descriptor("SH108");
+        let hull = ok(HullPackage::from_json(entry.package));
+        assert_eq!(hull.detail.triangles.len(), 4_044);
+        assert_eq!(hull.native.triangles.len(), 208);
+        assert_stock_and_local(entry.model.object, entry.model.geometry_key);
     }
 
     #[test]
