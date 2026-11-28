@@ -648,6 +648,12 @@ const DESCRIPTORS: &[StockDescriptor] = &[
         0xbdde_60da_7833_232e
     ),
     stock_package!(
+        "SH156",
+        "Lion Bastion",
+        "integration/sh156-lion-bastion/ORIGINAL-INSPECTION.json",
+        0x473f_b0ee_ee99_d94f
+    ),
+    stock_package!(
         "SH157",
         "Wolf Scout",
         "integration/sh157-wolf-scout/WOLF-SCOUT-STUDIO.json",
@@ -815,11 +821,11 @@ mod tests {
     #[test]
     fn every_stock_descriptor_authenticates_its_own_source_and_real_preview() {
         let catalogue = ok(crate::docked_screens::Catalogue::bundled());
-        assert_eq!(STOCK_MODELS.len(), 109);
+        assert_eq!(STOCK_MODELS.len(), 110);
         for held in [
             "SH082", "SH102", "SH103", "SH108", "SH112", "SH113", "SH114", "SH115", "SH116",
             "SH117", "SH118", "SH119", "SH120", "SH121", "SH122", "SH123", "SH124", "SH125",
-            "SH141", "SH156", "SH161", "SH162", "SH164",
+            "SH141", "SH161", "SH162", "SH164",
         ] {
             assert!(
                 !STOCK_MODELS.iter().any(|model| model.object == held),
@@ -1020,6 +1026,16 @@ mod tests {
         stock.object = "SH023".into();
         stock.geometry_key = SPARROWHAWK_GEOMETRY_KEY.into();
         assert!(ok(stock_visual_for(&stock)).is_none());
+    }
+
+    #[test]
+    fn lion_bastion_stock_and_local_preview_retain_the_source_geometry() {
+        let entry = descriptor("SH156");
+        let package = ok(HullPackage::from_json(entry.package));
+        assert_eq!(package.schema, 2);
+        assert_eq!(package.detail.triangles.len(), 4_072);
+        assert_eq!(package.native.triangles.len(), 904);
+        assert_stock_and_local(entry.model.object, entry.model.geometry_key);
     }
 
     #[test]

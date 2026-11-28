@@ -1,0 +1,40 @@
+{
+  "id": "SH156",
+  "name": "Lion Bastion",
+  "kind": "platform",
+  "revision": "0d8cc9ebe0018bf74b0d9fa10ef23b70339dd6b0",
+  "inputs": {
+    "resource.toml": {
+      "source": "Sources/L337Core/Resources/Ships/SH156.toml",
+      "sha256": "e464bb2d70ac42037fcc898cd2f59cf1243b1e4f7d9517df2da71b2fd5fe8505",
+      "bytes": 597760
+    },
+    "native-export.json": {
+      "source": "Sources/L337Core/Resources/OriginalFleetShowroomModels/SH156.json",
+      "sha256": "ed9595b62043ab5fe02e8f0883dd937e91f9d398d7f1500994cd72741e031025",
+      "bytes": 100574
+    },
+    "contract.toml": {
+      "source": "docs/fleet-design-v2/ships/SH156.toml",
+      "sha256": "9f023a5547867793485716c3a19a2ee73edc08988d6666ec6dadbdb8568b1bfc",
+      "bytes": 1679
+    },
+    "engineering.json": {
+      "source": "Sources/L337Core/Resources/OriginalFleetPhysical/SH156.json",
+      "sha256": "b07c553bb8b41ca866bfc4da2ea41928faedde61e1c589cd8e6432e2b6120273",
+      "bytes": 170314
+    },
+    "LICENSE": {
+      "source": "LICENSE",
+      "sha256": "033b7058d73f22c3c6b8a5825eb866ca2d67088f3ee94dd5f3e46da59d624766",
+      "bytes": 1071
+    }
+  },
+  "nativeRegistrationMatches": true,
+  "geometryHashMatches": true,
+  "selectedNativeFaces": 904,
+  "archivedNativeFaces": 904,
+  "detailedFaces": 4072,
+  "originalScale": 52.97233666862861,
+  "finiteDrySourceFiles": []
+}
