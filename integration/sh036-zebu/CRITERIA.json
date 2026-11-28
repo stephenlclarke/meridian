@@ -1,0 +1,139 @@
+{
+  "hull": "SH036 Zebu",
+  "status": "ORIGINAL_SOURCE_AND_EXPORT_PRESERVED;STOCK_INSPECTION_CANDIDATE;OPERATIONAL_UNASSIGNED",
+  "legacyRevision": "0d8cc9ebe0018bf74b0d9fa10ef23b70339dd6b0",
+  "sourceManifest": "assets/fleet/sh036/SOURCE-GEOMETRY.json",
+  "sourceUnits": "metres",
+  "metresPerSourceUnit": 1,
+  "detailed": {"vertices": 1790, "triangles": 3468, "components": 28},
+  "native": {"vertices": 114, "triangles": 192, "components": 9, "maximumFaces": 512},
+  "supportGroups": 24,
+  "roundingMetres": 0.02,
+  "originalTextures": {
+    "l337-patrol-diffuse": "9699517d12b4fbbb28746e00bed9ee65c19a098d14402b1d5160280c6f6bfc54",
+    "l337-strike-diffuse": "e56f149228caf90237a652d720ae549768bde1056af3d903dc8a5c243ad26e97",
+    "l337-service-details": "35edd84f6ce527195dd8a9bcc039521a6efc5aa2333452bbbc30217b8372103d"
+  },
+  "engineering": {
+    "active": null,
+    "referenceDryMassKg": 64051,
+    "referenceOnly": true,
+    "budget": "assets/fleet/sh036/engineering-budget.json",
+    "finiteDry": "assets/fleet/sh036/finite-dry-reference.json",
+    "nativeQualification": false,
+    "operatingAuthority": false,
+    "loadedState": "UNASSIGNED"
+  },
+  "campaignPlacement": "UNASSIGNED; authored catalogue and acquisition proposals are not game entitlement",
+  "surfaceFit": {
+    "method": "Certified exposed rounded support samples as strict lower bounds; complete fan patch upper certificates including buried portions for both source meshes; no surface fit inferred from vertices alone",
+    "report": "integration/sh036-zebu/SURFACE-FIT.json",
+    "sha256": "380fed42a6851afbc710abf8385f71b677c7e67cd853f0899b3a46065481990d",
+    "detailedMillimetres": {"strictExposedLower": 546, "fullUpper": 691},
+    "nativeMillimetres": {"strictExposedLower": 4980, "fullUpper": 4989},
+    "refinementDepth": 8,
+    "originalDifference": "integration/sh036-zebu/ORIGINAL-DIFFERENCE.json",
+    "originalDifferenceSha256": "ef378e962ea4d2da244af71f43c7b56283871aa099000b867c9a19fdfd9a0c36",
+    "originalDifferenceLowerMillimetres": {"nativeVertexToDetailed": 88, "detailedVertexToNative": 4967},
+    "execution": {
+      "host": "SteveMBA",
+      "utcStarted": "2026-11-19T10:38:47Z",
+      "utcCompleted": "2026-11-19T10:38:57Z",
+      "python": "3.14.3 (assertions enabled)",
+      "numpy": "2.5.5",
+      "scipy": "1.18.1",
+      "trimesh": "5.2.1",
+      "rtree": "1.4.1",
+      "byteReplay": true,
+      "canonicalOutputReplayCompletedUtc": "2026-11-19T10:51:13Z",
+      "toolHashes": {
+        "tools/measure_zebu_surface_fit.py": "437a03993b82108992d3bd53acc2f04fa8df99af64923195d98c4616959a4455",
+        "tools/measure_goshawk_surface_fit.py": "5407ef1e5fad41810aa95444ca1338fe33a91e5c9857dcb752b4e4cf2fca6d0b"
+      }
+    }
+  },
+  "stationSweep": {
+    "station": "SH028",
+    "sourceSha256": "cd54d30cab638f6b33feacf1fa78c9136f8ce346e8cc6133259bfc0472c259d5",
+    "fixture": "integration/sh036-zebu/STATION-FIXTURE.json",
+    "fixtureSha256": "e0784908e0a04e20530e51e12b85520b88dc2d697f8bbb4c304a49d991b53d9c",
+    "report": "integration/sh036-zebu/STATION-RESULT.json",
+    "reportSha256": "d0e964668ec684e954d2b82cbdb2fb606e5c3be4871417dd579908ba60b841d3",
+    "toolSha256": "3391684368d22bd04eb2d2c9c207a9da4f194d39157b31ee536086b6b98f3fc4",
+    "alignedNetMillimetres": 39038,
+    "offsetInitialNetMillimetres": 1159,
+    "nativeLocalVertex": 31,
+    "originalStationFace": 482,
+    "stationContactPointMetres": [69.9,5.03,136.32],
+    "actorCentreZAtWitnessMetres": 161.82,
+    "fixedOrientationOnly": true,
+    "byteReplayOnSteveMBA": true,
+    "actualGameSweepQualified": false
+  },
+  "rawCheckoutProtection": {
+    "physicalSourceAttributes": "assets/fleet/sh036/.gitattributes * -text; root assets/legacy/** -text; integration/sh036-zebu/.gitattributes *.json -text; three explicitly pinned certificate tools text eol=lf",
+    "forcedCoreAutocrlfTrueCheckout": "26 pinned repository inputs retained exact bytes; unrelated Python control retained normal CRLF conversion"
+  },
+  "canonicalReportOutput": {
+    "format": "UTF-8/LF bytes emitted directly to binary redirected stdout",
+    "priorWindowsHead": "8e7f7b7e9c0ae4ba2bdeed3dc594686d2b283dc5",
+    "priorWindowsStationOutput": {"bytes": 1007, "crlfSequences": 38, "expectedCanonicalBytes": 969, "explicitLFExact": true},
+    "regression": "Simulated CRLF-translating text stdout fails for prior station and all three fit CLI modes; passes with the canonical byte writer, along with actual redirected station subprocess",
+    "unchangedReportsReplayedOnSteveMBA": true,
+    "nativeWindowsCorrectedHeadReplay": "Original ba74d309 passed seven focused tests and the raw station report on Windows. The original Windows run did not compare both numerical report files."
+  },
+  "hullStudio": {
+    "definition": "integration/sh036-zebu/ZEBU-STUDIO.json",
+    "definitionSha256": "390218fe32ae2efb75a9c24de051c091143b52f8c432c927c959e7f3f233cd56",
+    "witnesses": "integration/sh036-zebu/CONTACT-WITNESSES.json",
+    "witnessesSha256": "6a41a70002a5281a9ad81c8909bf63a4d90612c6170a314e5322a4a3708367b1",
+    "installedExport": {
+      "utcDate": "2026-11-19",
+      "host": "StevesM5Pro",
+      "validatorSha256": "8800efb734ca5b8123ae88b1ab06aa62f1e22f37975cd6230f88581f69cf76e7",
+      "launcherSha256": "ee1e6e307707a385c7ad24e00cbcce589f5ab0762e31b474720715f62c146f9f",
+      "bundleSignatureVerified": true,
+      "export": {"bytes": 443654, "sha256": "191cd027ddb4d908bf256237de1956f89ad447f31cd65e96b6245c31ccca5c9b"},
+      "positiveReport": {"bytes": 59896, "sha256": "4c8ba190814be7afdddbf27c08b40732d2577d81efdd298c5699b4e2c3afcc05", "exit": 0},
+      "negativeInput": {"bytes": 443935, "sha256": "fd781f546313bd69b5231c26cf3b76fc4e833220e6ce21abdd5ab98ae6430900"},
+      "negativeReport": {"bytes": 152745, "sha256": "461c3b8b834c603e58157a5f4e43b03f70316ab5299ee0631e8a853a66a275a9", "exit": 1},
+      "openingProbesPassed": 3,
+      "contactProbesRefused": 3,
+      "supportPointsExactlyMatchAuthoredMeshes": true,
+      "byteReplayExportAndReports": true,
+      "gameLaunch": false
+    }
+  },
+  "execution": {
+    "sourceReplay": "python3 -B tools/prepare_zebu_studio.py --check",
+    "focusedTests": "python3 -B -m unittest discover -s tools -p test_prepare_zebu_studio.py -v",
+    "stationProofReplay": "python3 -B tools/verify_zebu_station.py | cmp - integration/sh036-zebu/STATION-RESULT.json",
+    "surfaceFitReplay": "python3 -B tools/measure_zebu_surface_fit.py | cmp - integration/sh036-zebu/SURFACE-FIT.json",
+    "originalDifferenceReplay": "python3 -B tools/measure_zebu_surface_fit.py --difference | cmp - integration/sh036-zebu/ORIGINAL-DIFFERENCE.json",
+    "installedExportReplay": "python3 -B tools/verify_zebu_studio_export.py --studio <studio-executable> --validator <bundled-validator> --output <new-evidence-directory>",
+    "ownedNative": "Search SH036 or Zebu in the station Showroom. The candidate binds the stock selection to the archived Studio export and includes a production station sweep regression."
+  },
+  "stockScope": "Station inspection. Original physical budgets are reference data. A one-group collision control blocks all three source passages.",
+  "replayPins": {
+    "integration/sh036-zebu/CERTIFIED-FIT.json": "77b75484474bf598d820386d35032cfb718291fa7e4e71f2441a10b000f9b45e",
+    "integration/sh036-zebu/CERTIFIED-DIFFERENCE.json": "4b26a6fce0c7f88059375a02016e2e5cfdebdbb101d0690610ae02b555fdd622",
+    "integration/sh036-zebu/SUPPORT-FAN.json": "cdea3bf34967ae6f694b59d6f38cbc63288eda0bb5b5c9dbca8aa74052676b29",
+    "integration/sh036-zebu/SURFACE-FIT.json": "380fed42a6851afbc710abf8385f71b677c7e67cd853f0899b3a46065481990d",
+    "integration/sh036-zebu/ORIGINAL-DIFFERENCE.json": "ef378e962ea4d2da244af71f43c7b56283871aa099000b867c9a19fdfd9a0c36",
+    "integration/sh036-zebu/STATION-RESULT.json": "d0e964668ec684e954d2b82cbdb2fb606e5c3be4871417dd579908ba60b841d3",
+    "tools/measure_zebu.py": "1873819683ff0e0c7c2c522ec99323589866d30743131373e8e9d6a3f36a05d2",
+    "tools/measure_zebu_surface_fit.py": "437a03993b82108992d3bd53acc2f04fa8df99af64923195d98c4616959a4455",
+    "tools/prepare_zebu_studio.py": "68d7f59ebf6c712466dd6d9fb8b589ddc87ecbfad51e07eb90a9f7e5aba73dcc",
+    "tools/verify_zebu_station.py": "3391684368d22bd04eb2d2c9c207a9da4f194d39157b31ee536086b6b98f3fc4",
+    "tools/measure_goshawk_surface_fit.py": "5407ef1e5fad41810aa95444ca1338fe33a91e5c9857dcb752b4e4cf2fca6d0b",
+    "tools/vulture_mk_i_exact_fit.py": "479b31f8714a198a82c0e2888b8d19efe46c7b4c43a576b83ab84c571ae738c6",
+    "tools/encode_goshawk_visual.py": "9e524e9a32a237d71d212c8b5c34ecf12cde5a8e08885b1d03991b95c278f61c",
+    "tools/import_goshawk_envelope_source.py": "14b530725629ee3eaa5b3fd69f01fe00fe371564a1a52cb398d3969142db977e"
+  },
+  "byteReplay": {
+    "commands": [
+      "python3 -B tools/measure_zebu.py | cmp - integration/sh036-zebu/CERTIFIED-FIT.json",
+      "python3 -B tools/measure_zebu.py --difference | cmp - integration/sh036-zebu/CERTIFIED-DIFFERENCE.json"
+    ]
+  }
+}

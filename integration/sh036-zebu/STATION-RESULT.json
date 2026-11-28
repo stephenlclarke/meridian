@@ -1,0 +1,38 @@
+{
+  "hull": "SH036",
+  "station": "SH028",
+  "method": "Exact original binary64 rational AABB separating axes for full translation; rounded supports plus 1 mm guard. Exact half-turn native vertex intersection with station lip triangle interior.",
+  "aligned": {
+    "netMillimetres": 39038,
+    "limitingPiece": 9,
+    "limitingStationFace": 452,
+    "stationLipZMetres": [
+      134.32,
+      136.32
+    ],
+    "guardedFirstLeadingEdgeZMetres": 137.479,
+    "guardedLastTrailingEdgeZMetres": 133.111
+  },
+  "offsetStart": {
+    "netMillimetres": 1159,
+    "limitingPiece": 1,
+    "limitingStationFace": 480
+  },
+  "nativeLipCrossing": {
+    "nativeLocalVertex": 31,
+    "nativeGlobalVertex": 1821,
+    "stationFace": 482,
+    "fraction": 0.3933333333333356,
+    "actorCentreZMetres": 161.82,
+    "pointMetres": [
+      69.9,
+      5.03,
+      136.32
+    ],
+    "barycentrics": [
+      0.1099999999999931,
+      0.3380200066137635,
+      0.5519799933862434
+    ]
+  }
+}
