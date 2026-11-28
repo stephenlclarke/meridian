@@ -205,7 +205,7 @@ fn exact_catalogue_taxonomy_is_162_ships_not_171_ships() {
     assert_eq!(c.worlds.len(), 2048);
     assert_eq!(c.objects.len(), 171);
     assert_eq!(c.ship_count(), 162);
-    assert_eq!(c.search_showroom("").len(), 166);
+    assert_eq!(c.search_showroom("").len(), 167);
     assert_eq!(c.object("SH028").map(|o| o.kind), Some("station"));
     assert_eq!(c.object("SH025").map(|o| o.name), Some("Peregrine Mk V"));
     assert!(c.search_showroom("SH028").is_empty());
@@ -616,6 +616,16 @@ fn wolf_citadel_showroom_inspection_preserves_catalogue_kind_and_refuses_exchang
         "Wolf Citadel",
         "station",
         "integration/sh161-wolf-citadel/ORIGINAL-INSPECTION.json",
+    );
+}
+
+#[test]
+fn larvaal_probe_showroom_inspection_preserves_catalogue_kind_and_refuses_exchange() {
+    assert_inspection_only_catalogue_object(
+        "SH162",
+        "Larvaal Probe",
+        "other",
+        "integration/sh162-larvaal-probe/ORIGINAL-INSPECTION.json",
     );
 }
 
