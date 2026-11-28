@@ -1,0 +1,40 @@
+{
+  "id": "SH162",
+  "name": "Larvaal Probe",
+  "kind": "other",
+  "revision": "0d8cc9ebe0018bf74b0d9fa10ef23b70339dd6b0",
+  "inputs": {
+    "resource.toml": {
+      "source": "Sources/L337Core/Resources/Ships/SH162.toml",
+      "sha256": "7f154b524fe32215311e1dc75a5ccb9deed133ed78f0dad8073becd0c8890ad6",
+      "bytes": 241879
+    },
+    "native-export.json": {
+      "source": "Sources/L337Core/Resources/OriginalFleetShowroomModels/SH162.json",
+      "sha256": "5d80c28c34940d8c9b0cb77ea0034debc4a73e9fa42be6485bd2992d0bdfbe77",
+      "bytes": 64283
+    },
+    "contract.toml": {
+      "source": "docs/fleet-design-v2/ships/SH162.toml",
+      "sha256": "243c15f460f4c990a2e4d9573ab6ea4ae24168477c68d7345139e1fe6dc28e59",
+      "bytes": 1645
+    },
+    "engineering.json": {
+      "source": "Sources/L337Core/Resources/OriginalFleetPhysical/SH162.json",
+      "sha256": "74c75edfec6fb3243bd2a6d4497ffebfe6f8d5353d1dd7e388d8eee7b7df8d67",
+      "bytes": 5277
+    },
+    "LICENSE": {
+      "source": "LICENSE",
+      "sha256": "033b7058d73f22c3c6b8a5825eb866ca2d67088f3ee94dd5f3e46da59d624766",
+      "bytes": 1071
+    }
+  },
+  "nativeRegistrationMatches": true,
+  "geometryHashMatches": true,
+  "selectedNativeFaces": 596,
+  "archivedNativeFaces": 596,
+  "detailedFaces": 1524,
+  "originalScale": 5.82901460022432,
+  "finiteDrySourceFiles": []
+}

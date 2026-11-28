@@ -816,6 +816,12 @@ const DESCRIPTORS: &[StockDescriptor] = &[
         0xf324_9afc_b1ab_990d
     ),
     stock_package!(
+        "SH162",
+        "Larvaal Probe",
+        "integration/sh162-larvaal-probe/ORIGINAL-INSPECTION.json",
+        0x6c30_5e1d_58a3_6823
+    ),
+    stock_package!(
         "SH163",
         "Lammergeier",
         "integration/sh163-lammergeier/LAMMERGEIER-STUDIO.json",
@@ -959,10 +965,10 @@ mod tests {
     #[test]
     fn every_stock_descriptor_authenticates_its_own_source_and_real_preview() {
         let catalogue = ok(crate::docked_screens::Catalogue::bundled());
-        assert_eq!(STOCK_MODELS.len(), 126);
+        assert_eq!(STOCK_MODELS.len(), 127);
         for held in [
             "SH102", "SH112", "SH113", "SH114", "SH115", "SH116", "SH117", "SH118", "SH119",
-            "SH120", "SH121", "SH122", "SH123", "SH124", "SH125", "SH162", "SH164",
+            "SH120", "SH121", "SH122", "SH123", "SH124", "SH125", "SH164",
         ] {
             assert!(
                 !STOCK_MODELS.iter().any(|model| model.object == held),
@@ -1507,6 +1513,16 @@ mod tests {
         assert_eq!(package.schema, 2);
         assert_eq!(package.detail.triangles.len(), 2_052);
         assert_eq!(package.native.triangles.len(), 788);
+        assert_stock_and_local(entry.model.object, entry.model.geometry_key);
+    }
+
+    #[test]
+    fn larvaal_probe_stock_and_local_preview_retain_the_source_geometry() {
+        let entry = descriptor("SH162");
+        let package = ok(HullPackage::from_json(entry.package));
+        assert_eq!(package.schema, 2);
+        assert_eq!(package.detail.triangles.len(), 1_524);
+        assert_eq!(package.native.triangles.len(), 596);
         assert_stock_and_local(entry.model.object, entry.model.geometry_key);
     }
 
