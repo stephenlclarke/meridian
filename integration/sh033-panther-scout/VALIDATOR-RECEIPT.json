@@ -1,0 +1,90 @@
+{
+  "validatorSHA256": "fef5d09229091438a0118182b23434f985f504ee78702185d554761b960f5477",
+  "positive": {
+    "label": "original Scout open paths",
+    "exitCode": 0,
+    "clearances": [
+      {
+        "name": "Port arch opening",
+        "passed": true
+      },
+      {
+        "name": "Starboard arch opening",
+        "passed": true
+      },
+      {
+        "name": "Port Scout upper opening",
+        "passed": true
+      },
+      {
+        "name": "Starboard Scout upper opening",
+        "passed": true
+      }
+    ],
+    "diagnostics": []
+  },
+  "negative": [
+    {
+      "label": "keel",
+      "exitCode": 1,
+      "clearances": [
+        {
+          "name": "keel",
+          "passed": false
+        }
+      ],
+      "diagnostics": [
+        {
+          "message": "Clearance keel is blocked or indeterminate"
+        }
+      ]
+    },
+    {
+      "label": "scout-survey-spine",
+      "exitCode": 1,
+      "clearances": [
+        {
+          "name": "scout-survey-spine",
+          "passed": false
+        }
+      ],
+      "diagnostics": [
+        {
+          "message": "Clearance scout-survey-spine is blocked or indeterminate"
+        }
+      ]
+    },
+    {
+      "label": "left-scout-sail",
+      "exitCode": 1,
+      "clearances": [
+        {
+          "name": "left-scout-sail",
+          "passed": false
+        }
+      ],
+      "diagnostics": [
+        {
+          "message": "Clearance left-scout-sail is blocked or indeterminate"
+        }
+      ]
+    },
+    {
+      "label": "right-scout-sail",
+      "exitCode": 1,
+      "clearances": [
+        {
+          "name": "right-scout-sail",
+          "passed": false
+        }
+      ],
+      "diagnostics": [
+        {
+          "message": "Clearance right-scout-sail is blocked or indeterminate"
+        }
+      ]
+    }
+  ],
+  "sourcePackageSHA256": "95bff56994a82e320ce4df5610087838bed9aaae1c70d928d8e1fc58cd860899",
+  "fixtureSHA256": "389103167825a301322414f8261605dad03fe38cb490cd37afea07a4738ec7a3"
+}

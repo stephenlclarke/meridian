@@ -127,3 +127,7 @@ The [Newt capsule](../integration/sh040-newt-escape-pod/README.md) can be select
 ## Zebu stock inspection
 
 Search for **SH036** or **Zebu** in the station Showroom. The stock entry opens the original long-haul trader with its detailed artwork, 192-face native mesh and three texture maps. The 64,051 kg engineering budget remains a source reference. The stock package supplies no active engineering mass. The [Zebu hull record](ZEBU-GAMEPLAY-ENVELOPE.md) gives the measured differences between the meshes and the station clearance.
+
+## Panther Scout stock inspection
+
+Search for **SH033** or **Panther Scout** in the station Showroom. The forest-ivory Scout retains its survey spine, paired sails and original 320-face native mesh. Its 35 rounded supports leave four passages open. The [Scout hull record](../integration/sh033-panther-scout/README.md) gives the source measurements and contact checks.
