@@ -1,5 +1,7 @@
 # Implementation and validation status
 
+The current desktop uses the [number row and Control shortcuts](../README.md#controls) for missiles, training, saves and fullscreen. Earlier qualification entries record the keys used by their named builds.
+
 PR #232 merged the flyable Medusa, Hull Studio, 115 selectable Showroom models and bulk trading. The local Mac build at `78bb0eba` passed Developer ID, notarisation and Gatekeeper checks for all three apps. The Medusa flight test retained its original hull, speed and expanded hold after a cold restart. Native Windows reproduced all 288 hull measurements across 104 hull directories. [Player guide](PREVIEW-RELEASES.md#fleet-medusa-and-hull-studio)
 
 The scanner development branch adds distance-ordered Tab selection and manual designation without a targeting computer. Basic targeting aligns the ship. Advanced targeting can fly a work approach. Fitted docking and work modules enable the corresponding automatic sequence. Mac CI passed for the signed local Scanner Preview at `53e2210a`. Its Metal playtest selected a released ore fragment, switched from manual to assisted control, and saved the collected Alloys. Linux and native Windows tests covered hand-flown mining, scooping, salvage and occupied-ship review. The combined main build passed all required platform, coverage and Sonar checks. [Scanner Preview 11](https://github.com/stephenlclarke/meridian/releases/tag/v0.11.0-preview.1) was published on 26 November 2026 and all four downloads were verified.
@@ -10,9 +12,13 @@ The development save store explicitly unlocks on close. Dell Linux reproduced th
 
 The Fleet XYZZY development change issues an SH171 Medusa to the ordinary commander slot through the testing menu. It includes a five-position missile rack, an expanded 32 t hold, fitted systems, and a test issue tied to the berth and account revision that survives Continue. [Equipment and acceptance scope](EQUIPMENT-PLAYABLE.md#fleet-xyzzy-medusa)
 
-## Fleet Medusa four-facing laser candidate
+## Ordinary cockpit viewport
 
-The ordinary XYZZY-issued SH171 uses the actual front fit and three integral Naval Lasers for port, starboard and aft. Fire follows the selected view. All mounts share the ship's weapon resources. Focused tests cover the original issue, repeat issue, cold Continue and Peregrine behaviour. Platform and native acceptance are tracked separately. [Controls and integration](FLEET-MEDUSA-LASERS.md)
+The desktop source uses the pilot’s position and projects the flight scene above the scanner. Tool sights follow the current mount and selected work equipment. Flight Help opens a status card with the latest notice and its placement control. Routine feedback defaults to the instrument footer. [Cockpit display and controls](COCKPIT-HUD.md#ordinary-flight-viewport)
+
+## Independent laser fitting
+
+Station Equipment supports paid purchases and stored-item refits for each of the four mounts on the issued Fleet Medusa. The Peregrine supports front fitting. The selected mount supplies the weapon identity, class, damage and cooldown. Reloading a commander retains mixed fits and stored guns. The Medusa’s explicit reissue restores the Naval outfit from owned equipment. [Station fitting and flight controls](FLEET-MEDUSA-LASERS.md)
 
 ## Ordinary hyperspace drive source candidate
 
@@ -596,7 +602,7 @@ Native v8 station-hit/interception cold journeys were not repeated; their exact 
 
 ## Qualified attempt closure and retry
 
-Current source adds [reviewed closure and retry](SAFE-GUNNERY-ATTEMPTS.md): F7 reviews failed or incomplete closure at the actual Avenor berth; Enter publishes the save before committing live state, while B cancels. F10 reviews a new attempt after terminal settlement. The HUD uses the current attempt outcome, independently of a previous first trace; I shows retained outcome counts and first-clue status. No refund, reward or ammunition reset occurs.
+Current source adds [reviewed closure and retry](SAFE-GUNNERY-ATTEMPTS.md): Shift+5 reviews failed or incomplete closure at the actual Avenor berth; Enter publishes the save before committing live state, while B cancels. Shift+3 reviews a new attempt after terminal settlement. The HUD uses the current attempt outcome, independently of a previous first trace; I shows retained outcome counts and first-clue status. No refund, reward or ammunition reset occurs.
 
 Candidate `3b5a18b` passed 159 core plus 49 desktop tests (208 top-level Rust cases), 48 importer tests, strict Clippy and release builds on Mac, Linux and native Windows. Nested child-process summaries are excluded. Signed Metal qualification and Root audit covered failed/abandoned closures, explicit retries, paused live retry continuation and two receptions with one retained first trace. Twenty-three named v9 files, seven cold comparisons and ten normal process exits were checked. Six unpaused docked cold sessions advanced ordinary UI ticks; the paused live retry preserved every observed state field. A misaligned approach was recovered with public F9 from the owner's retained valid checkpoint, then a corrected physical approach; both paths remain in evidence. The read-only observer is not a full semantic validator.
 
@@ -639,7 +645,7 @@ Earlier exact-source tests and failures remain in Git history, merged PRs and re
 
 The [T01 flight lesson](FLIGHT-RECEPTION.md) candidate `152ac26ba848e2ac0c8cb63efec016a10b383155`, tree `a0bb78afde77f3e0298c1e99224fdf90621b229d`, passed independent whole-source review. Mac, Linux and genuine native Windows each passed 175 core plus 56 desktop tests: 231 top-level Rust cases, including all 23 new T01 entries. Six filtered child summaries per lane are excluded. Each lane also passed 74 Python tests (54 importer plus 20 publisher), 29 Markdown files, formatting, workspace checks, strict Clippy and release builds. Root checked all 139 source pins per lane, both Dell built/retained binaries and all 236 copied Dell artifacts. Short Dell jobs and the 11-second Mac release ended before Root process inspection; delayed immutable verification supplies their evidence, with no live-observation or visibility-rerun claim. Root observed the Mac make job and staged app live after actual START.
 
-F6 reviews consent or reception; F12 reviews cancellation; C opens lesson details; 0/1/2/3 request World-owned front/rear/left/right views. The host publishes checked proposed saves before committing live state. Actual store-failure, dropped preparation, stale authority, shared occupancy, fit, compatibility and corruption regressions passed. The original docked review-lifetime defect and default HUD row overflow were corrected before qualification, with new regressions and unchanged assertions/row budget. The internal fatal-reducer fixture remains separate from native player-hit or damage-save acceptance.
+Shift+1 reviews consent or reception; Shift+2 reviews cancellation; C opens lesson details; 0/1/2/3 request World-owned front/rear/left/right views. The host publishes checked proposed saves before committing live state. Actual store-failure, dropped preparation, stale authority, shared occupancy, fit, compatibility and corruption regressions passed. The original docked review-lifetime defect and default HUD row overflow were corrected before qualification, with new regressions and unchanged assertions/row budget. The internal fatal-reducer fixture remains separate from native player-hit or damage-save acceptance.
 
 The signed staged Metal/M5 Pro app used a new commander created through N in an empty isolated saves-v10 directory. Actual Back preserved an empty lesson ledger, delayed consent succeeded after ordinary docked ticks, early reception and in-flight cancellation refused, and normal launch/brake/yaw/thrust created a measured closing pair at ticks 9738-9739, ranges 1273.3225 to 1273.2316 and alignment about 0.004 degrees. Genuine Avenor PhysicalEntry followed at tick 15328; separately reviewed reception committed at tick 20083. The account remained 7200 tenths, and equipment, missile ownership, pulse state and markets were unchanged through the lesson. One native completion recorded its first trace. Two completions are current core-test evidence, not two native journey claims.
 

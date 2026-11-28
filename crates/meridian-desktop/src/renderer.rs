@@ -83,6 +83,7 @@ impl PendingProjection {
 pub struct Renderer {
     flight_view: FlightView,
     player_hull: meridian_core::PlayerHullKind,
+    medusa_preview: bool,
     player_medusa: Option<crate::mule_render::showroom::PlayerMedusaPass>,
     celestial: crate::celestial::Pass,
     mule: Option<crate::mule_render::Pass>,
@@ -96,6 +97,7 @@ pub struct Renderer {
     size: PhysicalSize<u32>,
     pipeline: wgpu::RenderPipeline,
     projection: wgpu::Buffer,
+    flight_size: PhysicalSize<u32>,
     pending_projection: PendingProjection,
     projection_group: wgpu::BindGroup,
     vertices: wgpu::Buffer,
@@ -277,6 +279,7 @@ impl Renderer {
             window,
             flight_view: FlightView::Front,
             player_hull: meridian_core::PlayerHullKind::Peregrine,
+            medusa_preview: false,
             player_medusa: None,
             celestial,
             mule: None,
@@ -288,6 +291,7 @@ impl Renderer {
             size,
             pipeline,
             projection,
+            flight_size: size,
             pending_projection: PendingProjection::default(),
             projection_group,
             vertices,
@@ -343,14 +347,18 @@ impl Renderer {
         self.config.height = size.height;
         self.surface.configure(&self.device, &self.config);
         self.depth = Self::depth_texture(&self.device, &self.config);
-        self.pending_projection.resize(size);
     }
 
     pub fn set_flight_view(&mut self, view: FlightView) {
         self.flight_view = view;
     }
 
-    pub(crate) fn set_player_hull(&mut self, hull: meridian_core::PlayerHullKind) {
+    pub(crate) fn set_player_hull(
+        &mut self,
+        hull: meridian_core::PlayerHullKind,
+        medusa_preview: bool,
+    ) {
+        self.medusa_preview = medusa_preview;
         self.player_hull = hull;
     }
 
@@ -366,13 +374,35 @@ impl Renderer {
                 pose: station.pose,
                 port: station.port,
                 docked: station.docked,
-                player_hull: self.player_hull,
+                medusa_preview: self.medusa_preview,
             },
         )
     }
 
     pub fn scanner_viewport(&self) -> [u32; 2] {
-        [self.size.width.max(1), self.size.height.max(1)]
+        self.cockpit_viewport(false)
+    }
+
+    fn cockpit_viewport(&self, docked: bool) -> [u32; 2] {
+        let size = self.size;
+        if self.is_zero_sized() {
+            return [1, 1];
+        }
+        let logical = size.to_logical::<f64>(self.window.scale_factor());
+        let height = logical.height.round().max(1.) as u32;
+        let width = logical.width.round() as u32;
+        let top = if docked && width >= 320 && height >= 240 {
+            hud::cockpit::Layout::new(width, height).top
+        } else {
+            hud::cockpit::flight_height(width, height)
+        };
+        let fraction = top / height as f32;
+        [
+            size.width,
+            (size.height as f32 * fraction)
+                .round()
+                .clamp(1., size.height as f32) as u32,
+        ]
     }
 
     fn prepare_hud_frame(
@@ -459,7 +489,12 @@ impl Renderer {
                         target,
                         camera,
                         view: self.flight_view,
-                        projection: flight_projection(self.config.width, self.config.height),
+                        projection: flight_projection(
+                            self.flight_size.width,
+                            self.flight_size.height,
+                        ),
+                        flight_height: self.flight_size.height as f32 * height as f32
+                            / self.size.height as f32,
                         details,
                         model,
                     },
@@ -556,18 +591,18 @@ impl Renderer {
                     *snapshot,
                     self.flight_view,
                     crate::celestial::Projection {
-                        viewport: [self.config.width, self.config.height],
+                        viewport: [self.config.width, self.flight_size.height],
                         clip: [
                             0.0,
                             0.0,
                             self.config.width as f32,
-                            self.config.height as f32,
+                            self.flight_size.height as f32,
                         ],
                         center: [
                             self.config.width as f32 / 2.0,
-                            self.config.height as f32 / 2.0,
+                            self.flight_size.height as f32 / 2.0,
                         ],
-                        focal: self.config.height as f32 * 0.8,
+                        focal: self.flight_size.height as f32 * 0.8,
                         near: 1.0,
                         far: 20000.0,
                     },
@@ -598,7 +633,7 @@ impl Renderer {
             pose: scene.pose,
             port: scene.port,
             docked: scene.docked,
-            player_hull: self.player_hull,
+            medusa_preview: self.medusa_preview,
         });
         if let (Some(placement), Some(station)) = (mule, station) {
             let scene = placement.for_camera(|| mesh::scene_camera_pose(snapshot, station))?;
@@ -618,7 +653,10 @@ impl Renderer {
                     crate::mule_render::View {
                         camera,
                         flight: self.flight_view,
-                        projection: flight_projection(self.config.width, self.config.height),
+                        projection: flight_projection(
+                            self.flight_size.width,
+                            self.flight_size.height,
+                        ),
                         tick: snapshot.tick,
                     },
                 )?;
@@ -649,7 +687,10 @@ impl Renderer {
                     crate::mule_render::View {
                         camera,
                         flight: self.flight_view,
-                        projection: flight_projection(self.config.width, self.config.height),
+                        projection: flight_projection(
+                            self.flight_size.width,
+                            self.flight_size.height,
+                        ),
                         tick: snapshot.tick,
                     },
                 )?;
@@ -758,6 +799,14 @@ impl Renderer {
             );
             self.celestial.draw_halos(&mut pass);
         } else {
+            pass.set_viewport(
+                0.0,
+                0.0,
+                self.flight_size.width as f32,
+                self.flight_size.height as f32,
+                0.0,
+                1.0,
+            );
             self.celestial.draw_surfaces(&mut pass);
             pass.set_scissor_rect(0, 0, self.config.width, self.config.height);
             pass.set_pipeline(&self.pipeline);
@@ -850,6 +899,17 @@ impl Renderer {
             self.recover_surface(recovery)
         });
         let Some((frame, reconfigure)) = Self::prepare_acquired_frame(acquired, || {
+            let flight_size = if let Some(instruments) = cockpit {
+                let [width, height] = self
+                    .cockpit_viewport(instruments.flight.mode == meridian_core::FlightMode::Docked);
+                PhysicalSize::new(width, height)
+            } else {
+                self.size
+            };
+            if self.flight_size != flight_size {
+                self.flight_size = flight_size;
+                self.pending_projection.resize(flight_size);
+            }
             self.pending_projection.upload(|projection| {
                 self.queue
                     .write_buffer(&self.projection, 0, bytemuck::cast_slice(&projection))

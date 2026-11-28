@@ -4,7 +4,9 @@
 
 The Fleet, Medusa and Hull Studio preview adds 115 station Showroom models and a dedicated flyable Medusa. Open **Meridian Medusa Preview** and press **L** to launch with a separate commander save. The Apple silicon Fleet and Medusa apps require macOS 14 or later. The packaged Hull Studio requires macOS 27 or later. [Preview installation and controls](docs/PREVIEW-RELEASES.md#fleet-medusa-and-hull-studio) · [Published previews](https://github.com/stephenlclarke/meridian/releases)
 
-The ordinary Fleet XYZZY Medusa candidate carries four laser facings. Use **0–3** to select the view and **Z** to fire its installed laser. [Fleet Medusa laser controls](docs/FLEET-MEDUSA-LASERS.md)
+In the Fleet development build, open **5 Equipment** at a station to buy, store or refit the XYZZY Medusa’s front, aft, port and starboard lasers independently. Use **0–3** to select a view and **Z** to fire its fitted class. [Fleet Medusa laser controls](docs/FLEET-MEDUSA-LASERS.md)
+
+The development cockpit shows the pilot’s view above the scanner. Its centre sight identifies the active laser or work tool by shape and colour. Press **H**, then **I**, for flight status. Press **N** on that card to choose a notice position. [Cockpit instruments](docs/COCKPIT-HUD.md)
 
 The ordinary-drive development candidate adds the Basic, Intermediate and Advanced hyperspace drive slot to Equipment. Paid upgrades change the actual jump countdown and station mass lock; explicit XYZZY maximum fitting uses the Advanced drive. The [equipment implementation and testing ledger](docs/EQUIPMENT-PLAYABLE.md) records all catalogue grades, remaining gameplay paths and Medusa compatibility constraints. This candidate is not part of Preview 10 and awaits owned validation.
 
@@ -117,6 +119,10 @@ Preview 8 uses the earlier startup controls. N starts a commander; C continues a
 
 H or ? opens a dismissible help popup for the current screen, including station details and transaction reviews. Every station popup lists 1 Galaxy, 2 System, 3 Showroom, 4 Market, 5 Equipment, Tab/Shift+Tab and Escape/back. Escape, H or ? closes help and retains the screen, selection, search and review. Gameplay and underlying actions wait while help is open. During galaxy text search, H remains a typed letter and ? opens help.
 
+### Controls
+
+The table describes the current source. Use the number row for views, training and missiles. Press the equals or minus key without Shift for missile launch or safe/unlock. Hold Control for save, reload and fullscreen.
+
 | Controls | Action |
 | --- | --- |
 | H / ? | Context help; Escape, H or ? dismisses |
@@ -134,10 +140,10 @@ H or ? opens a dismissible help popup for the current screen, including station 
 | O; K; U; Y | Equipment panel; buy/fit cargo bay; store when docked; refit |
 | Hold U in active flight | Charge the fitted EMP for 600 accepted ticks; early release cancels |
 | I; V; X | Mission details; review all held freight deliveries; review abandonment |
-| T in flight; F1; F2; F3; F4 | Lock the selected ship for missiles; next ship/practice lock; arm/safe; launch one missile; safe/unlock |
-| F7; F8; F10 | Review attempt closure; reception; fresh consent |
-| F6; F12; C; 0/1/2/3 | Flight lesson consent/reception; cancellation; details; view direction |
-| P; F11; F5; F9 | Pause; fullscreen; save; reload the current qualified save |
+| T in flight; 8; 9; =; - | Lock the selected ship for missiles; next ship/practice lock; arm/safe; launch one missile; safe/unlock |
+| Shift+5; Shift+4; Shift+3 | Review attempt closure; reception; fresh consent |
+| Shift+1; Shift+2; C; 0/1/2/3 | Flight lesson consent/reception; cancellation; details; view direction |
+| P; Ctrl+Enter; Ctrl+S; Ctrl+R | Pause; fullscreen; save; reload the current qualified save |
 | Escape / window close | Save before exit; failure keeps the app open |
 
 The [station trade estimate details](integration/followup-trade-detail/README.md) show the current finite commodity allocation behind the chart scan and route estimates. They do not purchase, sell or install a route.

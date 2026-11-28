@@ -1,0 +1,13 @@
+{
+  "schema": 1,
+  "id": "player-laser-fittings",
+  "undoBefore": [
+    "fleet-medusa-contacts"
+  ],
+  "undoAfter": [],
+  "kind": "inverse",
+  "manifest": "integration/player-laser-fittings/PROTECTED-CORE-INVERSE.json",
+  "sha256": "9cd0eabed4661a1bb8ca59a68e0f23b7150cb999cc6a1a1c14392b051589966a",
+  "base": "6478502bff60520edfc6d4bb5f2d8e43e1cd391e",
+  "label": "Independent fitting and firing on the supported laser mounts"
+}

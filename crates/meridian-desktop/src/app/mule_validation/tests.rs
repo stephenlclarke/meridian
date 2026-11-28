@@ -252,8 +252,8 @@ fn internal_keyboard_focus_and_repeat_cannot_move_observer_or_open_profile_actio
     for code in [
         KeyCode::KeyN,
         KeyCode::KeyC,
-        KeyCode::F5,
-        KeyCode::F9,
+        KeyCode::KeyS,
+        KeyCode::KeyR,
         KeyCode::KeyW,
         KeyCode::KeyU,
         KeyCode::KeyZ,

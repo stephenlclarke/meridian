@@ -289,8 +289,8 @@ mod tests {
             KeyCode::KeyH,
             KeyCode::Tab,
             KeyCode::Delete,
-            KeyCode::F5,
-            KeyCode::F9,
+            KeyCode::KeyS,
+            KeyCode::KeyR,
         ] {
             assert_eq!(choice(key, false), Choice::Consumed);
             assert_eq!(choice(key, true), Choice::Consumed);
@@ -353,8 +353,8 @@ mod tests {
             KeyCode::KeyP,
             KeyCode::KeyH,
             KeyCode::Tab,
-            KeyCode::F5,
-            KeyCode::F9,
+            KeyCode::KeyS,
+            KeyCode::KeyR,
         ] {
             assert_eq!(press(&mut app, key, false), None);
             assert!(app.keys.is_empty());

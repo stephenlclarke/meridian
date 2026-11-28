@@ -223,13 +223,17 @@ impl Practice {
 
 impl Range {
     fn laser_cadence(&self, tick: u64, world: &super::super::World) -> Result<u8, SaveError> {
-        if self
+        if let Some((facing, emission)) = self
             .hits
             .iter()
             .flatten()
-            .any(|h| h.tick == tick && h.integral.is_some())
+            .filter(|hit| hit.tick == tick)
+            .find_map(|hit| hit.integral)
         {
-            Ok(super::super::OrdinaryWeapon::FrontNavalLaser.cooldown_ticks())
+            let (_, weapon) = world
+                .laser_fit_at_tick(facing, tick, emission)
+                .ok_or(INVALID)?;
+            Ok(weapon.cooldown_ticks())
         } else {
             world.front_cadence_at_tick(tick).ok_or(INVALID)
         }

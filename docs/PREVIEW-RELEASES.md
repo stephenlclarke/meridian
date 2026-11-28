@@ -1,8 +1,10 @@
 # GitHub preview releases
 
+The controls below apply to the named download. See the [current controls](../README.md#controls) for builds with the revised keyboard layout.
+
 ## Fleet, Medusa and Hull Studio
 
-Extract the complete platform archive. The Fleet game opens on Commander Details. Press **3** to inspect the 115 ships in its Showroom. To fly SH171, use **Meridian Medusa Preview.app** or **Launch Medusa Preview.cmd**. Press **L** to launch, **W/S** to change throttle, **Space** to brake and **F5** to save. Medusa has its own commander profile.
+Extract the complete platform archive. The Fleet game opens on Commander Details. Press **3** to inspect the 115 ships in its Showroom. To fly SH171, use **Meridian Medusa Preview.app** or **Launch Medusa Preview.cmd**. Press **L** to launch, **W/S** to change throttle, **Space** to brake and use the save shortcut shown in the game. Medusa has its own commander profile.
 
 On Apple silicon, Fleet and Medusa require macOS 14 or later. Hull Studio requires macOS 27 or later because of the native libraries in its bundled Python runtime. The Windows x64 game executables are unsigned and require the Microsoft Visual C++ x64 runtime. On the Dell, both launchers saved and reopened their separate profiles and Hull Studio exported its reference package. Interactive Windows rendering remains unverified. [Published archives and release notes](https://github.com/stephenlclarke/meridian/releases)
 

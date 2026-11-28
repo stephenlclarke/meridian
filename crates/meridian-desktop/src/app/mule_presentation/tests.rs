@@ -136,12 +136,12 @@ fn the_paid_freight_sortie_adds_mule_to_the_existing_camera_and_flight_mesh() {
         pose: some(snapshot.station),
         port: some(world.station_port()),
         docked: false,
-        player_hull: meridian_core::PlayerHullKind::Peregrine,
+        medusa_preview: false,
     };
     let camera = ok(mesh::scene_camera_pose(&snapshot, station));
     let scene = ok(placement.for_camera(|| mesh::scene_camera_pose(&snapshot, station)));
     assert_eq!(scene.observer, camera);
-    assert_ne!(scene.observer.position.z as f32, snapshot.position[2]);
+    assert_eq!(scene.observer, mesh::player_pose(&snapshot));
     assert_eq!(scene.actor.id, frame.actor().id);
     assert!(std::ptr::eq(scene.envelope, frame.presentation().as_ref()));
 
@@ -160,7 +160,7 @@ fn the_paid_freight_sortie_adds_mule_to_the_existing_camera_and_flight_mesh() {
         placement.internal_observer(),
         &mut with_mule,
     ));
-    assert_eq!(ordinary.len(), ship.len() + station_vertices.len());
+    assert_eq!(ordinary.len(), station_vertices.len());
     if let Some(traffic) = world.traffic_snapshot() {
         ok(mesh::traffic::append(
             &snapshot,
@@ -222,7 +222,7 @@ fn isolated_frame_keeps_its_world_owned_observer_and_rejects_stale_publications(
         pose: some(snapshot.station),
         port: some(world.station_port()),
         docked: false,
-        player_hull: meridian_core::PlayerHullKind::Peregrine,
+        medusa_preview: false,
     };
     let mut frame_vertices = Vec::new();
     ok(mesh::frame_vertices_for_observer(

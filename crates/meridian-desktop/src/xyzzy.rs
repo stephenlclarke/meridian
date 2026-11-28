@@ -5,6 +5,7 @@ use meridian_core::{ShieldGrade, World, XyzzyAction};
 pub fn provenance(value: meridian_core::ModuleProvenance) -> &'static str {
     match value {
         meridian_core::ModuleProvenance::StandardBirth => "Born module",
+        meridian_core::ModuleProvenance::MedusaIssue { .. } => "Issued with Fleet Medusa",
         meridian_core::ModuleProvenance::Paid { .. } => "Paid module; original receipt retained",
         meridian_core::ModuleProvenance::XYZzy { .. } => "XYZZY grant; no paid purchase",
     }
