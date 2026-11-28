@@ -363,7 +363,7 @@ impl Pass {
         pass.draw(0..self.frame.text.len() as u32, 0..1);
     }
 
-    #[cfg(test)]
+    #[cfg(all(test, target_os = "macos"))]
     pub(crate) fn retained_original_hulls(&self) -> [Option<showroom::Hull>; MAX_MODELS] {
         self.goshawk
             .each_ref()
