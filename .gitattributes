@@ -647,8 +647,3 @@ integration/sh073-griffon-spectre/ARCHIVE-FIT-SUPPORT-FANS.json text eol=lf
 # Shared algorithm pinned by the directed hull measurement receipts.
 tools/directed_hull_fit.py text eol=lf
 tools/fleet_hull_measurement.py text eol=lf
-
-# Onager measurement and source tools have pinned byte hashes.
-tools/measure_onager_air.py text eol=lf
-tools/prepare_onager_geometry.py text eol=lf
-tools/verify_onager_geometry.py text eol=lf
