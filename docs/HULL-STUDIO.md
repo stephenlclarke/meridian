@@ -119,3 +119,7 @@ The [SH041 Serval Fighter](SERVAL-GAMEPLAY-ENVELOPE.md) opens in the stock Showr
 ## Vulture Mk I
 
 The [SH037 Vulture Mk I](VULTURE-MK-I-GAMEPLAY-ENVELOPE.md) opens in the stock Showroom with all 8,272 original detailed faces. The Studio definition uses the 512-face proxy. The original 3,016-face native mesh remains in the source archive.
+
+## Newt Escape Pod
+
+The [Newt capsule](../integration/sh040-newt-escape-pod/README.md) can be selected by name or SH040 in the station Showroom. Its original native shell and internal detailed artwork form one rounded support. The capsule is permanently unavailable for purchase.

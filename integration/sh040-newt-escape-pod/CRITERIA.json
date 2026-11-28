@@ -1,0 +1,24 @@
+{
+  "id": "SH040",
+  "name": "Newt Escape Pod",
+  "sourcePullRequest": 104,
+  "originalRevision": "a11fe16924d87d06021816f9037952afcbac08db",
+  "scope": "Stock capsule inspection and explicit geometry tests. Purchase policy never.",
+  "replayPins": {
+    "integration/sh040-newt-escape-pod/CERTIFIED-FIT.json": "502a115d48256db87816160cb8d08b59b5ddf3758d318503897bdfe9863904cf",
+    "integration/sh040-newt-escape-pod/SUPPORT-FAN.json": "ceef2a633361b262ad7feff2c6a4658244ebb4b928aa620ac4e614a347d61e6b",
+    "integration/sh040-newt-escape-pod/NEWT-STUDIO.json": "4d21284273415002a1480b17e0e1c3f62b9df85d06f6a5ae1af38aa816551eb5",
+    "integration/sh040-newt-escape-pod/CONTACT-RESULT.json": "066726d320152d38da8119650c827bbce0a8f03106538e9f5fb9796a4bf5df7c",
+    "integration/sh040-newt-escape-pod/NEWT-ORIGINAL-TENSOR.json": "4f70eab0e6ef6943565d6fa04fe5f32b673829665123e8f44641503447a4f9c6",
+    "tools/measure_newt_escape_pod.py": "e94d0a6748d88a06f28e47c4b8a9fba1dbcf820134adf46b5d8215a412a6594c",
+    "tools/prepare_newt_escape_pod_studio.py": "1c4ee83a0a14d4fa80a11b90ab8507b2be9e77f96ea5356452166d7a2e593fc2",
+    "tools/verify_newt_escape_pod.py": "222fd98924b984bb20083c34671011e8eb71c2017dfd24a028a309ed3e458990",
+    "tools/vulture_mk_i_exact_fit.py": "479b31f8714a198a82c0e2888b8d19efe46c7b4c43a576b83ab84c571ae738c6",
+    "tools/measure_goshawk_surface_fit.py": "5407ef1e5fad41810aa95444ca1338fe33a91e5c9857dcb752b4e4cf2fca6d0b"
+  },
+  "byteReplay": {
+    "commands": [
+      "python3 -B tools/measure_newt_escape_pod.py | cmp - integration/sh040-newt-escape-pod/CERTIFIED-FIT.json"
+    ]
+  }
+}

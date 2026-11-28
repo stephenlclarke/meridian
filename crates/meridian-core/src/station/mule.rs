@@ -587,3 +587,6 @@ mod tests {
 
 #[cfg(test)]
 mod serval_tests;
+
+#[cfg(test)]
+mod newt_tests;

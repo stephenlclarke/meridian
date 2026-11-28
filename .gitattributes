@@ -662,3 +662,11 @@ tools/measure_vulture_mk_i_air.py text eol=lf
 tools/prepare_vulture_mk_i_geometry.py text eol=lf
 tools/prepare_vulture_mk_i_studio.py text eol=lf
 tools/verify_vulture_mk_i_geometry.py text eol=lf
+
+# Newt source records and validator receipts have published byte hashes.
+assets/fleet/sh040/** -text
+integration/sh040-newt-escape-pod/*.json text eol=lf
+tools/measure_newt_escape_pod.py text eol=lf
+tools/measure_newt_escape_pod_fit.py text eol=lf
+tools/prepare_newt_escape_pod_studio.py text eol=lf
+tools/verify_newt_escape_pod.py text eol=lf

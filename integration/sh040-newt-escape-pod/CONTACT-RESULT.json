@@ -1,0 +1,216 @@
+{
+  "hull": "SH040",
+  "packageSHA256": "4d21284273415002a1480b17e0e1c3f62b9df85d06f6a5ae1af38aa816551eb5",
+  "openRoutes": [
+    {
+      "name": "Port exterior",
+      "start": [
+        -0.8,
+        0,
+        -1.5
+      ],
+      "end": [
+        -0.8,
+        0,
+        1.5
+      ],
+      "radiusMetres": 0.1,
+      "lowerBoundMetres": 0.11157894736842111
+    },
+    {
+      "name": "Starboard exterior",
+      "start": [
+        0.8,
+        0,
+        -1.5
+      ],
+      "end": [
+        0.8,
+        0,
+        1.5
+      ],
+      "radiusMetres": 0.1,
+      "lowerBoundMetres": 0.11157894736842111
+    },
+    {
+      "name": "Above closed lid",
+      "start": [
+        0,
+        0.7,
+        -1.5
+      ],
+      "end": [
+        0,
+        0.7,
+        1.5
+      ],
+      "radiusMetres": 0.1,
+      "lowerBoundMetres": 0.12210526315789472
+    },
+    {
+      "name": "Below vessel",
+      "start": [
+        0,
+        -0.75,
+        -1.5
+      ],
+      "end": [
+        0,
+        -0.75,
+        1.5
+      ],
+      "radiusMetres": 0.1,
+      "lowerBoundMetres": 0.12473684210526315
+    }
+  ],
+  "solidRoutes": [
+    {
+      "name": "Through closed vessel from port",
+      "start": [
+        -0.8,
+        0,
+        0
+      ],
+      "end": [
+        0.8,
+        0,
+        0
+      ],
+      "radiusMetres": 0.1
+    },
+    {
+      "name": "Through closed lid",
+      "start": [
+        0,
+        0.7,
+        0
+      ],
+      "end": [
+        0,
+        0,
+        0
+      ],
+      "radiusMetres": 0.1
+    },
+    {
+      "name": "Through forward end",
+      "start": [
+        0,
+        0,
+        1.5
+      ],
+      "end": [
+        0,
+        0,
+        0
+      ],
+      "radiusMetres": 0.1
+    },
+    {
+      "name": "Through aft end",
+      "start": [
+        0,
+        0,
+        -1.5
+      ],
+      "end": [
+        0,
+        0,
+        0
+      ],
+      "radiusMetres": 0.1
+    }
+  ],
+  "station": {
+    "stationSHA256": "cd54d30cab638f6b33feacf1fa78c9136f8ce346e8cc6133259bfc0472c259d5",
+    "aligned": {
+      "actorX": 0,
+      "actorZ": [
+        137.32,
+        135.32
+      ],
+      "lowerGapMillimetres": 50273
+    },
+    "offsetOpening": {
+      "actorX": 69.95473684210526,
+      "actorZ": 138.51999999999998,
+      "lowerGapMillimetres": 978
+    },
+    "offsetContact": {
+      "actorX": 69.95473684210526,
+      "actorZ": [
+        138.51999999999998,
+        136.51999999999998
+      ],
+      "nativeVertex": 36,
+      "stationFace": 482,
+      "fraction": 0.49999999999999434,
+      "barycentrics": [
+        0.3099999999999977,
+        0.1900000000000023,
+        0.5
+      ],
+      "stationPointMetres": [
+        69.5,
+        0.0,
+        136.32
+      ]
+    },
+    "scope": "Exact original station triangle separation with 21 mm outward guard, exact source vertex crossing (not first contact)."
+  },
+  "scope": "Closed capsule; external bypasses only; no through-opening or actual gameplay admission.",
+  "validator": {
+    "validatorSHA256": "fef5d09229091438a0118182b23434f985f504ee78702185d554761b960f5477",
+    "cases": [
+      {
+        "case": "original-tensor",
+        "input": "NEWT-ORIGINAL-TENSOR.json",
+        "inputSHA256": "4f70eab0e6ef6943565d6fa04fe5f32b673829665123e8f44641503447a4f9c6",
+        "report": "ORIGINAL-TENSOR-REFUSAL.json",
+        "reportSHA256": "67ec0bf6bb160674c19a42b98d87cdeda74b064358f2e59d9c2eb39641178c05",
+        "exitCode": 1
+      },
+      {
+        "case": "normalized",
+        "input": "NEWT-STUDIO.json",
+        "inputSHA256": "4d21284273415002a1480b17e0e1c3f62b9df85d06f6a5ae1af38aa816551eb5",
+        "report": "NORMALIZED-VALIDATOR-REPORT.json",
+        "reportSHA256": "29d21888aa2b279e423566fe7513dd7838e7ae1c756f4b900ed14ddd7011eb5a",
+        "exitCode": 0
+      },
+      {
+        "case": "solid-1",
+        "input": "SOLID-1-INPUT.json",
+        "inputSHA256": "625d3431bc07f95ddd6597fae46cc4b4108550ae5fd2d50989c0d4588b803fb5",
+        "report": "SOLID-1-REPORT.json",
+        "reportSHA256": "e62db9096bd3c76cdb27f0484556ce7e389c7a36ee49a50839508c0e7349c30d",
+        "exitCode": 1
+      },
+      {
+        "case": "solid-2",
+        "input": "SOLID-2-INPUT.json",
+        "inputSHA256": "75ec538981b18d53f9d9a83ed6d9753c8b0e0f7f52046f2f932b71c3ed005821",
+        "report": "SOLID-2-REPORT.json",
+        "reportSHA256": "8c4e233f5ffc6afb4f9b3451f6de9421963e1850c043dd8e1bf688d45358869d",
+        "exitCode": 1
+      },
+      {
+        "case": "solid-3",
+        "input": "SOLID-3-INPUT.json",
+        "inputSHA256": "d48d1163509581308ced8b90737ce13959cc5132f4958da9fa04be152d4bfb9a",
+        "report": "SOLID-3-REPORT.json",
+        "reportSHA256": "64345839d2e5bcb5030fba1c784577954d29155f70be03b6b1ce31d41b44c336",
+        "exitCode": 1
+      },
+      {
+        "case": "solid-4",
+        "input": "SOLID-4-INPUT.json",
+        "inputSHA256": "e4570bb06f5a7667cc635fe629111e9e3efdb1ac4d8f6b2d58cc80058398a024",
+        "report": "SOLID-4-REPORT.json",
+        "reportSHA256": "44663f4d484ed0142e4f6eff12f43ca84b4f2d4064bc5d8422dfd47ce6b1ad97",
+        "exitCode": 1
+      }
+    ],
+    "supportMembership": "Exact single group id 0 and all 304 original scaled inputs verified"
+  }
+}
