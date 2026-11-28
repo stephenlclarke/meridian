@@ -1,0 +1,190 @@
+{
+  "nominalPaddingMetres": 0.02,
+  "minimumRefinementTargetsMillimetres": {
+    "detailed": 1800,
+    "archiveNative": 2000,
+    "candidateNative": 2200
+  },
+  "fullUpperMillimetres": {
+    "detailed": 1975,
+    "archiveNative": 2115,
+    "candidateNative": 2492
+  },
+  "pieces": {
+    "body primary pressure envelope[1]": {
+      "detailed": 1555,
+      "archiveNative": 1647,
+      "candidateNative": 2067
+    },
+    "body primary pressure envelope/service-well-0-0[1]": {
+      "detailed": 1533,
+      "archiveNative": 2115,
+      "candidateNative": 2492
+    },
+    "body primary pressure envelope/service-well-0-1[1]": {
+      "detailed": 1533,
+      "archiveNative": 1653,
+      "candidateNative": 1903
+    },
+    "body primary pressure envelope/service-well-0-2[1]": {
+      "detailed": 1533,
+      "archiveNative": 1882,
+      "candidateNative": 2104
+    },
+    "body primary pressure envelope/service-well-1-0[1]": {
+      "detailed": 1533,
+      "archiveNative": 2115,
+      "candidateNative": 2492
+    },
+    "body primary pressure envelope/service-well-1-1[1]": {
+      "detailed": 1533,
+      "archiveNative": 2000,
+      "candidateNative": 1897
+    },
+    "body primary pressure envelope/service-well-1-2[1]": {
+      "detailed": 1541,
+      "archiveNative": 1904,
+      "candidateNative": 1997
+    },
+    "body primary pressure envelope/service-well-2-0[1]": {
+      "detailed": 1533,
+      "archiveNative": 1882,
+      "candidateNative": 2159
+    },
+    "body primary pressure envelope/service-well-2-1[1]": {
+      "detailed": 1533,
+      "archiveNative": 1647,
+      "candidateNative": 1908
+    },
+    "body primary pressure envelope/service-well-2-2[1]": {
+      "detailed": 1533,
+      "archiveNative": 1412,
+      "candidateNative": 2008
+    },
+    "body primary pressure envelope/service-well-3-0[1]": {
+      "detailed": 1533,
+      "archiveNative": 1882,
+      "candidateNative": 2172
+    },
+    "body primary pressure envelope/service-well-3-1[1]": {
+      "detailed": 1533,
+      "archiveNative": 1796,
+      "candidateNative": 1945
+    },
+    "body primary pressure envelope/service-well-3-2[1]": {
+      "detailed": 1533,
+      "archiveNative": 1909,
+      "candidateNative": 2094
+    },
+    "body primary pressure envelope/longitudinal-service-strut-0[1]": {
+      "detailed": 232,
+      "archiveNative": 591,
+      "candidateNative": 598
+    },
+    "body primary pressure envelope/longitudinal-service-strut-1[1]": {
+      "detailed": 232,
+      "archiveNative": 595,
+      "candidateNative": 595
+    },
+    "cockpit glazing envelope[1]": {
+      "detailed": 742,
+      "archiveNative": 753,
+      "candidateNative": 1345
+    },
+    "cockpit connected structural crossmember[1]": {
+      "detailed": 256,
+      "archiveNative": 256,
+      "candidateNative": 256
+    },
+    "engine_pair/negative side/connected support[1]": {
+      "detailed": 1303,
+      "archiveNative": 1303,
+      "candidateNative": 1303
+    },
+    "engine_pair/negative side/propulsion casing[1]": {
+      "detailed": 1733,
+      "archiveNative": 1894,
+      "candidateNative": 1733
+    },
+    "engine_pair/negative side/propulsion luminous recess[1]": {
+      "detailed": 1219,
+      "archiveNative": 1533,
+      "candidateNative": 1862
+    },
+    "engine_pair/positive side/connected support[1]": {
+      "detailed": 1303,
+      "archiveNative": 1303,
+      "candidateNative": 1303
+    },
+    "engine_pair/positive side/propulsion casing[1]": {
+      "detailed": 1733,
+      "archiveNative": 1894,
+      "candidateNative": 1733
+    },
+    "engine_pair/positive side/propulsion luminous recess[1]": {
+      "detailed": 1219,
+      "archiveNative": 1533,
+      "candidateNative": 1862
+    },
+    "open curved loop/span-01": {
+      "detailed": 1787,
+      "archiveNative": 1787,
+      "candidateNative": 1825
+    },
+    "open curved loop/span-02": {
+      "detailed": 1946,
+      "archiveNative": 1948,
+      "candidateNative": 2145
+    },
+    "open curved loop/span-03": {
+      "detailed": 1950,
+      "archiveNative": 1950,
+      "candidateNative": 1880
+    },
+    "open curved loop/span-04": {
+      "detailed": 1975,
+      "archiveNative": 1979,
+      "candidateNative": 1882
+    },
+    "open curved loop/span-05": {
+      "detailed": 1795,
+      "archiveNative": 1787,
+      "candidateNative": 2148
+    },
+    "open curved loop/span-06": {
+      "detailed": 1787,
+      "archiveNative": 1652,
+      "candidateNative": 1755
+    },
+    "open curved loop/span-07": {
+      "detailed": 1787,
+      "archiveNative": 1769,
+      "candidateNative": 1729
+    },
+    "open curved loop/span-08": {
+      "detailed": 1795,
+      "archiveNative": 1793,
+      "candidateNative": 2032
+    },
+    "open curved loop/span-09": {
+      "detailed": 1955,
+      "archiveNative": 1979,
+      "candidateNative": 1882
+    },
+    "open curved loop/span-10": {
+      "detailed": 1950,
+      "archiveNative": 1950,
+      "candidateNative": 1880
+    },
+    "open curved loop/span-11": {
+      "detailed": 1946,
+      "archiveNative": 1948,
+      "candidateNative": 2145
+    },
+    "open curved loop/span-12": {
+      "detailed": 1787,
+      "archiveNative": 1787,
+      "candidateNative": 1826
+    }
+  }
+}

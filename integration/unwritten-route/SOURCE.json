@@ -1,0 +1,17 @@
+{
+  "catalogue": {
+    "revision": "a11fe16924d87d06021816f9037952afcbac08db",
+    "path": "Sources/L337Core/ScriptBaseClueCatalog.swift",
+    "sha256": "e910323278e77a75eefd36bacd51368d9ecbde77c25936c91c7f1ca5bc9b1de5"
+  },
+  "story": {
+    "revision": "a11fe16924d87d06021816f9037952afcbac08db",
+    "path": "docs/meridian/INTENDED-GAME-STORY-WALKTHROUGH.md",
+    "sha256": "8b4ae7e3ccd07b02a0102d2e468d285451200fea45a95a81bdd0c289aae5bf48"
+  },
+  "configuration": {
+    "revision": "a91c899589e226c01adb180c4bee6b162cb0ee67",
+    "path": "docs/meridian/missions/gameplay/MEDUSA-FLAGSHIP.md",
+    "sha256": "6647310bbd7758e6bd571e8aad1c301884ac2e38ce8c509b71ba805ba3b4618c"
+  }
+}

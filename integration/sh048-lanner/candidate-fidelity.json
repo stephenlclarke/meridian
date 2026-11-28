@@ -1,0 +1,188 @@
+{
+  "originalArchivedNativeFaces": 936,
+  "candidateNativeFaces": 456,
+  "archiveWithin512FaceBudget": false,
+  "nativeCandidateWithin512FaceBudget": true,
+  "parts": [
+    {
+      "index": 0,
+      "name": "open curved loop",
+      "originalFaces": 364,
+      "candidateFaces": 100,
+      "verifiedUpperMillimetres": {
+        "candidateToArchive": 631,
+        "archiveToCandidate": 682
+      }
+    },
+    {
+      "index": 1,
+      "name": "body primary pressure envelope",
+      "originalFaces": 116,
+      "candidateFaces": 56,
+      "verifiedUpperMillimetres": {
+        "candidateToArchive": 496,
+        "archiveToCandidate": 470
+      }
+    },
+    {
+      "index": 2,
+      "name": "body primary pressure envelope/service-well-0-0",
+      "originalFaces": 20,
+      "candidateFaces": 20,
+      "verifiedUpperMillimetres": {
+        "candidateToArchive": 0,
+        "archiveToCandidate": 0
+      }
+    },
+    {
+      "index": 3,
+      "name": "body primary pressure envelope/service-well-1-0",
+      "originalFaces": 20,
+      "candidateFaces": 20,
+      "verifiedUpperMillimetres": {
+        "candidateToArchive": 0,
+        "archiveToCandidate": 0
+      }
+    },
+    {
+      "index": 4,
+      "name": "body primary pressure envelope/service-well-2-0",
+      "originalFaces": 20,
+      "candidateFaces": 20,
+      "verifiedUpperMillimetres": {
+        "candidateToArchive": 0,
+        "archiveToCandidate": 0
+      }
+    },
+    {
+      "index": 5,
+      "name": "body primary pressure envelope/service-well-3-0",
+      "originalFaces": 20,
+      "candidateFaces": 20,
+      "verifiedUpperMillimetres": {
+        "candidateToArchive": 0,
+        "archiveToCandidate": 0
+      }
+    },
+    {
+      "index": 6,
+      "name": "cockpit glazing envelope",
+      "originalFaces": 116,
+      "candidateFaces": 56,
+      "verifiedUpperMillimetres": {
+        "candidateToArchive": 493,
+        "archiveToCandidate": 493
+      }
+    },
+    {
+      "index": 7,
+      "name": "cockpit connected structural crossmember",
+      "originalFaces": 12,
+      "candidateFaces": 12,
+      "verifiedUpperMillimetres": {
+        "candidateToArchive": 0,
+        "archiveToCandidate": 0
+      }
+    },
+    {
+      "index": 8,
+      "name": "engine_pair/negative side/connected support",
+      "originalFaces": 12,
+      "candidateFaces": 12,
+      "verifiedUpperMillimetres": {
+        "candidateToArchive": 0,
+        "archiveToCandidate": 0
+      }
+    },
+    {
+      "index": 9,
+      "name": "engine_pair/negative side/propulsion casing",
+      "originalFaces": 44,
+      "candidateFaces": 20,
+      "verifiedUpperMillimetres": {
+        "candidateToArchive": 485,
+        "archiveToCandidate": 418
+      }
+    },
+    {
+      "index": 10,
+      "name": "engine_pair/negative side/propulsion luminous recess",
+      "originalFaces": 44,
+      "candidateFaces": 20,
+      "verifiedUpperMillimetres": {
+        "candidateToArchive": 452,
+        "archiveToCandidate": 428
+      }
+    },
+    {
+      "index": 11,
+      "name": "engine_pair/positive side/connected support",
+      "originalFaces": 12,
+      "candidateFaces": 12,
+      "verifiedUpperMillimetres": {
+        "candidateToArchive": 0,
+        "archiveToCandidate": 0
+      }
+    },
+    {
+      "index": 12,
+      "name": "engine_pair/positive side/propulsion casing",
+      "originalFaces": 44,
+      "candidateFaces": 20,
+      "verifiedUpperMillimetres": {
+        "candidateToArchive": 485,
+        "archiveToCandidate": 418
+      }
+    },
+    {
+      "index": 13,
+      "name": "engine_pair/positive side/propulsion luminous recess",
+      "originalFaces": 44,
+      "candidateFaces": 20,
+      "verifiedUpperMillimetres": {
+        "candidateToArchive": 452,
+        "archiveToCandidate": 428
+      }
+    },
+    {
+      "index": 14,
+      "name": "explicit military mount upright",
+      "originalFaces": 12,
+      "candidateFaces": 12,
+      "verifiedUpperMillimetres": {
+        "candidateToArchive": 0,
+        "archiveToCandidate": 0
+      }
+    },
+    {
+      "index": 15,
+      "name": "explicit military mount longitudinal member",
+      "originalFaces": 12,
+      "candidateFaces": 12,
+      "verifiedUpperMillimetres": {
+        "candidateToArchive": 0,
+        "archiveToCandidate": 0
+      }
+    },
+    {
+      "index": 16,
+      "name": "explicit military mount upright",
+      "originalFaces": 12,
+      "candidateFaces": 12,
+      "verifiedUpperMillimetres": {
+        "candidateToArchive": 0,
+        "archiveToCandidate": 0
+      }
+    },
+    {
+      "index": 17,
+      "name": "explicit military mount longitudinal member",
+      "originalFaces": 12,
+      "candidateFaces": 12,
+      "verifiedUpperMillimetres": {
+        "candidateToArchive": 0,
+        "archiveToCandidate": 0
+      }
+    }
+  ]
+}

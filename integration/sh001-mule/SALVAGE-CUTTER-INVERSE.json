@@ -1,0 +1,375 @@
+{
+  "base": "4eabe14e93ac37dd3272b4d8076537fd87796758",
+  "files": {
+    "flight/emp.rs": {
+      "beforeSHA256": "3fe0ed6be975fbefa59c097a96aef3c8b7d7d4701fbd848b96a31ec0e572fb97",
+      "afterSHA256": "fae66cbc0f7068ffa6e8c8dc3e436268b852642054a56696b71c96254230271a",
+      "hunks": [
+        {
+          "offset": 2407,
+          "before": "",
+          "after": "    flight: Option<SalvageHandover>,\n}\n#[derive(Debug, Clone, Copy, PartialEq, Eq)]\nstruct SalvageHandover {\n    cutter: u64,\n    visit: u64,\n    clock: u64,\n}\n\n#[derive(Debug, Clone, Copy, PartialEq, Eq)]\npub(in crate::flight) struct SalvageEmpLink {\n    pub(crate) item: u64,\n    pub(crate) cutter: u64,\n    pub(crate) revision: u64,\n    pub(crate) tick: u64,\n    pub(crate) visit: u64,\n    pub(crate) clock: u64,\n    pub(crate) restoring: bool,\n"
+        },
+        {
+          "offset": 4204,
+          "before": "",
+          "after": "        let mut suspended = false;\n"
+        },
+        {
+          "offset": 4284,
+          "before": "",
+          "after": "            if event.flight.is_some() {\n                match event.action {\n                    EmpEquipmentAction::Store { .. } if !suspended => suspended = true,\n                    EmpEquipmentAction::Fit { .. } if suspended => suspended = false,\n                    _ => return Err(INVALID),\n                }\n            } else if suspended {\n                return Err(INVALID);\n            }\n"
+        },
+        {
+          "offset": 7719,
+          "before": "",
+          "after": "            if let Some(flight) = event.flight {\n                let (item, restoring) = match event.action {\n                    EmpEquipmentAction::Store { item } => (item, false),\n                    EmpEquipmentAction::Fit { item } => (item, true),\n                    _ => return Err(INVALID),\n                };\n                if event.secret\n                    || flight.clock == 0\n                    || flight.clock > world.combat.physical_tick()\n                    || flight.clock > event.tick\n                    || flight.visit <= event.dock.visit()\n                    || previous.is_none_or(|prior| prior.dock != event.dock)\n                    || self.salvage_charge_overlaps(flight.clock)\n                    || !world.modular.matches_salvage_emp_event(SalvageEmpLink {\n                        item,\n                        cutter: flight.cutter,\n                        revision: event.revision,\n                        tick: event.tick,\n                        visit: flight.visit,\n                        clock: flight.clock,\n                        restoring,\n                    })\n                {\n                    return Err(INVALID);\n                }\n            }\n"
+        },
+        {
+          "offset": 10391,
+          "before": "",
+          "after": "    }\n\n    fn salvage_charge_overlaps(&self, clock: u64) -> bool {\n        self.charge.as_ref().is_some_and(|charge| {\n            charge.start.physical_tick <= clock && charge.ended_at.is_none_or(|end| end >= clock)\n        }) || self.pulses.iter().any(|pulse| {\n            pulse.charge.start.physical_tick <= clock && pulse.release.physical_tick >= clock\n        })\n    }\n\n    pub(in crate::flight) fn prepare_salvage_handover(\n        &self,\n        link: SalvageEmpLink,\n    ) -> Result<Self, SaveError> {\n        let SalvageEmpLink {\n            item,\n            cutter,\n            revision,\n            tick,\n            visit,\n            clock,\n            restoring,\n        } = link;\n        let dock = self.equipment.last().ok_or(INVALID)?.dock;\n        if self.equipment.len() >= MAX_EQUIPMENT_EVENTS\n            || self.input_blocked()\n            || self.salvage_charge_overlaps(clock)\n            || self\n                .owned()?\n                .is_none_or(|owned| owned.item != item || owned.fitted == restoring)\n        {\n            return Err(INVALID);\n        }\n        let mut next = self.clone();\n        Arc::make_mut(&mut next.equipment).push(EquipmentEvent {\n            secret: false,\n            action: if restoring {\n                EmpEquipmentAction::Fit { item }\n            } else {\n                EmpEquipmentAction::Store { item }\n            },\n            dock,\n            tick,\n            revision,\n            flight: Some(SalvageHandover {\n                cutter,\n                visit,\n                clock,\n            }),\n        });\n        next.owned()?;\n        Ok(next)\n    }\n\n    pub(in crate::flight) fn matches_salvage_handover(&self, link: SalvageEmpLink) -> bool {\n        let SalvageEmpLink {\n            item,\n            cutter,\n            revision,\n            tick,\n            visit,\n            clock,\n            restoring,\n        } = link;\n        self.equipment.iter().any(|event| {\n            event.revision == revision\n                && event.tick == tick\n                && !event.secret\n                && event.action\n                    == if restoring {\n                        EmpEquipmentAction::Fit { item }\n                    } else {\n                        EmpEquipmentAction::Store { item }\n                    }\n                && event.flight\n                    == Some(SalvageHandover {\n                        cutter,\n                        visit,\n                        clock,\n                    })\n        })\n"
+        }
+      ]
+    },
+    "flight/emp/equipment.rs": {
+      "beforeSHA256": "4beca3f8ea8d7af03120b4bcfe1e6399cc9d7209b06028f9bc684219568d41d3",
+      "afterSHA256": "f9926ff582004339a8055d523dcf13b0401efe138e3ba61af74beadcdcb4e450",
+      "hunks": [
+        {
+          "offset": 1693,
+          "before": "",
+          "after": "        if self.modular.salvage_exchange_pending() {\n            return Err(EmpError::UtilityCapacity);\n        }\n"
+        },
+        {
+          "offset": 6628,
+          "before": "",
+          "after": "            flight: None,\n"
+        },
+        {
+          "offset": 8861,
+          "before": "",
+          "after": "            flight: None,\n"
+        }
+      ]
+    },
+    "flight/emp/persistence.rs": {
+      "beforeSHA256": "de56cee1bed403a15e71c7d499652d489d5f25b647be9d3b12c19094f9d42829",
+      "afterSHA256": "8888c43ca7a233fa3daf41d5f9ec1de03ea538d405a403f6eaf7af8d937b9c22",
+      "hunks": [
+        {
+          "offset": 196,
+          "before": "    INVALID, MAX_EQUIPMENT_EVENTS, MAX_PULSES, Reader, SaveError, State, Writer, meter, runtime,\n    scene,\n",
+          "after": "    INVALID, MAX_EQUIPMENT_EVENTS, MAX_PULSES, Reader, SalvageHandover, SaveError, State, Writer,\n    meter, runtime, scene,\n"
+        },
+        {
+          "offset": 739,
+          "before": "                    w.u8(1);\n",
+          "after": "                    w.u8(if e.flight.is_some() { 4 } else { 1 });\n"
+        },
+        {
+          "offset": 912,
+          "before": "                    w.u8(2);\n",
+          "after": "                    w.u8(if e.flight.is_some() { 5 } else { 2 });\n"
+        },
+        {
+          "offset": 1376,
+          "before": "",
+          "after": "            }\n            if let Some(flight) = e.flight {\n                w.u64(flight.cutter);\n                w.u64(flight.visit);\n                w.u64(flight.clock);\n"
+        },
+        {
+          "offset": 3287,
+          "before": "            let action = match r.u8()? {\n",
+          "after": "            let tag = r.u8()?;\n            let action = match tag {\n"
+        },
+        {
+          "offset": 3406,
+          "before": "                1 => EmpEquipmentAction::Fit { item: r.u64()? },\n                2 => EmpEquipmentAction::Store { item: r.u64()? },\n",
+          "after": "                1 | 4 => EmpEquipmentAction::Fit { item: r.u64()? },\n                2 | 5 => EmpEquipmentAction::Store { item: r.u64()? },\n"
+        },
+        {
+          "offset": 3965,
+          "before": "",
+          "after": "            let flight = if matches!(tag, 4 | 5) {\n                Some(SalvageHandover {\n                    cutter: r.u64()?,\n                    visit: r.u64()?,\n                    clock: r.u64()?,\n                })\n            } else {\n                None\n            };\n"
+        },
+        {
+          "offset": 4455,
+          "before": "",
+          "after": "                flight,\n"
+        }
+      ]
+    },
+    "flight/emp/replay.rs": {
+      "beforeSHA256": "7f87762c7c740e83abeaa4206f7630b2529ebe87d2ea11d24c52e6ea35a50388",
+      "afterSHA256": "2afccbfdf9833ebaed55af856256a53bb3946f8b40384258e812b22010b5d797",
+      "hunks": [
+        {
+          "offset": 5616,
+          "before": "            let clock = world\n                .damage\n                .berth_clock(event.dock.sequence())\n                .ok_or(INVALID)?;\n",
+          "after": "            let clock = if let Some(flight) = event.flight {\n                flight.clock\n            } else {\n                world\n                    .damage\n                    .berth_clock(event.dock.sequence())\n                    .ok_or(INVALID)?\n            };\n"
+        }
+      ]
+    },
+    "flight/emp/validation.rs": {
+      "beforeSHA256": "7fd4526c6dbf9d210ed92271ca21a0bdd292ded7f76f38730abf21a147777ab4",
+      "afterSHA256": "023730d48acca990555e97f3890022d65743661b674631ec8f8a9de2354d89f6",
+      "hunks": [
+        {
+          "offset": 1008,
+          "before": "            if e.dock.visit() >= scene.owner.visit\n                || world\n                    .damage\n                    .berth_clock(e.dock.sequence())\n                    .is_none_or(|c| c > scene.physical_tick)\n            {\n",
+          "after": "            let valid = if let Some(flight) = e.flight {\n                flight.visit <= scene.owner.visit && flight.clock <= scene.physical_tick\n            } else {\n                e.dock.visit() < scene.owner.visit\n                    && world\n                        .damage\n                        .berth_clock(e.dock.sequence())\n                        .is_some_and(|c| c <= scene.physical_tick)\n            };\n            if !valid {\n"
+        },
+        {
+          "offset": 15347,
+          "before": "",
+          "after": "                            | super::super::ModuleSlot::UtilitySalvageCutter\n"
+        }
+      ]
+    },
+    "flight/equipment.rs": {
+      "beforeSHA256": "7219d07fd1fd8ba7f033ba142fda6b9ed017d5e2bf94a62b3145911caeac8867",
+      "afterSHA256": "1d7aa717ee2bf796159db5341023241eab1107ee77495c247be032d57bff341a",
+      "hunks": [
+        {
+          "offset": 271,
+          "before": "",
+          "after": "        if self.modular.salvage_exchange_pending() {\n            return Err(MissionError::Equipment(equipment::Error::Unavailable));\n        }\n"
+        }
+      ]
+    },
+    "flight/modular.rs": {
+      "beforeSHA256": "f9763f427721e0d5f91fc0e4c8055111869f087ad79b60063d4747f479e9be5b",
+      "afterSHA256": "8733e5c36c64aac71238acf93c4a90fc73f572af9d9512b72763d881916a9b06",
+      "hunks": [
+        {
+          "offset": 403,
+          "before": "",
+          "after": "mod salvage;\n"
+        },
+        {
+          "offset": 1239,
+          "before": "",
+          "after": "    SalvageCutter,\n"
+        },
+        {
+          "offset": 1806,
+          "before": "",
+          "after": "            Self::SalvageCutter => \"utility-salvageCutter\",\n"
+        },
+        {
+          "offset": 3591,
+          "before": "",
+          "after": "            Self::SalvageCutter => \"Salvage Cutter\",\n"
+        },
+        {
+          "offset": 5737,
+          "before": "",
+          "after": "            Self::SalvageCutter => ModuleSlot::UtilitySalvageCutter,\n"
+        },
+        {
+          "offset": 7337,
+          "before": "",
+          "after": "                | Self::SalvageCutter\n"
+        },
+        {
+          "offset": 8176,
+          "before": "            Self::FuelStorage | Self::Ecm => 1,\n",
+          "after": "            Self::FuelStorage | Self::Ecm | Self::SalvageCutter => 1,\n"
+        },
+        {
+          "offset": 8520,
+          "before": "",
+          "after": "            Self::SalvageCutter => Some((25_000, 7)),\n"
+        },
+        {
+          "offset": 12280,
+          "before": "",
+          "after": "            Self::SalvageCutter => 33,\n"
+        },
+        {
+          "offset": 13520,
+          "before": "",
+          "after": "            33 => Ok(Self::SalvageCutter),\n"
+        },
+        {
+          "offset": 13829,
+          "before": "",
+          "after": "    UtilitySalvageCutter,\n"
+        },
+        {
+          "offset": 15316,
+          "before": "    Purchase { kind: ModuleKind },\n",
+          "after": "    Purchase {\n        kind: ModuleKind,\n    },\n"
+        },
+        {
+          "offset": 15388,
+          "before": "    Store { item: u64 },\n    Install { item: u64, replacing: Option<u64> },\n",
+          "after": "    /// Reserved for the explicit XYZZY outfit; ordinary reviews refuse it.\n    GrantStoredSalvageCutter,\n    /// Internal reversible utility placement for an admitted external recovery.\n    FlightSalvageExchange {\n        source: crate::traffic::NpcId,\n        cutter: u64,\n        displaced_emp: Option<u64>,\n        visit: u64,\n        clock: u64,\n        restoring: bool,\n    },\n    Store {\n        item: u64,\n    },\n    Install {\n        item: u64,\n        replacing: Option<u64>,\n    },\n"
+        },
+        {
+          "offset": 16077,
+          "before": "",
+          "after": "            Self::GrantStoredSalvageCutter => Some(ModuleKind::SalvageCutter),\n"
+        },
+        {
+          "offset": 18029,
+          "before": "",
+          "after": "    salvage: salvage::State,\n"
+        },
+        {
+          "offset": 19490,
+          "before": "",
+          "after": "    salvage_return: Option<salvage::Exchange>,\n"
+        },
+        {
+          "offset": 26553,
+          "before": "",
+          "after": "        if self.salvage_return.is_some()\n            && !matches!(event.action, ModuleAction::FlightSalvageExchange { .. })\n        {\n            return Err(ModuleError::Capacity);\n        }\n        if event.action == ModuleAction::GrantStoredSalvageCutter && !event.xyzzy {\n            return Err(ModuleError::NotForSale);\n        }\n"
+        },
+        {
+          "offset": 28434,
+          "before": "            self.install(self.items.len() - 1, replacing)?;\n",
+          "after": "            if event.action != ModuleAction::GrantStoredSalvageCutter {\n                self.install(self.items.len() - 1, replacing)?;\n            }\n"
+        },
+        {
+          "offset": 28808,
+          "before": "",
+          "after": "                ModuleAction::FlightSalvageExchange { .. } => self.apply_salvage_exchange(event)?,\n"
+        },
+        {
+          "offset": 28957,
+          "before": "",
+          "after": "                    if self\n                        .salvage_return\n                        .is_some_and(|exchange| exchange.cutter == item)\n                    {\n                        return Err(ModuleError::Capacity);\n                    }\n"
+        },
+        {
+          "offset": 30667,
+          "before": "",
+          "after": "                | ModuleAction::GrantStoredSalvageCutter\n"
+        },
+        {
+          "offset": 35595,
+          "before": "",
+          "after": "            } else if matches!(e.action, ModuleAction::FlightSalvageExchange { .. }) {\n                super::AccountEffect::Debit(0)\n"
+        },
+        {
+          "offset": 39616,
+          "before": "",
+          "after": "            if let Some(exchange) = salvage::Exchange::from_action(e.action) {\n                self.validate_salvage_exchange(world, account, *e, previous, exchange)?;\n            }\n"
+        },
+        {
+          "offset": 42387,
+          "before": "",
+          "after": "                        + u16::from(ledger.fitted(ModuleSlot::UtilitySalvageCutter).is_some())\n"
+        },
+        {
+          "offset": 44122,
+          "before": "",
+          "after": "                        + u16::from(ledger.fitted(ModuleSlot::UtilitySalvageCutter).is_some())\n"
+        },
+        {
+          "offset": 44645,
+          "before": "",
+          "after": "            if ledger.fitted(ModuleSlot::UtilitySalvageCutter).is_some() {\n                let cargo = self.known_cargo_mounts_at(account, e.revision);\n                let mounts = u16::from(tanks)\n                    + u16::from(ledger.fitted(ModuleSlot::UtilityFuelScoops).is_some())\n                    + u16::from(ledger.fitted(ModuleSlot::UtilityEcm).is_some())\n                    + 1\n                    + cargo\n                    + world.emp.utility_mounts_at_revision(e.revision);\n                if mounts.saturating_sub(allowance) > budget.utility_mounts_capacity {\n                    return Err(INVALID);\n                }\n            }\n"
+        },
+        {
+          "offset": 51283,
+          "before": "",
+          "after": "            + u16::from(\n                after_ledger\n                    .fitted(ModuleSlot::UtilitySalvageCutter)\n                    .is_some(),\n            )\n"
+        },
+        {
+          "offset": 52307,
+          "before": "            | (u32::from(self.history.active()) << 30);\n",
+          "after": "            | (u32::from(self.history.active()) << 30)\n            | (u32::from(!self.salvage.is_empty()) << 29);\n"
+        },
+        {
+          "offset": 52793,
+          "before": "",
+          "after": "                ModuleAction::GrantStoredSalvageCutter => w.u8(17),\n                ModuleAction::FlightSalvageExchange {\n                    source,\n                    displaced_emp,\n                    visit,\n                    clock,\n                    restoring,\n                    ..\n                } => {\n                    w.u8(20);\n                    source.encode(w);\n                    w.option(displaced_emp.as_ref(), |w, item| w.u64(*item));\n                    w.u64(visit);\n                    w.u64(clock);\n                    w.bool(restoring);\n                }\n"
+        },
+        {
+          "offset": 54215,
+          "before": "",
+          "after": "        if !self.salvage.is_empty() {\n            self.salvage.encode(w);\n        }\n"
+        },
+        {
+          "offset": 54542,
+          "before": "        let count = (raw_count & 0x3fff_ffff) as usize;\n",
+          "after": "        let count = (raw_count & 0x1fff_ffff) as usize;\n"
+        },
+        {
+          "offset": 55290,
+          "before": "",
+          "after": "            let salvage_exchange = if tag == 20 {\n                Some((\n                    crate::traffic::NpcId::decode(r)?,\n                    r.option(|r| r.u64())?,\n                    r.u64()?,\n                    r.u64()?,\n                    r.bool()?,\n                ))\n            } else {\n                None\n            };\n"
+        },
+        {
+          "offset": 55986,
+          "before": "",
+          "after": "                17 => ModuleAction::GrantStoredSalvageCutter,\n                20 => {\n                    let (source, displaced_emp, visit, clock, restoring) =\n                        salvage_exchange.ok_or(SaveError::InvalidEncoding)?;\n                    ModuleAction::FlightSalvageExchange {\n                        source,\n                        cutter: item,\n                        displaced_emp,\n                        visit,\n                        clock,\n                        restoring,\n                    }\n                }\n"
+        },
+        {
+          "offset": 57678,
+          "before": "",
+          "after": "        let salvage = if raw_count & (1 << 29) != 0 {\n            salvage::State::decode(r)?\n        } else {\n            salvage::State::default()\n        };\n"
+        },
+        {
+          "offset": 58135,
+          "before": "",
+          "after": "            salvage,\n"
+        },
+        {
+          "offset": 60875,
+          "before": "",
+          "after": "            ModuleKind::SalvageCutter,\n"
+        },
+        {
+          "offset": 66077,
+          "before": "",
+          "after": "        if matches!(\n            action,\n            ModuleAction::GrantStoredSalvageCutter | ModuleAction::FlightSalvageExchange { .. }\n        ) {\n            return Err(ModuleError::NotForSale);\n        }\n        if self.modular.salvage_exchange_pending() {\n            return Err(ModuleError::Capacity);\n        }\n"
+        },
+        {
+          "offset": 78715,
+          "before": "",
+          "after": "        let cutter_stored = if kind == ModuleKind::SalvageCutter {\n            let definition = crate::equipment::definition().map_err(|_| INVALID)?;\n            let (units, mounts) = ledger\n                .budget_usage(current, self.emp.utility_mounts())\n                .map_err(|_| INVALID)?;\n            units >= definition.equipment_units_capacity\n                || mounts >= definition.utility_mounts_capacity\n        } else {\n            false\n        };\n        if cutter_stored && existing.is_some() {\n            return Ok(());\n        }\n"
+        },
+        {
+          "offset": 80005,
+          "before": "                ModuleAction::Purchase { kind },\n",
+          "after": "                if cutter_stored {\n                    ModuleAction::GrantStoredSalvageCutter\n                } else {\n                    ModuleAction::Purchase { kind }\n                },\n"
+        }
+      ]
+    },
+    "flight/modular/scoops.rs": {
+      "beforeSHA256": "c5176dd7df6d8709283e34d9a499166d4939128cc1e77a05aef70b8a334b42a0",
+      "afterSHA256": "8c114b556cf50accdc4cf23ab978a61971c25c7b90bf3b20e396eab4137d2ffa",
+      "hunks": [
+        {
+          "offset": 2324,
+          "before": "",
+          "after": "                        | ModuleSlot::UtilitySalvageCutter\n"
+        }
+      ]
+    },
+    "flight/persistence.rs": {
+      "beforeSHA256": "a2cfdc95b51dbe5df8cca58937b49fa7c415288d12bb885a5c8172acfae5e1a9",
+      "afterSHA256": "d47cb4f2da1c40c2ed19ed02e751b03b5e0cdf59d84be0b23b25c355a4c5587c",
+      "hunks": [
+        {
+          "offset": 32717,
+          "before": "",
+          "after": "        commerce.modular.validate_salvage(self, account)?;\n"
+        }
+      ]
+    },
+    "flight/xyzzy.rs": {
+      "beforeSHA256": "243f584fca8a79b0b8c8c6bd379fab9bdd10e64172c237555b085e74786d6ee4",
+      "afterSHA256": "7fd935b391895e7ca1cf819f43b325ec9b0248d4a8e096ddc790d57ff6210b6e",
+      "hunks": [
+        {
+          "offset": 28716,
+          "before": "",
+          "after": "            self.grant_xyzzy_module(review.dock, review.tick, super::ModuleKind::SalvageCutter)?;\n"
+        }
+      ]
+    }
+  }
+}

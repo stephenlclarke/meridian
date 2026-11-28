@@ -1,0 +1,226 @@
+{
+  "hull": "SH159 Wolf Mk II",
+  "scope": "Original catalogue inspection and geometry queries",
+  "source": "assets/fleet/sh159/SOURCE-GEOMETRY.json",
+  "frozenSources": "integration/sh159-wolf-mk-ii/FROZEN-SOURCES.json",
+  "sourceScaleMetresPerUnit": "1500000/182771",
+  "faces": {
+    "detailed": 2028,
+    "archivedNative": 764,
+    "candidateNative": 512,
+    "candidateMaximum": 512
+  },
+  "originalAccess": {
+    "runtimeCatalogue": {
+      "playerFlyable": false,
+      "normalPurchaseEligible": false,
+      "purchasePolicy": "pendingFabrication"
+    },
+    "r3DesignContract": {
+      "playerFlyable": true,
+      "purchasePolicy": "blueprintFabrication"
+    }
+  },
+  "engineering": {
+    "sourceReference": "finite-intrinsic-empty-wolf-mk-ii",
+    "massKg": 34023
+  },
+  "supportGroups": 93,
+  "candidateComponentInventory": {
+    "originalPartsRepresented": 29,
+    "unalteredNativeParts": 13,
+    "recessedWells": 10,
+    "partsUsingSelectedOriginalVertices": 6,
+    "sampledArcSections": 0,
+    "arcSeamVertices": 0
+  },
+  "minimumRouteClearanceMillimetres": 1229,
+  "sourceContactCounts": {
+    "overlap": 21,
+    "unchangedNativeParts": 13
+  },
+  "candidateRebuild": "tools/rebuild_wolf_mk_ii.py",
+  "fitUpperMillimetres": {
+    "detailed": 2762,
+    "archivedNative": 2799,
+    "candidateNative": 2765
+  },
+  "continuousCandidateFitMillimetres": {
+    "archiveToCandidate": {
+      "lowerFloor": 1559,
+      "upperCeiling": 1579
+    },
+    "candidateToArchive": {
+      "lowerFloor": 262,
+      "upperCeiling": 288
+    },
+    "detailedToCandidate": {
+      "lowerFloor": 1559,
+      "upperCeiling": 1581
+    },
+    "candidateToDetailed": {
+      "lowerFloor": 553,
+      "upperCeiling": 577
+    }
+  },
+  "hullStudio": {
+    "definition": "integration/sh159-wolf-mk-ii/WOLF-MK-II-STUDIO.json",
+    "bytes": 343990,
+    "sha256": "dbe054f7c369ae45d2d8f91384eb6e30cb87b65ec35637042eff716c26ce8744",
+    "supports": 93,
+    "probes": 7,
+    "detail": "2,028 original detailed faces",
+    "native": "512 separate candidate faces",
+    "loaderRevision": "27121e66ba37a29781135b56924a9d6e7f38a70a",
+    "signedInstalledExport": {
+      "status": "PASS",
+      "scope": "Signed installed Studio offline original artwork import/export",
+      "bundleIdentifier": "io.xyzzy.meridian.hullstudio",
+      "bundleVersion": "0.0.0",
+      "codeDirectoryHash": "93938bda9242ebdff508bfb9e16b3cdf83c0a200",
+      "developerIdTeam": "4MEB7MUTAV",
+      "signatureVerification": "deep strict",
+      "definition": {
+        "bytes": 343990,
+        "sha256": "dbe054f7c369ae45d2d8f91384eb6e30cb87b65ec35637042eff716c26ce8744"
+      },
+      "exportExitStatuses": [
+        0,
+        0
+      ],
+      "exportMatchesDefinitionExceptTrailingLf": true,
+      "valid": true,
+      "diagnostics": [],
+      "detailedTriangles": 2028,
+      "nativeTriangles": 512,
+      "supportGroups": 93,
+      "engineeringReference": "finite-intrinsic-empty-wolf-mk-ii",
+      "massKg": 34023,
+      "receiptFiles": {
+        "wolf-mk-ii.hull.json": {
+          "bytes": 343989,
+          "sha256": "86a9ce6068521d9f0e2cf70d66fcfba2b394cc7b36fdc061f4170b36f4b03657"
+        },
+        "wolf-mk-ii-repeat.hull.json": {
+          "bytes": 343989,
+          "sha256": "86a9ce6068521d9f0e2cf70d66fcfba2b394cc7b36fdc061f4170b36f4b03657"
+        },
+        "studio.stdout.json": {
+          "bytes": 97293,
+          "sha256": "ac5a59cb64500c30c90447350ef76f5fbe2a6da6db255984f88becbf23cf82a9"
+        },
+        "studio-repeat.stdout.json": {
+          "bytes": 97293,
+          "sha256": "ac5a59cb64500c30c90447350ef76f5fbe2a6da6db255984f88becbf23cf82a9"
+        },
+        "codesign.log": {
+          "bytes": 13038,
+          "sha256": "986589a9faa333f398d224473e1c6eddbab4f7d410227e9086358e1101353bd5"
+        },
+        "codesign-identity.log": {
+          "bytes": 988,
+          "sha256": "f6d772f29f9e72421e98a6d7243102b92b77b5995acbe6cda7ddb3bbfc3b1706"
+        }
+      },
+      "artworkProbeResults": [
+        {
+          "name": "dorsal",
+          "passed": true
+        },
+        {
+          "name": "ventral",
+          "passed": true
+        },
+        {
+          "name": "port-outboard",
+          "passed": true
+        },
+        {
+          "name": "starboard-outboard",
+          "passed": true
+        },
+        {
+          "name": "under-pressure-envelope",
+          "passed": true
+        },
+        {
+          "name": "above-port-lateral-structure",
+          "passed": true
+        },
+        {
+          "name": "above-starboard-lateral-structure",
+          "passed": true
+        }
+      ],
+      "triangleRoles": {
+        "detail": "original detailed visible",
+        "native": "derived native inspection candidate"
+      }
+    }
+  },
+  "byteReplay": {
+    "commands": [
+      "python3 -B tools/prepare_wolf_mk_ii.py --check",
+      "python3 -B tools/rebuild_wolf_mk_ii.py",
+      "python3 -B tools/verify_wolf_mk_ii.py | cmp - integration/sh159-wolf-mk-ii/CONTACT-RESULT.json",
+      "python3 -B tools/measure_wolf_mk_ii.py | cmp - integration/sh159-wolf-mk-ii/SURFACE-FIT.json",
+      "python3 -B tools/measure_wolf_mk_ii.py --fidelity | cmp - integration/sh159-wolf-mk-ii/CANDIDATE-FIDELITY.json",
+      "python3 -B tools/measure_wolf_mk_ii.py --directions | cmp - integration/sh159-wolf-mk-ii/CANDIDATE-FIT-LOCALIZATION.json",
+      "python3 -B tools/measure_wolf_mk_ii.py --reference-directions | cmp - integration/sh159-wolf-mk-ii/REFERENCE-FIT-LOCALIZATION.json"
+    ],
+    "host": "SteveMBA",
+    "startedUtc": "2026-11-25T08:28:17Z",
+    "finishedUtc": "2026-11-25T08:28:51Z",
+    "log": {
+      "bytes": 713,
+      "sha256": "4acb02dce2f5d079fe9397c035728c62447211a47ded01151a7d0fdb9351b1bd"
+    },
+    "fitDependencies": {
+      "python": "3.14.3",
+      "numpy": "2.5.5",
+      "scipy": "1.18.1",
+      "trimesh": "5.2.1",
+      "rtree": "1.4.1"
+    },
+    "originalCommit": "a8b3a0ca3bac01576b4d1ec0ca63cce17d4099d2",
+    "historicalReplayPins": {
+      "tools/measure_banteng_geometry.py": "4b7d8d5d972e30d93bebf7f422be71e415d6e4a9c4b622582ecf6e30a6bb9235",
+      "tools/measure_lanner_geometry.py": "cabbaf17ff7efdbcbee9a1fba67c7edafd59dceb8e97f367824a51c134479992",
+      "tools/verify_eagle_cruiser_geometry.py": "c7926cb6e699ae5ffb445951ce9d4e98a64018a7ecb1db2e5e77a611d742a783"
+    }
+  },
+  "replayPins": {
+    "tools/fleet_hull_measurement.py": "3570747d9f650efc7d0e4f88352e9fd32e42ab394f4669100223fbac0c1be6b7",
+    "tools/directed_hull_fit.py": "dbd5d45e5052453646b752695815d6cb53c6ccb2c3ad6694451a4c7e19fa8bf7",
+    "integration/sh159-wolf-mk-ii/WOLF-MK-II-STUDIO.json": "dbe054f7c369ae45d2d8f91384eb6e30cb87b65ec35637042eff716c26ce8744",
+    "integration/sh159-wolf-mk-ii/FROZEN-SOURCES.json": "b5c19d3e1a1ca3c04c463db480021e10cee9ef06ca44f3fbc52cb8d4e3fa8faa",
+    "integration/sh159-wolf-mk-ii/CONTACT-CANDIDATE.json": "2e9487bd68c62ee3c78ff4a0671e7a5298e9b2eefe498d8c3568b49db1264817",
+    "integration/sh159-wolf-mk-ii/CONTACT-RESULT.json": "a7adb3d56c2e98ba6f1f2434b2b2f8de84fce3a82d88b964034b9db4b33b7e8e",
+    "integration/sh159-wolf-mk-ii/ORIGINAL-OWNERSHIP.json": "7fc451d006028511315f2fd08bdf8f39074775f9354640c8676561e60dd25cf9",
+    "integration/sh159-wolf-mk-ii/RETAINED-OVERLAPS.json": "e18adcd3b76076a64059eef563f0ea3816314b2f85d5155a56ff927be0327c4f",
+    "integration/sh159-wolf-mk-ii/CANDIDATE-FIDELITY.json": "04486996df07698564395639c74bb156d247c91a8c93e98c6b45b9868740c381",
+    "integration/sh159-wolf-mk-ii/SUPPORT-FAN.json": "14c2d5e9e83d7044225c48a436a1365fcb1ae7c3fde846957cd2cdc1a32bbf0e",
+    "integration/sh159-wolf-mk-ii/SURFACE-FIT.json": "878cd13f8b277b626f5ed18d636aaaf336e2d76e9e75b9a55452225e632374df",
+    "integration/sh159-wolf-mk-ii/ARCHIVED-OVERLAPS.json": "bb2274464ba599e698bee4d6c2f8e8ee060b216d6e59383bfe08e6c72be1fef4",
+    "integration/sh159-wolf-mk-ii/CANDIDATE-TOPOLOGY-SURVEY.json": "babec12dfd000b5d0338914b1d92ab073b5422602a3d2153ec7f1df248024b26",
+    "integration/sh159-wolf-mk-ii/CANDIDATE-FIT-LOCALIZATION.json": "b8d912b419d693af7489274b0e465d467b271ec8904abcfd8fc43483b984123f",
+    "integration/sh159-wolf-mk-ii/REFERENCE-FIT-LOCALIZATION.json": "e9435c0fc24a453b9ea7342ef29cbab3594260f5794d157eb763362a9bb722eb",
+    "tools/atomic_asset_output.py": "2d13803823645d3bdea7c855af958eb54d7ebe513ec1bcb0af34e82870164bf0",
+    "tools/banteng_art_mesh.py": "ef5c0f538510486238d69dc301da80026fc93326767b38c50a04756ab9890a09",
+    "tools/encode_goshawk_visual.py": "9e524e9a32a237d71d212c8b5c34ecf12cde5a8e08885b1d03991b95c278f61c",
+    "tools/import_goshawk_envelope_source.py": "14b530725629ee3eaa5b3fd69f01fe00fe371564a1a52cb398d3969142db977e",
+    "tools/measure_banteng_geometry.py": "9356864e227302598fcae4e833ecb706b1ed8a5e600cbb4076b7165dc1e54bea",
+    "tools/measure_goshawk_surface_fit.py": "5407ef1e5fad41810aa95444ca1338fe33a91e5c9857dcb752b4e4cf2fca6d0b",
+    "tools/measure_lanner_geometry.py": "55d13a28602e6ed791adecd85ff43f3c8a7fbe118cf0977272e1747422c2408d",
+    "tools/measure_wolf_mk_ii.py": "095173db45c860a6c9667a88b4b8b34142e57ac6ec61a37fbfd737335aaa8ec8",
+    "tools/prepare_eagle_cruiser_geometry.py": "a1ea3b5d72f35e1f2932da71afa3ff8a276a504f7309a1086a2b3df35988addc",
+    "tools/prepare_wolf_mk_ii.py": "067ba258b31bad2d6c133f0081e2237b4207299b2a468a68085748ac57f2d66a",
+    "tools/verify_eagle_cruiser_geometry.py": "cb053ee5873fee62ee456bb3776e98d29b2cbb44c7344599bc617a8579164d43",
+    "tools/rebuild_wolf_mk_ii.py": "0a9efc8bdeb0eba36ad9c6f64f2d860114c32f3773ee90f57a29088cb7fefd88",
+    "tools/verify_wolf_mk_ii.py": "d5c73d26ea7f6193c9d5900a1955d0df62e635a24aa80229453ad55dc384dbfd",
+    "tools/vulture_mk_i_exact_fit.py": "479b31f8714a198a82c0e2888b8d19efe46c7b4c43a576b83ab84c571ae738c6",
+    "assets/fleet/sh159/GENERATED-COLLISION.json": "79cdba0a1afb0eb8508639565b449e04c77f0c5112fd25f4de58ef3df882b77b",
+    "assets/fleet/sh159/SOURCE-GEOMETRY.json": "acbb1c42abc65bc4338ddce037267b75362699ecb24291cdbbca285ed1947a95",
+    "tools/hull_contact_geometry.py": "07606202e6a298ad375a7504991fe6fb93da6a07f9b5cc4a22167bd570b07839"
+  }
+}

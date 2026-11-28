@@ -1,0 +1,105 @@
+{
+  "nominalPaddingMetres": 0.02,
+  "minimumRefinementTargetsMillimetres": {
+    "detailed": 2400,
+    "native": 4500
+  },
+  "fullUpperMillimetres": {
+    "detailed": 2031,
+    "native": 4042
+  },
+  "pieces": {
+    "primary pressure body": {
+      "detailed": 1030,
+      "native": 3370
+    },
+    "port wing": {
+      "detailed": 1873,
+      "native": 3561
+    },
+    "port nacelle": {
+      "detailed": 662,
+      "native": 2125
+    },
+    "port nozzle": {
+      "detailed": 1909,
+      "native": 1909
+    },
+    "starboard wing": {
+      "detailed": 2031,
+      "native": 4042
+    },
+    "starboard nacelle": {
+      "detailed": 662,
+      "native": 2125
+    },
+    "starboard nozzle": {
+      "detailed": 1909,
+      "native": 1909
+    },
+    "canopy": {
+      "detailed": 378,
+      "native": 900
+    },
+    "canopy ridge": {
+      "detailed": 340,
+      "native": 2553
+    },
+    "port service line": {
+      "detailed": 260,
+      "native": 676
+    },
+    "port instrument housing": {
+      "detailed": 668,
+      "native": 1382
+    },
+    "port louvre 1": {
+      "detailed": 241,
+      "native": 695
+    },
+    "port louvre 2": {
+      "detailed": 241,
+      "native": 698
+    },
+    "port louvre 3": {
+      "detailed": 241,
+      "native": 700
+    },
+    "port louvre 4": {
+      "detailed": 241,
+      "native": 703
+    },
+    "port louvre 5": {
+      "detailed": 241,
+      "native": 706
+    },
+    "starboard service line": {
+      "detailed": 260,
+      "native": 903
+    },
+    "starboard instrument housing": {
+      "detailed": 668,
+      "native": 1382
+    },
+    "starboard louvre 1": {
+      "detailed": 241,
+      "native": 694
+    },
+    "starboard louvre 2": {
+      "detailed": 241,
+      "native": 696
+    },
+    "starboard louvre 3": {
+      "detailed": 241,
+      "native": 699
+    },
+    "starboard louvre 4": {
+      "detailed": 241,
+      "native": 701
+    },
+    "starboard louvre 5": {
+      "detailed": 241,
+      "native": 704
+    }
+  }
+}

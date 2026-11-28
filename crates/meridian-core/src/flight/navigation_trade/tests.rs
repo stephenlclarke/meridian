@@ -63,6 +63,42 @@ fn service(w: &mut World, command: Command) -> Event {
     let tick = w.snapshot().tick;
     ok(w.request_station_service(command, tick))
 }
+
+#[test]
+fn bulk_trade_cannot_consume_the_identified_t04_tonne_or_replace_its_single_receipt() {
+    use crate::station_services::{CommodityTrade, TradeSide};
+    let mut world = commander(61104);
+    plan(&mut world, Id::Food);
+    let tick = world.snapshot().tick;
+    let order = |side, quantity| CommodityTrade {
+        side,
+        commodity: Id::Food,
+        quantity,
+    };
+    let before = ok(world.save_bytes());
+    assert_eq!(
+        world.request_commodity_trade(order(TradeSide::Buy, 2), tick),
+        Err(MissionError::NavigationTrade(Error::SingleUnitRequired))
+    );
+    assert_eq!(ok(world.save_bytes()), before);
+    ok(world.request_commodity_trade(order(TradeSide::Buy, 1), tick));
+    assert_eq!(world.reserved_commodity_quantity(Id::Food), Some(1));
+    let lesson = snap(&world);
+    ok(world.request_commodity_trade(order(TradeSide::Buy, 2), tick));
+    assert_eq!(world.commodity_quantity(Id::Food), Some(3));
+    let before = ok(world.save_bytes());
+    assert!(
+        world
+            .request_commodity_trade(order(TradeSide::Sell, 3), tick)
+            .is_err()
+    );
+    assert_eq!(ok(world.save_bytes()), before);
+    ok(world.request_commodity_trade(order(TradeSide::Sell, 2), tick));
+    assert_eq!(world.commodity_quantity(Id::Food), Some(1));
+    assert_eq!(world.reserved_commodity_quantity(Id::Food), Some(1));
+    assert_eq!(snap(&world).attempts, lesson.attempts);
+    assert_eq!(cold(&world).reserved_commodity_quantity(Id::Food), Some(1));
+}
 fn journey(w: &mut World, to: SystemId) {
     crate::flight::equipment::tests::journey(w, to);
     assert_eq!(some(w.current_dock_context()).system(), to);
@@ -177,6 +213,62 @@ fn complete(w: &mut World, id: Id) -> super::NavigationTradeTrace {
     );
     let _continued = cold(w);
     trace
+}
+
+#[test]
+fn abandoned_and_completed_fuel_anchors_survive_later_explicit_max_supply() {
+    use crate::XyzzyAction;
+    for (index, completed) in [false, true].into_iter().enumerate() {
+        let mut world = commander(18880 + index as u64);
+        if completed {
+            complete(&mut world, Id::Food);
+        } else {
+            plan(&mut world, Id::Food);
+            confirm(&mut world, Action::Cancel);
+        }
+        let past = snap(&world);
+        let anchor = *world
+            .navigation_trade
+            .attempts
+            .last()
+            .and_then(|a| a.terminal.as_ref())
+            .unwrap_or_else(|| panic!("terminal"));
+        let mut legacy = cold(&world);
+        let old = legacy
+            .navigation_trade
+            .attempts
+            .last_mut()
+            .unwrap_or_else(|| panic!("attempt"));
+        old.accepted_account_revision = None;
+        if let Some(terminal) = old.terminal.as_mut() {
+            terminal.account_revision = None;
+        }
+        for candidate in [&mut world, &mut legacy] {
+            let tick = candidate.snapshot().tick;
+            let review = ok(candidate.review_xyzzy(XyzzyAction::MaximumFuelStorage, tick));
+            ok(candidate.prepare_xyzzy(review, tick)).commit();
+            assert_eq!(some(candidate.snapshot().navigation).fuel_units, 410);
+            let loaded = cold(candidate);
+            assert_eq!(snap(&loaded).attempts, past.attempts);
+            let retained = loaded
+                .navigation_trade
+                .attempts
+                .last()
+                .and_then(|a| a.terminal)
+                .unwrap_or_else(|| panic!("terminal"));
+            assert_eq!(retained.fuel, anchor.fuel);
+            assert_eq!(retained.tick, anchor.tick);
+        }
+        reject(&mut world, |invalid| {
+            let terminal = invalid
+                .navigation_trade
+                .attempts
+                .last_mut()
+                .and_then(|a| a.terminal.as_mut())
+                .unwrap_or_else(|| panic!("terminal"));
+            terminal.fuel.fuel -= 1;
+        });
+    }
 }
 
 #[test]

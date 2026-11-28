@@ -1,0 +1,375 @@
+{
+  "roundingMetres": 0.02,
+  "minimumRefinementTargetsMillimetres": {
+    "detailed": 1800,
+    "archiveNative": 2000,
+    "candidateNative": 2400
+  },
+  "fullUpperMillimetres": {
+    "detailed": 2173,
+    "archiveNative": 2556,
+    "candidateNative": 4671
+  },
+  "pieces": {
+    "radial pressure envelope[1]": {
+      "detailed": 1684,
+      "archiveNative": 1862,
+      "candidateNative": 3232
+    },
+    "radial pressure envelope/service-well-0-0[1]": {
+      "detailed": 2173,
+      "archiveNative": 2551,
+      "candidateNative": 4222
+    },
+    "radial pressure envelope/service-well-0-1[1]": {
+      "detailed": 1670,
+      "archiveNative": 2082,
+      "candidateNative": 4093
+    },
+    "radial pressure envelope/service-well-0-2[1]": {
+      "detailed": 1670,
+      "archiveNative": 1811,
+      "candidateNative": 4040
+    },
+    "radial pressure envelope/service-well-1-0[1]": {
+      "detailed": 2130,
+      "archiveNative": 2546,
+      "candidateNative": 4472
+    },
+    "radial pressure envelope/service-well-1-1[1]": {
+      "detailed": 1670,
+      "archiveNative": 2056,
+      "candidateNative": 4134
+    },
+    "radial pressure envelope/service-well-1-2[1]": {
+      "detailed": 1670,
+      "archiveNative": 2086,
+      "candidateNative": 4030
+    },
+    "radial pressure envelope/service-well-2-0[1]": {
+      "detailed": 1670,
+      "archiveNative": 2556,
+      "candidateNative": 4324
+    },
+    "radial pressure envelope/service-well-2-1[1]": {
+      "detailed": 1670,
+      "archiveNative": 2070,
+      "candidateNative": 4090
+    },
+    "radial pressure envelope/service-well-2-2[1]": {
+      "detailed": 1670,
+      "archiveNative": 1818,
+      "candidateNative": 3671
+    },
+    "radial pressure envelope/service-well-3-0[1]": {
+      "detailed": 1670,
+      "archiveNative": 2541,
+      "candidateNative": 4344
+    },
+    "radial pressure envelope/service-well-3-1[1]": {
+      "detailed": 1670,
+      "archiveNative": 2067,
+      "candidateNative": 4138
+    },
+    "radial pressure envelope/service-well-3-2[1]": {
+      "detailed": 1670,
+      "archiveNative": 2076,
+      "candidateNative": 3661
+    },
+    "radial pressure envelope/longitudinal-service-strut-0[1]": {
+      "detailed": 380,
+      "archiveNative": 1090,
+      "candidateNative": 1093
+    },
+    "radial pressure envelope/longitudinal-service-strut-1[1]": {
+      "detailed": 380,
+      "archiveNative": 1085,
+      "candidateNative": 1085
+    },
+    "radial connected support[1]": {
+      "detailed": 1565,
+      "archiveNative": 1565,
+      "candidateNative": 1565
+    },
+    "radial pressure envelope[2]": {
+      "detailed": 1648,
+      "archiveNative": 1950,
+      "candidateNative": 3238
+    },
+    "radial pressure envelope/service-well-0-0[2]": {
+      "detailed": 1670,
+      "archiveNative": 2551,
+      "candidateNative": 4366
+    },
+    "radial pressure envelope/service-well-0-1[2]": {
+      "detailed": 1670,
+      "archiveNative": 2065,
+      "candidateNative": 3878
+    },
+    "radial pressure envelope/service-well-0-2[2]": {
+      "detailed": 1670,
+      "archiveNative": 1811,
+      "candidateNative": 3667
+    },
+    "radial pressure envelope/service-well-1-0[2]": {
+      "detailed": 2130,
+      "archiveNative": 2246,
+      "candidateNative": 4219
+    },
+    "radial pressure envelope/service-well-1-1[2]": {
+      "detailed": 1670,
+      "archiveNative": 2056,
+      "candidateNative": 4134
+    },
+    "radial pressure envelope/service-well-1-2[2]": {
+      "detailed": 1670,
+      "archiveNative": 2086,
+      "candidateNative": 3664
+    },
+    "radial pressure envelope/service-well-2-0[2]": {
+      "detailed": 2162,
+      "archiveNative": 2556,
+      "candidateNative": 4225
+    },
+    "radial pressure envelope/service-well-2-1[2]": {
+      "detailed": 1670,
+      "archiveNative": 2188,
+      "candidateNative": 4090
+    },
+    "radial pressure envelope/service-well-2-2[2]": {
+      "detailed": 1670,
+      "archiveNative": 1818,
+      "candidateNative": 3671
+    },
+    "radial pressure envelope/service-well-3-0[2]": {
+      "detailed": 1670,
+      "archiveNative": 2541,
+      "candidateNative": 4343
+    },
+    "radial pressure envelope/service-well-3-1[2]": {
+      "detailed": 1670,
+      "archiveNative": 2067,
+      "candidateNative": 4138
+    },
+    "radial pressure envelope/service-well-3-2[2]": {
+      "detailed": 1670,
+      "archiveNative": 2076,
+      "candidateNative": 3953
+    },
+    "radial pressure envelope/longitudinal-service-strut-0[2]": {
+      "detailed": 380,
+      "archiveNative": 1090,
+      "candidateNative": 1093
+    },
+    "radial pressure envelope/longitudinal-service-strut-1[2]": {
+      "detailed": 380,
+      "archiveNative": 1085,
+      "candidateNative": 1085
+    },
+    "radial connected support[2]": {
+      "detailed": 1314,
+      "archiveNative": 1314,
+      "candidateNative": 2081
+    },
+    "radial pressure envelope[3]": {
+      "detailed": 1648,
+      "archiveNative": 1927,
+      "candidateNative": 3244
+    },
+    "radial pressure envelope/service-well-0-0[3]": {
+      "detailed": 2173,
+      "archiveNative": 2226,
+      "candidateNative": 3990
+    },
+    "radial pressure envelope/service-well-0-1[3]": {
+      "detailed": 1670,
+      "archiveNative": 2082,
+      "candidateNative": 4093
+    },
+    "radial pressure envelope/service-well-0-2[3]": {
+      "detailed": 1670,
+      "archiveNative": 1811,
+      "candidateNative": 3667
+    },
+    "radial pressure envelope/service-well-1-0[3]": {
+      "detailed": 1670,
+      "archiveNative": 2546,
+      "candidateNative": 4451
+    },
+    "radial pressure envelope/service-well-1-1[3]": {
+      "detailed": 1670,
+      "archiveNative": 2056,
+      "candidateNative": 4134
+    },
+    "radial pressure envelope/service-well-1-2[3]": {
+      "detailed": 1670,
+      "archiveNative": 2086,
+      "candidateNative": 3664
+    },
+    "radial pressure envelope/service-well-2-0[3]": {
+      "detailed": 1670,
+      "archiveNative": 2556,
+      "candidateNative": 4225
+    },
+    "radial pressure envelope/service-well-2-1[3]": {
+      "detailed": 1670,
+      "archiveNative": 2070,
+      "candidateNative": 4090
+    },
+    "radial pressure envelope/service-well-2-2[3]": {
+      "detailed": 1670,
+      "archiveNative": 1818,
+      "candidateNative": 3984
+    },
+    "radial pressure envelope/service-well-3-0[3]": {
+      "detailed": 2130,
+      "archiveNative": 2541,
+      "candidateNative": 4671
+    },
+    "radial pressure envelope/service-well-3-1[3]": {
+      "detailed": 1670,
+      "archiveNative": 2067,
+      "candidateNative": 4138
+    },
+    "radial pressure envelope/service-well-3-2[3]": {
+      "detailed": 1670,
+      "archiveNative": 2076,
+      "candidateNative": 3661
+    },
+    "radial pressure envelope/longitudinal-service-strut-0[3]": {
+      "detailed": 380,
+      "archiveNative": 1090,
+      "candidateNative": 1093
+    },
+    "radial pressure envelope/longitudinal-service-strut-1[3]": {
+      "detailed": 380,
+      "archiveNative": 1085,
+      "candidateNative": 1085
+    },
+    "radial connected support[3]": {
+      "detailed": 1565,
+      "archiveNative": 1565,
+      "candidateNative": 2081
+    },
+    "cockpit glazing envelope[1]": {
+      "detailed": 1059,
+      "archiveNative": 1077,
+      "candidateNative": 2200
+    },
+    "cockpit connected structural crossmember[1]": {
+      "detailed": 420,
+      "archiveNative": 420,
+      "candidateNative": 420
+    },
+    "engine_pair/negative side/connected support[1]": {
+      "detailed": 1500,
+      "archiveNative": 1500,
+      "candidateNative": 2205
+    },
+    "engine_pair/negative side/propulsion casing[1]": {
+      "detailed": 1750,
+      "archiveNative": 2000,
+      "candidateNative": 2375
+    },
+    "engine_pair/negative side/propulsion luminous recess[1]": {
+      "detailed": 1776,
+      "archiveNative": 1981,
+      "candidateNative": 1258
+    },
+    "engine_pair/positive side/connected support[1]": {
+      "detailed": 1500,
+      "archiveNative": 1500,
+      "candidateNative": 2009
+    },
+    "engine_pair/positive side/propulsion casing[1]": {
+      "detailed": 1750,
+      "archiveNative": 2000,
+      "candidateNative": 2375
+    },
+    "engine_pair/positive side/propulsion luminous recess[1]": {
+      "detailed": 1776,
+      "archiveNative": 1981,
+      "candidateNative": 1169
+    },
+    "radial structural collar[1]-sector-1": {
+      "detailed": 1799,
+      "archiveNative": 1998,
+      "candidateNative": 2073
+    },
+    "radial structural collar[1]-sector-2": {
+      "detailed": 1799,
+      "archiveNative": 1955,
+      "candidateNative": 1572
+    },
+    "radial structural collar[1]-sector-3": {
+      "detailed": 1799,
+      "archiveNative": 1955,
+      "candidateNative": 1575
+    },
+    "radial structural collar[1]-sector-4": {
+      "detailed": 1799,
+      "archiveNative": 1997,
+      "candidateNative": 1887
+    },
+    "radial structural collar[1]-sector-5": {
+      "detailed": 1799,
+      "archiveNative": 1955,
+      "candidateNative": 2001
+    },
+    "radial structural collar[1]-sector-6": {
+      "detailed": 1799,
+      "archiveNative": 1955,
+      "candidateNative": 2198
+    },
+    "radial structural collar[1]-sector-7": {
+      "detailed": 1799,
+      "archiveNative": 1955,
+      "candidateNative": 1521
+    },
+    "radial structural collar[1]-sector-8": {
+      "detailed": 1799,
+      "archiveNative": 1955,
+      "candidateNative": 2073
+    },
+    "radial structural collar[2]-sector-1": {
+      "detailed": 1799,
+      "archiveNative": 1955,
+      "candidateNative": 2142
+    },
+    "radial structural collar[2]-sector-2": {
+      "detailed": 1799,
+      "archiveNative": 1906,
+      "candidateNative": 2061
+    },
+    "radial structural collar[2]-sector-3": {
+      "detailed": 1799,
+      "archiveNative": 1955,
+      "candidateNative": 1783
+    },
+    "radial structural collar[2]-sector-4": {
+      "detailed": 1799,
+      "archiveNative": 1955,
+      "candidateNative": 1521
+    },
+    "radial structural collar[2]-sector-5": {
+      "detailed": 1799,
+      "archiveNative": 1955,
+      "candidateNative": 1773
+    },
+    "radial structural collar[2]-sector-6": {
+      "detailed": 1799,
+      "archiveNative": 1955,
+      "candidateNative": 2142
+    },
+    "radial structural collar[2]-sector-7": {
+      "detailed": 1799,
+      "archiveNative": 1955,
+      "candidateNative": 1627
+    },
+    "radial structural collar[2]-sector-8": {
+      "detailed": 1799,
+      "archiveNative": 1955,
+      "candidateNative": 2142
+    }
+  }
+}

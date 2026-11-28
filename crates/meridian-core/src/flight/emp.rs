@@ -95,6 +95,24 @@ struct EquipmentEvent {
     dock: DockContext,
     tick: u64,
     revision: u64,
+    flight: Option<SalvageHandover>,
+}
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+struct SalvageHandover {
+    cutter: u64,
+    visit: u64,
+    clock: u64,
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub(in crate::flight) struct SalvageEmpLink {
+    pub(crate) item: u64,
+    pub(crate) cutter: u64,
+    pub(crate) revision: u64,
+    pub(crate) tick: u64,
+    pub(crate) visit: u64,
+    pub(crate) clock: u64,
+    pub(crate) restoring: bool,
 }
 impl EquipmentEvent {
     fn terms(self, grades: &mut EmpGrades) -> Result<(u32, u8), SaveError> {
@@ -130,7 +148,17 @@ const MAX_PULSES: usize = 16;
 impl State {
     pub(in crate::flight) fn owned(&self) -> Result<Option<OwnedEmp>, SaveError> {
         let mut item: Option<OwnedEmp> = None;
+        let mut suspended = false;
         for event in self.equipment.iter() {
+            if event.flight.is_some() {
+                match event.action {
+                    EmpEquipmentAction::Store { .. } if !suspended => suspended = true,
+                    EmpEquipmentAction::Fit { .. } if suspended => suspended = false,
+                    _ => return Err(INVALID),
+                }
+            } else if suspended {
+                return Err(INVALID);
+            }
             match event.action {
                 EmpEquipmentAction::Purchase => {
                     if item.is_some() {
@@ -204,6 +232,32 @@ impl State {
                 event.revision,
                 previous.map(|e| (e.dock.sequence(), e.tick, e.revision)),
             )?;
+            if let Some(flight) = event.flight {
+                let (item, restoring) = match event.action {
+                    EmpEquipmentAction::Store { item } => (item, false),
+                    EmpEquipmentAction::Fit { item } => (item, true),
+                    _ => return Err(INVALID),
+                };
+                if event.secret
+                    || flight.clock == 0
+                    || flight.clock > world.combat.physical_tick()
+                    || flight.clock > event.tick
+                    || flight.visit <= event.dock.visit()
+                    || previous.is_none_or(|prior| prior.dock != event.dock)
+                    || self.salvage_charge_overlaps(flight.clock)
+                    || !world.modular.matches_salvage_emp_event(SalvageEmpLink {
+                        item,
+                        cutter: flight.cutter,
+                        revision: event.revision,
+                        tick: event.tick,
+                        visit: flight.visit,
+                        clock: flight.clock,
+                        restoring,
+                    })
+                {
+                    return Err(INVALID);
+                }
+            }
             if event.secret
                 && !world
                     .xyzzy
@@ -229,6 +283,102 @@ impl State {
     }
     pub(super) fn utility_mounts(&self) -> u16 {
         u16::from(self.owned().ok().flatten().is_some_and(|item| item.fitted))
+    }
+    pub(super) fn utility_mounts_at_revision(&self, revision: u64) -> u16 {
+        let mut fitted = false;
+        for event in self
+            .equipment
+            .iter()
+            .take_while(|event| event.revision <= revision)
+        {
+            match event.action {
+                EmpEquipmentAction::Purchase | EmpEquipmentAction::Fit { .. } => fitted = true,
+                EmpEquipmentAction::Store { .. } => fitted = false,
+                EmpEquipmentAction::Upgrade { .. } => {}
+            }
+        }
+        u16::from(fitted)
+    }
+
+    fn salvage_charge_overlaps(&self, clock: u64) -> bool {
+        self.charge.as_ref().is_some_and(|charge| {
+            charge.start.physical_tick <= clock && charge.ended_at.is_none_or(|end| end >= clock)
+        }) || self.pulses.iter().any(|pulse| {
+            pulse.charge.start.physical_tick <= clock && pulse.release.physical_tick >= clock
+        })
+    }
+
+    pub(in crate::flight) fn prepare_salvage_handover(
+        &self,
+        link: SalvageEmpLink,
+    ) -> Result<Self, SaveError> {
+        let SalvageEmpLink {
+            item,
+            cutter,
+            revision,
+            tick,
+            visit,
+            clock,
+            restoring,
+        } = link;
+        let dock = self.equipment.last().ok_or(INVALID)?.dock;
+        if self.equipment.len() >= MAX_EQUIPMENT_EVENTS
+            || self.input_blocked()
+            || self.salvage_charge_overlaps(clock)
+            || self
+                .owned()?
+                .is_none_or(|owned| owned.item != item || owned.fitted == restoring)
+        {
+            return Err(INVALID);
+        }
+        let mut next = self.clone();
+        Arc::make_mut(&mut next.equipment).push(EquipmentEvent {
+            secret: false,
+            action: if restoring {
+                EmpEquipmentAction::Fit { item }
+            } else {
+                EmpEquipmentAction::Store { item }
+            },
+            dock,
+            tick,
+            revision,
+            flight: Some(SalvageHandover {
+                cutter,
+                visit,
+                clock,
+            }),
+        });
+        next.owned()?;
+        Ok(next)
+    }
+
+    pub(in crate::flight) fn matches_salvage_handover(&self, link: SalvageEmpLink) -> bool {
+        let SalvageEmpLink {
+            item,
+            cutter,
+            revision,
+            tick,
+            visit,
+            clock,
+            restoring,
+        } = link;
+        self.equipment.iter().any(|event| {
+            event.revision == revision
+                && event.tick == tick
+                && !event.secret
+                && event.action
+                    == if restoring {
+                        EmpEquipmentAction::Fit { item }
+                    } else {
+                        EmpEquipmentAction::Store { item }
+                    }
+                && event.flight
+                    == Some(SalvageHandover {
+                        cutter,
+                        visit,
+                        clock,
+                    })
+        })
     }
 }
 

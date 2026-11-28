@@ -1,0 +1,12 @@
+{
+  "schema": 1,
+  "id": "sh056-aplomado-interceptor",
+  "undoBefore": [
+    "sh055-condor"
+  ],
+  "undoAfter": [],
+  "kind": "declaration",
+  "module": "aplomado_interceptor",
+  "before": "#![forbid(unsafe_code)]\n\n",
+  "after": "pub mod banteng;\n"
+}

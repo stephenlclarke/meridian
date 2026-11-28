@@ -1,0 +1,12 @@
+{
+  "schema": 1,
+  "id": "sh144-razorback",
+  "undoBefore": [
+    "sh143-aardvark-miner"
+  ],
+  "undoAfter": [],
+  "kind": "declaration",
+  "module": "razorback",
+  "before": "pub mod rabbit_explorer;\n",
+  "after": "pub mod rhinoceros_trader;\n"
+}

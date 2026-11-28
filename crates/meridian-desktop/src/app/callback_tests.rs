@@ -1,5 +1,5 @@
 //! Callback decisions exercised without an event loop, window, GPU or private player save.
-use super::{App, FrameAdvance, step_frame};
+use super::{App, FrameAdvance, QuitRecovery, step_frame};
 use crate::{
     docked_screens as ui,
     profile::tests::{TestDirectory, open},
@@ -32,6 +32,269 @@ fn launched(app: &mut App) {
         assert_eq!(app.advance_frame(true, 1), FrameAdvance::Continue(None));
     }
     assert_eq!(app.game.world.snapshot().mode, FlightMode::Flight);
+}
+
+#[test]
+fn solar_outer_limit_quit_requires_explicit_discard_and_p_resumes_actual_controls() {
+    use meridian_core::save::{MAX_SAVE_FILE_BYTES, MAX_SOLAR_HISTORY_BYTES};
+    let directory = TestDirectory::new();
+    let mut profile = crate::profile::tests::solar_history_profile(&directory);
+    assert!(
+        !profile
+            .world
+            .solar_save_limit_reached(MAX_SOLAR_HISTORY_BYTES)
+    );
+    assert!(profile.world.solar_save_limit_reached(1));
+    ok(profile.save());
+    let slot = directory.0.join("commander.meridian");
+    let durable = ok(std::fs::read(&slot));
+    let durable_world = ok(World::from_save_bytes(&durable));
+    let mut app = App::with_profile(profile);
+    let error = app
+        .game
+        .prepare_quit_with_limits(MAX_SAVE_FILE_BYTES, 1)
+        .err()
+        .unwrap_or_else(|| panic!("outer limit admitted normal Quit"));
+    app.record_quit_failure(&error);
+    assert!(app.quit_failed && app.paused);
+    let notice = app.notice.text.as_deref().unwrap_or_default();
+    assert!(notice.contains("Solar save history is full"));
+    assert!(notice.contains("P resumes; Q discards unsaved progress"));
+    assert_eq!(app.quit_recovery_key(KeyCode::KeyS), None);
+    assert_eq!(
+        app.quit_recovery_key(KeyCode::KeyP),
+        Some(QuitRecovery::Resume)
+    );
+    assert!(!app.quit_failed && !app.paused);
+    let tick = app.game.world.snapshot().tick;
+    let orientation = app.game.world.snapshot().orientation;
+    app.keys.insert(KeyCode::KeyD);
+    assert_eq!(app.advance_frame(true, 1), FrameAdvance::Continue(None));
+    assert_eq!(app.game.world.snapshot().tick, tick + 1);
+    assert_ne!(app.game.world.snapshot().orientation, orientation);
+    let again = app
+        .game
+        .prepare_quit_with_limits(MAX_SAVE_FILE_BYTES, 1)
+        .err()
+        .unwrap_or_else(|| panic!("outer limit admitted subsequent Quit"));
+    app.record_quit_failure(&again);
+    assert_eq!(
+        app.quit_recovery_key(KeyCode::KeyQ),
+        Some(QuitRecovery::Discard)
+    );
+    assert_eq!(ok(std::fs::read(&slot)), durable);
+    drop(app); // the callback's explicit Discard action exits without another save.
+    let mut reopened = open(&directory.0);
+    ok(reopened.continue_saved());
+    assert_eq!(reopened.world.snapshot(), durable_world.snapshot());
+    assert_eq!(
+        reopened.world.solar_snapshot(),
+        durable_world.solar_snapshot()
+    );
+}
+
+#[test]
+fn actual_solar_destruction_freezes_catchup_keeps_hud_and_requires_explicit_recovery() {
+    let directory = TestDirectory::new();
+    let mut profile = crate::profile::tests::solar_history_profile(&directory);
+    ok(profile.save());
+    let slot = directory.0.join("commander.meridian");
+    let durable = ok(std::fs::read(&slot));
+    let alive = ok(World::from_save_bytes(&durable));
+    assert!(
+        !alive
+            .combat_snapshot()
+            .unwrap_or_else(|| panic!("combat"))
+            .player
+            .destroyed
+    );
+    let mut app = App::with_profile(profile);
+    app.keys.insert(KeyCode::KeyW);
+    for _ in 0..500 {
+        assert!(matches!(
+            app.advance_frame(true, 8),
+            FrameAdvance::Continue(_)
+        ));
+        if super::player_destroyed(&app.game.world) {
+            break;
+        }
+    }
+    assert!(super::player_destroyed(&app.game.world));
+    assert_eq!(
+        app.game
+            .world
+            .solar_snapshot()
+            .unwrap_or_else(|| panic!("solar"))
+            .cabin_temperature,
+        1.0
+    );
+    assert!(!app.simulation_active());
+    assert!(app.keys.is_empty());
+    assert!(app.pulse.is_none() && app.mining.is_none());
+    assert!(app.error.is_none());
+    assert_eq!(app.notice.text.as_deref(), Some(super::DESTROYED_NOTICE));
+    let terminal_snapshot = app.game.world.snapshot();
+    let terminal_bytes = ok(app.game.world.save_bytes());
+    let cockpit = ok(crate::hud::cockpit::Cockpit::capture(
+        &app.game.world,
+        terminal_snapshot,
+    ));
+    assert_eq!(cockpit.status(), "DESTROYED");
+    assert_eq!(
+        cockpit.solar_label().map(|(text, _)| text),
+        Some("CABIN OVERHEAT - HULL DESTROYED")
+    );
+    assert!(
+        app.frame_title(false, terminal_snapshot.mode)
+            .contains("DESTROYED | STOPPED")
+    );
+
+    // The core rejects a post-death tick by design; the host never treats that
+    // terminal state as a process-fatal error, even with stale held controls.
+    assert_eq!(
+        app.game.world.step(FlightInput::default()),
+        Err(StepError::InvalidMode)
+    );
+    assert_eq!(
+        app.frame_feedback(Err(StepError::InvalidMode)),
+        FrameAdvance::Continue(None)
+    );
+    app.keys.insert(KeyCode::KeyZ);
+    app.keys.insert(KeyCode::KeyU);
+    assert!(matches!(
+        app.advance_frame(true, 8),
+        FrameAdvance::Continue(_)
+    ));
+    assert_eq!(app.game.world.snapshot(), terminal_snapshot);
+    assert_eq!(ok(app.game.world.save_bytes()), terminal_bytes);
+    assert_eq!(ok(std::fs::read(&slot)), durable);
+    assert!(app.error.is_none());
+
+    app.focus_changed(false);
+    app.occlusion_changed(true);
+    let _ = app.route_keyboard(
+        PhysicalKey::Code(KeyCode::KeyU),
+        ElementState::Released,
+        false,
+        None,
+    );
+    app.focus_changed(true);
+    app.occlusion_changed(false);
+    assert_eq!(ok(app.game.world.save_bytes()), terminal_bytes);
+
+    // The actual presentation outcome router retries a skipped terminal cockpit even
+    // though the simulation is stopped; zero size/occlusion suppresses the retry.
+    let mut redraws = 0;
+    let eligible = app.terminal_cockpit_visible();
+    let skipped = ok(App::complete_presentation(
+        Ok(crate::renderer::Presentation::Skipped),
+        &mut app.docked,
+        None,
+        false,
+        eligible,
+        || redraws += 1,
+    ));
+    app.record_terminal_presentation(skipped);
+    assert_eq!(redraws, 1);
+    assert!(app.terminal_retry_needed(false));
+    assert!(!app.terminal_retry_needed(true));
+    app.occlusion_changed(true);
+    assert!(!app.terminal_retry_needed(false));
+    app.occlusion_changed(false);
+    assert!(app.terminal_retry_needed(false));
+    assert_eq!(app.advance_frame(false, 8), FrameAdvance::Continue(None));
+    assert_eq!(ok(app.game.world.save_bytes()), terminal_bytes);
+    let skipped = ok(App::complete_presentation(
+        Ok(crate::renderer::Presentation::Skipped),
+        &mut app.docked,
+        None,
+        true,
+        eligible,
+        || redraws += 1,
+    ));
+    app.record_terminal_presentation(skipped);
+    assert_eq!(redraws, 1);
+    let presented = ok(App::complete_presentation(
+        Ok(crate::renderer::Presentation::Presented),
+        &mut app.docked,
+        None,
+        false,
+        eligible,
+        || redraws += 1,
+    ));
+    app.record_terminal_presentation(presented);
+    assert!(!app.terminal_retry_needed(false));
+    assert_eq!(redraws, 1);
+
+    let refusal = app
+        .game
+        .prepare_quit()
+        .err()
+        .unwrap_or_else(|| panic!("normal Quit overwrote recoverable save"));
+    app.record_quit_failure(&refusal);
+    assert_eq!(
+        app.notice.text.as_deref(),
+        Some(super::DESTROYED_QUIT_NOTICE)
+    );
+    assert_eq!(
+        app.quit_recovery_key(KeyCode::KeyP),
+        Some(QuitRecovery::Resume)
+    );
+    assert!(!app.simulation_active()); // P closes the prompt; it cannot resurrect the hull.
+    assert_eq!(ok(app.game.world.save_bytes()), terminal_bytes);
+    assert_eq!(ok(std::fs::read(&slot)), durable);
+    app.load_profile();
+    assert_eq!(app.game.world.snapshot(), alive.snapshot());
+    assert!(!super::player_destroyed(&app.game.world));
+    assert!(app.simulation_active());
+
+    // An explicitly saved terminal state remains a valid cold recovery record;
+    // N uses the existing two-press safeguard rather than replacing it silently.
+    app.game.world = ok(World::from_save_bytes(&terminal_bytes));
+    app.save_profile();
+    let terminal_disk = ok(std::fs::read(&slot));
+    let cold_terminal = ok(World::from_save_bytes(&terminal_disk));
+    assert!(super::player_destroyed(&cold_terminal));
+    app.load_profile();
+    assert!(!app.simulation_active());
+    assert_eq!(app.notice.text.as_deref(), Some(super::DESTROYED_NOTICE));
+    let post_restore = ok(app.game.world.save_bytes());
+    assert_eq!(post_restore, ok(cold_terminal.save_bytes()));
+    app.focus_changed(false);
+    app.occlusion_changed(true);
+    app.focus_changed(true);
+    app.occlusion_changed(false);
+    app.reset_input();
+    assert_eq!(ok(app.game.world.save_bytes()), post_restore);
+    assert_eq!(ok(std::fs::read(&slot)), terminal_disk);
+    drop(app);
+
+    // Actual cold startup opens the Commander screen, which must release N to the
+    // common two-press route even though a destroyed profile is still playing.
+    let mut startup = ok(App::from_launch(super::mule_validation::Launch::Profile(
+        directory.0.clone(),
+    )));
+    assert!(startup.commander_open && super::player_destroyed(&startup.game.world));
+    let startup_bytes = ok(startup.game.world.save_bytes());
+    assert_eq!(startup_bytes, ok(cold_terminal.save_bytes()));
+    assert_eq!(
+        startup.route_keyboard(
+            PhysicalKey::Code(KeyCode::KeyN),
+            ElementState::Pressed,
+            false,
+            None
+        ),
+        Some(KeyCode::KeyN)
+    );
+    assert!(!startup.commander_key(KeyCode::KeyN));
+    startup.new_commander_from_key(19804);
+    assert!(super::player_destroyed(&startup.game.world));
+    assert_eq!(ok(startup.game.world.save_bytes()), startup_bytes);
+    assert_eq!(ok(std::fs::read(&slot)), terminal_disk);
+    assert!(!startup.commander_key(KeyCode::KeyN));
+    startup.new_commander_from_key(19804);
+    assert!(!super::player_destroyed(&startup.game.world));
+    assert_eq!(ok(std::fs::read(&slot)), terminal_disk);
 }
 
 #[derive(Default)]
@@ -82,9 +345,9 @@ fn audio_resume_reopens_once_and_primes_live_missile_without_replay() {
     ok(app.game.world.prepare_practice_confirmation(review, 0)).commit();
     app.game_key(KeyCode::KeyL);
     app.advance_frame(true, 1);
-    app.game_key(KeyCode::F1);
-    app.game_key(KeyCode::F2);
-    app.game_key(KeyCode::F3);
+    app.game_key(KeyCode::Digit8);
+    app.game_key(KeyCode::Digit9);
+    app.game_key(KeyCode::Equal);
     assert_eq!(original.borrow().sounds, [Launch, Ping]);
     app.suspend_audio();
     app.suspend_audio();
@@ -377,11 +640,65 @@ fn actual_missile_notice_and_restored_airborne_session_do_not_replay() {
     ok(app.game.world.prepare_practice_confirmation(review, 0)).commit();
     app.game_key(KeyCode::KeyL);
     app.advance_frame(true, 1);
-    app.game_key(KeyCode::F3); // not armed
+    app.game_key(KeyCode::Equal); // not armed
     assert_eq!(recording.borrow().sounds, [Launch]);
-    app.game_key(KeyCode::F1);
-    app.game_key(KeyCode::F2);
-    app.game_key(KeyCode::F3);
+    app.game_key(KeyCode::Digit8);
+    app.game_key(KeyCode::Digit9);
+    let armed = app.game.world.missile_snapshot();
+    for modifier in [
+        winit::keyboard::ModifiersState::SHIFT,
+        winit::keyboard::ModifiersState::CONTROL,
+        winit::keyboard::ModifiersState::ALT,
+        winit::keyboard::ModifiersState::SUPER,
+    ] {
+        app.modifiers = modifier;
+        if let Some(code) = key(
+            &mut app,
+            KeyCode::Equal,
+            ElementState::Pressed,
+            false,
+            Some("+"),
+        ) {
+            app.game_key(code);
+        }
+        app.modifiers = winit::keyboard::ModifiersState::empty();
+        assert_eq!(
+            key(&mut app, KeyCode::Equal, ElementState::Pressed, true, None),
+            None
+        );
+        assert_eq!(
+            key(
+                &mut app,
+                KeyCode::Equal,
+                ElementState::Released,
+                false,
+                None
+            ),
+            None
+        );
+        assert_eq!(app.game.world.missile_snapshot(), armed);
+    }
+    for retired in [
+        KeyCode::F1,
+        KeyCode::F2,
+        KeyCode::F3,
+        KeyCode::F4,
+        KeyCode::F5,
+        KeyCode::F6,
+        KeyCode::F7,
+        KeyCode::F8,
+        KeyCode::F9,
+        KeyCode::F10,
+        KeyCode::F11,
+        KeyCode::F12,
+    ] {
+        if let Some(code) = key(&mut app, retired, ElementState::Pressed, false, None) {
+            app.game_key(code);
+        }
+        assert_eq!(app.game.world.missile_snapshot(), armed);
+    }
+    assert_eq!(recording.borrow().sounds, [Launch]);
+    app.game_key(KeyCode::Equal);
     assert!(app.notice.missile);
     assert_eq!(recording.borrow().sounds, [Launch, Ping]);
     app.publish_audio(false);
@@ -956,7 +1273,7 @@ fn docked_repeats_allow_navigation_only_and_never_latch_flight_keys() {
             Some(code)
         );
     }
-    for code in [KeyCode::KeyG, KeyCode::Enter, KeyCode::F5, KeyCode::KeyZ] {
+    for code in [KeyCode::KeyG, KeyCode::Enter, KeyCode::KeyS, KeyCode::KeyZ] {
         assert_eq!(key(&mut app, code, ElementState::Pressed, true, None), None);
     }
     assert_eq!(
@@ -1187,8 +1504,17 @@ fn refused_commander_launch_keeps_real_docked_pause_through_immediate_save() {
     assert_eq!(ok(app.game.world.save_bytes()), paused_before_launch);
     assert_eq!(ok(std::fs::read(&path)), opening_save);
 
-    assert!(!app.commander_key(KeyCode::F5));
-    app.save_profile();
+    app.modifiers = winit::keyboard::ModifiersState::CONTROL;
+    assert_eq!(
+        key(
+            &mut app,
+            KeyCode::KeyS,
+            ElementState::Pressed,
+            false,
+            Some("s")
+        ),
+        None
+    );
     let saved = ok(std::fs::read(&path));
     assert_eq!(saved, paused_before_launch);
     let continued = ok(World::from_save_bytes(&saved));
@@ -1297,9 +1623,9 @@ fn ordinary_docked_exterior_clears_timed_feedback_above_the_instruments() {
         .unwrap_or_else(|| panic!("missing docked Help"));
     let controls = help.lines.join(" ");
     for control in [
-        "F7 Close practice",
-        "F8 Reception",
-        "F10 Practice review",
+        "Shift+5 Close practice",
+        "Shift+4 Reception",
+        "Shift+3 Practice review",
         "L Launch",
     ] {
         assert!(controls.contains(control), "{control}: {controls}");
@@ -1560,4 +1886,173 @@ fn corrupt_and_unsupported_startup_keep_the_slot_until_confirmed_replacement_is_
         ok(app.game.save());
         assert_ne!(ok(std::fs::read(&path)), bytes);
     }
+}
+
+#[test]
+fn normal_flight_opens_unwritten_route_clue_journal_without_advancing_or_jumping() {
+    use winit::keyboard::ModifiersState;
+
+    let directory = TestDirectory::new();
+    let mut app = app(&directory);
+    launched(&mut app);
+    let before = ok(app.game.world.save_bytes());
+    assert_eq!(
+        key(
+            &mut app,
+            KeyCode::KeyJ,
+            ElementState::Pressed,
+            false,
+            Some("j")
+        ),
+        Some(KeyCode::KeyJ)
+    );
+    assert!(app.help.is_none());
+    app.modifiers = ModifiersState::SHIFT;
+    assert_eq!(
+        key(
+            &mut app,
+            KeyCode::KeyJ,
+            ElementState::Pressed,
+            false,
+            Some("J")
+        ),
+        None,
+    );
+    let panel = app
+        .help
+        .as_ref()
+        .unwrap_or_else(|| panic!("missing clue journal"));
+    assert_eq!(panel.title, "The Unwritten Route - Clue Journal");
+    assert_eq!(panel.lines[0], "0 of 64 distinct source clues collected");
+    assert!(
+        panel
+            .lines
+            .iter()
+            .all(|line| !line.contains("PLUGH") && !line.contains("Corur"))
+    );
+    assert!(app.modal_open());
+    assert!(matches!(
+        app.advance_frame(true, 6),
+        FrameAdvance::Continue(None)
+    ));
+    assert_eq!(ok(app.game.world.save_bytes()), before);
+    assert_eq!(
+        key(
+            &mut app,
+            KeyCode::KeyJ,
+            ElementState::Pressed,
+            true,
+            Some("J")
+        ),
+        None,
+    );
+    assert!(app.help.is_some());
+    assert_eq!(
+        key(
+            &mut app,
+            KeyCode::Escape,
+            ElementState::Pressed,
+            false,
+            None
+        ),
+        None,
+    );
+    assert!(app.help.is_none());
+    assert_eq!(ok(app.game.world.save_bytes()), before);
+}
+
+#[test]
+fn shift_j_shows_the_actual_earned_cabin_journey_after_cold_profile_continue() {
+    use crate::session::Action;
+    use meridian_core::{
+        CabinGrade, ModuleAction, ModuleKind, PassengerAction, XyzzyAction, navigation::SystemId,
+    };
+    use winit::keyboard::ModifiersState;
+    let directory = TestDirectory::new();
+    let mut app = app(&directory);
+    // Explicit preview test cash only; the following two cabins are actual paid items.
+    // The core G04 regression independently uses ordinarily earned funds.
+    ok(app.game.xyzzy(XyzzyAction::Enter));
+    for _ in 0..2 {
+        ok(app.game.command(Action::Module(ModuleAction::Purchase {
+            kind: ModuleKind::Cabin(CabinGrade::Economy),
+        })));
+    }
+    for action in [PassengerAction::RequestReplies, PassengerAction::Board] {
+        ok(app
+            .game
+            .command(Action::Module(ModuleAction::Passenger(action))));
+    }
+    assert!(
+        app.game
+            .world
+            .unwritten_route_clue_progress()
+            .is_some_and(|progress| progress.earned.is_empty())
+    );
+    let world = &mut app.game.world;
+    ok(world.request_launch(world.snapshot().tick));
+    ok(world.step(FlightInput::default()));
+    ok(world.request_jump(SystemId::RENAS, world.snapshot().tick));
+    let remaining = world
+        .snapshot()
+        .navigation
+        .and_then(|navigation| navigation.travel)
+        .unwrap_or_else(|| panic!("actual jump"))
+        .remaining_ticks;
+    for _ in 0..remaining {
+        ok(world.step(FlightInput::default()));
+    }
+    for _ in 0..9000 {
+        let snapshot = world.snapshot();
+        if snapshot.mode == FlightMode::Docked {
+            break;
+        }
+        let speed = if snapshot.position[2] > 2500.0 {
+            34.3
+        } else {
+            4.0
+        };
+        ok(world.step(FlightInput {
+            throttle: ((speed - snapshot.speed) / (9.1 / 60.0)).clamp(-1.0, 1.0),
+            ..FlightInput::default()
+        }));
+        assert_eq!(world.snapshot().motion_refusal, None);
+    }
+    assert_eq!(
+        world.current_dock_context().map(|dock| dock.system()),
+        Some(SystemId::RENAS)
+    );
+    ok(app.game.command(Action::Module(ModuleAction::Passenger(
+        PassengerAction::Receive,
+    ))));
+    ok(app.game.save());
+    drop(app);
+    let mut profile = open(&directory.0);
+    ok(profile.continue_saved());
+    let mut app = App::with_profile(profile);
+    let before = ok(app.game.world.save_bytes());
+    app.modifiers = ModifiersState::SHIFT;
+    assert_eq!(
+        key(
+            &mut app,
+            KeyCode::KeyJ,
+            ElementState::Pressed,
+            false,
+            Some("J")
+        ),
+        None
+    );
+    let panel = app
+        .help
+        .as_ref()
+        .unwrap_or_else(|| panic!("actual clue journal"));
+    assert_eq!(panel.title, "The Unwritten Route - Clue Journal");
+    assert_eq!(panel.lines[0], "1 of 64 distinct source clues collected");
+    assert!(
+        panel
+            .lines
+            .iter()
+            .any(|line| line == "cabin journey family trace")
+    );
+    assert_eq!(ok(app.game.world.save_bytes()), before);
 }

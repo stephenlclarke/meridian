@@ -42,6 +42,7 @@ pub enum MissionError {
     Paused,
     SequenceExhausted,
     SharedCapacity,
+    TestFit,
     NavigationTrade(super::NavigationTradeError),
     Freight(g02::Error),
     Service(crate::station_services::Error),
@@ -59,6 +60,7 @@ impl fmt::Display for MissionError {
             Self::SharedCapacity => {
                 f.write_str("Original mission or active service capacity is full")
             }
+            Self::TestFit => f.write_str("Store test-only fuel tanks until the ordinary hull fit is legal before accepting custody"),
             Self::NavigationTrade(error) => write!(f, "{error}"),
             Self::Freight(error) => write!(f, "freight command refused: {error:?}"),
             Self::Service(error) => write!(f, "station service refused: {error:?}"),
@@ -284,6 +286,16 @@ impl World {
                 choice: g02::Choice::Accept,
                 ..
             }
+        ) && self.test_tank_overfit()
+        {
+            return Err(MissionError::TestFit);
+        }
+        if matches!(
+            command,
+            g02::Command::Confirm {
+                choice: g02::Choice::Accept,
+                ..
+            }
         ) && !self.original_service_has_capacity()
         {
             return Err(MissionError::SharedCapacity);
@@ -303,6 +315,7 @@ impl World {
             }
         }
         let facts = self.freight_facts()?;
+        let cargo_dock = self.current_dock_context().ok_or(MissionError::NotDocked)?;
         let account = self
             .commander_account
             .as_mut()
@@ -315,10 +328,19 @@ impl World {
             .state
             .prepare(account, &facts, command)
             .map_err(MissionError::Freight)?;
-        session
+        let sequence = session.state.cargo_sequence();
+        let event = session
             .state
             .commit(account, &facts, plan)
-            .map_err(MissionError::Freight)
+            .map_err(MissionError::Freight)?;
+        if session.state.cargo_sequence() != sequence {
+            self.modular.record_freight(
+                account.revision(),
+                session.state.cargo_sequence(),
+                cargo_dock,
+            );
+        }
+        Ok(event)
     }
 }
 

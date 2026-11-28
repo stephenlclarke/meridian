@@ -1,0 +1,11 @@
+# Atomic market quantities
+
+This increment adapts the earlier authored quantity branch (`bc53588a`, `b68afdbf`, `c61473bb`) to the current World ledger. The older aggregate preparation did not contain the current history of each ordinary service receipt. The joined implementation stages those actual one-unit results and exact successive account revisions on a prospective market and account, then publishes all requested units together or none.
+
+Open the ordinary station Market. Left/Right reduces or increases the selected quantity by one. Shift+Left/Right adjusts it by ten. The four labelled buttons do the same. Changing the selected commodity or opening a different screen resets quantity to one. The native units remain tonnes, kilograms or grams. G reviews a purchase, Shift+G reviews a sale, and Enter reviews the selected Buy/Sell mode. The review shows the quantity, current unit price and total payment or gross and actual credited sale value. Enter on the actual review confirms; B cancels. The isolated Medusa test profile does not acquire a market entitlement.
+
+Every unit uses World's existing finite stock, cash, owned hold, cabin mass and reserved-cargo checks. The request is bounded by the retained service receipt limit; the remaining capacity and complete save limit may refuse it earlier. An unaffordable or over-capacity batch does not settle a prefix. The ordinary wallet saturation rule remains exact. The T04 identified tonne requires one unit at its actual qualifying buy or sale; ordinary batches cannot consume that reservation.
+
+No new save format or authority is introduced. The same per-unit stock and accounting receipts are retained, so a successful batch is byte-equivalent to the corresponding accepted ordinary single transactions from the same state. The actual Profile publishes prospective bytes atomically before the live World changes. A writer or semantic refusal preserves both the live state and previous save.
+
+Regression cases cover repeated-single byte equality, failed publication, native non-tonne units, over-limit requests, reserved cargo, paid cabin mass, ordinary credit saturation, actual Market quantity controls and cold Continue. Platform qualification uses the final combined source and existing ordinary commander profiles remain separate.

@@ -1,8 +1,9 @@
 #[cfg(test)]
 use super::NavigationError;
 use super::{
-    BASIC_SPOOL_TICKS, CommanderId, DockContext, DockOrigin, NavigationState, OriginalNavigation,
-    PendingJump, PlayerShipId, StarterBasicDrive, SystemId, stock_jump_fuel_cost,
+    BASIC_SPOOL_TICKS, CommanderId, DockContext, DockOrigin, DriveGrade, NavigationState,
+    OriginalNavigation, PendingJump, PlayerShipId, StarterBasicDrive, SystemId,
+    stock_jump_fuel_cost,
 };
 use crate::save::{Reader, SaveError, Writer};
 use crate::station::FlightMode;
@@ -136,13 +137,16 @@ impl NavigationState {
         &self,
         catalogue: &OriginalNavigation,
         fitted_reach_ly: f64,
+        fitted_drive: (u64, DriveGrade),
     ) -> Result<(), SaveError> {
         if let Some(pending) = self.pending {
             let invalid = SaveError::InvalidState("pending jump");
-            if catalogue
-                .distance_ly(pending.source, pending.destination)
-                .map_err(|_| invalid)?
-                > fitted_reach_ly
+            if pending.drive.item_ordinal != fitted_drive.0
+                || pending.remaining_ticks > fitted_drive.1.spool_ticks()
+                || catalogue
+                    .distance_ly(pending.source, pending.destination)
+                    .map_err(|_| invalid)?
+                    > fitted_reach_ly
             {
                 return Err(invalid);
             }
@@ -179,7 +183,7 @@ impl NavigationState {
                 && (self.fuel_spent != 0 || self.system != SystemId::AVENOR)
             || self.completed_jumps > 0 && self.fuel_spent < self.completed_jumps
             || self.launches == 0 && mode != FlightMode::Docked
-            || u128::from(self.fuel_spent) > u128::from(self.completed_jumps) * u128::from(super::FUEL_CAPACITY)
+            || u128::from(self.fuel_spent) > u128::from(self.completed_jumps) * u128::from(super::MAX_FUEL_CAPACITY)
         {
             return Err(invalid);
         }
@@ -216,7 +220,8 @@ impl NavigationState {
             if mode != FlightMode::Flight
                 || p.source != self.system
                 || p.source_visit != self.visit
-                || p.drive != self.drive
+                || p.drive.owner != self.owner
+                || p.drive.ship != self.ship
                 || p.remaining_ticks == 0
                 || p.remaining_ticks > BASIC_SPOOL_TICKS
                 || distance <= 0.0
@@ -275,7 +280,7 @@ mod counter_tests {
         navigation.dock_sequence = u64::MAX;
         let before = navigation;
         assert_eq!(
-            navigation.step(true, u64::MAX, 130),
+            navigation.step(true, u64::MAX, 130, None),
             Err(NavigationError::SequenceExhausted)
         );
         assert_eq!(navigation, before);

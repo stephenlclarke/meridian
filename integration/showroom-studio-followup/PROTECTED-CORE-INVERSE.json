@@ -1,0 +1,47 @@
+{
+  "base": "a8a0b94ca63acac75c7b92a5e3ce9d81bfbd6622",
+  "files": {
+    "flight.rs": {
+      "beforeSHA256": "ec32d85a50a574e78d6903c17e51b8f19b76efbaf97fa3bd8603035babb802cc",
+      "afterSHA256": "ae570d2762ca795792238753202179829cbdc893dccbcf9f6fe02550e9d7ac30",
+      "hunks": [
+        {
+          "offset": 627,
+          "before": "",
+          "after": "pub use goshawk_validation::PeregrineMkIApproachSnapshot;\n"
+        }
+      ]
+    },
+    "lib.rs": {
+      "beforeSHA256": "df1869ef81ffff411cb56fb514a1d11a68ed94b4890e5e50a361e192f316656a",
+      "afterSHA256": "f39cd46afc4bbaabb6006bdbe3dcb51e966ab292eb22144b91129895811e9d0c",
+      "hunks": [
+        {
+          "offset": 564,
+          "before": "",
+          "after": "pub mod hull_package;\n"
+        },
+        {
+          "offset": 617,
+          "before": "",
+          "after": "pub mod kite_interceptor;\n"
+        },
+        {
+          "offset": 764,
+          "before": "",
+          "after": "pub mod peregrine_mk3;\npub mod peregrine_mk_i;\n"
+        },
+        {
+          "offset": 932,
+          "before": "",
+          "after": "pub mod sparrowhawk;\n"
+        },
+        {
+          "offset": 1139,
+          "before": "",
+          "after": "pub use flight::PeregrineMkIApproachSnapshot;\n"
+        }
+      ]
+    }
+  }
+}

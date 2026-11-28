@@ -1,5 +1,4 @@
-//! Front-view acquisition uses the exact flight projection and admitted visual triangles.
-//! The overlay consumes only immutable World projections.
+//! The scanner chooses contacts in World; the overlay projects the selected contact.
 use crate::{
     hud,
     mesh::{self, Vertex},
@@ -29,93 +28,29 @@ fn relative(camera: RigidPose, pose: RigidPose, source: [f32; 3]) -> [f32; 3] {
     [local.x as f32, local.y as f32, local.z as f32]
 }
 
-fn plane(point: [f32; 3], projection: [f32; 4], side: usize) -> f32 {
-    let [x, y, z] = point;
-    let [aspect, focal, near, far] = projection;
-    match side {
-        0 => z - near,
-        1 => far - z,
-        2 => z + x * focal / aspect,
-        3 => z - x * focal / aspect,
-        4 => z + y * focal,
-        _ => z - y * focal,
-    }
-}
-
-fn triangle_visible(triangle: [[f32; 3]; 3], projection: [f32; 4]) -> bool {
-    if triangle.iter().flatten().any(|v| !v.is_finite()) {
-        return false;
-    }
-    if (0..6).any(|side| {
-        triangle
-            .iter()
-            .all(|&point| plane(point, projection, side) < 0.0)
-    }) {
-        return false;
-    }
-    // Clip entire triangles, including ones whose three vertices lie outside different planes.
-    let mut polygon = triangle.to_vec();
-    let mut clipped = Vec::with_capacity(9);
-    for side in 0..6 {
-        clipped.clear();
-        let Some(mut previous) = polygon.last().copied() else {
-            return false;
-        };
-        let mut previous_distance = plane(previous, projection, side);
-        for &point in &polygon {
-            let distance = plane(point, projection, side);
-            if (distance >= 0.0) != (previous_distance >= 0.0) {
-                let fraction = previous_distance / (previous_distance - distance);
-                clipped.push(std::array::from_fn(|i| {
-                    previous[i] + fraction * (point[i] - previous[i])
-                }));
-            }
-            if distance >= 0.0 {
-                clipped.push(point);
-            }
-            previous = point;
-            previous_distance = distance;
-        }
-        std::mem::swap(&mut polygon, &mut clipped);
-    }
-    if polygon.len() < 3 {
-        return false;
-    }
-    let origin = polygon[0];
-    let projected = |p: [f32; 3]| [p[0] / p[2], p[1] / p[2]];
-    let origin = projected(origin);
-    polygon[1..].windows(2).any(|pair| {
-        let [a, b] = [projected(pair[0]), projected(pair[1])];
-        (a[0] - origin[0]) * (b[1] - origin[1]) - (a[1] - origin[1]) * (b[0] - origin[0]) != 0.0
-    })
-}
-
-pub(super) fn visible(
-    mesh: &[Vertex],
-    camera: RigidPose,
-    pose: RigidPose,
-    projection: [f32; 4],
-) -> bool {
-    mesh.as_chunks::<3>().0.iter().any(|triangle| {
-        triangle_visible(
-            std::array::from_fn(|i| relative(camera, pose, triangle[i].position)),
-            projection,
-        )
-    })
-}
-
 /// The same physical asteroid corners and face ordering as the ordinary belt renderer.
 pub(super) fn asteroid_model(body: &meridian_core::mining::AsteroidSnapshot) -> Vec<Vertex> {
+    mineral_model(body.vertices, body.position)
+}
+
+pub(super) fn ore_model(ore: &meridian_core::mining::OreSnapshot) -> Vec<Vertex> {
+    mineral_model(ore.vertices(), ore.position)
+}
+
+fn mineral_model(
+    vertices: [meridian_core::docking::Vec3; 6],
+    centre: meridian_core::docking::Vec3,
+) -> Vec<Vertex> {
     meridian_core::mining::ASTEROID_FACES
         .into_iter()
         .flatten()
         .map(|index| {
-            let p = body.vertices[index];
+            let p = vertices[index];
             Vertex {
                 position: [
-                    (p.x - body.position.x) as f32,
-                    (p.y - body.position.y) as f32,
-                    (p.z - body.position.z) as f32,
+                    (p.x - centre.x) as f32,
+                    (p.y - centre.y) as f32,
+                    (p.z - centre.z) as f32,
                 ],
                 color: [0.31, 0.23, 0.14],
             }
@@ -158,6 +93,7 @@ fn marker(
     size: [f32; 2],
     camera: RigidPose,
     view: FlightView,
+    flight_height: f32,
     target: RigidPose,
     projection: [f32; 4],
 ) {
@@ -170,7 +106,7 @@ fn marker(
     if ![x, y, z].into_iter().all(f32::is_finite) {
         return;
     }
-    let half = [size[0] * 0.5, size[1] * 0.5];
+    let half = [size[0] * 0.5, flight_height * 0.5];
     let [aspect, focal, near, far] = projection;
     if ![aspect, focal, near, far]
         .into_iter()
@@ -252,6 +188,7 @@ pub(super) struct Overlay<'a> {
     pub camera: RigidPose,
     pub view: FlightView,
     pub projection: [f32; 4],
+    pub flight_height: f32,
     pub details: Option<bool>,
     pub model: &'a [Vertex],
 }
@@ -267,6 +204,7 @@ pub(super) fn append(out: &mut Vec<Vertex>, size: [u32; 2], overlay: Overlay<'_>
         size,
         overlay.camera,
         overlay.view,
+        overlay.flight_height,
         overlay.target.pose,
         overlay.projection,
     );
@@ -278,8 +216,11 @@ pub(super) fn append(out: &mut Vec<Vertex>, size: [u32; 2], overlay: Overlay<'_>
     let top = 8.0;
     let mut lines = vec![
         overlay.target.identity.label(),
-        format!("AUTO: {}", overlay.target.guidance),
-        format!("F: {}", overlay.target.filter.label()),
+        overlay.target.guidance.to_owned(),
+        overlay.target.tier.map_or_else(
+            || "NO TARGETING CORE".into(),
+            |tier| format!("{} CORE", tier.label()),
+        ),
     ];
     if expanded {
         if let Some(model) = overlay.target.model {
@@ -352,23 +293,6 @@ mod tests {
         TargetIdentity, TargetMode, equipment::TargetingTier, navigation::SystemId,
     };
     #[test]
-    fn actual_triangle_crossing_view_counts_without_visible_vertices() {
-        let projection = [1.0, 1.6, 1.0, 20_000.0];
-        assert!(triangle_visible(
-            [[-10.0, -10.0, 4.0], [10.0, -10.0, 4.0], [0.0, 10.0, 4.0]],
-            projection
-        ));
-        assert!(!triangle_visible(
-            [[8.0, 0.0, 4.0], [9.0, 1.0, 4.0], [10.0, -1.0, 4.0]],
-            projection
-        ));
-        assert!(!triangle_visible(
-            [[-1.0, -1.0, -4.0], [1.0, -1.0, -4.0], [0.0, 1.0, -4.0]],
-            projection
-        ));
-    }
-
-    #[test]
     fn cue_uses_supplied_projection_and_tiny_drawable_produces_no_vertices() {
         let camera = RigidPose {
             position: Vec3::new(0.0, 0.0, 0.0),
@@ -379,11 +303,12 @@ mod tests {
             ..camera
         };
         let target = TargetingSnapshot {
+            tracked_fragment: None,
             identity: TargetIdentity::Station {
                 system: SystemId::AVENOR,
                 visit: 1,
             },
-            tier: TargetingTier::Docking,
+            tier: Some(TargetingTier::Docking),
             filter: meridian_core::TargetFilter::Ships,
             mode: TargetMode::Station,
             guidance: "Approach",
@@ -399,6 +324,7 @@ mod tests {
             camera,
             view: FlightView::Front,
             projection,
+            flight_height: 200.0,
             details: Some(false),
             model: &[],
         };
@@ -410,6 +336,7 @@ mod tests {
             [400.0, 200.0],
             camera,
             FlightView::Front,
+            200.,
             pose,
             projection,
         );
@@ -429,6 +356,7 @@ mod tests {
             [400.0, 200.0],
             camera,
             FlightView::Rear,
+            200.,
             pose,
             projection,
         );

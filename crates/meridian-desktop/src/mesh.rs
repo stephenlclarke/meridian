@@ -1,6 +1,7 @@
 use meridian_core::docking::{Basis3, DockingPort, RigidPose, StationPose, Vec3};
 use meridian_core::{PRACTICE_HALF_SIDE, PracticeBeaconSnapshot, PulseShot, Snapshot};
 
+pub(crate) mod paint;
 mod station_finish;
 mod station_seams;
 pub mod traffic;
@@ -13,7 +14,11 @@ pub struct Vertex {
 }
 
 pub fn load_ship() -> Result<Vec<Vertex>, String> {
-    decode_mesh(include_bytes!("../../../assets/legacy/sh025.mesh"))
+    let mut ship = decode_mesh(include_bytes!("../../../assets/legacy/sh025.mesh"))?;
+    for vertex in &mut ship {
+        vertex.color = paint::ship_linear(vertex.color);
+    }
+    Ok(ship)
 }
 
 pub fn load_station() -> Result<Vec<Vertex>, String> {
@@ -30,6 +35,7 @@ pub struct StationRender<'a> {
     pub pose: StationPose,
     pub port: &'a DockingPort,
     pub docked: bool,
+    pub(crate) medusa_preview: bool,
 }
 
 struct Camera {
@@ -41,7 +47,7 @@ fn point(values: [f32; 3]) -> Vec3 {
     Vec3::new(values[0].into(), values[1].into(), values[2].into())
 }
 
-fn player_pose(snapshot: &Snapshot) -> RigidPose {
+pub(crate) fn player_pose(snapshot: &Snapshot) -> RigidPose {
     let [x, y, z, w] = snapshot.orientation.map(f64::from);
     RigidPose {
         position: point(snapshot.position),
@@ -103,13 +109,14 @@ fn camera_for(snapshot: &Snapshot, station: StationRender<'_>) -> Result<Camera,
     let distance = difference(player.position, entrance.position());
     // Use the pilot's pose near the door so the chase camera cannot sit inside a wall.
     // This threshold is a view convention, not a docking or collision condition.
-    if distance.dot(distance) < 500.0 * 500.0 {
+    if !station.medusa_preview || distance.dot(distance) < 500.0 * 500.0 {
         return Ok(Camera {
             pose: player,
             draw_ship: false,
         });
     }
-    let offset = player.orientation.apply(Vec3::new(0.0, 45.0, -220.0));
+    let local_offset = Vec3::new(0.0, 15.0, -76.0);
+    let offset = player.orientation.apply(local_offset);
     Ok(Camera {
         pose: RigidPose {
             position: Vec3::new(
@@ -128,6 +135,18 @@ pub(crate) fn scene_camera_pose(
     station: StationRender<'_>,
 ) -> Result<RigidPose, String> {
     Ok(camera_for(snapshot, station)?.pose)
+}
+
+/// Only the isolated Medusa inspection preview draws the player hull.
+pub(crate) fn medusa_chase_camera(
+    snapshot: &Snapshot,
+    station: StationRender<'_>,
+) -> Result<Option<RigidPose>, String> {
+    if !station.medusa_preview {
+        return Ok(None);
+    }
+    let camera = camera_for(snapshot, station)?;
+    Ok(camera.draw_ship.then_some(camera.pose))
 }
 
 /// Controlled World-owned observer: draw the actual station in its first-person frame.
@@ -291,16 +310,18 @@ pub fn append_pulse(
     snapshot: &Snapshot,
     station: StationRender<'_>,
     shot: &PulseShot,
+    facing: meridian_core::FlightView,
     output: &mut Vec<Vertex>,
 ) -> Result<(), String> {
     let camera = camera_for(snapshot, station)?;
-    append_segment(&camera, shot.origin, shot.end, output)
+    append_segment(&camera, shot.origin, shot.end, facing, output)
 }
 
 fn append_segment(
     camera: &Camera,
     origin: Vec3,
     endpoint: Vec3,
+    facing: meridian_core::FlightView,
     output: &mut Vec<Vertex>,
 ) -> Result<(), String> {
     let view = |world| {
@@ -319,11 +340,18 @@ fn append_segment(
     if length == 0.0 {
         return Ok(());
     }
+    use meridian_core::FlightView;
+    let (right, forward) = match facing {
+        FlightView::Front => (Vec3::new(1., 0., 0.), Vec3::new(0., 0., 1.)),
+        FlightView::Rear => (Vec3::new(-1., 0., 0.), Vec3::new(0., 0., -1.)),
+        FlightView::Left => (Vec3::new(0., 0., 1.), Vec3::new(-1., 0., 0.)),
+        FlightView::Right => (Vec3::new(0., 0., -1.), Vec3::new(1., 0., 0.)),
+    };
     let vertex = |center: Vec3, x: f64, y: f64| Vertex {
         position: [
-            (center.x + x) as f32,
+            (center.x + x * right.x) as f32,
             (center.y + y) as f32,
-            center.z as f32,
+            (center.z + x * right.z) as f32,
         ],
         color: [1.0, 0.24, 0.09],
     };
@@ -338,8 +366,13 @@ fn append_segment(
     let mut along = (12.0 / length).min(0.5);
     // Match the flight projection's near plane for a short visible segment.
     let near = 1.0;
-    if start.z + along * extent.z <= near && start.z <= near && end.z > near {
-        let visible_start = (near - start.z) / extent.z;
+    let start_depth = start.dot(forward);
+    let end_depth = end.dot(forward);
+    if start_depth + along * (end_depth - start_depth) <= near
+        && start_depth <= near
+        && end_depth > near
+    {
+        let visible_start = (near - start_depth) / (end_depth - start_depth);
         along = (1.0 + visible_start) * 0.5;
     }
     let center = Vec3::new(
@@ -428,9 +461,6 @@ pub fn frame_vertices(
     output.clear();
     if let Some(station) = station {
         let camera = camera_for(snapshot, station)?;
-        if camera.draw_ship {
-            append_mesh(ship, player_pose(snapshot), &camera, output)?;
-        }
         append_mesh(
             station.vertices,
             station.pose.model_pose().map_err(|e| e.to_string())?,
@@ -530,6 +560,7 @@ mod tests {
                     .station_port()
                     .unwrap_or_else(|| panic!("Expected station_port")),
                 docked: false,
+                medusa_preview: false,
             };
             let mut frame = Vec::new();
             append_missiles(
@@ -686,6 +717,7 @@ mod tests {
             pose: reference_station_pose(),
             port: &port,
             docked: true,
+            medusa_preview: false,
         };
         let camera = camera_for(&snapshot, station).unwrap_or_else(|e| panic!("{e}"));
         assert!(!camera.draw_ship);
@@ -721,6 +753,7 @@ mod tests {
             pose: reference_station_pose(),
             port: &port,
             docked: false,
+            medusa_preview: false,
         };
         assert!(
             !camera_for(&snapshot, station)
@@ -742,8 +775,14 @@ mod tests {
                 contact,
             };
             let mut output = Vec::with_capacity(PULSE_VERTEX_COUNT);
-            append_pulse(&snapshot, station, &shot, &mut output)
-                .unwrap_or_else(|error| panic!("{error}"));
+            append_pulse(
+                &snapshot,
+                station,
+                &shot,
+                meridian_core::FlightView::Front,
+                &mut output,
+            )
+            .unwrap_or_else(|error| panic!("{error}"));
             // Match flight.wgsl's perspective division at aspect 1.
             let has_visible_triangle = output.as_chunks::<3>().0.iter().any(|vertices| {
                 let [a, b, c] = vertices.map(|vertex| vertex.position);
@@ -764,6 +803,43 @@ mod tests {
     }
 
     #[test]
+    fn sh171_lasers_flash_has_projected_area_in_every_facing_at_the_near_plane() {
+        use meridian_core::FlightView;
+        let camera = Camera {
+            pose: RigidPose {
+                position: Vec3::new(0., 0., 0.),
+                orientation: meridian_core::docking::Basis3::IDENTITY,
+            },
+            draw_ship: false,
+        };
+        for (facing, endpoint) in [
+            (FlightView::Front, Vec3::new(0., 0., 1.25)),
+            (FlightView::Rear, Vec3::new(0., 0., -1.25)),
+            (FlightView::Left, Vec3::new(-1.25, 0., 0.)),
+            (FlightView::Right, Vec3::new(1.25, 0., 0.)),
+        ] {
+            let mut vertices = Vec::new();
+            append_segment(
+                &camera,
+                camera.pose.position,
+                endpoint,
+                facing,
+                &mut vertices,
+            )
+            .unwrap_or_else(|e| panic!("{e}"));
+            apply_flight_view(facing, &mut vertices);
+            let flash = &vertices[6..9];
+            assert!(
+                flash
+                    .iter()
+                    .all(|v| v.position[2] > 1. && v.position[2] < 1.25)
+            );
+            let [a, b, c] = [flash[0], flash[1], flash[2]]
+                .map(|v| [v.position[0] / v.position[2], v.position[1] / v.position[2]]);
+            assert!(((b[0] - a[0]) * (c[1] - a[1]) - (b[1] - a[1]) * (c[0] - a[0])).abs() > 0.001);
+        }
+    }
+    #[test]
     fn close_station_view_uses_pilot_pose_and_has_no_fixture_rings() {
         let mut snapshot = meridian_core::World::new().snapshot();
         snapshot.position = [0.0, 0.0, 300.0];
@@ -777,6 +853,7 @@ mod tests {
             pose: reference_station_pose(),
             port: &port,
             docked: false,
+            medusa_preview: false,
         };
         let camera = camera_for(&snapshot, station).unwrap_or_else(|e| panic!("{e}"));
         assert!(!camera.draw_ship);
@@ -791,6 +868,57 @@ mod tests {
             assert_eq!(frame.capacity(), capacity);
             assert_eq!(frame[0].position, [1.0, 2.0, 136.32_f32 - 300.0]);
         }
+    }
+
+    #[test]
+    fn ordinary_cockpit_uses_pilot_pose_and_only_the_isolated_medusa_preview_has_a_chase_camera() {
+        let mut snapshot = meridian_core::World::new().snapshot();
+        snapshot.position = [0.0, 0.0, 2000.0];
+        snapshot.orientation = [0.0, 0.0, 0.0, 1.0];
+        let port = reference_port();
+        let vertices = [Vertex {
+            position: [0.0, 0.0, 0.0],
+            color: [1.0; 3],
+        }; 3];
+        let stock = StationRender {
+            vertices: &vertices,
+            pose: reference_station_pose(),
+            port: &port,
+            docked: false,
+            medusa_preview: false,
+        };
+        let mut medusa = StationRender {
+            medusa_preview: true,
+            ..stock
+        };
+        let camera = camera_for(&snapshot, stock).unwrap_or_else(|e| panic!("{e}"));
+        assert_eq!(camera.pose.position, player_pose(&snapshot).position);
+        assert_eq!(medusa_chase_camera(&snapshot, stock), Ok(None));
+        let camera = medusa_chase_camera(&snapshot, medusa).unwrap_or_else(|e| panic!("{e}"));
+        assert_eq!(
+            camera,
+            Some(RigidPose {
+                position: Vec3::new(0.0, 15.0, 1924.0),
+                orientation: Basis3::IDENTITY
+            })
+        );
+        assert_eq!(camera, scene_camera_pose(&snapshot, medusa).ok());
+        let mut frame = Vec::new();
+        frame_vertices(&snapshot, &vertices, Some(stock), &mut frame)
+            .unwrap_or_else(|e| panic!("{e}"));
+        assert_eq!(frame.len(), 3);
+        frame_vertices(&snapshot, &vertices, Some(medusa), &mut frame)
+            .unwrap_or_else(|e| panic!("{e}"));
+        assert_eq!(frame.len(), 3);
+        snapshot.position = [0.0, 0.0, 300.0];
+        assert_eq!(medusa_chase_camera(&snapshot, medusa), Ok(None));
+        assert_eq!(
+            scene_camera_pose(&snapshot, medusa),
+            Ok(player_pose(&snapshot))
+        );
+        snapshot.position = [0.0, 0.0, 2000.0];
+        medusa.docked = true;
+        assert_eq!(medusa_chase_camera(&snapshot, medusa), Ok(None));
     }
 }
 

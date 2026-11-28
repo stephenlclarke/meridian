@@ -2,7 +2,10 @@ use super::{
     Geometry, MAX_GEOMETRY, MAX_GLYPHS, MAX_MODEL_VERTICES, MAX_MODELS, Model, TextVertex, atlas,
     intersection,
 };
-use crate::{docked_screens::Frame, mesh::Vertex, mule_render::showroom};
+use crate::{
+    authored_hull::AuthoredHulls, docked_screens::Frame, mesh::Vertex, mule_render::showroom,
+};
+use std::sync::Arc;
 
 fn reusable_slot(
     cached: impl Iterator<Item = showroom::Hull>,
@@ -24,16 +27,28 @@ pub struct Pass {
     glyphs: wgpu::BindGroup,
     frame: Geometry,
     model: Model,
+    authored: Arc<AuthoredHulls>,
     srgb: bool,
     format: wgpu::TextureFormat,
     goshawk: Vec<showroom::Pass>,
     goshawk_active: [Option<usize>; MAX_MODELS],
+    authored_passes: Vec<showroom::AuthoredPass>,
+    authored_count: usize,
 }
 impl Pass {
     pub fn new(
         device: &wgpu::Device,
         queue: &wgpu::Queue,
         format: wgpu::TextureFormat,
+    ) -> Result<Self, String> {
+        Self::with_authored(device, queue, format, Arc::default())
+    }
+
+    pub(crate) fn with_authored(
+        device: &wgpu::Device,
+        queue: &wgpu::Queue,
+        format: wgpu::TextureFormat,
+        authored: Arc<AuthoredHulls>,
     ) -> Result<Self, String> {
         let model = Model::sh025()?;
         let shader = device.create_shader_module(wgpu::ShaderModuleDescriptor {
@@ -195,10 +210,13 @@ impl Pass {
             glyphs,
             frame: Geometry::with_capacity(),
             model,
+            authored,
             srgb: format.is_srgb(),
             format,
             goshawk: Vec::with_capacity(showroom::Hull::COUNT * MAX_MODELS),
             goshawk_active: [None; MAX_MODELS],
+            authored_passes: Vec::new(),
+            authored_count: 0,
         })
     }
     pub fn prepare(
@@ -216,12 +234,58 @@ impl Pass {
         {
             return Err("docked frame viewport no longer matches the window".into());
         }
-        self.frame
-            .compose(frame, &self.model, self.srgb, planet_system)?;
+        self.frame.compose_with_authored(
+            frame,
+            &self.model,
+            self.srgb,
+            planet_system,
+            &self.authored,
+        )?;
         queue.write_buffer(&self.shapes, 0, bytemuck::cast_slice(&self.frame.shapes));
         queue.write_buffer(&self.text, 0, bytemuck::cast_slice(&self.frame.text));
         queue.write_buffer(&self.models, 0, bytemuck::cast_slice(&self.frame.models));
-        self.prepare_goshawk(device, queue, frame, logical_size, physical_size)
+        self.prepare_goshawk(device, queue, frame, logical_size, physical_size)?;
+        self.prepare_authored(device, queue, frame, logical_size, physical_size)
+    }
+
+    fn prepare_authored(
+        &mut self,
+        device: &wgpu::Device,
+        queue: &wgpu::Queue,
+        frame: &Frame,
+        logical_size: [f64; 2],
+        physical_size: [u32; 2],
+    ) -> Result<(), String> {
+        self.authored_count = 0;
+        let scale = std::array::from_fn(|axis| f64::from(physical_size[axis]) / logical_size[axis]);
+        for preview in &frame.models {
+            let visual = match self.authored.visual_for(preview) {
+                Some(visual) => Some(visual),
+                None => crate::authored_hull::stock_visual_for(preview)?,
+            };
+            let Some(visual) = visual else {
+                continue;
+            };
+            let Some(bounds) = intersection(preview.bounds, frame.viewport.canvas()) else {
+                continue;
+            };
+            if self.authored_count == self.authored_passes.len() {
+                self.authored_passes.push(showroom::AuthoredPass::new(
+                    device,
+                    queue,
+                    self.format,
+                    preview,
+                    visual,
+                )?);
+            } else if !self.authored_passes[self.authored_count].matches(preview) {
+                self.authored_passes[self.authored_count] =
+                    showroom::AuthoredPass::new(device, queue, self.format, preview, visual)?;
+            }
+            self.authored_passes[self.authored_count]
+                .prepare(queue, preview, bounds, scale, self.srgb)?;
+            self.authored_count += 1;
+        }
+        Ok(())
     }
 
     fn prepare_goshawk(
@@ -243,7 +307,7 @@ impl Pass {
             };
             let active_slot = active
                 .iter()
-                .position(|slot| slot.is_none())
+                .position(Option::is_none)
                 .ok_or("Too many original Showroom preview panes")?;
             let cache_slot =
                 match reusable_slot(self.goshawk.iter().map(showroom::Pass::hull), &active, hull) {
@@ -251,7 +315,7 @@ impl Pass {
                     None => {
                         if self.goshawk.len() >= showroom::Hull::COUNT * MAX_MODELS {
                             return Err(
-                                "Goshawk Showroom pass cache exceeded its hull/pane bound".into()
+                                "Original Showroom pass cache exceeded its hull/pane bound".into(),
                             );
                         }
                         let index = self.goshawk.len();
@@ -267,7 +331,7 @@ impl Pass {
             self.goshawk[cache_slot].prepare(queue, preview, bounds, scale, self.srgb)?;
             active[active_slot] = Some(cache_slot);
         }
-        // Commit only fully prepared panes. Cached passes from previous selections are never drawn.
+        // Draw only the panes selected and prepared for this frame.
         self.goshawk_active = active;
         Ok(())
     }
@@ -278,6 +342,9 @@ impl Pass {
         pass.draw(0..self.frame.models.len() as u32, 0..1);
         for index in self.goshawk_active.into_iter().flatten() {
             self.goshawk[index].draw(pass);
+        }
+        for preview in &self.authored_passes[..self.authored_count] {
+            preview.draw(pass);
         }
     }
     pub fn draw_overlay(&self, pass: &mut wgpu::RenderPass<'_>) {
@@ -293,8 +360,8 @@ impl Pass {
 
 #[cfg(test)]
 mod tests {
-    use super::*;
-    use showroom::Hull::{Custom, Explorer, Mk2};
+    use super::{MAX_MODELS, reusable_slot, showroom};
+    use showroom::Hull::{Custom, Explorer, Medusa, Mk2, PeregrineMkI, PeregrineMkIII};
 
     #[test]
     fn original_showroom_cache_reuses_only_the_same_hull_and_unused_pane() {
@@ -324,8 +391,16 @@ mod tests {
         assert_eq!(frame(&[Explorer, Custom]), [Some(0), Some(4)]);
         assert_eq!(frame(&[Custom, Explorer]), [Some(4), Some(0)]);
         assert_eq!(frame(&[]), [None, None]);
+        for (offset, hull) in [Medusa, PeregrineMkI, PeregrineMkIII]
+            .into_iter()
+            .enumerate()
+        {
+            assert_eq!(
+                frame(&[hull, hull]),
+                [Some(6 + offset * 2), Some(7 + offset * 2)]
+            );
+        }
         assert_eq!(frame(&[Mk2]), [Some(1), None]);
-        assert_eq!(cached, [Explorer, Mk2, Mk2, Explorer, Custom, Custom]);
         assert_eq!(cached.len(), showroom::Hull::COUNT * MAX_MODELS);
     }
 }

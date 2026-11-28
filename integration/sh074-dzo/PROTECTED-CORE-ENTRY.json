@@ -1,0 +1,12 @@
+{
+  "schema": 1,
+  "id": "sh074-dzo",
+  "undoBefore": [
+    "sh073-griffon-spectre"
+  ],
+  "undoAfter": [],
+  "kind": "declaration",
+  "module": "dzo",
+  "before": "pub mod docking;\n",
+  "after": "pub mod eagle_cruiser;\n"
+}

@@ -15,6 +15,7 @@ fn station(w: &meridian_core::World) -> StationRender<'_> {
         pose: w.snapshot().station.unwrap_or_else(|| panic!("pose")),
         port: w.station_port().unwrap_or_else(|| panic!("port")),
         docked: false,
+        medusa_preview: false,
     }
 }
 #[test]

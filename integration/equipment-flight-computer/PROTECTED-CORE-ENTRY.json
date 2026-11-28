@@ -1,0 +1,11 @@
+{
+  "schema": 1,
+  "id": "equipment-flight-computer",
+  "undoBefore": [],
+  "undoAfter": [],
+  "kind": "inverse",
+  "manifest": "integration/sh001-mule/FLIGHT-COMPUTER-INVERSE.json",
+  "sha256": "094fb89c24d15d3b882c49e24a149a5ccb188ed6e949577691440f76b3872a1d",
+  "base": "fcec61d182b66478846b92390ad17805b0dfc7e0",
+  "label": "flight computer"
+}

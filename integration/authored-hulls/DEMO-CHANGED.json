@@ -1,0 +1,34 @@
+{
+  "schema": 1,
+  "id": "TEST901",
+  "name": "Fixture Skiff",
+  "metresPerUnit": 1,
+  "roundingMetres": 0.02,
+  "detail": {
+    "vertices": [[-1, -1, -1], [4, -1, -1], [0, 1, -1], [0, 0, 1]],
+    "triangles": [[0, 2, 1], [0, 1, 3], [1, 2, 3], [2, 0, 3]],
+    "groups": [0, 0, 0, 0]
+  },
+  "native": {
+    "vertices": [[-1, -1, -1], [4, -1, -1], [0, 1, -1], [0, 0, 1]],
+    "triangles": [[0, 2, 1], [0, 1, 3], [1, 2, 3], [2, 0, 3]],
+    "groups": [0, 0, 0, 0]
+  },
+  "materials": [
+    {"name": "Jade", "rgb": [20, 180, 80], "alpha": 180, "emissive": true},
+    {"name": "Ivory", "rgb": [220, 210, 170]}
+  ],
+  "faceMaterials": [0, 1, 0, 1],
+  "faceTextures": [
+    {"texture": null, "uv": [[0, 0], [0, 1], [1, 0]]},
+    {"texture": "l337-service-details", "uv": [[0, 0], [1, 0], [0.5, 1]]},
+    {"texture": null, "uv": [[0, 0], [1, 0], [0.5, 1]]},
+    {"texture": null, "uv": [[0, 0], [1, 0], [0.5, 1]]}
+  ],
+  "engineering": null,
+  "flight": {"maxSpeed": null},
+  "clearances": [
+    {"name": "Side pass", "start": [5.0, -0.9, -3], "end": [5.0, -0.9, 3], "radiusMetres": 0.02}
+  ],
+  "provenance": {"kind": "authored", "source": "Synthetic Meridian changed-mesh and material regression fixture"}
+}

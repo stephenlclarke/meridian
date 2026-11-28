@@ -67,10 +67,15 @@ impl World {
         navigation: Option<NavigationState>,
         prepared: &missiles::PreparedStep,
         traffic: Option<&(traffic::State, StationMarkets)>,
-        resources: (&State, &crate::mining::State, &crate::flight::emp::State),
+        resources: (
+            &State,
+            &crate::mining::State,
+            &crate::flight::emp::State,
+            &crate::flight::ecm::State,
+        ),
         trade: Option<&navigation_trade::State>,
     ) -> Result<(), SaveError> {
-        let (damage, mining, emp) = resources;
+        let (damage, mining, emp, ecm) = resources;
         if self.commander_account.is_none() {
             return Ok(());
         }
@@ -90,6 +95,7 @@ impl World {
             && !missile_growth
             && !journal_grows
             && !emp.proof_grows_from(&self.emp)
+            && ecm.unchanged_since(&self.ecm)
         {
             return Ok(());
         }
@@ -119,6 +125,8 @@ impl World {
             .and_then(|n| n.checked_add(new_mining))
             .and_then(|n| n.checked_sub(size(|w| self.emp.encode(w))))
             .and_then(|n| n.checked_add(size(|w| emp.encode(w))))
+            .and_then(|n| n.checked_sub(self.ecm.encoded_len()))
+            .and_then(|n| n.checked_add(ecm.encoded_len()))
             .ok_or(SaveError::TooLarge)?;
         let old = size(|w| {
             if let Some(n) = self.navigation {
@@ -151,6 +159,11 @@ impl World {
             total = total
                 .checked_add(size(|w| dock.encode_save(w)) + 8 + 8 + 1 + 8)
                 .ok_or(SaveError::TooLarge)?;
+            if self.modular.history_active() {
+                total = total
+                    .checked_add(size(|w| dock.encode_save(w)))
+                    .ok_or(SaveError::TooLarge)?;
+            }
         }
         if journal_grows {
             total = total

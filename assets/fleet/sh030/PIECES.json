@@ -1,0 +1,30 @@
+{
+  "pieces": [
+    "central-fuselage",
+    "left-slab",
+    "left-boom",
+    "left-dorsal-fin",
+    "left-drive",
+    "right-slab",
+    "right-boom",
+    "right-dorsal-fin",
+    "right-drive",
+    "glazing",
+    "canopy-crest",
+    "left-pipe",
+    "left-pipe-mount",
+    "left-pipe-clamp-0",
+    "left-pipe-clamp-1",
+    "left-pipe-clamp-2",
+    "left-pipe-clamp-3",
+    "left-pipe-clamp-4",
+    "right-pipe",
+    "right-pipe-mount",
+    "right-pipe-clamp-0",
+    "right-pipe-clamp-1",
+    "right-pipe-clamp-2",
+    "right-pipe-clamp-3",
+    "right-pipe-clamp-4"
+  ],
+  "roundingMetres": 0.02
+}

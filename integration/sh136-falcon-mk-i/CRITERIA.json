@@ -1,0 +1,223 @@
+{
+  "hull": "SH136 Falcon Mk I",
+  "scope": "Original catalogue inspection and geometry queries",
+  "source": "assets/fleet/sh136/SOURCE-GEOMETRY.json",
+  "frozenSources": "integration/sh136-falcon-mk-i/FROZEN-SOURCES.json",
+  "sourceScaleMetresPerUnit": "20000/1881",
+  "faces": {
+    "detailed": 1756,
+    "archivedNative": 636,
+    "candidateNative": 512,
+    "candidateMaximum": 512
+  },
+  "originalAccess": {
+    "runtimeCatalogue": {
+      "playerFlyable": false,
+      "normalPurchaseEligible": false,
+      "purchasePolicy": "pendingFabrication"
+    },
+    "r3DesignContract": {
+      "playerFlyable": true,
+      "purchasePolicy": "blueprintFabrication"
+    }
+  },
+  "engineering": {
+    "sourceReference": "finite-intrinsic-empty-falcon-mk-i",
+    "massKg": 41570
+  },
+  "supportGroups": 73,
+  "candidateComponentInventory": {
+    "originalPartsRepresented": 21,
+    "unalteredNativeParts": 15,
+    "unalteredWells": 6
+  },
+  "minimumRouteClearanceMillimetres": 673,
+  "sourceContactCounts": {
+    "overlap": 10,
+    "unchangedNativeParts": 15
+  },
+  "candidateRebuild": "tools/rebuild_falcon_mk_i.py",
+  "fitUpperMillimetres": {
+    "detailed": 2574,
+    "archivedNative": 2994,
+    "candidateNative": 2994
+  },
+  "continuousCandidateFitMillimetres": {
+    "archiveToCandidate": {
+      "lowerFloor": 191,
+      "upperCeiling": 217
+    },
+    "candidateToArchive": {
+      "lowerFloor": 147,
+      "upperCeiling": 172
+    },
+    "detailedToCandidate": {
+      "lowerFloor": 1183,
+      "upperCeiling": 1195
+    },
+    "candidateToDetailed": {
+      "lowerFloor": 729,
+      "upperCeiling": 753
+    }
+  },
+  "hullStudio": {
+    "definition": "integration/sh136-falcon-mk-i/FALCON-MK-I-STUDIO.json",
+    "bytes": 296961,
+    "sha256": "61bbffa97974d3ffe271fd5ea2fe48ed04949cd7eca0311301bea5b7da1d98b5",
+    "supports": 73,
+    "probes": 7,
+    "detail": "1,756 original detailed faces",
+    "native": "512 separate candidate faces",
+    "loaderRevision": "27121e66ba37a29781135b56924a9d6e7f38a70a",
+    "signedInstalledExport": {
+      "status": "PASS",
+      "scope": "Signed installed Studio offline original artwork import/export",
+      "bundleIdentifier": "io.xyzzy.meridian.hullstudio",
+      "bundleVersion": "0.0.0",
+      "codeDirectoryHash": "93938bda9242ebdff508bfb9e16b3cdf83c0a200",
+      "developerIdTeam": "4MEB7MUTAV",
+      "signatureVerification": "deep strict",
+      "definition": {
+        "bytes": 296961,
+        "sha256": "61bbffa97974d3ffe271fd5ea2fe48ed04949cd7eca0311301bea5b7da1d98b5"
+      },
+      "exportExitStatuses": [
+        0,
+        0
+      ],
+      "exportMatchesDefinitionExceptTrailingLf": true,
+      "valid": true,
+      "diagnostics": [],
+      "detailedTriangles": 1756,
+      "nativeTriangles": 512,
+      "supportGroups": 73,
+      "engineeringReference": "finite-intrinsic-empty-falcon-mk-i",
+      "massKg": 41570,
+      "receiptFiles": {
+        "falcon-mk-i.hull.json": {
+          "bytes": 296960,
+          "sha256": "b8a8110593cb61d19fc20f65de260b2a420cb23c7f00a6ca4dc9f3bd6f77d140"
+        },
+        "falcon-mk-i-repeat.hull.json": {
+          "bytes": 296960,
+          "sha256": "b8a8110593cb61d19fc20f65de260b2a420cb23c7f00a6ca4dc9f3bd6f77d140"
+        },
+        "studio.stdout.json": {
+          "bytes": 84751,
+          "sha256": "45e95af14373a4e2179e8994548b12bb46c695475094584b2b54dab231ba3acb"
+        },
+        "studio-repeat.stdout.json": {
+          "bytes": 84751,
+          "sha256": "45e95af14373a4e2179e8994548b12bb46c695475094584b2b54dab231ba3acb"
+        },
+        "codesign.log": {
+          "bytes": 13038,
+          "sha256": "340071e9405cbdf72e31bdf9ebe3a4e09458c906841f14733a42b82d6edfad5f"
+        },
+        "codesign-identity.log": {
+          "bytes": 988,
+          "sha256": "f6d772f29f9e72421e98a6d7243102b92b77b5995acbe6cda7ddb3bbfc3b1706"
+        }
+      },
+      "artworkProbeResults": [
+        {
+          "name": "dorsal",
+          "passed": true
+        },
+        {
+          "name": "ventral",
+          "passed": true
+        },
+        {
+          "name": "port-outboard",
+          "passed": true
+        },
+        {
+          "name": "starboard-outboard",
+          "passed": true
+        },
+        {
+          "name": "between-keels",
+          "passed": true
+        },
+        {
+          "name": "port-inboard-keel",
+          "passed": true
+        },
+        {
+          "name": "starboard-inboard-keel",
+          "passed": true
+        }
+      ],
+      "triangleRoles": {
+        "detail": "original detailed visible",
+        "native": "derived native inspection candidate"
+      }
+    }
+  },
+  "byteReplay": {
+    "commands": [
+      "python3 -B tools/prepare_falcon_mk_i.py --check",
+      "python3 -B tools/rebuild_falcon_mk_i.py",
+      "python3 -B tools/verify_falcon_mk_i.py | cmp - integration/sh136-falcon-mk-i/CONTACT-RESULT.json",
+      "python3 -B tools/measure_falcon_mk_i.py | cmp - integration/sh136-falcon-mk-i/SURFACE-FIT.json",
+      "python3 -B tools/measure_falcon_mk_i.py --fidelity | cmp - integration/sh136-falcon-mk-i/CANDIDATE-FIDELITY.json",
+      "python3 -B tools/measure_falcon_mk_i.py --directions | cmp - integration/sh136-falcon-mk-i/CANDIDATE-FIT-LOCALIZATION.json",
+      "python3 -B tools/measure_falcon_mk_i.py --reference-directions | cmp - integration/sh136-falcon-mk-i/REFERENCE-FIT-LOCALIZATION.json"
+    ],
+    "host": "SteveMBA",
+    "startedUtc": "2026-11-25T06:19:24Z",
+    "finishedUtc": "2026-11-25T06:19:57Z",
+    "log": {
+      "bytes": 720,
+      "sha256": "9832dcd43ec1bdfa13425bca24eb12da0f64a6fda58524b2790b014a2c0e25a7"
+    },
+    "fitDependencies": {
+      "python": "3.14.3",
+      "numpy": "2.5.5",
+      "scipy": "1.18.1",
+      "trimesh": "5.2.1",
+      "rtree": "1.4.1"
+    },
+    "originalCommit": "67bec95f20c505611d435be26a7524f8685a4fd6",
+    "historicalReplayPins": {
+      "tools/measure_banteng_geometry.py": "4b7d8d5d972e30d93bebf7f422be71e415d6e4a9c4b622582ecf6e30a6bb9235",
+      "tools/measure_lanner_geometry.py": "cabbaf17ff7efdbcbee9a1fba67c7edafd59dceb8e97f367824a51c134479992",
+      "tools/verify_eagle_cruiser_geometry.py": "c7926cb6e699ae5ffb445951ce9d4e98a64018a7ecb1db2e5e77a611d742a783"
+    }
+  },
+  "replayPins": {
+    "tools/fleet_hull_measurement.py": "3570747d9f650efc7d0e4f88352e9fd32e42ab394f4669100223fbac0c1be6b7",
+    "tools/directed_hull_fit.py": "dbd5d45e5052453646b752695815d6cb53c6ccb2c3ad6694451a4c7e19fa8bf7",
+    "integration/sh136-falcon-mk-i/FALCON-MK-I-STUDIO.json": "61bbffa97974d3ffe271fd5ea2fe48ed04949cd7eca0311301bea5b7da1d98b5",
+    "integration/sh136-falcon-mk-i/FROZEN-SOURCES.json": "622af851e690293933530ce77d25c49cc4a946e8aae3acdd67bff0e15b764ef2",
+    "integration/sh136-falcon-mk-i/CONTACT-CANDIDATE.json": "498d6dc4cc958331d7f8d15e9a3601061240c48ac91a57baa304cb23c8f01619",
+    "integration/sh136-falcon-mk-i/CONTACT-RESULT.json": "289b0559a6bfba3b7547ea7cbce71e5824443f0a7941aba7b7da650626edec9b",
+    "integration/sh136-falcon-mk-i/ORIGINAL-OWNERSHIP.json": "bfdbaab06da4a0b1753e11d44b37f4cab49efe5fe94c80264b3a06015f88ab1a",
+    "integration/sh136-falcon-mk-i/RETAINED-OVERLAPS.json": "fff4978286f82ca522c1c1b51cae6b1479624cd178fe50364ce855e22c7c2a5f",
+    "integration/sh136-falcon-mk-i/CANDIDATE-FIDELITY.json": "8fa71df87cf0716e2b746216a4363bbab6ce0334505dd4f3a1f336df84c3ff66",
+    "integration/sh136-falcon-mk-i/SUPPORT-FAN.json": "1935bc8a276749f388c42aa901d1250bdd523c508bc7bc408443b8535db4df12",
+    "integration/sh136-falcon-mk-i/SURFACE-FIT.json": "63e4decc56f040915ea7c60dfb0eb7f2c07c3e3c31adb51bd0c2468d011bcc28",
+    "integration/sh136-falcon-mk-i/ARCHIVED-OVERLAPS.json": "769b0786853c0e2212f62557994b20e559ee82a2d5da10e5329d61d576a0ca33",
+    "integration/sh136-falcon-mk-i/CANDIDATE-TOPOLOGY-SURVEY.json": "398ecc61f45627248149e1fba27da2eba6ef3258d1542bd675eca8ae94bb8398",
+    "integration/sh136-falcon-mk-i/CANDIDATE-FIT-LOCALIZATION.json": "e2f4e3e700090fab16463006d80738798f839ae262245d10745f9d2c98c08b6b",
+    "integration/sh136-falcon-mk-i/REFERENCE-FIT-LOCALIZATION.json": "88106a9846374ad5c284ecc3e714a6fb088a29b50085b00029ad13bd7829d804",
+    "tools/atomic_asset_output.py": "2d13803823645d3bdea7c855af958eb54d7ebe513ec1bcb0af34e82870164bf0",
+    "tools/banteng_art_mesh.py": "ef5c0f538510486238d69dc301da80026fc93326767b38c50a04756ab9890a09",
+    "tools/encode_goshawk_visual.py": "9e524e9a32a237d71d212c8b5c34ecf12cde5a8e08885b1d03991b95c278f61c",
+    "tools/import_goshawk_envelope_source.py": "14b530725629ee3eaa5b3fd69f01fe00fe371564a1a52cb398d3969142db977e",
+    "tools/measure_banteng_geometry.py": "9356864e227302598fcae4e833ecb706b1ed8a5e600cbb4076b7165dc1e54bea",
+    "tools/measure_goshawk_surface_fit.py": "5407ef1e5fad41810aa95444ca1338fe33a91e5c9857dcb752b4e4cf2fca6d0b",
+    "tools/measure_lanner_geometry.py": "55d13a28602e6ed791adecd85ff43f3c8a7fbe118cf0977272e1747422c2408d",
+    "tools/measure_falcon_mk_i.py": "ee3c104d816d99067659fdf76c858edfb5fd5535d49ac161d0b6a4252f29de81",
+    "tools/prepare_eagle_cruiser_geometry.py": "a1ea3b5d72f35e1f2932da71afa3ff8a276a504f7309a1086a2b3df35988addc",
+    "tools/prepare_falcon_mk_i.py": "1e8f9b21d2a239b2345b1c945c45ca32f4fee85e8ad7e7bcf755071cedd469c2",
+    "tools/verify_eagle_cruiser_geometry.py": "cb053ee5873fee62ee456bb3776e98d29b2cbb44c7344599bc617a8579164d43",
+    "tools/rebuild_falcon_mk_i.py": "d397efd9f084c6a9345245eeee2c38f4269ce8447415aed4e3267d62f2ecebd5",
+    "tools/verify_falcon_mk_i.py": "5e26e983444313e7693c2f103b15cfeda2cceb2385c4854b42074dbd055e1960",
+    "tools/vulture_mk_i_exact_fit.py": "479b31f8714a198a82c0e2888b8d19efe46c7b4c43a576b83ab84c571ae738c6",
+    "assets/fleet/sh136/GENERATED-COLLISION.json": "706e1ebe02491156d100e726e6bac1b9fdf00d834ff736d0b94073bfc3aa1dd7",
+    "assets/fleet/sh136/SOURCE-GEOMETRY.json": "03ec66a375f9ce9250684a9620d7190dfba793920f3cb0bfe6acbe7271a803dd",
+    "tools/hull_contact_geometry.py": "07606202e6a298ad375a7504991fe6fb93da6a07f9b5cc4a22167bd570b07839"
+  }
+}

@@ -1,0 +1,12 @@
+{
+  "schema": 1,
+  "id": "sh045-erne-corvette",
+  "undoBefore": [
+    "sh044-harpy-assault"
+  ],
+  "undoAfter": [],
+  "kind": "declaration",
+  "module": "erne_corvette",
+  "before": "pub mod equipment;\n",
+  "after": "mod flight;\n"
+}

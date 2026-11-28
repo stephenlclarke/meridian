@@ -88,6 +88,301 @@ fn cold(w: &World) -> World {
     );
     loaded
 }
+
+#[test]
+fn paid_scoops_take_one_physical_fragment_once_and_sell_it_after_cold_continue() {
+    paid_fragment_journey(false);
+}
+
+#[test]
+fn manual_scanner_laser_and_scoop_use_actual_hardware_without_computers() {
+    paid_fragment_journey(true);
+}
+
+fn designate(world: &mut World, id: crate::equipment::WorkTargetId) {
+    for _ in world.scanner_targets() {
+        assert!(ok(
+            world.cycle_scanner_target(world.snapshot().tick, [1280, 720])
+        ));
+        if world
+            .selected_work_target()
+            .is_some_and(|work| work.id == id)
+        {
+            return;
+        }
+    }
+    panic!("scanner did not offer {id:?}");
+}
+
+#[test]
+fn manual_mining_accepts_basic_alignment_without_mining_targeting() {
+    use crate::{
+        ModuleKind,
+        equipment::{TargetingTier, WorkTargetId},
+    };
+    let (mut world, _) = paid(12005);
+    module(
+        &mut world,
+        ModuleAction::Purchase {
+            kind: ModuleKind::Targeting(TargetingTier::Basic),
+        },
+    );
+    approach(&mut world);
+    let contact = some(some(world.mining_belt_snapshot()).front_contact);
+    designate(&mut world, WorkTargetId::Asteroid(contact.asteroid));
+    assert!(!world.manual_scanner_target());
+    assert!(!world.work_targeting_fit().mining);
+    assert!(world.pilot_operates_selected_tool());
+    assert_eq!(
+        ok(world.request_manual_mining()).contact.asteroid,
+        contact.asteroid
+    );
+}
+
+fn paid_fragment_journey(manual: bool) {
+    use crate::equipment::WorkTargetId;
+    let (mut world, _) = paid(12005);
+    module(&mut world, ModuleAction::PurchaseFuelScoops);
+    approach(&mut world);
+    let cash = world.credits_tenths();
+    if manual {
+        assert_eq!(world.targeting_tier(), None);
+        let belt = some(world.mining_belt_snapshot());
+        let rock = some(belt.front_contact).asteroid;
+        let other = some(belt.bodies.iter().find(|body| body.id != rock)).id;
+        designate(&mut world, WorkTargetId::Asteroid(other));
+        let before = ok(world.save_bytes());
+        assert!(matches!(
+            world.request_manual_mining(),
+            Err(MiningError::NoTarget)
+        ));
+        assert_eq!(ok(world.save_bytes()), before);
+        designate(&mut world, WorkTargetId::Asteroid(rock));
+        ok(world.request_manual_mining());
+    } else {
+        work(&mut world);
+    }
+    steps(&mut world, 18);
+    let shot = if manual {
+        ok(world.request_manual_mining())
+    } else {
+        work(&mut world)
+    };
+    if manual {
+        let ore = some(world.mining_collection_target(shot.contact.asteroid));
+        designate(&mut world, WorkTargetId::Ore(ore.id));
+        assert_eq!(
+            world.request_manual_ore_collection(),
+            Err(MiningError::NoEligibleOreBody)
+        );
+    }
+    let t = world.snapshot().tick;
+    let before = ok(world.save_bytes());
+    assert_eq!(
+        world.request_collect_mined_ore(t - 1),
+        Err(MiningError::StaleCommand)
+    );
+    assert_eq!(
+        world.request_collect_mined_ore(t),
+        Err(MiningError::NoEligibleOreBody)
+    );
+    assert_eq!(ok(world.save_bytes()), before);
+
+    // Real flight controls only. Approach the drifting source horizontally, then rotate
+    // the lower-forward aperture towards the fragment while stopped.
+    for _ in 0..2200 {
+        let ore = some(world.mining_collection_target(shot.contact.asteroid));
+        let player = some(flight_pose(
+            world.snapshot().position,
+            world.snapshot().orientation,
+        ));
+        let horizontal =
+            (ore.position.x - player.position.x).hypot(ore.position.z - player.position.z);
+        let speed = world.snapshot().speed;
+        // The source never stops moving. Waiting for both exact zero ship speed and a
+        // moving projected standoff can chase it forever while it climbs beyond the aperture.
+        // Brake as soon as the real player is inside the standoff at a low closing speed.
+        if horizontal < 70.0 && speed <= 0.7 {
+            break;
+        }
+        let desired = ((2.0 * 9.1 * (horizontal - 58.0).max(0.0) / 18.0).sqrt() as f32).min(30.0);
+        ok(world.step(FlightInput {
+            throttle: ((desired - speed) / (9.1 / 60.0)).clamp(-1.0, 1.0),
+            ..FlightInput::default()
+        }));
+        assert_eq!(world.snapshot().motion_refusal, None);
+    }
+    stop(&mut world);
+    let ore = some(world.mining_collection_target(shot.contact.asteroid));
+    let player = some(flight_pose(
+        world.snapshot().position,
+        world.snapshot().orientation,
+    ));
+    let delta = crate::docking::Vec3::new(
+        ore.position.x - player.position.x,
+        ore.position.y - player.position.y,
+        ore.position.z - player.position.z,
+    );
+    assert!(
+        delta.dot(delta).sqrt() < 85.0,
+        "public approach failed to enter aperture range: player={player:?} ore={ore:?} delta={delta:?}"
+    );
+    let mut collected = false;
+    let mut pitch_ticks = 0;
+    for _ in 0..100 {
+        let tick = world.snapshot().tick;
+        match if manual {
+            world.request_manual_ore_collection()
+        } else {
+            world.request_collect_mined_ore(tick)
+        } {
+            Ok(()) => {
+                collected = true;
+                break;
+            }
+            Err(MiningError::NoEligibleOreBody) => {}
+            Err(error) => panic!("unexpected actual scoop refusal: {error:?}"),
+        }
+        ok(world.step(FlightInput {
+            pitch: 1.0,
+            ..FlightInput::default()
+        }));
+        pitch_ticks += 1;
+    }
+    assert!(
+        collected,
+        "physical controls never reached the lower-forward fragment: final player={:?} ore={:?}",
+        flight_pose(world.snapshot().position, world.snapshot().orientation),
+        world.mining_collection_target(shot.contact.asteroid)
+    );
+    assert_eq!(world.credits_tenths(), cash);
+    assert_eq!(world.commodity_quantity(shot.commodity), Some(1));
+    assert!(some(world.mining_belt_snapshot()).pending_ore.is_empty());
+    let mut loaded = cold(&world);
+    assert_eq!(loaded.commodity_quantity(shot.commodity), Some(1));
+    let before = ok(loaded.save_bytes());
+    let tick = loaded.snapshot().tick;
+    assert_eq!(
+        loaded.request_collect_mined_ore(tick),
+        Err(MiningError::NoEligibleOreBody)
+    );
+    assert_eq!(ok(loaded.save_bytes()), before);
+    // Route away from the empty source with public controls before a normal station sale.
+    // Returning the pitch to horizontal avoids a vertical drift on the dock helper.
+    for _ in 0..pitch_ticks {
+        ok(loaded.step(FlightInput {
+            pitch: -1.0,
+            ..FlightInput::default()
+        }));
+    }
+    fly_axis(&mut loaded, 0, 0.0, 10.0);
+    dock(&mut loaded);
+    let tick = loaded.snapshot().tick;
+    ok(loaded.request_station_service(
+        crate::station_services::Command::SellCommodity(shot.commodity),
+        tick,
+    ));
+    assert_eq!(loaded.commodity_quantity(shot.commodity), Some(0));
+    assert!(some(loaded.credits_tenths()) > some(cash));
+    let _ = cold(&loaded);
+}
+
+#[test]
+fn explicit_max_owns_stored_mining_tool_and_reversible_exchange_preserves_shared_pools() {
+    use crate::{ModuleKind, ModuleSlot, XyzzyAction};
+    let mut world = ok(World::new_commander(12005));
+    let review = ok(world.review_xyzzy(XyzzyAction::Enter, 0));
+    ok(world.prepare_xyzzy(review, 0)).commit();
+    let items = some(world.modular_equipment_snapshot()).items;
+    let mining = some(
+        items
+            .iter()
+            .find(|i| i.kind == ModuleKind::MiningLaser)
+            .copied(),
+    );
+    let naval = some(
+        items
+            .iter()
+            .find(|i| i.kind == ModuleKind::NavalLaser)
+            .copied(),
+    );
+    assert_eq!(mining.slot, None);
+    assert_eq!(naval.slot, Some(ModuleSlot::FrontLaser));
+    use crate::station_services::{CargoUnit, Command, CommodityId};
+    for commodity in CommodityId::ALL
+        .into_iter()
+        .filter(|id| id.unit() == CargoUnit::Tonne && id.departure_legal_weight() == 0)
+    {
+        loop {
+            let service = some(world.service_snapshot());
+            if service.used_tonnes == service.hold_capacity_tonnes
+                || some(world.commodity_quote(commodity)).stock == 0
+            {
+                break;
+            }
+            let tick = world.snapshot().tick;
+            ok(world.request_station_service(Command::BuyCommodity(commodity), tick));
+        }
+    }
+    let full = some(world.service_snapshot());
+    assert_eq!(full.used_tonnes, full.hold_capacity_tonnes);
+    let unchanged = ok(world.save_bytes());
+    assert_eq!(
+        world.prepare_mining_intake_account(CommodityId::Alloys),
+        Err(MiningError::HoldFull)
+    );
+    assert!(
+        world
+            .prepare_mining_intake_account(CommodityId::Gold)
+            .is_ok()
+    );
+    assert_eq!(ok(world.save_bytes()), unchanged);
+    launch(&mut world);
+    stop(&mut world);
+    let target = some(world.mining_belt_snapshot()).bodies[0].id;
+    ok(world.cycle_target_filter());
+    let tick = world.snapshot().tick;
+    ok(world.cycle_targeting_with_work(
+        tick,
+        crate::TargetingViewport {
+            size: [800, 600],
+            front: Vec::new(),
+        },
+        &[crate::equipment::WorkTargetId::Asteroid(target)],
+    ));
+    let cash = world.credits_tenths();
+    let pools = world.flight_resources_snapshot();
+    ok(world.select_auto_mining_tool());
+    assert_eq!(some(world.fitted_mining_tool()).item, mining.id);
+    assert_eq!(world.credits_tenths(), cash);
+    assert_eq!(world.flight_resources_snapshot(), pools);
+    let before = ok(world.save_bytes());
+    assert_eq!(world.auto_mine_tick(target), "Cargo hold full");
+    assert_eq!(ok(world.save_bytes()), before);
+    let mut cold_world = cold(&world);
+    world.cancel_targeting();
+    assert_eq!(world.auto_mine_tick(target), "Target released");
+    assert_eq!(ok(world.save_bytes()), before);
+    ok(world.restore_auto_mining_tool());
+    ok(cold_world.restore_auto_mining_tool());
+    for restored in [&mut world, &mut cold_world] {
+        let fit = some(restored.modular_equipment_snapshot());
+        assert_eq!(
+            some(fit.items.iter().find(|item| item.id == naval.id)).slot,
+            Some(ModuleSlot::FrontLaser)
+        );
+        assert_eq!(
+            some(fit.items.iter().find(|item| item.id == mining.id)).slot,
+            None
+        );
+        let before = ok(restored.save_bytes());
+        ok(restored.restore_auto_mining_tool());
+        assert_eq!(ok(restored.save_bytes()), before);
+        assert_eq!(restored.flight_resources_snapshot(), pools);
+        assert_eq!(restored.credits_tenths(), cash);
+    }
+    let _ = cold(&world);
+}
 #[test]
 fn genuinely_paid_tool_applies_original_partial_damage_then_releases_pending_ore_without_cargo_or_cash_credit()
  {
@@ -323,6 +618,17 @@ fn explicit_old_fifteen_save_refuses_before_mining_state_changes() {
     );
     assert_eq!(ok(fresh.save_bytes()), before);
 }
+fn reject_historical_stroke_speed(world: &World, speed: f32) {
+    let mut candidate = cold(world);
+    let mut hit = candidate.mining.strokes()[0].clone();
+    assert!(hit.world_tick < candidate.snapshot().tick);
+    hit.speed = speed;
+    let opening = candidate.mining.before_emission(hit.emission);
+    candidate.mining = ok(opening.prepare_work(hit)).0;
+    let bytes = ok(candidate.unchecked_test_save());
+    assert!(World::from_save_bytes(&bytes).is_err());
+}
+
 #[test]
 fn original_work_has_no_invented_slow_speed_gate_and_never_changes_player_motion() {
     let (mut w, _) = paid(12005);
@@ -338,6 +644,8 @@ fn original_work_has_no_invented_slow_speed_gate_and_never_changes_player_motion
     let shot = work(&mut w);
     assert_eq!(shot.remaining_energy, 50.0);
     assert_eq!(w.snapshot(), motion);
+    steps(&mut w, 1);
+    reject_historical_stroke_speed(&w, 40.0);
     let _continued = cold(&w);
 }
 
@@ -395,4 +703,102 @@ fn secret_outfit_preserves_paid_mining_work_custody_and_refuses_inflight_reactiv
     assert_eq!(continued.service_snapshot(), cargo);
     assert_eq!(some(continued.fitted_mining_tool()).item, item);
     assert_eq!(some(continued.mining_belt_snapshot()).pending_ore.len(), 1);
+}
+
+#[test]
+fn peregrine_stroke_cannot_be_relabelled_as_a_later_medusa_visit() {
+    let (mut world, _) = paid(12005);
+    approach(&mut world);
+    work(&mut world);
+    crate::flight::missiles::tests::issue_medusa_at_renas(&mut world);
+    crate::flight::equipment::tests::journey(&mut world, SystemId::AVENOR);
+    launch(&mut world);
+    let mut continued = cold(&world);
+    let original = continued.mining.strokes()[0].clone();
+    let later = some(continued.combat_identity());
+    assert_eq!(later.system, original.owner.system);
+    assert!(later.visit > original.owner.visit);
+    assert!(world.xyzzy_medusa_active());
+    let bytes = ok(continued.save_bytes());
+    for (world_tick, physical_tick) in [
+        (original.world_tick, original.physical_tick),
+        (continued.snapshot().tick, original.physical_tick),
+        (original.world_tick, continued.combat.physical_tick()),
+    ] {
+        let mut forged = cold(&continued);
+        let mut hit = original.clone();
+        hit.owner.visit = later.visit;
+        hit.world_tick = world_tick;
+        hit.peers.world_tick = world_tick;
+        hit.physical_tick = physical_tick;
+        assert!(
+            continued
+                .validate_mining_visit(hit.owner, world_tick, physical_tick)
+                .is_err()
+        );
+        forged.mining = ok(forged
+            .mining
+            .before_emission(hit.emission)
+            .prepare_work(hit))
+        .0;
+        assert!(
+            continued
+                .restore_bytes(&ok(forged.unchecked_test_save()))
+                .is_err()
+        );
+        assert_eq!(ok(continued.save_bytes()), bytes);
+    }
+}
+
+#[test]
+fn medusa_mining_above_peregrine_speed_repeats_and_replays_cold() {
+    let mut world = ok(World::new_commander(12005));
+    let issue = ok(world.review_xyzzy(crate::XyzzyAction::ActivateMedusa, 0));
+    ok(world.prepare_xyzzy(issue, 0)).commit();
+    let items = some(world.modular_equipment_snapshot()).items;
+    let mining = some(
+        items
+            .iter()
+            .find(|item| item.kind == crate::ModuleKind::MiningLaser),
+    );
+    let front = some(
+        items
+            .iter()
+            .find(|item| item.slot == Some(crate::ModuleSlot::FrontLaser)),
+    );
+    module(
+        &mut world,
+        ModuleAction::Install {
+            item: mining.id,
+            replacing: Some(front.id),
+        },
+    );
+    launch(&mut world);
+    stop(&mut world);
+    let rock = some(world.mining_belt_snapshot()).bodies[0];
+    aim_at(&mut world, rock.position);
+    for _ in 0..1800 {
+        let snapshot = some(world.mining_belt_snapshot());
+        if world.snapshot().speed > 40.0
+            && snapshot
+                .front_contact
+                .is_some_and(|hit| hit.asteroid == rock.id)
+        {
+            let first = work(&mut world);
+            assert_eq!(first.contact.asteroid, rock.id);
+            world = cold(&world);
+            steps(&mut world, 20);
+            reject_historical_stroke_speed(&world, 50.4);
+            assert!(world.snapshot().speed > 40.0);
+            assert_eq!(work(&mut world).contact.asteroid, rock.id);
+            stop(&mut world);
+            assert_eq!(cold(&world).mining.strokes().len(), 2);
+            return;
+        }
+        ok(world.step(FlightInput {
+            throttle: 1.0,
+            ..Default::default()
+        }));
+    }
+    panic!("Medusa did not reach a native mining contact at speed");
 }

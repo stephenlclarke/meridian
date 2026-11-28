@@ -1,0 +1,14 @@
+{
+  "schema": 1,
+  "id": "showroom-studio-followup",
+  "undoBefore": [
+    "sh069-baza-fighter",
+    "sh171-medusa-preview"
+  ],
+  "undoAfter": [],
+  "kind": "inverse",
+  "manifest": "integration/showroom-studio-followup/PROTECTED-CORE-INVERSE.json",
+  "sha256": "d45ef9aa9de70e1adeaef05c6b4b5cabd55dcdba6c5e09d4c59990c8d6ed7861",
+  "base": "a8a0b94ca63acac75c7b92a5e3ce9d81bfbd6622",
+  "label": "showroom Studio integration"
+}

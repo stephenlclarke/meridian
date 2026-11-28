@@ -50,6 +50,9 @@ impl World {
         action: EmpEquipmentAction,
         tick: u64,
     ) -> Result<EmpEquipmentReview, EmpError> {
+        if self.modular.salvage_exchange_pending() {
+            return Err(EmpError::UtilityCapacity);
+        }
         if tick != self.state.tick {
             return Err(EmpError::StaleReview);
         }
@@ -104,7 +107,9 @@ impl World {
                 (0, 0)
             }
         };
-        let definition = crate::equipment::definition().map_err(|_| EmpError::BerthRequired)?;
+        let definition = account
+            .equipment_definition()
+            .map_err(|_| EmpError::BerthRequired)?;
         let site =
             super::super::services::service_site(dock.system()).ok_or(EmpError::BerthRequired)?;
         if definition.offer(site).technology < technology {
@@ -180,6 +185,7 @@ impl World {
             dock: review.dock,
             tick,
             revision: account.revision(),
+            flight: None,
         });
         state.owned().map_err(EmpError::Save)?;
         let bytes = self
@@ -250,6 +256,7 @@ impl World {
             dock,
             tick,
             revision: account.revision(),
+            flight: None,
         });
         self.commander_account = Some(account);
         Ok(())

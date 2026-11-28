@@ -1,0 +1,30 @@
+{
+  "status": "AUTHORED_STOCK_SHOWROOM;OWNED_PORTABLE_AND_METAL_PENDING",
+  "sourceParents": {
+    "sharedStudioLoader": "1789030980e0d2a7897c2dc48518fad728c9bbf2",
+    "originalSourcePR93": "de94cb4a65b648e6db7abc499207a50248d172f9"
+  },
+  "identity": {"object": "SH030", "geometryKey": "integration/sh030-sparrowhawk/SPARROWHAWK-STUDIO.json", "localInspection": "LOCAL:SH030"},
+  "packageSha256": "623d68f3936be2bdcbdf632f49a14c6fb65f29a9e214ba8cca5c9f3c680ee2de",
+  "packageFnv1a64": "23b9dcfcce0bc49c",
+  "originalDetailedPackedSha256": "a44e9be1dd114f2a13b46955ee3b18f8eaedbcbe5670fd577dd7eb77913f16b0",
+  "detailCorners": 9324,
+  "unmappedFaces": 1216,
+  "supportGroups": 25,
+  "portableTests": [
+    "stock_sparrowhawk_package_binds_every_original_corner_and_own_support_group",
+    "stock_sparrowhawk_refuses_local_or_crossed_identity_and_geometry_key",
+    "stock_and_explicit_local_sparrowhawk_remain_independent_session_identities",
+    "selecting_stock_sparrowhawk_routes_its_original_preview_without_granting_exchange",
+    "ordinary_game_entry_opens_stock_sparrowhawk_and_returns_to_owned_baseline",
+    "stock_sparrowhawk_original_fits_actual_minimum_station_showroom_panes"
+  ],
+  "portableInvocation": "cargo test --locked -p meridian-desktop sparrowhawk",
+  "coreInvocation": "cargo test --locked -p meridian-core sparrowhawk",
+  "metal": {
+    "directoryVariable": "MERIDIAN_SH030_STOCK_SHOWROOM_DIR",
+    "invocation": "Set the variable to a fresh absolute path and run cargo test --locked -p meridian-desktop mule_render::showroom::metal_qualification::sparrowhawk_stock_qualification::metal_stock_sparrowhawk_normal_showroom -- --ignored --exact --nocapture",
+    "acceptance": "Ordinary SH025/SH030 and solo frames at 640x360 logical, front/oblique/upper. Exact full-target RGB matches independently prepared original package pass, each pane nonblack with own gutter, exact isolated pane union, and changed RGB at changed pose."
+  },
+  "limits": "No stock mass, purchase, fabrication, encounter, World spawn, collision or shield-shimmer authority and no release result are added. Earlier isolated Studio source qualification remains separate."
+}

@@ -1,0 +1,43 @@
+{
+  "base": "482db0ad82889e4dca8e1ad7a8510a99c7c065e6",
+  "files": {
+    "flight.rs": {
+      "beforeSHA256": "ae570d2762ca795792238753202179829cbdc893dccbcf9f6fe02550e9d7ac30",
+      "afterSHA256": "339e95b3de9e68d8febcfc37147623bb196d352f9c40d816604d8a427d1cfd2a",
+      "hunks": [
+        {
+          "offset": 3751,
+          "before": "pub use profit_scan::ProfitDestination;\n",
+          "after": "pub use profit_scan::{ProfitDestination, ProfitDetail};\n"
+        }
+      ]
+    },
+    "lib.rs": {
+      "beforeSHA256": "860334a829da99f3e0b980a9bad61aad4f161aee60b6d11c39f05c81dac3859e",
+      "afterSHA256": "b67b2de9bcd88044f683dd341b3316a27206fe92e1861bd65ff3e170aae625ab",
+      "hunks": [
+        {
+          "offset": 1765,
+          "before": "pub use flight::ProfitDestination;\n",
+          "after": ""
+        },
+        {
+          "offset": 2146,
+          "before": "",
+          "after": "pub use flight::{ProfitDestination, ProfitDetail};\n"
+        }
+      ]
+    },
+    "navigation.rs": {
+      "beforeSHA256": "779554fcb85b68374e2034b24281b471242b42096610cb0e7357e06f62eb514d",
+      "afterSHA256": "e8dd0982a09f199a2c730d9e16f122da94e0be6326ef7b9747ab0ebadbf41e3a",
+      "hunks": [
+        {
+          "offset": 535,
+          "before": "    RouteStatus,\n",
+          "after": "    RouteStatus, RouteTradeLeg, TradeExportEstimate,\n"
+        }
+      ]
+    }
+  }
+}

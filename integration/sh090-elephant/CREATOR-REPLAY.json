@@ -1,0 +1,66 @@
+{
+  "host": "SteveMBA",
+  "python": "3.14.3",
+  "numpy": "2.5.5",
+  "scipy": "1.18.1",
+  "method": "Pinned source-vertex exchanges from the measured contact-preserving trial",
+  "command": "python3 -B reallocate_elephant_shoulder.py .015 shoulder-reallocated",
+  "candidate": {
+    "vertices": 312,
+    "triangles": 512,
+    "parts": 28,
+    "fixedParts": 19,
+    "identicalExactOriginalWitnesses": 22
+  },
+  "proofSHA256": "107f4002a87536d2c72b02a9c09075221f1f6a25b56c5f6df526ffc4ef2ca6c3",
+  "receipts": {
+    "ORIGINAL-OWNERSHIP.json": {
+      "bytes": 138415,
+      "sha256": "c1f09fd15e1c40210228f693c34afccbb60908fd0af1071c4b57bf45d9c7d730"
+    },
+    "SH090-candidate.json": {
+      "bytes": 63057,
+      "sha256": "26c3849433f3d5fd19e6d77a9a756acdf63a993665d60a210753a012017080d6"
+    },
+    "SH090-contact-facet.json": {
+      "bytes": 63061,
+      "sha256": "6f08a02616efa3ecfe8718c28caa88e664fd43187979aeffa50003490b5f18c7"
+    },
+    "SH090-shoulder-reallocated.json": {
+      "bytes": 63057,
+      "sha256": "26c3849433f3d5fd19e6d77a9a756acdf63a993665d60a210753a012017080d6"
+    },
+    "SHOULDER-REALLOCATION.log": {
+      "bytes": 578,
+      "sha256": "026724818343a6aa7fcb12fa191eb7ad8df15f95cd9ad6e804e3fcea56bfa5f5"
+    },
+    "assess_elephant_trials.py": {
+      "bytes": 9661,
+      "sha256": "29ca04b6b405b25868dac1325719b75eff58fe6bbf2d33d18db342fcbddf053a"
+    },
+    "balanced-CONTACTS-AND-CLEARANCE.json": {
+      "bytes": 17066,
+      "sha256": "2d8081e47c11f5452acd823a0aa8f71563270d2cd596ef11c5f954d688eed3d3"
+    },
+    "original/contract.toml": {
+      "bytes": 3485,
+      "sha256": "af105a6530de697eecb95e7efbc58b833aae9f3ee55d7a7c78f3ce4ca25842c3"
+    },
+    "original/native-export.json": {
+      "bytes": 121067,
+      "sha256": "a9a39fa1e956cce7d35a2007af347b403e1f5cf85ae087fe3a71f73622234a3b"
+    },
+    "original/resource.toml": {
+      "bytes": 662749,
+      "sha256": "9a117e4f23f1ea6e7022cd4b3c8bb783c3745159ab117450683a7ed46f3299d5"
+    },
+    "reallocate_elephant_shoulder.py": {
+      "bytes": 7688,
+      "sha256": "68989d1794683774f1fb34ba5b6199b67935dea51d352c9783d5eb9c637e4f19"
+    },
+    "verify_selected_witnesses.py": {
+      "bytes": 3253,
+      "sha256": "825dd4c961cc119ebe322e5b4ce063038bccc703739b0be9df9d3c9671c74ef4"
+    }
+  }
+}

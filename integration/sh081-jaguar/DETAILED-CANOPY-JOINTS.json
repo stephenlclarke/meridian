@@ -1,0 +1,34 @@
+[
+  {
+    "name": "canopy-ridge-to-canopy",
+    "pointMetres": [
+      0.05,
+      17.621,
+      -1.04
+    ],
+    "originalFaces": {
+      "detailed": {
+        "canopy-ridge": {
+          "faceRange": [
+            5640,
+            5652
+          ],
+          "hitCountsAboveBelow": [
+            1,
+            1
+          ]
+        },
+        "canopy": {
+          "faceRange": [
+            4680,
+            5640
+          ],
+          "hitCountsAboveBelow": [
+            1,
+            1
+          ]
+        }
+      }
+    }
+  }
+]

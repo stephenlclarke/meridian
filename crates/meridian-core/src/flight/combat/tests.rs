@@ -551,8 +551,7 @@ fn resealed_last_station_window_cannot_be_refreshed_without_a_new_incident() {
     prefix.u64(world.combat.emissions);
     prefix.u64(world.combat.incidents);
     prefix.u64(world.combat.physical_tick);
-    prefix.u16(world.combat.front);
-    prefix.u16(world.combat.rear);
+    world.combat.shields.encode(&mut prefix);
     prefix.u8(world.combat.penalties);
     prefix.bool(world.combat.unbound_player_impact);
     prefix.bool(true);

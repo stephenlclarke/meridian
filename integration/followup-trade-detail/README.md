@@ -1,0 +1,11 @@
+# Station trade estimate details
+
+The earlier authored route trade preview at `bacc89ca` exposed the commodity quantities and quotes behind route and profit estimates. The current game already has a different, executable route planner, saved route progress and the chart's best-profit scan. This increment adds the missing explanatory readout to that current implementation. It does not replace the live market model with the earlier initial-bid benchmark.
+
+At a station, open the Galaxy chart and press P. Each reachable positive destination shows the existing estimated improvement, the estimated sale of current unreserved cargo here and there, and the finite extra exports behind the amount. Each row gives the original commodity name, actual native quantity, and the current ask and destination bid in CR per unit. Estimates share the same current cash, free tonne room, finite stock, destination market capacity and separate non-tonne limits as the existing profit scan. Row prices are unit quotes, not a promise of settlement. The total also respects the existing wallet ceiling.
+
+Review a route with R, select an offered alternative, then press D or choose Trade details. The readout shows each leg's estimated extra export value and the same finite allocation rows behind its candidate route score. Each leg uses the market snapshot at route review and is estimated independently, not a funded multi-leg transaction. Reopen the route to refresh quotes. Up/Down, Page Up/Down and the wheel scroll the readout. D, B or Enter closes it without installing a route. Confirm the route separately from the route chooser if required.
+
+The core returns descriptive projections only. No cargo, cash, market stock, route, save field, purchase or sale is modified by opening the readout. The existing World route approval and ordinary market transactions remain the only execution authority. The original three admitted station markets, reach and fuel rules remain unchanged.
+
+Core regressions compare detailed rows to actual live quotes, finite allocation totals and cold Save/Continue. Desktop regressions use the chart and actual route chooser, including the 320×240 minimum viewport and Enter closing readout without route installation. Native acceptance must use the final exact combined preview source.

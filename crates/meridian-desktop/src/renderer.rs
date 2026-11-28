@@ -82,6 +82,9 @@ impl PendingProjection {
 
 pub struct Renderer {
     flight_view: FlightView,
+    player_hull: meridian_core::PlayerHullKind,
+    medusa_preview: bool,
+    player_medusa: Option<crate::mule_render::showroom::PlayerMedusaPass>,
     celestial: crate::celestial::Pass,
     mule: Option<crate::mule_render::Pass>,
     docked: crate::docked_render::Pass,
@@ -94,6 +97,7 @@ pub struct Renderer {
     size: PhysicalSize<u32>,
     pipeline: wgpu::RenderPipeline,
     projection: wgpu::Buffer,
+    flight_size: PhysicalSize<u32>,
     pending_projection: PendingProjection,
     projection_group: wgpu::BindGroup,
     vertices: wgpu::Buffer,
@@ -110,7 +114,11 @@ pub struct Renderer {
 }
 
 impl Renderer {
-    pub async fn new(window: Arc<Window>, display: OwnedDisplayHandle) -> Result<Self, String> {
+    pub async fn new(
+        window: Arc<Window>,
+        display: OwnedDisplayHandle,
+        authored: Arc<crate::authored_hull::AuthoredHulls>,
+    ) -> Result<Self, String> {
         let instance = wgpu::Instance::new(wgpu::InstanceDescriptor::new_with_display_handle(
             Box::new(display),
         ));
@@ -149,7 +157,11 @@ impl Renderer {
             surface.configure(&device, &config);
         }
         let celestial = crate::celestial::Pass::new(&device, config.format);
-        let docked = crate::docked_render::Pass::new(&device, &queue, config.format)?;
+        let docked = if authored.is_empty() {
+            crate::docked_render::Pass::new(&device, &queue, config.format)?
+        } else {
+            crate::docked_render::Pass::with_authored(&device, &queue, config.format, authored)?
+        };
         let shader = device.create_shader_module(wgpu::ShaderModuleDescriptor {
             label: Some("Meridian flight WGSL"),
             source: wgpu::ShaderSource::Wgsl(include_str!("flight.wgsl").into()),
@@ -251,6 +263,7 @@ impl Renderer {
             + mesh::PRACTICE_VERTEX_COUNT
             + mesh::MISSILE_VERTEX_COUNT
             + asteroid_render::VERTEX_COUNT
+            + asteroid_render::ORE_VERTEX_COUNT
             + asteroid_render::BEAM_VERTEX_COUNT
             + mesh::traffic::vertex_capacity(ship.len())
                 .ok_or("Traffic vertex capacity overflow")?;
@@ -265,6 +278,9 @@ impl Renderer {
             surface,
             window,
             flight_view: FlightView::Front,
+            player_hull: meridian_core::PlayerHullKind::Peregrine,
+            medusa_preview: false,
+            player_medusa: None,
             celestial,
             mule: None,
             docked,
@@ -275,6 +291,7 @@ impl Renderer {
             size,
             pipeline,
             projection,
+            flight_size: size,
             pending_projection: PendingProjection::default(),
             projection_group,
             vertices,
@@ -330,11 +347,19 @@ impl Renderer {
         self.config.height = size.height;
         self.surface.configure(&self.device, &self.config);
         self.depth = Self::depth_texture(&self.device, &self.config);
-        self.pending_projection.resize(size);
     }
 
     pub fn set_flight_view(&mut self, view: FlightView) {
         self.flight_view = view;
+    }
+
+    pub(crate) fn set_player_hull(
+        &mut self,
+        hull: meridian_core::PlayerHullKind,
+        medusa_preview: bool,
+    ) {
+        self.medusa_preview = medusa_preview;
+        self.player_hull = hull;
     }
 
     fn targeting_camera(
@@ -349,70 +374,35 @@ impl Renderer {
                 pose: station.pose,
                 port: station.port,
                 docked: station.docked,
+                medusa_preview: self.medusa_preview,
             },
         )
     }
 
-    pub fn targeting_viewport(
-        &self,
-        snapshot: &Snapshot,
-        station: StationScene<'_>,
-        traffic: Option<&meridian_core::traffic::TrafficSnapshot>,
-        mule: Option<&meridian_core::traffic::MuleActorSnapshot>,
-        belt: Option<&meridian_core::mining::BeltSnapshot>,
-    ) -> Result<
-        (
-            meridian_core::TargetingViewport,
-            Vec<meridian_core::equipment::WorkTargetId>,
-        ),
-        String,
-    > {
-        use meridian_core::{equipment::WorkTargetId, traffic::NpcPhase};
+    pub fn scanner_viewport(&self) -> [u32; 2] {
+        self.cockpit_viewport(false)
+    }
+
+    fn cockpit_viewport(&self, docked: bool) -> [u32; 2] {
+        let size = self.size;
         if self.is_zero_sized() {
-            return Err("Targeting requires an active flight viewport".into());
+            return [1, 1];
         }
-        let camera = self.targeting_camera(snapshot, &station)?;
-        let projection = flight_projection(self.config.width, self.config.height);
-        let mut front = Vec::new();
-        let mut work_front = Vec::new();
-        if let Some(traffic) = traffic {
-            for actor in traffic.actors.iter().filter(|actor| {
-                actor.hull_id == "SH025"
-                    && targeting::visible(&self.ship, camera, actor.pose, projection)
-            }) {
-                if actor.phase == NpcPhase::Destroyed {
-                    work_front.push(WorkTargetId::Wreck(actor.id));
-                } else if actor.phase != NpcPhase::Complete {
-                    front.push(actor.id);
-                }
-            }
-        }
-        if let Some(mule) = mule.filter(|m| m.is_renas_encounter()) {
-            let mesh = crate::mule_render::targeting_vertices()?;
-            if targeting::visible(&mesh, camera, mule.actor().pose, projection) {
-                front.push(mule.actor().id);
-            }
-        }
-        if let Some(belt) = belt {
-            for body in belt.bodies.iter().filter(|body| body.remaining_units > 0) {
-                let pose = meridian_core::docking::RigidPose {
-                    position: body.position,
-                    orientation: meridian_core::docking::Basis3::IDENTITY,
-                };
-                if targeting::visible(&targeting::asteroid_model(body), camera, pose, projection) {
-                    work_front.push(WorkTargetId::Asteroid(body.id));
-                }
-            }
-        }
-        // Pending ore has an actual World position but no ordinary visual mesh in this build.
-        // Its fitted work identity remains selectable as known/offscreen, never fake-visible.
-        Ok((
-            meridian_core::TargetingViewport {
-                size: [self.size.width, self.size.height],
-                front,
-            },
-            work_front,
-        ))
+        let logical = size.to_logical::<f64>(self.window.scale_factor());
+        let height = logical.height.round().max(1.) as u32;
+        let width = logical.width.round() as u32;
+        let top = if docked && width >= 320 && height >= 240 {
+            hud::cockpit::Layout::new(width, height).top
+        } else {
+            hud::cockpit::flight_height(width, height)
+        };
+        let fraction = top / height as f32;
+        [
+            size.width,
+            (size.height as f32 * fraction)
+                .round()
+                .clamp(1., size.height as f32) as u32,
+        ]
     }
 
     fn prepare_hud_frame(
@@ -499,7 +489,12 @@ impl Renderer {
                         target,
                         camera,
                         view: self.flight_view,
-                        projection: flight_projection(self.config.width, self.config.height),
+                        projection: flight_projection(
+                            self.flight_size.width,
+                            self.flight_size.height,
+                        ),
+                        flight_height: self.flight_size.height as f32 * height as f32
+                            / self.size.height as f32,
                         details,
                         model,
                     },
@@ -596,18 +591,18 @@ impl Renderer {
                     *snapshot,
                     self.flight_view,
                     crate::celestial::Projection {
-                        viewport: [self.config.width, self.config.height],
+                        viewport: [self.config.width, self.flight_size.height],
                         clip: [
                             0.0,
                             0.0,
                             self.config.width as f32,
-                            self.config.height as f32,
+                            self.flight_size.height as f32,
                         ],
                         center: [
                             self.config.width as f32 / 2.0,
-                            self.config.height as f32 / 2.0,
+                            self.flight_size.height as f32 / 2.0,
                         ],
-                        focal: self.config.height as f32 * 0.8,
+                        focal: self.flight_size.height as f32 * 0.8,
                         near: 1.0,
                         far: 20000.0,
                     },
@@ -638,6 +633,7 @@ impl Renderer {
             pose: scene.pose,
             port: scene.port,
             docked: scene.docked,
+            medusa_preview: self.medusa_preview,
         });
         if let (Some(placement), Some(station)) = (mule, station) {
             let scene = placement.for_camera(|| mesh::scene_camera_pose(snapshot, station))?;
@@ -657,7 +653,10 @@ impl Renderer {
                     crate::mule_render::View {
                         camera,
                         flight: self.flight_view,
-                        projection: flight_projection(self.config.width, self.config.height),
+                        projection: flight_projection(
+                            self.flight_size.width,
+                            self.flight_size.height,
+                        ),
                         tick: snapshot.tick,
                     },
                 )?;
@@ -666,6 +665,39 @@ impl Renderer {
             pass.hide();
         }
         let internal_observer = mule.and_then(crate::mule_render::Placement::internal_observer);
+        let medusa_camera = if let Some(station) = station {
+            mesh::medusa_chase_camera(snapshot, station)?
+        } else if self.player_hull == meridian_core::PlayerHullKind::Medusa {
+            return Err("Active Medusa has no station presentation frame".into());
+        } else {
+            None
+        };
+        if let Some(camera) = medusa_camera.filter(|_| internal_observer.is_none()) {
+            if self.player_medusa.is_none() {
+                self.player_medusa = Some(crate::mule_render::showroom::PlayerMedusaPass::new(
+                    &self.device,
+                    &self.queue,
+                    self.config.format,
+                )?);
+            }
+            if let Some(pass) = &mut self.player_medusa {
+                pass.prepare(
+                    &self.queue,
+                    mesh::player_pose(snapshot),
+                    crate::mule_render::View {
+                        camera,
+                        flight: self.flight_view,
+                        projection: flight_projection(
+                            self.flight_size.width,
+                            self.flight_size.height,
+                        ),
+                        tick: snapshot.tick,
+                    },
+                )?;
+            }
+        } else if let Some(pass) = &mut self.player_medusa {
+            pass.hide();
+        }
         mesh::frame_vertices_for_observer(
             snapshot,
             &self.ship,
@@ -680,14 +712,26 @@ impl Renderer {
         if let Some(station) = station {
             mesh::append_missiles(snapshot, station, missiles, &mut self.frame)?;
         }
+        let beam_view = if self.player_hull == meridian_core::PlayerHullKind::Medusa {
+            self.flight_view
+        } else {
+            meridian_core::FlightView::Front
+        };
         if let (Some(station), Some(traffic)) = (station, traffic) {
-            mesh::traffic::append(snapshot, station, &self.ship, traffic, &mut self.frame)?;
+            mesh::traffic::append(
+                snapshot,
+                station,
+                &self.ship,
+                traffic,
+                beam_view,
+                &mut self.frame,
+            )?;
         }
         if let (Some(station), Some(shot)) = (station, pulse)
             && !traffic
                 .is_some_and(|scene| mesh::traffic::contains_pulse(scene, snapshot.tick, shot))
         {
-            mesh::append_pulse(snapshot, station, shot, &mut self.frame)?;
+            mesh::append_pulse(snapshot, station, shot, beam_view, &mut self.frame)?;
         }
         if let (Some(station), Some(mining)) = (station, mining) {
             let sun = celestial.and_then(|scene| scene.sun.map(|sun| sun.position));
@@ -755,12 +799,23 @@ impl Renderer {
             );
             self.celestial.draw_halos(&mut pass);
         } else {
+            pass.set_viewport(
+                0.0,
+                0.0,
+                self.flight_size.width as f32,
+                self.flight_size.height as f32,
+                0.0,
+                1.0,
+            );
             self.celestial.draw_surfaces(&mut pass);
             pass.set_scissor_rect(0, 0, self.config.width, self.config.height);
             pass.set_pipeline(&self.pipeline);
             pass.set_bind_group(0, &self.projection_group, &[]);
             pass.set_vertex_buffer(0, self.vertices.slice(..));
             pass.draw(0..self.frame.len() as u32, 0..1);
+            if let Some(player) = &self.player_medusa {
+                player.draw(&mut pass);
+            }
             if let Some(mule) = &self.mule {
                 mule.draw_solid(&mut pass);
             }
@@ -844,6 +899,17 @@ impl Renderer {
             self.recover_surface(recovery)
         });
         let Some((frame, reconfigure)) = Self::prepare_acquired_frame(acquired, || {
+            let flight_size = if let Some(instruments) = cockpit {
+                let [width, height] = self
+                    .cockpit_viewport(instruments.flight.mode == meridian_core::FlightMode::Docked);
+                PhysicalSize::new(width, height)
+            } else {
+                self.size
+            };
+            if self.flight_size != flight_size {
+                self.flight_size = flight_size;
+                self.pending_projection.resize(flight_size);
+            }
             self.pending_projection.upload(|projection| {
                 self.queue
                     .write_buffer(&self.projection, 0, bytemuck::cast_slice(&projection))
@@ -851,9 +917,19 @@ impl Renderer {
             self.prepare_scene_surfaces(snapshot, &effects)?;
             let target = match (effects.targeting, station.as_ref()) {
                 (Some(target), Some(station)) => {
-                    let work_mesh = match target.identity {
-                        meridian_core::TargetIdentity::Work(
-                            meridian_core::equipment::WorkTargetId::Asteroid(id),
+                    let work_mesh = match (target.tracked_fragment, target.identity) {
+                        (Some(id), _) => effects
+                            .mining
+                            .as_ref()
+                            .and_then(|scene| {
+                                scene.belt.pending_ore.iter().find(|ore| ore.id == id)
+                            })
+                            .map(targeting::ore_model),
+                        (
+                            None,
+                            meridian_core::TargetIdentity::Work(
+                                meridian_core::equipment::WorkTargetId::Asteroid(id),
+                            ),
                         ) => effects
                             .mining
                             .as_ref()

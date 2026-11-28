@@ -1,0 +1,361 @@
+{
+  "originalArchivedNativeFaces": 1720,
+  "candidateNativeFaces": 512,
+  "fixedParts": 12,
+  "resampledParts": 8,
+  "resampledCollars": 2,
+  "omittedBlindWellParts": 6,
+  "omittedWellDepths": {
+    "3": {
+      "mouthToFloorUpperMillimetres": [
+        1040,
+        1041,
+        1041,
+        1040
+      ]
+    },
+    "4": {
+      "mouthToFloorUpperMillimetres": [
+        1040,
+        1040,
+        1040,
+        1040
+      ]
+    },
+    "7": {
+      "mouthToFloorUpperMillimetres": [
+        1041,
+        1040,
+        1040,
+        1041
+      ]
+    },
+    "10": {
+      "mouthToFloorUpperMillimetres": [
+        1040,
+        1040,
+        1040,
+        1040
+      ]
+    },
+    "14": {
+      "mouthToFloorUpperMillimetres": [
+        1040,
+        1041,
+        1041,
+        1040
+      ]
+    },
+    "15": {
+      "mouthToFloorUpperMillimetres": [
+        1040,
+        1041,
+        1041,
+        1040
+      ]
+    }
+  },
+  "silhouette": {
+    "directionsPerOrthographicView": 16,
+    "againstArchivedNative": {
+      "axisExtremaAbsoluteDeltaMillimetres": [
+        [
+          0,
+          0
+        ],
+        [
+          0,
+          0
+        ],
+        [
+          0,
+          0
+        ]
+      ],
+      "maxSampledSilhouetteOffsetMillimetres": {
+        "xy": 657,
+        "xz": 0,
+        "yz": 0
+      }
+    },
+    "againstDetailed": {
+      "axisExtremaAbsoluteDeltaMillimetres": [
+        [
+          0,
+          0
+        ],
+        [
+          0,
+          526
+        ],
+        [
+          0,
+          0
+        ]
+      ],
+      "maxSampledSilhouetteOffsetMillimetres": {
+        "xy": 657,
+        "xz": 0,
+        "yz": 526
+      }
+    }
+  },
+  "fullUpperMillimetres": {
+    "candidateToArchive": 2750,
+    "archiveToCandidate": 4259,
+    "candidateToDetailed": 2844,
+    "detailedToCandidate": 4748
+  },
+  "archivedOriginalComparisonUpperMillimetres": {
+    "archivedNativeToDetailed": 2222,
+    "detailedToArchivedNative": 2598
+  },
+  "parts": [
+    {
+      "index": 0,
+      "name": "radial pressure envelope",
+      "mode": "resampled original longitudinal stations",
+      "verifiedUpperMillimetres": {
+        "candidateToArchive": 2750,
+        "archiveToCandidate": 2986
+      }
+    },
+    {
+      "index": 1,
+      "name": "radial pressure envelope/service-well-0-0",
+      "mode": "original",
+      "verifiedUpperMillimetres": {
+        "candidateToArchive": 0,
+        "archiveToCandidate": 0
+      }
+    },
+    {
+      "index": 2,
+      "name": "radial pressure envelope/service-well-1-0",
+      "mode": "original",
+      "verifiedUpperMillimetres": {
+        "candidateToArchive": 0,
+        "archiveToCandidate": 0
+      }
+    },
+    {
+      "index": 3,
+      "name": "radial pressure envelope/service-well-2-0",
+      "mode": "omitted independent inboard blind well",
+      "verifiedUpperMillimetres": {
+        "archiveToCandidate": 3787
+      }
+    },
+    {
+      "index": 4,
+      "name": "radial pressure envelope/service-well-3-0",
+      "mode": "omitted independent inboard blind well",
+      "verifiedUpperMillimetres": {
+        "archiveToCandidate": 3792
+      }
+    },
+    {
+      "index": 5,
+      "name": "radial connected support",
+      "mode": "original",
+      "verifiedUpperMillimetres": {
+        "candidateToArchive": 0,
+        "archiveToCandidate": 0
+      }
+    },
+    {
+      "index": 6,
+      "name": "radial pressure envelope",
+      "mode": "resampled original longitudinal stations",
+      "verifiedUpperMillimetres": {
+        "candidateToArchive": 2741,
+        "archiveToCandidate": 2948
+      }
+    },
+    {
+      "index": 7,
+      "name": "radial pressure envelope/service-well-0-0",
+      "mode": "omitted independent inboard blind well",
+      "verifiedUpperMillimetres": {
+        "archiveToCandidate": 3994
+      }
+    },
+    {
+      "index": 8,
+      "name": "radial pressure envelope/service-well-1-0",
+      "mode": "original",
+      "verifiedUpperMillimetres": {
+        "candidateToArchive": 0,
+        "archiveToCandidate": 0
+      }
+    },
+    {
+      "index": 9,
+      "name": "radial pressure envelope/service-well-2-0",
+      "mode": "original",
+      "verifiedUpperMillimetres": {
+        "candidateToArchive": 0,
+        "archiveToCandidate": 0
+      }
+    },
+    {
+      "index": 10,
+      "name": "radial pressure envelope/service-well-3-0",
+      "mode": "omitted independent inboard blind well",
+      "verifiedUpperMillimetres": {
+        "archiveToCandidate": 4255
+      }
+    },
+    {
+      "index": 11,
+      "name": "radial connected support",
+      "mode": "original",
+      "verifiedUpperMillimetres": {
+        "candidateToArchive": 0,
+        "archiveToCandidate": 0
+      }
+    },
+    {
+      "index": 12,
+      "name": "radial pressure envelope",
+      "mode": "resampled original longitudinal stations",
+      "verifiedUpperMillimetres": {
+        "candidateToArchive": 2727,
+        "archiveToCandidate": 2960
+      }
+    },
+    {
+      "index": 13,
+      "name": "radial pressure envelope/service-well-0-0",
+      "mode": "original",
+      "verifiedUpperMillimetres": {
+        "candidateToArchive": 0,
+        "archiveToCandidate": 0
+      }
+    },
+    {
+      "index": 14,
+      "name": "radial pressure envelope/service-well-1-0",
+      "mode": "omitted independent inboard blind well",
+      "verifiedUpperMillimetres": {
+        "archiveToCandidate": 3980
+      }
+    },
+    {
+      "index": 15,
+      "name": "radial pressure envelope/service-well-2-0",
+      "mode": "omitted independent inboard blind well",
+      "verifiedUpperMillimetres": {
+        "archiveToCandidate": 4259
+      }
+    },
+    {
+      "index": 16,
+      "name": "radial pressure envelope/service-well-3-0",
+      "mode": "original",
+      "verifiedUpperMillimetres": {
+        "candidateToArchive": 0,
+        "archiveToCandidate": 0
+      }
+    },
+    {
+      "index": 17,
+      "name": "radial connected support",
+      "mode": "original",
+      "verifiedUpperMillimetres": {
+        "candidateToArchive": 0,
+        "archiveToCandidate": 0
+      }
+    },
+    {
+      "index": 18,
+      "name": "radial structural collar",
+      "mode": "resampled original toroidal rings",
+      "verifiedUpperMillimetres": {
+        "candidateToArchive": 1499,
+        "archiveToCandidate": 1734
+      }
+    },
+    {
+      "index": 19,
+      "name": "radial structural collar",
+      "mode": "resampled original toroidal rings",
+      "verifiedUpperMillimetres": {
+        "candidateToArchive": 1499,
+        "archiveToCandidate": 1727
+      }
+    },
+    {
+      "index": 20,
+      "name": "cockpit glazing envelope",
+      "mode": "resampled original longitudinal stations",
+      "verifiedUpperMillimetres": {
+        "candidateToArchive": 1220,
+        "archiveToCandidate": 1412
+      }
+    },
+    {
+      "index": 21,
+      "name": "cockpit connected structural crossmember",
+      "mode": "original",
+      "verifiedUpperMillimetres": {
+        "candidateToArchive": 0,
+        "archiveToCandidate": 0
+      }
+    },
+    {
+      "index": 22,
+      "name": "engine_pair/negative side/connected support",
+      "mode": "original",
+      "verifiedUpperMillimetres": {
+        "candidateToArchive": 0,
+        "archiveToCandidate": 0
+      }
+    },
+    {
+      "index": 23,
+      "name": "engine_pair/negative side/propulsion casing",
+      "mode": "resampled original longitudinal stations",
+      "verifiedUpperMillimetres": {
+        "candidateToArchive": 2000,
+        "archiveToCandidate": 2000
+      }
+    },
+    {
+      "index": 24,
+      "name": "engine_pair/negative side/propulsion luminous recess",
+      "mode": "resampled original longitudinal stations",
+      "verifiedUpperMillimetres": {
+        "candidateToArchive": 899,
+        "archiveToCandidate": 908
+      }
+    },
+    {
+      "index": 25,
+      "name": "engine_pair/positive side/connected support",
+      "mode": "original",
+      "verifiedUpperMillimetres": {
+        "candidateToArchive": 0,
+        "archiveToCandidate": 0
+      }
+    },
+    {
+      "index": 26,
+      "name": "engine_pair/positive side/propulsion casing",
+      "mode": "resampled original longitudinal stations",
+      "verifiedUpperMillimetres": {
+        "candidateToArchive": 2000,
+        "archiveToCandidate": 2000
+      }
+    },
+    {
+      "index": 27,
+      "name": "engine_pair/positive side/propulsion luminous recess",
+      "mode": "resampled original longitudinal stations",
+      "verifiedUpperMillimetres": {
+        "candidateToArchive": 899,
+        "archiveToCandidate": 985
+      }
+    }
+  ]
+}

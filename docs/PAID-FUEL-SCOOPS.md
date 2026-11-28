@@ -1,5 +1,7 @@
 # Paid Fuel Scoops equipment source
 
+For the later real solar-fuel path, independent temperature and dedicated testing control, see the [solar fuel source candidate](SOLAR-FUEL-SCOOPS.md). The historical equipment and ore boundary below is retained.
+
 This source-only equipment increment follows mining `03682dd` and source/dependency closure `cd4fc91` on the same existing branch. It implements genuine paid Fuel Scoops ownership and fitting without granting ore collection. Ten new branch tests and two separate Root loader-integration cases are authored **UNRUN**. No compiler, Cargo/Clippy, Rust helper, GUI or native run was performed. Original cargo geometry remains the exact positive pickup/sale blocker described in [the source trace](FUEL-SCOOPS.md).
 
 ## Actual paid utility and typed fit

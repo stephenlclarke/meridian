@@ -23,3 +23,13 @@ The desktop input in the originating run remains diagnostic. This regression
 uses the emitted bytes to check explicit V16 refusal and live-state preservation. It separately checks current V17 cold Continue.
 
 `xyzzy-paid-base-v17.bin` is a synthetic commander saved on Ubuntu by Meridian revision `fcec61d182b66478846b92390ad17805b0dfc7e0`. The EMP tests' `paid()` journey earned and purchased the base, then `secret()` activated the original outfit at Renas. The original encoder wrote the fixture before XYZZY granted EMP grades. It preserves an ordinary paid base at grade zero, 1,000,000 CR, and the earlier outfit history for cold-load and paid-upgrade regression tests. SHA-256 `87caec50eba9e8cbeb1b205c545a71429972e896b1844cd53bd71b7cb39596df`.
+
+## Occupied cutter warning fixture
+
+`occupied-cut-held-v17.bin` is the exact 39,168-byte scratch profile emitted on 26 November 2026 by G1 from the existing `disabled_native_target_with_fit` / `occupied_cut_requires_explicit_review_and_retains_actual_finite_game_contact` core test at its first genuine occupied contact review. The source producer starts with the retained paid-base and explicitly XYZZY-supported fixture, uses public flight, paid grades, actual laser and EMP contacts and native selected hold; it does not inject a ship or a writeable contact. This is headless actual simulation evidence, not a native UI or normally earned whole-profile acceptance.
+
+- Source producer's committed base: `6a21c890f5ec2e33c44f037cacdac825570592dd`; the occupied selection correction is `93d752c65f2989b9bea8626a4ae1aba66c060c95`. Desktop confirmation tests passed on Mac, Linux and Windows on combined commit `d0f7daba`.
+- SHA-256: `e9e156f9761d7c39e7c2c9767574ae73d7d4b6204527c5bb59647c127f62b9b9`.
+- Save format: V17; World tick 34,515; target profile 16,101, galaxy 0, system 185 (Renas), serial 2; fitted cutter item 116,114; no occupied contact receipt.
+
+The desktop regression copies these unchanged bytes to disposable scratch slots, opens normal Profile Continue, and explicitly selects the actual disabled occupied actor through the public targeting API. It then checks the modal's frozen tick, ordinary key suppression, Escape, stale selection and focus cancellation, one atomic confirmed contact, failed-writer rollback and cold Continue without repeat. It does not infer material, cargo, hull or crew acquisition. No live player profile was used.

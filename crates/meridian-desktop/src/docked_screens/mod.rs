@@ -8,6 +8,7 @@ mod presentation;
 mod route;
 #[cfg(test)]
 mod tests;
+pub(crate) use catalogue::AuthoredRecord;
 pub use catalogue::{Catalogue, ObjectRecord, Specification, WorldRecord};
 pub use controller::DockedScreens;
 pub use layout::{ChartLayout, Rect, Viewport};
@@ -68,6 +69,11 @@ pub enum Key {
     PreviousTab,
     Buy,
     Sell,
+    QuantityLess,
+    QuantityMore,
+    QuantityLessTen,
+    QuantityMoreTen,
+    Refuel,
     BuyMode,
     SellMode,
     LocalChart,
@@ -137,10 +143,12 @@ pub enum Request {
     SetNavigationRoute(RoutePlan),
     ClearNavigationRoute,
     RefuelNavigationRoute,
+    RefuelMarket,
     ReviewBodyRoute(NavigationBodyId),
     ReviewCommodity {
         commodity: CommodityId,
         buy: bool,
+        quantity: u64,
     },
     ReviewEquipment {
         node: String,
@@ -153,6 +161,39 @@ pub enum Request {
     ReviewShipExchange(String),
     ConfirmReview(u64),
     CancelReview(u64),
+}
+
+pub(crate) struct MarketRefuelQuote {
+    pub fuel: u16,
+    pub capacity: u16,
+    pub price: u32,
+}
+
+pub(crate) fn market_refuel_quote(world: &World) -> Option<MarketRefuelQuote> {
+    let nav = world.snapshot().navigation?;
+    let missing = nav.fuel_capacity_units.checked_sub(nav.fuel_units)?;
+    Some(MarketRefuelQuote {
+        fuel: nav.fuel_units,
+        capacity: nav.fuel_capacity_units,
+        price: u32::from(missing) * meridian_core::station_services::FUEL_PRICE_TENTHS,
+    })
+}
+
+pub(crate) fn market_refuel_admission(world: &World) -> Result<(), &'static str> {
+    if world.commodity_quote(CommodityId::Food).is_none() {
+        return Err("Refuelling service unavailable");
+    }
+    if world.mission_snapshot().is_some_and(|m| m.paused) {
+        return Err("Resume before refuelling");
+    }
+    let quote = market_refuel_quote(world).ok_or("Fuel status unavailable")?;
+    if quote.fuel == quote.capacity {
+        return Err("Fuel tank is already full");
+    }
+    if world.credits_tenths().is_none_or(|cash| cash < quote.price) {
+        return Err("Not enough cash for fuel");
+    }
+    Ok(())
 }
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub enum Outcome {

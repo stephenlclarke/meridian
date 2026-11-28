@@ -1,0 +1,12 @@
+{
+  "schema": 1,
+  "id": "sh069-baza-fighter",
+  "undoBefore": [
+    "sh068-badger"
+  ],
+  "undoAfter": [],
+  "kind": "declaration",
+  "module": "baza_fighter",
+  "before": "pub mod barbary;\n",
+  "after": "pub mod caracal_scout;\n"
+}

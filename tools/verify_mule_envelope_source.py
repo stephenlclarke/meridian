@@ -1,6 +1,5 @@
 """Verify source bytes, old-source preservation and current-gameplay adaptation only."""
 import ast
-import hashlib
 import json
 from pathlib import Path
 import re
@@ -10,20 +9,23 @@ import tomllib
 if not __debug__:
     raise RuntimeError("Mule source verification requires Python assertions")
 
+from protected_core_entries import (
+    CORE_SOURCE, LIB_SOURCE, discover_entries, order_entries, sha, undo_flight_computer,
+)
+
 RUST_TEST_NAME = r'#\[test\]\s*fn\s+(\w+)\('
 FLIGHT_SOURCE = 'flight.rs'
 FLIGHT_PERSISTENCE = 'flight/persistence.rs'
 EMP_TESTS = 'flight/emp/tests.rs'
-LIB_SOURCE = 'lib.rs'
 ROOT = Path(__file__).resolve().parents[1]
 PROTECTED_CORE = Path('integration/sh001-mule/PROTECTED-CORE.json')
-FLIGHT_COMPUTER_INVERSE = Path('integration/sh001-mule/FLIGHT-COMPUTER-INVERSE.json')
+# Historical generator default and stable fields in the existing JSON result.
 FLIGHT_COMPUTER_BASE = 'fcec61d182b66478846b92390ad17805b0dfc7e0'
-FLIGHT_COMPUTER_INVERSE_SHA256 = '094fb89c24d15d3b882c49e24a149a5ccb188ed6e949577691440f76b3872a1d'
-
-
-def sha(data):
-    return hashlib.sha256(data).hexdigest()
+REPORTED_INVERSES = (
+    'equipment-flight-computer', 'equipment-hyperspace-drive', 'equipment-stock-shield',
+    'equipment-fuel-storage', 'equipment-solar-scoops', 'equipment-stock-ecm',
+    'equipment-stock-ecm-field',
+)
 
 
 def protected_core_pins(root):
@@ -32,111 +34,6 @@ def protected_core_pins(root):
     baseline = json.loads(pin_bytes)
     assert baseline['base'] == '792f4485372ae37d0c1d583ae11229e85932ce2f'
     return baseline['sha256']
-
-
-def flight_computer_inverse(root, protected):
-    manifest = (root / FLIGHT_COMPUTER_INVERSE).read_bytes()
-    assert sha(manifest) == FLIGHT_COMPUTER_INVERSE_SHA256, 'flight computer inverse manifest'
-    inverse = json.loads(manifest)
-    assert inverse['base'] == FLIGHT_COMPUTER_BASE, 'flight computer inverse base'
-    files = inverse['files']
-    assert files and files.keys() <= protected.keys(), 'flight computer inverse paths'
-    return files
-
-
-def undo_gunship_publication(relative, data):
-    if relative != LIB_SOURCE:
-        return data
-    declaration = b'pub mod harpy_gunship;\n'
-    before, after = b'pub mod harpy_dropship;\n', b'pub mod mining;\n'
-    span = before + declaration + after
-    assert data.count(declaration) == 1 and data.count(span) == 1, relative
-    return data.replace(span, before + after, 1)
-
-
-def undo_mk2_publication(relative, data):
-    if relative != LIB_SOURCE:
-        return data
-    declaration = b'pub mod goshawk_mk2;\n'
-    before, after = b'pub mod goshawk_custom;\n', b'pub mod harpy_assault;\n'
-    span = before + declaration + after
-    assert data.count(declaration) == 1 and data.count(span) == 1, relative
-    return data.replace(span, before + after, 1)
-
-
-def undo_dropship_publication(relative, data):
-    if relative != LIB_SOURCE:
-        return data
-    declaration = b'pub mod harpy_dropship;\n'
-    before, after = b'pub mod harpy_assault;\n', b'pub mod mining;\n'
-    span = before + declaration + after
-    assert data.count(declaration) == 1 and data.count(span) == 1, relative
-    return data.replace(span, before + after, 1)
-
-
-def undo_erne_publication(relative, data):
-    if relative != LIB_SOURCE:
-        return data
-    declaration = b'pub mod erne_corvette;\n'
-    before, after = b'pub mod equipment;\n', b'mod flight;\n'
-    span = before + declaration + after
-    assert data.count(declaration) == 1 and data.count(span) == 1, relative
-    return data.replace(span, before + after, 1)
-
-
-def undo_harpy_publication(relative, data):
-    if relative != LIB_SOURCE:
-        return data
-    declaration = b'pub mod harpy_assault;\n'
-    before, after = b'pub mod goshawk_custom;\n', b'pub mod mining;\n'
-    span = before + declaration + after
-    assert data.count(declaration) == 1 and data.count(span) == 1, relative
-    return data.replace(span, before + after, 1)
-
-
-def undo_eagle_publication(relative, data):
-    if relative != LIB_SOURCE:
-        return data
-    declaration = b'pub mod eagle_cruiser;\n'
-    before, after = b'pub mod docking;\n', b'pub mod equipment;\n'
-    span = before + declaration + after
-    assert data.count(declaration) == 1 and data.count(span) == 1, relative
-    return data.replace(span, before + after, 1)
-
-
-def undo_saker_publication(relative, data):
-    """Restore the reviewed lib.rs insertion before checking the Flight Computer hashes."""
-    if relative != LIB_SOURCE:
-        return data
-    declaration = b'pub mod saker;\n'
-    anchor = b'pub mod navigation;\n'
-    assert data.count(declaration) == 1 and data.count(anchor + declaration) == 1, relative
-    return data.replace(anchor + declaration, anchor, 1)
-
-
-def undo_flight_computer(relative, data, inverse):
-    """Restore exact pre-slice bytes, without fuzzy matching or exclusions."""
-    if relative not in inverse:
-        return data
-    record = inverse[relative]
-    assert sha(data) == record['afterSHA256'], relative
-    assert record['hunks'], relative
-    restored = bytearray()
-    cursor = 0
-    for hunk in record['hunks']:
-        start = hunk['offset']
-        current = hunk['after'].encode('utf-8')
-        previous = hunk['before'].encode('utf-8')
-        assert cursor <= start <= len(data) and current != previous, relative
-        end = start + len(current)
-        assert end <= len(data) and data[start:end] == current, relative
-        restored.extend(data[cursor:start])
-        restored.extend(previous)
-        cursor = end
-    restored.extend(data[cursor:])
-    result = bytes(restored)
-    assert sha(result) == record['beforeSHA256'], relative
-    return result
 
 
 def undo_commander_launch(relative, data):
@@ -311,59 +208,64 @@ def undo_goshawk_world(relative, data):
     return data
 
 
+MULE_ADDITIONS = {
+    FLIGHT_SOURCE: [
+        b'mod mule_validation;\n',
+        b'    mule_validation: Option<crate::traffic::mule_validation::State>,\n',
+        b'            mule_validation: None,\n',
+        b'        if self.mule_validation.is_some() {\n            return self.step_mule_validation(input);\n        }\n',
+    ],
+    EMP_TESTS: [b'        mule_validation: None,\n'],
+    FLIGHT_PERSISTENCE: [b'            mule_validation: None,\n'],
+    LIB_SOURCE: [b'pub mod mule;\n', b'pub mod goshawk;\n'],
+    'station.rs': [b'mod mule;\n'],
+    'traffic.rs': [
+        b'pub(crate) mod mule_validation;\n',
+        b'pub use mule_validation::{MuleActorSnapshot, MuleValidationRefusal};\n',
+    ],
+}
+
+
+def restore_entries(relative, data, plan):
+    for entry in plan:
+        data = entry.undo(relative, data)
+    return data
+
+
+def restore_historical(relative, data):
+    # Preserve the reviewed historical Mule and pre-Mule intermediate checks.
+    data = undo_goshawk_world(relative, data)
+    data = undo_renas_encounter(relative, data)
+    for addition in MULE_ADDITIONS.get(relative, []):
+        assert data.count(addition) == 1, relative
+        data = data.replace(addition, b'', 1)
+    data = undo_commander_launch(relative, data)
+    if relative == LIB_SOURCE:
+        publication = b'pub mod stag_liner;\n\n'
+        assert data.count(publication) == 1, relative
+        data = data.replace(publication, b'', 1)
+    if relative == FLIGHT_SOURCE:
+        speed_line = b'        if !(0.0..=MAX_SPEED).contains(&self.state.speed) {\n'
+        original_line = b'        if !self.state.speed.is_finite() || !(0.0..=MAX_SPEED).contains(&self.state.speed) {\n'
+        assert data.count(speed_line) == 1, relative
+        data = data.replace(speed_line, original_line, 1)
+    return data
+
+
 def verify_protected_core(root):
-    # Undo the reviewed Mule hooks and the equivalent finite-speed range check.
     # Checking every pre-existing core blob catches unrelated gameplay edits.
-    additions = {
-        FLIGHT_SOURCE: [
-            b'mod mule_validation;\n',
-            b'    mule_validation: Option<crate::traffic::mule_validation::State>,\n',
-            b'            mule_validation: None,\n',
-            b'        if self.mule_validation.is_some() {\n            return self.step_mule_validation(input);\n        }\n',
-        ],
-        EMP_TESTS: [b'        mule_validation: None,\n'],
-        FLIGHT_PERSISTENCE: [b'            mule_validation: None,\n'],
-        LIB_SOURCE: [b'pub mod mule;\n', b'pub mod goshawk;\n'],
-        'station.rs': [b'mod mule;\n'],
-        'traffic.rs': [
-            b'pub(crate) mod mule_validation;\n',
-            b'pub use mule_validation::{MuleActorSnapshot, MuleValidationRefusal};\n',
-        ],
-    }
     baseline = protected_core_pins(root)
-    inverse = flight_computer_inverse(root, baseline)
-    checked = set()
+    entries = discover_entries(root, baseline)
+    plan = order_entries(entries)
     unchanged = 0
     for relative, expected in baseline.items():
-        current = (root / 'crates/meridian-core/src' / relative).read_bytes()
-        data = undo_gunship_publication(relative, current)
-        data = undo_mk2_publication(relative, data)
-        data = undo_dropship_publication(relative, data)
-        data = undo_erne_publication(relative, data)
-        data = undo_harpy_publication(relative, data)
-        data = undo_eagle_publication(relative, data)
-        data = undo_saker_publication(relative, data)
-        data = undo_flight_computer(relative, data, inverse)
-        data = undo_goshawk_world(relative, data)
-        data = undo_renas_encounter(relative, data)
-        for addition in additions.get(relative, []):
-            assert data.count(addition) == 1, relative
-            data = data.replace(addition, b'', 1)
-        data = undo_commander_launch(relative, data)
-        if relative == LIB_SOURCE:
-            publication = b'pub mod stag_liner;\n\n'
-            assert data.count(publication) == 1, relative
-            data = data.replace(publication, b'', 1)
-        if relative == FLIGHT_SOURCE:
-            speed_line = b'        if !(0.0..=MAX_SPEED).contains(&self.state.speed) {\n'
-            original_line = b'        if !self.state.speed.is_finite() || !(0.0..=MAX_SPEED).contains(&self.state.speed) {\n'
-            assert data.count(speed_line) == 1, relative
-            data = data.replace(speed_line, original_line, 1)
+        current = (root / CORE_SOURCE / relative).read_bytes()
+        data = restore_historical(relative, restore_entries(relative, current, plan))
         assert sha(data) == expected, relative
-        checked.add(relative)
         unchanged += data == current
-    assert set(additions) <= checked and len(checked) == 115
-    return len(checked), len(additions), unchanged, len(inverse)
+    assert MULE_ADDITIONS.keys() <= baseline.keys() and len(baseline) == 115
+    return (len(baseline), len(MULE_ADDITIONS), unchanged,
+            *(len(entries[name].files) for name in REPORTED_INVERSES))
 
 
 def verify_test_registry(criteria):
@@ -422,7 +324,7 @@ def verify():
     folder = ROOT / 'assets/fleet/sh001'
     verify_inputs(folder)
     groups = verify_geometry(folder)
-    checked, hooks, unchanged, flight_computer = verify_protected_core(ROOT)
+    checked, hooks, unchanged, flight_computer, hyperspace_drive, stock_shield, fuel_storage, solar_scoops, stock_ecm, stock_ecm_field = verify_protected_core(ROOT)
     counts = verify_historical_bindings(folder, groups)
     return {
         'status': 'PASS_SOURCE_ONLY',
@@ -430,6 +332,12 @@ def verify():
         'protectedCoreFilesWithCommanderLaunch': 2,
         'protectedCoreFilesWithMuleHooks': hooks,
         'protectedCoreFilesWithFlightComputerChanges': flight_computer,
+        'protectedCoreFilesWithHyperspaceDriveChanges': hyperspace_drive,
+        'protectedCoreFilesWithStockShieldChanges': stock_shield,
+        'protectedCoreFilesWithFuelStorageChanges': fuel_storage,
+        'protectedCoreFilesWithSolarScoopsChanges': solar_scoops,
+        'protectedCoreFilesWithStockEcmChanges': stock_ecm,
+        'protectedCoreFilesWithStockEcmFieldChanges': stock_ecm_field,
         'protectedCoreFilesChecked': checked,
         **counts,
         'vertexEncoding': 5344,

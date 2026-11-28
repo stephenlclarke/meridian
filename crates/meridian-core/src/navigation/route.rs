@@ -1,10 +1,11 @@
 //! Route planning over G01 stations with implemented travel, docking and refuelling.
 use super::{
-    FUEL_CAPACITY, NavigationError, NavigationGrade, OriginalNavigation, PlayerShipId, SystemId,
+    NavigationError, NavigationGrade, OriginalNavigation, PlayerShipId, SystemId,
     persistence::{read_system, write_system},
     stock_jump_fuel_cost,
 };
 use crate::save::{Reader, SaveError, Writer};
+use crate::station_services::CommodityId;
 
 pub const ROUTE_SYSTEMS: [SystemId; 3] = [SystemId::AVENOR, SystemId::LARERIA, SystemId::RENAS];
 const INVALID: SaveError = SaveError::InvalidState("navigation computer plan");
@@ -66,6 +67,7 @@ pub struct RoutePlan {
     pub(crate) origin_jumps: u64,
     pub(crate) grade: NavigationGrade,
     pub(crate) origin_fuel: u16,
+    pub(crate) origin_storage_count: u8,
     pub(crate) stop: u8,
     pub(crate) systems: Vec<SystemId>,
 }
@@ -100,7 +102,10 @@ impl RoutePlan {
         writer.u64(self.origin_visit);
         writer.u64(self.origin_jumps);
         writer.u8(self.grade.tag());
-        writer.u16(self.origin_fuel);
+        writer.u16(super::pack_fuel(
+            self.origin_fuel,
+            self.origin_storage_count,
+        ));
         writer.u8(self.stop);
         writer.u8(self.systems.len() as u8);
         for &system in &self.systems {
@@ -114,7 +119,7 @@ impl RoutePlan {
         let origin_visit = reader.u64()?;
         let origin_jumps = reader.u64()?;
         let grade = NavigationGrade::decode(reader)?;
-        let origin_fuel = reader.u16()?;
+        let (origin_fuel, origin_storage_count) = super::unpack_fuel(reader.u16()?)?;
         let stop = reader.u8()?;
         let count = usize::from(reader.u8()?);
         if !(2..=ROUTE_SYSTEMS.len()).contains(&count) || usize::from(stop) >= count {
@@ -128,10 +133,7 @@ impl RoutePlan {
             }
             systems.push(system);
         }
-        if grade == NavigationGrade::Empty
-            || !(1..=FUEL_CAPACITY).contains(&origin_fuel)
-            || origin_visit <= origin_jumps
-        {
+        if grade == NavigationGrade::Empty || origin_fuel == 0 || origin_visit <= origin_jumps {
             return Err(INVALID);
         }
         Ok(Self {
@@ -141,6 +143,7 @@ impl RoutePlan {
             origin_jumps,
             grade,
             origin_fuel,
+            origin_storage_count,
             stop,
             systems,
         })
@@ -156,6 +159,24 @@ pub struct RouteAlternative {
     pub risk: f64,
     pub trade_tenths: u64,
     pub cargo_sale_tenths: u64,
+    /// Read-only estimates from the same live quote snapshot as the route score.
+    pub trade_legs: Vec<RouteTradeLeg>,
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub struct TradeExportEstimate {
+    pub commodity: CommodityId,
+    pub quantity: u64,
+    pub ask_tenths: u32,
+    pub bid_tenths: u32,
+}
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct RouteTradeLeg {
+    pub from: SystemId,
+    pub to: SystemId,
+    pub profit_tenths: u64,
+    pub exports: Vec<TradeExportEstimate>,
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -182,6 +203,7 @@ pub struct RouteProgress {
 pub(crate) struct RouteEconomy {
     pub(crate) trade: [[u64; ROUTE_SYSTEMS.len()]; ROUTE_SYSTEMS.len()],
     pub(crate) sale: [u64; ROUTE_SYSTEMS.len()],
+    pub(crate) exports: [[Vec<TradeExportEstimate>; ROUTE_SYSTEMS.len()]; ROUTE_SYSTEMS.len()],
 }
 
 pub(crate) fn route_station_index(system: SystemId) -> Option<usize> {
@@ -206,6 +228,7 @@ pub(crate) fn route_feasible(
     catalogue: &OriginalNavigation,
     path: &[SystemId],
     first_fuel: u16,
+    tank_capacity: u16,
     grade: NavigationGrade,
 ) -> bool {
     grade != NavigationGrade::Empty
@@ -213,7 +236,7 @@ pub(crate) fn route_feasible(
             let fuel = if index == 0 {
                 first_fuel
             } else {
-                FUEL_CAPACITY
+                tank_capacity
             };
             route_hop(catalogue, hop[0], hop[1]).is_ok_and(|(distance, debit)| {
                 distance <= grade.reach_ly().min(f64::from(fuel) / 10.0) && debit <= fuel
@@ -239,7 +262,7 @@ pub(crate) fn route_alternatives(
         .map_err(|_| RouteError::UnsupportedSystem)?;
     if template
         .grade
-        .planning_radius_ly()
+        .planning_radius_with_capacity(super::fuel_capacity(template.origin_storage_count))
         .is_some_and(|radius| distance > radius)
     {
         return Err(RouteError::OutsidePlanningRadius);
@@ -254,9 +277,15 @@ pub(crate) fn route_alternatives(
             .map(|via| vec![origin, via, destination]),
     );
     let mut candidates = Vec::new();
-    for path in
-        paths.filter(|path| route_feasible(catalogue, path, template.origin_fuel, template.grade))
-    {
+    for path in paths.filter(|path| {
+        route_feasible(
+            catalogue,
+            path,
+            template.origin_fuel,
+            super::fuel_capacity(template.origin_storage_count),
+            template.grade,
+        )
+    }) {
         candidates.push(candidate(catalogue, template, path, economy)?);
     }
     if candidates.is_empty() {
@@ -305,6 +334,7 @@ fn candidate(
     let mut risk = 0.0;
     let mut trade_tenths = 0u64;
     let mut cargo_sale_tenths = 0;
+    let mut trade_legs = Vec::new();
     for hop in systems.windows(2) {
         let from = route_station_index(hop[0]).ok_or(RouteError::UnsupportedSystem)?;
         let to = route_station_index(hop[1]).ok_or(RouteError::UnsupportedSystem)?;
@@ -315,6 +345,12 @@ fn candidate(
         risk += HOSTILITY[to];
         trade_tenths = trade_tenths.saturating_add(economy.trade[from][to]);
         cargo_sale_tenths = cargo_sale_tenths.max(economy.sale[to]);
+        trade_legs.push(RouteTradeLeg {
+            from: hop[0],
+            to: hop[1],
+            profit_tenths: economy.trade[from][to],
+            exports: economy.exports[from][to].clone(),
+        });
     }
     Ok(RouteAlternative {
         preferences: Vec::new(),
@@ -327,6 +363,7 @@ fn candidate(
         risk,
         trade_tenths,
         cargo_sale_tenths,
+        trade_legs,
     })
 }
 

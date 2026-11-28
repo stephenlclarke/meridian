@@ -1,0 +1,105 @@
+{
+  "nominalPaddingMetres": 0.02,
+  "minimumRefinementTargetsMillimetres": {
+    "detailed": 2400,
+    "native": 4500
+  },
+  "fullUpperMillimetres": {
+    "detailed": 2221,
+    "native": 4311
+  },
+  "pieces": {
+    "primary pressure body": {
+      "detailed": 1761,
+      "native": 4311
+    },
+    "port nacelle": {
+      "detailed": 932,
+      "native": 2607
+    },
+    "port brace": {
+      "detailed": 1011,
+      "native": 1011
+    },
+    "port nozzle": {
+      "detailed": 2221,
+      "native": 2617
+    },
+    "starboard nacelle": {
+      "detailed": 932,
+      "native": 2607
+    },
+    "starboard brace": {
+      "detailed": 1011,
+      "native": 1011
+    },
+    "starboard nozzle": {
+      "detailed": 2221,
+      "native": 2617
+    },
+    "canopy": {
+      "detailed": 362,
+      "native": 1003
+    },
+    "canopy ridge": {
+      "detailed": 339,
+      "native": 1838
+    },
+    "port service line": {
+      "detailed": 260,
+      "native": 1770
+    },
+    "port instrument housing": {
+      "detailed": 668,
+      "native": 1679
+    },
+    "port louvre 1": {
+      "detailed": 243,
+      "native": 1278
+    },
+    "port louvre 2": {
+      "detailed": 243,
+      "native": 1282
+    },
+    "port louvre 3": {
+      "detailed": 243,
+      "native": 1287
+    },
+    "port louvre 4": {
+      "detailed": 243,
+      "native": 1291
+    },
+    "port louvre 5": {
+      "detailed": 243,
+      "native": 1295
+    },
+    "starboard service line": {
+      "detailed": 260,
+      "native": 930
+    },
+    "starboard instrument housing": {
+      "detailed": 668,
+      "native": 1679
+    },
+    "starboard louvre 1": {
+      "detailed": 243,
+      "native": 1250
+    },
+    "starboard louvre 2": {
+      "detailed": 243,
+      "native": 1255
+    },
+    "starboard louvre 3": {
+      "detailed": 243,
+      "native": 1259
+    },
+    "starboard louvre 4": {
+      "detailed": 243,
+      "native": 1279
+    },
+    "starboard louvre 5": {
+      "detailed": 243,
+      "native": 1274
+    }
+  }
+}

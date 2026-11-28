@@ -1,0 +1,226 @@
+{
+  "hull": "SH149 Owlet Mk II",
+  "scope": "Original catalogue inspection and geometry queries",
+  "source": "assets/fleet/sh149/SOURCE-GEOMETRY.json",
+  "frozenSources": "integration/sh149-owlet-mk-ii/FROZEN-SOURCES.json",
+  "sourceScaleMetresPerUnit": "12000/1357",
+  "faces": {
+    "detailed": 3520,
+    "archivedNative": 1000,
+    "candidateNative": 512,
+    "candidateMaximum": 512
+  },
+  "originalAccess": {
+    "runtimeCatalogue": {
+      "playerFlyable": false,
+      "normalPurchaseEligible": false,
+      "purchasePolicy": "pendingFabrication"
+    },
+    "r3DesignContract": {
+      "playerFlyable": true,
+      "purchasePolicy": "blueprintFabrication"
+    }
+  },
+  "engineering": {
+    "sourceReference": "finite-intrinsic-empty-owlet-mk-ii",
+    "massKg": 41374
+  },
+  "supportGroups": 168,
+  "candidateComponentInventory": {
+    "originalPartsRepresented": 30,
+    "unalteredNativeParts": 10,
+    "recessedWells": 12,
+    "partsUsingSelectedOriginalVertices": 8,
+    "sampledArcSections": 0,
+    "arcSeamVertices": 0
+  },
+  "minimumRouteClearanceMillimetres": 1214,
+  "sourceContactCounts": {
+    "overlap": 31,
+    "unchangedNativeParts": 10
+  },
+  "candidateRebuild": "tools/rebuild_owlet_mk_ii.py",
+  "fitUpperMillimetres": {
+    "detailed": 2541,
+    "archivedNative": 2855,
+    "candidateNative": 3566
+  },
+  "continuousCandidateFitMillimetres": {
+    "archiveToCandidate": {
+      "lowerFloor": 839,
+      "upperCeiling": 863
+    },
+    "candidateToArchive": {
+      "lowerFloor": 293,
+      "upperCeiling": 319
+    },
+    "detailedToCandidate": {
+      "lowerFloor": 1159,
+      "upperCeiling": 1185
+    },
+    "candidateToDetailed": {
+      "lowerFloor": 667,
+      "upperCeiling": 693
+    }
+  },
+  "hullStudio": {
+    "definition": "integration/sh149-owlet-mk-ii/OWLET-MK-II-STUDIO.json",
+    "bytes": 584213,
+    "sha256": "0e294d002eaf773cd9f8d3c9b8132392dc843660fbce2dd28aa8ca57c998fcf4",
+    "supports": 168,
+    "probes": 7,
+    "detail": "3,520 original detailed faces",
+    "native": "512 separate candidate faces",
+    "loaderRevision": "27121e66ba37a29781135b56924a9d6e7f38a70a",
+    "signedInstalledExport": {
+      "status": "PASS",
+      "scope": "Signed installed Studio offline original artwork import/export",
+      "bundleIdentifier": "io.xyzzy.meridian.hullstudio",
+      "bundleVersion": "0.0.0",
+      "codeDirectoryHash": "93938bda9242ebdff508bfb9e16b3cdf83c0a200",
+      "developerIdTeam": "4MEB7MUTAV",
+      "signatureVerification": "deep strict",
+      "definition": {
+        "bytes": 584213,
+        "sha256": "0e294d002eaf773cd9f8d3c9b8132392dc843660fbce2dd28aa8ca57c998fcf4"
+      },
+      "exportExitStatuses": [
+        0,
+        0
+      ],
+      "exportMatchesDefinitionExceptTrailingLf": true,
+      "valid": true,
+      "diagnostics": [],
+      "detailedTriangles": 3520,
+      "nativeTriangles": 512,
+      "supportGroups": 168,
+      "engineeringReference": "finite-intrinsic-empty-owlet-mk-ii",
+      "massKg": 41374,
+      "receiptFiles": {
+        "owlet-mk-ii.hull.json": {
+          "bytes": 584212,
+          "sha256": "d8ef00a92e12c08f340bc4f853e66c5c9e8c07e51cea26babf327c6fa627aa3b"
+        },
+        "owlet-mk-ii-repeat.hull.json": {
+          "bytes": 584212,
+          "sha256": "d8ef00a92e12c08f340bc4f853e66c5c9e8c07e51cea26babf327c6fa627aa3b"
+        },
+        "studio.stdout.json": {
+          "bytes": 157150,
+          "sha256": "599e5b3917557fd3eeb3210df0657a17d070db3b1070605e56e63258186a1c7c"
+        },
+        "studio-repeat.stdout.json": {
+          "bytes": 157150,
+          "sha256": "599e5b3917557fd3eeb3210df0657a17d070db3b1070605e56e63258186a1c7c"
+        },
+        "codesign.log": {
+          "bytes": 13038,
+          "sha256": "52991b8ac5a1fa8f0262837bb94a264cd845ee24313f8685b9df119b5cfe5940"
+        },
+        "codesign-identity.log": {
+          "bytes": 988,
+          "sha256": "f6d772f29f9e72421e98a6d7243102b92b77b5995acbe6cda7ddb3bbfc3b1706"
+        }
+      },
+      "artworkProbeResults": [
+        {
+          "name": "dorsal",
+          "passed": true
+        },
+        {
+          "name": "ventral",
+          "passed": true
+        },
+        {
+          "name": "port-outboard",
+          "passed": true
+        },
+        {
+          "name": "starboard-outboard",
+          "passed": true
+        },
+        {
+          "name": "between-forward-forks",
+          "passed": true
+        },
+        {
+          "name": "above-port-fork",
+          "passed": true
+        },
+        {
+          "name": "above-starboard-fork",
+          "passed": true
+        }
+      ],
+      "triangleRoles": {
+        "detail": "original detailed visible",
+        "native": "derived native inspection candidate"
+      }
+    }
+  },
+  "byteReplay": {
+    "commands": [
+      "python3 -B tools/prepare_owlet_mk_ii.py --check",
+      "python3 -B tools/rebuild_owlet_mk_ii.py",
+      "python3 -B tools/verify_owlet_mk_ii.py | cmp - integration/sh149-owlet-mk-ii/CONTACT-RESULT.json",
+      "python3 -B tools/measure_owlet_mk_ii.py | cmp - integration/sh149-owlet-mk-ii/SURFACE-FIT.json",
+      "python3 -B tools/measure_owlet_mk_ii.py --fidelity | cmp - integration/sh149-owlet-mk-ii/CANDIDATE-FIDELITY.json",
+      "python3 -B tools/measure_owlet_mk_ii.py --directions | cmp - integration/sh149-owlet-mk-ii/CANDIDATE-FIT-LOCALIZATION.json",
+      "python3 -B tools/measure_owlet_mk_ii.py --reference-directions | cmp - integration/sh149-owlet-mk-ii/REFERENCE-FIT-LOCALIZATION.json"
+    ],
+    "host": "SteveMBA",
+    "startedUtc": "2026-11-25T07:22:29Z",
+    "finishedUtc": "2026-11-25T07:23:17Z",
+    "log": {
+      "bytes": 720,
+      "sha256": "e99ccc0970aa0a55a77544c463208c8bc87eb641f44c87d8fd883ec104244c2b"
+    },
+    "fitDependencies": {
+      "python": "3.14.3",
+      "numpy": "2.5.5",
+      "scipy": "1.18.1",
+      "trimesh": "5.2.1",
+      "rtree": "1.4.1"
+    },
+    "originalCommit": "f4229929f6f884ed693d875c46b916959120e2ba",
+    "historicalReplayPins": {
+      "tools/measure_banteng_geometry.py": "4b7d8d5d972e30d93bebf7f422be71e415d6e4a9c4b622582ecf6e30a6bb9235",
+      "tools/measure_lanner_geometry.py": "cabbaf17ff7efdbcbee9a1fba67c7edafd59dceb8e97f367824a51c134479992",
+      "tools/verify_eagle_cruiser_geometry.py": "c7926cb6e699ae5ffb445951ce9d4e98a64018a7ecb1db2e5e77a611d742a783"
+    }
+  },
+  "replayPins": {
+    "tools/fleet_hull_measurement.py": "3570747d9f650efc7d0e4f88352e9fd32e42ab394f4669100223fbac0c1be6b7",
+    "tools/directed_hull_fit.py": "dbd5d45e5052453646b752695815d6cb53c6ccb2c3ad6694451a4c7e19fa8bf7",
+    "integration/sh149-owlet-mk-ii/OWLET-MK-II-STUDIO.json": "0e294d002eaf773cd9f8d3c9b8132392dc843660fbce2dd28aa8ca57c998fcf4",
+    "integration/sh149-owlet-mk-ii/FROZEN-SOURCES.json": "a33ceacae0d40808bcc8b89c00da79478b2985ff92121ecb574c2ee78bd28b6f",
+    "integration/sh149-owlet-mk-ii/CONTACT-CANDIDATE.json": "86bb5067a7e5406b56c3af1fc59e837a3f5af8aa899c7df2dacfe2403717abcd",
+    "integration/sh149-owlet-mk-ii/CONTACT-RESULT.json": "bf16066c9d5c935c6462aba5cba78c2f0cc6549b0c386f16cc28f10a3719cc34",
+    "integration/sh149-owlet-mk-ii/ORIGINAL-OWNERSHIP.json": "616c5035bb39f6ad3eb946d30a12f9db55731322256b04de15c6b7c779240058",
+    "integration/sh149-owlet-mk-ii/RETAINED-OVERLAPS.json": "28589b209481b0446a0023b05a9ea8be3199806c8f3432a3907d3e23838dc529",
+    "integration/sh149-owlet-mk-ii/CANDIDATE-FIDELITY.json": "829444c67859b6ca778ca8d395a8d1c4a66bbf19d1cd7c6192c76aa0600c1dc2",
+    "integration/sh149-owlet-mk-ii/SUPPORT-FAN.json": "47d196c3b8075ff0a3d6f876242585597749b9fe4b0495c67f662dc8cab0e7f3",
+    "integration/sh149-owlet-mk-ii/SURFACE-FIT.json": "bc24b4bb72a0e28ddd99e25d79ea35fcd1ddf65d617837c2cec81117106bfa6e",
+    "integration/sh149-owlet-mk-ii/ARCHIVED-OVERLAPS.json": "030daf2a8fac8e2750ea46a4b86dc7cf3f3d98c233fbe3a9b534385cdb931a3d",
+    "integration/sh149-owlet-mk-ii/CANDIDATE-TOPOLOGY-SURVEY.json": "b7e31a3a4a3b71dfc9a99730f264fb192473d6033cb8f2a4f95eb0f1aaf8dc61",
+    "integration/sh149-owlet-mk-ii/CANDIDATE-FIT-LOCALIZATION.json": "21d1c99a66dbc59444c0df45ba38c1604e78b36316043cf7886f86649ca39229",
+    "integration/sh149-owlet-mk-ii/REFERENCE-FIT-LOCALIZATION.json": "32df4744e8d7e57668047d0b63eace300c7009f84d6e721453b69b693f47e72b",
+    "tools/atomic_asset_output.py": "2d13803823645d3bdea7c855af958eb54d7ebe513ec1bcb0af34e82870164bf0",
+    "tools/banteng_art_mesh.py": "ef5c0f538510486238d69dc301da80026fc93326767b38c50a04756ab9890a09",
+    "tools/encode_goshawk_visual.py": "9e524e9a32a237d71d212c8b5c34ecf12cde5a8e08885b1d03991b95c278f61c",
+    "tools/import_goshawk_envelope_source.py": "14b530725629ee3eaa5b3fd69f01fe00fe371564a1a52cb398d3969142db977e",
+    "tools/measure_banteng_geometry.py": "9356864e227302598fcae4e833ecb706b1ed8a5e600cbb4076b7165dc1e54bea",
+    "tools/measure_goshawk_surface_fit.py": "5407ef1e5fad41810aa95444ca1338fe33a91e5c9857dcb752b4e4cf2fca6d0b",
+    "tools/measure_lanner_geometry.py": "55d13a28602e6ed791adecd85ff43f3c8a7fbe118cf0977272e1747422c2408d",
+    "tools/measure_owlet_mk_ii.py": "132f244354e5de8004496f3eaa005dac3fb1ff0db251bb1ac9e694e97c66d404",
+    "tools/prepare_eagle_cruiser_geometry.py": "a1ea3b5d72f35e1f2932da71afa3ff8a276a504f7309a1086a2b3df35988addc",
+    "tools/prepare_owlet_mk_ii.py": "31abfca007f4d302cc98a5d6592e03fc743acf92a4d6131122c44d73270b53f0",
+    "tools/verify_eagle_cruiser_geometry.py": "cb053ee5873fee62ee456bb3776e98d29b2cbb44c7344599bc617a8579164d43",
+    "tools/rebuild_owlet_mk_ii.py": "47a35ea69a7d3c426c20aa49d7827ca951f21f15861faccd0d1b6a6fa38daf60",
+    "tools/verify_owlet_mk_ii.py": "726c172cc45c4f9a9fdd0caf4977a8498d3f04128a64c4a78c8356f4e8fe14ef",
+    "tools/vulture_mk_i_exact_fit.py": "479b31f8714a198a82c0e2888b8d19efe46c7b4c43a576b83ab84c571ae738c6",
+    "assets/fleet/sh149/GENERATED-COLLISION.json": "0f6c83a3a7878543d5015c2dceff5cf3604c5018a086bad84f50897c35091edd",
+    "assets/fleet/sh149/SOURCE-GEOMETRY.json": "80a85d79a78b715ad6f307cba13004536a1b78dd2039f00140345e6e2c023048",
+    "tools/hull_contact_geometry.py": "07606202e6a298ad375a7504991fe6fb93da6a07f9b5cc4a22167bd570b07839"
+  }
+}

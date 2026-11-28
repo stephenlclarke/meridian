@@ -1,0 +1,13 @@
+{
+  "schema": 1,
+  "id": "fleet-medusa-contacts",
+  "undoBefore": [
+    "fleet-medusa-lasers"
+  ],
+  "undoAfter": [],
+  "kind": "inverse",
+  "manifest": "integration/fleet-medusa-contacts/PROTECTED-CORE-INVERSE.json",
+  "sha256": "aca99f70b849b17bea38af707813fa8257f05b85178c05aa1cf45cb0de11e803",
+  "base": "492e49b6cab7a75d70e03c91796b6a3ad62399c1",
+  "label": "Fleet Medusa historical and live contact geometry"
+}

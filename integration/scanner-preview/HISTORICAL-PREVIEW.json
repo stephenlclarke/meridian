@@ -1,0 +1,16 @@
+{
+  "schema": 1,
+  "sourceCommit": "53e2210a2956f41f0b23b5fb050268ad99102c3a",
+  "sourceTree": "bbd787f9c6545918110008574920dbc66b1f7b45",
+  "protectedFiles": 115,
+  "receipts": {
+    "integration/sh001-mule/SCANNER-TARGET-CYCLE-INVERSE.json": "f6ef396accf494a3e0cde3e3928029864ba22b9390c8b7c0f51dd92c66e3a6be",
+    "integration/sh001-mule/AUTOMATIC-WORK-INVERSE.json": "c0d4a3df9f7ed3aa0738c2315b854e636dd10c444cd4fc2d789b4af100c2b7ee",
+    "integration/sh001-mule/SALVAGE-CUTTER-INVERSE.json": "3227a053bf0e38c1f86b6e85a9349b96777f208e6c8d2d962d91d4e6aebf0d86",
+    "integration/sh001-mule/COMBINED-ECM-CABIN-INVERSE.json": "5e8fa008a56c78fd187419afa11b57def6ec4cc9ec3ab3de5444dc219c187987",
+    "integration/sh001-mule/PASSENGER-CABIN-INVERSE.json": "c1e13f79d4fee1fb24cb7ffcd5c03aee8300fa99064e09ae5391dd74c3eb6546",
+    "integration/sh001-mule/COMBINED-CABIN-ECM-INVERSE.json": "a645cfe0bdc6c05955ea178d360518c7ea1abf810dfb78e013b837cf7f39d77c",
+    "integration/scanner-preview/historical/STOCK-ECM-FIELD-INVERSE.json": "79dae295d74a7aee4115d3ec32022cfd72ca08d09e46021c9eefce4f11aa03ba",
+    "integration/scanner-preview/historical/STOCK-ECM-INVERSE.json": "a470932b8b411825325bdb3e0fb9e38cb5919a44bac7e90d55332dfcff0d6a32"
+  }
+}

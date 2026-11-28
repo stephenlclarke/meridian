@@ -1,0 +1,187 @@
+{
+  "hull": "SH145 Kestrel",
+  "scope": "Original catalogue inspection and geometry queries",
+  "source": "assets/fleet/sh145/SOURCE-GEOMETRY.json",
+  "frozenSources": "integration/sh145-kestrel/FROZEN-SOURCES.json",
+  "sourceMetresPerUnit": 1,
+  "faces": {
+    "detailed": 2316,
+    "native": 128,
+    "nativeMaximum": 512
+  },
+  "originalAccess": {
+    "runtimeCatalogue": {
+      "playerFlyable": false,
+      "normalPurchaseEligible": false,
+      "purchasePolicy": "pendingFabrication"
+    },
+    "r3DesignContract": {
+      "playerFlyable": true,
+      "purchasePolicy": "blueprintFabrication"
+    }
+  },
+  "engineering": {
+    "sourceReference": "finite-intrinsic-empty-kestrel",
+    "massKg": 20783
+  },
+  "supportGroups": 21,
+  "minimumRouteClearanceMillimetres": 797,
+  "sourceContactCounts": {
+    "design": 34,
+    "nativeDesign": 3
+  },
+  "sharedOverlapCount": 3,
+  "detailedOnlyOverlapCount": 31,
+  "fitUpperMillimetres": {
+    "detailed": 2263,
+    "native": 3882
+  },
+  "hullStudio": {
+    "definition": "integration/sh145-kestrel/KESTREL-STUDIO.json",
+    "bytes": 290441,
+    "sha256": "7c2ae055c7a6a9913b7c6c7b705bbff7e9b585443fef73dfc1800d61c2e96e6b",
+    "supports": 21,
+    "probes": 7,
+    "detail": "2316 original detailed faces",
+    "native": "128 original native faces",
+    "loaderRevision": "27121e66ba37a29781135b56924a9d6e7f38a70a",
+    "signedInstalledExport": {
+      "status": "PASS",
+      "scope": "Signed installed Studio offline original artwork import/export",
+      "bundleIdentifier": "io.xyzzy.meridian.hullstudio",
+      "bundleVersion": "0.0.0",
+      "codeDirectoryHash": "93938bda9242ebdff508bfb9e16b3cdf83c0a200",
+      "developerIdTeam": "4MEB7MUTAV",
+      "signatureVerification": "deep strict",
+      "definition": {
+        "bytes": 290441,
+        "sha256": "7c2ae055c7a6a9913b7c6c7b705bbff7e9b585443fef73dfc1800d61c2e96e6b"
+      },
+      "exportExitStatuses": [
+        0,
+        0
+      ],
+      "exportMatchesDefinitionExceptTrailingLf": true,
+      "valid": true,
+      "diagnostics": [],
+      "detailedTriangles": 2316,
+      "nativeTriangles": 128,
+      "supportGroups": 21,
+      "engineeringReference": "finite-intrinsic-empty-kestrel",
+      "massKg": 20783,
+      "receiptFiles": {
+        "kestrel.hull.json": {
+          "bytes": 290440,
+          "sha256": "be553ab09cd32f59312a3c82ed6c23d2c6bdf041e7707ccd825aa79d7aabb1e8"
+        },
+        "kestrel-repeat.hull.json": {
+          "bytes": 290440,
+          "sha256": "be553ab09cd32f59312a3c82ed6c23d2c6bdf041e7707ccd825aa79d7aabb1e8"
+        },
+        "studio.stdout.json": {
+          "bytes": 40302,
+          "sha256": "62dfb1784197b8d35a4c293f4f168d90695b7b03a4c9ce68ce582f2dc7d6da6c"
+        },
+        "studio-repeat.stdout.json": {
+          "bytes": 40302,
+          "sha256": "62dfb1784197b8d35a4c293f4f168d90695b7b03a4c9ce68ce582f2dc7d6da6c"
+        },
+        "codesign.log": {
+          "bytes": 13038,
+          "sha256": "b4d789b534e0e29ba09a6e32dc8156d1cd19a388715c29f15e042b43868dd0b3"
+        },
+        "codesign-identity.log": {
+          "bytes": 988,
+          "sha256": "f6d772f29f9e72421e98a6d7243102b92b77b5995acbe6cda7ddb3bbfc3b1706"
+        }
+      },
+      "artworkProbeResults": [
+        {
+          "name": "dorsal",
+          "passed": true
+        },
+        {
+          "name": "ventral",
+          "passed": true
+        },
+        {
+          "name": "between-aft-drives",
+          "passed": true
+        },
+        {
+          "name": "port-outboard",
+          "passed": true
+        },
+        {
+          "name": "starboard-outboard",
+          "passed": true
+        },
+        {
+          "name": "above-port-wing",
+          "passed": true
+        },
+        {
+          "name": "above-starboard-wing",
+          "passed": true
+        }
+      ],
+      "triangleRoles": {
+        "detail": "original detailed visible",
+        "native": "original native visible"
+      }
+    }
+  },
+  "byteReplay": {
+    "commands": [
+      "python3 -B tools/prepare_kestrel.py --check",
+      "python3 -B tools/verify_kestrel.py | cmp - integration/sh145-kestrel/CONTACT-RESULT.json",
+      "python3 -B tools/measure_kestrel.py | cmp - integration/sh145-kestrel/SURFACE-FIT.json",
+      "python3 -B tools/measure_kestrel.py --difference | cmp - integration/sh145-kestrel/LOD-DIFFERENCE.json"
+    ],
+    "host": "SteveMBA",
+    "startedUtc": "2026-11-25T07:06:06Z",
+    "finishedUtc": "2026-11-25T07:06:12Z",
+    "log": {
+      "bytes": 416,
+      "sha256": "b591787b04340e7f9f0cc8f9c882943faed26d102821fdfb8e151ace6dcd68ad"
+    },
+    "fitDependencies": {
+      "python": "3.14.3",
+      "numpy": "2.5.5",
+      "scipy": "1.18.1",
+      "trimesh": "5.2.1",
+      "rtree": "1.4.1"
+    },
+    "originalCommit": "38b1c659b1a2e265f71f93853e629b48f28a5d01",
+    "historicalReplayPins": {
+      "tools/measure_banteng_geometry.py": "4b7d8d5d972e30d93bebf7f422be71e415d6e4a9c4b622582ecf6e30a6bb9235",
+      "tools/measure_lanner_geometry.py": "cabbaf17ff7efdbcbee9a1fba67c7edafd59dceb8e97f367824a51c134479992",
+      "tools/verify_eagle_cruiser_geometry.py": "c7926cb6e699ae5ffb445951ce9d4e98a64018a7ecb1db2e5e77a611d742a783"
+    }
+  },
+  "replayPins": {
+    "assets/fleet/sh145/SOURCE-GEOMETRY.json": "cd522ea1b3408cf5b46630671839502d40ad01ab4a928eedaff6e4d39e91f8e5",
+    "integration/sh145-kestrel/KESTREL-STUDIO.json": "7c2ae055c7a6a9913b7c6c7b705bbff7e9b585443fef73dfc1800d61c2e96e6b",
+    "integration/sh145-kestrel/FROZEN-SOURCES.json": "574b03285b15b48c2dcd1ddf05aac9caa92baa79d16d8b96eb06ae8f85f9c77e",
+    "integration/sh145-kestrel/CONTACT-CANDIDATE.json": "fa6dd2b4da2b198a94976e59ae335599b7c641378cf42b1aa579ee6074ff9d18",
+    "integration/sh145-kestrel/CONTACT-RESULT.json": "ffa23c94d79d106c5a66b3ffc85fdf0096565b9a7a002c3425495dc489edd70f",
+    "integration/sh145-kestrel/ORIGINAL-OVERLAPS.json": "507757f6240423a49345f6873fc93f11e7cd6d1a5e71f2a50f39df2d0bea1d5e",
+    "integration/sh145-kestrel/LOD-DIFFERENCE.json": "272ae4fd428cf9efd980a1d1d986e106fdd9f6f7a56ae6416f534aac8e38b688",
+    "integration/sh145-kestrel/SUPPORT-FAN.json": "a4d5aa84421cdbaff40503062712968f2296655b03e91ef268945a7357b9014e",
+    "integration/sh145-kestrel/SURFACE-FIT.json": "87fee281bea1e74604cd49c98993b73c522800b98666df3f16e278ae76683190",
+    "tools/atomic_asset_output.py": "2d13803823645d3bdea7c855af958eb54d7ebe513ec1bcb0af34e82870164bf0",
+    "tools/banteng_art_mesh.py": "ef5c0f538510486238d69dc301da80026fc93326767b38c50a04756ab9890a09",
+    "tools/encode_goshawk_visual.py": "9e524e9a32a237d71d212c8b5c34ecf12cde5a8e08885b1d03991b95c278f61c",
+    "tools/import_goshawk_envelope_source.py": "14b530725629ee3eaa5b3fd69f01fe00fe371564a1a52cb398d3969142db977e",
+    "tools/measure_banteng_geometry.py": "9356864e227302598fcae4e833ecb706b1ed8a5e600cbb4076b7165dc1e54bea",
+    "tools/measure_goshawk_surface_fit.py": "5407ef1e5fad41810aa95444ca1338fe33a91e5c9857dcb752b4e4cf2fca6d0b",
+    "tools/measure_lanner_geometry.py": "55d13a28602e6ed791adecd85ff43f3c8a7fbe118cf0977272e1747422c2408d",
+    "tools/measure_kestrel.py": "fcde8e950732d944950254f3afd37b7133216c03e9c650180135d2a0bccb172a",
+    "tools/prepare_eagle_cruiser_geometry.py": "a1ea3b5d72f35e1f2932da71afa3ff8a276a504f7309a1086a2b3df35988addc",
+    "tools/prepare_kestrel.py": "1d0e69eb775855ed09bfd114647c1211ab6cb736563debb15f9bded7b96dd3ad",
+    "tools/verify_eagle_cruiser_geometry.py": "cb053ee5873fee62ee456bb3776e98d29b2cbb44c7344599bc617a8579164d43",
+    "tools/verify_kestrel.py": "1d44bde7b4d1055fe8f02d82e8966f4a9120a6e5b283b76e928a0b59fb9ce1d2",
+    "tools/vulture_mk_i_exact_fit.py": "479b31f8714a198a82c0e2888b8d19efe46c7b4c43a576b83ab84c571ae738c6",
+    "tools/hull_contact_geometry.py": "07606202e6a298ad375a7504991fe6fb93da6a07f9b5cc4a22167bd570b07839"
+  }
+}

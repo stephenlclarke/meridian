@@ -1,25 +1,24 @@
 //! Original detailed visuals for the Goshawk family. No collision or selection authority.
-use super::super::{VisualVertex, decode_visual};
-use super::{CUSTOM_DETAILED_FACES, CUSTOM_GEOMETRY_KEY, GEOMETRY_KEY, MK2_GEOMETRY_KEY, VERTICES};
+use super::super::VisualVertex;
+use super::{
+    CUSTOM_DETAILED_FACES, CUSTOM_GEOMETRY_KEY, CUSTOM_VISUAL, CUSTOM_VISUAL_FNV, GEOMETRY_KEY,
+    MK2_GEOMETRY_KEY, authenticated_visual,
+};
 
-const SH008_VISUAL: &[u8] = include_bytes!("../../../../../assets/fleet/sh008/visual.bin");
 const SH009_VISUAL: &[u8] = include_bytes!("../../../../../assets/fleet/sh009/visual.bin");
-const SH010_VISUAL: &[u8] = include_bytes!("../../../../../assets/fleet/sh010/visual.bin");
 const SH009_VERTICES: usize = 3_532 * 3;
-const SH008_FNV: u64 = 0x7a17_0c0c_6cdc_d5fd;
 const SH009_FNV: u64 = 0xd01c_abc6_c77a_3b19;
-const SH010_FNV: u64 = 0xfe21_3755_8ea3_8ccb;
 
 // Loader shared by all three authenticated original Goshawk hulls.
 pub(super) fn load(geometry_key: &str) -> Result<Vec<VisualVertex>, &'static str> {
     match geometry_key {
-        GEOMETRY_KEY => checked(SH008_VISUAL, b"GOSHVIZ1", VERTICES, SH008_FNV),
+        GEOMETRY_KEY => super::visual(),
         MK2_GEOMETRY_KEY => checked(SH009_VISUAL, b"GOS2VIZ1", SH009_VERTICES, SH009_FNV),
         CUSTOM_GEOMETRY_KEY => checked(
-            SH010_VISUAL,
+            CUSTOM_VISUAL,
             b"SH010VZ1",
             CUSTOM_DETAILED_FACES * 3,
-            SH010_FNV,
+            CUSTOM_VISUAL_FNV,
         ),
         _ => Err("Unknown Goshawk detailed visual"),
     }
@@ -31,17 +30,15 @@ fn checked(
     count: usize,
     expected_hash: u64,
 ) -> Result<Vec<VisualVertex>, &'static str> {
-    let hash = bytes.iter().fold(0xcbf2_9ce4_8422_2325_u64, |hash, byte| {
-        (hash ^ u64::from(*byte)).wrapping_mul(0x100_0000_01b3)
-    });
-    if hash != expected_hash {
-        return Err("Goshawk detailed visual bytes changed");
-    }
-    decode_visual(bytes, magic, count)
+    authenticated_visual(bytes, expected_hash, magic, count)
 }
 
 #[cfg(test)]
 mod tests {
+    use super::super::{
+        CUSTOM_VISUAL as SH010_VISUAL, CUSTOM_VISUAL_FNV as SH010_FNV, VERTICES,
+        VISUAL as SH008_VISUAL, VISUAL_FNV as SH008_FNV,
+    };
     use super::*;
 
     const POINTS: &[u8] = include_bytes!("../../../../../assets/fleet/sh009/source.vertices");

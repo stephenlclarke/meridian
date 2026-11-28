@@ -1,0 +1,12 @@
+{
+  "schema": 1,
+  "id": "sh064-arna-cutter",
+  "undoBefore": [
+    "equipment-stock-ecm-field"
+  ],
+  "undoAfter": [],
+  "kind": "declaration",
+  "module": "arna_cutter",
+  "before": "pub mod aplomado_interceptor;\n",
+  "after": "pub mod banteng;\n"
+}

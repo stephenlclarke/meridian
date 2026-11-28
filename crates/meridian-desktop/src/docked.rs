@@ -1,13 +1,33 @@
 //! Host menu state is ephemeral. Only Profile's prepared commands can change the game.
-use crate::{docked_screens as ui, profile::Profile, session::Action};
+use crate::{
+    authored_hull::AuthoredHulls, docked_screens as ui, profile::Profile, session::Action,
+};
 use meridian_core::{
-    AmmunitionAction, ModuleAction, ModuleKind, ModuleSlot, World, equipment,
-    navigation::{DockContext, FUEL_CAPACITY, SystemId},
+    AmmunitionAction, FlightView, ModuleAction, ModuleKind, ModuleSlot, PassageStatus,
+    PassengerAction, World, equipment,
+    navigation::{DockContext, SystemId},
     station_services::{self, CommodityId},
 };
+use std::sync::Arc;
 
 use meridian_core::navigation::ROUTE_SYSTEMS;
 pub const BINDINGS: &[ui::BindingHint<'static>] = &[
+    ui::BindingHint {
+        key: ui::Key::QuantityLess,
+        label: "Left -1",
+    },
+    ui::BindingHint {
+        key: ui::Key::QuantityMore,
+        label: "Right +1",
+    },
+    ui::BindingHint {
+        key: ui::Key::QuantityLessTen,
+        label: "Shift+Left -10",
+    },
+    ui::BindingHint {
+        key: ui::Key::QuantityMoreTen,
+        label: "Shift+Right +10",
+    },
     ui::BindingHint {
         key: ui::Key::Previous,
         label: "Up",
@@ -39,6 +59,10 @@ pub const BINDINGS: &[ui::BindingHint<'static>] = &[
     ui::BindingHint {
         key: ui::Key::Sell,
         label: "Shift+G",
+    },
+    ui::BindingHint {
+        key: ui::Key::Refuel,
+        label: "F",
     },
     ui::BindingHint {
         key: ui::Key::Fit,
@@ -78,6 +102,7 @@ fn context<'a>(
     review: Option<&'a ui::Review>,
     stamp: ui::Stamp,
     selected: SystemId,
+    models: &'a [ui::AvailableModel<'a>],
 ) -> ui::Context<'a> {
     let navigation = world.snapshot().navigation;
     let reach = world.jump_reach_ly();
@@ -90,9 +115,11 @@ fn context<'a>(
         current_reach_ly: navigation
             .zip(reach)
             .map(|(n, reach)| (f64::from(n.fuel_units) / 10.0).min(reach)),
-        full_reach_ly: reach.map(|reach| reach.min(f64::from(FUEL_CAPACITY) / 10.0)),
+        full_reach_ly: navigation
+            .zip(reach)
+            .map(|(n, reach)| reach.min(f64::from(n.fuel_capacity_units) / 10.0)),
         route_targets: &ROUTE_SYSTEMS,
-        models: &crate::docked_render::MODELS,
+        models,
         planet_previews: navigation.is_some_and(|n| n.system == selected)
             && world.celestial_snapshot().is_some(),
         navigation_bodies: &[],
@@ -114,6 +141,7 @@ struct Anchor {
     equipment: Option<equipment::Snapshot>,
     ammunition: Option<meridian_core::AmmunitionSnapshot>,
     modules: Option<meridian_core::ModularEquipmentSnapshot>,
+    passage: Option<meridian_core::PassengerJourneySnapshot>,
     emp: Option<meridian_core::EmpSnapshot>,
     services: Option<meridian_core::ServiceSnapshot>,
     quotes: Vec<Option<station_services::CommodityQuote>>,
@@ -128,6 +156,7 @@ impl Anchor {
             equipment: world.equipment_snapshot(),
             ammunition: world.ammunition_snapshot(),
             modules: world.modular_equipment_snapshot(),
+            passage: world.passenger_journey_snapshot(),
             emp: world.emp_snapshot(),
             services: world.service_snapshot(),
             quotes: ids
@@ -151,6 +180,7 @@ struct Pending {
 
 pub struct Docked {
     catalogue: ui::Catalogue,
+    authored: Arc<AuthoredHulls>,
     screens: ui::DockedScreens,
     pub open: bool,
     slot: String,
@@ -163,13 +193,24 @@ pub struct Docked {
 }
 impl Docked {
     pub fn new(world: &World) -> Result<Self, String> {
+        Self::with_authored(world, Arc::default())
+    }
+    pub(crate) fn with_authored(
+        world: &World,
+        authored: Arc<AuthoredHulls>,
+    ) -> Result<Self, String> {
         let current = world
             .snapshot()
             .navigation
             .ok_or("No commander navigation")?
             .system;
+        let mut catalogue = ui::Catalogue::bundled().map_err(str::to_owned)?;
+        for record in authored.records() {
+            catalogue.add_authored(record.clone())?;
+        }
         Ok(Self {
-            catalogue: ui::Catalogue::bundled().map_err(str::to_owned)?,
+            catalogue,
+            authored,
             screens: ui::DockedScreens::new(current, hull(world)?),
             open: false,
             slot: "front-laser".into(),
@@ -192,6 +233,20 @@ impl Docked {
         self.painted = None;
         self.screens.open(screen);
         self.open = true;
+        Ok(())
+    }
+    pub(crate) fn open_authored_showroom(&mut self, world: &World) -> Result<(), String> {
+        let id = self
+            .authored
+            .inspection_record()
+            .ok_or("Expected exactly one isolated authored hull")?
+            .id
+            .clone();
+        if self.catalogue.object(&id).is_none() {
+            return Err("Isolated authored hull missing from the Showroom catalogue".into());
+        }
+        self.open(world, ui::Screen::Showroom)?;
+        self.screens.select_initial_showroom_ship(&id);
         Ok(())
     }
     pub(crate) fn review_pending(&self) -> bool {
@@ -247,6 +302,7 @@ impl Docked {
             session: 1,
             revision: self.serial,
         };
+        let models = self.authored.available_models();
         let c = context(
             world,
             &self.catalogue,
@@ -254,6 +310,7 @@ impl Docked {
             self.pending.as_ref().map(|p| &p.view),
             stamp,
             self.screens.selected_system(),
+            &models,
         );
         Ok(self.screens.frame(&c, viewport))
     }
@@ -276,6 +333,7 @@ impl Docked {
             .as_ref()
             .ok_or("Wait for the current screen to draw")?;
         let panel = equipment_panel(&profile.world, &self.slot, &self.feedback)?;
+        let models = self.authored.available_models();
         let c = context(
             &profile.world,
             &self.catalogue,
@@ -286,6 +344,7 @@ impl Docked {
                 revision: self.serial,
             },
             self.screens.selected_system(),
+            &models,
         );
         let outcome = self.screens.handle(input, painted, &c);
         match outcome {
@@ -345,6 +404,15 @@ impl Docked {
                     station_services::Command::RefillFuel,
                 ))?;
             }
+            ui::Request::RefuelMarket => {
+                if self.screen() != ui::Screen::Trading {
+                    return Err("Open Market to refuel".into());
+                }
+                ui::market_refuel_admission(world)?;
+                self.feedback = profile.command(Action::StationService(
+                    station_services::Command::RefillFuel,
+                ))?;
+            }
             ui::Request::ReviewRoute(target) => {
                 if !ROUTE_SYSTEMS.contains(&target)
                     || Some(target) == world.snapshot().navigation.map(|n| n.system)
@@ -376,7 +444,11 @@ impl Docked {
                     ],
                 )?;
             }
-            ui::Request::ReviewCommodity { commodity, buy } => {
+            ui::Request::ReviewCommodity {
+                commodity,
+                buy,
+                quantity,
+            } => {
                 let quote = world
                     .commodity_quote(commodity)
                     .ok_or("No current commodity offer")?;
@@ -388,14 +460,34 @@ impl Docked {
                 } else {
                     quote.bid_tenths
                 };
-                let command = if buy {
-                    station_services::Command::BuyCommodity(commodity)
+                let command = station_services::CommodityTrade {
+                    commodity,
+                    quantity,
+                    side: if buy {
+                        station_services::TradeSide::Buy
+                    } else {
+                        station_services::TradeSide::Sell
+                    },
+                };
+                let total = u64::from(price)
+                    .checked_mul(quantity)
+                    .ok_or("Trade total is too large")?;
+                let cash = world.credits_tenths().ok_or("No commander wallet")?;
+                let credited = total.min(u64::from(u32::MAX - cash));
+                let settlement = if buy {
+                    format!("Pay {}.{} CR in total", total / 10, total % 10)
                 } else {
-                    station_services::Command::SellCommodity(commodity)
+                    format!(
+                        "Gross {}.{} CR; actual credit {}.{} CR",
+                        total / 10,
+                        total % 10,
+                        credited / 10,
+                        credited % 10
+                    )
                 };
                 self.review(
                     world,
-                    Intent::Change(Action::StationService(command)),
+                    Intent::Change(Action::CommodityTrade(command)),
                     if buy {
                         "Buy commodity"
                     } else {
@@ -403,13 +495,14 @@ impl Docked {
                     },
                     vec![
                         format!(
-                            "{}: 1 {} | {}.{} CR",
+                            "{}: {quantity} {} | {}.{} CR each",
                             definition.name,
                             definition.unit.symbol(),
                             price / 10,
                             price % 10
                         ),
-                        "Confirm changes cargo and credits together".into(),
+                        settlement,
+                        "Confirm trades all requested units or none".into(),
                     ],
                 )?;
             }
@@ -481,15 +574,35 @@ impl Docked {
                 .unwrap_or_else(|| "This fitting action is unavailable".into()));
         }
         let action = equipment_action(world, &node, instance, &slot, operation)?;
-        let details = vec![
-            row.name.clone(),
-            row.price_tenths.map_or_else(
-                || "Owned item; no charge for fitting or storing".into(),
-                |p| format!("Offer {}.{} CR", p / 10, p % 10),
-            ),
-            "Confirm publishes the complete equipment change".into(),
-        ];
-        self.review(world, Intent::Change(action), "Equipment review", details)?;
+        let details = if slot == "passenger-service" {
+            let mut details = vec![row.name.clone()];
+            details.extend(row.readout.clone());
+            details.push("Confirm publishes the complete passage action".into());
+            details
+        } else {
+            vec![
+                if laser_facing(&slot).is_some() {
+                    format!("{} | {}", row.group, row.name)
+                } else {
+                    row.name.clone()
+                },
+                row.price_tenths.map_or_else(
+                    || "Owned item; no charge for fitting or storing".into(),
+                    |p| format!("Offer {}.{} CR", p / 10, p % 10),
+                ),
+                "Confirm publishes the complete equipment change".into(),
+            ]
+        };
+        self.review(
+            world,
+            Intent::Change(action),
+            if slot == "passenger-service" {
+                "Passenger service review"
+            } else {
+                "Equipment review"
+            },
+            details,
+        )?;
         Ok(())
     }
 
@@ -519,6 +632,41 @@ impl Docked {
     }
 }
 
+const LASER_MOUNTS: [(&str, &str, FlightView); 4] = [
+    ("front-laser", "Front laser", FlightView::Front),
+    ("port-laser", "Port laser", FlightView::Left),
+    ("starboard-laser", "Starboard laser", FlightView::Right),
+    ("aft-laser", "Aft laser", FlightView::Rear),
+];
+
+fn laser_facing(slot_id: &str) -> Option<FlightView> {
+    LASER_MOUNTS
+        .iter()
+        .find(|(id, _, _)| *id == slot_id)
+        .map(|(_, _, facing)| *facing)
+}
+
+fn module_purchase(kind: ModuleKind, facing: Option<FlightView>) -> ModuleAction {
+    match facing {
+        Some(FlightView::Front) | None if kind == ModuleKind::MiningLaser => {
+            ModuleAction::PurchaseMiningLaser
+        }
+        Some(FlightView::Front) | None => ModuleAction::Purchase { kind },
+        Some(facing) => ModuleAction::PurchaseLaser { kind, facing },
+    }
+}
+
+fn module_install(item: u64, replacing: Option<u64>, facing: Option<FlightView>) -> ModuleAction {
+    match facing {
+        Some(FlightView::Front) | None => ModuleAction::Install { item, replacing },
+        Some(facing) => ModuleAction::InstallLaser {
+            item,
+            replacing,
+            facing,
+        },
+    }
+}
+
 fn equipment_action(
     world: &World,
     node: &str,
@@ -527,6 +675,19 @@ fn equipment_action(
     operation: ui::EquipmentOperation,
 ) -> Result<Action, String> {
     use ui::EquipmentOperation::{Buy, Fit, Store};
+    if slot == "passenger-service" {
+        if operation != Buy || instance.is_some() {
+            return Err("Select a passenger service action".into());
+        }
+        let action = match node {
+            "g04-request" => PassengerAction::RequestReplies,
+            "g04-board" => PassengerAction::Board,
+            "g04-receive" => PassengerAction::Receive,
+            "g04-cancel" => PassengerAction::Cancel,
+            _ => return Err("Unknown passenger service action".into()),
+        };
+        return Ok(Action::Module(ModuleAction::Passenger(action)));
+    }
     if slot == ui::emp::SLOT {
         return ui::emp::action(world, node, instance, operation).map(Action::Emp);
     }
@@ -568,9 +729,95 @@ fn equipment_action(
     let modules = world
         .modular_equipment_snapshot()
         .ok_or("No modular equipment")?;
+    let facing = laser_facing(slot);
+    if facing.is_some_and(|f| f != FlightView::Front) && !world.xyzzy_medusa_active() {
+        return Err("This hull has no laser mount on that facing".into());
+    }
     let targeting_node = node.starts_with("Targeting: ");
     if targeting_node != (slot == "targeting") {
         return Err("Select the targeting computer slot".into());
+    }
+    let drive_node = node.ends_with(" Hyperspace Drive");
+    if drive_node != (slot == "drive") {
+        return Err("Select the hyperspace drive slot".into());
+    }
+    if drive_node
+        && operation != Buy
+        && !modules
+            .items
+            .iter()
+            .any(|owned| Some(owned.id) == instance && owned.kind.node() == node)
+    {
+        return Err("Owned drive selection changed".into());
+    }
+    let shield_node = meridian_core::ShieldGrade::ALL
+        .iter()
+        .any(|grade| grade.node() == node);
+    if shield_node != (slot == "shield") {
+        return Err("Select the shield system slot".into());
+    }
+    let cabin_node = meridian_core::CabinGrade::ALL
+        .iter()
+        .any(|grade| grade.name() == node);
+    if cabin_node != (slot == "passenger-cabins") {
+        return Err("Select passenger cabins".into());
+    }
+    if cabin_node
+        && operation != Buy
+        && !modules
+            .items
+            .iter()
+            .any(|owned| Some(owned.id) == instance && owned.kind.node() == node)
+    {
+        return Err("Owned cabin selection changed".into());
+    }
+    if shield_node
+        && operation != Buy
+        && !modules
+            .items
+            .iter()
+            .any(|owned| Some(owned.id) == instance && owned.kind.node() == node)
+    {
+        return Err("Owned shield selection changed".into());
+    }
+    let tank_node = node == ModuleKind::FuelStorage.node();
+    if tank_node != (slot == "fuel-storage") {
+        return Err("Select the fuel storage slot".into());
+    }
+    if tank_node
+        && operation != Buy
+        && !modules
+            .items
+            .iter()
+            .any(|owned| Some(owned.id) == instance && owned.kind == ModuleKind::FuelStorage)
+    {
+        return Err("Owned fuel storage selection changed".into());
+    }
+    let ecm_node = node == ModuleKind::Ecm.node();
+    if ecm_node != (slot == "utility-ecm") {
+        return Err("Select the E.C.M. utility slot".into());
+    }
+    if ecm_node
+        && operation != Buy
+        && !modules
+            .items
+            .iter()
+            .any(|owned| Some(owned.id) == instance && owned.kind == ModuleKind::Ecm)
+    {
+        return Err("Owned E.C.M. selection changed".into());
+    }
+    let cutter_node = node == ModuleKind::SalvageCutter.node();
+    if cutter_node != (slot == "utility-salvage-cutter") {
+        return Err("Select the Salvage Cutter utility slot".into());
+    }
+    if cutter_node
+        && operation != Buy
+        && !modules
+            .items
+            .iter()
+            .any(|owned| Some(owned.id) == instance && owned.kind == ModuleKind::SalvageCutter)
+    {
+        return Err("Owned Salvage Cutter selection changed".into());
     }
     if targeting_node
         && operation != Buy
@@ -588,30 +835,37 @@ fn equipment_action(
                 .iter()
                 .find(|offer| offer.kind.node() == node)
                 .ok_or("No ordinary offer for this module")?;
-            if offer.kind == ModuleKind::MiningLaser {
-                ModuleAction::PurchaseMiningLaser
-            } else {
-                ModuleAction::Purchase { kind: offer.kind }
+            if offer.kind.laser_profile().is_some() != facing.is_some() {
+                return Err("Select a compatible fitting slot".into());
             }
+            module_purchase(offer.kind, facing)
         }
-        Store => ModuleAction::Store {
-            item: instance.ok_or("Select an owned module")?,
-        },
-        Fit => {
-            let item = instance.ok_or("Select an owned module")?;
-            let kind = modules
+        Fit | Store => {
+            let item = modules
                 .items
                 .iter()
-                .find(|owned| owned.id == item && owned.kind.node() == node)
-                .ok_or("Owned module selection changed")?
-                .kind;
-            ModuleAction::Install {
-                item,
-                replacing: modules
-                    .items
-                    .iter()
-                    .find(|owned| owned.slot == Some(kind.slot()))
-                    .map(|owned| owned.id),
+                .find(|owned| Some(owned.id) == instance && owned.kind.node() == node)
+                .ok_or("Owned module selection changed")?;
+            if item.kind.laser_profile().is_some() != facing.is_some() {
+                return Err("Select a compatible fitting slot".into());
+            }
+            let mount = facing.map_or_else(|| item.kind.slot(), ModuleSlot::laser);
+            if operation == Store {
+                if facing.is_some() && item.slot != Some(mount) {
+                    return Err("Select the laser fitted to this mount".into());
+                }
+                ModuleAction::Store { item: item.id }
+            } else {
+                let replacing = if item.kind == ModuleKind::FuelStorage || cabin_node {
+                    None
+                } else {
+                    modules
+                        .items
+                        .iter()
+                        .find(|owned| owned.slot == Some(mount))
+                        .map(|owned| owned.id)
+                };
+                module_install(item.id, replacing, facing)
             }
         }
         _ => return Err("Unsupported module operation".into()),
@@ -644,36 +898,131 @@ fn module_rows(
     slot: ModuleSlot,
     tick: u64,
 ) -> Vec<ui::EquipmentRow> {
+    let hull = world.player_hull_kind().source_id();
     let label = match slot {
         ModuleSlot::FrontLaser => "Front laser",
+        ModuleSlot::LeftLaser => "Port laser",
+        ModuleSlot::RightLaser => "Starboard laser",
+        ModuleSlot::RearLaser => "Aft laser",
         ModuleSlot::Energy => "Energy system",
         ModuleSlot::Navigation => "Navigation computer",
+        ModuleSlot::Drive => "Hyperspace drive",
+        ModuleSlot::Shield => "Shield system",
         ModuleSlot::Targeting => "Targeting computer",
         ModuleSlot::MiningTargeting => "Mining targeting",
         ModuleSlot::SalvageTargeting => "Salvage targeting",
         ModuleSlot::UtilityFuelScoops => "Fuel Scoops",
+        ModuleSlot::UtilitySalvageCutter => "Salvage Cutter",
+        ModuleSlot::UtilityEcm => "E.C.M. utility",
+        ModuleSlot::FuelStorage(_) => "Fuel storage",
+        ModuleSlot::PassengerCabin => "Passenger cabins",
     };
-    let fitted = modules.items.iter().find(|item| item.slot == Some(slot));
+    let fitted = if slot == ModuleSlot::PassengerCabin {
+        None
+    } else {
+        modules.items.iter().find(|item| item.slot == Some(slot))
+    };
     let mut rows = Vec::new();
-    for item in modules.items.iter().filter(|item| item.kind.slot() == slot) {
+    let laser_facing = LASER_MOUNTS
+        .iter()
+        .find(|(_, _, facing)| ModuleSlot::laser(*facing) == slot)
+        .map(|(_, _, facing)| *facing);
+    for item in modules.items.iter().filter(|item| {
+        if laser_facing.is_some() {
+            item.kind.laser_profile().is_some() && item.slot.is_none_or(|fitted| fitted == slot)
+        } else {
+            item.kind.slot() == slot
+        }
+    }) {
         let mut row = base_row(item.kind.node(), item.kind.name(), label);
         row.instance = Some(item.id);
         row.owned = 1;
         row.fitted = u32::from(item.slot.is_some());
         row.readout
             .push(crate::xyzzy::provenance(item.provenance).into());
-        if let Some(reach) = item.kind.navigation_reach_ly() {
-            row.compatibility = "Owned SH025 navigation module".into();
+        if item.kind == ModuleKind::FuelStorage {
+            row.compatibility =
+                "Repeatable physical tank; 1 utility mount and 1 equipment unit".into();
+            row.readout
+                .push("Adds 7.0 LY of tank fuel; refuel separately".into());
+            if let Some(ModuleSlot::FuelStorage(index)) = item.slot {
+                row.readout
+                    .push(format!("Fitted tank position {}", index + 1));
+            }
+        } else if let ModuleKind::Cabin(grade) = item.kind {
+            row.compatibility = "Separate 5t accommodation module | 1 equipment unit".into();
+            row.readout.push(format!(
+                "{} places | {}",
+                grade.places(),
+                if grade.supports_awake() {
+                    "Awake or stasis"
+                } else {
+                    "Stasis only"
+                }
+            ));
+            if let Some(cabin) = world
+                .passenger_cabins()
+                .and_then(|cabins| cabins.into_iter().find(|cabin| cabin.item == item.id))
+            {
+                if cabin.fitted {
+                    row.readout.push(format!(
+                        "Life support: {} | Stasis: {}",
+                        if cabin.life_support_working {
+                            "working"
+                        } else {
+                            "unavailable"
+                        },
+                        if cabin.stasis_working {
+                            "working"
+                        } else {
+                            "unavailable"
+                        }
+                    ));
+                }
+                row.readout.push(format!(
+                    "Free awake / stasis places {}/{}",
+                    cabin.free_awake_places, cabin.free_stasis_places
+                ));
+                if let Some(person) = cabin.passenger {
+                    row.readout
+                        .push(format!("Private reservation: {}", person.name));
+                }
+            }
+        } else if item.kind == ModuleKind::SalvageCutter {
+            row.compatibility =
+                format!("Unique {hull} work utility; 1 shared mount and 1 equipment unit");
+            row.readout
+                .push("Requires lawful salvage custody; not a combat laser".into());
+        } else if item.kind == ModuleKind::Ecm {
+            row.compatibility =
+                format!("Unique {hull} utility; 1 shared mount and 1 equipment unit");
+            row.readout
+                .push("K: activate E.C.M. in flight | Requires more than 22 energy".into());
+        } else if let ModuleKind::Shield(grade) = item.kind {
+            row.compatibility = format!("Owned {hull} shield module; one fitted shield required");
+            row.readout.push(format!(
+                "Capacity {} per bank | Recharge unchanged",
+                grade.capacity() / 100
+            ));
+        } else if let ModuleKind::Drive(grade) = item.kind {
+            row.compatibility = format!("Owned {hull} hyperspace drive; one fitted drive required");
+            row.readout.push(format!(
+                "Spool {}s | Station mass lock {}",
+                grade.spool_ticks() / 60,
+                grade.mass_lock_distance()
+            ));
+        } else if let Some(reach) = item.kind.navigation_reach_ly() {
+            row.compatibility = format!("Owned {hull} navigation module");
             row.readout.push(format!("Module jump limit {reach} LY"));
         } else if matches!(item.kind, ModuleKind::Targeting(_)) {
-            row.compatibility = "Owned SH025 computer module".into();
+            row.compatibility = format!("Owned {hull} computer module");
             row.readout.push("Equipment units 1".into());
         } else if matches!(
             item.kind,
             ModuleKind::MiningTargeting | ModuleKind::SalvageTargeting
         ) {
             row.compatibility =
-                "Independent SH025 fitting; requires a fitted targeting core".into();
+                format!("Independent {hull} fitting; requires a fitted targeting core");
             row.readout.push(
                 if item.kind == ModuleKind::MiningTargeting {
                     "Live rock hold and pending ore tracking"
@@ -684,7 +1033,7 @@ fn module_rows(
             );
         } else {
             row.compatibility =
-                "Owned SH025 module; fitting preserves shared energy and heat".into();
+                format!("Owned {hull} module; fitting preserves shared energy and heat");
         }
         if let Some(profile) = item.kind.laser_profile() {
             row.readout.push(format!(
@@ -701,18 +1050,23 @@ fn module_rows(
         row.can_store = world
             .review_module(ModuleAction::Store { item: item.id }, tick)
             .is_ok();
+        let replacing = if item.kind == ModuleKind::FuelStorage {
+            None
+        } else {
+            fitted.map(|item| item.id)
+        };
         row.can_fit = world
-            .review_module(
-                ModuleAction::Install {
-                    item: item.id,
-                    replacing: fitted.map(|item| item.id),
-                },
-                tick,
-            )
+            .review_module(module_install(item.id, replacing, laser_facing), tick)
             .is_ok();
         rows.push(row);
     }
-    for offer in modules.offers.iter().filter(|offer| offer.slot == slot) {
+    for offer in modules.offers.iter().filter(|offer| {
+        if laser_facing.is_some() {
+            offer.kind.laser_profile().is_some()
+        } else {
+            offer.slot == slot
+        }
+    }) {
         let mut row = base_row(
             offer.kind.node(),
             &format!("{} (purchase)", offer.kind.name()),
@@ -724,20 +1078,144 @@ fn module_rows(
             offer.required_technology, offer.technology, offer.equipment_units
         );
         if let Some(required) = offer.prerequisite {
-            row.readout
-                .push(format!("Requires owned {}", required.name()));
+            row.readout.push(format!(
+                "Requires {}{}",
+                if offer.slot == ModuleSlot::Drive {
+                    "fitted "
+                } else {
+                    "owned "
+                },
+                required.name()
+            ));
         }
-        let action = if offer.kind == ModuleKind::MiningLaser {
-            ModuleAction::PurchaseMiningLaser
-        } else {
-            ModuleAction::Purchase { kind: offer.kind }
-        };
+        if let ModuleKind::Drive(grade) = offer.kind {
+            row.readout.push(format!(
+                "Spool {}s | Station mass lock {}",
+                grade.spool_ticks() / 60,
+                grade.mass_lock_distance()
+            ));
+        }
+        if let ModuleKind::Shield(grade) = offer.kind {
+            row.readout.push(format!(
+                "Capacity {} per bank | Recharge unchanged",
+                grade.capacity() / 100
+            ));
+        }
+        if offer.kind == ModuleKind::FuelStorage {
+            row.readout
+                .push("Adds 7.0 LY of tank fuel; fuel not included".into());
+            row.readout.push(format!(
+                "Normal {hull}: {} shared utility mounts; global ownership cap 4",
+                modules.utility_mounts_capacity
+            ));
+        } else if let ModuleKind::Cabin(grade) = offer.kind {
+            row.readout.push(format!(
+                "5t | {} places | {}",
+                grade.places(),
+                if grade.supports_awake() {
+                    "Awake or stasis"
+                } else {
+                    "Stasis only"
+                }
+            ));
+        }
+        if offer.kind == ModuleKind::Ecm {
+            row.readout
+                .push("Unique utility; 1 shared mount | E.C.M. is distinct from EMP".into());
+            row.readout.push(
+                "Manual field ends owned standard missiles; incoming NPC defence open".into(),
+            );
+        }
+        let action = module_purchase(offer.kind, laser_facing);
         let admission = world.review_module(action, tick);
         row.can_buy = admission.is_ok();
         row.refusal = admission.err().map(|error| error.to_string());
         rows.push(row);
     }
     rows
+}
+fn shield_acquisition_rows() -> Vec<ui::EquipmentRow> {
+    use meridian_core::ShieldGrade;
+    [
+        (
+            ShieldGrade::AdvancedII,
+            "ELITE-rank earned reward or PLUGH-only paid stock",
+            "PLUGH source quote 10125.0 CR; unlock and rank paths are not available here",
+        ),
+        (
+            ShieldGrade::Elite,
+            "Acquisition-only; explicit XYZZY maximum or test grant",
+            "No ordinary shop offer; test access does not create an earned receipt",
+        ),
+    ]
+    .into_iter()
+    .map(|(grade, rule, limit)| {
+        let mut row = base_row(grade.node(), grade.name(), "Shield source acquisition");
+        row.compatibility = rule.into();
+        row.readout.push(format!(
+            "Capacity {} per bank | Recharge unchanged",
+            grade.capacity() / 100
+        ));
+        row.refusal = Some(limit.into());
+        row
+    })
+    .collect()
+}
+fn passenger_service_rows(world: &World) -> Result<Vec<ui::EquipmentRow>, String> {
+    let journey = world
+        .passenger_journey_snapshot()
+        .ok_or("No passenger service")?;
+    let mut rows = Vec::new();
+    for (node, label, action, detail) in [
+        (
+            "g04-request",
+            "Request replies",
+            PassengerAction::RequestReplies,
+            "Both people evaluate current separate awake cabins and the Renas route.",
+        ),
+        (
+            "g04-board",
+            "Board both people",
+            PassengerAction::Board,
+            "Board the same two consenting people, one per private cabin.",
+        ),
+        (
+            "g04-receive",
+            "Renas reception / receive both",
+            PassengerAction::Receive,
+            "Actual Renas reception awards 610 CR and the first trusted clue once.",
+        ),
+        (
+            "g04-cancel",
+            "Avenor custodian / release both",
+            PassengerAction::Cancel,
+            "Return both original people to Avenor; no payment or clue.",
+        ),
+    ] {
+        let mut row = base_row(node, label, "G04 passenger service");
+        row.compatibility = "Avenor to Renas | 3.365 LY | Untimed | No deposit".into();
+        let status = match journey.status {
+            PassageStatus::Waiting => "Awaiting replies",
+            PassageStatus::Refused if journey.reply_is_current => "Refused current offer",
+            PassageStatus::Accepted if journey.reply_is_current => "Accepted current offer",
+            PassageStatus::Refused | PassageStatus::Accepted => "Reply stale; request again",
+            PassageStatus::Aboard => "Aboard in separate private cabins",
+            PassageStatus::Delivered => "Received at Renas",
+            PassageStatus::Cancelled => "Released to Avenor",
+        };
+        for person in journey.people {
+            row.readout.push(format!("{}: {status}", person.name));
+        }
+        row.readout.push(detail.into());
+        if let Some(clue) = journey.clue.and_then(|receipt| receipt.clue_id()) {
+            row.readout.push(format!("Trusted clue: {clue}"));
+        }
+        let review = world.review_module(ModuleAction::Passenger(action), world.snapshot().tick);
+        row.can_buy = review.is_ok();
+        row.refusal = review.err().map(|error| error.to_string());
+        rows.push(row);
+    }
+    Ok(rows)
 }
 fn append_pylon_slots(
     slots: &mut Vec<ui::EquipmentSlot>,
@@ -767,29 +1245,32 @@ fn equipment_panel(
         .ok_or("No module inventory")?;
     let ammo = world.ammunition_snapshot().ok_or("No missile inventory")?;
     let tick = world.snapshot().tick;
-    let front = modules
-        .items
+    let mut slots: Vec<_> = LASER_MOUNTS
         .iter()
-        .find(|i| i.slot == Some(ModuleSlot::FrontLaser));
-    let mut slots = vec![
-        ui::EquipmentSlot {
-            id: "front-laser".into(),
-            label: "Front laser".into(),
-            fitted: front.map_or("Empty", |i| i.kind.name()).into(),
+        .filter(|(_, _, facing)| *facing == FlightView::Front || world.xyzzy_medusa_active())
+        .map(|&(id, label, facing)| ui::EquipmentSlot {
+            id: id.into(),
+            label: label.into(),
+            fitted: modules
+                .items
+                .iter()
+                .find(|item| item.slot == Some(ModuleSlot::laser(facing)))
+                .map_or("Empty", |item| item.kind.name())
+                .into(),
             available: true,
-        },
-        ui::EquipmentSlot {
-            id: "cargo-expansion".into(),
-            label: "Cargo expansion".into(),
-            fitted: if equipment.owned.is_some_and(|i| i.fitted) {
-                equipment.definition.name
-            } else {
-                "Empty"
-            }
-            .into(),
-            available: true,
-        },
-    ];
+        })
+        .collect();
+    slots.push(ui::EquipmentSlot {
+        id: "cargo-expansion".into(),
+        label: "Cargo expansion".into(),
+        fitted: if equipment.owned.is_some_and(|i| i.fitted) {
+            equipment.definition.name
+        } else {
+            "Empty"
+        }
+        .into(),
+        available: true,
+    });
     slots.push(ui::EquipmentSlot {
         id: "energy".into(),
         label: "Energy system".into(),
@@ -812,8 +1293,53 @@ fn equipment_panel(
             .into(),
         available: true,
     });
+    slots.push(ui::EquipmentSlot {
+        id: "drive".into(),
+        label: "Hyperspace drive".into(),
+        fitted: modules
+            .items
+            .iter()
+            .find(|item| item.slot == Some(ModuleSlot::Drive))
+            .map_or("Empty", |item| item.kind.name())
+            .into(),
+        available: true,
+    });
+    slots.push(ui::EquipmentSlot {
+        id: "shield".into(),
+        label: "Shield system".into(),
+        fitted: modules
+            .items
+            .iter()
+            .find(|item| item.slot == Some(ModuleSlot::Shield))
+            .map_or("Empty", |item| item.kind.name())
+            .into(),
+        available: true,
+    });
     slots.push(ui::fuel_scoops::slot(world)?);
     slots.push(ui::emp::slot(world));
+    slots.push(ui::EquipmentSlot {
+        id: "passenger-cabins".into(),
+        label: "Passenger cabins".into(),
+        fitted: format!(
+            "{} fitted",
+            modules
+                .items
+                .iter()
+                .filter(|item| item.slot == Some(ModuleSlot::PassengerCabin))
+                .count()
+        ),
+        available: true,
+    });
+    slots.push(ui::EquipmentSlot {
+        id: "passenger-service".into(),
+        label: "G04 passenger service".into(),
+        fitted: world
+            .passenger_journey_snapshot()
+            .map_or("Unavailable".into(), |snapshot| {
+                format!("{:?}", snapshot.status)
+            }),
+        available: true,
+    });
     append_pylon_slots(&mut slots, &ammo);
     for (id, label, slot) in [
         ("targeting", "Targeting computer", ModuleSlot::Targeting),
@@ -840,18 +1366,68 @@ fn equipment_panel(
             available: true,
         });
     }
+    let fitted_tanks = modules
+        .items
+        .iter()
+        .filter(|item| item.kind == ModuleKind::FuelStorage && item.slot.is_some())
+        .count();
+    let fuel = world.snapshot().navigation.ok_or("No fuel account")?;
+    slots.push(ui::EquipmentSlot {
+        id: "fuel-storage".into(),
+        label: "Fuel storage".into(),
+        fitted: format!(
+            "{fitted_tanks} fitted | {:.1}/{:.1} LY fuel",
+            f32::from(fuel.fuel_units) / 10.0,
+            f32::from(fuel.fuel_capacity_units) / 10.0
+        ),
+        available: true,
+    });
+    slots.push(ui::EquipmentSlot {
+        id: "utility-ecm".into(),
+        label: "E.C.M. utility".into(),
+        fitted: modules
+            .items
+            .iter()
+            .find(|item| item.slot == Some(ModuleSlot::UtilityEcm))
+            .map_or("Empty", |item| item.kind.name())
+            .into(),
+        available: true,
+    });
+    slots.push(ui::EquipmentSlot {
+        id: "utility-salvage-cutter".into(),
+        label: "Salvage Cutter".into(),
+        fitted: modules
+            .items
+            .iter()
+            .find(|item| item.slot == Some(ModuleSlot::UtilitySalvageCutter))
+            .map_or("Empty", |item| item.kind.name())
+            .into(),
+        available: true,
+    });
     let mut rows = Vec::new();
     let module_slot = match selected {
-        "front-laser" => Some(ModuleSlot::FrontLaser),
         "energy" => Some(ModuleSlot::Energy),
         "navigation" => Some(ModuleSlot::Navigation),
+        "drive" => Some(ModuleSlot::Drive),
+        "shield" => Some(ModuleSlot::Shield),
+        "fuel-storage" => Some(ModuleSlot::FuelStorage(0)),
+        "passenger-cabins" => Some(ModuleSlot::PassengerCabin),
+        "utility-ecm" => Some(ModuleSlot::UtilityEcm),
+        "utility-salvage-cutter" => Some(ModuleSlot::UtilitySalvageCutter),
         "targeting" => Some(ModuleSlot::Targeting),
         "targeting-mining" => Some(ModuleSlot::MiningTargeting),
         "targeting-salvage" => Some(ModuleSlot::SalvageTargeting),
-        _ => None,
+        _ => laser_facing(selected)
+            .filter(|facing| *facing == FlightView::Front || world.xyzzy_medusa_active())
+            .map(ModuleSlot::laser),
     };
     if let Some(slot) = module_slot {
         rows = module_rows(world, &modules, slot, tick);
+        if slot == ModuleSlot::Shield {
+            rows.extend(shield_acquisition_rows());
+        }
+    } else if selected == "passenger-service" {
+        rows = passenger_service_rows(world)?;
     } else if selected == ui::emp::SLOT {
         rows = ui::emp::rows(world);
     } else if selected == ui::fuel_scoops::SLOT {
@@ -892,11 +1468,16 @@ fn equipment_panel(
                 .is_some_and(|o| o.purchase_available)
             && world
                 .credits_tenths()
-                .is_some_and(|c| c >= equipment.definition.price_tenths);
+                .is_some_and(|c| c >= equipment.definition.price_tenths)
+            && modules.utility_mounts_used < modules.utility_mounts_capacity
+            && modules.equipment_units_used < modules.equipment_units_capacity;
         row.can_store = equipment.service_available
             && equipment.owned.is_some_and(|i| i.fitted)
             && equipment.used_tonnes <= equipment.definition.base_hold_tonnes;
-        row.can_fit = equipment.service_available && equipment.owned.is_some_and(|i| !i.fitted);
+        row.can_fit = equipment.service_available
+            && equipment.owned.is_some_and(|i| !i.fitted)
+            && modules.utility_mounts_used < modules.utility_mounts_capacity
+            && modules.equipment_units_used < modules.equipment_units_capacity;
         rows.push(row);
     } else if let Some(pylon) = selected
         .strip_prefix("pylon-")
@@ -961,8 +1542,8 @@ fn equipment_panel(
             u32::from(modules.equipment_units_capacity),
         ],
         utility_mounts: [
-            u32::from(equipment.utility_mounts_used),
-            u32::from(equipment.definition.utility_mounts_capacity),
+            u32::from(modules.utility_mounts_used),
+            u32::from(modules.utility_mounts_capacity),
         ],
         assigned_crew: None,
         required_crew: None,
@@ -978,6 +1559,48 @@ mod secret_ui_tests {
         result.unwrap_or_else(|error| panic!("{error:?}"))
     }
     #[test]
+    fn fuel_storage_rows_show_actual_count_capacity_and_repeatable_identity() {
+        let directory = TestDirectory::new();
+        let mut profile = open(&directory.0);
+        assert!(ok(profile.new_commander(99037)));
+        let panel = ok(equipment_panel(&profile.world, "fuel-storage", ""));
+        assert!(
+            panel
+                .rows
+                .iter()
+                .any(|row| row.price_tenths == Some(20_000) && !row.can_buy)
+        );
+        ok(profile.xyzzy(meridian_core::XyzzyAction::MaximumFuelStorage));
+        let panel = ok(equipment_panel(&profile.world, "fuel-storage", ""));
+        assert_eq!(panel.utility_mounts, [7, 3]);
+        let slot = panel
+            .slots
+            .iter()
+            .find(|slot| slot.id == "fuel-storage")
+            .unwrap_or_else(|| panic!("tank slot"));
+        assert!(slot.fitted.contains("4 fitted"));
+        assert!(slot.fitted.contains("41.0/41.0"));
+        let owned = panel
+            .rows
+            .iter()
+            .filter(|row| row.instance.is_some())
+            .collect::<Vec<_>>();
+        assert_eq!(owned.len(), 4);
+        assert!(owned.iter().all(|row| row.fitted == 1
+            && !row.can_store
+            && row.readout.iter().any(|line| line.contains("XYZZY grant"))));
+        assert!(
+            equipment_action(
+                &profile.world,
+                ModuleKind::FuelStorage.node(),
+                None,
+                "shield",
+                ui::EquipmentOperation::Buy
+            )
+            .is_err()
+        );
+    }
+    #[test]
     fn actual_equipment_panels_keep_born_paid_and_xyzzy_provenance_distinct() {
         let directory = TestDirectory::new();
         let mut profile = open(&directory.0);
@@ -987,6 +1610,7 @@ mod secret_ui_tests {
             "front-laser",
             "energy",
             "navigation",
+            "shield",
             "targeting",
             "utility-fuelScoops",
             "cargo-expansion",
@@ -1039,6 +1663,10 @@ pub fn key(code: winit::keyboard::KeyCode, shift: bool, screen: ui::Screen) -> O
         C::Tab => K::NextTab,
         C::Escape | C::KeyB if !shift => K::Back,
         C::Enter => K::Confirm,
+        C::ArrowLeft if screen == ui::Screen::Trading && shift => K::QuantityLessTen,
+        C::ArrowRight if screen == ui::Screen::Trading && shift => K::QuantityMoreTen,
+        C::ArrowLeft if screen == ui::Screen::Trading => K::QuantityLess,
+        C::ArrowRight if screen == ui::Screen::Trading => K::QuantityMore,
         C::ArrowUp => K::Previous,
         C::ArrowDown => K::Next,
         C::PageUp => K::PagePrevious,
@@ -1048,6 +1676,7 @@ pub fn key(code: winit::keyboard::KeyCode, shift: bool, screen: ui::Screen) -> O
         C::Delete => K::ClearSearch,
         C::KeyG if shift => K::Sell,
         C::KeyG => K::Buy,
+        C::KeyF if screen == ui::Screen::Trading && !shift => K::Refuel,
         C::KeyY => K::Fit,
         C::KeyU => K::Store,
         C::KeyO => K::Options,
@@ -1091,6 +1720,71 @@ mod tests {
         ok(menu.open(&profile.world, ui::Screen::Trading));
         (directory, profile, menu)
     }
+
+    #[test]
+    fn bulk_market_review_and_atomic_publication_continue_exactly() {
+        let (directory, mut profile, mut menu) = start();
+        let before = ok(profile.world.save_bytes());
+        present(&mut menu, &profile);
+        ok(menu.input(&mut profile, ui::Input::Key(ui::Key::QuantityMoreTen)));
+        present(&mut menu, &profile);
+        ok(menu.input(&mut profile, ui::Input::Key(ui::Key::Buy)));
+        assert_eq!(ok(profile.world.save_bytes()), before);
+        assert!(
+            menu.pending.as_ref().is_some_and(|p| p
+                .view
+                .details
+                .iter()
+                .any(|s| s.contains("11 t")))
+        );
+        present(&mut menu, &profile);
+        ok(menu.input(&mut profile, ui::Input::Key(ui::Key::Confirm)));
+        assert_eq!(
+            profile.world.commodity_quantity(CommodityId::Food),
+            Some(11)
+        );
+        assert_visible_feedback(&mut menu, &profile, "Bought 11 t Food");
+        let saved = ok(profile.world.save_bytes());
+        assert_eq!(
+            ok(std::fs::read(directory.0.join("commander.meridian"))),
+            saved
+        );
+        drop(profile);
+        let mut cold = open(&directory.0);
+        ok(cold.continue_saved());
+        // Continue uses the same cold session review rebind as direct decoding.
+        let decoded = ok(World::from_save_bytes(&saved));
+        assert_eq!(ok(cold.world.save_bytes()), ok(decoded.save_bytes()));
+        assert_eq!(cold.world.commodity_quantity(CommodityId::Food), Some(11));
+        assert_eq!(
+            ok(std::fs::read(directory.0.join("commander.meridian"))),
+            saved
+        );
+    }
+
+    #[test]
+    fn bulk_market_failed_writer_preserves_previous_save_and_all_live_units() {
+        let (directory, mut profile, mut menu) = start();
+        ok(profile.save());
+        let file = directory.0.join("commander.meridian");
+        let backup = directory.0.join("bulk-before-save");
+        let before = ok(profile.world.save_bytes());
+        present(&mut menu, &profile);
+        ok(menu.input(&mut profile, ui::Input::Key(ui::Key::QuantityMoreTen)));
+        present(&mut menu, &profile);
+        ok(menu.input(&mut profile, ui::Input::Key(ui::Key::Buy)));
+        present(&mut menu, &profile);
+        ok(std::fs::rename(&file, &backup));
+        ok(std::fs::create_dir(&file));
+        assert!(
+            menu.input(&mut profile, ui::Input::Key(ui::Key::Confirm))
+                .is_err()
+        );
+        assert_eq!(ok(profile.world.save_bytes()), before);
+        assert_eq!(ok(std::fs::read(&backup)), before);
+        ok(std::fs::remove_dir(&file));
+        ok(std::fs::rename(&backup, &file));
+    }
     fn present(menu: &mut Docked, profile: &Profile) {
         let viewport = ui::Viewport::new(1280.0, 720.0).unwrap_or_else(|| panic!("viewport"));
         let frame = ok(menu.build_frame(&profile.world, viewport, 0.0));
@@ -1108,6 +1802,153 @@ mod tests {
         assert!(label.at[1] + 9.0 <= label.clip.y + label.clip.height);
         assert!(label.text.chars().count() <= (label.clip.width / 7.5).floor() as usize);
         menu.presented(frame);
+    }
+    fn fit_paid_tank(profile: &mut Profile) {
+        ok(profile.xyzzy(meridian_core::XyzzyAction::Enter));
+        let scoop = profile
+            .world
+            .modular_equipment_snapshot()
+            .and_then(|snapshot| {
+                snapshot
+                    .items
+                    .into_iter()
+                    .find(|item| item.kind == ModuleKind::FuelScoops && item.slot.is_some())
+            })
+            .unwrap_or_else(|| panic!("fitted scoop"));
+        ok(profile.command(Action::Module(ModuleAction::Store { item: scoop.id })));
+        ok(profile.command(Action::Module(ModuleAction::Purchase {
+            kind: ModuleKind::FuelStorage,
+        })));
+    }
+    #[test]
+    fn market_refuel_key_pays_for_actual_tank_and_preserves_identity() {
+        use winit::keyboard::KeyCode;
+        let (directory, mut profile, mut menu) = start();
+        fit_paid_tank(&mut profile);
+        let before_modules = profile.world.modular_equipment_snapshot();
+        let before_cash = profile.world.credits_tenths().unwrap_or_default();
+        let viewport = ui::Viewport::new(1280.0, 720.0).unwrap_or_else(|| panic!("viewport"));
+        let frame = ok(menu.build_frame(&profile.world, viewport, 0.0));
+        assert!(frame.labels.iter().any(|label| label.text == "Refuel (F)"));
+        assert!(
+            frame
+                .labels
+                .iter()
+                .any(|label| label.text == "Fuel 13.0/20.0 LY | Refuel 14.0 CR")
+        );
+        assert!(
+            frame
+                .hits
+                .iter()
+                .any(|hit| hit.control == ui::Control::Key(ui::Key::Refuel) && hit.enabled)
+        );
+        menu.presented(frame);
+        assert_eq!(key(KeyCode::KeyF, false, ui::Screen::Equipment), None);
+        assert_eq!(key(KeyCode::KeyF, true, ui::Screen::Trading), None);
+        let refuel = key(KeyCode::KeyF, false, ui::Screen::Trading)
+            .unwrap_or_else(|| panic!("Market F binding"));
+
+        let tick = profile.world.snapshot().tick;
+        ok(profile.world.request_pause(true, tick));
+        present(&mut menu, &profile);
+        let paused = ok(profile.world.save_bytes());
+        ok(menu.input(&mut profile, ui::Input::Key(refuel)));
+        assert_visible_feedback(&mut menu, &profile, "Resume before refuelling");
+        assert_eq!(ok(profile.world.save_bytes()), paused);
+        ok(profile.world.request_pause(false, tick));
+        present(&mut menu, &profile);
+        let before = ok(profile.world.save_bytes());
+
+        // A different pending review cannot be bypassed by the fuel shortcut.
+        ok(menu.input(&mut profile, ui::Input::Key(ui::Key::Buy)));
+        present(&mut menu, &profile);
+        ok(menu.input(&mut profile, ui::Input::Key(refuel)));
+        assert_eq!(ok(profile.world.save_bytes()), before);
+        ok(menu.input(&mut profile, ui::Input::Key(ui::Key::Back)));
+        present(&mut menu, &profile);
+
+        // Refuelling uses Profile's durable transaction, not a direct world mutation.
+        let path = directory.0.join("commander.meridian");
+        let backup = directory.0.join("previous-save");
+        let disk_before = ok(std::fs::read(&path));
+        ok(std::fs::rename(&path, &backup));
+        ok(std::fs::create_dir(&path));
+        assert!(menu.input(&mut profile, ui::Input::Key(refuel)).is_err());
+        assert_eq!(ok(profile.world.save_bytes()), before);
+        assert_eq!(ok(std::fs::read(&backup)), disk_before);
+        ok(std::fs::remove_dir(&path));
+        ok(std::fs::rename(&backup, &path));
+        present(&mut menu, &profile);
+        ok(menu.input(&mut profile, ui::Input::Key(refuel)));
+        assert_eq!(profile.world.credits_tenths(), Some(before_cash - 140));
+        let nav = profile
+            .world
+            .snapshot()
+            .navigation
+            .unwrap_or_else(|| panic!("navigation"));
+        assert_eq!((nav.fuel_units, nav.fuel_capacity_units), (200, 200));
+        assert_eq!(profile.world.modular_equipment_snapshot(), before_modules);
+        let disk = ok(std::fs::read(&path));
+        assert_eq!(disk, ok(profile.world.save_bytes()));
+        let recovered = ok(World::from_save_bytes(&disk));
+        // Continue advances the mission epoch and review sequence deliberately. Compare the
+        // authoritative recovered game facts, not a new serialization of the invalidated session.
+        assert_eq!(recovered.snapshot().navigation, Some(nav));
+        assert_eq!(recovered.credits_tenths(), Some(before_cash - 140));
+        assert_eq!(recovered.modular_equipment_snapshot(), before_modules);
+        assert_eq!(recovered.commander_id(), profile.world.commander_id());
+        assert_eq!(recovered.player_ship_id(), profile.world.player_ship_id());
+        assert_eq!(
+            recovered.current_dock_context(),
+            profile.world.current_dock_context()
+        );
+        assert_eq!(
+            recovered.service_snapshot(),
+            profile.world.service_snapshot()
+        );
+
+        let frame = ok(menu.build_frame(&profile.world, viewport, 0.0));
+        let hit = frame
+            .hits
+            .iter()
+            .find(|hit| hit.control == ui::Control::Key(refuel))
+            .unwrap_or_else(|| panic!("refuel control"));
+        assert!(!hit.enabled);
+        let point = [hit.bounds.x + 5.0, hit.bounds.y + 5.0];
+        menu.presented(frame);
+        let full = ok(profile.world.save_bytes());
+        ok(menu.input(&mut profile, ui::Input::Click(point)));
+        assert_visible_feedback(&mut menu, &profile, "Fuel tank is already full");
+        ok(menu.input(&mut profile, ui::Input::Key(refuel)));
+        assert_eq!(ok(profile.world.save_bytes()), full);
+        assert_eq!(ok(std::fs::read(&path)), full);
+    }
+    #[test]
+    fn market_pointer_refuel_uses_the_same_paid_command() {
+        let (_directory, mut profile, mut menu) = start();
+        fit_paid_tank(&mut profile);
+        let before_modules = profile.world.modular_equipment_snapshot();
+        let cash = profile.world.credits_tenths().unwrap_or_default();
+        let viewport = ui::Viewport::new(1280.0, 720.0).unwrap_or_else(|| panic!("viewport"));
+        let frame = ok(menu.build_frame(&profile.world, viewport, 0.0));
+        let hit = frame
+            .hits
+            .iter()
+            .find(|hit| hit.control == ui::Control::Key(ui::Key::Refuel) && hit.enabled)
+            .unwrap_or_else(|| panic!("enabled refuel control"));
+        let point = [hit.bounds.x + 5.0, hit.bounds.y + 5.0];
+        menu.presented(frame);
+        ok(menu.input(&mut profile, ui::Input::Click(point)));
+        assert_eq!(profile.world.credits_tenths(), Some(cash - 140));
+        assert_eq!(
+            profile
+                .world
+                .snapshot()
+                .navigation
+                .map(|nav| nav.fuel_units),
+            Some(200)
+        );
+        assert_eq!(profile.world.modular_equipment_snapshot(), before_modules);
     }
     #[test]
     fn trading_writer_failure_is_visible_and_preserves_live_and_disk_state() {
@@ -1182,6 +2023,75 @@ mod tests {
                     .any(|row| row.node == node && row.fitted == 1)
             );
         }
+    }
+
+    #[test]
+    fn cabin_offers_and_separate_g04_review_use_real_demands_and_persist_refusal() {
+        let (directory, mut profile, mut menu) = start();
+        let panel = ok(equipment_panel(&profile.world, "passenger-cabins", ""));
+        assert_eq!(panel.rows.len(), 6);
+        for grade in meridian_core::CabinGrade::ALL {
+            let row = panel
+                .rows
+                .iter()
+                .find(|row| row.node == grade.name())
+                .unwrap_or_else(|| panic!("missing cabin"));
+            assert_eq!(row.price_tenths, Some(u64::from(grade.price_tenths())));
+            assert!(!row.can_buy);
+            assert_eq!(row.fitted, 0);
+        }
+        let panel = ok(equipment_panel(&profile.world, "passenger-service", ""));
+        assert!(
+            panel
+                .rows
+                .iter()
+                .any(|row| row.node == "g04-request" && row.can_buy)
+        );
+        assert!(
+            panel
+                .rows
+                .iter()
+                .any(|row| row.node == "g04-board" && !row.can_buy)
+        );
+        assert!(
+            equipment_action(
+                &profile.world,
+                "g04-request",
+                None,
+                "passenger-cabins",
+                ui::EquipmentOperation::Buy
+            )
+            .is_err()
+        );
+        ok(menu.open(&profile.world, ui::Screen::Equipment));
+        menu.slot = "passenger-service".into();
+        present(&mut menu, &profile);
+        ok(menu.input(&mut profile, ui::Input::Key(ui::Key::Confirm)));
+        assert!(
+            menu.pending
+                .as_ref()
+                .is_some_and(|pending| pending.view.title == "Passenger service review")
+        );
+        present(&mut menu, &profile);
+        ok(menu.input(&mut profile, ui::Input::Key(ui::Key::Confirm)));
+        let snapshot = profile
+            .world
+            .passenger_journey_snapshot()
+            .unwrap_or_else(|| panic!("passage"));
+        assert_eq!(snapshot.status, PassageStatus::Refused);
+        assert_eq!(profile.world.credits_tenths(), Some(7200));
+        drop(profile);
+        let mut continued = open(&directory.0);
+        ok(continued.continue_saved());
+        let restored = continued
+            .world
+            .passenger_journey_snapshot()
+            .unwrap_or_else(|| panic!("passage"));
+        assert_eq!(
+            (restored.status, restored.people, restored.cabins),
+            (snapshot.status, snapshot.people, None)
+        );
+        assert!(!restored.reply_is_current);
     }
 
     #[test]
@@ -1302,6 +2212,105 @@ mod tests {
         assert_eq!(ok(profile.world.save_bytes()), after_external_purchase);
     }
     #[test]
+    fn shield_panel_exposes_source_grades_and_distinguishes_unavailable_acquisition() {
+        use meridian_core::ShieldGrade;
+        let (_directory, profile, _menu) = start();
+        let panel = ok(equipment_panel(&profile.world, "shield", ""));
+        let slot = panel
+            .slots
+            .iter()
+            .find(|slot| slot.id == "shield")
+            .unwrap_or_else(|| panic!("shield slot"));
+        assert_eq!(slot.fitted, "Basic Shield");
+        for grade in ShieldGrade::ALL {
+            let row = panel
+                .rows
+                .iter()
+                .find(|row| row.node == grade.node())
+                .unwrap_or_else(|| panic!("missing shield grade"));
+            assert!(row.readout.iter().any(|line| {
+                line.contains(&format!("Capacity {} per bank", grade.capacity() / 100))
+            }));
+            assert!(!row.can_buy);
+            if let Some((price, _)) = grade.ordinary_offer() {
+                assert_eq!(row.price_tenths, Some(u64::from(price)));
+                assert_eq!(row.instance, None);
+            } else if grade == ShieldGrade::Basic {
+                assert_eq!(row.fitted, 1);
+                assert!(!row.can_store);
+                assert!(row.instance.is_some());
+            } else {
+                assert!(row.refusal.is_some());
+                assert_eq!(row.price_tenths, None);
+                assert_eq!(row.instance, None);
+            }
+        }
+        let capital = panel
+            .rows
+            .iter()
+            .find(|row| row.node == ShieldGrade::AdvancedII.node())
+            .unwrap_or_else(|| panic!("capital row"));
+        assert!(
+            capital.compatibility.contains("ELITE-rank") && capital.compatibility.contains("PLUGH")
+        );
+        assert!(
+            equipment_action(
+                &profile.world,
+                ShieldGrade::BasicII.node(),
+                None,
+                "energy",
+                ui::EquipmentOperation::Buy
+            )
+            .is_err()
+        );
+    }
+
+    #[test]
+    fn hyperspace_drive_panel_uses_actual_fitted_item_and_paid_offer_rules() {
+        use meridian_core::navigation::DriveGrade;
+        let (_directory, profile, _menu) = start();
+        let panel = ok(equipment_panel(&profile.world, "drive", ""));
+        let slot = panel
+            .slots
+            .iter()
+            .find(|slot| slot.id == "drive")
+            .unwrap_or_else(|| panic!("missing drive slot"));
+        assert_eq!(slot.fitted, "Basic Hyperspace Drive");
+        let basic = panel
+            .rows
+            .iter()
+            .find(|row| row.node == ModuleKind::Drive(DriveGrade::Basic).node())
+            .unwrap_or_else(|| panic!("missing born drive"));
+        assert_eq!(basic.fitted, 1);
+        assert!(!basic.can_store);
+        assert!(basic.readout.iter().any(|line| line.contains("Spool 10s")));
+        for (grade, price, text) in [
+            (DriveGrade::Intermediate, 50_000, "Spool 5s"),
+            (DriveGrade::Advanced, 150_000, "Spool 1s"),
+        ] {
+            let kind = ModuleKind::Drive(grade);
+            let row = panel
+                .rows
+                .iter()
+                .find(|row| row.node == kind.node())
+                .unwrap_or_else(|| panic!("missing drive offer"));
+            assert_eq!(row.price_tenths, Some(price));
+            assert!(!row.can_buy);
+            assert!(row.readout.iter().any(|line| line.contains(text)));
+            assert!(
+                equipment_action(
+                    &profile.world,
+                    kind.node(),
+                    None,
+                    "energy",
+                    ui::EquipmentOperation::Buy
+                )
+                .is_err()
+            );
+        }
+    }
+
+    #[test]
     fn navigation_computer_panel_uses_owned_slot_and_source_prices() {
         let (_directory, profile, _menu) = start();
         let panel = ok(equipment_panel(&profile.world, "navigation", ""));
@@ -1335,14 +2344,37 @@ mod tests {
     fn front_module_rows_and_pylon_slots_use_real_owned_instances_and_admission() {
         let (_directory, profile, _menu) = start();
         let panel = ok(equipment_panel(&profile.world, "front-laser", ""));
-        assert_eq!(panel.slots.len(), 18);
-        let targeting: Vec<_> = panel.slots[15..]
-            .iter()
-            .map(|slot| slot.id.as_str())
-            .collect();
+        assert_eq!(panel.slots.len(), 25);
+        let actual: Vec<_> = panel.slots.iter().map(|slot| slot.id.as_str()).collect();
         assert_eq!(
-            targeting,
-            ["targeting", "targeting-mining", "targeting-salvage"]
+            actual,
+            [
+                "front-laser",
+                "cargo-expansion",
+                "energy",
+                "navigation",
+                "drive",
+                "shield",
+                ui::fuel_scoops::SLOT,
+                ui::emp::SLOT,
+                "passenger-cabins",
+                "passenger-service",
+                "pylon-0",
+                "pylon-1",
+                "pylon-2",
+                "pylon-3",
+                "pylon-4",
+                "pylon-5",
+                "pylon-6",
+                "pylon-7",
+                "pylon-8",
+                "targeting",
+                "targeting-mining",
+                "targeting-salvage",
+                "fuel-storage",
+                "utility-ecm",
+                "utility-salvage-cutter"
+            ]
         );
         let emp = panel
             .slots
@@ -1396,6 +2428,169 @@ mod tests {
                 .count(),
             3
         );
+    }
+
+    #[test]
+    fn stock_ecm_real_slot_exposes_paid_offer_then_retains_owned_fit_across_publications() {
+        use ui::EquipmentOperation::{Buy, Fit, Store};
+        let (directory, mut profile, _menu) = start();
+        let slot = "utility-ecm";
+        let node = ModuleKind::Ecm.node();
+        let panel = ok(equipment_panel(&profile.world, slot, ""));
+        let offer = panel
+            .rows
+            .iter()
+            .find(|r| r.node == node)
+            .unwrap_or_else(|| panic!("ECM offer"));
+        assert_eq!(offer.price_tenths, Some(21_000));
+        assert!(!offer.can_buy);
+        assert!(equipment_action(&profile.world, node, None, "energy", Buy).is_err());
+        ok(profile.xyzzy(meridian_core::XyzzyAction::Enter));
+        let scoop = profile
+            .world
+            .fitted_fuel_scoops()
+            .unwrap_or_else(|| panic!("scoop"));
+        ok(profile.command(Action::Module(ModuleAction::Store { item: scoop.item })));
+        let cash = profile
+            .world
+            .credits_tenths()
+            .unwrap_or_else(|| panic!("cash"));
+        let action = ok(equipment_action(&profile.world, node, None, slot, Buy));
+        ok(profile.command(action));
+        let item = profile
+            .world
+            .fitted_ecm()
+            .unwrap_or_else(|| panic!("fitted ECM"));
+        assert_eq!(profile.world.credits_tenths(), Some(cash - 21_000));
+        let action = ok(equipment_action(
+            &profile.world,
+            node,
+            Some(item.id),
+            slot,
+            Store,
+        ));
+        ok(profile.command(action));
+        assert!(profile.world.fitted_ecm().is_none());
+        let action = ok(equipment_action(
+            &profile.world,
+            node,
+            Some(item.id),
+            slot,
+            Fit,
+        ));
+        ok(profile.command(action));
+        let cold = ok(World::from_save_bytes(&ok(std::fs::read(
+            directory.0.join("commander.meridian"),
+        ))));
+        assert_eq!(cold.fitted_ecm(), Some(item));
+        assert_eq!(cold.credits_tenths(), Some(cash - 21_000));
+    }
+
+    #[test]
+    fn station_laser_reviews_change_only_the_selected_mount_and_show_the_cold_loadout() {
+        use ui::EquipmentOperation::{Buy, Fit, Store};
+
+        let (directory, mut profile, mut menu) = start();
+        ok(menu.open(&profile.world, ui::Screen::Equipment));
+        assert!(
+            menu.request(
+                &mut profile,
+                ui::Request::InspectEquipmentSlot("port-laser".into()),
+            )
+            .is_err()
+        );
+        ok(profile.xyzzy(meridian_core::XyzzyAction::ActivateMedusa));
+        let initial = ok(equipment_panel(&profile.world, "port-laser", ""));
+        let pulse = initial
+            .rows
+            .iter()
+            .find(|row| row.node == ModuleKind::PulseLaser.node() && row.can_fit)
+            .and_then(|row| row.instance)
+            .unwrap_or_else(|| panic!("stored birth laser"));
+        let naval = initial
+            .rows
+            .iter()
+            .find(|row| row.node == ModuleKind::NavalLaser.node() && row.can_store)
+            .and_then(|row| row.instance)
+            .unwrap_or_else(|| panic!("issued port laser"));
+        assert!(initial.rows.iter().any(|row| {
+            row.instance == Some(naval)
+                && row
+                    .readout
+                    .iter()
+                    .any(|text| text.contains("Issued with Fleet Medusa"))
+        }));
+        assert!(
+            !initial
+                .rows
+                .iter()
+                .any(|row| row.node == ModuleKind::NavalLaser.node() && row.instance.is_none())
+        );
+        let cash = profile
+            .world
+            .credits_tenths()
+            .unwrap_or_else(|| panic!("wallet"));
+        for (slot, kind, item, operation) in [
+            ("port-laser", ModuleKind::PulseLaser, Some(pulse), Fit),
+            ("port-laser", ModuleKind::PulseLaser, Some(pulse), Store),
+            ("port-laser", ModuleKind::NavalLaser, Some(naval), Fit),
+            ("aft-laser", ModuleKind::PulseLaser, None, Buy),
+        ] {
+            ok(menu.request(&mut profile, ui::Request::InspectEquipmentSlot(slot.into())));
+            let before = ok(profile.world.save_bytes());
+            ok(menu.request(
+                &mut profile,
+                ui::Request::ReviewEquipment {
+                    node: kind.node().into(),
+                    instance: item,
+                    slot: slot.into(),
+                    operation,
+                    option: None,
+                },
+            ));
+            assert_eq!(ok(profile.world.save_bytes()), before);
+            present(&mut menu, &profile);
+            ok(menu.input(&mut profile, ui::Input::Key(ui::Key::Confirm)));
+            let mounted = profile
+                .world
+                .laser_mount_snapshot(laser_facing(slot).unwrap_or_else(|| panic!("facing")));
+            if operation == Store {
+                assert!(mounted.is_none());
+            } else {
+                let mounted = mounted.unwrap_or_else(|| panic!("fitted laser"));
+                assert_eq!(Some(mounted.weapon), kind.laser_profile());
+                if let Some(item) = item {
+                    assert_eq!(mounted.fitted_item_id, item);
+                }
+            }
+        }
+        let cold = ok(World::from_save_bytes(&ok(std::fs::read(
+            directory.0.join("commander.meridian"),
+        ))));
+        let panel = ok(equipment_panel(&cold, "aft-laser", ""));
+        assert_eq!(
+            panel
+                .slots
+                .iter()
+                .take(4)
+                .map(|slot| (slot.id.as_str(), slot.fitted.as_str()))
+                .collect::<Vec<_>>(),
+            [
+                ("front-laser", "Naval Laser"),
+                ("port-laser", "Naval Laser"),
+                ("starboard-laser", "Naval Laser"),
+                ("aft-laser", "Pulse Laser"),
+            ],
+        );
+        assert!(
+            panel
+                .rows
+                .iter()
+                .any(|row| row.node == ModuleKind::PulseLaser.node()
+                    && row.can_store
+                    && row.readout.iter().any(|text| text.contains("Paid module")))
+        );
+        assert_eq!(cold.credits_tenths(), Some(cash - 14_500));
     }
 
     #[test]

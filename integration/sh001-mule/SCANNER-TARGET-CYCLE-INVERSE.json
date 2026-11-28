@@ -1,0 +1,126 @@
+{
+  "base": "98ebd952a2b76f2c9dba424ff77037381cffb7a0",
+  "files": {
+    "flight/emp/tests.rs": {
+      "beforeSHA256": "e7f00e091a17ce5c2b7c9e7614365a3b158122631f1abcaf955fc677d97f09bd",
+      "afterSHA256": "fa0952492c31518165f8591524d6deb2ed4ad6b47b348e6d8d6ae14db4d328c2",
+      "hunks": [
+        {
+          "offset": 50115,
+          "before": "",
+          "after": "#[test]\nfn manual_scanner_occupied_review_without_computers_requires_safe_hold_and_consent() {\n    use crate::equipment::{WorkTarget, WorkTargetId, WorkTargetRole};\n    use crate::{ModuleAction, ModuleKind, ModuleSlot, OccupiedCutError};\n    let (mut pilot, target) = disabled_native_target_with_fit(|world| {\n        let tick = world.snapshot().tick;\n        let bay = world.equipment_snapshot().unwrap().owned.unwrap();\n        world\n            .request_equipment(crate::equipment::Command::UnfitCargoBay(bay.id), tick)\n            .unwrap();\n        for slot in [\n            ModuleSlot::MiningTargeting,\n            ModuleSlot::SalvageTargeting,\n            ModuleSlot::Targeting,\n            ModuleSlot::Navigation,\n        ] {\n            if let Some(item) = world\n                .modular_equipment_snapshot()\n                .unwrap()\n                .items\n                .into_iter()\n                .find(|i| i.slot == Some(slot))\n            {\n                let review = world\n                    .review_module(ModuleAction::Store { item: item.id }, tick)\n                    .unwrap();\n                world.prepare_module(review, tick).unwrap().commit();\n            }\n        }\n        if world.fitted_fuel_scoops().is_none() {\n            let review = world\n                .review_module(ModuleAction::PurchaseFuelScoops, tick)\n                .unwrap();\n            world.prepare_module(review, tick).unwrap().commit();\n        }\n        let review = world\n            .review_module(\n                ModuleAction::Purchase {\n                    kind: ModuleKind::SalvageCutter,\n                },\n                tick,\n            )\n            .unwrap();\n        world.prepare_module(review, tick).unwrap().commit();\n    });\n    pilot\n        .request_emp_trigger(false, pilot.snapshot().tick)\n        .unwrap();\n    assert_eq!(pilot.targeting_tier(), None);\n    for _ in pilot.scanner_targets() {\n        pilot\n            .cycle_scanner_target(pilot.snapshot().tick, [1280, 720])\n            .unwrap();\n        if pilot.selected_disabled_salvage_target() == Some(target) {\n            break;\n        }\n    }\n    assert!(pilot.pilot_operates_selected_tool());\n    let opening = pilot.snapshot().tick;\n    assert!(pilot.review_occupied_cut(target, opening).is_err());\n    let review = loop {\n        let tick = pilot.snapshot().tick;\n        assert!(\n            tick < opening + 1600,\n            \"hand-flown cutter never reached the surface\"\n        );\n        match pilot.review_occupied_cut(target, tick) {\n            Ok(review) => break review,\n            Err(OccupiedCutError::UnsafeHold | OccupiedCutError::ContactUnavailable) => {}\n            Err(e) => panic!(\"unexpected manual review refusal: {e}\"),\n        }\n        let position = pilot\n            .traffic_snapshot()\n            .unwrap()\n            .actors\n            .into_iter()\n            .find(|a| a.id == target)\n            .unwrap()\n            .pose\n            .position;\n        let work = WorkTarget {\n            id: WorkTargetId::Wreck(target),\n            role: WorkTargetRole::WreckTracking,\n            position,\n        };\n        let controls = pilot.work_hold_input(work, steer_to_real_point(&pilot, position));\n        pilot.step(controls).unwrap();\n        assert_eq!(pilot.snapshot().motion_refusal, None);\n    };\n    let before = pilot.save_bytes().unwrap();\n    review.cancel();\n    assert_eq!(before, pilot.save_bytes().unwrap());\n    let review = pilot\n        .review_occupied_cut(target, pilot.snapshot().tick)\n        .unwrap();\n    let hold = pilot.service_snapshot();\n    let cash = pilot.credits_tenths();\n    let contact = pilot.prepare_occupied_cut(review).unwrap().commit();\n    assert_eq!(contact.target, target);\n    let loaded = cold(&pilot);\n    assert_eq!(\n        loaded.occupied_cut_contacts().collect::<Vec<_>>(),\n        vec![contact]\n    );\n    assert_eq!(loaded.service_snapshot(), hold);\n    assert_eq!(loaded.credits_tenths(), cash);\n}\n\n"
+        }
+      ]
+    },
+    "flight/mining.rs": {
+      "beforeSHA256": "22defdcc8cf656efa55f7419c957a98b28246eee79c4fc729a388a5b09a8e284",
+      "afterSHA256": "159aa6934240088087db935838b6b06d5a7b3070c5ebd94d4ffc06f0c3054b8a",
+      "hunks": [
+        {
+          "offset": 6528,
+          "before": "",
+          "after": "    /// A manual designation never bends the beam to the selected rock.\n    pub fn request_manual_mining(&mut self) -> Result<MiningShot, MiningError> {\n        let tool = self.mining_tool_authority()?;\n        let Some(crate::equipment::WorkTargetId::Asteroid(id)) =\n            self.selected_work_target().map(|work| work.id)\n        else {\n            return Err(MiningError::NoTarget);\n        };\n        if !self.pilot_operates_selected_tool() {\n            return Err(MiningError::NoTarget);\n        }\n        self.mine(tool, self.state.tick, Some(id))\n    }\n\n"
+        },
+        {
+          "offset": 7361,
+          "before": "",
+          "after": "    ) -> Result<MiningShot, MiningError> {\n        self.mine(tool, tick, None)\n    }\n\n    fn mine(\n        &mut self,\n        tool: MiningToolAuthority,\n        tick: u64,\n        selected: Option<crate::mining::AsteroidId>,\n"
+        },
+        {
+          "offset": 9706,
+          "before": "",
+          "after": "            .filter(|hit| selected.is_none_or(|id| id == hit.asteroid))\n"
+        }
+      ]
+    },
+    "flight/mining/tests.rs": {
+      "beforeSHA256": "8a363fe0d10c6f4eee1630d841d3bf1b1c4d54fee13a3abc9e017b2b4ab3841e",
+      "afterSHA256": "b248399997fcca376ce1430e8610e4b920a9679ee128268436d9c9483be83424",
+      "hunks": [
+        {
+          "offset": 3288,
+          "before": "",
+          "after": "    paid_fragment_journey(false);\n}\n\n#[test]\nfn manual_scanner_laser_and_scoop_use_actual_hardware_without_computers() {\n    paid_fragment_journey(true);\n}\n\nfn designate(world: &mut World, id: crate::equipment::WorkTargetId) {\n    for _ in world.scanner_targets() {\n        assert!(ok(\n            world.cycle_scanner_target(world.snapshot().tick, [1280, 720])\n        ));\n        if world\n            .selected_work_target()\n            .is_some_and(|work| work.id == id)\n        {\n            return;\n        }\n    }\n    panic!(\"scanner did not offer {id:?}\");\n}\n\n#[test]\nfn manual_mining_accepts_basic_alignment_without_mining_targeting() {\n    use crate::{\n        ModuleKind,\n        equipment::{TargetingTier, WorkTargetId},\n    };\n    let (mut world, _) = paid(12005);\n    module(\n        &mut world,\n        ModuleAction::Purchase {\n            kind: ModuleKind::Targeting(TargetingTier::Basic),\n        },\n    );\n    approach(&mut world);\n    let contact = some(some(world.mining_belt_snapshot()).front_contact);\n    designate(&mut world, WorkTargetId::Asteroid(contact.asteroid));\n    assert!(!world.manual_scanner_target());\n    assert!(!world.work_targeting_fit().mining);\n    assert!(world.pilot_operates_selected_tool());\n    assert_eq!(\n        ok(world.request_manual_mining()).contact.asteroid,\n        contact.asteroid\n    );\n}\n\nfn paid_fragment_journey(manual: bool) {\n    use crate::equipment::WorkTargetId;\n"
+        },
+        {
+          "offset": 4877,
+          "before": "    work(&mut world);\n",
+          "after": "    if manual {\n        assert_eq!(world.targeting_tier(), None);\n        let belt = some(world.mining_belt_snapshot());\n        let rock = some(belt.front_contact).asteroid;\n        let other = some(belt.bodies.iter().find(|body| body.id != rock)).id;\n        designate(&mut world, WorkTargetId::Asteroid(other));\n        let before = ok(world.save_bytes());\n        assert!(matches!(\n            world.request_manual_mining(),\n            Err(MiningError::NoTarget)\n        ));\n        assert_eq!(ok(world.save_bytes()), before);\n        designate(&mut world, WorkTargetId::Asteroid(rock));\n        ok(world.request_manual_mining());\n    } else {\n        work(&mut world);\n    }\n"
+        },
+        {
+          "offset": 5585,
+          "before": "    let shot = work(&mut world);\n",
+          "after": "    let shot = if manual {\n        ok(world.request_manual_mining())\n    } else {\n        work(&mut world)\n    };\n    if manual {\n        let ore = some(world.mining_collection_target(shot.contact.asteroid));\n        designate(&mut world, WorkTargetId::Ore(ore.id));\n        assert_eq!(\n            world.request_manual_ore_collection(),\n            Err(MiningError::NoEligibleOreBody)\n        );\n    }\n"
+        },
+        {
+          "offset": 8245,
+          "before": "        match world.request_collect_mined_ore(tick) {\n",
+          "after": "        match if manual {\n            world.request_manual_ore_collection()\n        } else {\n            world.request_collect_mined_ore(tick)\n        } {\n"
+        }
+      ]
+    },
+    "flight/modular.rs": {
+      "beforeSHA256": "5fe2a40ab7cafdb08f3f2713eaeb08ca7a9bc7ffcde4505fc565b54008d3736a",
+      "afterSHA256": "271c8afc708a475b106eac5999f64a757fe83de5e0814f6477a9bed90b948133",
+      "hunks": [
+        {
+          "offset": 56256,
+          "before": "        ledger.fitted(ModuleSlot::Targeting)?;\n        ledger.fitted(ModuleSlot::SalvageTargeting)?;\n",
+          "after": ""
+        }
+      ]
+    },
+    "mining/ore.rs": {
+      "beforeSHA256": "b01f8463d28bee817d4b5363ce16b960f391c08dfe242ea609ab0aab13cc00a9",
+      "afterSHA256": "13743527e29e8bef8bd9524372b11c511c15d25df9d4dde1812857f9a65c04c7",
+      "hunks": [
+        {
+          "offset": 954,
+          "before": "    /// World vertices shared by the Meridian fragment mesh and automatic scoop checks.\n",
+          "after": "    /// World vertices shared by the Meridian fragment mesh and full-aperture scoop checks.\n"
+        },
+        {
+          "offset": 1400,
+          "before": "    pub(crate) fn scoop_admissible(self, pose: RigidPose, speed: f32, automatic: bool) -> bool {\n",
+          "after": "    pub(crate) fn scoop_admissible(self, pose: RigidPose, speed: f32, full_aperture: bool) -> bool {\n"
+        },
+        {
+          "offset": 2170,
+          "before": "        if !automatic {\n",
+          "after": "        if !full_aperture {\n"
+        },
+        {
+          "offset": 3112,
+          "before": "    pub(crate) automatic: bool,\n",
+          "after": "    pub(crate) full_aperture: bool,\n"
+        },
+        {
+          "offset": 8532,
+          "before": "                || !ore.scoop_admissible(receipt.pose, receipt.speed, receipt.automatic)\n",
+          "after": "                || !ore.scoop_admissible(receipt.pose, receipt.speed, receipt.full_aperture)\n"
+        },
+        {
+          "offset": 9352,
+          "before": "            w.bool(c.automatic);\n",
+          "after": "            w.bool(c.full_aperture);\n"
+        },
+        {
+          "offset": 10380,
+          "before": "                automatic: r.bool()?,\n",
+          "after": "                full_aperture: r.bool()?,\n"
+        }
+      ]
+    },
+    "mining/tests.rs": {
+      "beforeSHA256": "b19dda8c93a3b05ad2111f6919b12974492a5a3e7b7216d8287cf992c6d3efe2",
+      "afterSHA256": "8d4ad383f7b4fd36fe60607de7dba006ed757c470b99e8ed8cd3a17979dbc54c",
+      "hunks": [
+        {
+          "offset": 5385,
+          "before": "        automatic: true,\n",
+          "after": "        full_aperture: true,\n"
+        }
+      ]
+    }
+  }
+}

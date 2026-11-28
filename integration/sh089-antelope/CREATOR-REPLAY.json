@@ -1,0 +1,78 @@
+{
+  "host": "SteveMBA",
+  "python": "3.14.3",
+  "numpy": "2.5.5",
+  "pillow": "13.0.0",
+  "testCount": 3,
+  "testResult": "PASS",
+  "sourceRecipeRevision": "a11fe16924d87d06021816f9037952afcbac08db",
+  "staging": "The driver redirects paths in its staged blueprint and restores the exact original blueprint. Recipe and test source are unmodified.",
+  "candidate": {
+    "vertices": 284,
+    "triangles": 504,
+    "parts": 16,
+    "fixedParts": 9
+  },
+  "receipts": {
+    "SH088-candidate.json": {
+      "bytes": 57782,
+      "sha256": "5e4dc38ce8569065b04e59be6333bf4e36817b530ebe7eababf6a3a78c699359"
+    },
+    "SH089-candidate.json": {
+      "bytes": 58055,
+      "sha256": "5f729016e436c3b78571dbd677b326ba3e1877850abfb8ac5c432cb7ef54e156"
+    },
+    "Sources/L337Core/Resources/Ships/SH088.toml": {
+      "bytes": 437218,
+      "sha256": "9472ffe6e4ad44a82238624f50f4ef10b67f9364e8befc23dfa41f7a137f9606"
+    },
+    "Sources/L337Core/Resources/Ships/SH089.toml": {
+      "bytes": 436964,
+      "sha256": "64111eb6f1dca889d1d8db7de4f8bc711f184425a899848daad43f529b858eef"
+    },
+    "docs/fleet-physical/creator-ownership-records/SH088.json": {
+      "bytes": 44936,
+      "sha256": "7d670474398ce0a9d7b1401f4bb46c502cdd418e1c3208b7f97556ca8a539904"
+    },
+    "docs/fleet-physical/creator-ownership-records/SH089.json": {
+      "bytes": 45014,
+      "sha256": "2b826987358e1d15e45b30915c76ae6d826c1d20f2fbe1a5e3ce0f2ea256581b"
+    },
+    "docs/fleet-physical/liner-runner-native-candidate-blueprint.json": {
+      "bytes": 6988,
+      "sha256": "96ea8ee458a0003ccdc67f5f0c696adf22a692085b3fc1e5063d3af65685953a"
+    },
+    "docs/fleet-physical/liner-runner-native-candidate-recipe.py": {
+      "bytes": 10333,
+      "sha256": "796013da682d984166746493a6efc9e3feb85432ca15894c9b6401dbdaef5e80"
+    },
+    "docs/fleet-physical/liner-runner-native-candidate-tests.py": {
+      "bytes": 10093,
+      "sha256": "5aad84057d0f19a7431eab52f1f47cb357bee7deac6e4e64016efa1b84851c49"
+    },
+    "original-creator/SH088-design.toml": {
+      "bytes": 412371,
+      "sha256": "8382b438252441ae6bb373bf307f7d341ec4d5d16fc525ab8d3edfa8cefbb8de"
+    },
+    "original-creator/SH089-design.toml": {
+      "bytes": 412879,
+      "sha256": "75eaa16f5496ef1164f9665d1ee98da814d309562421addb3f86e78b778ed4d5"
+    },
+    "original-creator/fleet_redesign.py": {
+      "bytes": 48273,
+      "sha256": "3f029d5a417dea1b787dc5f0327d72687822275cc372de79790c3531e7cba429"
+    },
+    "original-creator/generate.py": {
+      "bytes": 32122,
+      "sha256": "a80f3606edd1ca0c9e4f0133136ab97257b07b2afe3efbbeb8a46960eb836476"
+    },
+    "original-creator/independent-fleet-input.json": {
+      "bytes": 69958,
+      "sha256": "a792c7b4ec0665bc42a515262957bd3c6830c672379462ac2ac6145d4964f2ba"
+    },
+    "tests.log": {
+      "bytes": 2129,
+      "sha256": "c90ff0b270da9f46c29f39ac1d3073d9fbb4f313e82103b02f87e03f7c97c285"
+    }
+  }
+}

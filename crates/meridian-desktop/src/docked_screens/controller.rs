@@ -21,6 +21,7 @@ pub struct DockedScreens {
     pub(super) compare: bool,
     pub(super) commodity: CommodityId,
     pub(super) sell: bool,
+    pub(super) quantity: u64,
     pub(super) body_index: usize,
     pub(super) equipment_index: usize,
     pub(super) option_index: usize,
@@ -56,6 +57,7 @@ impl DockedScreens {
             compare: true,
             commodity: CommodityId::Food,
             sell: false,
+            quantity: 1,
             body_index: 0,
             equipment_index: 0,
             option_index: 0,
@@ -98,12 +100,17 @@ impl DockedScreens {
     }
     pub fn open(&mut self, screen: Screen) {
         self.screen = screen;
+        self.quantity = 1;
         self.route_chooser = None;
         self.searching = false;
         self.query.clear();
         self.detail = false;
         self.options = false;
         self.scroll = 0;
+        self.bump();
+    }
+    pub(crate) fn select_initial_showroom_ship(&mut self, id: &str) {
+        self.ship = id.into();
         self.bump();
     }
     fn bump(&mut self) {
@@ -225,8 +232,13 @@ impl DockedScreens {
         if context.review.is_some() {
             Outcome::Ignored
         } else if self.searching {
+            let limit = if self.screen == Screen::Showroom {
+                262
+            } else {
+                64
+            };
             for c in text.chars().filter(|c| !c.is_control()) {
-                if self.query.chars().count() < 64 {
+                if self.query.chars().count() < limit {
                     self.query.push(c);
                 }
             }
@@ -252,7 +264,11 @@ impl DockedScreens {
         if context.review.is_some() || !painted.viewport.body().contains(point) {
             Outcome::Ignored
         } else if let Some(chooser) = &mut self.route_chooser {
-            chooser.choose(moved(chooser.selected, rows, chooser.candidates.len()))
+            if chooser.trade_detail {
+                chooser.scroll_details(rows, context)
+            } else {
+                chooser.choose(moved(chooser.selected, rows, chooser.candidates.len()))
+            }
         } else if self.screen == Screen::System
             || (self.detail && self.screen == Screen::Showroom)
             || (self.screen == Screen::Galaxy && {
@@ -337,6 +353,9 @@ impl DockedScreens {
                 Outcome::Updated
             }
             Control::SelectCommodity(id) => {
+                if self.commodity != *id {
+                    self.quantity = 1;
+                }
                 self.commodity = *id;
                 Outcome::Updated
             }
@@ -437,7 +456,11 @@ impl DockedScreens {
                         .iter()
                         .position(|id| *id == self.commodity)
                         .unwrap_or(0);
-                    self.commodity = order[moved(index, amount, order.len())];
+                    let next = order[moved(index, amount, order.len())];
+                    if next != self.commodity {
+                        self.quantity = 1;
+                    }
+                    self.commodity = next;
                 }
             }
             Screen::Equipment => {
@@ -465,12 +488,21 @@ impl DockedScreens {
             return self.search_key(key, c);
         }
         if let Some(chooser) = &mut self.route_chooser {
+            if chooser.trade_detail {
+                return match key {
+                    Key::Back | Key::Details | Key::Confirm => chooser.toggle_trade_detail(),
+                    Key::Previous | Key::PagePrevious => chooser.scroll_details(-1, c),
+                    Key::Next | Key::PageNext => chooser.scroll_details(1, c),
+                    _ => Outcome::Ignored,
+                };
+            }
             return match key {
                 Key::Back => {
                     self.route_chooser = None;
                     Outcome::Updated
                 }
                 Key::Confirm if !c.paused => chooser.confirm(),
+                Key::Details => chooser.toggle_trade_detail(),
                 Key::Previous | Key::Next if !chooser.candidates.is_empty() => {
                     chooser.choose(moved(
                         chooser.selected,
@@ -668,6 +700,21 @@ impl DockedScreens {
     }
     fn market_key(&mut self, key: Key, c: &Context<'_>) -> Outcome {
         match key {
+            Key::QuantityLess | Key::QuantityMore | Key::QuantityLessTen | Key::QuantityMoreTen => {
+                let step = if matches!(key, Key::QuantityLessTen | Key::QuantityMoreTen) {
+                    10
+                } else {
+                    1
+                };
+                self.quantity = if matches!(key, Key::QuantityLess | Key::QuantityLessTen) {
+                    self.quantity.saturating_sub(step).max(1)
+                } else {
+                    self.quantity
+                        .saturating_add(step)
+                        .min(meridian_core::station_services::MAX_TRADE_QUANTITY)
+                };
+                Outcome::Updated
+            }
             Key::Previous | Key::Next | Key::PagePrevious | Key::PageNext => {
                 self.move_selection(selection_step(key), c);
                 Outcome::Updated
@@ -679,6 +726,10 @@ impl DockedScreens {
             Key::Confirm => self.commerce(!self.sell, c),
             Key::Buy => self.commerce(true, c),
             Key::Sell => self.commerce(false, c),
+            Key::Refuel => match super::market_refuel_admission(c.world) {
+                Ok(()) => Outcome::Request(Request::RefuelMarket),
+                Err(reason) => Outcome::Refused(reason.into()),
+            },
             _ => Outcome::Ignored,
         }
     }
@@ -754,6 +805,7 @@ impl DockedScreens {
         Outcome::Request(Request::ReviewCommodity {
             commodity: self.commodity,
             buy,
+            quantity: self.quantity,
         })
     }
     fn route(&mut self, c: &Context<'_>) -> Outcome {
@@ -782,6 +834,8 @@ impl DockedScreens {
                 self.route_chooser = Some(RouteChooser {
                     candidates,
                     selected: 0,
+                    trade_detail: false,
+                    detail_scroll: 0,
                 });
                 self.searching = false;
                 Outcome::Updated
@@ -797,6 +851,8 @@ impl DockedScreens {
         self.route_chooser = Some(RouteChooser {
             candidates: Vec::new(),
             selected: 0,
+            trade_detail: false,
+            detail_scroll: 0,
         });
         self.searching = false;
         Outcome::Updated

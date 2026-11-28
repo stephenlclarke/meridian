@@ -1,6 +1,6 @@
 //! Read-only, bounded trade estimates for the actual station and directly reachable markets.
 use super::World;
-use crate::navigation::{ROUTE_SYSTEMS, SystemId, route_hop};
+use crate::navigation::{ROUTE_SYSTEMS, SystemId, TradeExportEstimate, route_hop};
 use crate::station_services::{
     AccountProjection, CargoUnit, CommodityId, CommodityQuote, MAX_MARKET_QUANTITY,
 };
@@ -13,9 +13,27 @@ pub struct ProfitDestination {
     pub profit_tenths: u64,
 }
 
+/// Current-quote explanation of the existing profit destination, not an order or saved offer.
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct ProfitDetail {
+    pub destination: ProfitDestination,
+    pub sale_here_tenths: u64,
+    pub sale_there_tenths: u64,
+    pub trade_tenths: u64,
+    pub exports: Vec<TradeExportEstimate>,
+}
+
 impl World {
     /// At most five positive results. No hypothetical refuel, purchase, sale or save mutation.
     pub fn profit_destinations(&self) -> Vec<ProfitDestination> {
+        self.profit_details()
+            .into_iter()
+            .map(|detail| detail.destination)
+            .collect()
+    }
+
+    /// Exact explanation of each ranked positive estimate using the same live, finite allocation.
+    pub fn profit_details(&self) -> Vec<ProfitDetail> {
         let Some((dock, markets)) = self
             .current_dock_context()
             .zip(self.station_markets.as_ref())
@@ -47,21 +65,31 @@ impl World {
                 continue;
             };
             let target = CommodityId::ALL.map(|id| markets.commodity_quote(site, id));
-            let profit_tenths = estimate(cargo, &origin, &target);
+            let sale_here_tenths = cargo_sale_tenths(cargo, &origin);
+            let sale_there_tenths = cargo_sale_tenths(cargo, &target);
+            let (trade_tenths, exports) = trade_estimate(cargo, &origin, &target);
+            let profit_tenths = (sale_there_tenths + trade_tenths).saturating_sub(sale_here_tenths);
             if profit_tenths > 0 {
-                destinations.push(ProfitDestination {
-                    system,
-                    profit_tenths,
+                destinations.push(ProfitDetail {
+                    destination: ProfitDestination {
+                        system,
+                        profit_tenths,
+                    },
+                    sale_here_tenths,
+                    sale_there_tenths,
+                    trade_tenths,
+                    exports,
                 });
             }
         }
-        rank(&mut destinations);
+        rank(&mut destinations, |result| result.destination);
         destinations
     }
 }
 
-fn rank(destinations: &mut Vec<ProfitDestination>) {
+fn rank<T>(destinations: &mut Vec<T>, summary: impl Fn(&T) -> ProfitDestination) {
     destinations.sort_by_key(|result| {
+        let result = summary(result);
         (
             core::cmp::Reverse(result.profit_tenths),
             result.system.galaxy,
@@ -110,15 +138,16 @@ pub(super) fn cargo_sale_tenths(cargo: AccountProjection, market: &[CommodityQuo
 }
 
 /// Additional credits from affordable exports after allowing for onboard cargo at the destination.
-pub(super) fn trade_profit_tenths(
+pub(super) fn trade_estimate(
     cargo: AccountProjection,
     origin: &[CommodityQuote; 17],
     target: &[CommodityQuote; 17],
-) -> u64 {
+) -> (u64, Vec<TradeExportEstimate>) {
     let mut room = u64::from(cargo.hold_capacity_tonnes.saturating_sub(cargo.used_tonnes));
     let mut cash = u64::from(cargo.credits_tenths);
     let (mut destination_sale, destination_capacity) = sale_projection(cargo, target);
     let destination_without_exports = settled_wallet(cash, destination_sale);
+    let mut details = Vec::new();
     // Original scan buys highest positive unit margin first. Share the same wallet and hold;
     // the three non-tonne goods retain the legacy scan's independent 63-unit purchase cap.
     let mut exports = CommodityId::ALL;
@@ -146,21 +175,34 @@ pub(super) fn trade_profit_tenths(
             .min(origin[i].stock)
             .min(destination_capacity[i])
             .min(cash.checked_div(price).unwrap_or(u64::MAX));
+        if quantity == 0 {
+            continue;
+        }
         cash -= quantity * price;
         if tonnes {
             room -= quantity;
         }
         destination_sale += u128::from(quantity) * u128::from(target[i].bid_tenths);
+        details.push(TradeExportEstimate {
+            commodity: id,
+            quantity,
+            ask_tenths: origin[i].ask_tenths,
+            bid_tenths: target[i].bid_tenths,
+        });
     }
-    settled_wallet(cash, destination_sale).saturating_sub(destination_without_exports)
+    (
+        settled_wallet(cash, destination_sale).saturating_sub(destination_without_exports),
+        details,
+    )
 }
 
+#[cfg(test)]
 fn estimate(
     cargo: AccountProjection,
     origin: &[CommodityQuote; 17],
     target: &[CommodityQuote; 17],
 ) -> u64 {
-    let remote = cargo_sale_tenths(cargo, target) + trade_profit_tenths(cargo, origin, target);
+    let remote = cargo_sale_tenths(cargo, target) + trade_estimate(cargo, origin, target).0;
     remote.saturating_sub(cargo_sale_tenths(cargo, origin))
 }
 
@@ -180,6 +222,38 @@ mod tests {
         assert_eq!(result[0].system, SystemId::RENAS);
         assert!(result[0].profit_tenths > 0);
         assert_eq!(world.save_bytes().unwrap(), before);
+        let details = world.profit_details();
+        assert_eq!(
+            details
+                .iter()
+                .map(|detail| detail.destination)
+                .collect::<Vec<_>>(),
+            result
+        );
+        assert!(!details[0].exports.is_empty());
+        assert_eq!(
+            details[0].destination.profit_tenths,
+            (details[0].sale_there_tenths + details[0].trade_tenths)
+                .saturating_sub(details[0].sale_here_tenths)
+        );
+        let markets = world.station_markets.as_ref().unwrap();
+        let mut cost = 0;
+        for row in &details[0].exports {
+            let ask = markets.commodity_quote(MarketSite::Avenor, row.commodity);
+            let bid = markets.commodity_quote(MarketSite::Renas, row.commodity);
+            assert_eq!(
+                (row.ask_tenths, row.bid_tenths),
+                (ask.ask_tenths, bid.bid_tenths)
+            );
+            assert!((1..=ask.stock).contains(&row.quantity));
+            cost += row.quantity * u64::from(row.ask_tenths);
+        }
+        assert!(cost <= u64::from(world.credits_tenths().unwrap()));
+        assert_eq!(world.save_bytes().unwrap(), before);
+        assert_eq!(
+            World::from_save_bytes(&before).unwrap().profit_details(),
+            details
+        );
         assert_eq!(
             World::from_save_bytes(&before)
                 .unwrap()
@@ -232,6 +306,31 @@ mod tests {
         }
         target[gold].stock = MAX_MARKET_QUANTITY - 1;
         assert_eq!(estimate(cargo, &origin, &target), 50);
+        let (profit, rows) = trade_estimate(cargo, &origin, &target);
+        assert_eq!(profit, 50);
+        assert_eq!(
+            rows,
+            vec![
+                TradeExportEstimate {
+                    commodity: CommodityId::Textiles,
+                    quantity: 1,
+                    ask_tenths: 20,
+                    bid_tenths: 45
+                },
+                TradeExportEstimate {
+                    commodity: CommodityId::Food,
+                    quantity: 1,
+                    ask_tenths: 10,
+                    bid_tenths: 25
+                },
+                TradeExportEstimate {
+                    commodity: CommodityId::Gold,
+                    quantity: 1,
+                    ask_tenths: 5,
+                    bid_tenths: 15
+                },
+            ]
+        );
         cargo.credits_tenths = 20;
         assert_eq!(estimate(cargo, &origin, &target), 25);
         cargo.credits_tenths = 0;
@@ -251,7 +350,7 @@ mod tests {
                 profit_tenths: if system == 6 { 2 } else { 1 },
             })
             .collect::<Vec<_>>();
-        rank(&mut results);
+        rank(&mut results, |result| *result);
         assert_eq!(
             results
                 .iter()

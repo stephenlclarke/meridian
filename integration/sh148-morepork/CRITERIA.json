@@ -1,0 +1,226 @@
+{
+  "hull": "SH148 Morepork",
+  "scope": "Original catalogue inspection and geometry queries",
+  "source": "assets/fleet/sh148/SOURCE-GEOMETRY.json",
+  "frozenSources": "integration/sh148-morepork/FROZEN-SOURCES.json",
+  "sourceScaleMetresPerUnit": "30000/2521",
+  "faces": {
+    "detailed": 2576,
+    "archivedNative": 792,
+    "candidateNative": 512,
+    "candidateMaximum": 512
+  },
+  "originalAccess": {
+    "runtimeCatalogue": {
+      "playerFlyable": false,
+      "normalPurchaseEligible": false,
+      "purchasePolicy": "pendingFabrication"
+    },
+    "r3DesignContract": {
+      "playerFlyable": true,
+      "purchasePolicy": "blueprintFabrication"
+    }
+  },
+  "engineering": {
+    "sourceReference": "finite-intrinsic-empty-morepork",
+    "massKg": 52211
+  },
+  "supportGroups": 116,
+  "candidateComponentInventory": {
+    "originalPartsRepresented": 24,
+    "unalteredNativeParts": 9,
+    "recessedWells": 8,
+    "partsUsingSelectedOriginalVertices": 7,
+    "sampledArcSections": 0,
+    "arcSeamVertices": 0
+  },
+  "minimumRouteClearanceMillimetres": 163,
+  "sourceContactCounts": {
+    "overlap": 21,
+    "unchangedNativeParts": 9
+  },
+  "candidateRebuild": "tools/rebuild_morepork.py",
+  "fitUpperMillimetres": {
+    "detailed": 2785,
+    "archivedNative": 3307,
+    "candidateNative": 4218
+  },
+  "continuousCandidateFitMillimetres": {
+    "archiveToCandidate": {
+      "lowerFloor": 1001,
+      "upperCeiling": 1021
+    },
+    "candidateToArchive": {
+      "lowerFloor": 380,
+      "upperCeiling": 406
+    },
+    "detailedToCandidate": {
+      "lowerFloor": 1509,
+      "upperCeiling": 1529
+    },
+    "candidateToDetailed": {
+      "lowerFloor": 951,
+      "upperCeiling": 970
+    }
+  },
+  "hullStudio": {
+    "definition": "integration/sh148-morepork/MOREPORK-STUDIO.json",
+    "bytes": 427906,
+    "sha256": "57c086404c550dce49649fbef645abc1d75e38c9b23d71ffc41010b10fd9cf50",
+    "supports": 116,
+    "probes": 7,
+    "detail": "2,576 original detailed faces",
+    "native": "512 separate candidate faces",
+    "loaderRevision": "27121e66ba37a29781135b56924a9d6e7f38a70a",
+    "signedInstalledExport": {
+      "status": "PASS",
+      "scope": "Signed installed Studio offline original artwork import/export",
+      "bundleIdentifier": "io.xyzzy.meridian.hullstudio",
+      "bundleVersion": "0.0.0",
+      "codeDirectoryHash": "93938bda9242ebdff508bfb9e16b3cdf83c0a200",
+      "developerIdTeam": "4MEB7MUTAV",
+      "signatureVerification": "deep strict",
+      "definition": {
+        "bytes": 427906,
+        "sha256": "57c086404c550dce49649fbef645abc1d75e38c9b23d71ffc41010b10fd9cf50"
+      },
+      "exportExitStatuses": [
+        0,
+        0
+      ],
+      "exportMatchesDefinitionExceptTrailingLf": true,
+      "valid": true,
+      "diagnostics": [],
+      "detailedTriangles": 2576,
+      "nativeTriangles": 512,
+      "supportGroups": 116,
+      "engineeringReference": "finite-intrinsic-empty-morepork",
+      "massKg": 52211,
+      "receiptFiles": {
+        "morepork.hull.json": {
+          "bytes": 427905,
+          "sha256": "390d62bb00ae5ecb4daf4409014fc121446fbaed1604ce0f6bc6c7eb4d93d452"
+        },
+        "morepork-repeat.hull.json": {
+          "bytes": 427905,
+          "sha256": "390d62bb00ae5ecb4daf4409014fc121446fbaed1604ce0f6bc6c7eb4d93d452"
+        },
+        "studio.stdout.json": {
+          "bytes": 116661,
+          "sha256": "5150d903c5eb86cbbe6bf52104f85b382c0d2cf145cdaf6fac0258b06f3dc1bc"
+        },
+        "studio-repeat.stdout.json": {
+          "bytes": 116661,
+          "sha256": "5150d903c5eb86cbbe6bf52104f85b382c0d2cf145cdaf6fac0258b06f3dc1bc"
+        },
+        "codesign.log": {
+          "bytes": 13038,
+          "sha256": "da4df3ed74af4b6bd7616cf319320347823426b220937e8c71477bba1993e163"
+        },
+        "codesign-identity.log": {
+          "bytes": 988,
+          "sha256": "f6d772f29f9e72421e98a6d7243102b92b77b5995acbe6cda7ddb3bbfc3b1706"
+        }
+      },
+      "artworkProbeResults": [
+        {
+          "name": "dorsal",
+          "passed": true
+        },
+        {
+          "name": "ventral",
+          "passed": true
+        },
+        {
+          "name": "port-outboard",
+          "passed": true
+        },
+        {
+          "name": "starboard-outboard",
+          "passed": true
+        },
+        {
+          "name": "below-port-envelope",
+          "passed": true
+        },
+        {
+          "name": "below-starboard-envelope",
+          "passed": true
+        },
+        {
+          "name": "between-aft-drives",
+          "passed": true
+        }
+      ],
+      "triangleRoles": {
+        "detail": "original detailed visible",
+        "native": "derived native inspection candidate"
+      }
+    }
+  },
+  "byteReplay": {
+    "commands": [
+      "python3 -B tools/prepare_morepork.py --check",
+      "python3 -B tools/rebuild_morepork.py",
+      "python3 -B tools/verify_morepork.py | cmp - integration/sh148-morepork/CONTACT-RESULT.json",
+      "python3 -B tools/measure_morepork.py | cmp - integration/sh148-morepork/SURFACE-FIT.json",
+      "python3 -B tools/measure_morepork.py --fidelity | cmp - integration/sh148-morepork/CANDIDATE-FIDELITY.json",
+      "python3 -B tools/measure_morepork.py --directions | cmp - integration/sh148-morepork/CANDIDATE-FIT-LOCALIZATION.json",
+      "python3 -B tools/measure_morepork.py --reference-directions | cmp - integration/sh148-morepork/REFERENCE-FIT-LOCALIZATION.json"
+    ],
+    "host": "SteveMBA",
+    "startedUtc": "2026-11-25T07:18:00Z",
+    "finishedUtc": "2026-11-25T07:18:34Z",
+    "log": {
+      "bytes": 699,
+      "sha256": "8c605c63ac50cd02a03d250ca91b8a9d37638764adf5245c8f1ad6e49e0c185b"
+    },
+    "fitDependencies": {
+      "python": "3.14.3",
+      "numpy": "2.5.5",
+      "scipy": "1.18.1",
+      "trimesh": "5.2.1",
+      "rtree": "1.4.1"
+    },
+    "originalCommit": "0468d79b04ab6a101784f64ca884e3197a879ff8",
+    "historicalReplayPins": {
+      "tools/measure_banteng_geometry.py": "4b7d8d5d972e30d93bebf7f422be71e415d6e4a9c4b622582ecf6e30a6bb9235",
+      "tools/measure_lanner_geometry.py": "cabbaf17ff7efdbcbee9a1fba67c7edafd59dceb8e97f367824a51c134479992",
+      "tools/verify_eagle_cruiser_geometry.py": "c7926cb6e699ae5ffb445951ce9d4e98a64018a7ecb1db2e5e77a611d742a783"
+    }
+  },
+  "replayPins": {
+    "tools/fleet_hull_measurement.py": "3570747d9f650efc7d0e4f88352e9fd32e42ab394f4669100223fbac0c1be6b7",
+    "tools/directed_hull_fit.py": "dbd5d45e5052453646b752695815d6cb53c6ccb2c3ad6694451a4c7e19fa8bf7",
+    "integration/sh148-morepork/MOREPORK-STUDIO.json": "57c086404c550dce49649fbef645abc1d75e38c9b23d71ffc41010b10fd9cf50",
+    "integration/sh148-morepork/FROZEN-SOURCES.json": "27aa2955cc9c7e0898e9173311c4774954b3b25267de71dcd4f1ac50068f956e",
+    "integration/sh148-morepork/CONTACT-CANDIDATE.json": "0c53d15fedbae339c721de85863f7b41dc1f3e81c0fe8c454b884bd91d6bc155",
+    "integration/sh148-morepork/CONTACT-RESULT.json": "58e878d7683b3d435c20d36f69eea497f028b9bcb686c4a707b630d245874348",
+    "integration/sh148-morepork/ORIGINAL-OWNERSHIP.json": "7c794227681b584af47792f1ef0ef4b813a299272edf74fbb7f4b99749f175ef",
+    "integration/sh148-morepork/RETAINED-OVERLAPS.json": "339cf929c85f1fb3d150d0bc2355b0538237766b36a2980d6412b9a42729633a",
+    "integration/sh148-morepork/CANDIDATE-FIDELITY.json": "56448752ab2f796fb5fb1799e2553ff0a592d1a7791cc8eaa2e2e71ee4d85598",
+    "integration/sh148-morepork/SUPPORT-FAN.json": "b209223090e0ec6f3172f3482519d025c1e6dfc4d1d87f5ca89cc6f8614c97f2",
+    "integration/sh148-morepork/SURFACE-FIT.json": "744a6f86edd86affeda0f48779dc80589d59597a19734259316d2145ef60c35b",
+    "integration/sh148-morepork/ARCHIVED-OVERLAPS.json": "b1a7997b5bf864f1ad1f018649f1902a320459bd1a4d83b4d000a92903f3eadc",
+    "integration/sh148-morepork/CANDIDATE-TOPOLOGY-SURVEY.json": "6c4962d9ca57eea322e305aaa6148f67c2c3d38412020d98b697a81fb5902077",
+    "integration/sh148-morepork/CANDIDATE-FIT-LOCALIZATION.json": "f8c25ed0f752cf7810971d95356f059d46a8ae0679b1def807f10a976458d5b2",
+    "integration/sh148-morepork/REFERENCE-FIT-LOCALIZATION.json": "4c16e16e80643f1ca4277fc579692051ac89df52c97c7dae334fd61a087003a1",
+    "tools/atomic_asset_output.py": "2d13803823645d3bdea7c855af958eb54d7ebe513ec1bcb0af34e82870164bf0",
+    "tools/banteng_art_mesh.py": "ef5c0f538510486238d69dc301da80026fc93326767b38c50a04756ab9890a09",
+    "tools/encode_goshawk_visual.py": "9e524e9a32a237d71d212c8b5c34ecf12cde5a8e08885b1d03991b95c278f61c",
+    "tools/import_goshawk_envelope_source.py": "14b530725629ee3eaa5b3fd69f01fe00fe371564a1a52cb398d3969142db977e",
+    "tools/measure_banteng_geometry.py": "9356864e227302598fcae4e833ecb706b1ed8a5e600cbb4076b7165dc1e54bea",
+    "tools/measure_goshawk_surface_fit.py": "5407ef1e5fad41810aa95444ca1338fe33a91e5c9857dcb752b4e4cf2fca6d0b",
+    "tools/measure_lanner_geometry.py": "55d13a28602e6ed791adecd85ff43f3c8a7fbe118cf0977272e1747422c2408d",
+    "tools/measure_morepork.py": "159670e3067c3e5c42783d18844d85214531fc824690815917187301d191b741",
+    "tools/prepare_eagle_cruiser_geometry.py": "a1ea3b5d72f35e1f2932da71afa3ff8a276a504f7309a1086a2b3df35988addc",
+    "tools/prepare_morepork.py": "34b00aa4091b98594cc68a954779f4a384d18da425247e40cd5c608faf692eef",
+    "tools/verify_eagle_cruiser_geometry.py": "cb053ee5873fee62ee456bb3776e98d29b2cbb44c7344599bc617a8579164d43",
+    "tools/rebuild_morepork.py": "bc61b48750b3f9cb9a4ee97c7619f6c4a990724d69620d2774f5638e5f60bd86",
+    "tools/verify_morepork.py": "8096a147f53e92c2567dbd46e918b0caa9b52cd7253bec0fbe546035af52ceb7",
+    "tools/vulture_mk_i_exact_fit.py": "479b31f8714a198a82c0e2888b8d19efe46c7b4c43a576b83ab84c571ae738c6",
+    "assets/fleet/sh148/GENERATED-COLLISION.json": "a3fd856206412030c87c2efabf37e8c968556bb1b020980a210c3341ac04c72d",
+    "assets/fleet/sh148/SOURCE-GEOMETRY.json": "642e0410dc1387e7a175d48611bf0dcc2bde58c04544b2b8f0a8a2a082a9d36e",
+    "tools/hull_contact_geometry.py": "07606202e6a298ad375a7504991fe6fb93da6a07f9b5cc4a22167bd570b07839"
+  }
+}

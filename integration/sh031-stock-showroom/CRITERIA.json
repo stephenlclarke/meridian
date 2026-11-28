@@ -1,0 +1,32 @@
+{
+  "status": "AUTHORED_SECOND_STOCK_SHOWROOM;OWNED_PORTABLE_AND_METAL_PENDING",
+  "sourceParents": {
+    "sparrowhawkStock": "795b7e85a6992cc024fb937cc3ebe3dd9061344a",
+    "reviewedKiteSource": "5b14e68163d0663cd9ba37ab127702df879642e0"
+  },
+  "identity": {"object": "SH031", "geometryKey": "integration/sh031-kite-interceptor/KITE-INTERCEPTOR-STUDIO.json", "localInspection": "LOCAL:SH031"},
+  "packageSha256": "fb1e1012a7b2fd9903ffb2438e081edeaf16024b50a71d893e46268bfc0d941d",
+  "packageFnv1a64": "9209a322acdaf89d",
+  "peerPackageSha256": "623d68f3936be2bdcbdf632f49a14c6fb65f29a9e214ba8cca5c9f3c680ee2de",
+  "sparrowhawkWindowsSourceCorrection": "310082e80343c1ad753fff916313976552f63fcd",
+  "packageCheckout": {"SH030": "nearest rule text eol=lf", "SH031": "nearest rule text eol=lf; shared root wildcard -text remains for other stock packages", "scope": "Both rules preserve exact published package bytes with core.autocrlf=true; native Windows qualification remains separately owned."},
+  "originalDetailedPackedSha256": "4fcae58eee6b677d8f82754231af7debd871bd22546d90cea649640283c7294e",
+  "detailCorners": 9324,
+  "unmappedFaces": 1216,
+  "supportGroups": 25,
+  "portableTests": [
+    "stock_kite_package_binds_every_original_corner_own_support_group_and_refuses_peer_payloads",
+    "stock_and_explicit_local_kite_remain_independent_and_peer_cache_never_crosses",
+    "selecting_stock_kite_routes_its_original_preview_without_granting_exchange",
+    "ordinary_game_entry_switches_stock_kite_sparrowhawk_and_owned_baseline",
+    "stock_kite_original_fits_actual_minimum_station_showroom_panes",
+    "stock_sparrowhawk_kite_pin_actual_station_compare_in_both_orders_and_duplicates"
+  ],
+  "portableInvocations": ["cargo test --locked -p meridian-desktop kite", "cargo test --locked -p meridian-desktop sparrowhawk", "cargo test --locked -p meridian-core kite_interceptor"],
+  "metal": [
+    {"directoryVariable": "MERIDIAN_SH031_STOCK_SHOWROOM_DIR", "test": "mule_render::showroom::metal_qualification::kite_stock_qualification::metal_stock_kite_normal_showroom", "acceptance": "Actual stock solo and SH025/SH031 front, oblique, upper minimum panes, independent exact direct RGB, own nonblack gutter, exact full-target isolated union and different orientation RGB."},
+    {"directoryVariable": "MERIDIAN_SH030_SH031_STOCK_CACHE_DIR", "test": "mule_render::showroom::metal_qualification::kite_stock_qualification::metal_stock_sparrowhawk_kite_cache_comparison", "acceptance": "Actual pinned SH030/SH031 both orders and two duplicate identities using different renderer-only orientations. Independent reference per pane, exact RGB, own nonblack gutters, compound full-target union and exact distinct solo returns."}
+  ],
+  "metalInvocation": "Set the directory variable to a fresh absolute path and run cargo test --locked -p meridian-desktop <test> -- --ignored --exact --nocapture.",
+  "limits": "No stock mass, purchases, fabrication, World spawn, encounter, shield-shimmer or release acceptance. Original source and earlier Studio run retain their own identity."
+}

@@ -1,0 +1,20 @@
+{
+  "unchangedOtherSupportsUpperMillimetres": {
+    "detailed": 2617,
+    "native": 4321
+  },
+  "ring": {
+    "intactUpperMillimetres": {
+      "detailed": 5000,
+      "native": 4997
+    },
+    "4SpansUpperMillimetres": {
+      "detailed": 4247,
+      "native": 4385
+    },
+    "8SpansUpperMillimetres": {
+      "detailed": 3286,
+      "native": 3476
+    }
+  }
+}

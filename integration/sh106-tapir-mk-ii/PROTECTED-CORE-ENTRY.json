@@ -1,0 +1,12 @@
+{
+  "schema": 1,
+  "id": "sh106-tapir-mk-ii",
+  "undoBefore": [
+    "sh105-tapir-shuttle"
+  ],
+  "undoAfter": [],
+  "kind": "declaration",
+  "module": "tapir_mk_ii",
+  "before": "pub mod tamaraw;\n",
+  "after": "pub mod tapir_shuttle;\n"
+}

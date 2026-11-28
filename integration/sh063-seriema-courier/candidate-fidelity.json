@@ -1,0 +1,241 @@
+{
+  "exactParts": 16,
+  "allParts": 20,
+  "silhouette": {
+    "directionsPerOrthographicView": 16,
+    "againstArchivedNative": {
+      "axisExtremaAbsoluteDeltaMillimetres": [
+        [
+          0,
+          0
+        ],
+        [
+          0,
+          0
+        ],
+        [
+          0,
+          0
+        ]
+      ],
+      "maxSampledSilhouetteOffsetMillimetres": {
+        "xy": 0,
+        "xz": 0,
+        "yz": 0
+      }
+    },
+    "againstDetailed": {
+      "axisExtremaAbsoluteDeltaMillimetres": [
+        [
+          0,
+          0
+        ],
+        [
+          0,
+          0
+        ],
+        [
+          0,
+          0
+        ]
+      ],
+      "maxSampledSilhouetteOffsetMillimetres": {
+        "xy": 48,
+        "xz": 0,
+        "yz": 0
+      }
+    }
+  },
+  "fullUpperMillimetres": {
+    "candidateToArchive": 934,
+    "archiveToCandidate": 900,
+    "candidateToDetailed": 984,
+    "detailedToCandidate": 1235
+  },
+  "archivedOriginalComparisonUpperMillimetres": {
+    "archiveNativeToDetailed": 914,
+    "detailedToArchivedNative": 1234
+  },
+  "parts": [
+    {
+      "partIndex": 0,
+      "name": "body primary pressure envelope",
+      "exactVerticesFacesMaterialsAndUV": false,
+      "boundsMillimetres": {
+        "candidateToArchive": 934,
+        "archiveToCandidate": 900
+      }
+    },
+    {
+      "partIndex": 1,
+      "name": "body primary pressure envelope/service-well-0-0",
+      "exactVerticesFacesMaterialsAndUV": true,
+      "boundsMillimetres": {
+        "candidateToArchive": 0,
+        "archiveToCandidate": 0
+      }
+    },
+    {
+      "partIndex": 2,
+      "name": "body primary pressure envelope/service-well-1-0",
+      "exactVerticesFacesMaterialsAndUV": true,
+      "boundsMillimetres": {
+        "candidateToArchive": 0,
+        "archiveToCandidate": 0
+      }
+    },
+    {
+      "partIndex": 3,
+      "name": "body primary pressure envelope/service-well-2-0",
+      "exactVerticesFacesMaterialsAndUV": true,
+      "boundsMillimetres": {
+        "candidateToArchive": 0,
+        "archiveToCandidate": 0
+      }
+    },
+    {
+      "partIndex": 4,
+      "name": "body primary pressure envelope/service-well-3-0",
+      "exactVerticesFacesMaterialsAndUV": true,
+      "boundsMillimetres": {
+        "candidateToArchive": 0,
+        "archiveToCandidate": 0
+      }
+    },
+    {
+      "partIndex": 5,
+      "name": "vertical blade rail",
+      "exactVerticesFacesMaterialsAndUV": true,
+      "boundsMillimetres": {
+        "candidateToArchive": 0,
+        "archiveToCandidate": 0
+      }
+    },
+    {
+      "partIndex": 6,
+      "name": "cockpit glazing envelope",
+      "exactVerticesFacesMaterialsAndUV": false,
+      "boundsMillimetres": {
+        "candidateToArchive": 707,
+        "archiveToCandidate": 686
+      }
+    },
+    {
+      "partIndex": 7,
+      "name": "cockpit connected structural crossmember",
+      "exactVerticesFacesMaterialsAndUV": true,
+      "boundsMillimetres": {
+        "candidateToArchive": 0,
+        "archiveToCandidate": 0
+      }
+    },
+    {
+      "partIndex": 8,
+      "name": "engine_pair/negative side/connected support",
+      "exactVerticesFacesMaterialsAndUV": true,
+      "boundsMillimetres": {
+        "candidateToArchive": 0,
+        "archiveToCandidate": 0
+      }
+    },
+    {
+      "partIndex": 9,
+      "name": "engine_pair/negative side/propulsion casing",
+      "exactVerticesFacesMaterialsAndUV": true,
+      "boundsMillimetres": {
+        "candidateToArchive": 0,
+        "archiveToCandidate": 0
+      }
+    },
+    {
+      "partIndex": 10,
+      "name": "engine_pair/negative side/propulsion luminous recess",
+      "exactVerticesFacesMaterialsAndUV": false,
+      "boundsMillimetres": {
+        "candidateToArchive": 880,
+        "archiveToCandidate": 880
+      }
+    },
+    {
+      "partIndex": 11,
+      "name": "engine_pair/positive side/connected support",
+      "exactVerticesFacesMaterialsAndUV": true,
+      "boundsMillimetres": {
+        "candidateToArchive": 0,
+        "archiveToCandidate": 0
+      }
+    },
+    {
+      "partIndex": 12,
+      "name": "engine_pair/positive side/propulsion casing",
+      "exactVerticesFacesMaterialsAndUV": true,
+      "boundsMillimetres": {
+        "candidateToArchive": 0,
+        "archiveToCandidate": 0
+      }
+    },
+    {
+      "partIndex": 13,
+      "name": "engine_pair/positive side/propulsion luminous recess",
+      "exactVerticesFacesMaterialsAndUV": false,
+      "boundsMillimetres": {
+        "candidateToArchive": 880,
+        "archiveToCandidate": 880
+      }
+    },
+    {
+      "partIndex": 14,
+      "name": "blade rail transverse support",
+      "exactVerticesFacesMaterialsAndUV": true,
+      "boundsMillimetres": {
+        "candidateToArchive": 0,
+        "archiveToCandidate": 0
+      }
+    },
+    {
+      "partIndex": 15,
+      "name": "blade rail transverse support",
+      "exactVerticesFacesMaterialsAndUV": true,
+      "boundsMillimetres": {
+        "candidateToArchive": 0,
+        "archiveToCandidate": 0
+      }
+    },
+    {
+      "partIndex": 16,
+      "name": "explicit military mount upright",
+      "exactVerticesFacesMaterialsAndUV": true,
+      "boundsMillimetres": {
+        "candidateToArchive": 0,
+        "archiveToCandidate": 0
+      }
+    },
+    {
+      "partIndex": 17,
+      "name": "explicit military mount longitudinal member",
+      "exactVerticesFacesMaterialsAndUV": true,
+      "boundsMillimetres": {
+        "candidateToArchive": 0,
+        "archiveToCandidate": 0
+      }
+    },
+    {
+      "partIndex": 18,
+      "name": "explicit military mount upright",
+      "exactVerticesFacesMaterialsAndUV": true,
+      "boundsMillimetres": {
+        "candidateToArchive": 0,
+        "archiveToCandidate": 0
+      }
+    },
+    {
+      "partIndex": 19,
+      "name": "explicit military mount longitudinal member",
+      "exactVerticesFacesMaterialsAndUV": true,
+      "boundsMillimetres": {
+        "candidateToArchive": 0,
+        "archiveToCandidate": 0
+      }
+    }
+  ]
+}

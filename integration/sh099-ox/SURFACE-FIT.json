@@ -1,0 +1,61 @@
+{
+  "nominalPaddingMetres": 0.02,
+  "minimumRefinementTargetsMillimetres": {
+    "detailed": 2400,
+    "native": 3550
+  },
+  "fullUpperMillimetres": {
+    "detailed": 2392,
+    "native": 3521
+  },
+  "pieces": {
+    "lower freight deck": {
+      "detailed": 1324,
+      "native": 2628
+    },
+    "upper freight deck": {
+      "detailed": 1324,
+      "native": 2628
+    },
+    "port deck brace": {
+      "detailed": 2166,
+      "native": 3052
+    },
+    "starboard deck brace": {
+      "detailed": 2166,
+      "native": 3052
+    },
+    "cockpit glazing": {
+      "detailed": 1820,
+      "native": 1797
+    },
+    "cockpit crossmember": {
+      "detailed": 572,
+      "native": 572
+    },
+    "port drive support": {
+      "detailed": 2061,
+      "native": 3041
+    },
+    "port drive casing": {
+      "detailed": 2392,
+      "native": 3521
+    },
+    "port luminous recess": {
+      "detailed": 2358,
+      "native": 3186
+    },
+    "starboard drive support": {
+      "detailed": 2061,
+      "native": 3041
+    },
+    "starboard drive casing": {
+      "detailed": 2392,
+      "native": 3521
+    },
+    "starboard luminous recess": {
+      "detailed": 2356,
+      "native": 3186
+    }
+  }
+}

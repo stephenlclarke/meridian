@@ -1,0 +1,12 @@
+{
+  "schema": 1,
+  "id": "sh071-griffon",
+  "undoBefore": [
+    "sh070-baza-mk-ii"
+  ],
+  "undoAfter": [],
+  "kind": "declaration",
+  "module": "griffon",
+  "before": "pub mod goshawk_custom;\n",
+  "after": "pub mod harpy_assault;\n"
+}

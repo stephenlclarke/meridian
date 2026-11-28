@@ -1,8 +1,8 @@
 //! Current-format EMP state only. Decode neither purchases hardware nor charges a bank.
 use super::{
     Arc, DockContext, EmpAxis, EmpChargePhase, EmpEquipmentAction, EmpOrigin, EquipmentEvent,
-    INVALID, MAX_EQUIPMENT_EVENTS, MAX_PULSES, Reader, SaveError, State, Writer, meter, runtime,
-    scene,
+    INVALID, MAX_EQUIPMENT_EVENTS, MAX_PULSES, Reader, SalvageHandover, SaveError, State, Writer,
+    meter, runtime, scene,
 };
 use crate::docking::{Basis3, RigidPose, Vec3};
 use crate::traffic::{NpcId, NpcPhase};
@@ -14,11 +14,11 @@ impl State {
             match e.action {
                 EmpEquipmentAction::Purchase => w.u8(0),
                 EmpEquipmentAction::Fit { item } => {
-                    w.u8(1);
+                    w.u8(if e.flight.is_some() { 4 } else { 1 });
                     w.u64(item);
                 }
                 EmpEquipmentAction::Store { item } => {
-                    w.u8(2);
+                    w.u8(if e.flight.is_some() { 5 } else { 2 });
                     w.u64(item);
                 }
                 EmpEquipmentAction::Upgrade { item, axis } => {
@@ -30,6 +30,11 @@ impl State {
                         EmpAxis::Recharge => 2,
                     });
                 }
+            }
+            if let Some(flight) = e.flight {
+                w.u64(flight.cutter);
+                w.u64(flight.visit);
+                w.u64(flight.clock);
             }
             e.dock.encode_save(w);
             w.u64(e.tick);
@@ -83,10 +88,11 @@ impl State {
         let mut equipment = Vec::new();
         for _ in 0..n {
             let secret = r.bool()?;
-            let action = match r.u8()? {
+            let tag = r.u8()?;
+            let action = match tag {
                 0 => EmpEquipmentAction::Purchase,
-                1 => EmpEquipmentAction::Fit { item: r.u64()? },
-                2 => EmpEquipmentAction::Store { item: r.u64()? },
+                1 | 4 => EmpEquipmentAction::Fit { item: r.u64()? },
+                2 | 5 => EmpEquipmentAction::Store { item: r.u64()? },
                 3 => EmpEquipmentAction::Upgrade {
                     item: r.u64()?,
                     axis: match r.u8()? {
@@ -98,12 +104,22 @@ impl State {
                 },
                 _ => return Err(INVALID),
             };
+            let flight = if matches!(tag, 4 | 5) {
+                Some(SalvageHandover {
+                    cutter: r.u64()?,
+                    visit: r.u64()?,
+                    clock: r.u64()?,
+                })
+            } else {
+                None
+            };
             equipment.push(EquipmentEvent {
                 secret,
                 action,
                 dock: DockContext::decode_save(r)?,
                 tick: r.u64()?,
                 revision: r.u64()?,
+                flight,
             });
         }
         let meter_clock = r.u64()?;

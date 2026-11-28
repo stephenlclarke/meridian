@@ -1,5 +1,7 @@
 # Docked preview integration
 
+The development renderer gives the Peregrine lapis and ochre paint, the Mule petrol and turquoise, and the Goshawk family pine green and blued steel. Lion Citadel uses ocean-blue plating and orange-amber docking lights. Preview 10 shows the earlier finishes.
+
 Candidate `e470017` passed independent source review and owning qualification on macOS, Linux and native Windows. Each platform passed 358 top-level Rust tests (229 core and 129 desktop), 74 Python tests, documentation lint, formatting, workspace checks, strict Clippy and a locked release build. This is a qualified candidate, not a published release or full-game acceptance.
 
 Galaxy, system, showroom, trading and equipment screens share semantic keyboard/mouse actions. Only the renderer-confirmed presented frame may supply pointer hit regions. Skipped or stale frames cannot authorize a purchase. Human review modals retain actual dock, wallet, market and equipment facts while allowing ordinary docked time to pass; changed material facts require a fresh review.

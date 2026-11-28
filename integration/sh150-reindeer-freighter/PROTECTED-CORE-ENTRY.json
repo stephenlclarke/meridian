@@ -1,0 +1,12 @@
+{
+  "schema": 1,
+  "id": "sh150-reindeer-freighter",
+  "undoBefore": [
+    "sh149-owlet-mk-ii"
+  ],
+  "undoAfter": [],
+  "kind": "declaration",
+  "module": "reindeer_freighter",
+  "before": "pub mod razorback;\n",
+  "after": "pub mod rhinoceros_trader;\n"
+}

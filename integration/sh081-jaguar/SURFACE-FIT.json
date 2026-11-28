@@ -1,0 +1,149 @@
+{
+  "nominalPaddingMetres": 0.02,
+  "minimumRefinementTargetsMillimetres": {
+    "detailed": 3300,
+    "native": 5100
+  },
+  "fullUpperMillimetres": {
+    "detailed": 2991,
+    "native": 4741
+  },
+  "pieces": {
+    "central-hull": {
+      "detailed": 2565,
+      "native": 4678
+    },
+    "port-lower-arm": {
+      "detailed": 2991,
+      "native": 2991
+    },
+    "port-lower-pod": {
+      "detailed": 1459,
+      "native": 4354
+    },
+    "port-lower-nozzle": {
+      "detailed": 2850,
+      "native": 4741
+    },
+    "port-upper-arm": {
+      "detailed": 1795,
+      "native": 3569
+    },
+    "port-upper-pod": {
+      "detailed": 1459,
+      "native": 4354
+    },
+    "port-upper-nozzle": {
+      "detailed": 2850,
+      "native": 4741
+    },
+    "port-forward-outrigger": {
+      "detailed": 856,
+      "native": 2562
+    },
+    "port-forward-connector": {
+      "detailed": 1973,
+      "native": 1973
+    },
+    "starboard-lower-arm": {
+      "detailed": 1795,
+      "native": 3569
+    },
+    "starboard-lower-pod": {
+      "detailed": 1459,
+      "native": 4354
+    },
+    "starboard-lower-nozzle": {
+      "detailed": 2850,
+      "native": 4741
+    },
+    "starboard-upper-arm": {
+      "detailed": 2991,
+      "native": 2991
+    },
+    "starboard-upper-pod": {
+      "detailed": 1459,
+      "native": 4354
+    },
+    "starboard-upper-nozzle": {
+      "detailed": 2850,
+      "native": 4741
+    },
+    "starboard-forward-outrigger": {
+      "detailed": 891,
+      "native": 2562
+    },
+    "starboard-forward-connector": {
+      "detailed": 1973,
+      "native": 1973
+    },
+    "dorsal-deckhouse": {
+      "detailed": 2521,
+      "native": 3976
+    },
+    "canopy": {
+      "detailed": 632,
+      "native": 1799
+    },
+    "canopy-ridge": {
+      "detailed": 340,
+      "native": 3273
+    },
+    "port-service-pipe": {
+      "detailed": 260,
+      "native": 4329
+    },
+    "port-instrument-housing": {
+      "detailed": 668,
+      "native": 749
+    },
+    "port-louvre-1": {
+      "detailed": 250,
+      "native": 4099
+    },
+    "port-louvre-2": {
+      "detailed": 250,
+      "native": 4238
+    },
+    "port-louvre-3": {
+      "detailed": 250,
+      "native": 4378
+    },
+    "port-louvre-4": {
+      "detailed": 250,
+      "native": 4512
+    },
+    "port-louvre-5": {
+      "detailed": 250,
+      "native": 4606
+    },
+    "starboard-service-pipe": {
+      "detailed": 260,
+      "native": 4329
+    },
+    "starboard-instrument-housing": {
+      "detailed": 668,
+      "native": 1003
+    },
+    "starboard-louvre-1": {
+      "detailed": 250,
+      "native": 4099
+    },
+    "starboard-louvre-2": {
+      "detailed": 250,
+      "native": 4238
+    },
+    "starboard-louvre-3": {
+      "detailed": 250,
+      "native": 4378
+    },
+    "starboard-louvre-4": {
+      "detailed": 250,
+      "native": 4518
+    },
+    "starboard-louvre-5": {
+      "detailed": 250,
+      "native": 4658
+    }
+  }
+}

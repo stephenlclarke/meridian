@@ -190,6 +190,7 @@ fn end_tag(e: MissileEnd) -> u8 {
         MissileEnd::TargetLost => 3,
         MissileEnd::Culled => 4,
         MissileEnd::Intercepted => 5,
+        MissileEnd::Ecm => 6,
     }
 }
 fn read_end(r: &mut Reader<'_>) -> Result<MissileEnd, SaveError> {
@@ -200,6 +201,7 @@ fn read_end(r: &mut Reader<'_>) -> Result<MissileEnd, SaveError> {
         3 => MissileEnd::TargetLost,
         4 => MissileEnd::Culled,
         5 => MissileEnd::Intercepted,
+        6 => MissileEnd::Ecm,
         _ => return Err(SaveError::InvalidEncoding),
     })
 }
@@ -236,21 +238,27 @@ impl State {
     /// reconstruction of every intervening homing trajectory.
     pub(in crate::flight) fn validate_npc_beam_scene(
         &self,
+        ecm: &super::super::ecm::State,
         hit: &crate::traffic::NpcPlayerHit,
     ) -> Result<(), SaveError> {
-        self.validate_retained_beam(super::RetainedBeam {
-            system: hit.attacker.system(),
-            visit: hit.visit,
-            world_tick: hit.world_tick,
-            physical_tick: hit.physical_tick,
-            command_emission: None,
-            ray: hit.source_pose,
-            point: hit.point,
-            bodies: &hit.missiles,
-        })
+        self.validate_retained_beam(
+            ecm,
+            super::RetainedBeam {
+                system: hit.attacker.system(),
+                visit: hit.visit,
+                world_tick: hit.world_tick,
+                physical_tick: hit.physical_tick,
+                command_emission: None,
+                ecm_after_scene: true,
+                ray: hit.source_pose,
+                point: hit.point,
+                bodies: &hit.missiles,
+            },
+        )
     }
     pub(in crate::flight) fn validate_retained_beam(
         &self,
+        ecm: &super::super::ecm::State,
         hit: super::RetainedBeam<'_>,
     ) -> Result<(), SaveError> {
         let expected: Vec<_> = self
@@ -265,6 +273,13 @@ impl State {
                             && hit.command_emission.is_some_and(|e| p.origin.emission < e)))
                     && (p.ended.is_none()
                         || p.last_tick > hit.world_tick
+                        || (p.ended == Some(MissileEnd::Ecm)
+                            && p.last_tick == hit.world_tick
+                            && (hit.ecm_after_scene
+                                || hit.command_emission.is_some_and(|emission| {
+                                    ecm.termination(p.origin.projectile)
+                                        .is_some_and(|end| end.after_emission >= emission)
+                                })))
                         || (p.ended == Some(MissileEnd::Intercepted)
                             && p.last_tick == hit.world_tick
                             && hit
@@ -810,6 +825,14 @@ impl State {
             Some(MissileEnd::Intercepted) => {
                 self.validate_interception(world, Some(lesson), p, i)?
             }
+            Some(MissileEnd::Ecm) => {
+                if p.propulsion_travel >= MISSILE_RANGE
+                    || p.age_ticks >= MISSILE_LIFETIME_TICKS
+                    || world.ecm.termination(p.origin.projectile).is_none()
+                {
+                    return Err(INVALID);
+                }
+            }
         }
 
         Ok(())
@@ -884,7 +907,7 @@ impl State {
         }
         // The only admitted shield damage has all of its bounded missile receipts retained.
         // Check the numeric result; loading never applies these effects to the World.
-        let mut shields = [30_000_u16; 2];
+        let mut shields = super::super::shield::ShieldPools::default();
         {
             let mut hits = self.retained_player_missile_hits(practice, history, dock_sequence);
             hits.sort_by_key(|h| h.incident);
@@ -895,13 +918,8 @@ impl State {
                         return Err(INVALID);
                     }
                     let elapsed = hit.physical_tick - clock;
-                    for shield in &mut shields {
-                        *shield = u64::from(*shield)
-                            .saturating_add(elapsed.saturating_mul(3))
-                            .min(30_000) as u16;
-                    }
-                    let side = usize::from(!front);
-                    shields[side] = shields[side].saturating_sub(16_000);
+                    shields.advance(elapsed);
+                    shields.absorb(front, 16_000);
                     clock = hit.physical_tick;
                 }
             }
@@ -910,18 +928,9 @@ impl State {
                 .physical_tick()
                 .checked_sub(clock)
                 .ok_or(INVALID)?;
-            for shield in &mut shields {
-                *shield = u64::from(*shield)
-                    .saturating_add(elapsed.saturating_mul(3))
-                    .min(30_000) as u16;
-            }
+            shields.advance(elapsed);
         }
-        let condition = world.combat_snapshot().ok_or(INVALID)?.player;
-        if [
-            condition.front_shield_hundredths,
-            condition.rear_shield_hundredths,
-        ] != shields
-        {
+        if world.combat.shields() != shields {
             return Err(INVALID);
         }
 
@@ -1040,7 +1049,7 @@ impl State {
         }
         let player =
             super::super::flight_pose(m.flight.position, m.flight.orientation).ok_or(INVALID)?;
-        let data = world.station_data.as_ref().ok_or(INVALID)?;
+        let data = world.station_at_visit(o.owner.visit).ok_or(INVALID)?;
         let cleared = m.cleared
             || length(sub(m.position, player.position)) > data.player_clearance_radius() + 1e-6;
         let travel = (MISSILE_SPEED / 60.0).min((MISSILE_RANGE - m.travel).max(0.0));
@@ -1164,7 +1173,7 @@ impl State {
         motion_tick: u64,
     ) -> Result<(), SaveError> {
         let o = p.origin;
-        super::super::persistence::validate_flight(&m.flight)?;
+        super::super::persistence::validate_flight(world, &m.flight)?;
         if m.flight.tick != motion_tick
             || m.flight.mode != FlightMode::Flight
             || m.age.checked_add(1) != Some(p.age_ticks)
@@ -1212,6 +1221,9 @@ impl State {
                         .find(|p| Some(p.origin.emission) == other.intercepting_emission)
                         .is_some_and(|p| usize::from(p.origin.projectile.ordinal) >= i)
                 }
+                // All physical motion precedes an accepted manual ECM command
+                // at this same World clock.
+                Some(MissileEnd::Ecm) => true,
                 Some(_) => slot >= i,
             }
         })
@@ -1312,7 +1324,7 @@ impl State {
             if distance != d || shot.end != add(shot.origin, scale(shot.direction, d)) {
                 return Err(INVALID);
             }
-            self.validate_intercepted_bodies(b, p, i, emission, (ray, d, id))?;
+            self.validate_intercepted_bodies(&world.ecm, b, p, i, emission, (ray, d, id))?;
             let station = world
                 .station_data
                 .as_ref()
@@ -1361,6 +1373,7 @@ impl State {
     }
     fn validate_intercepted_bodies(
         &self,
+        ecm: &super::super::ecm::State,
         b: &Beam,
         p: ProjectileSnapshot,
         i: usize,
@@ -1368,17 +1381,23 @@ impl State {
         (ray, d, id): (RigidPose, f64, ProjectileId),
     ) -> Result<(), SaveError> {
         let shot = b.shot;
+        let live_before = |other: ProjectileSnapshot| {
+            other.ended.is_none()
+                || other.last_tick > shot.tick
+                || (other.ended == Some(MissileEnd::Ecm)
+                    && other.last_tick == shot.tick
+                    && ecm
+                        .termination(other.origin.projectile)
+                        .is_some_and(|end| end.after_emission >= emission))
+        };
         for other in self.projectiles.iter().skip(b.bodies.len()).flatten() {
-            if other.origin.emission < emission
-                && (other.ended.is_none() || other.last_tick > shot.tick)
-            {
+            if other.origin.emission < emission && live_before(*other) {
                 return Err(INVALID);
             }
         }
         for (slot, body) in b.bodies.iter().copied().enumerate() {
             let expected = self.projectiles[slot].is_some_and(|other| {
-                other.origin.emission < emission
-                    && (slot == i || other.ended.is_none() || other.last_tick > shot.tick)
+                other.origin.emission < emission && (slot == i || live_before(other))
             });
             if body.is_some() != expected {
                 return Err(INVALID);
@@ -1410,7 +1429,7 @@ impl State {
             || emission <= p.origin.emission
             || shot.tick != p.last_tick
             || world
-                .front_weapon_at_tick(shot.fitted_item_id, shot.tick)
+                .laser_weapon_at_tick(shot.fitted_item_id, shot.tick, emission)
                 .is_none()
             || id != p.origin.projectile
             || !valid_vector(shot.origin)

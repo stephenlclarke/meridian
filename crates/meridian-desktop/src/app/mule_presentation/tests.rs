@@ -74,6 +74,11 @@ fn the_paid_freight_sortie_adds_mule_to_the_existing_camera_and_flight_mesh() {
         panic!("actual G02 load")
     };
     assert_eq!(units.len(), 8);
+    assert!(
+        some(world.unwritten_route_clue_progress())
+            .earned
+            .is_empty()
+    );
     dock_at_renas(&mut world);
 
     let receiver = world.station_contacts()[0];
@@ -105,6 +110,14 @@ fn the_paid_freight_sortie_adds_mule_to_the_existing_camera_and_flight_mesh() {
     ));
     assert_eq!(world.credits_tenths(), cash.map(|value| value + 7300));
     assert_eq!(some(world.mission_snapshot()).freight.held_tonnes, 0);
+    let clues = some(world.unwritten_route_clue_progress());
+    assert_eq!(clues.earned.len(), 1);
+    assert_eq!(clues.earned[0].clue_id, meridian_core::freight::CLUE_ID);
+    let saved = ok(world.save_bytes());
+    assert_eq!(
+        ok(World::from_save_bytes(&saved)).unwritten_route_clue_progress(),
+        Some(clues)
+    );
     assert!(world.mule_actor_snapshot().is_none());
     start_flight(&mut world);
     let snapshot = world.snapshot();
@@ -123,11 +136,12 @@ fn the_paid_freight_sortie_adds_mule_to_the_existing_camera_and_flight_mesh() {
         pose: some(snapshot.station),
         port: some(world.station_port()),
         docked: false,
+        medusa_preview: false,
     };
     let camera = ok(mesh::scene_camera_pose(&snapshot, station));
     let scene = ok(placement.for_camera(|| mesh::scene_camera_pose(&snapshot, station)));
     assert_eq!(scene.observer, camera);
-    assert_ne!(scene.observer.position.z as f32, snapshot.position[2]);
+    assert_eq!(scene.observer, mesh::player_pose(&snapshot));
     assert_eq!(scene.actor.id, frame.actor().id);
     assert!(std::ptr::eq(scene.envelope, frame.presentation().as_ref()));
 
@@ -146,13 +160,14 @@ fn the_paid_freight_sortie_adds_mule_to_the_existing_camera_and_flight_mesh() {
         placement.internal_observer(),
         &mut with_mule,
     ));
-    assert_eq!(ordinary.len(), ship.len() + station_vertices.len());
+    assert_eq!(ordinary.len(), station_vertices.len());
     if let Some(traffic) = world.traffic_snapshot() {
         ok(mesh::traffic::append(
             &snapshot,
             station,
             &ship,
             &traffic,
+            meridian_core::FlightView::Front,
             &mut ordinary,
         ));
         ok(mesh::traffic::append(
@@ -160,6 +175,7 @@ fn the_paid_freight_sortie_adds_mule_to_the_existing_camera_and_flight_mesh() {
             station,
             &ship,
             &traffic,
+            meridian_core::FlightView::Front,
             &mut with_mule,
         ));
     }
@@ -206,6 +222,7 @@ fn isolated_frame_keeps_its_world_owned_observer_and_rejects_stale_publications(
         pose: some(snapshot.station),
         port: some(world.station_port()),
         docked: false,
+        medusa_preview: false,
     };
     let mut frame_vertices = Vec::new();
     ok(mesh::frame_vertices_for_observer(

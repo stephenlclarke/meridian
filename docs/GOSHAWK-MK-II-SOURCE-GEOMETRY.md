@@ -108,7 +108,7 @@ python3 -B tools/encode_goshawk_mk2_visual.py --check
 python3 -B -m unittest discover -s tools -p 'test_encode_goshawk*visual.py' -v
 ```
 
-The focused Python parity and mutation tests inspect all ordered records against the original TOML and check that source, winding, texture, geometry and packed-output mutations are refused. The Rust loader regressions are authored for designated compiler execution. No native SH009 Showroom observation follows from the source checks.
+The focused Python parity and mutation tests inspect all ordered records against the original TOML and check that source, winding, texture, geometry and packed-output mutations are refused. The earlier Mac qualification at `342b666` exercised the Mk II and Custom in both pane orders, duplicate panes and the return to solo. The source checks above cover the encoded records. The current integration also needs its own compiler and renderer checks.
 
 ## Joined SH009 and SH010 renderer review
 
