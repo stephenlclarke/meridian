@@ -802,13 +802,20 @@ fn showroom(s: &DockedScreens, c: &Context<'_>, f: &mut Frame) {
         );
     }
     if rows.is_empty() {
-        label(f, "No matching hull", list.x, list.y, Ink::Orange, list);
+        label(
+            f,
+            "No matching catalogue object",
+            list.x,
+            list.y,
+            Ink::Orange,
+            list,
+        );
         return;
     }
     let Some(ship) = selected.and_then(|i| rows.get(i)) else {
         label(
             f,
-            "Select a matching hull",
+            "Select a matching catalogue object",
             details.x,
             details.y,
             Ink::Orange,
@@ -875,7 +882,7 @@ fn showroom(s: &DockedScreens, c: &Context<'_>, f: &mut Frame) {
         enabled,
         offer
             .and_then(|o| o.refusal)
-            .or(Some("This ship is not available for exchange")),
+            .or(Some("This catalogue entry is unavailable for exchange")),
     );
 }
 fn showroom_controls(s: &DockedScreens, f: &mut Frame, details: Rect) {
@@ -990,6 +997,11 @@ fn showroom_specifications(
             "Cryostasis capsule. Inspection only.".into(),
             "Dry mass: 248 kg".into(),
             "Unavailable for purchase.".into(),
+        ]
+    } else if ship.kind != "ship" {
+        vec![
+            format!("Catalogue type: {}", ship.kind),
+            "Inspection only. Unavailable for purchase.".into(),
         ]
     } else {
         vec![

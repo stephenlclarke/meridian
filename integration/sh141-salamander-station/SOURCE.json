@@ -1,0 +1,35 @@
+{
+  "id": "SH141",
+  "name": "Salamander Station",
+  "kind": "station",
+  "revision": "0d8cc9ebe0018bf74b0d9fa10ef23b70339dd6b0",
+  "inputs": {
+    "resource.toml": {
+      "source": "Sources/L337Core/Resources/Ships/SH141.toml",
+      "sha256": "893cafd891d3c8889b725b313a7a1c878bfede0f8b86abfb24b7afee2e1a9384",
+      "bytes": 856358
+    },
+    "native-export.json": {
+      "source": "Sources/L337Core/Resources/OriginalFleetShowroomModels/SH141.json",
+      "sha256": "3b24d93ddf21865dadc1290402cd22443f046d609ebe0323664a8a2df8a6313e",
+      "bytes": 36082
+    },
+    "contract.toml": {
+      "source": "docs/fleet-design-v2/ships/SH141.toml",
+      "sha256": "968c0e6f99c1076f5d675e40d407e92383a4af5f45e8de05fecde80a8e4d4728",
+      "bytes": 1706
+    },
+    "LICENSE": {
+      "source": "LICENSE",
+      "sha256": "033b7058d73f22c3c6b8a5825eb866ca2d67088f3ee94dd5f3e46da59d624766",
+      "bytes": 1071
+    }
+  },
+  "nativeRegistrationMatches": false,
+  "geometryHashMatches": true,
+  "selectedNativeFaces": 416,
+  "archivedNativeFaces": 392,
+  "detailedFaces": 6252,
+  "originalScale": 1,
+  "finiteDrySourceFiles": []
+}

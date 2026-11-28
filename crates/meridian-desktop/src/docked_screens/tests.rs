@@ -205,7 +205,7 @@ fn exact_catalogue_taxonomy_is_162_ships_not_171_ships() {
     assert_eq!(c.worlds.len(), 2048);
     assert_eq!(c.objects.len(), 171);
     assert_eq!(c.ship_count(), 162);
-    assert_eq!(c.search_showroom("").len(), 163);
+    assert_eq!(c.search_showroom("").len(), 164);
     assert_eq!(c.object("SH028").map(|o| o.kind), Some("station"));
     assert_eq!(c.object("SH025").map(|o| o.name), Some("Peregrine Mk V"));
     assert!(c.search_showroom("SH028").is_empty());
@@ -545,6 +545,60 @@ fn model_previews_require_real_asset_handles_and_share_the_same_orientation() {
     ctx.models = &[];
     assert!(ui.frame(&ctx, view()).models.is_empty());
 }
+fn assert_inspection_only_catalogue_object(id: &str, name: &str, kind: &str, geometry_key: &str) {
+    let catalogue = catalogue();
+    let world = world();
+    let offers = [ShipExchange {
+        object: id,
+        purchase_tenths: 1,
+        trade_in_tenths: 0,
+        refusal: None,
+    }];
+    let mut ctx = context(&world, &catalogue);
+    ctx.models = &crate::authored_hull::STOCK_MODELS;
+    ctx.exchanges = &offers;
+    let policy = catalogue
+        .object(id)
+        .map(|row| (row.kind, row.player_flyable, row.purchase_policy));
+    assert_eq!(policy, Some((kind, false, "never")));
+    for query in [id, name] {
+        let mut ui = DockedScreens::new(SystemId::AVENOR, "SH025");
+        ui.open(Screen::Showroom);
+        key(&mut ui, &ctx, Key::Search);
+        let before = ui.frame(&ctx, view());
+        ui.handle(Input::Text(query.into()), &before, &ctx);
+        let frame = ui.frame(&ctx, view());
+        assert_eq!(ui.selected_ship(), id);
+        assert!(
+            frame
+                .models
+                .iter()
+                .any(|model| model.object == id && model.geometry_key == geometry_key)
+        );
+        assert!(
+            frame
+                .hits
+                .iter()
+                .any(|hit| hit.control == Control::Key(Key::Exchange) && !hit.enabled)
+        );
+        key(&mut ui, &ctx, Key::Confirm);
+        assert!(matches!(
+            key(&mut ui, &ctx, Key::Exchange),
+            Outcome::Refused(_)
+        ));
+    }
+}
+
+#[test]
+fn salamander_station_showroom_inspection_preserves_catalogue_kind_and_refuses_exchange() {
+    assert_inspection_only_catalogue_object(
+        "SH141",
+        "Salamander Station",
+        "station",
+        "integration/sh141-salamander-station/SALAMANDER-STUDIO.json",
+    );
+}
+
 #[test]
 fn newt_capsule_is_searchable_and_its_never_purchase_policy_refuses_an_offer() {
     let catalogue = catalogue();

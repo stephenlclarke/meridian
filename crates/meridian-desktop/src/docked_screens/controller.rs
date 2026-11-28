@@ -872,7 +872,7 @@ impl DockedScreens {
             .iter()
             .any(|o| o.id == self.ship)
         {
-            return Outcome::Refused("Select a visible matching ship".into());
+            return Outcome::Refused("Select a visible catalogue entry".into());
         }
         let Some(offer) = c.exchange_offer(&self.ship) else {
             return Outcome::Refused("No admitted ship exchange offer for this hull".into());
