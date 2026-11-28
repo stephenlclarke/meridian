@@ -1,0 +1,40 @@
+{
+  "id": "SH161",
+  "name": "Wolf Citadel",
+  "kind": "station",
+  "revision": "0d8cc9ebe0018bf74b0d9fa10ef23b70339dd6b0",
+  "inputs": {
+    "resource.toml": {
+      "source": "Sources/L337Core/Resources/Ships/SH161.toml",
+      "sha256": "7bf1de5fb1589f47a9ef65433f854e0645c97433f0e7cbe025d96851db813821",
+      "bytes": 334768
+    },
+    "native-export.json": {
+      "source": "Sources/L337Core/Resources/OriginalFleetShowroomModels/SH161.json",
+      "sha256": "66cc5050335c43554bd7a9ee6d40a776d532e4782d7bb3396a47b267644cf0e1",
+      "bytes": 87407
+    },
+    "contract.toml": {
+      "source": "docs/fleet-design-v2/ships/SH161.toml",
+      "sha256": "354edb2f79b3b82e39dda176b9b68a6407172467547381e0a873665cb9d5e53b",
+      "bytes": 1603
+    },
+    "engineering.json": {
+      "source": "Sources/L337Core/Resources/OriginalFleetPhysical/SH161.json",
+      "sha256": "0fb430800bed13bcbefe00e37ea0d1b4d94b5178bb8a6749d0f226ffca61a870",
+      "bytes": 71772
+    },
+    "LICENSE": {
+      "source": "LICENSE",
+      "sha256": "033b7058d73f22c3c6b8a5825eb866ca2d67088f3ee94dd5f3e46da59d624766",
+      "bytes": 1071
+    }
+  },
+  "nativeRegistrationMatches": true,
+  "geometryHashMatches": true,
+  "selectedNativeFaces": 788,
+  "archivedNativeFaces": 788,
+  "detailedFaces": 2052,
+  "originalScale": 44.5573229960344,
+  "finiteDrySourceFiles": []
+}
