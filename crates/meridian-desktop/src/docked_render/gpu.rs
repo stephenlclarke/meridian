@@ -7,13 +7,19 @@ use crate::{
 };
 use std::sync::Arc;
 
-fn reusable_slot(
-    cached: impl Iterator<Item = showroom::Hull>,
-    active: &[Option<usize>; MAX_MODELS],
-    hull: showroom::Hull,
-) -> Option<usize> {
-    cached.enumerate().find_map(|(index, candidate)| {
-        (candidate == hull && !active.contains(&Some(index))).then_some(index)
+/// Move each matching pass into its requested pane only once. Unrequested passes are
+/// released before new GPU resources are allocated for this frame.
+fn retain_visible<T>(
+    mut previous: [Option<T>; MAX_MODELS],
+    requested: [Option<showroom::Hull>; MAX_MODELS],
+    hull: impl Fn(&T) -> showroom::Hull,
+) -> [Option<T>; MAX_MODELS] {
+    requested.map(|wanted| {
+        let wanted = wanted?;
+        previous
+            .iter_mut()
+            .find(|slot| slot.as_ref().is_some_and(|pass| hull(pass) == wanted))?
+            .take()
     })
 }
 
@@ -30,8 +36,7 @@ pub struct Pass {
     authored: Arc<AuthoredHulls>,
     srgb: bool,
     format: wgpu::TextureFormat,
-    goshawk: Vec<showroom::Pass>,
-    goshawk_active: [Option<usize>; MAX_MODELS],
+    goshawk: [Option<showroom::Pass>; MAX_MODELS],
     authored_passes: Vec<showroom::AuthoredPass>,
     authored_count: usize,
 }
@@ -213,8 +218,7 @@ impl Pass {
             authored,
             srgb: format.is_srgb(),
             format,
-            goshawk: Vec::with_capacity(showroom::Hull::COUNT * MAX_MODELS),
-            goshawk_active: [None; MAX_MODELS],
+            goshawk: Default::default(),
             authored_passes: Vec::new(),
             authored_count: 0,
         })
@@ -228,24 +232,31 @@ impl Pass {
         physical_size: [u32; 2],
         planet_system: Option<meridian_core::navigation::SystemId>,
     ) -> Result<(), String> {
-        self.goshawk_active.fill(None);
         if (frame.viewport.width - logical_size[0]).abs() > 0.01
             || (frame.viewport.height - logical_size[1]).abs() > 0.01
         {
+            self.goshawk = Default::default();
             return Err("docked frame viewport no longer matches the window".into());
         }
-        self.frame.compose_with_authored(
+        if let Err(reason) = self.frame.compose_with_authored(
             frame,
             &self.model,
             self.srgb,
             planet_system,
             &self.authored,
-        )?;
+        ) {
+            self.goshawk = Default::default();
+            return Err(reason);
+        }
         queue.write_buffer(&self.shapes, 0, bytemuck::cast_slice(&self.frame.shapes));
         queue.write_buffer(&self.text, 0, bytemuck::cast_slice(&self.frame.text));
         queue.write_buffer(&self.models, 0, bytemuck::cast_slice(&self.frame.models));
         self.prepare_goshawk(device, queue, frame, logical_size, physical_size)?;
-        self.prepare_authored(device, queue, frame, logical_size, physical_size)
+        let result = self.prepare_authored(device, queue, frame, logical_size, physical_size);
+        if result.is_err() {
+            self.goshawk = Default::default();
+        }
+        result
     }
 
     fn prepare_authored(
@@ -296,7 +307,8 @@ impl Pass {
         logical_size: [f64; 2],
         physical_size: [u32; 2],
     ) -> Result<(), String> {
-        let mut active = [None; MAX_MODELS];
+        let previous = std::mem::take(&mut self.goshawk);
+        let mut requests = [None; MAX_MODELS];
         let scale = std::array::from_fn(|axis| f64::from(physical_size[axis]) / logical_size[axis]);
         for preview in &frame.models {
             let Some(hull) = showroom::hull(preview) else {
@@ -305,34 +317,28 @@ impl Pass {
             let Some(bounds) = intersection(preview.bounds, frame.viewport.canvas()) else {
                 continue;
             };
-            let active_slot = active
-                .iter()
-                .position(Option::is_none)
+            let request = requests
+                .iter_mut()
+                .find(|request| request.is_none())
                 .ok_or("Too many original Showroom preview panes")?;
-            let cache_slot =
-                match reusable_slot(self.goshawk.iter().map(showroom::Pass::hull), &active, hull) {
-                    Some(index) => index,
-                    None => {
-                        if self.goshawk.len() >= showroom::Hull::COUNT * MAX_MODELS {
-                            return Err(
-                                "Original Showroom pass cache exceeded its hull/pane bound".into(),
-                            );
-                        }
-                        let index = self.goshawk.len();
-                        self.goshawk.push(showroom::Pass::for_hull(
-                            device,
-                            queue,
-                            self.format,
-                            hull,
-                        )?);
-                        index
-                    }
-                };
-            self.goshawk[cache_slot].prepare(queue, preview, bounds, scale, self.srgb)?;
-            active[active_slot] = Some(cache_slot);
+            *request = Some((hull, preview, bounds));
         }
-        // Draw only the panes selected and prepared for this frame.
-        self.goshawk_active = active;
+        let requested = requests
+            .each_ref()
+            .map(|request| request.map(|(hull, _, _)| hull));
+        let mut passes = retain_visible(previous, requested, showroom::Pass::hull);
+        for (request, slot) in requests.into_iter().zip(&mut passes) {
+            let Some((hull, preview, bounds)) = request else {
+                continue;
+            };
+            if slot.is_none() {
+                *slot = Some(showroom::Pass::for_hull(device, queue, self.format, hull)?);
+            }
+            let pass = slot.as_mut().ok_or("Missing original Showroom pane pass")?;
+            pass.prepare(queue, preview, bounds, scale, self.srgb)?;
+        }
+        // Each active pane has its own uniform buffer. No inactive hull pass survives.
+        self.goshawk = passes;
         Ok(())
     }
     /// The caller supplies a black-cleared colour target and fresh depth attachment for models.
@@ -340,8 +346,8 @@ impl Pass {
         pass.set_pipeline(&self.model_pipeline);
         pass.set_vertex_buffer(0, self.models.slice(..));
         pass.draw(0..self.frame.models.len() as u32, 0..1);
-        for index in self.goshawk_active.into_iter().flatten() {
-            self.goshawk[index].draw(pass);
+        for preview in self.goshawk.iter().flatten() {
+            preview.draw(pass);
         }
         for preview in &self.authored_passes[..self.authored_count] {
             preview.draw(pass);
@@ -356,51 +362,80 @@ impl Pass {
         pass.set_vertex_buffer(0, self.text.slice(..));
         pass.draw(0..self.frame.text.len() as u32, 0..1);
     }
+
+    #[cfg(test)]
+    pub(crate) fn retained_original_hulls(&self) -> [Option<showroom::Hull>; MAX_MODELS] {
+        self.goshawk
+            .each_ref()
+            .map(|slot| slot.as_ref().map(showroom::Pass::hull))
+    }
 }
 
 #[cfg(test)]
 mod tests {
-    use super::{MAX_MODELS, reusable_slot, showroom};
+    use super::{MAX_MODELS, retain_visible, showroom};
     use showroom::Hull::{Custom, Explorer, Medusa, Mk2, PeregrineMkI, PeregrineMkIII};
+    use std::{cell::Cell, rc::Rc};
+
+    struct Pane {
+        hull: showroom::Hull,
+        id: usize,
+        live: Rc<Cell<usize>>,
+    }
+
+    impl Drop for Pane {
+        fn drop(&mut self) {
+            self.live.set(self.live.get() - 1);
+        }
+    }
 
     #[test]
     fn original_showroom_cache_reuses_only_the_same_hull_and_unused_pane() {
-        let mut cached = Vec::new();
-        let mut frame = |hulls: &[showroom::Hull]| {
-            let mut active = [None; MAX_MODELS];
-            for (slot, hull) in hulls.iter().copied().enumerate() {
-                let index =
-                    reusable_slot(cached.iter().copied(), &active, hull).unwrap_or_else(|| {
-                        cached.push(hull);
-                        cached.len() - 1
-                    });
-                active[slot] = Some(index);
+        let live = Rc::new(Cell::new(0));
+        let mut cached: [Option<Pane>; MAX_MODELS] = Default::default();
+        let mut next_id = 0;
+        let mut frame = |requested: [Option<showroom::Hull>; MAX_MODELS]| {
+            let mut panes =
+                retain_visible(std::mem::take(&mut cached), requested, |pane| pane.hull);
+            for (wanted, slot) in requested.into_iter().zip(&mut panes) {
+                if let Some(hull) = wanted {
+                    if slot.is_none() {
+                        // Even during replacement, old inactive passes have already dropped.
+                        assert!(live.get() < MAX_MODELS);
+                        live.set(live.get() + 1);
+                        *slot = Some(Pane {
+                            hull,
+                            id: next_id,
+                            live: Rc::clone(&live),
+                        });
+                        next_id += 1;
+                    }
+                    assert_eq!(slot.as_ref().map(|pane| pane.hull), Some(hull));
+                } else {
+                    assert!(slot.is_none());
+                }
             }
-            active
+            assert_eq!(live.get(), requested.iter().flatten().count());
+            cached = panes;
+            cached
+                .each_ref()
+                .map(|slot| slot.as_ref().map(|pane| pane.id))
         };
-        assert_eq!(frame(&[Explorer]), [Some(0), None]);
-        assert_eq!(frame(&[Mk2]), [Some(1), None]);
-        assert_eq!(frame(&[Explorer]), [Some(0), None]);
-        assert_eq!(frame(&[Explorer, Mk2]), [Some(0), Some(1)]);
-        assert_eq!(frame(&[Mk2, Explorer]), [Some(1), Some(0)]);
-        assert_eq!(frame(&[Mk2, Mk2]), [Some(1), Some(2)]);
-        assert_eq!(frame(&[Explorer, Explorer]), [Some(0), Some(3)]);
-        assert_eq!(frame(&[Custom, Mk2]), [Some(4), Some(1)]);
-        assert_eq!(frame(&[Mk2, Custom]), [Some(1), Some(4)]);
-        assert_eq!(frame(&[Custom, Custom]), [Some(4), Some(5)]);
-        assert_eq!(frame(&[Explorer, Custom]), [Some(0), Some(4)]);
-        assert_eq!(frame(&[Custom, Explorer]), [Some(4), Some(0)]);
-        assert_eq!(frame(&[]), [None, None]);
-        for (offset, hull) in [Medusa, PeregrineMkI, PeregrineMkIII]
-            .into_iter()
-            .enumerate()
-        {
-            assert_eq!(
-                frame(&[hull, hull]),
-                [Some(6 + offset * 2), Some(7 + offset * 2)]
-            );
+        assert_eq!(frame([Some(Explorer), None]), [Some(0), None]);
+        assert_eq!(frame([Some(Mk2), None]), [Some(1), None]);
+        assert_eq!(frame([Some(Explorer), None]), [Some(2), None]);
+        assert_eq!(frame([Some(Explorer), Some(Mk2)]), [Some(2), Some(3)]);
+        assert_eq!(frame([Some(Mk2), Some(Explorer)]), [Some(3), Some(2)]);
+        assert_eq!(frame([Some(Mk2), Some(Mk2)]), [Some(3), Some(4)]);
+        assert_eq!(frame([Some(Explorer), Some(Explorer)]), [Some(5), Some(6)]);
+        assert_eq!(frame([Some(Custom), Some(Mk2)]), [Some(7), Some(8)]);
+        assert_eq!(frame([Some(Mk2), Some(Custom)]), [Some(8), Some(7)]);
+        assert_eq!(frame([Some(Custom), Some(Custom)]), [Some(7), Some(9)]);
+        for hull in [Medusa, PeregrineMkI, PeregrineMkIII] {
+            let duplicate = frame([Some(hull), Some(hull)]);
+            assert_ne!(duplicate[0], duplicate[1]);
         }
-        assert_eq!(frame(&[Mk2]), [Some(1), None]);
-        assert_eq!(cached.len(), showroom::Hull::COUNT * MAX_MODELS);
+        assert_eq!(frame([None, None]), [None, None]);
+        assert_eq!(live.get(), 0);
     }
 }

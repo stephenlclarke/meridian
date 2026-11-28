@@ -111,8 +111,6 @@ fn shader(piece_count: usize) -> String {
 }
 
 impl Hull {
-    pub(crate) const COUNT: usize = 6;
-
     fn visual(self) -> Result<Vec<VisualVertex>, &'static str> {
         match self {
             Self::Explorer => visual_assets::load(GEOMETRY_KEY),

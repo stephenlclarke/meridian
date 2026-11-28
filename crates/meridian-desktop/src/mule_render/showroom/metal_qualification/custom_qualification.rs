@@ -81,6 +81,19 @@ impl<'a> Capture<'a> {
             size,
             None,
         ));
+        assert_eq!(
+            self.docked
+                .retained_original_hulls()
+                .into_iter()
+                .flatten()
+                .collect::<Vec<_>>(),
+            frame
+                .models
+                .iter()
+                .filter_map(showroom::hull)
+                .collect::<Vec<_>>(),
+            "retain only the original passes for this visible capture"
+        );
         let rgb = self.crop.capture(self.gpu, self.target, |render| {
             self.docked.draw_models(render)
         });
