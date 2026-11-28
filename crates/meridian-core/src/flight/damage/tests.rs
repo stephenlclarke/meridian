@@ -155,7 +155,7 @@ fn rear_damage_and_true_berth_reset_are_exact_with_retained_weapon_cooldown() {
     assert_eq!(actual.shields.amounts(), [30000; 2]);
     let mut expected = ok(PulseResources::default().prepare_discharge());
     expected.replay_advance(1);
-    expected.replay_berth();
+    expected.replay_berth(crate::ENERGY_CAPACITY_HUNDREDTHS);
     assert_eq!(actual.pulse, expected);
     assert!(actual.pulse.prepare_discharge().is_err());
 }

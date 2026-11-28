@@ -31,7 +31,7 @@ impl World {
     pub fn equipment_snapshot(&self) -> Option<Snapshot> {
         let account = self.commander_account.as_ref()?;
         let projection = self.reserved_service_projection().ok()?;
-        let definition = equipment::definition().ok()?;
+        let definition = account.equipment_definition().ok()?;
         let site = self
             .current_dock_context()
             .and_then(|dock| super::services::service_site(dock.system()));

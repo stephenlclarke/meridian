@@ -2,6 +2,9 @@
 use crate::docked_screens::Screen;
 use meridian_core::unwritten_route::ClueProgress;
 
+pub(crate) const FLIGHT_STATUS: &str = "Flight status";
+pub(crate) const FLIGHT_CONTROLS: &str = "Flight controls";
+
 pub const MAX_LINES: usize = 18;
 pub const MAX_COLUMNS: usize = 78;
 pub const MAX_VERTICES: usize = 6 + MAX_LINES * MAX_COLUMNS * 35 * 6;
@@ -86,7 +89,7 @@ impl Panel {
             &[
                 "C Continue current save | N New commander",
                 "N again confirms a replacement | Escape Quit",
-                "F11 Fullscreen",
+                "Ctrl+Enter Fullscreen",
             ],
         )
     }
@@ -96,13 +99,16 @@ impl Panel {
             "Commander details",
             &[
                 "Shift+J Clue Journal",
-                "F5 Save | F9 Reload | F11 Fullscreen | Escape Save/Quit",
+                "Ctrl+S Save | Ctrl+R Reload | Ctrl+Enter Fullscreen | Escape Save/Quit",
             ],
         );
         if has_berth {
             panel
                 .lines
                 .insert(0, "L Launch | 0 Commander details".into());
+            panel.lines.push(
+                "Shift+1/2 Lesson review/cancel | Shift+3/4/5 Gunnery review/receive/close".into(),
+            );
             panel.lines.insert(
                 1,
                 "1 Galaxy | 2 System | 3 Showroom | 4 Market | 5 Equipment".into(),
@@ -113,22 +119,66 @@ impl Panel {
         panel
     }
 
+    pub fn flight_facing(
+        weapon: Option<&str>,
+        review: Option<&str>,
+        facing: meridian_core::FlightView,
+    ) -> Self {
+        let mut panel = Self::flight(weapon, review);
+        if facing != meridian_core::FlightView::Front {
+            let mount = crate::flight_lesson::view_name(facing);
+            panel.lines[1] = weapon.map_or_else(
+                || format!("Z: no laser fitted to {mount}"),
+                |name| format!("Z Fire {mount} {name}"),
+            );
+        }
+        panel
+    }
+    pub(crate) fn flight_status(
+        world: &meridian_core::World,
+        last_notice: Option<&str>,
+        placement: crate::hud::cockpit::notice::Placement,
+    ) -> Self {
+        let mut panel = Self::new(FLIGHT_STATUS, &[]);
+        panel.footer = "N Change notice position | Escape / H Close";
+        panel
+            .lines
+            .push(format!("Notice position: {}", placement.name()));
+        let last = last_notice.map(|message| format!("Last notice: {message}"));
+        for line in last
+            .into_iter()
+            .chain(crate::session::Session::flight_status(world))
+        {
+            let mut row = String::new();
+            for word in line.split_whitespace() {
+                if row.len() + 1 + word.len() > MAX_COLUMNS {
+                    panel.lines.push(std::mem::take(&mut row));
+                }
+                if !row.is_empty() {
+                    row.push(' ');
+                }
+                row.push_str(word);
+            }
+            panel.lines.push(row);
+        }
+        panel
+    }
     pub fn flight(weapon: Option<&str>, review: Option<&str>) -> Self {
         let mut panel = Self::new(
-            "Flight controls",
+            FLIGHT_CONTROLS,
             &[
                 "W/S Accelerate/slow | Space Brake to zero | Arrows Pitch | A/D Yaw | Q/E Roll",
                 "N Start or cancel auto-docking | 0 Front | 1 Rear | 2 Left | 3 Right view",
-                "T Lock selected ship for missiles | F1 Next missile target | F2 Arm / safe",
-                "F3 Launch missile | F4 Safe/clear target | K E.C.M. (22 energy)",
-                "J Jump | Shift+J Clue Journal | P Pause / resume",
-                "F6 Flight lesson | F12 Cancel | C Lesson details | F7 Close run | F8 Reception",
+                "T Lock selected ship for missiles | 8 Next missile target | 9 Arm / safe",
+                "= Launch missile | - Safe/clear target | K E.C.M. (22 energy)",
+                "J Jump | Shift+J Clue Journal | P Pause | Shift+4 Reception | Shift+5 Close",
+                "Shift+1 Flight lesson | Shift+2 Cancel | C Lesson details",
                 "Tab Next scanner target (no core: mark) | F Manual/assist | Delete Release",
                 "Basic aligns | Advanced approaches | Docking+nav docks | Specialists auto-work",
                 "I Mission details | Shift+I Target details | Occupied: Enter/Escape",
                 "Hold U 10 seconds: EMP | Release U cancels unfinished charge",
-                "F10 Practice review at Avenor | 4 Trade review | 5 Plan | 6 Cancel | 7 Details",
-                "F5 Save | F9 Reload | F11 Fullscreen | Escape Save/Quit",
+                "Shift+3 Gunnery review | 4 Trade review | 5 Plan | 6 Cancel | 7 Details",
+                "Ctrl+S Save | Ctrl+R Reload | Ctrl+Enter Fullscreen | Escape Save/Quit",
             ],
         );
         panel.lines.insert(
@@ -144,6 +194,7 @@ impl Panel {
                 },
             ),
         );
+        panel.footer = "I Flight status | Escape / H / ? Close help";
         panel.review(review, "After help: B cancels; Escape saves and quits");
         // The host app appends the audio control; reserve that row as well as title/footer.
         if panel.lines.len() < MAX_LINES - 3 {
@@ -158,14 +209,14 @@ impl Panel {
         let mut panel = Self::new(
             "Station controls",
             &[
-                "L Launch | F Buy fuel",
+                "L Launch | F Buy fuel | P Pause",
                 "T Select crew | R Review interaction | I Mission details",
                 "V Review deliveries | X Review abandonment",
                 "Enter Confirm review | B Cancel review",
-                "F6 Flight lesson | F12 Cancel | C Lesson details",
-                "F7 Close practice | F8 Reception | F10 Practice review",
+                "Shift+1 Flight lesson | Shift+2 Cancel | C Lesson details",
+                "Shift+5 Close practice | Shift+4 Reception | Shift+3 Practice review",
                 "6 Cancel trade lesson | 7 Trade lesson details",
-                "F5 Save | F9 Reload | P Pause | F11 Fullscreen | Escape Save/Quit",
+                "Ctrl+S Save | Ctrl+R Reload | Ctrl+Enter Fullscreen | Escape Save/Quit",
             ],
         );
         panel.navigation();
@@ -219,7 +270,7 @@ impl Panel {
             Screen::Equipment => (
                 "Equipment",
                 &[
-                    "] Next slot | Up / Down Select owned item or offer",
+                    "] Next slot or laser mount | Up / Down Select owned item or offer",
                     "G / Enter Review purchase | Y Review fit | U Review store",
                     "D Details | O Options",
                     "EMP slot: G reviews base/grade; Y fits; U stores; no free charge",
@@ -396,6 +447,19 @@ mod tests {
                 .iter()
                 .any(|line| line.contains("exchange is unavailable"))
         );
+    }
+
+    #[test]
+    fn flight_help_names_the_laser_on_the_selected_mount() {
+        use meridian_core::FlightView;
+        for (weapon, expected) in [
+            (Some("Beam Laser"), "Z Fire LEFT Beam Laser"),
+            (Some("Naval Laser"), "Z Fire LEFT Naval Laser"),
+            (None, "Z: no laser fitted to LEFT"),
+        ] {
+            let panel = Panel::flight_facing(weapon, None, FlightView::Left);
+            assert_eq!(panel.lines[1], expected);
+        }
     }
 
     #[test]

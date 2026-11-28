@@ -1,7 +1,6 @@
 //! Exact cargo and shared fitting chronology after the first explicit four-tank test fit.
 use super::{
-    CommanderAccount, DockContext, INVALID, Ledger, ModuleSlot, Reader, SaveError, State, World,
-    Writer,
+    CommanderAccount, DockContext, INVALID, ModuleSlot, Reader, SaveError, State, World, Writer,
 };
 use crate::flight::{AccountEffect, AccountEvent, emp};
 
@@ -203,7 +202,7 @@ impl State {
             let Some(cargo) = self.cargo_fit_at(revision) else {
                 continue;
             };
-            let mut ledger = Ledger::born(owner)?;
+            let mut ledger = self.born_ledger(owner)?;
             let mut counters = [0; 2];
             for event in self
                 .events

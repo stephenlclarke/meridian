@@ -7,6 +7,9 @@ const READY: &str = "Occupied: confirm cut";
 
 /// Only the current World can establish a selected disabled actor at the accepted work hold.
 pub(super) fn ready_target(world: &World) -> Option<NpcId> {
+    if world.selected_laser_view() != meridian_core::FlightView::Front {
+        return None;
+    }
     if world.automatic_work_status() == Some(READY) {
         world.selected_disabled_salvage_target()
     } else {
@@ -286,8 +289,8 @@ mod tests {
             KeyCode::KeyH,
             KeyCode::Tab,
             KeyCode::Delete,
-            KeyCode::F5,
-            KeyCode::F9,
+            KeyCode::KeyS,
+            KeyCode::KeyR,
         ] {
             assert_eq!(choice(key, false), Choice::Consumed);
             assert_eq!(choice(key, true), Choice::Consumed);
@@ -350,8 +353,8 @@ mod tests {
             KeyCode::KeyP,
             KeyCode::KeyH,
             KeyCode::Tab,
-            KeyCode::F5,
-            KeyCode::F9,
+            KeyCode::KeyS,
+            KeyCode::KeyR,
         ] {
             assert_eq!(press(&mut app, key, false), None);
             assert!(app.keys.is_empty());

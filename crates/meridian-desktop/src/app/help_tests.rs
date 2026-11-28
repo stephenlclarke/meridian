@@ -108,8 +108,8 @@ fn every_station_help_retains_its_screen_selection_and_all_navigation_bindings()
             KeyCode::KeyX,
             KeyCode::Digit1,
             KeyCode::Tab,
-            KeyCode::F5,
-            KeyCode::F9,
+            KeyCode::KeyS,
+            KeyCode::KeyR,
             KeyCode::KeyP,
             KeyCode::KeyL,
         ] {
@@ -180,6 +180,12 @@ fn question_help_preserves_literal_h_search_through_focus_and_occlusion() {
     app.menu_input(ui::Input::Key(ui::Key::Search));
     // Text routing follows current controller state even before its next paint.
     assert_eq!(press(&mut app, KeyCode::KeyH, Some("h")), None);
+    // A composing keyboard can report a physical key before it supplies printable text.
+    app.modifiers = winit::keyboard::ModifiersState::SHIFT;
+    assert_eq!(press(&mut app, KeyCode::Digit3, None), None);
+    assert_eq!(press(&mut app, KeyCode::Digit3, Some("#")), None);
+    assert!(app.game.session.help_review().is_none());
+    app.modifiers = winit::keyboard::ModifiersState::empty();
     let search = paint(&mut app);
     assert!(search.search_active);
     assert!(app.help.is_none());
@@ -271,12 +277,18 @@ fn flight_help_lists_the_computer_keys_and_consumes_them_while_open() {
     press(&mut app, KeyCode::Escape, None);
     app.game_key(KeyCode::KeyN);
     assert!(app.game.world.auto_docking_active());
-    assert!(
-        app.game
-            .lines(true, None)
-            .iter()
-            .any(|line| line.contains("AUTO DOCK"))
-    );
+    assert!(app.game.lines(true, None).is_empty());
+    let saved = ok(app.game.world.save_bytes());
+    press(&mut app, KeyCode::KeyH, Some("h"));
+    press(&mut app, KeyCode::KeyI, Some("i"));
+    let panel = app
+        .help
+        .as_ref()
+        .unwrap_or_else(|| panic!("missing flight status"));
+    assert_eq!(panel.title, "Flight status");
+    assert!(panel.lines.iter().any(|line| line.contains("AUTO DOCK")));
+    press(&mut app, KeyCode::Escape, None);
+    assert_eq!(ok(app.game.world.save_bytes()), saved);
     app.game_key(KeyCode::KeyN);
     assert!(!app.game.world.auto_docking_active());
     app.game_key(KeyCode::KeyN);
@@ -295,7 +307,7 @@ fn title_help_intercepts_new_continue_quit_and_repeated_toggle_without_a_profile
     assert!(!app.game.playing());
     press(&mut app, KeyCode::KeyH, Some("h"));
     let title = app.help.clone();
-    for code in [KeyCode::KeyN, KeyCode::KeyC, KeyCode::Enter, KeyCode::F5] {
+    for code in [KeyCode::KeyN, KeyCode::KeyC, KeyCode::Enter, KeyCode::KeyS] {
         assert_eq!(press(&mut app, code, None), None);
     }
     assert_eq!(
@@ -357,5 +369,125 @@ fn session_review_help_uses_b_cancel_and_escape_first_only_dismisses_help() {
     );
     app.game_key(KeyCode::KeyB);
     assert!(app.game.session.pending_trade.is_none());
+    assert_eq!(ok(app.game.world.save_bytes()), before);
+}
+
+#[test]
+fn training_shortcuts_open_the_same_review_from_commander_and_station() {
+    use winit::keyboard::ModifiersState;
+    for (digit, action) in [
+        (KeyCode::Digit1, Action::ReviewFlightLesson),
+        (KeyCode::Digit2, Action::CancelFlightLesson),
+        (KeyCode::Digit3, Action::ReviewPractice),
+        (KeyCode::Digit4, Action::ReviewPracticeReception),
+        (KeyCode::Digit5, Action::ReviewPracticeClosure),
+    ] {
+        let expected_dir = TestDirectory::new();
+        let mut expected = app(&expected_dir);
+        let message = expected.game.command(action).unwrap_or_else(|error| error);
+        for from_commander in [true, false] {
+            let dir = TestDirectory::new();
+            let mut app = app(&dir);
+            station(&mut app, ui::Screen::System);
+            if from_commander {
+                app.show_station_commander();
+                assert!(app.commander_open);
+            }
+            app.modifiers = ModifiersState::SHIFT;
+            assert_eq!(press(&mut app, digit, None), None);
+            assert!(!app.commander_open && !app.menu_active());
+            assert_eq!(app.notice.text.as_deref(), Some(message.as_str()));
+            assert_eq!(
+                app.game.session.help_review(),
+                expected.game.session.help_review()
+            );
+            assert!(!dir.0.join("commander.meridian").exists());
+        }
+    }
+}
+
+#[test]
+fn control_shortcuts_preserve_modal_enter_and_use_the_correct_save_slot() {
+    use winit::keyboard::ModifiersState;
+    let dir = TestDirectory::new();
+    let mut ordinary = app(&dir);
+    let fleet = dir.0.join("commander.meridian");
+    press(&mut ordinary, KeyCode::KeyH, None);
+    ordinary.modifiers = ModifiersState::CONTROL;
+    for code in [KeyCode::KeyS, KeyCode::KeyR, KeyCode::Enter] {
+        assert_eq!(press(&mut ordinary, code, None), None);
+        assert!(ordinary.help.is_some());
+    }
+    assert!(!fleet.exists());
+    ordinary.modifiers = ModifiersState::empty();
+    press(&mut ordinary, KeyCode::Escape, None);
+    assert!(ordinary.help.is_none());
+    ordinary.modifiers = ModifiersState::CONTROL;
+    assert_eq!(press(&mut ordinary, KeyCode::KeyS, Some("s")), None);
+    assert!(!ordinary.keys.contains(&KeyCode::KeyS));
+    let saved = ok(std::fs::read(&fleet));
+    let opening = ordinary.game.world.snapshot();
+    ordinary.game_key(KeyCode::KeyL);
+    ordinary
+        .game
+        .world
+        .step(FlightInput::default())
+        .unwrap_or_else(|e| panic!("{e:?}"));
+    assert_ne!(ordinary.game.world.snapshot(), opening);
+    assert_eq!(press(&mut ordinary, KeyCode::KeyR, Some("r")), None);
+    assert_eq!(ordinary.game.world.snapshot(), opening);
+    let mut preview = App::with_profile(ok(crate::profile::Profile::open_medusa_preview(
+        dir.0.clone(),
+    )));
+    preview.modifiers = ModifiersState::CONTROL;
+    assert_eq!(press(&mut preview, KeyCode::KeyS, None), None);
+    assert!(!preview.keys.contains(&KeyCode::KeyS));
+    let prior = preview.game.world.snapshot();
+    assert!(dir.0.join("medusa-preview.meridian").is_file());
+    ok(preview.game.world.request_launch(prior.tick));
+    ok(preview.game.world.step(FlightInput::default()));
+    assert_eq!(press(&mut preview, KeyCode::KeyR, None), None);
+    assert_eq!(preview.game.world.snapshot(), prior);
+    assert_eq!(ok(std::fs::read(fleet)), saved);
+}
+
+#[test]
+fn flight_status_cycles_notice_positions_and_keeps_the_last_launch_notice() {
+    use crate::hud::cockpit::notice::Placement;
+    let directory = TestDirectory::new();
+    let mut app = app(&directory);
+    let launch = ok(app.game.command(Action::Launch));
+    app.notice.set(launch.clone());
+    ok(app.game.world.step(FlightInput::default()));
+    let before = ok(app.game.world.save_bytes());
+    let prepared = ok(app.prepare_presentation(true, None, 0., |_| None));
+    assert_eq!(prepared.hud_lines.as_slice(), std::slice::from_ref(&launch));
+    let deadline = app
+        .notice
+        .expires
+        .unwrap_or_else(|| panic!("timed launch feedback"));
+    assert!(app.expire_hud_notice(deadline));
+    press(&mut app, KeyCode::KeyH, Some("h"));
+    press(&mut app, KeyCode::KeyI, Some("i"));
+    for expected in [
+        Placement::Instruments,
+        Placement::UpperLeft,
+        Placement::UpperRight,
+        Placement::StatusOnly,
+        Placement::Instruments,
+    ] {
+        assert_eq!(app.notice_placement, expected);
+        let panel = app.help.as_ref().unwrap_or_else(|| panic!("status card"));
+        assert!(
+            panel
+                .lines
+                .iter()
+                .any(|line| line == &format!("Notice position: {}", expected.name()))
+        );
+        assert!(panel.lines.iter().any(|line| line.contains(&launch)));
+        assert!(panel.footer.contains("N Change notice position"));
+        press(&mut app, KeyCode::KeyN, Some("n"));
+    }
+    press(&mut app, KeyCode::Escape, None);
     assert_eq!(ok(app.game.world.save_bytes()), before);
 }

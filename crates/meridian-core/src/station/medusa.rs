@@ -16,7 +16,9 @@ impl OriginalStationData {
         }
         let pieces = load_supports(SUPPORTS)?;
         hull.radius = hull.radius.max(rounded_maximum_origin_radius(&pieces));
-        Self::from_pinned_parts(STATION_BYTES, hull, PORT_BYTES, Some(pieces))
+        let mut data = Self::from_pinned_parts(STATION_BYTES, hull, PORT_BYTES, Some(pieces))?;
+        data.npc_geometry = Some(Box::new(Self::bundled()?));
+        Ok(data)
     }
 
     /// The same rounded pieces used by the authenticated SH028 launch and entry checks.
