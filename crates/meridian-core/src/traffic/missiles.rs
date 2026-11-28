@@ -26,9 +26,9 @@ pub(crate) struct MissileScene {
     pub(crate) bodies: Vec<NpcBody>,
 }
 impl MissileScene {
-    pub(crate) fn player_motion_clear(&self, before: Vec3, after: Vec3, radius: f64) -> bool {
+    pub(crate) fn player_motion_clear(&self, before: Vec3, after: Vec3, clearance: f64) -> bool {
         self.bodies.iter().all(|body| {
-            super::segment_distance(before, after, body.pose.position) > radius * 2.0 + 1.0
+            super::segment_distance(before, after, body.pose.position) > clearance + 1.0
         })
     }
     pub(crate) fn target(&self, id: NpcId) -> Option<NpcBody> {
@@ -47,7 +47,8 @@ impl MissileScene {
         self.bodies
             .iter()
             .filter_map(|b| {
-                data.player_beam_distance(b.pose, origin, direction, range)
+                data.npc_geometry()
+                    .player_beam_distance(b.pose, origin, direction, range)
                     .ok()
                     .flatten()
                     .map(|distance| TrafficContact {
@@ -213,6 +214,7 @@ impl State {
         world_tick: u64,
         data: &OriginalStationData,
     ) -> Result<(), SaveError> {
+        let data = data.npc_geometry();
         let si = system_index(s.system).ok_or(INVALID)?;
         if s.world_tick > world_tick
             || s.local_tick > self.clocks[si]

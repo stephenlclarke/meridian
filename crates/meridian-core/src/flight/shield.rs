@@ -141,11 +141,21 @@ impl ShieldPools {
     }
 
     pub(super) fn advance(&mut self, ticks: u64) {
+        self.advance_for_hull(0, ticks, false);
+    }
+
+    pub(super) fn advance_for_hull(&mut self, start: u64, ticks: u64, medusa: bool) {
+        // 2.1 shield units per second is 3.5 hundredths per 60 Hz tick.
+        let gain = if medusa {
+            ticks
+                .saturating_mul(3)
+                .saturating_add(ticks / 2 + (start % 2) * (ticks % 2))
+        } else {
+            ticks.saturating_mul(RECHARGE_HUNDREDTHS_PER_TICK)
+        };
         let capacity = u64::from(self.capacity());
         for bank in &mut self.banks {
-            *bank = u64::from(*bank)
-                .saturating_add(ticks.saturating_mul(RECHARGE_HUNDREDTHS_PER_TICK))
-                .min(capacity) as u32;
+            *bank = u64::from(*bank).saturating_add(gain).min(capacity) as u32;
         }
     }
 

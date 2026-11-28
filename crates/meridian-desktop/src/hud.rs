@@ -111,10 +111,24 @@ pub fn vertices_with_cockpit(
     if width == 0 || height == 0 {
         return;
     }
+    if let Some(c) = cockpit
+        && let Some(placement) = c.notice_placement
+        && lines.len() <= 1
+    {
+        cockpit::append(c, width, height, output);
+        if let Some(message) = lines.first() {
+            placement.draw(message, width, height, output);
+        }
+        return;
+    }
     let size = [width as f32, height as f32];
     let scale = text_scale(width);
     let bottom = if cockpit.is_some() && width >= 320 && height >= 240 {
-        cockpit::Layout::new(width, height).top
+        if cockpit.is_some_and(|c| c.flight.mode != meridian_core::FlightMode::Docked) {
+            cockpit::flight_height(width, height)
+        } else {
+            cockpit::Layout::new(width, height).top
+        }
     } else {
         size[1]
     };

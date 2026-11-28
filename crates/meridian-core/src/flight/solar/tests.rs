@@ -615,7 +615,11 @@ fn genuine_planet_refusal_replays_attempted_input_and_rejects_forged_clear_stop_
     )
     .unwrap();
     let hull = world.station_data.as_ref().unwrap().player_radius();
-    let attempted = last.opening.frame.advance(Motion::Active(input)).unwrap();
+    let attempted = last
+        .opening
+        .frame
+        .advance(Motion::Active(input), crate::PlayerHullKind::Peregrine)
+        .unwrap();
     assert!(
         scene
             .planet
@@ -678,7 +682,11 @@ fn genuine_planet_refusal_replays_attempted_input_and_rejects_forged_clear_stop_
         run.opening.tick,
     )
     .unwrap();
-    let attempted = run.opening.frame.advance(Motion::Active(input)).unwrap();
+    let attempted = run
+        .opening
+        .frame
+        .advance(Motion::Active(input), crate::PlayerHullKind::Peregrine)
+        .unwrap();
     assert!(!clear_scene.blocks_motion(run.opening.frame.position, attempted.position, hull));
     let fake = Motion::Stopped {
         input,
@@ -863,7 +871,9 @@ fn historic_mule_active_crossing_refuses_but_genuine_legacy_overlap_escape_remai
             orientation,
             speed: super::super::MAX_SPEED,
         };
-        let attempted = frame.advance(Motion::Active(input)).unwrap();
+        let attempted = frame
+            .advance(Motion::Active(input), crate::PlayerHullKind::Peregrine)
+            .unwrap();
         let before = crate::station::flight_pose(frame.position, frame.orientation).unwrap();
         let after = crate::station::flight_pose(attempted.position, attempted.orientation).unwrap();
         if !data.crosses_aperture(before, after)

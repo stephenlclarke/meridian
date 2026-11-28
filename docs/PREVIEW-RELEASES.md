@@ -2,9 +2,18 @@
 
 ## Fleet, Medusa and Hull Studio
 
-Extract the complete platform archive. The Fleet game opens on Commander Details. Press **3** to inspect the 115 ships in its Showroom. To fly SH171, use **Meridian Medusa Preview.app** or **Launch Medusa Preview.cmd**. Press **L** to launch, **W/S** to change throttle, **Space** to brake and **F5** to save. Medusa has its own commander profile.
+Preview 12 (`v0.12.0-preview.1`) was published on 28 November 2026 from protected main `83ceae733d6e4f9cffc81c517fabb3eb7b39fba8`. Download the ZIP for your platform and extract the whole archive. The release includes `SHA256SUMS.txt` and `preview.json`. [Preview 12 downloads and release notes](https://github.com/stephenlclarke/meridian/releases/tag/v0.12.0-preview.1)
 
-On Apple silicon, Fleet and Medusa require macOS 14 or later. Hull Studio requires macOS 27 or later because of the native libraries in its bundled Python runtime. The Windows x64 game executables are unsigned and require the Microsoft Visual C++ x64 runtime. On the Dell, both launchers saved and reopened their separate profiles and Hull Studio exported its reference package. Interactive Windows rendering remains unverified. [Published archives and release notes](https://github.com/stephenlclarke/meridian/releases)
+| Platform | Start Fleet | Start the standalone Medusa | Start Hull Studio |
+| --- | --- | --- | --- |
+| Apple silicon | Meridian Fleet Preview.app | Meridian Medusa Preview.app | Meridian Hull Studio.app |
+| Windows x64 | Launch Meridian.cmd | Launch Medusa Preview.cmd | Launch Hull Studio.cmd |
+
+In **Fleet**, press **3** at a berth to inspect the 115 Showroom models. To fly the fully fitted Medusa in your Fleet save, press **Ctrl+Shift+X**, choose **Activate / refit SH171 Medusa**, and press **Enter** twice to review and confirm. Close the menu and press **L** to launch. The standalone Medusa launcher opens a separate profile. **Ctrl+S** saves and **Ctrl+R** reloads. [Keyboard controls](../README.md#controls)
+
+**macOS.** Fleet and Medusa require macOS 14 or later. Hull Studio requires macOS 27 or later. All three extracted apps passed Developer ID signature, notarisation ticket and Gatekeeper checks. Both games started and exited normally on Metal. Hull Studio validated and exported its reference package and displayed a native Showroom frame.
+
+**Windows.** The unsigned executables require the Microsoft Visual C++ x64 Redistributable. On the locked Dell, both launchers saved and reopened their separate profiles. Hull Studio passed offline export and headless Help checks. The game windows stayed in graphics initialisation. Interactive gameplay, Fleet refit, in-game Continue and the Studio Showroom frame remain unverified on Windows. [Runtime download](https://learn.microsoft.com/en-us/cpp/windows/latest-supported-vc-redist/) · [Validation record](IMPLEMENTATION-STATUS.md#published-preview-12)
 
 ## Scanner Preview 11
 
@@ -72,7 +81,7 @@ After owner packaging, independent review, qualification and verified retained n
 
 ### Preview 12 publication gate
 
-The planned tag `v0.12.0-preview.1` alone selects the multi-app policy. Scanner Preview 11 and other managed previews retain the existing single-app publication check. Preview 12 requires the fixed wrapper `Meridian Preview 12/` on both platforms.
+The published tag `v0.12.0-preview.1` alone selects the multi-app policy. Scanner Preview 11 and other managed previews retain the existing single-app publication check. Preview 12 requires the fixed wrapper `Meridian Preview 12/` on both platforms.
 
 The Mac archive contains exactly three separate top-level apps: `Meridian Fleet Preview.app`, `Meridian Medusa Preview.app` and `Meridian Hull Studio.app`. Studio contains one nested `Contents/Helpers/Meridian Hull Showroom.app`. The publisher checks each bundle's exact identifier, executable, hardened Developer ID signature and source binding. The actual native executable and Studio runtime Mach-O headers must identify thin arm64 code. Each of the three top-level apps must have a separate accepted notarization submission, validated staple and accepted Gatekeeper assessment. The nested Showroom must pass its own strict signature and remain inside the signed, notarized Studio bundle. All three game copies retain the full current source notice set; the publisher independently derives every current source notice path and byte pin from immutable Git blobs for the selected protected commit.
 

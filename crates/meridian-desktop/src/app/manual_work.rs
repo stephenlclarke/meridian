@@ -2,12 +2,36 @@
 use super::{App, asteroid_render};
 use meridian_core::{equipment::WorkTargetId, mining::MiningError};
 
+/// The same Z binding drives held fire, one-shot work and the cockpit sight.
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub(crate) enum FlightTrigger {
+    MountedLaser,
+    Manual(WorkTargetId),
+    OccupiedReview,
+}
+
+impl FlightTrigger {
+    pub(crate) fn current(world: &meridian_core::World) -> Self {
+        if world.selected_laser_view() == meridian_core::FlightView::Front {
+            if world.pilot_operates_selected_tool()
+                && let Some(target) = world.selected_work_target()
+            {
+                return Self::Manual(target.id);
+            }
+            if super::occupied_cut::ready_target(world).is_some() {
+                return Self::OccupiedReview;
+            }
+        }
+        Self::MountedLaser
+    }
+}
+
 impl App {
     pub(super) fn use_manual_tool(&mut self) -> bool {
         let world = &mut self.game.world;
-        if !world.pilot_operates_selected_tool() {
+        let FlightTrigger::Manual(work) = FlightTrigger::current(world) else {
             return false;
-        }
+        };
         if let Some(target) = world.selected_disabled_salvage_target() {
             let result = world.review_occupied_cut(target, world.snapshot().tick);
             match result {
@@ -18,10 +42,7 @@ impl App {
                 Err(err) => self.notice.set(err.to_string()),
             }
         } else {
-            let Some(work) = world.selected_work_target() else {
-                return false;
-            };
-            let message = match work.id {
+            let message = match work {
                 WorkTargetId::Wreck(_) => world.request_manual_wreck_recovery(),
                 WorkTargetId::Ore(_) => match world.request_manual_ore_collection() {
                     Ok(()) => "Ore collected",

@@ -346,7 +346,7 @@ impl Session {
             Action::FlightLessonDetails => {
                 self.invalidate();
                 self.show_flight_lesson = true;
-                Ok("Flight lesson details. F6 reviews; F12 reviews cancellation.".into())
+                Ok("Flight lesson details. Shift+1 reviews; Shift+2 reviews cancellation.".into())
             }
             Action::ToggleAutoDocking => world
                 .toggle_auto_docking()
@@ -645,8 +645,32 @@ impl Session {
         }
     }
 
-    fn flight_alerts(world: &World, notice: Option<&str>) -> Vec<String> {
-        let mut lines: Vec<String> = notice.into_iter().map(str::to_owned).collect();
+    pub(crate) fn flight_status(world: &World) -> Vec<String> {
+        let mut lines = vec![format!(
+            "{} VIEW | SPEED {:.1}",
+            crate::flight_lesson::view_name(world.flight_view()),
+            world.snapshot().speed
+        )];
+        let flight = world.snapshot();
+        if let Some(nav) = flight.navigation {
+            let credits = world.credits_tenths().unwrap_or_default();
+            lines.push(format!(
+                "FUEL {:.1}/{:.1} | CREDITS {}.{} CR | TICK {}",
+                f32::from(nav.fuel_units) / 10.,
+                f32::from(nav.fuel_capacity_units) / 10.,
+                credits / 10,
+                credits % 10,
+                flight.tick
+            ));
+        }
+        let mount = crate::flight_lesson::view_name(world.selected_laser_view());
+        lines.push(world.selected_laser_snapshot().map_or_else(
+            || format!("{mount} LASER MOUNT EMPTY"),
+            |fit| format!("{mount} {} LASER", fit.weapon.label()),
+        ));
+        if let Some(work) = world.automatic_work_status() {
+            lines.push(format!("AUTOMATIC WORK | {work}"));
+        }
         if let Some(phase) = world.auto_docking_status() {
             lines.push(format!("AUTO DOCK | {phase} | N Cancel"));
         }
@@ -662,6 +686,28 @@ impl Session {
                 "JUMP COUNTDOWN: {:.1} SECONDS",
                 travel.remaining_ticks as f32 / 60.0
             ));
+        }
+        if let Some(state) = world.xyzzy_snapshot().filter(|state| state.active) {
+            lines.push(format!(
+                "CLARKE | XYZZY | FUEL {}",
+                if state.unlimited_fuel {
+                    "UNLIMITED"
+                } else {
+                    "NORMAL"
+                }
+            ));
+        }
+        if let Some(emp) = crate::docked_screens::emp::status(world) {
+            lines.push(emp);
+        }
+        if world.manual_scanner_target() {
+            lines.push("MANUAL TARGET | F ASSIST".into());
+        }
+        if let Some(belt) = world.mining_belt_snapshot() {
+            match crate::asteroid_render::hud_line(world.snapshot(), &belt, None) {
+                Ok(Some(line)) | Err(line) => lines.push(line),
+                Ok(None) => {}
+            }
         }
         lines
     }
@@ -725,11 +771,12 @@ impl Session {
         }
         if snapshot.mode == FlightMode::Flight
             && snapshot.navigation.is_some_and(|nav| nav.travel.is_none())
-            && let Some(laser) = world.front_laser_snapshot()
+            && let Some(laser) = world.selected_laser_snapshot()
             && let Some(resources) = world.flight_resources_snapshot()
         {
             lines.push(format!(
-                "Z FIRE FRONT {} | ENERGY {}.{:02} | HEAT {}.{} | COOLDOWN {} TICKS",
+                "Z FIRE {} {} | ENERGY {}.{:02} | HEAT {}.{} | COOLDOWN {} TICKS",
+                crate::flight_lesson::view_name(world.selected_laser_view()),
                 laser.weapon.label(),
                 resources.energy_hundredths / 100,
                 resources.energy_hundredths % 100,
@@ -768,11 +815,7 @@ impl Session {
     pub fn lines(&self, world: &World, active: bool, notice: Option<&str>) -> Vec<String> {
         let snapshot = world.snapshot();
         if !self.hud_panel_open() {
-            match snapshot.mode {
-                FlightMode::Docked => return notice.into_iter().map(str::to_owned).collect(),
-                FlightMode::Flight => return Self::flight_alerts(world, notice),
-                FlightMode::Launching => {}
-            }
+            return notice.into_iter().map(str::to_owned).collect();
         }
         let name = snapshot
             .navigation
@@ -877,17 +920,17 @@ fn append_missile_panel(world: &World, mode: FlightMode, lines: &mut Vec<String>
 fn practice_terms(selection: PracticeSelection) -> &'static str {
     match selection {
         PracticeSelection::Consent(_) => {
-            "Hit the three uncrewed beacons with the fitted front Pulse Laser. Stop firing for three uninterrupted seconds in flight, then dock at Avenor and review reception with F8. No fee or cash reward."
+            "Hit the three uncrewed beacons with the fitted front Pulse Laser. Stop firing for three uninterrupted seconds in flight, then dock at Avenor and review reception with Shift+4. No fee or cash reward."
         }
         PracticeSelection::Reception(_) => {
             "Confirm reception at the Avenor main berth. The first Safe Gunnery Family Trace stays recorded once. No cash reward."
         }
         PracticeSelection::Closure(review) => match review.outcome() {
             PracticeOutcome::Failed => {
-                "Close this failed attempt. Its ordinary hit and all weapon history stay recorded. No reward, refund or ammunition refill. F10 can review a fresh attempt after closure. B cancels."
+                "Close this failed attempt. Its ordinary hit and all weapon history stay recorded. No reward, refund or ammunition refill. Shift+3 can review a fresh attempt after closure. B cancels."
             }
             _ => {
-                "Abandon this incomplete attempt. Its history stays recorded. No reward, refund or ammunition refill. F10 can review a fresh attempt after closure. B cancels."
+                "Abandon this incomplete attempt. Its history stays recorded. No reward, refund or ammunition refill. Shift+3 can review a fresh attempt after closure. B cancels."
             }
         },
     }
@@ -909,21 +952,21 @@ fn practice_line(world: &World) -> Option<String> {
             PracticeOutcome::Abandoned => "ABANDONED",
         };
         let next = if world.review_practice(snapshot.tick).is_ok() {
-            "F10 REVIEW NEW ATTEMPT"
+            "Shift+3 REVIEW NEW ATTEMPT"
         } else {
             "NEW REVIEW REQUIRES AVAILABLE AVENOR OFFER"
         };
         format!("PRACTICE {result} | {next}")
     } else {
         let close = if world.review_practice_closure(snapshot.tick).is_ok() {
-            " | F7 REVIEW CLOSURE"
+            " | Shift+5 REVIEW CLOSURE"
         } else {
             ""
         };
         let state = match practice.status {
             PracticeStatus::Unaccepted => {
                 if world.review_practice(snapshot.tick).is_ok() {
-                    "F10 REVIEW AVENOR PRACTICE".into()
+                    "Shift+3 REVIEW AVENOR PRACTICE".into()
                 } else {
                     "PRACTICE REVIEW REQUIRES AVENOR BERTH".into()
                 }
@@ -944,7 +987,7 @@ fn practice_line(world: &World) -> Option<String> {
             },
             PracticeStatus::Retired => {
                 if world.review_practice_reception(snapshot.tick).is_ok() {
-                    "F8 REVIEW PRACTICE RECEPTION".into()
+                    "Shift+4 REVIEW PRACTICE RECEPTION".into()
                 } else if reception.is_some_and(|state| state.ready) {
                     "DOCK AT AVENOR FOR PRACTICE RECEPTION".into()
                 } else {
@@ -1044,7 +1087,7 @@ fn missile_command(world: &mut World, action: Action) -> Result<String, String> 
             world
                 .request_fire_missile(tick)
                 .map_err(|e| e.to_string())?;
-            Ok("Missile launched; F5 saves the owned round and projectile state".into())
+            Ok("Missile launched; Ctrl+S saves the owned round and projectile state".into())
         }
         Action::ClearMissile => {
             world
@@ -1165,19 +1208,14 @@ mod tests {
     #[test]
     fn missile_controls_cycle_actual_locks_consume_a_round_and_continue_state() {
         fn assert_visible(session: &Session, world: &World) {
-            let lines = session.lines(world, true, None);
-            let budget = crate::hud::line_budget(640, 360);
+            assert!(session.lines(world, true, None).is_empty());
+            let panel = crate::help::Panel::flight_status(world, None, Default::default());
             assert!(
-                lines.len() <= budget,
-                "Flight HUD has {} rows, budget {budget}",
-                lines.len()
+                panel
+                    .lines
+                    .iter()
+                    .any(|line| line.contains("PRACTICE BEACONS"))
             );
-            let visible = lines
-                .into_iter()
-                .take(budget)
-                .collect::<Vec<_>>()
-                .join("\n");
-            assert!(visible.contains("PRACTICE BEACONS"));
             let cockpit = crate::hud::cockpit::Cockpit::capture(world, world.snapshot())
                 .unwrap_or_else(|e| panic!("{e}"));
             let state = world

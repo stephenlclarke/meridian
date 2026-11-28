@@ -72,7 +72,7 @@ pub fn append_panel(
         definition.unit.symbol(),
         definition.unit.symbol()
     ));
-    lines.push("M CLOSE | I MISSION | F5 SAVE | F9 RELOAD | ESC SAVE AND QUIT".into());
+    lines.push("M CLOSE | I MISSION | Ctrl+S SAVE | Ctrl+R RELOAD | ESC SAVE AND QUIT".into());
     Ok(())
 }
 

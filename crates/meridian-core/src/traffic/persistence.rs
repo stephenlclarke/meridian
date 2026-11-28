@@ -43,10 +43,11 @@ impl State {
             self.validate(seed, world_tick, player_emissions, data, markets),
             self.validate_separation(data),
             self.validate_shots(world_tick, player_emissions, data),
-            self.validate_player_hits(world_tick, data),
+            self.validate_player_hits(world_tick, data, None),
             self.validate_missile_resource_replay(),
         )
     }
+    #[cfg(test)]
     pub(crate) fn validate(
         &self,
         seed: u64,
@@ -54,6 +55,17 @@ impl State {
         player_emissions: u64,
         data: &OriginalStationData,
         markets: &StationMarkets,
+    ) -> Result<(), SaveError> {
+        self.validate_with_hull_change(seed, world_tick, player_emissions, data, markets, None)
+    }
+    pub(crate) fn validate_with_hull_change(
+        &self,
+        seed: u64,
+        world_tick: u64,
+        player_emissions: u64,
+        data: &OriginalStationData,
+        markets: &StationMarkets,
+        issue_berth: Option<u64>,
     ) -> Result<(), SaveError> {
         if !self.enabled {
             return if self.seed == 0
@@ -81,14 +93,14 @@ impl State {
             let Some(a) = a else {
                 continue;
             };
-            self.validate_identity(*a, index, seed, world_tick, data)?;
+            self.validate_identity(*a, index, seed, world_tick, data.npc_geometry())?;
             Self::validate_economy(*a, seed, world_tick, markets)?;
             self.validate_resources(*a)?;
             self.validate_terminal_manifest(*a)?;
         }
-        self.validate_separation(data)?;
-        self.validate_shots(world_tick, player_emissions, data)?;
-        self.validate_player_hits(world_tick, data)?;
+        self.validate_separation(data.npc_geometry())?;
+        self.validate_shots(world_tick, player_emissions, data.npc_geometry())?;
+        self.validate_player_hits(world_tick, data, issue_berth)?;
         self.validate_missile_resource_replay()
     }
     fn validate_identity(

@@ -60,7 +60,7 @@ fn solar_outer_limit_quit_requires_explicit_discard_and_p_resumes_actual_control
     let notice = app.notice.text.as_deref().unwrap_or_default();
     assert!(notice.contains("Solar save history is full"));
     assert!(notice.contains("P resumes; Q discards unsaved progress"));
-    assert_eq!(app.quit_recovery_key(KeyCode::F5), None);
+    assert_eq!(app.quit_recovery_key(KeyCode::KeyS), None);
     assert_eq!(
         app.quit_recovery_key(KeyCode::KeyP),
         Some(QuitRecovery::Resume)
@@ -345,9 +345,9 @@ fn audio_resume_reopens_once_and_primes_live_missile_without_replay() {
     ok(app.game.world.prepare_practice_confirmation(review, 0)).commit();
     app.game_key(KeyCode::KeyL);
     app.advance_frame(true, 1);
-    app.game_key(KeyCode::F1);
-    app.game_key(KeyCode::F2);
-    app.game_key(KeyCode::F3);
+    app.game_key(KeyCode::Digit8);
+    app.game_key(KeyCode::Digit9);
+    app.game_key(KeyCode::Equal);
     assert_eq!(original.borrow().sounds, [Launch, Ping]);
     app.suspend_audio();
     app.suspend_audio();
@@ -640,11 +640,65 @@ fn actual_missile_notice_and_restored_airborne_session_do_not_replay() {
     ok(app.game.world.prepare_practice_confirmation(review, 0)).commit();
     app.game_key(KeyCode::KeyL);
     app.advance_frame(true, 1);
-    app.game_key(KeyCode::F3); // not armed
+    app.game_key(KeyCode::Equal); // not armed
     assert_eq!(recording.borrow().sounds, [Launch]);
-    app.game_key(KeyCode::F1);
-    app.game_key(KeyCode::F2);
-    app.game_key(KeyCode::F3);
+    app.game_key(KeyCode::Digit8);
+    app.game_key(KeyCode::Digit9);
+    let armed = app.game.world.missile_snapshot();
+    for modifier in [
+        winit::keyboard::ModifiersState::SHIFT,
+        winit::keyboard::ModifiersState::CONTROL,
+        winit::keyboard::ModifiersState::ALT,
+        winit::keyboard::ModifiersState::SUPER,
+    ] {
+        app.modifiers = modifier;
+        if let Some(code) = key(
+            &mut app,
+            KeyCode::Equal,
+            ElementState::Pressed,
+            false,
+            Some("+"),
+        ) {
+            app.game_key(code);
+        }
+        app.modifiers = winit::keyboard::ModifiersState::empty();
+        assert_eq!(
+            key(&mut app, KeyCode::Equal, ElementState::Pressed, true, None),
+            None
+        );
+        assert_eq!(
+            key(
+                &mut app,
+                KeyCode::Equal,
+                ElementState::Released,
+                false,
+                None
+            ),
+            None
+        );
+        assert_eq!(app.game.world.missile_snapshot(), armed);
+    }
+    for retired in [
+        KeyCode::F1,
+        KeyCode::F2,
+        KeyCode::F3,
+        KeyCode::F4,
+        KeyCode::F5,
+        KeyCode::F6,
+        KeyCode::F7,
+        KeyCode::F8,
+        KeyCode::F9,
+        KeyCode::F10,
+        KeyCode::F11,
+        KeyCode::F12,
+    ] {
+        if let Some(code) = key(&mut app, retired, ElementState::Pressed, false, None) {
+            app.game_key(code);
+        }
+        assert_eq!(app.game.world.missile_snapshot(), armed);
+    }
+    assert_eq!(recording.borrow().sounds, [Launch]);
+    app.game_key(KeyCode::Equal);
     assert!(app.notice.missile);
     assert_eq!(recording.borrow().sounds, [Launch, Ping]);
     app.publish_audio(false);
@@ -1219,7 +1273,7 @@ fn docked_repeats_allow_navigation_only_and_never_latch_flight_keys() {
             Some(code)
         );
     }
-    for code in [KeyCode::KeyG, KeyCode::Enter, KeyCode::F5, KeyCode::KeyZ] {
+    for code in [KeyCode::KeyG, KeyCode::Enter, KeyCode::KeyS, KeyCode::KeyZ] {
         assert_eq!(key(&mut app, code, ElementState::Pressed, true, None), None);
     }
     assert_eq!(
@@ -1450,8 +1504,17 @@ fn refused_commander_launch_keeps_real_docked_pause_through_immediate_save() {
     assert_eq!(ok(app.game.world.save_bytes()), paused_before_launch);
     assert_eq!(ok(std::fs::read(&path)), opening_save);
 
-    assert!(!app.commander_key(KeyCode::F5));
-    app.save_profile();
+    app.modifiers = winit::keyboard::ModifiersState::CONTROL;
+    assert_eq!(
+        key(
+            &mut app,
+            KeyCode::KeyS,
+            ElementState::Pressed,
+            false,
+            Some("s")
+        ),
+        None
+    );
     let saved = ok(std::fs::read(&path));
     assert_eq!(saved, paused_before_launch);
     let continued = ok(World::from_save_bytes(&saved));
@@ -1560,9 +1623,9 @@ fn ordinary_docked_exterior_clears_timed_feedback_above_the_instruments() {
         .unwrap_or_else(|| panic!("missing docked Help"));
     let controls = help.lines.join(" ");
     for control in [
-        "F7 Close practice",
-        "F8 Reception",
-        "F10 Practice review",
+        "Shift+5 Close practice",
+        "Shift+4 Reception",
+        "Shift+3 Practice review",
         "L Launch",
     ] {
         assert!(controls.contains(control), "{control}: {controls}");

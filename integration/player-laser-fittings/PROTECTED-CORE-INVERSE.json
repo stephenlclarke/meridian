@@ -1,0 +1,465 @@
+{
+  "base": "6478502bff60520edfc6d4bb5f2d8e43e1cd391e",
+  "files": {
+    "flight/combat.rs": {
+      "beforeSHA256": "c14b9d98dd9b31b9208ef1a54f748fa0eed950c0e374c2ac445d45d7a4eb4aa9",
+      "afterSHA256": "5f92c364072a6a09e986fa7f182e8103f51a66e3681e3fe2c9839b558d661eac",
+      "hunks": [
+        {
+          "offset": 25182,
+          "before": "        let facing = world\n            .integral_view_at(self.item, self.tick)\n            .unwrap_or(super::FlightView::Front);\n",
+          "after": "        let (facing, weapon) = world\n            .owned_laser_at(self.item, self.tick, self.attacker)\n            .ok_or(invalid)?;\n"
+        },
+        {
+          "offset": 26117,
+          "before": "            || (if facing == super::FlightView::Front {\n                world.owned_front_laser_at(self.item, self.tick, self.attacker)\n            } else {\n                world\n                    .xyzzy_medusa_issue()\n                    .filter(|(dock, _, _)| dock.visit() < self.attacker.visit)\n                    .map(|_| OrdinaryWeapon::FrontNavalLaser)\n            }) != Some(self.weapon)\n",
+          "after": "            || weapon != self.weapon\n"
+        }
+      ]
+    },
+    "flight/damage.rs": {
+      "beforeSHA256": "30f1569cbeb5ca6566e43c76f4b38f740f3d178a3f1179a3cb61a3449304a56e",
+      "afterSHA256": "0f6740131740217f20035eb4d2269a67a7bbb3c4fa587b47e4c0fa81e817cc37",
+      "hunks": [
+        {
+          "offset": 725,
+          "before": "    IntegralLaser(super::FlightView),\n",
+          "after": "    FacingLaser(super::FlightView, super::OrdinaryWeapon),\n"
+        },
+        {
+          "offset": 2724,
+          "before": "        if !self.enabled || weapon != super::OrdinaryWeapon::FrontNavalLaser {\n",
+          "after": "        if !self.enabled || !weapon.is_laser() {\n"
+        },
+        {
+          "offset": 2835,
+          "before": "        self.append(clock, Kind::IntegralLaser(facing))\n",
+          "after": "        self.append(clock, Kind::FacingLaser(facing, weapon))\n"
+        },
+        {
+          "offset": 3051,
+          "before": "            matches!(event.kind, Kind::IntegralLaser(_))\n                || matches!(event.kind, Kind::Laser(weapon) if weapon.cooldown_ticks() == 6)\n",
+          "after": "            matches!(event.kind, Kind::Laser(weapon) | Kind::FacingLaser(_, weapon) if weapon.cooldown_ticks() == 6)\n"
+        },
+        {
+          "offset": 6115,
+          "before": "                Kind::IntegralLaser(view) => view.integral_tag(64),\n",
+          "after": "                // Keep the original three Naval tags for saves from the first hull issue.\n                Kind::FacingLaser(view, super::OrdinaryWeapon::FrontNavalLaser) => {\n                    view.integral_tag(64)\n                }\n                Kind::FacingLaser(view, weapon) => view.integral_tag(67 + 3 * weapon.tag()),\n"
+        },
+        {
+          "offset": 7251,
+          "before": "                tag @ 64..=66 if version >= 17 => {\n                    Kind::IntegralLaser(super::medusa_lasers::INTEGRAL[usize::from(tag - 64)])\n",
+          "after": "                tag @ 64..=66 if version >= 17 => Kind::FacingLaser(\n                    super::medusa_lasers::INTEGRAL[usize::from(tag - 64)],\n                    super::OrdinaryWeapon::FrontNavalLaser,\n                ),\n                tag @ (67..=69 | 73..=81) if version >= 17 => {\n                    let offset = tag - 67;\n                    Kind::FacingLaser(\n                        super::medusa_lasers::INTEGRAL[usize::from(offset % 3)],\n                        super::OrdinaryWeapon::from_tag(offset / 3)?,\n                    )\n"
+        },
+        {
+          "offset": 10141,
+          "before": "                Kind::IntegralLaser(facing) => {\n                    let (dock, _, _) = world.xyzzy_medusa_issue().ok_or(INVALID)?;\n                    if event.clock <= self.berth_clock(dock.sequence()).ok_or(INVALID)? {\n                        return Err(INVALID);\n                    }\n                    let item = world.integral_laser(facing).ok_or(INVALID)?;\n                    let weapon = super::OrdinaryWeapon::FrontNavalLaser;\n                    lasers.push(LaserSpend {\n                        emission: next_emission,\n                        clock: event.clock,\n                        weapon,\n                        item,\n                    });\n                    Effect::Laser(weapon)\n                }\n",
+          "after": ""
+        },
+        {
+          "offset": 10167,
+          "before": "                    let weapon = match kind {\n                        Kind::Pulse => super::OrdinaryWeapon::FrontPulseLaser,\n                        Kind::Laser(weapon) => weapon,\n",
+          "after": "                    let (facing, weapon) = match kind {\n                        Kind::Pulse => (\n                            super::FlightView::Front,\n                            super::OrdinaryWeapon::FrontPulseLaser,\n                        ),\n                        Kind::Laser(weapon) => (super::FlightView::Front, weapon),\n                        Kind::FacingLaser(facing, weapon) => (facing, weapon),\n"
+        },
+        {
+          "offset": 10720,
+          "before": "                        .front_at_physical(world, event.clock, next_emission)\n",
+          "after": "                        .laser_at_physical(world, facing, event.clock, next_emission)\n"
+        },
+        {
+          "offset": 20330,
+          "before": "        if world.integral_view_at(shot.item, tick) != Some(facing)\n",
+          "after": "        if world.laser_fit_at_tick(facing, tick, emission) != Some((shot.item, shot.weapon))\n"
+        }
+      ]
+    },
+    "flight/modular.rs": {
+      "beforeSHA256": "0b56f9ee408121e76cec152c25a654c10a58459ed40462d9c548562db4526d0c",
+      "afterSHA256": "c8d9b6896e0307b1b7f3e17030a0c42b203317ace3a15aa29ec25ff5027a82b9",
+      "hunks": [
+        {
+          "offset": 98,
+          "before": "use super::{FlightMode, ShieldGrade, World};\n",
+          "after": "use super::{FlightMode, FlightView, ShieldGrade, World};\n"
+        },
+        {
+          "offset": 415,
+          "before": "",
+          "after": "mod laser_slots;\npub(super) use laser_slots::issued_laser_id;\n"
+        },
+        {
+          "offset": 13904,
+          "before": "",
+          "after": "    LeftLaser,\n    RightLaser,\n    RearLaser,\n"
+        },
+        {
+          "offset": 14259,
+          "before": "",
+          "after": "    MedusaIssue {\n        dock: DockContext,\n        tick: u64,\n        account_revision: u64,\n    },\n"
+        },
+        {
+          "offset": 15622,
+          "before": "",
+          "after": "    PurchaseLaser {\n        kind: ModuleKind,\n        facing: FlightView,\n    },\n    InstallLaser {\n        item: u64,\n        replacing: Option<u64>,\n        facing: FlightView,\n    },\n"
+        },
+        {
+          "offset": 16964,
+          "before": "            Self::Purchase { kind } => Some(kind),\n",
+          "after": "            Self::Purchase { kind } | Self::PurchaseLaser { kind, .. } => Some(kind),\n"
+        },
+        {
+          "offset": 18693,
+          "before": "",
+          "after": "    // Derived from the first authenticated hull issue at world restore.\n    mount_issue: Option<(DockContext, u64, u64)>,\n"
+        },
+        {
+          "offset": 20461,
+          "before": "",
+          "after": "    pending_mount_issue: Option<(DockContext, u64, u64)>,\n    has_side_mounts: bool,\n"
+        },
+        {
+          "offset": 25044,
+          "before": "        let slot = if self.items[index].kind == ModuleKind::FuelStorage {\n",
+          "after": "        self.install_at(index, replacing, None)\n    }\n    fn install_at(\n        &mut self,\n        index: usize,\n        replacing: Option<u64>,\n        facing: Option<FlightView>,\n    ) -> Result<(), ModuleError> {\n        let slot = if let Some(facing) = facing {\n            self.laser_slot(self.items[index].kind, facing)?\n        } else if self.items[index].kind == ModuleKind::FuelStorage {\n"
+        },
+        {
+          "offset": 27912,
+          "before": "",
+          "after": "        self.issue_mounts_through(event.revision)?;\n        let facing = match event.action {\n            ModuleAction::PurchaseLaser { facing, .. }\n            | ModuleAction::InstallLaser { facing, .. } => {\n                if event.xyzzy {\n                    return Err(ModuleError::NotForSale);\n                }\n                Some(facing)\n            }\n            _ => None,\n        };\n"
+        },
+        {
+          "offset": 31399,
+          "before": "                    self.fitted(kind.slot()).map(|i| i.id)\n",
+          "after": "                    self.fitted(if let Some(facing) = facing {\n                        self.laser_slot(kind, facing)?\n                    } else {\n                        kind.slot()\n                    })\n                    .map(|i| i.id)\n"
+        },
+        {
+          "offset": 32598,
+          "before": "                self.install(self.items.len() - 1, replacing)?;\n                if kind.slot() == ModuleSlot::FrontLaser {\n",
+          "after": "                self.install_at(self.items.len() - 1, replacing, facing)?;\n                if self.items.last().and_then(|i| i.slot) == Some(ModuleSlot::FrontLaser) {\n"
+        },
+        {
+          "offset": 34475,
+          "before": "                ModuleAction::Install { item, replacing } => {\n",
+          "after": "                ModuleAction::Install { item, replacing }\n                | ModuleAction::InstallLaser {\n                    item, replacing, ..\n                } => {\n"
+        },
+        {
+          "offset": 34993,
+          "before": "                    self.install(index, replacing)?;\n                    if self.items[index].kind.slot() == ModuleSlot::FrontLaser {\n",
+          "after": "                    self.install_at(index, replacing, facing)?;\n                    if self.items[index].slot == Some(ModuleSlot::FrontLaser) {\n"
+        },
+        {
+          "offset": 35498,
+          "before": "                | ModuleAction::Purchase { .. } => {\n",
+          "after": "                | ModuleAction::Purchase { .. }\n                | ModuleAction::PurchaseLaser { .. } => {\n"
+        },
+        {
+          "offset": 37057,
+          "before": "        ModuleAction::Store { item } | ModuleAction::Install { item, .. } => item != e.item,\n",
+          "after": "        ModuleAction::Store { item }\n        | ModuleAction::Install { item, .. }\n        | ModuleAction::InstallLaser { item, .. } => item != e.item,\n"
+        },
+        {
+          "offset": 37398,
+          "before": "        let mut ledger = Ledger::born(owner)?;\n",
+          "after": "        let mut ledger = self.born_ledger(owner)?;\n"
+        },
+        {
+          "offset": 38454,
+          "before": "        let mut ledger = Ledger::born(owner)?;\n",
+          "after": "        let mut ledger = self.born_ledger(owner)?;\n"
+        },
+        {
+          "offset": 39093,
+          "before": "        let mut ledger = Ledger::born(owner)?;\n",
+          "after": "        let mut ledger = self.born_ledger(owner)?;\n"
+        },
+        {
+          "offset": 40790,
+          "before": "                    ModuleAction::Store { .. } | ModuleAction::Install { .. }\n",
+          "after": "                    ModuleAction::Store { .. }\n                        | ModuleAction::Install { .. }\n                        | ModuleAction::InstallLaser { .. }\n"
+        },
+        {
+          "offset": 42728,
+          "before": "        let Ok(mut ledger) = Ledger::born(hit.owner.owner) else {\n",
+          "after": "        let Ok(mut ledger) = self.born_ledger(hit.owner.owner) else {\n"
+        },
+        {
+          "offset": 44243,
+          "before": "        let mut ledger = Ledger::born(owner)?;\n",
+          "after": "        let mut ledger = self.born_ledger(owner)?;\n"
+        },
+        {
+          "offset": 44930,
+          "before": "",
+          "after": "            if matches!(\n                e.action,\n                ModuleAction::PurchaseLaser { .. } | ModuleAction::InstallLaser { .. }\n            ) {\n                world\n                    .jump_journal\n                    .validate_passenger_berth(e.dock, e.tick)?;\n                if let Some((issue_dock, issue_tick, issue_revision)) = self.mount_issue\n                    && e.revision >= issue_revision\n                    && (e.tick < issue_tick || e.dock.sequence() < issue_dock.sequence())\n                {\n                    return Err(INVALID);\n                }\n            }\n"
+        },
+        {
+          "offset": 54311,
+          "before": "",
+          "after": "        ledger\n            .issue_mounts_through(account.revision())\n            .map_err(|_| INVALID)?;\n"
+        },
+        {
+          "offset": 55371,
+          "before": "            let fitted = ledger.fitted(slot).is_some_and(|i| i.id == owner + offset);\n",
+          "after": "            let fitted = ledger.item_is_fitted(owner + offset, slot);\n"
+        },
+        {
+          "offset": 56670,
+          "before": "        let mut ledger = Ledger::born(owner).ok()?;\n",
+          "after": "        let mut ledger = self.born_ledger(owner).ok()?;\n"
+        },
+        {
+          "offset": 57283,
+          "before": "",
+          "after": "        }\n        if let Some((dock, issue_tick, revision)) = self.mount_issue\n            && dock.visit() < visit\n            && issue_tick < tick\n        {\n            ledger.issue_mounts_through(revision).ok()?;\n"
+        },
+        {
+          "offset": 59791,
+          "before": "            let mut ledger = Ledger::born(owner)?;\n",
+          "after": "            let mut ledger = self.born_ledger(owner)?;\n"
+        },
+        {
+          "offset": 62357,
+          "before": "",
+          "after": "                ModuleAction::PurchaseLaser { kind, facing } => {\n                    w.u8(21);\n                    w.u8(kind.tag());\n                    w.u8(laser_slots::tag(facing));\n                }\n                ModuleAction::InstallLaser {\n                    replacing, facing, ..\n                } => {\n                    w.u8(22);\n                    w.u8(laser_slots::tag(facing));\n                    w.option(replacing.as_ref(), |w, i| w.u64(*i));\n                }\n"
+        },
+        {
+          "offset": 65639,
+          "before": "            let kind = if tag == 3 && version >= 16 {\n",
+          "after": "            let kind = if matches!(tag, 3 | 21) && version >= 16 {\n"
+        },
+        {
+          "offset": 66001,
+          "before": "            let replacing = if tag == 2 {\n",
+          "after": "            let facing = if matches!(tag, 21 | 22) {\n                Some(laser_slots::facing(r.u8()?)?)\n            } else {\n                None\n            };\n            let replacing = if matches!(tag, 2 | 22) {\n"
+        },
+        {
+          "offset": 67054,
+          "before": "",
+          "after": "                21 => ModuleAction::PurchaseLaser {\n                    kind: kind.ok_or(INVALID)?,\n                    facing: facing.ok_or(INVALID)?,\n                },\n                22 => ModuleAction::InstallLaser {\n                    item,\n                    replacing,\n                    facing: facing.ok_or(INVALID)?,\n                },\n"
+        },
+        {
+          "offset": 70128,
+          "before": "",
+          "after": "            mount_issue: None,\n"
+        },
+        {
+          "offset": 74771,
+          "before": "    pub(super) fn owned_front_laser_at(\n",
+          "after": "    pub(super) fn owned_laser_at(\n"
+        },
+        {
+          "offset": 74896,
+          "before": "    ) -> Option<super::OrdinaryWeapon> {\n",
+          "after": "    ) -> Option<(FlightView, super::OrdinaryWeapon)> {\n"
+        },
+        {
+          "offset": 75224,
+          "before": "        if item.slot != Some(ModuleSlot::FrontLaser) {\n            return None;\n",
+          "after": "        let facing = item.slot?.laser_facing()?;\n        if facing != FlightView::Front {\n            let (dock, issue_tick, _) = self.modular.mount_issue?;\n            if tick <= issue_tick || owner.visit <= dock.visit() {\n                return None;\n            }\n"
+        },
+        {
+          "offset": 75501,
+          "before": "        super::OrdinaryWeapon::from_module(item.kind)\n",
+          "after": "        Some((facing, item.kind.laser_profile()?))\n"
+        },
+        {
+          "offset": 76043,
+          "before": "",
+          "after": "        self.fitted_laser_item(FlightView::Front)\n    }\n    pub(super) fn fitted_laser_item(&self, facing: FlightView) -> Option<OwnedModule> {\n"
+        },
+        {
+          "offset": 76287,
+          "before": "            .front()\n",
+          "after": "            .fitted(ModuleSlot::laser(facing))\n"
+        },
+        {
+          "offset": 80048,
+          "before": "                ModuleAction::Store { item } | ModuleAction::Install { item, .. } => self\n",
+          "after": "                ModuleAction::Store { item }\n                | ModuleAction::Install { item, .. }\n                | ModuleAction::InstallLaser { item, .. } => self\n"
+        },
+        {
+          "offset": 83740,
+          "before": "                .filter(|item| !matches!(item.provenance, ModuleProvenance::StandardBirth))\n",
+          "after": "                .filter(|item| {\n                    matches!(\n                        item.provenance,\n                        ModuleProvenance::Paid { .. } | ModuleProvenance::XYZzy { .. }\n                    )\n                })\n"
+        },
+        {
+          "offset": 85791,
+          "before": "                ModuleAction::Store { item } | ModuleAction::Install { item, .. } => item,\n",
+          "after": "                ModuleAction::Store { item }\n                | ModuleAction::Install { item, .. }\n                | ModuleAction::InstallLaser { item, .. } => item,\n"
+        },
+        {
+          "offset": 86993,
+          "before": "        let pulse_fitted = ledger.front().is_some_and(|i| i.id == owner + 7);\n",
+          "after": "        let pulse_fitted = ledger.item_is_fitted(owner + 7, ModuleSlot::FrontLaser);\n"
+        },
+        {
+          "offset": 89477,
+          "before": "    pub(super) fn front_at_physical(\n",
+          "after": "    pub(super) fn laser_at_physical(\n"
+        },
+        {
+          "offset": 89552,
+          "before": "",
+          "after": "        facing: FlightView,\n"
+        },
+        {
+          "offset": 89661,
+          "before": "        let mut ledger = Ledger::born(world.combat_identity()?.owner).ok()?;\n",
+          "after": "        if facing != FlightView::Front {\n            let (dock, _, _) = self.mount_issue?;\n            if clock <= world.damage.berth_clock(dock.sequence())? {\n                return None;\n            }\n        }\n        let mut ledger = self.born_ledger(world.combat_identity()?.owner).ok()?;\n"
+        },
+        {
+          "offset": 90505,
+          "before": "        ledger.front()\n",
+          "after": "        if let Some((dock, _, revision)) = self.mount_issue\n            && world.damage.berth_clock(dock.sequence())? < clock\n        {\n            ledger.issue_mounts_through(revision).ok()?;\n        }\n        ledger.fitted(ModuleSlot::laser(facing))\n"
+        },
+        {
+          "offset": 90779,
+          "before": "    fn historical_front_at_tick(&self, tick: u64, firing_emission: u64) -> Option<OwnedModule> {\n        let mut ledger = Ledger::born(self.combat_identity()?.owner).ok()?;\n",
+          "after": "    fn laser_ledger_at_tick(&self, tick: u64, firing_emission: u64) -> Option<Ledger> {\n        let mut ledger = self\n            .modular\n            .born_ledger(self.combat_identity()?.owner)\n            .ok()?;\n"
+        },
+        {
+          "offset": 91434,
+          "before": "        ledger.front()\n",
+          "after": "        if let Some((_, issue_tick, revision)) = self.modular.mount_issue\n            && issue_tick < tick\n        {\n            ledger.issue_mounts_through(revision).ok()?;\n        }\n        Some(ledger)\n"
+        },
+        {
+          "offset": 91645,
+          "before": "    pub(super) fn front_weapon_at_tick(\n",
+          "after": "    pub(super) fn historical_laser_at_tick(\n        &self,\n        facing: FlightView,\n        tick: u64,\n        emission: u64,\n    ) -> Option<OwnedModule> {\n        if facing != FlightView::Front && tick <= self.modular.mount_issue?.1 {\n            return None;\n        }\n        self.laser_ledger_at_tick(tick, emission)?\n            .fitted(ModuleSlot::laser(facing))\n    }\n    pub(super) fn historical_fitted_laser_item(\n"
+        },
+        {
+          "offset": 92148,
+          "before": "    ) -> Option<super::OrdinaryWeapon> {\n        let fitted = self.historical_front_at_tick(tick, emission)?;\n        if item != fitted.id {\n            return None;\n        }\n        super::OrdinaryWeapon::from_module(fitted.kind)\n",
+          "after": "    ) -> Option<OwnedModule> {\n        self.laser_ledger_at_tick(tick, emission)?\n            .items\n            .into_iter()\n            .find(|i| {\n                i.id == item\n                    && i.slot\n                        .and_then(ModuleSlot::laser_facing)\n                        .is_some_and(|facing| {\n                            facing == FlightView::Front\n                                || self\n                                    .modular\n                                    .mount_issue\n                                    .is_some_and(|(_, issue_tick, _)| tick > issue_tick)\n                        })\n            })\n"
+        },
+        {
+          "offset": 92866,
+          "before": "        super::OrdinaryWeapon::from_module(self.historical_front_at_tick(tick, u64::MAX)?.kind)\n            .map(super::OrdinaryWeapon::cooldown_ticks)\n",
+          "after": "        super::OrdinaryWeapon::from_module(\n            self.historical_laser_at_tick(FlightView::Front, tick, u64::MAX)?\n                .kind,\n        )\n        .map(super::OrdinaryWeapon::cooldown_ticks)\n"
+        },
+        {
+          "offset": 99053,
+          "before": "        let born = |slot, offset| {\n            ledger\n                .fitted(slot)\n                .is_some_and(|item| item.id == owner.owner + offset)\n        };\n",
+          "after": "        let born = |slot, offset| ledger.item_is_fitted(owner.owner + offset, slot);\n"
+        },
+        {
+          "offset": 100474,
+          "before": "        let existing = ledger\n            .items\n            .iter()\n            .find(|item| item.kind == kind && (!tank || item.slot.is_none()))\n            .copied();\n",
+          "after": "        let existing = if kind == ModuleKind::NavalLaser {\n            // The front grant must leave every other emplacement in place.\n            ledger.front().filter(|item| item.kind == kind).or_else(|| {\n                ledger\n                    .items\n                    .iter()\n                    .find(|item| item.kind == kind && item.slot.is_none())\n                    .copied()\n            })\n        } else {\n            ledger\n                .items\n                .iter()\n                .find(|item| item.kind == kind && (!tank || item.slot.is_none()))\n                .copied()\n        };\n"
+        },
+        {
+          "offset": 103222,
+          "before": "        let born_fitted = |slot, offset| {\n            ledger\n                .fitted(slot)\n                .is_some_and(|item| item.id == owner + offset)\n        };\n",
+          "after": "        let born_fitted = |slot, offset| ledger.item_is_fitted(owner + offset, slot);\n"
+        },
+        {
+          "offset": 104355,
+          "before": "        let mut ledger = Ledger::born(owner)?;\n",
+          "after": "        let mut ledger = self.born_ledger(owner)?;\n"
+        }
+      ]
+    },
+    "flight/modular/scoops.rs": {
+      "beforeSHA256": "29cee46a0abe4a904f8b585a2a90cd9fdedd06d8c90a67ae71086badd6800d94",
+      "afterSHA256": "5b2a088dcdd4f22837433a5ea51834fc96d1a41facad39329b2e2545f84832eb",
+      "hunks": [
+        {
+          "offset": 2016,
+          "before": "",
+          "after": "                }\n                ModuleSlot::LeftLaser | ModuleSlot::RightLaser | ModuleSlot::RearLaser => {\n                    definition.hull != \"SH171\" || i.kind.laser_profile().is_none()\n"
+        }
+      ]
+    },
+    "flight/modular/tests.rs": {
+      "beforeSHA256": "4b82329e06fbaa2505e863bf68130dc9b9d050af6131c5c66b4b2699f81c425e",
+      "afterSHA256": "7c52220e54b80d485eaafbe04c24b31e393b6ee7029a409a9323ab7d4bc27e09",
+      "hunks": [
+        {
+          "offset": 22602,
+          "before": "",
+          "after": "\n#[test]\nfn station_laser_mounts_keep_born_property_and_reject_unsupported_fits_atomically() {\n    use FlightView::{Front, Left, Rear, Right};\n\n    let mut w = funded(31817);\n    let tick = w.snapshot().tick;\n    let pulse = w.fitted_laser_item(Front).unwrap();\n    let purchase = ModuleAction::PurchaseLaser {\n        kind: ModuleKind::PulseLaser,\n        facing: Left,\n    };\n    let original = w.save_bytes().unwrap();\n    assert_eq!(w.review_module(purchase, tick), Err(ModuleError::Capacity));\n    assert_eq!(w.save_bytes().unwrap(), original);\n\n    let issue = w\n        .review_xyzzy(crate::XyzzyAction::ActivateMedusa, tick)\n        .unwrap();\n    w.prepare_xyzzy(issue, tick).unwrap().commit();\n    let [front, left, right, rear] =\n        [Front, Left, Right, Rear].map(|v| w.fitted_laser_item(v).unwrap());\n    let wallet = w.credits_tenths();\n    let wrong = ModuleAction::InstallLaser {\n        item: pulse.id,\n        replacing: Some(front.id),\n        facing: Left,\n    };\n    let original = w.save_bytes().unwrap();\n    assert_eq!(\n        w.review_module(wrong, tick),\n        Err(ModuleError::StaleOccupant)\n    );\n    let wrong_kind = ModuleAction::PurchaseLaser {\n        kind: ModuleKind::FuelStorage,\n        facing: Left,\n    };\n    assert_eq!(\n        w.review_module(wrong_kind, tick),\n        Err(ModuleError::Capacity)\n    );\n    let replace = ModuleAction::InstallLaser {\n        item: pulse.id,\n        replacing: Some(left.id),\n        facing: Left,\n    };\n    let review = w.review_module(replace, tick).unwrap();\n    assert_eq!(\n        w.prepare_module(review, tick)\n            .unwrap()\n            .publish_with(|_| Err(())),\n        Err(())\n    );\n    assert_eq!(w.save_bytes().unwrap(), original);\n\n    apply(&mut w, replace);\n    let mut w = cold(&w);\n    assert_eq!(\n        [Front, Right, Rear].map(|v| w.fitted_laser_item(v).unwrap()),\n        [front, right, rear]\n    );\n    assert_eq!(\n        w.fitted_laser_item(Left).unwrap(),\n        OwnedModule {\n            slot: Some(ModuleSlot::LeftLaser),\n            ..pulse\n        }\n    );\n    assert!(snap(&w).items.contains(&OwnedModule { slot: None, ..left }));\n    assert_eq!(w.credits_tenths(), wallet);\n    apply(&mut w, ModuleAction::Store { item: pulse.id });\n    apply(\n        &mut w,\n        ModuleAction::InstallLaser {\n            item: left.id,\n            replacing: None,\n            facing: Left,\n        },\n    );\n    assert_eq!(cold(&w).fitted_laser_item(Left), Some(left));\n    assert_eq!(w.credits_tenths(), wallet);\n}\n"
+        }
+      ]
+    },
+    "flight/persistence.rs": {
+      "beforeSHA256": "2acebf546db3b529e408f6916e62af392c487a0032151913f1c05771bcd6f572",
+      "afterSHA256": "bb87f33082373c193045b436e09ce093cadce5516a7c070667910c4844f4160f",
+      "hunks": [
+        {
+          "offset": 23992,
+          "before": "",
+          "after": "        candidate\n            .modular\n            .bind_mount_issue(candidate.xyzzy_medusa_issue());\n"
+        }
+      ]
+    },
+    "flight/practice/persistence.rs": {
+      "beforeSHA256": "960610a5ca69da7d5d8c02648e169f0a439ffd761b323196357d2f1e7c6823fe",
+      "afterSHA256": "40be4e5b636dd826790c7bf28c57d7ef44530fa22dd9e34c0bf674a501e2bab1",
+      "hunks": [
+        {
+          "offset": 8882,
+          "before": "        if self\n",
+          "after": "        if let Some((facing, emission)) = self\n"
+        },
+        {
+          "offset": 8990,
+          "before": "            .any(|h| h.tick == tick && h.integral.is_some())\n",
+          "after": "            .filter(|hit| hit.tick == tick)\n            .find_map(|hit| hit.integral)\n"
+        },
+        {
+          "offset": 9086,
+          "before": "            Ok(super::super::OrdinaryWeapon::FrontNavalLaser.cooldown_ticks())\n",
+          "after": "            let (_, weapon) = world\n                .laser_fit_at_tick(facing, tick, emission)\n                .ok_or(INVALID)?;\n            Ok(weapon.cooldown_ticks())\n"
+        }
+      ]
+    },
+    "flight/weapons.rs": {
+      "beforeSHA256": "5362aeba46c704471a8f4d15ee539b4997d60df00aa65fa65cd4e873a6be99d0",
+      "afterSHA256": "db52526dec15f5da559cb6b25e3635b870854af13e85b7716044ff3bcf345034",
+      "hunks": [
+        {
+          "offset": 1297,
+          "before": "            Self::NoFittedFrontLaser => \"No owned compatible front laser is fitted\",\n",
+          "after": "            Self::NoFittedFrontLaser => \"No compatible laser is fitted to this mount\",\n"
+        },
+        {
+          "offset": 19689,
+          "before": "        let (fitted_item_id, weapon) = self.fitted_front_laser()?;\n        Some(FrontLaserSnapshot {\n            fitted_item_id,\n            weapon,\n            damage_hundredths: weapon.damage_hundredths(),\n            range: 6000,\n            cooldown_ticks_per_shot: weapon.cooldown_ticks(),\n        })\n",
+          "after": "        self.laser_mount_snapshot(super::FlightView::Front)\n"
+        }
+      ]
+    },
+    "flight/xyzzy.rs": {
+      "beforeSHA256": "40bd66730ffc9c06e58b10d8847330eec9271e02141e5809ed3ba7d8ab98b1fb",
+      "afterSHA256": "9a316098e5990787ebc2535c4ed1352c856c682e2ae10e87a992cc9841a4f732",
+      "hunks": [
+        {
+          "offset": 27607,
+          "before": "",
+          "after": "    fn refit_medusa_side_lasers(&mut self, tick: u64) -> Result<(), SaveError> {\n        use super::{ModuleAction, ModuleKind, ModuleSlot};\n\n        let (dock, _, revision) = self.xyzzy_medusa_issue().ok_or(INVALID)?;\n        let ledger = self\n            .modular\n            .ledger(self, self.commander_account.as_ref().ok_or(INVALID)?)?;\n        let mut stored: Vec<_> = ledger\n            .items\n            .iter()\n            .filter(|item| item.kind == ModuleKind::NavalLaser && item.slot.is_none())\n            .map(|item| item.id)\n            .collect();\n        for facing in super::medusa_lasers::INTEGRAL {\n            let occupant = ledger\n                .items\n                .iter()\n                .find(|item| item.slot == Some(ModuleSlot::laser(facing)));\n            if occupant.is_some_and(|item| item.kind == ModuleKind::NavalLaser) {\n                continue;\n            }\n            let original =\n                super::modular::issued_laser_id(dock, revision, facing).ok_or(INVALID)?;\n            let index = stored\n                .iter()\n                .position(|id| *id == original)\n                .or_else(|| stored.len().checked_sub(1))\n                .ok_or(INVALID)?;\n            let action = ModuleAction::InstallLaser {\n                item: stored.remove(index),\n                replacing: occupant.map(|item| item.id),\n                facing,\n            };\n            let review = self.review_module(action, tick).map_err(|_| INVALID)?;\n            self.prepare_module(review, tick)\n                .map_err(|_| INVALID)?\n                .commit();\n        }\n        Ok(())\n    }\n"
+        },
+        {
+          "offset": 29312,
+          "before": "",
+          "after": "        if review.action.outfit() && self.xyzzy_medusa_active() {\n            self.refit_medusa_side_lasers(review.tick)?;\n        }\n"
+        },
+        {
+          "offset": 31898,
+          "before": "",
+          "after": "            self.modular.bind_mount_issue(self.xyzzy_medusa_issue());\n"
+        }
+      ]
+    },
+    "flight/xyzzy/tests.rs": {
+      "beforeSHA256": "679a61954bc56fa5d8efd671537c77be62f4877131c1d248005ad8ebaf41d415",
+      "afterSHA256": "f219a13147b192e4a34d569fb213ec31b82b8d3cba8d53a5b3b6ace807fefcfa",
+      "hunks": [
+        {
+          "offset": 34221,
+          "before": "",
+          "after": "fn medusa_reissue_refits_owned_naval_lasers_without_losing_paid_guns() {\n    use crate::FlightView::{Front, Left, Rear, Right};\n\n    let mut w = World::new_commander(31815).unwrap();\n    apply(&mut w, XyzzyAction::ActivateMedusa);\n    let mounts = [Front, Rear, Left, Right];\n    let initial = mounts.map(|f| w.laser_mount_snapshot(f).unwrap());\n    let pulse = module(\n        &mut w,\n        ModuleAction::PurchaseLaser {\n            kind: ModuleKind::PulseLaser,\n            facing: Left,\n        },\n    );\n    let beam = module(\n        &mut w,\n        ModuleAction::PurchaseLaser {\n            kind: ModuleKind::BeamLaser,\n            facing: Rear,\n        },\n    );\n    let inventory = w.modular_equipment_snapshot().unwrap().items;\n    let cash = w.credits_tenths();\n    let mut w = cold(&w);\n    assert_eq!(w.laser_mount_snapshot(Left).unwrap().fitted_item_id, pulse);\n    assert_eq!(w.laser_mount_snapshot(Rear).unwrap().fitted_item_id, beam);\n    for action in [\n        XyzzyAction::MaximumSupportedHardware,\n        XyzzyAction::ActivateMedusa,\n    ] {\n        apply(&mut w, action);\n        w = cold(&w);\n        let items = w.modular_equipment_snapshot().unwrap().items;\n        assert_eq!(items.len(), inventory.len());\n        for previous in &inventory {\n            let restored = items.iter().find(|item| item.id == previous.id).unwrap();\n            assert_eq!(restored.provenance, previous.provenance);\n            if [pulse, beam].contains(&restored.id) {\n                assert!(restored.slot.is_none());\n            }\n        }\n        assert_eq!(w.credits_tenths(), cash);\n        assert_eq!(mounts.map(|f| w.laser_mount_snapshot(f).unwrap()), initial);\n    }\n}\n\n#[test]\n"
+        }
+      ]
+    }
+  }
+}

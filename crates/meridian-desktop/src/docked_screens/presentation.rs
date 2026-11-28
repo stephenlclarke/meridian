@@ -223,9 +223,9 @@ pub(crate) fn commander_frame(
                 Ink::Cyan,
                 canvas,
             );
-            "L Launch | I Mission details | F5 Save | F9 Reload"
+            "L Launch | I Mission details | Ctrl+S Save | Ctrl+R Reload"
         } else {
-            "Enter Resume flight | F5 Save | F9 Reload"
+            "Enter Resume flight | Ctrl+S Save | Ctrl+R Reload"
         }
     };
     label(&mut f, controls, 16.0, 175.0, Ink::Cyan, canvas);

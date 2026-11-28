@@ -2,7 +2,7 @@
 
 In ordinary flight, press **H** or **?** for controls and **C** for flight lesson details. The cockpit instruments show missile readiness. **I** opens mission details and the missile readout.
 
-After completing G02, open **I** at Renas main orbital. **R** reviews the optional lesson when the commander has a freight completion clue, has no active freight job and can accept training towards the first flight clue. **Enter** accepts or **B** goes back. The Renas training berth issues the lesson. Make the measured local approach and return through its doorway, then use **F6** and **Enter** for the debrief. G02 pays 730 CR. Flight practice pays zero and grants its own first-success clue. Continue restores the freight receipt, the lesson stage and each earned clue.
+After completing G02, open **I** at Renas main orbital. **R** reviews the optional lesson when the commander has a freight completion clue, has no active freight job and can accept training towards the first flight clue. **Enter** accepts or **B** goes back. The Renas training berth issues the lesson. Make the measured local approach and return through its doorway, then use **Shift+1** and **Enter** for the debrief. G02 pays 730 CR. Flight practice pays zero and grants its own first-success clue. Continue restores the freight receipt, the lesson stage and each earned clue.
 
 The [pinned original walkthrough](../integration/unwritten-route/SOURCE.json) leaves the choice of work open after the Renas handoff. The optional offer uses the [original T01 berth and reception rules](FLIGHT-RECEPTION-SOURCES.json).
 
@@ -63,7 +63,7 @@ Desktop binding must expose reviewed Accept/Receive/Cancel with explicit confirm
 
 ## Joined desktop candidate
 
-F6 reviews a new lesson when none is active, or reception for the active lesson after its genuine measured return. F12 reviews cancellation at the actual issuing berth. Enter atomically publishes the proposed save before live commit; B discards the review. A writer failure drops the proposal and requires a fresh review. C while playing opens the lesson details, retained counts, measured interval/ranges and once-only trace. Title-screen C still Continues the selected profile.
+Shift+1 reviews a new lesson when none is active, or reception for the active lesson after its genuine measured return. Shift+2 reviews cancellation at the actual issuing berth. Enter atomically publishes the proposed save before live commit; B discards the review. A writer failure drops the proposal and requires a fresh review. C while playing opens the lesson details, retained counts, measured interval/ranges and once-only trace. Title-screen C still Continues the selected profile.
 
 Keys 0/1/2/3 request World-owned front/rear/left/right view. The renderer rotates every scene primitive in the same camera frame using the committed World view; it does not change ship pose, weapon aim or manufacture a measurement. Continue restores the saved view. Only actual front-view physical flight can supply the core lesson reading. Existing flight, market, equipment, freight and safe-gunnery keys keep their meanings.
 
