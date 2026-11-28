@@ -205,7 +205,7 @@ fn exact_catalogue_taxonomy_is_162_ships_not_171_ships() {
     assert_eq!(c.worlds.len(), 2048);
     assert_eq!(c.objects.len(), 171);
     assert_eq!(c.ship_count(), 162);
-    assert_eq!(c.search_showroom("").len(), 164);
+    assert_eq!(c.search_showroom("").len(), 165);
     assert_eq!(c.object("SH028").map(|o| o.kind), Some("station"));
     assert_eq!(c.object("SH025").map(|o| o.name), Some("Peregrine Mk V"));
     assert!(c.search_showroom("SH028").is_empty());
@@ -596,6 +596,16 @@ fn salamander_station_showroom_inspection_preserves_catalogue_kind_and_refuses_e
         "Salamander Station",
         "station",
         "integration/sh141-salamander-station/SALAMANDER-STUDIO.json",
+    );
+}
+
+#[test]
+fn lion_bastion_showroom_inspection_preserves_catalogue_kind_and_refuses_exchange() {
+    assert_inspection_only_catalogue_object(
+        "SH156",
+        "Lion Bastion",
+        "platform",
+        "integration/sh156-lion-bastion/ORIGINAL-INSPECTION.json",
     );
 }
 
