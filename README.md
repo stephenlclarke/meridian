@@ -40,7 +40,7 @@ The development build adds [Cheetah (SH082)](docs/CHEETAH-SHIELD.md) to the stat
 
 The development build adds [Redtail Mk III (SH103)](docs/REDTAIL-MK-III-INSPECTION.md) to the station Showroom. Its original 2,328-face detailed mesh and 140-face native mesh use the source calibration of one metre per unit.
 
-The development catalogue also includes [Besra (SH108)](docs/BESRA-INSPECTION.md) and [Salamander Station (SH141)](docs/SALAMANDER-STATION-INSPECTION.md). The source Showroom now has 130 previews.
+The development catalogue also includes [Besra (SH108)](docs/BESRA-INSPECTION.md), [Salamander Station (SH141)](docs/SALAMANDER-STATION-INSPECTION.md) and [Lion Bastion (SH156)](docs/LION-BASTION-INSPECTION.md). The source Showroom now has 131 previews.
 
 The separate [Medusa player flight preview](integration/sh171-medusa-preview/README.md) uses a dedicated profile and the admitted reduced flight geometry. On signed Mac build `5a924315`, the original SH171 artwork was visible in actual flight at 50.30/50.30. A cold restart restored the same ship, speed and expanded 32 t hold. Native docking return and fit-limit refusal were not observed in that run. Ordinary progression, fabrication and exchange do not grant the Medusa. See the [Preview 12 validation record](docs/IMPLEMENTATION-STATUS.md#published-preview-12) for final-package checks.
 
