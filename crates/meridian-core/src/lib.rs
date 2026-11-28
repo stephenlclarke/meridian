@@ -90,6 +90,7 @@ pub mod osprey_support;
 pub mod owlet_mk_ii;
 pub mod ox;
 pub mod ox_mk_ii;
+pub mod panther_explorer;
 pub mod peregrine_mk3;
 pub mod peregrine_mk_i;
 pub mod puma;

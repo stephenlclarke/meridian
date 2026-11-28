@@ -53,6 +53,8 @@ AUTHORED_MODES = {
     'sh040-newt-escape-pod': (((), 'CERTIFIED-FIT.json'),),
     'sh036-zebu': (((), 'CERTIFIED-FIT.json'), (('--difference',), 'CERTIFIED-DIFFERENCE.json')),
     'sh033-panther-scout': (((), 'CERTIFIED-FIT.json'),),
+    'sh032-panther-explorer': (((), 'CERTIFIED-FIT.json'), (('--difference',), 'CERTIFIED-DIFFERENCE.json'),
+                              (('--unsplit',), 'CERTIFIED-UNSPLIT.json'), (('--contact',), 'CONTACT-RESULT.json')),
     'sh055-condor': COLLISION_MODES,
     'sh068-badger': COLLAR_MODES,
     'sh074-dzo': COLLAR_MODES,
