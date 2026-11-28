@@ -561,3 +561,136 @@ fn peregrine_mk_i_world_enforces_own_r3_speed_and_snapshot_scope() -> Result<(),
     }
     Ok(())
 }
+
+#[test]
+fn zebra_world_approach_reports_its_own_physical_contacts_and_entry() -> Result<(), Box<dyn Error>>
+{
+    let closer_observer = FlightStart {
+        position: [0.0, 0.0, 360.0],
+        ..OBSERVER
+    };
+    let cases = [
+        (
+            "zebra-aligned",
+            OBSERVER,
+            inbound(0.0, 220.0, 4.0),
+            Status::Entered,
+        ),
+        (
+            "zebra-overspeed",
+            OBSERVER,
+            inbound(0.0, 220.0, 9.0),
+            Status::EntryConditions,
+        ),
+        (
+            "zebra-lip",
+            OBSERVER,
+            inbound(63.96, 220.0, 12.0),
+            Status::StationContact,
+        ),
+        (
+            "zebra-off-aperture",
+            OBSERVER,
+            inbound(100.0, 220.0, 4.0),
+            Status::EntryConditions,
+        ),
+        (
+            "zebra-observer",
+            closer_observer,
+            inbound(0.0, 520.0, 8.0),
+            Status::ObserverContact,
+        ),
+    ];
+    for (label, observer, approach, expected) in cases {
+        let world = World::zebra_docking_validation_scenario(observer, approach)?;
+        assert!(world.goshawk_approach_snapshot().is_none());
+        assert!(world.goshawk_custom_approach_snapshot().is_none());
+        run_world(label, world, expected, World::zebra_approach_snapshot)?;
+    }
+    Ok(())
+}
+
+#[test]
+fn zebra_world_enforces_own_r3_speed_and_snapshot_scope() -> Result<(), Box<dyn Error>> {
+    use crate::zebra::{ZEBRA_CONTRACT_SHA256, ZEBRA_RESOURCE_SHA256};
+    assert!(World::new().zebra_approach_snapshot().is_none());
+    let start = inbound(0.0, 220.0, 4.0);
+    let mut world = World::zebra_docking_validation_scenario(OBSERVER, start)?;
+    let other = World::zebra_docking_validation_scenario(OBSERVER, start)?;
+    let explorer = World::goshawk_docking_validation_scenario(OBSERVER, start)?;
+    let custom = World::goshawk_custom_docking_validation_scenario(OBSERVER, start)?;
+    let first = world
+        .zebra_approach_snapshot()
+        .ok_or(StepError::InvalidMode)?;
+    assert!(world.goshawk_approach_snapshot().is_none());
+    assert!(world.goshawk_custom_approach_snapshot().is_none());
+    assert!(explorer.zebra_approach_snapshot().is_none());
+    assert!(custom.zebra_approach_snapshot().is_none());
+    assert!(!custom.zebra_snapshot_is_current(&first));
+    let explorer_frame = explorer
+        .goshawk_approach_snapshot()
+        .ok_or(StepError::InvalidMode)?;
+    let custom_frame = custom
+        .goshawk_custom_approach_snapshot()
+        .ok_or(StepError::InvalidMode)?;
+    assert!(!world.goshawk_snapshot_is_current(&explorer_frame));
+    assert!(!world.goshawk_custom_snapshot_is_current(&custom_frame));
+    assert_eq!(explorer_frame.engineering().dry_mass_kilograms, 33_719);
+    assert_eq!(custom_frame.pieces().len(), 73);
+    assert!(!explorer.zebra_snapshot_is_current(&first));
+    assert!(!other.zebra_snapshot_is_current(&first));
+    assert!(world.zebra_snapshot_is_current(&first));
+    assert_eq!(first.pieces().len(), 48);
+    assert_eq!(
+        first.source_identity(),
+        (ZEBRA_RESOURCE_SHA256, ZEBRA_CONTRACT_SHA256)
+    );
+    assert!(world.commander_id().is_none() && world.player_ship_id().is_none());
+    assert_eq!(world.save_bytes(), Err(SaveError::NoCommander));
+    let observer = world
+        .zebra_observer_pose(&first)
+        .ok_or(StepError::InvalidMode)?;
+    let input = FlightInput {
+        yaw: 0.5,
+        ..FlightInput::default()
+    };
+    assert_eq!(world.step(input), Err(StepError::InvalidMode));
+    assert!(world.zebra_snapshot_is_current(&first));
+    world.step(FlightInput::default())?;
+    let second = world
+        .zebra_approach_snapshot()
+        .ok_or(StepError::InvalidMode)?;
+    assert!(!world.zebra_snapshot_is_current(&first));
+    assert!(world.zebra_observer_pose(&first).is_none());
+    assert_eq!(world.zebra_observer_pose(&second), Some(observer));
+    assert!(Arc::ptr_eq(first.pieces(), second.pieces()));
+    // R3's inclusive 34.0 controlled speed comes from the pinned SH021 contract.
+    // Exercise the actual constructor and step at the boundary, independent of
+    // the ordinary station entry speed limit.
+    let mut maximum =
+        World::zebra_docking_validation_scenario(OBSERVER, inbound(0.0, 220.0, 34.0))?;
+    let at_limit = maximum
+        .zebra_approach_snapshot()
+        .ok_or(StepError::InvalidMode)?;
+    assert_eq!(at_limit.speed_units(), 34.0);
+    assert_eq!(at_limit.status(), Status::Approaching);
+    assert_eq!(
+        at_limit.source_identity(),
+        (ZEBRA_RESOURCE_SHA256, ZEBRA_CONTRACT_SHA256)
+    );
+    maximum.step(FlightInput::default())?;
+    let advanced = maximum
+        .zebra_approach_snapshot()
+        .ok_or(StepError::InvalidMode)?;
+    assert_eq!(advanced.speed_units(), 34.0);
+    assert_eq!(advanced.status(), Status::Approaching);
+    assert_eq!(advanced.world_tick(), at_limit.world_tick() + 1);
+    assert!(advanced.pose().position.z < at_limit.pose().position.z);
+    for speed in [0.0, 34.0_f32.next_up()] {
+        assert!(matches!(
+            World::zebra_docking_validation_scenario(OBSERVER, inbound(0.0, 220.0, speed)),
+            Err(StationError::InvalidPose)
+        ));
+    }
+    Ok(())
+}

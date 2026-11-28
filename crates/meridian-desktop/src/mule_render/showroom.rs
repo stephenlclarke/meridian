@@ -22,6 +22,10 @@ use meridian_core::{
         PEREGRINE_MK3_DETAILED_FACES, PEREGRINE_MK3_DETAILED_VERTICES,
         PEREGRINE_MK3_NATIVE_VERTICES, PEREGRINE_MK3_PIECES, PeregrineMk3HullSource,
     },
+    zebra::{
+        ZEBRA_DETAILED_FACES, ZEBRA_DETAILED_VERTICES, ZEBRA_NATIVE_VERTICES, ZEBRA_PIECES,
+        ZebraHullSource,
+    },
 };
 mod authored;
 pub(crate) use authored::{AuthoredFace, AuthoredPass, AuthoredVisual};
@@ -38,6 +42,9 @@ const VISUAL_FNV: u64 = 0x7a17_0c0c_6cdc_d5fd;
 pub(crate) const CUSTOM_GEOMETRY_KEY: &str = "assets/fleet/sh010/visual.bin";
 const CUSTOM_VISUAL: &[u8] = include_bytes!("../../../../assets/fleet/sh010/visual.bin");
 const CUSTOM_VISUAL_FNV: u64 = 0xfe21_3755_8ea3_8ccb;
+pub(crate) const ZEBRA_GEOMETRY_KEY: &str = "assets/fleet/sh021/visual.bin";
+const ZEBRA_VISUAL: &[u8] = include_bytes!("../../../../assets/fleet/sh021/visual.bin");
+const ZEBRA_VISUAL_FNV: u64 = 0xd344_36cb_554f_1645;
 pub(crate) const PEREGRINE_I_GEOMETRY_KEY: &str = "assets/fleet/sh022/visual.bin";
 const PEREGRINE_I_VISUAL: &[u8] = include_bytes!("../../../../assets/fleet/sh022/visual.bin");
 const PEREGRINE_I_VISUAL_FNV: u64 = 0x0259_dab8_59ed_15d8;
@@ -54,6 +61,7 @@ const EMPTY_PIECE: Piece = Piece {
 pub(crate) enum Hull {
     Explorer,
     Custom,
+    Zebra,
     Medusa,
     PeregrineMkI,
     PeregrineMkIII,
@@ -63,6 +71,7 @@ pub(crate) fn hull(model: &ModelPreview) -> Option<Hull> {
     match (model.object.as_str(), model.geometry_key.as_str()) {
         ("SH008", GEOMETRY_KEY) => Some(Hull::Explorer),
         ("SH010", CUSTOM_GEOMETRY_KEY) => Some(Hull::Custom),
+        ("SH021", ZEBRA_GEOMETRY_KEY) => Some(Hull::Zebra),
         ("SH171", MEDUSA_GEOMETRY_KEY) => Some(Hull::Medusa),
         ("SH022", PEREGRINE_I_GEOMETRY_KEY) => Some(Hull::PeregrineMkI),
         ("SH023", PEREGRINE_III_GEOMETRY_KEY) => Some(Hull::PeregrineMkIII),
@@ -114,6 +123,12 @@ impl Hull {
                 b"SH010VZ1",
                 CUSTOM_DETAILED_FACES * 3,
             ),
+            Self::Zebra => authenticated_visual(
+                ZEBRA_VISUAL,
+                ZEBRA_VISUAL_FNV,
+                b"SH021VZ1",
+                ZEBRA_DETAILED_FACES * 3,
+            ),
             Self::Medusa => medusa::visual(),
             Self::PeregrineMkI => authenticated_visual(
                 PEREGRINE_I_VISUAL,
@@ -134,6 +149,7 @@ impl Hull {
         match self {
             Self::Explorer => GOSHAWK_PIECES,
             Self::Custom => CUSTOM_PIECES,
+            Self::Zebra => ZEBRA_PIECES,
             Self::Medusa => medusa::PIECES,
             Self::PeregrineMkI => PEREGRINE_I_PIECES,
             Self::PeregrineMkIII => PEREGRINE_MK3_PIECES,
@@ -157,6 +173,15 @@ impl Hull {
                 let (triangles, pieces) = support_mesh(
                     source.pieces(),
                     CUSTOM_DETAILED_VERTICES + CUSTOM_NATIVE_VERTICES,
+                )
+                .map_err(SupportError::Render)?;
+                Ok((triangles, pieces.to_vec()))
+            }
+            Self::Zebra => {
+                let source = ZebraHullSource::bundled().map_err(SupportError::Source)?;
+                let (triangles, pieces) = support_mesh(
+                    source.pieces(),
+                    ZEBRA_DETAILED_VERTICES + ZEBRA_NATIVE_VERTICES,
                 )
                 .map_err(SupportError::Render)?;
                 Ok((triangles, pieces.to_vec()))
@@ -336,9 +361,11 @@ impl Pass {
     ) -> Result<Self, String> {
         match hull {
             Hull::Explorer => Self::new(device, queue, format),
-            Hull::Custom | Hull::Medusa | Hull::PeregrineMkI | Hull::PeregrineMkIII => {
-                Self::construct(device, queue, format, hull)
-            }
+            Hull::Custom
+            | Hull::Zebra
+            | Hull::Medusa
+            | Hull::PeregrineMkI
+            | Hull::PeregrineMkIII => Self::construct(device, queue, format, hull),
         }
     }
 
@@ -375,7 +402,8 @@ impl Pass {
                 points: &triangles,
                 visual: &vertices,
                 authored_materials: false,
-                display_paint: true,
+                // Zebra uses the ice-blue palette encoded in its original detailed visual.
+                display_paint: hull != Hull::Zebra,
             },
         )?;
         // The uniform header and all source-local support records are contiguous in WGSL.
@@ -654,6 +682,72 @@ mod tests {
         assert_eq!(
             PeregrineMk3HullSource::from_bytes(source_i, membership_iii),
             Err(EnvelopeError::ChangedSource)
+        );
+    }
+
+    #[test]
+    fn zebra_original_visual_and_all_local_supports_bind_to_its_own_shader() {
+        check_variant(Hull::Zebra, ZEBRA_DETAILED_FACES, ZEBRA_PIECES);
+        assert!(authenticated_visual(ZEBRA_VISUAL, VISUAL_FNV, b"GOSHVIZ1", VERTICES).is_err());
+        assert!(
+            authenticated_visual(
+                ZEBRA_VISUAL,
+                CUSTOM_VISUAL_FNV,
+                b"SH010VZ1",
+                CUSTOM_DETAILED_FACES * 3
+            )
+            .is_err()
+        );
+        assert!(
+            authenticated_visual(
+                CUSTOM_VISUAL,
+                ZEBRA_VISUAL_FNV,
+                b"SH021VZ1",
+                ZEBRA_DETAILED_FACES * 3
+            )
+            .is_err()
+        );
+        assert!(
+            authenticated_visual(
+                VISUAL,
+                ZEBRA_VISUAL_FNV,
+                b"SH021VZ1",
+                ZEBRA_DETAILED_FACES * 3
+            )
+            .is_err()
+        );
+        let mut model = ModelPreview {
+            object: "SH021".into(),
+            geometry_key: ZEBRA_GEOMETRY_KEY.into(),
+            bounds: Rect::new(0.0, 0.0, 256.0, 256.0),
+            orientation: Orientation::default(),
+        };
+        assert_eq!(hull(&model), Some(Hull::Zebra));
+        model.geometry_key = GEOMETRY_KEY.into();
+        assert!(!matches(&model));
+        model.object = "SH008".into();
+        assert_eq!(hull(&model), Some(Hull::Explorer));
+        model.geometry_key = ZEBRA_GEOMETRY_KEY.into();
+        assert!(!matches(&model));
+        model.object = "SH010".into();
+        assert!(!matches(&model));
+        model.geometry_key = CUSTOM_GEOMETRY_KEY.into();
+        assert_eq!(hull(&model), Some(Hull::Custom));
+        model.object = "SH021".into();
+        assert!(!matches(&model));
+        model.geometry_key = "assets/fleet/sh020/visual.bin".into();
+        assert!(!matches(&model));
+        model.object = "SH020".into();
+        model.geometry_key = ZEBRA_GEOMETRY_KEY.into();
+        assert!(!matches(&model));
+        assert!(
+            authenticated_visual(
+                ZEBRA_VISUAL,
+                ZEBRA_VISUAL_FNV,
+                b"SH020VZ1",
+                ZEBRA_DETAILED_FACES * 3,
+            )
+            .is_err()
         );
     }
 

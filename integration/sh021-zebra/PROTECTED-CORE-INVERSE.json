@@ -1,0 +1,32 @@
+{
+  "base": "32c49cb598f7be71103cf5d58d6d8679cbf27f5b",
+  "files": {
+    "flight.rs": {
+      "beforeSHA256": "abb0b55ddbf5336fccb757514e3e6fceba26519bde173bf243abfec7604bb4d3",
+      "afterSHA256": "c9e527422fd84c7c96aa9daf2c20d636afb678b5c5007b3786a4872a7b45cf03",
+      "hunks": [
+        {
+          "offset": 685,
+          "before": "",
+          "after": "pub use goshawk_validation::ZebraApproachSnapshot;\n"
+        }
+      ]
+    },
+    "lib.rs": {
+      "beforeSHA256": "9ee57fbf2f334d39ff5021ef4efdaa6f632e787987e2c5ac4289919c74f322e8",
+      "afterSHA256": "5772b652142b0b523d3edc7b426ed4441bd3ae6d9287cd5714edf7f579a6dbcb",
+      "hunks": [
+        {
+          "offset": 2691,
+          "before": "",
+          "after": "pub mod zebra;\n"
+        },
+        {
+          "offset": 2870,
+          "before": "",
+          "after": "pub use flight::ZebraApproachSnapshot;\n"
+        }
+      ]
+    }
+  }
+}

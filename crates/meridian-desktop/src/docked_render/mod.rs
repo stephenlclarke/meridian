@@ -11,7 +11,7 @@ const MAX_GEOMETRY: usize = 180_000;
 const MAX_MODELS: usize = 2;
 const MAX_MODEL_VERTICES: usize = 10452 * MAX_MODELS * 9;
 const SHIP_KEY: &str = "assets/legacy/sh025.mesh";
-const LEGACY_MODELS: [AvailableModel<'static>; 6] = [
+const LEGACY_MODELS: [AvailableModel<'static>; 7] = [
     AvailableModel {
         object: "SH025",
         geometry_key: SHIP_KEY,
@@ -27,6 +27,10 @@ const LEGACY_MODELS: [AvailableModel<'static>; 6] = [
     AvailableModel {
         object: "SH171",
         geometry_key: crate::mule_render::showroom::MEDUSA_GEOMETRY_KEY,
+    },
+    AvailableModel {
+        object: "SH021",
+        geometry_key: crate::mule_render::showroom::ZEBRA_GEOMETRY_KEY,
     },
     AvailableModel {
         object: "SH022",

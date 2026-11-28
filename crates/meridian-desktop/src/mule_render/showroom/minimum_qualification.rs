@@ -338,6 +338,14 @@ fn original_custom_fits_minimum_station_showroom_solo_and_compare() {
 }
 
 #[test]
+fn original_zebra_fits_minimum_station_showroom_solo_and_compare() {
+    let vertices = ok(super::Hull::Zebra.visual());
+    assert_eq!(vertices.len(), super::ZEBRA_DETAILED_FACES * 3);
+    let view = View::new(&vertices, [EMPTY_PIECE; super::ZEBRA_PIECES]);
+    assert_variant_fits_minimum(station_frames_for("Zebra"), &view, &vertices, "SH021");
+}
+
+#[test]
 fn original_peregrine_mk_i_fits_minimum_station_showroom_solo_and_compare() {
     let vertices = ok(super::Hull::PeregrineMkI.visual());
     assert_eq!(vertices.len(), super::PEREGRINE_I_DETAILED_FACES * 3);

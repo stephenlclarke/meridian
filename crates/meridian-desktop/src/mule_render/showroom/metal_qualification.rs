@@ -32,6 +32,7 @@ mod peregrine_mk_i_qualification;
 mod peregrine_pair_qualification;
 mod sparrowhawk_stock_qualification;
 mod stag_stock_qualification;
+mod zebra_qualification;
 
 fn ok<T, E: std::fmt::Debug>(result: Result<T, E>) -> T {
     result.unwrap_or_else(|error| panic!("{error:?}"))
@@ -613,6 +614,12 @@ fn metal_peregrine_mk_iii_same_pose_shimmer() {
         "Peregrine Mk III",
         "MERIDIAN_SH023_EVIDENCE_DIR",
     );
+}
+
+#[test]
+#[ignore = "Mac owner only: explicit production SH021 visual qualification"]
+fn metal_zebra_same_pose_shimmer() {
+    same_pose_shimmer(Hull::Zebra, "SH021", "Zebra", "MERIDIAN_SH021_EVIDENCE_DIR");
 }
 
 fn same_pose_shimmer(hull: Hull, object: &str, name: &str, variable: &str) {

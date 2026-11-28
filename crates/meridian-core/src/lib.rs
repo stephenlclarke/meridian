@@ -129,11 +129,13 @@ pub mod wolf_mk_ii;
 pub mod wolf_scout;
 pub mod wombat;
 pub mod yak;
+pub mod zebra;
 
 pub use flight::GoshawkCustomApproachSnapshot;
 pub use flight::PeregrineMkIApproachSnapshot;
 pub use flight::PreparedNavigationRoute;
 pub use flight::ShieldGrade;
+pub use flight::ZebraApproachSnapshot;
 pub use flight::{
     ECM_ENERGY_HUNDREDTHS, ECM_FIELD_TICKS, EcmActivation, EcmError, EcmSnapshot, EcmTermination,
     EcmTrigger, PreparedEcm,

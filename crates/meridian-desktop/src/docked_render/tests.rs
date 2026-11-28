@@ -303,6 +303,61 @@ fn selecting_mk_ii_custom_routes_its_own_preview_without_granting_exchange() {
 }
 
 #[test]
+fn showroom_registry_gives_each_native_and_package_hull_one_preview() {
+    let mut objects = std::collections::BTreeSet::new();
+    let mut keys = std::collections::BTreeSet::new();
+    for model in MODELS {
+        assert!(objects.insert(model.object), "duplicate {}", model.object);
+        assert!(
+            keys.insert(model.geometry_key),
+            "duplicate {}",
+            model.geometry_key
+        );
+    }
+    assert_eq!(
+        objects.len(),
+        LEGACY_MODELS.len() + crate::authored_hull::STOCK_MODELS.len()
+    );
+}
+
+#[test]
+fn selecting_zebra_routes_its_own_preview_without_granting_exchange() {
+    assert_inspection_preview("Zebra", "SH021", "assets/fleet/sh021/visual.bin");
+}
+
+#[test]
+fn selecting_crow_does_not_select_zebra_or_its_geometry() {
+    use crate::docked_screens::{Catalogue, DockedScreens, Input, Key, Outcome, Screen, Viewport};
+    let world = meridian_core::World::new_commander(95006).unwrap_or_else(|e| panic!("{e}"));
+    let catalogue = Catalogue::bundled().unwrap_or_else(|e| panic!("{e}"));
+    let ctx = context(&world, &catalogue);
+    let viewport = Viewport::new(1280.0, 720.0).unwrap_or_else(|| panic!("viewport"));
+    let mut ui = DockedScreens::new(meridian_core::navigation::SystemId::AVENOR, "SH025");
+    ui.open(Screen::Showroom);
+    let frame = ui.frame(&ctx, viewport);
+    assert!(matches!(
+        ui.handle(Input::Key(Key::Search), &frame, &ctx),
+        Outcome::Updated
+    ));
+    let frame = ui.frame(&ctx, viewport);
+    assert!(matches!(
+        ui.handle(Input::Text("Crow Prototype".into()), &frame, &ctx),
+        Outcome::Updated
+    ));
+    assert_eq!(ui.selected_ship(), "SH020");
+    let frame = ui.frame(&ctx, viewport);
+    assert!(matches!(
+        ui.handle(Input::Key(Key::Confirm), &frame, &ctx),
+        Outcome::Updated
+    ));
+    let frame = ui.frame(&ctx, viewport);
+    assert!(
+        frame.models.iter().all(|model| model.object != "SH021"
+            && model.geometry_key != "assets/fleet/sh021/visual.bin")
+    );
+}
+
+#[test]
 fn selecting_medusa_routes_the_original_preview_without_granting_exchange() {
     assert_inspection_preview("Medusa", "SH171", "assets/fleet/sh171/visual.bin");
 }

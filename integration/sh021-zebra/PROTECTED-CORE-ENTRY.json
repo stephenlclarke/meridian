@@ -1,0 +1,14 @@
+{
+  "schema": 1,
+  "id": "sh021-zebra",
+  "undoBefore": [
+    "player-laser-fittings",
+    "sh170-caracara-mk-ii"
+  ],
+  "undoAfter": [],
+  "kind": "inverse",
+  "manifest": "integration/sh021-zebra/PROTECTED-CORE-INVERSE.json",
+  "sha256": "e4963739ed9e600fcf190a106ff5942ffa959b912d1d24153269a4ab6a28e6de",
+  "base": "32c49cb598f7be71103cf5d58d6d8679cbf27f5b",
+  "label": "Zebra controlled approach and hull"
+}

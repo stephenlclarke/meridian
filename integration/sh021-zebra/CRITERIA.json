@@ -1,0 +1,102 @@
+{
+  "hull": "SH021",
+  "name": "Zebra",
+  "sourceRevision": "a11fe16924d87d06021816f9037952afcbac08db",
+  "protectedBase": "dae39800a35e2d8ca57b3d6a7ead20c7438c6b49",
+  "sourceManifestSha256": "4477d260f98b0e8eb8b584ae0d30698b795e21331a86a0898c5c9bcdc233b3d2",
+  "independentFitWitnessSha256": "7af4cbb925b1da6c5760d9d4c61471b43914f286bac8656ea6abad0b2f4acb52",
+  "independentSurfaceFitSha256": "5aa4ece65ac9ff214dad08f8a868e09907575d28413aee31f9cb0b10c1eef8dd",
+  "geometry": {
+    "detailedVertices": 1488,
+    "detailedFaces": 2528,
+    "nativeVertices": 412,
+    "nativeFaces": 744,
+    "nativeExactFaceLimit": 512,
+    "roundedPieces": 48,
+    "roundingMetres": 0.02,
+    "criteria": [
+      "Both original mesh sources remain unchanged. The two freight keels, two actual cross-bridges, cockpit, drive structures and source-local well regions retain separate support ownership.",
+      "Each original triangle remains enclosed by its own declared support; no broad central convex fill. The real centre freight trench remains open over the full 40m translation.",
+      "The packaged original 744-face native source exceeds its 512 cap. Its separate frozen 20-part reduction source proposal is explicitly unexecuted and uninstalled. This port does not select, execute or qualify it."
+    ]
+  },
+  "engineering": {
+    "dryMassKg": 60108,
+    "metresPerSourceUnit": "40/3",
+    "maxControlledSpeedUnits": 34,
+    "physicalRecordStatus": "NEW_AUTHORED_SOURCE_BUDGET_NOT_NATIVE_QUALIFICATION",
+    "scope": "Original adopted source budget and full signed inertia retained; actual material construction, loaded mass, hardware/crew/paid role rights unresolved."
+  },
+  "fit": {
+    "freightTrenchSourceClearanceMetres": 1.37316226111996,
+    "translationMetres": 40,
+    "alignedStationSweepMetres": 39.659,
+    "offApertureCompleteSweepMetres": 2.979,
+    "lipSourceVertex": 96,
+    "launchOutwardF32Bits": "0x44908ae2",
+    "retainedSurfaceBoundsMillimetres": {
+      "detailed": [
+        1060,
+        1063
+      ],
+      "nativeCandidate": [
+        1515,
+        1597
+      ],
+      "mandatoryCrossSourceVertices": [
+        1498,
+        1041
+      ],
+      "bothCrossBridges": {
+        "detailed": 581,
+        "nativeCandidate": 1142
+      }
+    }
+  },
+  "sourceOnly": {
+    "rebuild": "python3 -B tools/prepare_zebra.py --check",
+    "fit": "python3 -B tools/verify_zebra_fit.py",
+    "surface": "python3 -B -m unittest discover -s tools -p 'test_audit_zebra_surface.py' -v",
+    "negatives": "python3 -B -m unittest discover -s tools -p 'test_zebra.py' -v",
+    "scope": "Pinned source and actual fixed Git blob command with strictly resolved repository cwd; spaced path/missing input regression; immutable source, engineering bits, visual and shape replay."
+  },
+  "ownedTests": {
+    "workspace": "cargo test --locked --workspace",
+    "core": "cargo test --locked -p meridian-core zebra::tests -- --nocapture",
+    "typedWorld": "cargo test --locked -p meridian-core flight::goshawk_validation::tests -- --nocapture",
+    "desktop": [
+      "cargo test --locked -p meridian-desktop zebra_original_visual_and_all_local_supports_bind_to_its_own_shader",
+      "cargo test --locked -p meridian-desktop selecting_zebra_routes_its_own_preview_without_granting_exchange",
+      "cargo test --locked -p meridian-desktop selecting_crow_does_not_select_zebra_or_its_geometry",
+      "cargo test --locked -p meridian-desktop original_zebra_fits_minimum_station_showroom_solo_and_compare"
+    ],
+    "acceptance": [
+      "Five actual controlled World routes and inclusive 34-unit speed boundary; typed SH008/SH010 source and scope cross-refusal remains intact.",
+      "Ordinary Showroom retains original ice-blue geometry; no SH020 Crow alias or ordinary exchange; full central trench and twin keels visibly distinguish SH021."
+    ]
+  },
+  "metal": {
+    "invocation": "Set each variable to a distinct new absolute directory and run cargo test --locked -p meridian-desktop <test> -- --ignored --exact --nocapture.",
+    "tests": [
+      {
+        "directoryVariable": "MERIDIAN_SH021_EVIDENCE_DIR",
+        "test": "mule_render::showroom::metal_qualification::metal_zebra_same_pose_shimmer",
+        "verifier": "python3 -B tools/verify_goshawk_showroom_evidence.py <evidence-directory>"
+      },
+      {
+        "directoryVariable": "MERIDIAN_SH021_MINIMUM_DIR",
+        "test": "mule_render::showroom::metal_qualification::zebra_qualification::metal_zebra_minimum_showroom_model_pass"
+      },
+      {
+        "directoryVariable": "MERIDIAN_SH021_CACHE_DIR",
+        "test": "mule_render::showroom::metal_qualification::zebra_qualification::metal_zebra_cache_switching"
+      }
+    ],
+    "scope": "Production offscreen direct original RGB and full-target pane union in both Explorer/Zebra and Custom/Zebra orders; three distinct solo cache returns. Minimum 640×360 logical. Native resize/compositor and GPU timing separate."
+  },
+  "remaining": [
+    "Owned Rust, native Metal and exact native source/collision qualification.",
+    "Ordinary placement, acquisition, paid equipment, loaded engineering and crew custody.",
+    "SH020 Crow Prototype remains separately owned; no implementation or source imports here."
+  ]
+}

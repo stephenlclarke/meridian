@@ -1,0 +1,2123 @@
+{
+  "hull": "SH021",
+  "legacyRevision": "a11fe16924d87d06021816f9037952afcbac08db",
+  "manifestSha256": "4477d260f98b0e8eb8b584ae0d30698b795e21331a86a0898c5c9bcdc233b3d2",
+  "nominalPaddingMetres": 0.02,
+  "pieceCount": 48,
+  "sourceComparisons": {
+    "detailed": {
+      "certifiedUpperMillimetres": 1063,
+      "largestExposedSample": {
+        "metres": 1.0610604779929897,
+        "beyondPaddingMetres": 1.0410604779929897,
+        "point": [
+          -11.635812710363481,
+          -0.8607061617067119,
+          -7.266666666666667
+        ],
+        "closestPoint": [
+          -10.716176987848295,
+          -1.3897681178211216,
+          -7.281258528270895
+        ],
+        "face": 90,
+        "certifiedLowerMillimetres": 1060,
+        "supportFacetGlobalVertices": [
+          1563,
+          1561,
+          1562
+        ],
+        "supportFacetWeightNumeratorsOver12": [
+          0,
+          0,
+          12
+        ]
+      }
+    },
+    "nativeCandidate": {
+      "certifiedUpperMillimetres": 1597,
+      "largestExposedSample": {
+        "metres": 1.5163548364400508,
+        "beyondPaddingMetres": 1.4963548364400507,
+        "point": [
+          -11.680783788516612,
+          -4.479849486087619,
+          -15.133333333333333
+        ],
+        "closestPoint": [
+          -10.334227584812249,
+          -3.978724854445142,
+          -14.648573099999762
+        ],
+        "face": 23,
+        "certifiedLowerMillimetres": 1515,
+        "supportFacetGlobalVertices": [
+          338,
+          339,
+          336
+        ],
+        "supportFacetWeightNumeratorsOver12": [
+          0,
+          0,
+          12
+        ]
+      }
+    }
+  },
+  "mandatoryCrossSourceVertices": [
+    {
+      "source": "detailed",
+      "comparedTo": "nativeCandidate",
+      "vertex": 904,
+      "piece": "detailed: pods explicit member 1/service-well-2-0",
+      "nearestFace": 219,
+      "sampleMetres": 1.4999604180058805,
+      "certifiedLowerMillimetres": 1498
+    },
+    {
+      "source": "nativeCandidate",
+      "comparedTo": "detailed",
+      "vertex": 182,
+      "piece": "nativeCandidate: pods explicit member 1/service-well-1-0",
+      "nearestFace": 1022,
+      "sampleMetres": 1.0423589048554862,
+      "certifiedLowerMillimetres": 1041
+    }
+  ],
+  "perPiece": [
+    {
+      "piece": "pods explicit member 0",
+      "exposedSamples": 4191,
+      "comparisons": {
+        "detailed": {
+          "largestExposedSample": {
+            "metres": 0.03045332521792511,
+            "beyondPaddingMetres": 0.010453325217925108,
+            "point": [
+              -5.074899462662283,
+              -3.4792283761300036,
+              19.178074134709007
+            ],
+            "closestPoint": [
+              -5.092248594930289,
+              -3.461387669049868,
+              19.16052073625581
+            ],
+            "face": 208
+          },
+          "fullRoundedPieceUpperMillimetres": 997
+        },
+        "nativeCandidate": {
+          "largestExposedSample": {
+            "metres": 0.17842942805312018,
+            "beyondPaddingMetres": 0.15842942805312019,
+            "point": [
+              -11.05381998961716,
+              -1.7622942426460217,
+              -13.599724486110741
+            ],
+            "closestPoint": [
+              -10.886595496293177,
+              -1.8245273023490238,
+              -13.6
+            ],
+            "face": 44
+          },
+          "fullRoundedPieceUpperMillimetres": 1292
+        }
+      }
+    },
+    {
+      "piece": "detailed: pods explicit member 0/service-well-0-0",
+      "exposedSamples": 146,
+      "comparisons": {
+        "detailed": {
+          "largestExposedSample": {
+            "metres": 0.4420216238711368,
+            "beyondPaddingMetres": 0.4220216238711368,
+            "point": [
+              -2.143626105604363,
+              -0.008994939124100236,
+              -11.244444444444445
+            ],
+            "closestPoint": [
+              -2.378503526819658,
+              -0.2950067307759716,
+              -11.002756695460315
+            ],
+            "face": 245
+          },
+          "fullRoundedPieceUpperMillimetres": 867
+        },
+        "nativeCandidate": {
+          "largestExposedSample": {
+            "metres": 1.5147687427622787,
+            "beyondPaddingMetres": 1.4947687427622787,
+            "point": [
+              -1.1235205500488075,
+              -0.8467171613463225,
+              -15.133333333333333
+            ],
+            "closestPoint": [
+              -2.468668267935646,
+              -1.347317621079348,
+              -14.64908015489407
+            ],
+            "face": 11
+          },
+          "fullRoundedPieceUpperMillimetres": 1581
+        }
+      }
+    },
+    {
+      "piece": "detailed: pods explicit member 0/service-well-0-1",
+      "exposedSamples": 220,
+      "comparisons": {
+        "detailed": {
+          "largestExposedSample": {
+            "metres": 0.4420246594734891,
+            "beyondPaddingMetres": 0.4220246594734891,
+            "point": [
+              -2.255531105831517,
+              -0.07152597003157354,
+              -1.2444444444444445
+            ],
+            "closestPoint": [
+              -2.49105629897747,
+              -0.3570054853093222,
+              -1.00275222418695
+            ],
+            "face": 301
+          },
+          "fullRoundedPieceUpperMillimetres": 882
+        },
+        "nativeCandidate": {
+          "largestExposedSample": {
+            "metres": 1.1330401841319495,
+            "beyondPaddingMetres": 1.1130401841319495,
+            "point": [
+              -1.2373255502759617,
+              -0.9115593033649069,
+              -0.4666666666666667
+            ],
+            "closestPoint": [
+              -2.2991138897324896,
+              -1.3067067833057078,
+              -0.4822887711454289
+            ],
+            "face": 34
+          },
+          "fullRoundedPieceUpperMillimetres": 1597
+        }
+      }
+    },
+    {
+      "piece": "detailed: pods explicit member 0/service-well-0-2",
+      "exposedSamples": 221,
+      "comparisons": {
+        "detailed": {
+          "largestExposedSample": {
+            "metres": 0.4420284612489856,
+            "beyondPaddingMetres": 0.4220284612489856,
+            "point": [
+              -2.3629033606241725,
+              -0.1316375680615477,
+              8.355555555555556
+            ],
+            "closestPoint": [
+              -2.5990910734431085,
+              -0.4165761534133605,
+              8.597246530656435
+            ],
+            "face": 357
+          },
+          "fullRoundedPieceUpperMillimetres": 882
+        },
+        "nativeCandidate": {
+          "largestExposedSample": {
+            "metres": 1.1795752833105124,
+            "beyondPaddingMetres": 1.1595752833105124,
+            "point": [
+              -1.3466366939575054,
+              -0.9740153458393255,
+              9.133333333333333
+            ],
+            "closestPoint": [
+              -2.4350681290822456,
+              -1.374770468167604,
+              8.918600494771038
+            ],
+            "face": 58
+          },
+          "fullRoundedPieceUpperMillimetres": 1243
+        }
+      }
+    },
+    {
+      "piece": "detailed: pods explicit member 0/service-well-1-0",
+      "exposedSamples": 125,
+      "comparisons": {
+        "detailed": {
+          "largestExposedSample": {
+            "metres": 0.4420293095052996,
+            "beyondPaddingMetres": 0.4220293095052996,
+            "point": [
+              -10.037886232347105,
+              0.4978361189845801,
+              -11.244444444444445
+            ],
+            "closestPoint": [
+              -9.803457959691064,
+              0.2114498022194583,
+              -11.002750065091213
+            ],
+            "face": 413
+          },
+          "fullRoundedPieceUpperMillimetres": 888
+        },
+        "nativeCandidate": {
+          "largestExposedSample": {
+            "metres": 1.02823863309218,
+            "beyondPaddingMetres": 1.00823863309218,
+            "point": [
+              -11.63837168511153,
+              -0.9128039972105763,
+              -13.18888888888889
+            ],
+            "closestPoint": [
+              -10.674798002348087,
+              -1.2714006198445544,
+              -13.203342494130341
+            ],
+            "face": 44
+          },
+          "fullRoundedPieceUpperMillimetres": 1579
+        }
+      }
+    },
+    {
+      "piece": "detailed: pods explicit member 0/service-well-1-1",
+      "exposedSamples": 221,
+      "comparisons": {
+        "detailed": {
+          "largestExposedSample": {
+            "metres": 0.44202932467856415,
+            "beyondPaddingMetres": 0.42202932467856413,
+            "point": [
+              -10.742903417071135,
+              -0.2341570111716728,
+              -4.355555555555556
+            ],
+            "closestPoint": [
+              -10.507825926731122,
+              -0.5200103607427545,
+              -4.597250321635051
+            ],
+            "face": 461
+          },
+          "fullRoundedPieceUpperMillimetres": 888
+        },
+        "nativeCandidate": {
+          "largestExposedSample": {
+            "metres": 1.132586799961498,
+            "beyondPaddingMetres": 1.112586799961498,
+            "point": [
+              -11.558530083737804,
+              -0.904899233393895,
+              -0.4666666666666667
+            ],
+            "closestPoint": [
+              -10.49579821209705,
+              -1.2961919023462039,
+              -0.4822831858097487
+            ],
+            "face": 45
+          },
+          "fullRoundedPieceUpperMillimetres": 1453
+        }
+      }
+    },
+    {
+      "piece": "detailed: pods explicit member 0/service-well-1-2",
+      "exposedSamples": 221,
+      "comparisons": {
+        "detailed": {
+          "largestExposedSample": {
+            "metres": 0.44202867079637465,
+            "beyondPaddingMetres": 0.4220286707963746,
+            "point": [
+              -9.821214641890759,
+              0.37777803098142704,
+              8.355555555555556
+            ],
+            "closestPoint": [
+              -9.585479675384482,
+              0.09246772842942048,
+              8.59725040992771
+            ],
+            "face": 525
+          },
+          "fullRoundedPieceUpperMillimetres": 888
+        },
+        "nativeCandidate": {
+          "largestExposedSample": {
+            "metres": 1.1782149562775746,
+            "beyondPaddingMetres": 1.1582149562775745,
+            "point": [
+              -11.44936575300187,
+              -0.9674753023519063,
+              9.133333333333333
+            ],
+            "closestPoint": [
+              -10.362367867760165,
+              -1.3677025986360276,
+              8.91782418738976
+            ],
+            "face": 68
+          },
+          "fullRoundedPieceUpperMillimetres": 1485
+        }
+      }
+    },
+    {
+      "piece": "detailed: pods explicit member 0/service-well-2-0",
+      "exposedSamples": 169,
+      "comparisons": {
+        "detailed": {
+          "largestExposedSample": {
+            "metres": 0.44202738758921434,
+            "beyondPaddingMetres": 0.4220273875892143,
+            "point": [
+              -10.662000455183279,
+              -5.319177263865397,
+              -11.244444444444445
+            ],
+            "closestPoint": [
+              -10.426668576128941,
+              -5.033533093364855,
+              -11.002753472460059
+            ],
+            "face": 581
+          },
+          "fullRoundedPieceUpperMillimetres": 867
+        },
+        "nativeCandidate": {
+          "largestExposedSample": {
+            "metres": 1.5163548364400508,
+            "beyondPaddingMetres": 1.4963548364400507,
+            "point": [
+              -11.680783788516612,
+              -4.479849486087619,
+              -15.133333333333333
+            ],
+            "closestPoint": [
+              -10.334227584812249,
+              -3.978724854445142,
+              -14.648573099999762
+            ],
+            "face": 23,
+            "certifiedLowerMillimetres": 1515,
+            "supportFacetGlobalVertices": [
+              338,
+              339,
+              336
+            ],
+            "supportFacetWeightNumeratorsOver12": [
+              0,
+              0,
+              12
+            ]
+          },
+          "fullRoundedPieceUpperMillimetres": 1580
+        }
+      }
+    },
+    {
+      "piece": "detailed: pods explicit member 0/service-well-2-1",
+      "exposedSamples": 220,
+      "comparisons": {
+        "detailed": {
+          "largestExposedSample": {
+            "metres": 0.4420234001804828,
+            "beyondPaddingMetres": 0.4220234001804828,
+            "point": [
+              -10.143189895203308,
+              -5.593408365933611,
+              -4.355555555555556
+            ],
+            "closestPoint": [
+              -9.907215636617485,
+              -5.308300594677091,
+              -4.597246255337583
+            ],
+            "face": 629
+          },
+          "fullRoundedPieceUpperMillimetres": 867
+        },
+        "nativeCandidate": {
+          "largestExposedSample": {
+            "metres": 1.1346011886311544,
+            "beyondPaddingMetres": 1.1146011886311544,
+            "point": [
+              -11.566818784092199,
+              -4.415113921489167,
+              -0.4666666666666667
+            ],
+            "closestPoint": [
+              -10.503567604748518,
+              -4.019422041620918,
+              -0.4823102939261048
+            ],
+            "face": 46
+          },
+          "fullRoundedPieceUpperMillimetres": 1597
+        }
+      }
+    },
+    {
+      "piece": "detailed: pods explicit member 0/service-well-2-2",
+      "exposedSamples": 221,
+      "comparisons": {
+        "detailed": {
+          "largestExposedSample": {
+            "metres": 0.44203014663684537,
+            "beyondPaddingMetres": 0.42203014663684535,
+            "point": [
+              -10.036441018393566,
+              -5.534335525038035,
+              5.2444444444444445
+            ],
+            "closestPoint": [
+              -9.799806258554643,
+              -5.249768721605258,
+              5.002749646495011
+            ],
+            "face": 685
+          },
+          "fullRoundedPieceUpperMillimetres": 882
+        },
+        "nativeCandidate": {
+          "largestExposedSample": {
+            "metres": 1.1810207203405043,
+            "beyondPaddingMetres": 1.1610207203405043,
+            "point": [
+              -11.457347685060231,
+              -4.35275108059359,
+              9.133333333333333
+            ],
+            "closestPoint": [
+              -10.367582499454961,
+              -3.951504877872251,
+              8.918337363794317
+            ],
+            "face": 70
+          },
+          "fullRoundedPieceUpperMillimetres": 1246
+        }
+      }
+    },
+    {
+      "piece": "detailed: pods explicit member 0/service-well-3-0",
+      "exposedSamples": 170,
+      "comparisons": {
+        "detailed": {
+          "largestExposedSample": {
+            "metres": 0.4420303412742262,
+            "beyondPaddingMetres": 0.4220303412742262,
+            "point": [
+              -1.9503604004010324,
+              -5.167753846641469,
+              -14.355555555555556
+            ],
+            "closestPoint": [
+              -2.184339216732631,
+              -4.881000241087875,
+              -14.59725186462354
+            ],
+            "face": 741
+          },
+          "fullRoundedPieceUpperMillimetres": 867
+        },
+        "nativeCandidate": {
+          "largestExposedSample": {
+            "metres": 1.511560699456608,
+            "beyondPaddingMetres": 1.491560699456608,
+            "point": [
+              -1.132169289289921,
+              -4.5001494021970245,
+              -15.133333333333333
+            ],
+            "closestPoint": [
+              -2.4744682899413193,
+              -4.0006091004962725,
+              -14.65010602867358
+            ],
+            "face": 33
+          },
+          "fullRoundedPieceUpperMillimetres": 1582
+        }
+      }
+    },
+    {
+      "piece": "detailed: pods explicit member 0/service-well-3-1",
+      "exposedSamples": 221,
+      "comparisons": {
+        "detailed": {
+          "largestExposedSample": {
+            "metres": 0.4420269025974798,
+            "beyondPaddingMetres": 0.42202690259747977,
+            "point": [
+              -2.6748308978119617,
+              -5.6066318413717005,
+              -1.2444444444444445
+            ],
+            "closestPoint": [
+              -2.9094551046655486,
+              -5.320409440162191,
+              -1.0027504204717577
+            ],
+            "face": 805
+          },
+          "fullRoundedPieceUpperMillimetres": 888
+        },
+        "nativeCandidate": {
+          "largestExposedSample": {
+            "metres": 1.1309693898776787,
+            "beyondPaddingMetres": 1.1109693898776787,
+            "point": [
+              -1.2456408978119615,
+              -4.435080730260589,
+              -0.4666666666666667
+            ],
+            "closestPoint": [
+              -2.3068551169022418,
+              -4.044346853542565,
+              -0.4822608843706515
+            ],
+            "face": 57
+          },
+          "fullRoundedPieceUpperMillimetres": 1329
+        }
+      }
+    },
+    {
+      "piece": "detailed: pods explicit member 0/service-well-3-2",
+      "exposedSamples": 221,
+      "comparisons": {
+        "detailed": {
+          "largestExposedSample": {
+            "metres": 0.4420344631910841,
+            "beyondPaddingMetres": 0.42203446319108406,
+            "point": [
+              -2.169778607043348,
+              -5.043749237142814,
+              5.2444444444444445
+            ],
+            "closestPoint": [
+              -2.405066885944622,
+              -4.7580662907990545,
+              5.002743913562415
+            ],
+            "face": 853
+          },
+          "fullRoundedPieceUpperMillimetres": 888
+        },
+        "nativeCandidate": {
+          "largestExposedSample": {
+            "metres": 1.176740593199047,
+            "beyondPaddingMetres": 1.1567405931990469,
+            "point": [
+              -1.3546452737100143,
+              -4.372411459365036,
+              9.133333333333333
+            ],
+            "closestPoint": [
+              -2.440282940648686,
+              -3.9726849887965594,
+              8.918093865453319
+            ],
+            "face": 80
+          },
+          "fullRoundedPieceUpperMillimetres": 1480
+        }
+      }
+    },
+    {
+      "piece": "pods explicit member 0/longitudinal-service-strut-0",
+      "exposedSamples": 228,
+      "comparisons": {
+        "detailed": {
+          "largestExposedSample": {
+            "metres": 0.020000000000000018,
+            "beyondPaddingMetres": 1.734723475976807e-17,
+            "point": [
+              -6.20356,
+              0.9485466666666666,
+              5.533333333333334
+            ],
+            "closestPoint": [
+              -6.20356,
+              0.9685466666666667,
+              5.533333333333336
+            ],
+            "face": 912
+          },
+          "fullRoundedPieceUpperMillimetres": 260
+        },
+        "nativeCandidate": {
+          "largestExposedSample": {
+            "metres": 0.6612962080889314,
+            "beyondPaddingMetres": 0.6412962080889314,
+            "point": [
+              -6.18356,
+              1.2285466666666667,
+              7.2
+            ],
+            "closestPoint": [
+              -6.30882366662765,
+              0.5792504622959633,
+              7.193989372279541
+            ],
+            "face": 38
+          },
+          "fullRoundedPieceUpperMillimetres": 662
+        }
+      }
+    },
+    {
+      "piece": "pods explicit member 0/longitudinal-service-strut-1",
+      "exposedSamples": 228,
+      "comparisons": {
+        "detailed": {
+          "largestExposedSample": {
+            "metres": 0.020000000000000018,
+            "beyondPaddingMetres": 1.734723475976807e-17,
+            "point": [
+              -6.19832,
+              -6.302106666666667,
+              -2.82
+            ],
+            "closestPoint": [
+              -6.19832,
+              -6.302106666666667,
+              -2.8
+            ],
+            "face": 920
+          },
+          "fullRoundedPieceUpperMillimetres": 260
+        },
+        "nativeCandidate": {
+          "largestExposedSample": {
+            "metres": 0.6588784093747021,
+            "beyondPaddingMetres": 0.6388784093747021,
+            "point": [
+              -6.19832,
+              -6.562106666666666,
+              7.2
+            ],
+            "closestPoint": [
+              -6.324420861977129,
+              -5.915435579604481,
+              7.194013673365479
+            ],
+            "face": 53
+          },
+          "fullRoundedPieceUpperMillimetres": 660
+        }
+      }
+    },
+    {
+      "piece": "pods explicit member 1",
+      "exposedSamples": 4191,
+      "comparisons": {
+        "detailed": {
+          "largestExposedSample": {
+            "metres": 0.030453325217925615,
+            "beyondPaddingMetres": 0.010453325217925614,
+            "point": [
+              7.725100537337717,
+              -3.4792283761300036,
+              19.178074134709007
+            ],
+            "closestPoint": [
+              7.70775140506971,
+              -3.461387669049868,
+              19.16052073625581
+            ],
+            "face": 1140
+          },
+          "fullRoundedPieceUpperMillimetres": 997
+        },
+        "nativeCandidate": {
+          "largestExposedSample": {
+            "metres": 0.17842942805312018,
+            "beyondPaddingMetres": 0.15842942805312019,
+            "point": [
+              11.05381998961716,
+              -3.5710390906873117,
+              -13.599724486110741
+            ],
+            "closestPoint": [
+              10.886595496293177,
+              -3.5088060309843097,
+              -13.6
+            ],
+            "face": 252
+          },
+          "fullRoundedPieceUpperMillimetres": 1292
+        }
+      }
+    },
+    {
+      "piece": "detailed: pods explicit member 1/service-well-0-0",
+      "exposedSamples": 124,
+      "comparisons": {
+        "detailed": {
+          "largestExposedSample": {
+            "metres": 0.4420216238711374,
+            "beyondPaddingMetres": 0.4220216238711374,
+            "point": [
+              10.656373894395637,
+              -0.008994939124100234,
+              -11.244444444444445
+            ],
+            "closestPoint": [
+              10.42149647318034,
+              -0.29500673077597156,
+              -11.002756695460315
+            ],
+            "face": 1177
+          },
+          "fullRoundedPieceUpperMillimetres": 873
+        },
+        "nativeCandidate": {
+          "largestExposedSample": {
+            "metres": 1.0243678631650148,
+            "beyondPaddingMetres": 1.0043678631650148,
+            "point": [
+              11.642575098189438,
+              -0.91951718229164,
+              -13.577777777777778
+            ],
+            "closestPoint": [
+              10.68262516203082,
+              -1.27676521756067,
+              -13.591901532616454
+            ],
+            "face": 230
+          },
+          "fullRoundedPieceUpperMillimetres": 1581
+        }
+      }
+    },
+    {
+      "piece": "detailed: pods explicit member 1/service-well-0-1",
+      "exposedSamples": 220,
+      "comparisons": {
+        "detailed": {
+          "largestExposedSample": {
+            "metres": 0.44202465947348735,
+            "beyondPaddingMetres": 0.42202465947348733,
+            "point": [
+              10.544468894168482,
+              -0.07152597003157354,
+              -1.2444444444444445
+            ],
+            "closestPoint": [
+              10.30894370102253,
+              -0.35700548530932114,
+              -1.0027522241869506
+            ],
+            "face": 1233
+          },
+          "fullRoundedPieceUpperMillimetres": 882
+        },
+        "nativeCandidate": {
+          "largestExposedSample": {
+            "metres": 1.1330401841319502,
+            "beyondPaddingMetres": 1.1130401841319502,
+            "point": [
+              11.562674449724039,
+              -0.9115593033649069,
+              -0.4666666666666667
+            ],
+            "closestPoint": [
+              10.50088611026751,
+              -1.306706783305708,
+              -0.48228877114543245
+            ],
+            "face": 230
+          },
+          "fullRoundedPieceUpperMillimetres": 1597
+        }
+      }
+    },
+    {
+      "piece": "detailed: pods explicit member 1/service-well-0-2",
+      "exposedSamples": 221,
+      "comparisons": {
+        "detailed": {
+          "largestExposedSample": {
+            "metres": 0.44202846124898554,
+            "beyondPaddingMetres": 0.4220284612489855,
+            "point": [
+              10.437096639375829,
+              -0.13163756806154767,
+              8.355555555555556
+            ],
+            "closestPoint": [
+              10.200908926556894,
+              -0.4165761534133608,
+              8.597246530656435
+            ],
+            "face": 1289
+          },
+          "fullRoundedPieceUpperMillimetres": 882
+        },
+        "nativeCandidate": {
+          "largestExposedSample": {
+            "metres": 1.179575283310512,
+            "beyondPaddingMetres": 1.159575283310512,
+            "point": [
+              11.453363306042494,
+              -0.9740153458393255,
+              9.133333333333333
+            ],
+            "closestPoint": [
+              10.364931870917754,
+              -1.3747704681676045,
+              8.918600494771038
+            ],
+            "face": 254
+          },
+          "fullRoundedPieceUpperMillimetres": 1243
+        }
+      }
+    },
+    {
+      "piece": "detailed: pods explicit member 1/service-well-1-0",
+      "exposedSamples": 146,
+      "comparisons": {
+        "detailed": {
+          "largestExposedSample": {
+            "metres": 0.4420264246135062,
+            "beyondPaddingMetres": 0.4220264246135062,
+            "point": [
+              2.149260434319561,
+              -0.0038338810154198936,
+              -11.244444444444445
+            ],
+            "closestPoint": [
+              2.383687176986108,
+              -0.2902183286883402,
+              -11.002751642502748
+            ],
+            "face": 1345
+          },
+          "fullRoundedPieceUpperMillimetres": 871
+        },
+        "nativeCandidate": {
+          "largestExposedSample": {
+            "metres": 1.51317056065335,
+            "beyondPaddingMetres": 1.49317056065335,
+            "point": [
+              1.127838212097339,
+              -0.8399505476820865,
+              -15.133333333333333
+            ],
+            "closestPoint": [
+              2.4715668047435218,
+              -1.3400228760147872,
+              -14.649591375912856
+            ],
+            "face": 217
+          },
+          "fullRoundedPieceUpperMillimetres": 1581
+        }
+      }
+    },
+    {
+      "piece": "detailed: pods explicit member 1/service-well-1-1",
+      "exposedSamples": 221,
+      "comparisons": {
+        "detailed": {
+          "largestExposedSample": {
+            "metres": 0.44202932467856615,
+            "beyondPaddingMetres": 0.42202932467856613,
+            "point": [
+              2.0570965829288625,
+              -0.2341570111716728,
+              -4.355555555555556
+            ],
+            "closestPoint": [
+              2.2921740732688765,
+              -0.5200103607427551,
+              -4.597250321635053
+            ],
+            "face": 1393
+          },
+          "fullRoundedPieceUpperMillimetres": 871
+        },
+        "nativeCandidate": {
+          "largestExposedSample": {
+            "metres": 1.132586799961498,
+            "beyondPaddingMetres": 1.112586799961498,
+            "point": [
+              1.2414699162621958,
+              -0.904899233393895,
+              -0.4666666666666667
+            ],
+            "closestPoint": [
+              2.3042017879029495,
+              -1.2961919023462039,
+              -0.4822831858097487
+            ],
+            "face": 241
+          },
+          "fullRoundedPieceUpperMillimetres": 1453
+        }
+      }
+    },
+    {
+      "piece": "detailed: pods explicit member 1/service-well-1-2",
+      "exposedSamples": 221,
+      "comparisons": {
+        "detailed": {
+          "largestExposedSample": {
+            "metres": 0.4420286707963741,
+            "beyondPaddingMetres": 0.4220286707963741,
+            "point": [
+              2.978785358109241,
+              0.37777803098142704,
+              8.355555555555556
+            ],
+            "closestPoint": [
+              3.2145203246155165,
+              0.09246772842942025,
+              8.59725040992771
+            ],
+            "face": 1457
+          },
+          "fullRoundedPieceUpperMillimetres": 871
+        },
+        "nativeCandidate": {
+          "largestExposedSample": {
+            "metres": 1.1782149562775726,
+            "beyondPaddingMetres": 1.1582149562775725,
+            "point": [
+              1.3506342469981303,
+              -0.9674753023519063,
+              9.133333333333333
+            ],
+            "closestPoint": [
+              2.4376321322398344,
+              -1.3677025986360263,
+              8.91782418738976
+            ],
+            "face": 264
+          },
+          "fullRoundedPieceUpperMillimetres": 1485
+        }
+      }
+    },
+    {
+      "piece": "detailed: pods explicit member 1/service-well-2-0",
+      "exposedSamples": 169,
+      "comparisons": {
+        "detailed": {
+          "largestExposedSample": {
+            "metres": 0.442027387589215,
+            "beyondPaddingMetres": 0.422027387589215,
+            "point": [
+              2.1379995448167213,
+              -5.319177263865397,
+              -11.244444444444445
+            ],
+            "closestPoint": [
+              2.37333142387106,
+              -5.033533093364855,
+              -11.002753472460059
+            ],
+            "face": 1513
+          },
+          "fullRoundedPieceUpperMillimetres": 888
+        },
+        "nativeCandidate": {
+          "largestExposedSample": {
+            "metres": 1.5163548364400503,
+            "beyondPaddingMetres": 1.4963548364400503,
+            "point": [
+              1.1192162114833881,
+              -4.479849486087619,
+              -15.133333333333333
+            ],
+            "closestPoint": [
+              2.4657724151877507,
+              -3.978724854445141,
+              -14.648573099999762
+            ],
+            "face": 219,
+            "certifiedLowerMillimetres": 1515,
+            "supportFacetGlobalVertices": [
+              906,
+              907,
+              904
+            ],
+            "supportFacetWeightNumeratorsOver12": [
+              0,
+              0,
+              12
+            ]
+          },
+          "fullRoundedPieceUpperMillimetres": 1580
+        }
+      }
+    },
+    {
+      "piece": "detailed: pods explicit member 1/service-well-2-1",
+      "exposedSamples": 220,
+      "comparisons": {
+        "detailed": {
+          "largestExposedSample": {
+            "metres": 0.44202340018048336,
+            "beyondPaddingMetres": 0.42202340018048334,
+            "point": [
+              2.6568101047966897,
+              -5.593408365933611,
+              -4.355555555555556
+            ],
+            "closestPoint": [
+              2.892784363382513,
+              -5.30830059467709,
+              -4.597246255337583
+            ],
+            "face": 1561
+          },
+          "fullRoundedPieceUpperMillimetres": 882
+        },
+        "nativeCandidate": {
+          "largestExposedSample": {
+            "metres": 1.1346011886311544,
+            "beyondPaddingMetres": 1.1146011886311544,
+            "point": [
+              1.233181215907801,
+              -4.415113921489167,
+              -0.4666666666666667
+            ],
+            "closestPoint": [
+              2.2964323952514816,
+              -4.019422041620918,
+              -0.4823102939261048
+            ],
+            "face": 242
+          },
+          "fullRoundedPieceUpperMillimetres": 1597
+        }
+      }
+    },
+    {
+      "piece": "detailed: pods explicit member 1/service-well-2-2",
+      "exposedSamples": 221,
+      "comparisons": {
+        "detailed": {
+          "largestExposedSample": {
+            "metres": 0.4420301466368438,
+            "beyondPaddingMetres": 0.4220301466368438,
+            "point": [
+              2.7635589816064345,
+              -5.534335525038035,
+              5.2444444444444445
+            ],
+            "closestPoint": [
+              3.0001937414453566,
+              -5.249768721605259,
+              5.002749646495012
+            ],
+            "face": 1617
+          },
+          "fullRoundedPieceUpperMillimetres": 882
+        },
+        "nativeCandidate": {
+          "largestExposedSample": {
+            "metres": 1.1810207203405045,
+            "beyondPaddingMetres": 1.1610207203405045,
+            "point": [
+              1.3426523149397682,
+              -4.35275108059359,
+              9.133333333333333
+            ],
+            "closestPoint": [
+              2.4324175005450384,
+              -3.9515048778722512,
+              8.918337363794317
+            ],
+            "face": 266
+          },
+          "fullRoundedPieceUpperMillimetres": 1246
+        }
+      }
+    },
+    {
+      "piece": "detailed: pods explicit member 1/service-well-3-0",
+      "exposedSamples": 170,
+      "comparisons": {
+        "detailed": {
+          "largestExposedSample": {
+            "metres": 0.4420303412742267,
+            "beyondPaddingMetres": 0.4220303412742267,
+            "point": [
+              10.849639599598968,
+              -5.167753846641469,
+              -14.355555555555556
+            ],
+            "closestPoint": [
+              10.61566078326737,
+              -4.881000241087874,
+              -14.59725186462354
+            ],
+            "face": 1673
+          },
+          "fullRoundedPieceUpperMillimetres": 888
+        },
+        "nativeCandidate": {
+          "largestExposedSample": {
+            "metres": 1.511560699456608,
+            "beyondPaddingMetres": 1.491560699456608,
+            "point": [
+              11.66783071071008,
+              -4.5001494021970245,
+              -15.133333333333333
+            ],
+            "closestPoint": [
+              10.325531710058682,
+              -4.000609100496272,
+              -14.65010602867358
+            ],
+            "face": 229
+          },
+          "fullRoundedPieceUpperMillimetres": 1582
+        }
+      }
+    },
+    {
+      "piece": "detailed: pods explicit member 1/service-well-3-1",
+      "exposedSamples": 221,
+      "comparisons": {
+        "detailed": {
+          "largestExposedSample": {
+            "metres": 0.442027420332228,
+            "beyondPaddingMetres": 0.422027420332228,
+            "point": [
+              9.920999102188036,
+              -5.773996285816144,
+              -1.2444444444444447
+            ],
+            "closestPoint": [
+              9.686374620525147,
+              -5.487773549361694,
+              -1.002750137381761
+            ],
+            "face": 1737
+          },
+          "fullRoundedPieceUpperMillimetres": 888
+        },
+        "nativeCandidate": {
+          "largestExposedSample": {
+            "metres": 1.1309693898776783,
+            "beyondPaddingMetres": 1.1109693898776782,
+            "point": [
+              11.554359102188037,
+              -4.435080730260589,
+              -0.4666666666666667
+            ],
+            "closestPoint": [
+              10.493144883097758,
+              -4.044346853542565,
+              -0.4822608843706515
+            ],
+            "face": 253
+          },
+          "fullRoundedPieceUpperMillimetres": 1329
+        }
+      }
+    },
+    {
+      "piece": "detailed: pods explicit member 1/service-well-3-2",
+      "exposedSamples": 221,
+      "comparisons": {
+        "detailed": {
+          "largestExposedSample": {
+            "metres": 0.4420344631910844,
+            "beyondPaddingMetres": 0.4220344631910844,
+            "point": [
+              10.630221392956651,
+              -5.043749237142814,
+              5.2444444444444445
+            ],
+            "closestPoint": [
+              10.394933114055377,
+              -4.758066290799054,
+              5.002743913562416
+            ],
+            "face": 1785
+          },
+          "fullRoundedPieceUpperMillimetres": 888
+        },
+        "nativeCandidate": {
+          "largestExposedSample": {
+            "metres": 1.1767405931990456,
+            "beyondPaddingMetres": 1.1567405931990455,
+            "point": [
+              11.445354726289985,
+              -4.372411459365036,
+              9.133333333333333
+            ],
+            "closestPoint": [
+              10.359717059351315,
+              -3.972684988796559,
+              8.918093865453319
+            ],
+            "face": 276
+          },
+          "fullRoundedPieceUpperMillimetres": 1480
+        }
+      }
+    },
+    {
+      "piece": "pods explicit member 1/longitudinal-service-strut-0",
+      "exposedSamples": 228,
+      "comparisons": {
+        "detailed": {
+          "largestExposedSample": {
+            "metres": 0.020000000000000018,
+            "beyondPaddingMetres": 1.734723475976807e-17,
+            "point": [
+              6.59644,
+              0.9485466666666666,
+              5.533333333333334
+            ],
+            "closestPoint": [
+              6.59644,
+              0.9685466666666667,
+              5.533333333333336
+            ],
+            "face": 1844
+          },
+          "fullRoundedPieceUpperMillimetres": 260
+        },
+        "nativeCandidate": {
+          "largestExposedSample": {
+            "metres": 0.6612962080889313,
+            "beyondPaddingMetres": 0.6412962080889313,
+            "point": [
+              6.61644,
+              1.2285466666666667,
+              7.2
+            ],
+            "closestPoint": [
+              6.491176333372349,
+              0.5792504622959636,
+              7.193989372279541
+            ],
+            "face": 234
+          },
+          "fullRoundedPieceUpperMillimetres": 662
+        }
+      }
+    },
+    {
+      "piece": "pods explicit member 1/longitudinal-service-strut-1",
+      "exposedSamples": 228,
+      "comparisons": {
+        "detailed": {
+          "largestExposedSample": {
+            "metres": 0.020000000000000018,
+            "beyondPaddingMetres": 1.734723475976807e-17,
+            "point": [
+              6.60168,
+              -6.302106666666667,
+              -2.82
+            ],
+            "closestPoint": [
+              6.60168,
+              -6.302106666666667,
+              -2.8
+            ],
+            "face": 1852
+          },
+          "fullRoundedPieceUpperMillimetres": 260
+        },
+        "nativeCandidate": {
+          "largestExposedSample": {
+            "metres": 0.658878409374702,
+            "beyondPaddingMetres": 0.638878409374702,
+            "point": [
+              6.60168,
+              -6.562106666666666,
+              7.2
+            ],
+            "closestPoint": [
+              6.475579138022872,
+              -5.915435579604481,
+              7.194013673365479
+            ],
+            "face": 249
+          },
+          "fullRoundedPieceUpperMillimetres": 660
+        }
+      }
+    },
+    {
+      "piece": "keel cross bridge (aft)",
+      "exposedSamples": 216,
+      "comparisons": {
+        "detailed": {
+          "largestExposedSample": {
+            "metres": 0.020000000000000018,
+            "beyondPaddingMetres": 1.734723475976807e-17,
+            "point": [
+              6.416666666666667,
+              1.2466666666666666,
+              -10.266666666666666
+            ],
+            "closestPoint": [
+              6.416666666666666,
+              1.2666666666666666,
+              -10.266666666666666
+            ],
+            "face": 1868
+          },
+          "fullRoundedPieceUpperMillimetres": 581
+        },
+        "nativeCandidate": {
+          "largestExposedSample": {
+            "metres": 0.020000000000000018,
+            "beyondPaddingMetres": 1.734723475976807e-17,
+            "point": [
+              6.416666666666667,
+              1.2466666666666666,
+              -10.266666666666666
+            ],
+            "closestPoint": [
+              6.416666666666666,
+              1.2666666666666666,
+              -10.266666666666666
+            ],
+            "face": 396
+          },
+          "fullRoundedPieceUpperMillimetres": 1142
+        }
+      }
+    },
+    {
+      "piece": "keel cross bridge (forward)",
+      "exposedSamples": 228,
+      "comparisons": {
+        "detailed": {
+          "largestExposedSample": {
+            "metres": 0.020000000000000018,
+            "beyondPaddingMetres": 1.734723475976807e-17,
+            "point": [
+              6.416666666666667,
+              1.2466666666666666,
+              12.933333333333332
+            ],
+            "closestPoint": [
+              6.416666666666668,
+              1.2666666666666666,
+              12.933333333333334
+            ],
+            "face": 1880
+          },
+          "fullRoundedPieceUpperMillimetres": 581
+        },
+        "nativeCandidate": {
+          "largestExposedSample": {
+            "metres": 0.020000000000000018,
+            "beyondPaddingMetres": 1.734723475976807e-17,
+            "point": [
+              6.416666666666667,
+              1.2466666666666666,
+              12.933333333333332
+            ],
+            "closestPoint": [
+              6.416666666666668,
+              1.2666666666666666,
+              12.933333333333334
+            ],
+            "face": 408
+          },
+          "fullRoundedPieceUpperMillimetres": 1142
+        }
+      }
+    },
+    {
+      "piece": "cockpit glazing envelope",
+      "exposedSamples": 4484,
+      "comparisons": {
+        "detailed": {
+          "largestExposedSample": {
+            "metres": 0.022626592462022473,
+            "beyondPaddingMetres": 0.002626592462022473,
+            "point": [
+              -0.7901736199260351,
+              9.692881405537944,
+              13.293676615789217
+            ],
+            "closestPoint": [
+              -0.7869756628568119,
+              9.685569889927493,
+              13.27250405107674
+            ],
+            "face": 2070
+          },
+          "fullRoundedPieceUpperMillimetres": 890
+        },
+        "nativeCandidate": {
+          "largestExposedSample": {
+            "metres": 0.13800694071790767,
+            "beyondPaddingMetres": 0.11800694071790767,
+            "point": [
+              -3.622122846884553,
+              8.523302797080703,
+              8.361315380434121
+            ],
+            "closestPoint": [
+              -3.498061754764044,
+              8.583743105505595,
+              8.36
+            ],
+            "face": 462
+          },
+          "fullRoundedPieceUpperMillimetres": 1077
+        }
+      }
+    },
+    {
+      "piece": "cockpit connected structural crossmember",
+      "exposedSamples": 0,
+      "comparisons": {
+        "detailed": {
+          "largestExposedSample": null,
+          "fullRoundedPieceUpperMillimetres": 287
+        },
+        "nativeCandidate": {
+          "largestExposedSample": null,
+          "fullRoundedPieceUpperMillimetres": 287
+        }
+      }
+    },
+    {
+      "piece": "engine_pair/negative side/connected support",
+      "exposedSamples": 54,
+      "comparisons": {
+        "detailed": {
+          "largestExposedSample": {
+            "metres": 0.020000000000002197,
+            "beyondPaddingMetres": 2.1961599205866378e-15,
+            "point": [
+              -1.4394242100843329,
+              1.7238262441402092,
+              -9.353630534735894
+            ],
+            "closestPoint": [
+              -1.4528811111111117,
+              1.7202377777777773,
+              -9.367984444444446
+            ],
+            "face": 2137
+          },
+          "fullRoundedPieceUpperMillimetres": 744
+        },
+        "nativeCandidate": {
+          "largestExposedSample": {
+            "metres": 0.020000000000002197,
+            "beyondPaddingMetres": 2.1961599205866378e-15,
+            "point": [
+              -1.4394242100843329,
+              1.7238262441402092,
+              -9.353630534735894
+            ],
+            "closestPoint": [
+              -1.4528811111111117,
+              1.7202377777777773,
+              -9.367984444444446
+            ],
+            "face": 545
+          },
+          "fullRoundedPieceUpperMillimetres": 1468
+        }
+      }
+    },
+    {
+      "piece": "engine_pair/negative side/propulsion casing",
+      "exposedSamples": 1206,
+      "comparisons": {
+        "detailed": {
+          "largestExposedSample": {
+            "metres": 0.02000317635415365,
+            "beyondPaddingMetres": 3.176354153647948e-06,
+            "point": [
+              -11.141784250507689,
+              -1.5352953425854485,
+              -16.358022241355364
+            ],
+            "closestPoint": [
+              -11.123444870239869,
+              -1.5276987956382437,
+              -16.355555123578164
+            ],
+            "face": 2197
+          },
+          "fullRoundedPieceUpperMillimetres": 992
+        },
+        "nativeCandidate": {
+          "largestExposedSample": {
+            "metres": 0.15831418781293508,
+            "beyondPaddingMetres": 0.13831418781293509,
+            "point": [
+              -11.5477231965627,
+              -1.0604751906645635,
+              -14.802466728631368
+            ],
+            "closestPoint": [
+              -11.394822085398514,
+              -1.0195051099045027,
+              -14.8
+            ],
+            "face": 579
+          },
+          "fullRoundedPieceUpperMillimetres": 1564
+        }
+      }
+    },
+    {
+      "piece": "engine_pair/negative side/propulsion luminous recess",
+      "exposedSamples": 1282,
+      "comparisons": {
+        "detailed": {
+          "largestExposedSample": {
+            "metres": 0.020000000000001735,
+            "beyondPaddingMetres": 1.734723475976807e-15,
+            "point": [
+              -10.010653160080796,
+              -0.7611758573721914,
+              -18.758888888888887
+            ],
+            "closestPoint": [
+              -9.992175555555555,
+              -0.7535222222222216,
+              -18.758888888888887
+            ],
+            "face": 2288
+          },
+          "fullRoundedPieceUpperMillimetres": 999
+        },
+        "nativeCandidate": {
+          "largestExposedSample": {
+            "metres": 0.10569547264515738,
+            "beyondPaddingMetres": 0.08569547264515738,
+            "point": [
+              -8.254837172491285,
+              2.4539622329331507,
+              -18.773333333333333
+            ],
+            "closestPoint": [
+              -8.227481371461852,
+              2.3518681925207874,
+              -18.773333333333333
+            ],
+            "face": 616
+          },
+          "fullRoundedPieceUpperMillimetres": 1551
+        }
+      }
+    },
+    {
+      "piece": "engine_pair/positive side/connected support",
+      "exposedSamples": 57,
+      "comparisons": {
+        "detailed": {
+          "largestExposedSample": {
+            "metres": 0.020000000000002644,
+            "beyondPaddingMetres": 2.643718577388654e-15,
+            "point": [
+              1.3373019878621106,
+              2.2047773552513203,
+              -9.56960831251367
+            ],
+            "closestPoint": [
+              1.3507588888888902,
+              2.2011888888888884,
+              -9.583962222222222
+            ],
+            "face": 2332
+          },
+          "fullRoundedPieceUpperMillimetres": 744
+        },
+        "nativeCandidate": {
+          "largestExposedSample": {
+            "metres": 0.020000000000002644,
+            "beyondPaddingMetres": 2.643718577388654e-15,
+            "point": [
+              1.3373019878621106,
+              2.2047773552513203,
+              -9.56960831251367
+            ],
+            "closestPoint": [
+              1.3507588888888902,
+              2.2011888888888884,
+              -9.583962222222222
+            ],
+            "face": 644
+          },
+          "fullRoundedPieceUpperMillimetres": 1468
+        }
+      }
+    },
+    {
+      "piece": "engine_pair/positive side/propulsion casing",
+      "exposedSamples": 1187,
+      "comparisons": {
+        "detailed": {
+          "largestExposedSample": {
+            "metres": 0.02000317635415202,
+            "beyondPaddingMetres": 3.176354152020777e-06,
+            "point": [
+              11.141784250507687,
+              1.5352953425854485,
+              -16.358022241355364
+            ],
+            "closestPoint": [
+              11.123444870239869,
+              1.5276987956382437,
+              -16.355555123578164
+            ],
+            "face": 2369
+          },
+          "fullRoundedPieceUpperMillimetres": 992
+        },
+        "nativeCandidate": {
+          "largestExposedSample": {
+            "metres": 0.15831418781293508,
+            "beyondPaddingMetres": 0.13831418781293509,
+            "point": [
+              11.5477231965627,
+              1.0604751906645635,
+              -14.802466728631368
+            ],
+            "closestPoint": [
+              11.394822085398514,
+              1.0195051099045027,
+              -14.8
+            ],
+            "face": 667
+          },
+          "fullRoundedPieceUpperMillimetres": 1564
+        }
+      }
+    },
+    {
+      "piece": "engine_pair/positive side/propulsion luminous recess",
+      "exposedSamples": 1272,
+      "comparisons": {
+        "detailed": {
+          "largestExposedSample": {
+            "metres": 0.020000000000001694,
+            "beyondPaddingMetres": 1.6930901125533637e-15,
+            "point": [
+              10.010653160080796,
+              0.7611758573721914,
+              -18.67222222222222
+            ],
+            "closestPoint": [
+              9.992175555555555,
+              0.7535222222222218,
+              -18.67222222222222
+            ],
+            "face": 2461
+          },
+          "fullRoundedPieceUpperMillimetres": 985
+        },
+        "nativeCandidate": {
+          "largestExposedSample": {
+            "metres": 0.10569547264515738,
+            "beyondPaddingMetres": 0.08569547264515738,
+            "point": [
+              8.254837172491285,
+              2.4539622329331507,
+              -18.773333333333333
+            ],
+            "closestPoint": [
+              8.227481371461852,
+              2.3518681925207874,
+              -18.773333333333333
+            ],
+            "face": 714
+          },
+          "fullRoundedPieceUpperMillimetres": 1551
+        }
+      }
+    },
+    {
+      "piece": "nativeCandidate: pods explicit member 0/service-well-0-0",
+      "exposedSamples": 148,
+      "comparisons": {
+        "detailed": {
+          "largestExposedSample": {
+            "metres": 1.0602319035276695,
+            "beyondPaddingMetres": 1.0402319035276695,
+            "point": [
+              -1.159922933770368,
+              -0.8674328264559662,
+              -7.266666666666667
+            ],
+            "closestPoint": [
+              -2.078842844572448,
+              -1.3960829795750436,
+              -7.281050768883333
+            ],
+            "face": 72
+          },
+          "fullRoundedPieceUpperMillimetres": 1062
+        },
+        "nativeCandidate": {
+          "largestExposedSample": {
+            "metres": 0.446675095082755,
+            "beyondPaddingMetres": 0.426675095082755,
+            "point": [
+              -1.975531822659257,
+              -0.19667727090041065,
+              -8.822222222222221
+            ],
+            "closestPoint": [
+              -2.259256316163224,
+              -0.541668651014618,
+              -8.822222222222221
+            ],
+            "face": 133
+          },
+          "fullRoundedPieceUpperMillimetres": 1421
+        }
+      }
+    },
+    {
+      "piece": "nativeCandidate: pods explicit member 0/service-well-1-0",
+      "exposedSamples": 165,
+      "comparisons": {
+        "detailed": {
+          "largestExposedSample": {
+            "metres": 1.0610604779929897,
+            "beyondPaddingMetres": 1.0410604779929897,
+            "point": [
+              -11.635812710363481,
+              -0.8607061617067119,
+              -7.266666666666667
+            ],
+            "closestPoint": [
+              -10.716176987848295,
+              -1.3897681178211216,
+              -7.281258528270895
+            ],
+            "face": 90,
+            "certifiedLowerMillimetres": 1060,
+            "supportFacetGlobalVertices": [
+              1563,
+              1561,
+              1562
+            ],
+            "supportFacetWeightNumeratorsOver12": [
+              0,
+              0,
+              12
+            ]
+          },
+          "fullRoundedPieceUpperMillimetres": 1063
+        },
+        "nativeCandidate": {
+          "largestExposedSample": {
+            "metres": 0.44666777855897766,
+            "beyondPaddingMetres": 0.42666777855897764,
+            "point": [
+              -10.819146043696815,
+              -0.19123505059560075,
+              -8.822222222222221
+            ],
+            "closestPoint": [
+              -10.535971403118564,
+              -0.5366684411880426,
+              -8.822222222222221
+            ],
+            "face": 153
+          },
+          "fullRoundedPieceUpperMillimetres": 1467
+        }
+      }
+    },
+    {
+      "piece": "nativeCandidate: pods explicit member 0/service-well-2-0",
+      "exposedSamples": 165,
+      "comparisons": {
+        "detailed": {
+          "largestExposedSample": {
+            "metres": 1.0605556053452632,
+            "beyondPaddingMetres": 1.0405556053452631,
+            "point": [
+              -11.644328057272906,
+              -4.459160470399478,
+              -7.266666666666667
+            ],
+            "closestPoint": [
+              -10.72512758893963,
+              -3.930348913897927,
+              -7.281055160526346
+            ],
+            "face": 96
+          },
+          "fullRoundedPieceUpperMillimetres": 1062
+        },
+        "nativeCandidate": {
+          "largestExposedSample": {
+            "metres": 0.4466700620557741,
+            "beyondPaddingMetres": 0.42667006205577407,
+            "point": [
+              -10.829776946161795,
+              -5.131200470399477,
+              -9.988888888888889
+            ],
+            "closestPoint": [
+              -10.545513765502102,
+              -4.786659343016774,
+              -9.988888888888889
+            ],
+            "face": 173
+          },
+          "fullRoundedPieceUpperMillimetres": 1331
+        }
+      }
+    },
+    {
+      "piece": "nativeCandidate: pods explicit member 0/service-well-3-0",
+      "exposedSamples": 164,
+      "comparisons": {
+        "detailed": {
+          "largestExposedSample": {
+            "metres": 1.0606954053218962,
+            "beyondPaddingMetres": 1.0406954053218962,
+            "point": [
+              -1.168478260989911,
+              -4.479353730429135,
+              -7.266666666666667
+            ],
+            "closestPoint": [
+              -2.0877975699955806,
+              -3.9504738054670474,
+              -7.2812535077371905
+            ],
+            "face": 114
+          },
+          "fullRoundedPieceUpperMillimetres": 1063
+        },
+        "nativeCandidate": {
+          "largestExposedSample": {
+            "metres": 0.4466688632348778,
+            "beyondPaddingMetres": 0.4266688632348778,
+            "point": [
+              -2.8039093721010215,
+              -5.815727063762467,
+              -9.21111111111111
+            ],
+            "closestPoint": [
+              -3.0865399713949127,
+              -5.4698470011304705,
+              -9.211111111111112
+            ],
+            "face": 193
+          },
+          "fullRoundedPieceUpperMillimetres": 1467
+        }
+      }
+    },
+    {
+      "piece": "nativeCandidate: pods explicit member 1/service-well-0-0",
+      "exposedSamples": 165,
+      "comparisons": {
+        "detailed": {
+          "largestExposedSample": {
+            "metres": 1.0602319035276684,
+            "beyondPaddingMetres": 1.0402319035276684,
+            "point": [
+              11.640077066229631,
+              -0.8674328264559662,
+              -7.266666666666667
+            ],
+            "closestPoint": [
+              10.721157155427553,
+              -1.396082979575044,
+              -7.281050768883333
+            ],
+            "face": 1004
+          },
+          "fullRoundedPieceUpperMillimetres": 1062
+        },
+        "nativeCandidate": {
+          "largestExposedSample": {
+            "metres": 0.4466750950827553,
+            "beyondPaddingMetres": 0.4266750950827553,
+            "point": [
+              10.824468177340743,
+              -0.19667727090041065,
+              -9.988888888888889
+            ],
+            "closestPoint": [
+              10.540743683836775,
+              -0.5416686510146179,
+              -9.988888888888889
+            ],
+            "face": 329
+          },
+          "fullRoundedPieceUpperMillimetres": 875
+        }
+      }
+    },
+    {
+      "piece": "nativeCandidate: pods explicit member 1/service-well-1-0",
+      "exposedSamples": 147,
+      "comparisons": {
+        "detailed": {
+          "largestExposedSample": {
+            "metres": 1.0610604779929893,
+            "beyondPaddingMetres": 1.0410604779929893,
+            "point": [
+              1.164187289636519,
+              -0.8607061617067119,
+              -7.266666666666667
+            ],
+            "closestPoint": [
+              2.0838230121517056,
+              -1.389768117821121,
+              -7.281258528270895
+            ],
+            "face": 1022,
+            "certifiedLowerMillimetres": 1060,
+            "supportFacetGlobalVertices": [
+              1671,
+              1669,
+              1670
+            ],
+            "supportFacetWeightNumeratorsOver12": [
+              0,
+              0,
+              12
+            ]
+          },
+          "fullRoundedPieceUpperMillimetres": 1063
+        },
+        "nativeCandidate": {
+          "largestExposedSample": {
+            "metres": 0.44666777855897694,
+            "beyondPaddingMetres": 0.4266677785589769,
+            "point": [
+              1.980853956303186,
+              -0.19123505059560075,
+              -9.988888888888889
+            ],
+            "closestPoint": [
+              2.2640285968814364,
+              -0.5366684411880418,
+              -9.988888888888889
+            ],
+            "face": 348
+          },
+          "fullRoundedPieceUpperMillimetres": 1467
+        }
+      }
+    },
+    {
+      "piece": "nativeCandidate: pods explicit member 1/service-well-2-0",
+      "exposedSamples": 164,
+      "comparisons": {
+        "detailed": {
+          "largestExposedSample": {
+            "metres": 1.060555605345263,
+            "beyondPaddingMetres": 1.040555605345263,
+            "point": [
+              1.1556719427270936,
+              -4.459160470399478,
+              -7.266666666666667
+            ],
+            "closestPoint": [
+              2.07487241106037,
+              -3.9303489138979275,
+              -7.281055160526346
+            ],
+            "face": 1028
+          },
+          "fullRoundedPieceUpperMillimetres": 1062
+        },
+        "nativeCandidate": {
+          "largestExposedSample": {
+            "metres": 0.44667006205577353,
+            "beyondPaddingMetres": 0.4266700620557735,
+            "point": [
+              1.9702230538382048,
+              -5.131200470399477,
+              -9.988888888888889
+            ],
+            "closestPoint": [
+              2.2544862344978966,
+              -4.786659343016774,
+              -9.988888888888889
+            ],
+            "face": 369
+          },
+          "fullRoundedPieceUpperMillimetres": 875
+        }
+      }
+    },
+    {
+      "piece": "nativeCandidate: pods explicit member 1/service-well-3-0",
+      "exposedSamples": 165,
+      "comparisons": {
+        "detailed": {
+          "largestExposedSample": {
+            "metres": 1.060695405321896,
+            "beyondPaddingMetres": 1.040695405321896,
+            "point": [
+              11.63152173901009,
+              -4.479353730429135,
+              -7.266666666666667
+            ],
+            "closestPoint": [
+              10.712202430004421,
+              -3.9504738054670465,
+              -7.2812535077371905
+            ],
+            "face": 1046
+          },
+          "fullRoundedPieceUpperMillimetres": 1063
+        },
+        "nativeCandidate": {
+          "largestExposedSample": {
+            "metres": 0.44666886323487903,
+            "beyondPaddingMetres": 0.426668863234879,
+            "point": [
+              9.99609062789898,
+              -5.815727063762467,
+              -9.21111111111111
+            ],
+            "closestPoint": [
+              9.713460028605088,
+              -5.46984700113047,
+              -9.211111111111109
+            ],
+            "face": 389
+          },
+          "fullRoundedPieceUpperMillimetres": 1467
+        }
+      }
+    }
+  ],
+  "method": "Exact calibrated dyadic hull-fan and outward-rounded patch coverage give a conservative upper bound including occluded piece surfaces. Exact point-to-triangle checks certify the largest nominated source vertices and two largest exposed samples against each distinct source. Sampling alone cannot prove a maximum.",
+  "scope": "Source-only directed surface bounds. Actual station/render/native/runtime acceptance remains separate."
+}

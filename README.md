@@ -28,6 +28,8 @@ In Preview 10, press 3 at a station and search for Goshawk Explorer. Compare sho
 
 The development source also provides a separate Goshawk Mk II Custom Showroom and collision candidate. Its original detailed appearance, four lower mounts and SH028 fit evidence are in the [SH010 hull guide](docs/GOSHAWK-MK-II-CUSTOM.md). Owned native validation is pending.
 
+On the Zebra development branch, search for Zebra in the station Showroom to inspect its ice-blue hull, twin freight keels and two crosspieces. The branch also provides a controlled approach to the original station. [Zebra geometry and flight limits](docs/ZEBRA-GAMEPLAY-ENVELOPE.md)
+
 Medusa (SH171) can be inspected in the station Showroom. The source package preserves both original meshes and the inspection shield. The Showroom lists the verified empty stock dry mass. [Medusa inspection and flight limits](integration/sh171-medusa/README.md)
 
 Preview 12 offers 115 selectable stock previews in the ordinary station Showroom. This includes 109 validated Hull Studio schema-1 fleet packages and six original stock models. Cheetah (SH082) and the 22 outstanding entries in the final fleet intake remain outside the preview registry. These are catalogue previews, not new ships for purchase or flight. [Hull Studio](docs/HULL-STUDIO.md) also opens a local or archived preview in a disposable Showroom session without changing the player's ship. The earlier 37-preview Mac build passed the stock loader and station Showroom tests; the final Mac package displayed a native nested Showroom frame. Interactive Windows Showroom rendering remains unverified. [Outstanding fleet scope](docs/IMPLEMENTATION-STATUS.md#outstanding-fleet-inspection-scope)
