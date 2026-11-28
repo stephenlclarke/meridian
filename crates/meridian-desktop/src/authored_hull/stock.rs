@@ -810,6 +810,12 @@ const DESCRIPTORS: &[StockDescriptor] = &[
         0xf35e_051d_e326_d11d
     ),
     stock_package!(
+        "SH161",
+        "Wolf Citadel",
+        "integration/sh161-wolf-citadel/ORIGINAL-INSPECTION.json",
+        0xf324_9afc_b1ab_990d
+    ),
+    stock_package!(
         "SH163",
         "Lammergeier",
         "integration/sh163-lammergeier/LAMMERGEIER-STUDIO.json",
@@ -953,10 +959,10 @@ mod tests {
     #[test]
     fn every_stock_descriptor_authenticates_its_own_source_and_real_preview() {
         let catalogue = ok(crate::docked_screens::Catalogue::bundled());
-        assert_eq!(STOCK_MODELS.len(), 125);
+        assert_eq!(STOCK_MODELS.len(), 126);
         for held in [
             "SH102", "SH112", "SH113", "SH114", "SH115", "SH116", "SH117", "SH118", "SH119",
-            "SH120", "SH121", "SH122", "SH123", "SH124", "SH125", "SH161", "SH162", "SH164",
+            "SH120", "SH121", "SH122", "SH123", "SH124", "SH125", "SH162", "SH164",
         ] {
             assert!(
                 !STOCK_MODELS.iter().any(|model| model.object == held),
@@ -1491,6 +1497,16 @@ mod tests {
         assert_eq!(package.schema, 2);
         assert_eq!(package.detail.triangles.len(), 4_072);
         assert_eq!(package.native.triangles.len(), 904);
+        assert_stock_and_local(entry.model.object, entry.model.geometry_key);
+    }
+
+    #[test]
+    fn wolf_citadel_stock_and_local_preview_retain_the_source_geometry() {
+        let entry = descriptor("SH161");
+        let package = ok(HullPackage::from_json(entry.package));
+        assert_eq!(package.schema, 2);
+        assert_eq!(package.detail.triangles.len(), 2_052);
+        assert_eq!(package.native.triangles.len(), 788);
         assert_stock_and_local(entry.model.object, entry.model.geometry_key);
     }
 
