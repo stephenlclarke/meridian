@@ -593,3 +593,6 @@ mod newt_tests;
 
 #[cfg(test)]
 mod zebu_tests;
+
+#[cfg(test)]
+mod panther_scout_tests;

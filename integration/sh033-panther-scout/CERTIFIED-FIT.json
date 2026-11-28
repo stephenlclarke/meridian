@@ -1,0 +1,108 @@
+{
+  "detailed": {
+    "exposedLower": {
+      "group": "left-arch-1",
+      "millimetres": 437
+    },
+    "completeUpperMillimetres": 1001,
+    "pieceUpperMillimetres": {
+      "cabin": 949,
+      "glazing": 530,
+      "glazing-crest": 340,
+      "keel": 930,
+      "left-arch-0": 999,
+      "left-arch-1": 1001,
+      "left-arch-2": 1001,
+      "left-arch-3": 999,
+      "left-cross-brace": 902,
+      "left-drive": 879,
+      "left-pipe": 260,
+      "left-pipe-clamp-0": 247,
+      "left-pipe-clamp-1": 247,
+      "left-pipe-clamp-2": 247,
+      "left-pipe-clamp-3": 247,
+      "left-pipe-clamp-4": 247,
+      "left-pipe-mount": 668,
+      "left-scout-sail": 997,
+      "left-sled": 575,
+      "right-arch-0": 999,
+      "right-arch-1": 1001,
+      "right-arch-2": 1001,
+      "right-arch-3": 999,
+      "right-cross-brace": 662,
+      "right-drive": 879,
+      "right-pipe": 260,
+      "right-pipe-clamp-0": 247,
+      "right-pipe-clamp-1": 247,
+      "right-pipe-clamp-2": 247,
+      "right-pipe-clamp-3": 247,
+      "right-pipe-clamp-4": 247,
+      "right-pipe-mount": 668,
+      "right-scout-sail": 997,
+      "right-sled": 575,
+      "scout-survey-spine": 362
+    },
+    "oppositeMeshWitness": {
+      "sourceVertex": 2754,
+      "nearestFaces": [
+        1832,
+        1863,
+        1864,
+        1865,
+        1926
+      ],
+      "strictLowerMillimetres": 88
+    }
+  },
+  "native": {
+    "exposedLower": {
+      "group": "left-pipe-mount",
+      "millimetres": 2164
+    },
+    "completeUpperMillimetres": 2292,
+    "pieceUpperMillimetres": {
+      "cabin": 2202,
+      "glazing": 1439,
+      "glazing-crest": 1549,
+      "keel": 2271,
+      "left-arch-0": 1422,
+      "left-arch-1": 1489,
+      "left-arch-2": 1435,
+      "left-arch-3": 1422,
+      "left-cross-brace": 1304,
+      "left-drive": 1850,
+      "left-pipe": 2051,
+      "left-pipe-clamp-0": 1874,
+      "left-pipe-clamp-1": 1858,
+      "left-pipe-clamp-2": 1855,
+      "left-pipe-clamp-3": 1858,
+      "left-pipe-clamp-4": 1860,
+      "left-pipe-mount": 2292,
+      "left-scout-sail": 1913,
+      "left-sled": 1834,
+      "right-arch-0": 1422,
+      "right-arch-1": 1489,
+      "right-arch-2": 1435,
+      "right-arch-3": 1422,
+      "right-cross-brace": 1304,
+      "right-drive": 1850,
+      "right-pipe": 1746,
+      "right-pipe-clamp-0": 1918,
+      "right-pipe-clamp-1": 1833,
+      "right-pipe-clamp-2": 1837,
+      "right-pipe-clamp-3": 1841,
+      "right-pipe-clamp-4": 1845,
+      "right-pipe-mount": 2292,
+      "right-scout-sail": 1913,
+      "right-sled": 1835,
+      "scout-survey-spine": 993
+    },
+    "oppositeMeshWitness": {
+      "sourceVertex": 2568,
+      "nearestFaces": [
+        303
+      ],
+      "strictLowerMillimetres": 1848
+    }
+  }
+}

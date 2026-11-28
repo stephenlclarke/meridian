@@ -1,0 +1,52 @@
+{
+  "hull": "SH033",
+  "stationSHA256": "cd54d30cab638f6b33feacf1fa78c9136f8ce346e8cc6133259bfc0472c259d5",
+  "packageSHA256": "95bff56994a82e320ce4df5610087838bed9aaae1c70d928d8e1fc58cd860899",
+  "orientation": "inward: basis (-X,+Y,-Z)",
+  "guardMillimetres": 21,
+  "aligned": {
+    "actorX": 0,
+    "actorCentreZ": [
+      137.32,
+      135.32
+    ],
+    "minimumSeparationMillimetres": 43218,
+    "expectedClear": true
+  },
+  "offsetOpening": {
+    "actorX": 69.5,
+    "actorCentreZ": [
+      154.32,
+      154.32
+    ],
+    "minimumSeparationMillimetres": 979,
+    "expectedClear": true
+  },
+  "offsetLipContact": {
+    "actorX": 69.5,
+    "actorCentreZ": [
+      154.32,
+      152.32
+    ],
+    "stationFace": 482,
+    "nativeSupportVertex": 13,
+    "nativePointMetres": [
+      0.0,
+      -0.524,
+      17.0
+    ],
+    "crossingFraction": 0.5,
+    "stationPointMetres": [
+      69.5,
+      -0.524,
+      136.32
+    ],
+    "barycentrics": [
+      0.3099999999999974,
+      0.19541501322751587,
+      0.49458498677248675
+    ],
+    "expectedClear": false
+  },
+  "scope": "All 488 original station triangles and every rounded local support tested by exact rational separation; strict actual source vertex/triangle crossing proves contact. No World/native admission."
+}

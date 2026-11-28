@@ -676,3 +676,11 @@ tools/measure_zebu.py text eol=lf
 tools/measure_zebu_surface_fit.py text eol=lf
 tools/prepare_zebu_studio.py text eol=lf
 tools/verify_zebu_station.py text eol=lf
+
+# Scout source and measurements must replay identically on CRLF checkouts.
+assets/fleet/sh033/** -text
+integration/sh033-panther-scout/*.json -text
+tools/measure_panther_scout.py text eol=lf
+tools/measure_panther_scout_fit.py text eol=lf
+tools/prepare_panther_scout_studio.py text eol=lf
+tools/verify_panther_scout_station.py text eol=lf

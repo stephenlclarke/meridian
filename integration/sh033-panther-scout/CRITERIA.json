@@ -1,0 +1,47 @@
+{
+  "hull": "SH033 Panther Scout",
+  "sourcePR": 98,
+  "sourceHead": "ca4fe0640d627a8930bb33304425c245cbd2a811",
+  "scope": "Stock Showroom inspection. The original Scout engineering field remains null.",
+  "installedSourceExport": {
+    "bytes": 695657,
+    "sha256": "173e2c47a17b4db63d30f172da6ebb5f3de227efbca18c2c649a9fc48f157cc6",
+    "sourceDefinitionDifference": "final LF only"
+  },
+  "originalCornerCount": 15636,
+  "localRoundedSupports": 35,
+  "routes": {
+    "open": 4,
+    "solid": 4,
+    "wholeHullControlBlocked": 4
+  },
+  "replayPins": {
+    "integration/sh033-panther-scout/CERTIFIED-FIT.json": "4273d745b2d7d23f2eb22ebee7397440211f0c5e315b899fc3211f347f389ff7",
+    "integration/sh033-panther-scout/SURFACE-FIT.json": "c68ceb9c8fa9c2140f4fc7f4f09cca1332ca056214c1e98d22b4c36fdf61ec6d",
+    "integration/sh033-panther-scout/SUPPORT-FAN.json": "dfd7669c7d16685c42a73f57956b31045b8a9d27b2951a4cc870bd3a6fdf8b54",
+    "integration/sh033-panther-scout/STATION-CONTACT.json": "4e92d57455a49903f239c48493ee9aaa788dc3d27e148180617da1d1d31405b2",
+    "integration/sh033-panther-scout/PANTHER-SCOUT-STUDIO.json": "95bff56994a82e320ce4df5610087838bed9aaae1c70d928d8e1fc58cd860899",
+    "integration/sh033-panther-scout/CLEARANCE-FIXTURES.json": "389103167825a301322414f8261605dad03fe38cb490cd37afea07a4738ec7a3",
+    "integration/sh033-panther-scout/VALIDATOR-RECEIPT.json": "715e726a40c41f9d35c531f636601ea9df142acdc7e2643a7e8d0a8fd87fa641",
+    "tools/measure_panther_scout.py": "600ac293e98b004ba6a659f42452ffdb1e033844cbf21d2771f98dc0f45113f2",
+    "tools/measure_panther_scout_fit.py": "69b142944477b212f1f9a78fe176122119ba375f9990ad58f3e8979f0684252e",
+    "tools/prepare_panther_scout_studio.py": "3e964e4a0cf7026fa67fc97988f229ea7fdecde01e8e73355092764b7bb6ba11",
+    "tools/verify_panther_scout_station.py": "da36d6589da3892530fd36ffa13fbb3f00c43fa33e93cadfa9bd84f6b7806bba",
+    "tools/measure_goshawk_surface_fit.py": "5407ef1e5fad41810aa95444ca1338fe33a91e5c9857dcb752b4e4cf2fca6d0b",
+    "tools/vulture_mk_i_exact_fit.py": "479b31f8714a198a82c0e2888b8d19efe46c7b4c43a576b83ab84c571ae738c6",
+    "tools/import_goshawk_envelope_source.py": "14b530725629ee3eaa5b3fd69f01fe00fe371564a1a52cb398d3969142db977e",
+    "tools/prepare_stag_liner_geometry.py": "9fe2c68530bbc6d60e38e640247226f86c91680cef4f1884da49de60063158f0",
+    "tools/encode_goshawk_visual.py": "9e524e9a32a237d71d212c8b5c34ecf12cde5a8e08885b1d03991b95c278f61c",
+    "assets/fleet/sh033/resource.toml": "1988405e8771bf509d9a22811cf36dea4433d4a1dca451e3bf64fd55b9e385b5",
+    "assets/fleet/sh033/native-export.json": "c55369c81023703ca030f39b6934c69e844e21a4a7c2b400ff95cc0d7c90d405",
+    "assets/fleet/sh033/contract.toml": "f2e0376401c62989cac6f1faad27d484e53627008818dabe0e49ae2e3f194c76",
+    "assets/fleet/sh033/LICENSE": "033b7058d73f22c3c6b8a5825eb866ca2d67088f3ee94dd5f3e46da59d624766",
+    "assets/fleet/sh033/visual.bin": "5d1a69f2b4405516ae3a9ff855202a43069c48d80d83395f626fc22680e5e901"
+  },
+  "byteReplay": {
+    "commands": [
+      "python3 -B tools/measure_panther_scout.py | cmp - integration/sh033-panther-scout/CERTIFIED-FIT.json",
+      "python3 -B tools/verify_panther_scout_station.py | cmp - integration/sh033-panther-scout/STATION-CONTACT.json"
+    ]
+  }
+}
