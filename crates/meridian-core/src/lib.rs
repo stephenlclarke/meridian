@@ -27,6 +27,7 @@ pub mod cavy_racer;
 pub mod celestial;
 pub mod chimango;
 pub mod condor;
+pub mod crow_prototype;
 pub mod docking;
 pub mod dzo;
 pub mod dzo_mk_ii;

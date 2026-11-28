@@ -1,0 +1,13 @@
+{
+  "schema": 1,
+  "id": "sh020-crow-prototype",
+  "undoBefore": [
+    "sh055-condor",
+    "followup-bulk-market"
+  ],
+  "undoAfter": [],
+  "kind": "declaration",
+  "module": "crow_prototype",
+  "before": "pub mod condor;\n",
+  "after": "pub mod docking;\n"
+}

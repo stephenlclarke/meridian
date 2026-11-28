@@ -204,6 +204,17 @@ impl OriginalStationData {
         ) && self.goshawk_motion_clear(source, start, end, angular_travel)
     }
 
+    /// Controlled SH020 motion against the original SH028 mesh.
+    pub fn crow_prototype_motion_clear(
+        &self,
+        source: &crate::crow_prototype::CrowPrototypeHullSource,
+        start: RigidPose,
+        end: RigidPose,
+        angular_travel: f64,
+    ) -> bool {
+        self.rounded_station_motion_clear(source.pieces(), start, end, angular_travel)
+    }
+
     pub(crate) fn goshawk_entry_conditions(
         &self,
         source: &GoshawkHullSource,

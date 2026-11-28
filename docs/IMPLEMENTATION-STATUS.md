@@ -116,6 +116,10 @@ includes both luminous recesses. The new World regression awaits owned
 execution. Ordinary placement and gameplay docking remain open.
 [Stock engineering](GOSHAWK-GAMEPLAY-ENVELOPE.md#adopted-stock-engineering)
 
+## Crow Prototype source envelope
+
+SH020 preserves the original 3,472-face detailed mesh and 952-face native mesh. Its 68 collision supports leave the fork open and define a controlled sweep against the SH028 station port. The native mesh exceeds the 512-face limit by 440 faces. Ordinary flight admission, stock Showroom inspection and runtime mass remain open. [Source geometry and clearance measurements](CROW-PROTOTYPE-GAMEPLAY-ENVELOPE.md)
+
 ## Stag Liner source envelope
 
 SH035 preserves the two original pearl-teal meshes and uses 26 local supports. SteveMBA verified seven routes, eight structural overlaps and the original SH028 offset lip contact. The full fit bounds are 705 mm detailed and 3,038 mm native. The installed signed Hull Studio exported the exact definition with all 26 groups and seven routes passing. The per-hull Rust contact tests and Showroom qualification remain pending. [Stag Liner source and evidence](STAG-LINER-GAMEPLAY-ENVELOPE.md)
