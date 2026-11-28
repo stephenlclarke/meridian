@@ -1,3 +1,136 @@
+# Elephant source preparation and replay use exact LF bytes.
+tools/measure_elephant.py text eol=lf
+tools/prepare_elephant.py text eol=lf
+tools/verify_elephant.py text eol=lf
+
+# Gopher source preparation and replay use exact LF bytes.
+tools/measure_gopher.py text eol=lf
+tools/prepare_gopher.py text eol=lf
+tools/verify_gopher.py text eol=lf
+
+# Antelope source preparation and replay use exact LF bytes.
+tools/measure_antelope.py text eol=lf
+tools/prepare_antelope.py text eol=lf
+tools/verify_antelope.py text eol=lf
+
+# Springbok Starliner source preparation and replay use exact LF bytes.
+tools/measure_springbok_starliner.py text eol=lf
+tools/prepare_springbok_starliner.py text eol=lf
+tools/verify_springbok_starliner.py text eol=lf
+
+# Elk source preparation and replay use exact LF bytes.
+tools/measure_elk.py text eol=lf
+tools/prepare_elk.py text eol=lf
+tools/verify_elk.py text eol=lf
+
+# Alpaca source preparation and replay use exact LF bytes.
+tools/measure_alpaca.py text eol=lf
+tools/prepare_alpaca.py text eol=lf
+tools/verify_alpaca.py text eol=lf
+
+# Laggar source preparation and replay use exact LF bytes.
+tools/measure_laggar.py text eol=lf
+tools/prepare_laggar.py text eol=lf
+tools/verify_laggar.py text eol=lf
+
+# Llama source preparation and replay use exact LF bytes.
+tools/measure_llama.py text eol=lf
+tools/prepare_llama.py text eol=lf
+tools/verify_llama.py text eol=lf
+
+# Hare Explorer source preparation and replay use exact LF bytes.
+tools/measure_hare_explorer.py text eol=lf
+tools/prepare_hare_explorer.py text eol=lf
+tools/verify_hare_explorer.py text eol=lf
+
+# Jaguar source preparation and replay use exact LF bytes.
+tools/measure_jaguar.py text eol=lf
+tools/prepare_jaguar.py text eol=lf
+tools/verify_jaguar.py text eol=lf
+
+# Carabao Highliner source preparation and replay use exact LF bytes.
+tools/measure_carabao_highliner.py text eol=lf
+tools/prepare_carabao_highliner.py text eol=lf
+tools/verify_carabao_highliner.py text eol=lf
+
+# Carabao Freighter source preparation and replay use exact LF bytes.
+tools/measure_carabao_freighter.py text eol=lf
+tools/prepare_carabao_freighter.py text eol=lf
+tools/verify_carabao_freighter.py text eol=lf
+
+# Oryx Voyager source preparation and replay use exact LF bytes.
+tools/measure_oryx_voyager.py text eol=lf
+tools/prepare_oryx_voyager.py text eol=lf
+tools/verify_oryx_voyager.py text eol=lf
+tools/oryx_voyager_ring_support.py text eol=lf
+
+# Tamaraw source preparation and replay use exact LF bytes.
+tools/measure_tamaraw.py text eol=lf
+tools/prepare_tamaraw.py text eol=lf
+tools/verify_tamaraw.py text eol=lf
+
+# Hog source preparation and replay use exact LF bytes.
+tools/measure_hog.py text eol=lf
+tools/prepare_hog.py text eol=lf
+tools/verify_hog.py text eol=lf
+
+# Dzo Mk II source preparation and replay use exact LF bytes.
+tools/measure_dzo_mk_ii.py text eol=lf
+tools/prepare_dzo_mk_ii.py text eol=lf
+tools/verify_dzo_mk_ii.py text eol=lf
+
+# Dzo source preparation and replay use exact LF bytes.
+tools/dzo_collar_support.py text eol=lf
+tools/measure_dzo.py text eol=lf
+tools/prepare_dzo.py text eol=lf
+tools/verify_dzo.py text eol=lf
+
+# Griffon Spectre source preparation and replay use exact LF bytes.
+tools/measure_griffon_spectre_geometry.py text eol=lf
+tools/prepare_griffon_spectre_geometry.py text eol=lf
+tools/verify_griffon_spectre_geometry.py text eol=lf
+
+# Griffon Mk II source preparation and replay use exact LF bytes.
+tools/measure_griffon_mk_ii_geometry.py text eol=lf
+tools/prepare_griffon_mk_ii_geometry.py text eol=lf
+tools/verify_griffon_mk_ii_geometry.py text eol=lf
+
+# Griffon source preparation and replay use exact LF bytes.
+tools/measure_griffon_geometry.py text eol=lf
+tools/prepare_griffon_geometry.py text eol=lf
+tools/verify_griffon_geometry.py text eol=lf
+
+# Baza Mk II source preparation and replay use exact LF bytes.
+tools/measure_baza_mk_ii.py text eol=lf
+tools/prepare_baza_mk_ii.py text eol=lf
+tools/verify_baza_mk_ii.py text eol=lf
+
+# Baza Fighter source preparation and replay use exact LF bytes.
+tools/measure_baza_fighter.py text eol=lf
+tools/prepare_baza_fighter.py text eol=lf
+tools/verify_baza_fighter.py text eol=lf
+
+# Badger source preparation and replay use exact LF bytes.
+tools/measure_badger.py text eol=lf
+tools/prepare_badger.py text eol=lf
+tools/verify_badger.py text eol=lf
+
+# Rhinoceros Trader source preparation and replay use exact LF bytes.
+tools/measure_rhinoceros_trader.py text eol=lf
+tools/prepare_rhinoceros_trader.py text eol=lf
+tools/verify_rhinoceros_trader.py text eol=lf
+
+# Rabbit Explorer source preparation and replay use exact LF bytes.
+tools/rabbit_explorer_art_mesh.py text eol=lf
+tools/measure_rabbit_explorer.py text eol=lf
+tools/prepare_rabbit_explorer.py text eol=lf
+tools/verify_rabbit_explorer.py text eol=lf
+# Sparrowhawk replay helpers have published byte hashes.
+tools/measure_sparrowhawk_air.py text eol=lf
+tools/prepare_sparrowhawk_geometry.py text eol=lf
+tools/prepare_sparrowhawk_studio.py text eol=lf
+tools/verify_sparrowhawk_geometry.py text eol=lf
+
 # Asset and provenance hashes identify exact bytes on every platform.
 assets/legacy/** -text
 assets/fleet/sh001/** -text
@@ -6,8 +139,517 @@ assets/fleet/sh001/visual.bin binary
 assets/fleet/sh008/** -text
 assets/fleet/sh008/visual.bin binary
 
+# Medusa artwork and receipts carry exact archive and authoring bytes.
+assets/fleet/sh171/** -text
+assets/fleet/sh171/*.gz binary
+assets/fleet/sh171/*.bin binary
+assets/fleet/sh171/source.vertices binary
+integration/sh171-medusa/*.json -text
+tools/prepare_medusa_inspection.py text eol=lf
+tools/verify_medusa_shield.py text eol=lf
+tools/prepare_medusa_stock.py text eol=lf
+crates/meridian-core/src/medusa.rs text eol=lf
+integration/sh171-medusa/LEGACY-FINITE-*.py.txt -text
+
+# Vulture Raider authoring and replay programs use exact LF bytes.
+tools/measure_vulture_raider.py text eol=lf
+tools/prepare_vulture_raider.py text eol=lf
+tools/verify_vulture_raider.py text eol=lf
+
+# Arna Cutter authoring and replay programs use exact LF bytes.
+tools/measure_arna_cutter.py text eol=lf
+tools/prepare_arna_cutter.py text eol=lf
+tools/verify_arna_cutter.py text eol=lf
+
+# Seriema Courier authoring and replay programs use exact LF bytes.
+tools/measure_seriema_courier_geometry.py text eol=lf
+tools/prepare_seriema_courier_geometry.py text eol=lf
+tools/verify_seriema_courier_geometry.py text eol=lf
+
+# Moose Clipper authoring and replay programs use exact LF bytes.
+tools/measure_moose_clipper.py text eol=lf
+tools/prepare_moose_clipper.py text eol=lf
+tools/verify_moose_clipper.py text eol=lf
+
+# Saiga authoring and replay programs use exact LF bytes.
+tools/measure_saiga_geometry.py text eol=lf
+tools/prepare_saiga_candidate.py text eol=lf
+tools/prepare_saiga_geometry.py text eol=lf
+tools/saiga_art_mesh.py text eol=lf
+tools/verify_saiga_geometry.py text eol=lf
+
+# Wombat authoring and replay programs use exact LF bytes.
+tools/wombat_art_mesh.py text eol=lf
+tools/measure_wombat_geometry.py text eol=lf
+tools/prepare_wombat_candidate.py text eol=lf
+tools/prepare_wombat_geometry.py text eol=lf
+tools/verify_wombat_geometry.py text eol=lf
+
+# Barbary authoring and replay programs use exact LF bytes.
+tools/measure_barbary.py text eol=lf
+tools/prepare_barbary.py text eol=lf
+tools/verify_barbary.py text eol=lf
+
+# Muskox authoring and replay programs use exact LF bytes.
+tools/measure_muskox.py text eol=lf
+tools/prepare_muskox.py text eol=lf
+tools/verify_muskox.py text eol=lf
+
+# Falconet authoring and replay programs use exact LF bytes.
+tools/measure_falconet.py text eol=lf
+tools/prepare_falconet.py text eol=lf
+tools/verify_falconet.py text eol=lf
+
+# Aplomado Interceptor authoring and replay programs use exact LF bytes.
+tools/measure_aplomado_interceptor.py text eol=lf
+tools/prepare_aplomado_interceptor.py text eol=lf
+tools/verify_aplomado_interceptor.py text eol=lf
+
+# Condor authoring and replay programs use exact LF bytes.
+tools/measure_condor.py text eol=lf
+tools/prepare_condor.py text eol=lf
+tools/verify_condor.py text eol=lf
+tools/verify_condor_collision.py text eol=lf
+
+# Hobby Fighter authoring and replay programs use exact LF bytes.
+tools/measure_hobby_fighter.py text eol=lf
+tools/prepare_hobby_fighter.py text eol=lf
+tools/verify_hobby_fighter.py text eol=lf
+
+# Caracal Scout authoring and replay programs use exact LF bytes.
+tools/caracal_scout_art_mesh.py text eol=lf
+tools/measure_caracal_scout_geometry.py text eol=lf
+tools/prepare_caracal_scout_candidate.py text eol=lf
+tools/prepare_caracal_scout_geometry.py text eol=lf
+tools/verify_caracal_scout_geometry.py text eol=lf
+
+# Banteng authoring and replay programs use exact LF bytes.
+tools/banteng_art_mesh.py text eol=lf
+tools/measure_banteng_geometry.py text eol=lf
+tools/prepare_banteng_candidate.py text eol=lf
+tools/prepare_banteng_geometry.py text eol=lf
+tools/verify_banteng_geometry.py text eol=lf
+
+# Jackal authoring and replay programs use exact LF bytes.
+tools/jackal_art_mesh.py text eol=lf
+tools/measure_jackal_geometry.py text eol=lf
+tools/prepare_jackal_geometry.py text eol=lf
+tools/verify_jackal_geometry.py text eol=lf
+
+# Yak authoring and replay programs use exact LF bytes.
+tools/measure_yak_geometry.py text eol=lf
+tools/prepare_yak_geometry.py text eol=lf
+tools/verify_yak_geometry.py text eol=lf
+tools/yak_art_mesh.py text eol=lf
+
+# Hyena authoring and replay programs use exact LF bytes.
+tools/hyena_art_mesh.py text eol=lf
+tools/measure_hyena_geometry.py text eol=lf
+tools/prepare_hyena_geometry.py text eol=lf
+tools/verify_hyena_geometry.py text eol=lf
+
+# Lanner authoring and replay programs use exact LF bytes.
+tools/lanner_art_mesh.py text eol=lf
+tools/measure_lanner_geometry.py text eol=lf
+tools/prepare_lanner_geometry.py text eol=lf
+tools/verify_lanner_geometry.py text eol=lf
+
+# Harpy Gunship authoring and replay programs use exact LF bytes.
+tools/measure_harpy_gunship.py text eol=lf
+tools/prepare_harpy_gunship.py text eol=lf
+tools/verify_harpy_gunship.py text eol=lf
+
+# Harpy Dropship authoring and replay programs use exact LF bytes.
+tools/measure_harpy_dropship.py text eol=lf
+tools/prepare_harpy_dropship.py text eol=lf
+tools/verify_harpy_dropship.py text eol=lf
+
+# Erne Corvette authoring and replay programs use exact LF bytes.
+tools/measure_erne_corvette.py text eol=lf
+tools/prepare_erne_corvette.py text eol=lf
+tools/verify_erne_corvette.py text eol=lf
+
+# Harpy Assault authoring and replay programs use exact LF bytes.
+tools/measure_harpy_assault.py text eol=lf
+tools/prepare_harpy_assault.py text eol=lf
+tools/verify_harpy_assault.py text eol=lf
+
+# Eagle Cruiser authoring and replay programs use exact LF bytes.
+tools/measure_eagle_cruiser_air.py text eol=lf
+tools/prepare_eagle_cruiser_geometry.py text eol=lf
+tools/prepare_eagle_cruiser_studio.py text eol=lf
+tools/verify_eagle_cruiser_geometry.py text eol=lf
+
+# Byte-pinned Saker authoring and replay programs.
+tools/atomic_asset_output.py text eol=lf
+tools/measure_saker_air.py text eol=lf
+tools/prepare_saker_geometry.py text eol=lf
+tools/prepare_saker_studio.py text eol=lf
+tools/verify_saker_geometry.py text eol=lf
+tools/hull_contact_geometry.py text eol=lf
+tools/vulture_mk_i_exact_fit.py text eol=lf
+
+# Stag Liner replay helpers have published byte hashes.
+tools/measure_stag_liner_air.py text eol=lf
+tools/prepare_stag_liner_geometry.py text eol=lf
+tools/prepare_stag_liner_studio.py text eol=lf
+tools/verify_stag_liner_geometry.py text eol=lf
+
 # These source and review fixtures are verified against their Git blob bytes.
 crates/meridian-core/src/**/*.rs text eol=lf
 integration/sh001-mule/*.json text eol=lf
+integration/*/PROTECTED-CORE-ENTRY.json text eol=lf
+integration/*/PROTECTED-CORE-INVERSE.json text eol=lf
 integration/sh001-mule/*.patch -text
 integration/sh008-goshawk/*.json text eol=lf
+integration/scanner-preview/*.json text eol=lf
+integration/scanner-preview/historical/*.json text eol=lf
+
+# Bundled stock schema packages authenticate their exact exported bytes (including final LF).
+integration/**/*-STUDIO.json -text
+
+# Studio ships the same web asset bytes on Mac and Windows.
+tools/hull_studio/web/* text eol=lf
+
+# Kite Interceptor replay helpers have published byte hashes.
+tools/measure_kite_interceptor_air.py text eol=lf
+tools/prepare_kite_interceptor_geometry.py text eol=lf
+tools/prepare_kite_interceptor_studio.py text eol=lf
+tools/verify_kite_interceptor_geometry.py text eol=lf
+
+# Byte-pinned Aurochs replay programs.
+tools/measure_aurochs.py text eol=lf
+tools/prepare_aurochs.py text eol=lf
+tools/verify_aurochs.py text eol=lf
+
+# Byte-pinned Giraffe Liner replay programs.
+tools/measure_giraffe_liner.py text eol=lf
+tools/prepare_giraffe_liner.py text eol=lf
+tools/verify_giraffe_liner.py text eol=lf
+
+# Byte-pinned Shikra replay programs.
+tools/measure_shikra.py text eol=lf
+tools/prepare_shikra.py text eol=lf
+tools/verify_shikra.py text eol=lf
+
+# Byte-pinned Shikra Interdictor replay programs.
+tools/measure_shikra_interdictor.py text eol=lf
+tools/prepare_shikra_interdictor.py text eol=lf
+tools/verify_shikra_interdictor.py text eol=lf
+
+# Byte-pinned Wisent replay programs.
+tools/measure_wisent.py text eol=lf
+tools/prepare_wisent.py text eol=lf
+tools/verify_wisent.py text eol=lf
+
+# Byte-pinned Wisent Mk II replay programs.
+tools/measure_wisent_mk_ii.py text eol=lf
+tools/prepare_wisent_mk_ii.py text eol=lf
+tools/verify_wisent_mk_ii.py text eol=lf
+
+# Byte-pinned Anoa replay programs.
+tools/measure_anoa.py text eol=lf
+tools/prepare_anoa.py text eol=lf
+tools/verify_anoa.py text eol=lf
+
+# Byte-pinned Ox replay programs.
+tools/measure_ox.py text eol=lf
+tools/prepare_ox.py text eol=lf
+tools/verify_ox.py text eol=lf
+
+# Byte-pinned Ox Mk II replay programs.
+tools/measure_ox_mk_ii.py text eol=lf
+tools/prepare_ox_mk_ii.py text eol=lf
+tools/verify_ox_mk_ii.py text eol=lf
+
+# Byte-pinned Cavy Racer replay programs.
+tools/measure_cavy_racer.py text eol=lf
+tools/prepare_cavy_racer.py text eol=lf
+tools/verify_cavy_racer.py text eol=lf
+
+# Byte-pinned Wildebeest replay programs.
+tools/measure_wildebeest.py text eol=lf
+tools/prepare_wildebeest.py text eol=lf
+tools/verify_wildebeest.py text eol=lf
+
+# Byte-pinned Tapir Shuttle replay programs.
+tools/measure_tapir_shuttle.py text eol=lf
+tools/prepare_tapir_shuttle.py text eol=lf
+tools/rebuild_tapir_shuttle.py text eol=lf
+tools/verify_tapir_shuttle.py text eol=lf
+
+# Byte-pinned Tapir Mk II replay programs.
+tools/measure_tapir_mk_ii.py text eol=lf
+tools/prepare_tapir_mk_ii.py text eol=lf
+tools/rebuild_tapir_mk_ii.py text eol=lf
+tools/verify_tapir_mk_ii.py text eol=lf
+
+# Byte-pinned Magpie replay programs.
+tools/measure_magpie.py text eol=lf
+tools/prepare_magpie.py text eol=lf
+tools/rebuild_magpie.py text eol=lf
+tools/verify_magpie.py text eol=lf
+
+# Byte-pinned Hippo replay programs.
+tools/measure_hippo.py text eol=lf
+tools/prepare_hippo.py text eol=lf
+tools/verify_hippo.py text eol=lf
+
+# Byte-pinned Leopard Fighter replay programs.
+tools/measure_leopard_fighter.py text eol=lf
+tools/prepare_leopard_fighter.py text eol=lf
+tools/verify_leopard_fighter.py text eol=lf
+
+# Byte-pinned Puma replay programs.
+tools/measure_puma.py text eol=lf
+tools/prepare_puma.py text eol=lf
+tools/verify_puma.py text eol=lf
+
+# Byte-pinned Mangalica replay programs.
+tools/measure_mangalica.py text eol=lf
+tools/prepare_mangalica.py text eol=lf
+tools/verify_mangalica.py text eol=lf
+
+# Byte-pinned Gaur Trader replay programs.
+tools/measure_gaur_trader.py text eol=lf
+tools/prepare_gaur_trader.py text eol=lf
+tools/rebuild_gaur_trader.py text eol=lf
+tools/verify_gaur_trader.py text eol=lf
+
+# Byte-pinned Boar Transport replay programs.
+tools/measure_boar_transport.py text eol=lf
+tools/prepare_boar_transport.py text eol=lf
+tools/rebuild_boar_transport.py text eol=lf
+tools/verify_boar_transport.py text eol=lf
+
+# Byte-pinned Warthog Escort replay programs.
+tools/measure_warthog_escort.py text eol=lf
+tools/prepare_warthog_escort.py text eol=lf
+tools/verify_warthog_escort.py text eol=lf
+
+# Byte-pinned Marmot Prospector replay programs.
+tools/measure_marmot_prospector.py text eol=lf
+tools/prepare_marmot_prospector.py text eol=lf
+tools/verify_marmot_prospector.py text eol=lf
+
+# Byte-pinned Warthog Light replay programs.
+tools/measure_warthog_light.py text eol=lf
+tools/prepare_warthog_light.py text eol=lf
+tools/verify_warthog_light.py text eol=lf
+
+# Byte-pinned Warthog Freighter replay programs.
+tools/measure_warthog_freighter.py text eol=lf
+tools/prepare_warthog_freighter.py text eol=lf
+tools/verify_warthog_freighter.py text eol=lf
+
+# Byte-pinned Warthog Tanker replay programs.
+tools/measure_warthog_tanker.py text eol=lf
+tools/prepare_warthog_tanker.py text eol=lf
+tools/verify_warthog_tanker.py text eol=lf
+
+# Byte-pinned Warthog Heavy replay programs.
+tools/measure_warthog_heavy.py text eol=lf
+tools/prepare_warthog_heavy.py text eol=lf
+tools/verify_warthog_heavy.py text eol=lf
+
+# Byte-pinned Javelina replay programs.
+tools/measure_javelina.py text eol=lf
+tools/prepare_javelina.py text eol=lf
+tools/verify_javelina.py text eol=lf
+
+# Byte-pinned Falcon Mk I replay programs.
+tools/measure_falcon_mk_i.py text eol=lf
+tools/prepare_falcon_mk_i.py text eol=lf
+tools/rebuild_falcon_mk_i.py text eol=lf
+tools/verify_falcon_mk_i.py text eol=lf
+
+# Byte-pinned Falcon Mk II replay programs.
+tools/measure_falcon_mk_ii.py text eol=lf
+tools/prepare_falcon_mk_ii.py text eol=lf
+tools/rebuild_falcon_mk_ii.py text eol=lf
+tools/verify_falcon_mk_ii.py text eol=lf
+
+# Byte-pinned Falcon Mk III replay programs.
+tools/measure_falcon_mk_iii.py text eol=lf
+tools/prepare_falcon_mk_iii.py text eol=lf
+tools/rebuild_falcon_mk_iii.py text eol=lf
+tools/verify_falcon_mk_iii.py text eol=lf
+
+# Byte-pinned Falcon Mk IV replay programs.
+tools/measure_falcon_mk_iv.py text eol=lf
+tools/prepare_falcon_mk_iv.py text eol=lf
+tools/rebuild_falcon_mk_iv.py text eol=lf
+tools/verify_falcon_mk_iv.py text eol=lf
+
+# Byte-pinned Chimango replay programs.
+tools/measure_chimango.py text eol=lf
+tools/prepare_chimango.py text eol=lf
+tools/verify_chimango.py text eol=lf
+
+# Byte-pinned Buzzard Mk II replay programs.
+tools/measure_buzzard_mk_ii.py text eol=lf
+tools/prepare_buzzard_mk_ii.py text eol=lf
+tools/rebuild_buzzard_mk_ii.py text eol=lf
+tools/verify_buzzard_mk_ii.py text eol=lf
+
+# Byte-pinned Aardvark Miner replay programs.
+tools/measure_aardvark_miner.py text eol=lf
+tools/prepare_aardvark_miner.py text eol=lf
+tools/rebuild_aardvark_miner.py text eol=lf
+tools/verify_aardvark_miner.py text eol=lf
+
+# Byte-pinned Razorback replay programs.
+tools/measure_razorback.py text eol=lf
+tools/prepare_razorback.py text eol=lf
+tools/verify_razorback.py text eol=lf
+
+# Byte-pinned Kestrel replay programs.
+tools/measure_kestrel.py text eol=lf
+tools/prepare_kestrel.py text eol=lf
+tools/verify_kestrel.py text eol=lf
+
+# Byte-pinned Merlin replay programs.
+tools/measure_merlin.py text eol=lf
+tools/prepare_merlin.py text eol=lf
+tools/verify_merlin.py text eol=lf
+
+# Byte-pinned Hawk replay programs.
+tools/measure_hawk.py text eol=lf
+tools/prepare_hawk.py text eol=lf
+tools/verify_hawk.py text eol=lf
+
+# Byte-pinned Morepork replay programs.
+tools/measure_morepork.py text eol=lf
+tools/prepare_morepork.py text eol=lf
+tools/rebuild_morepork.py text eol=lf
+tools/verify_morepork.py text eol=lf
+
+# Byte-pinned Owlet Mk II replay programs.
+tools/measure_owlet_mk_ii.py text eol=lf
+tools/prepare_owlet_mk_ii.py text eol=lf
+tools/rebuild_owlet_mk_ii.py text eol=lf
+tools/verify_owlet_mk_ii.py text eol=lf
+
+# Byte-pinned Reindeer Freighter replay programs.
+tools/measure_reindeer_freighter.py text eol=lf
+tools/prepare_reindeer_freighter.py text eol=lf
+tools/rebuild_reindeer_freighter.py text eol=lf
+tools/verify_reindeer_freighter.py text eol=lf
+
+# Byte-pinned Lynx Escort replay programs.
+tools/measure_lynx_escort.py text eol=lf
+tools/prepare_lynx_escort.py text eol=lf
+tools/rebuild_lynx_escort.py text eol=lf
+tools/verify_lynx_escort.py text eol=lf
+
+# Byte-pinned Osprey Scout replay programs.
+tools/measure_osprey_scout.py text eol=lf
+tools/prepare_osprey_scout.py text eol=lf
+tools/rebuild_osprey_scout.py text eol=lf
+tools/verify_osprey_scout.py text eol=lf
+
+# Byte-pinned Osprey Strike replay programs.
+tools/measure_osprey_strike.py text eol=lf
+tools/prepare_osprey_strike.py text eol=lf
+tools/rebuild_osprey_strike.py text eol=lf
+tools/verify_osprey_strike.py text eol=lf
+
+# Byte-pinned Osprey Patrol replay programs.
+tools/measure_osprey_patrol.py text eol=lf
+tools/prepare_osprey_patrol.py text eol=lf
+tools/rebuild_osprey_patrol.py text eol=lf
+tools/verify_osprey_patrol.py text eol=lf
+
+# Byte-pinned Osprey Support replay programs.
+tools/measure_osprey_support.py text eol=lf
+tools/prepare_osprey_support.py text eol=lf
+tools/rebuild_osprey_support.py text eol=lf
+tools/verify_osprey_support.py text eol=lf
+
+# Byte-pinned Wolf Scout replay programs.
+tools/measure_wolf_scout.py text eol=lf
+tools/prepare_wolf_scout.py text eol=lf
+tools/rebuild_wolf_scout.py text eol=lf
+tools/verify_wolf_scout.py text eol=lf
+
+# Byte-pinned Wolf Mk I replay programs.
+tools/measure_wolf_mk_i.py text eol=lf
+tools/prepare_wolf_mk_i.py text eol=lf
+tools/rebuild_wolf_mk_i.py text eol=lf
+tools/verify_wolf_mk_i.py text eol=lf
+
+# Byte-pinned Wolf Mk II replay programs.
+tools/measure_wolf_mk_ii.py text eol=lf
+tools/prepare_wolf_mk_ii.py text eol=lf
+tools/rebuild_wolf_mk_ii.py text eol=lf
+tools/verify_wolf_mk_ii.py text eol=lf
+
+# Byte-pinned Wolf Cutter replay programs.
+tools/measure_wolf_cutter.py text eol=lf
+tools/prepare_wolf_cutter.py text eol=lf
+tools/rebuild_wolf_cutter.py text eol=lf
+tools/verify_wolf_cutter.py text eol=lf
+
+# Byte-pinned Lammergeier replay programs.
+tools/measure_lammergeier.py text eol=lf
+tools/prepare_lammergeier.py text eol=lf
+tools/rebuild_lammergeier.py text eol=lf
+tools/verify_lammergeier.py text eol=lf
+
+# Byte-pinned Secretarybird replay programs.
+tools/measure_secretarybird.py text eol=lf
+tools/prepare_secretarybird.py text eol=lf
+tools/rebuild_secretarybird.py text eol=lf
+tools/verify_secretarybird.py text eol=lf
+
+# Byte-pinned Camel Rescue replay programs.
+tools/measure_camel_rescue.py text eol=lf
+tools/prepare_camel_rescue.py text eol=lf
+tools/rebuild_camel_rescue.py text eol=lf
+tools/verify_camel_rescue.py text eol=lf
+
+# Byte-pinned Secretarybird Survey replay programs.
+tools/measure_secretarybird_survey.py text eol=lf
+tools/prepare_secretarybird_survey.py text eol=lf
+tools/rebuild_secretarybird_survey.py text eol=lf
+tools/verify_secretarybird_survey.py text eol=lf
+
+# Byte-pinned Armadillo Miner replay programs.
+tools/measure_armadillo_miner.py text eol=lf
+tools/prepare_armadillo_miner.py text eol=lf
+tools/rebuild_armadillo_miner.py text eol=lf
+tools/verify_armadillo_miner.py text eol=lf
+
+# Byte-pinned Caracara Mk I replay programs.
+tools/measure_caracara_mk_i.py text eol=lf
+tools/prepare_caracara_mk_i.py text eol=lf
+tools/rebuild_caracara_mk_i.py text eol=lf
+tools/verify_caracara_mk_i.py text eol=lf
+
+# Byte-pinned Caracara Mk II replay programs.
+tools/measure_caracara_mk_ii.py text eol=lf
+tools/prepare_caracara_mk_ii.py text eol=lf
+tools/rebuild_caracara_mk_ii.py text eol=lf
+tools/verify_caracara_mk_ii.py text eol=lf
+
+# Authored span fans and their verifier are pinned as LF bytes.
+tools/measure_collar_support_fans.py text eol=lf
+integration/sh074-dzo/OPTION-SUPPORT-FANS.json text eol=lf
+integration/sh075-dzo-mk-ii/OPTION-SUPPORT-FANS.json text eol=lf
+integration/sh078-oryx-voyager/OPTION-SUPPORT-FANS.json text eol=lf
+integration/sh071-griffon/ARCHIVE-FIT-SUPPORT-FANS.json text eol=lf
+integration/sh071-griffon/CANDIDATE-FIT-SUPPORT-FANS.json text eol=lf
+integration/sh072-griffon-mk-ii/CANDIDATE-FIT-SUPPORT-FANS.json text eol=lf
+integration/sh073-griffon-spectre/CANDIDATE-FIT-SUPPORT-FANS.json text eol=lf
+integration/sh072-griffon-mk-ii/ARCHIVE-FIT-SUPPORT-FANS.json text eol=lf
+integration/sh073-griffon-spectre/ARCHIVE-FIT-SUPPORT-FANS.json text eol=lf
+
+# Shared algorithm pinned by the directed hull measurement receipts.
+tools/directed_hull_fit.py text eol=lf
+tools/fleet_hull_measurement.py text eol=lf
+
+# Crow Prototype replay checks hash these scripts and compare the JSON output byte for byte.
+tools/measure_crow_prototype_air.py text eol=lf
+tools/prepare_crow_prototype_geometry.py text eol=lf
+tools/verify_crow_prototype_geometry.py text eol=lf
+integration/sh020-crow-prototype/*.json text eol=lf

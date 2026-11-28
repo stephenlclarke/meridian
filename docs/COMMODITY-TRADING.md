@@ -1,5 +1,7 @@
 # Ordinary commodity trading
 
+The follow-up source adds [atomic Market quantity controls](../integration/followup-bulk-market/README.md). Requests keep the current native units, exact individual service receipt chronology and actual World custody. The expanded control is not a separate save format or a change to the underlying market prices.
+
 Historical feature contract and author-stage notes. For current delivered behavior, exact validation and open limits, read [implementation status](IMPLEMENTATION-STATUS.md). Earlier UNRUN statements below apply to the original handoff, not the latest delivered source.
 
 This records the historical version-two commodity component. The current M2

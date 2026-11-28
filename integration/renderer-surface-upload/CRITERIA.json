@@ -1,0 +1,34 @@
+{
+  "status": "AUTHORED_UPLOAD_LIFETIME_FIX;OWNED_RUST_AND_NATIVE_MEMORY_EVIDENCE_PENDING",
+  "incident": {
+    "report": "meridian-desktop_2026-11-19-110058_StevesM5Pro.cpu_resource.diag",
+    "reportSha256": "33c3ad2861b08c3dbcea89e9b7ae4b2be0fbe369d8184ed209756a810c5b4ae7",
+    "pid": 9776,
+    "identifier": "io.xyzzy.meridian.peregrine-pair.a8b8468",
+    "build": 86,
+    "source": "a8b84684bbcd73bb309763843a7e99ab5969f5d0",
+    "sampleFootprint": "941.47 MB to 23.21 GB (+22.29 GB)",
+    "periodUtc": ["2026-11-19T10:59:24.881Z", "2026-11-19T11:00:57.198Z"],
+    "samplePath": "Renderer::draw -> Queue::write_buffer -> wgpu_core::StagingBuffer::new -> Metal device create_buffer -> AGX/IOGPU allocation",
+    "limits": "Sampled stack and source show this growth mechanism; the report is not a per-frame surface-status trace and does not prove all system-crash causes. The implicated interactive run is not relaunched."
+  },
+  "sharedSource": {
+    "rendererDrawSha256": "6a5fd2ce9c04a4cf8f8d3c0f0336ba177a669a0434e60b772407a37e3373e10c",
+    "drawSlice": "from pub fn draw through end of Renderer implementation before cfg(test)",
+    "revisions": {
+      "privatePair": "a8b84684bbcd73bb309763843a7e99ab5969f5d0",
+      "ordinaryMain": "5fef61f1f73d82440c5a053eb96bea489b0bf1c9",
+      "signedStudioHelper": "eef206fdd64e3b1ee538b0d1e2d808483f307282",
+      "studioSource": "76b287d5c2cc0f07c4b8096fc90bb3f99b4aff4a"
+    },
+    "pinnedQueue": "wgpu 29.0.4 and wgpu-core 29.0.4: write_buffer allocates a new native staging buffer, PendingWrites consumes it into temp_resources, and the next submit owns it until completion. Destination buffer Arcs are also retained."
+  },
+  "invariant": "No per-frame queue staging before successful drawable acquisition. Timeout/Occluded skip; Outdated reconfigures; Lost recreates; Validation or failed recovery errors; none invoke frame uploads. Resize coalesces to one CPU projection. Acquired normal/suboptimal frames prepare and submit in the existing order.",
+  "boundedTests": [
+    "repeated_surface_skips_never_prepare_or_accumulate_frame_uploads",
+    "surface_validation_or_failed_recovery_never_runs_uploads",
+    "resize_projection_coalesces_through_skipped_frames_and_uploads_latest_once"
+  ],
+  "testInvocation": "cargo test --locked -p meridian-desktop renderer::preparation_tests -- --nocapture",
+  "scope": "Deterministic real skip enum routing and callback order, successful recovery represented by a token, not a fabricated GPU measurement. Owned normal bounded rendering and memory observations on a corrected candidate remain separate; no claim that all memory growth or the OS crash is resolved."
+}

@@ -3,7 +3,10 @@ use crate::{
     session::{Action, PracticeSelection, Session},
     storage::{SaveCommit, Store},
 };
-use meridian_core::{FlightMode, World, save::MAX_SAVE_BYTES};
+use meridian_core::{
+    World,
+    save::{MAX_SAVE_FILE_BYTES, MAX_SOLAR_HISTORY_BYTES},
+};
 use std::{io, path::PathBuf};
 
 pub struct Profile {
@@ -16,9 +19,62 @@ pub struct Profile {
 }
 
 impl Profile {
+    pub(crate) fn open_medusa_preview(
+        directory: PathBuf,
+    ) -> Result<Self, Box<dyn std::error::Error>> {
+        let store = Store::open_medusa_preview(directory)?;
+        let saved = store.load(MAX_SAVE_FILE_BYTES)?;
+        let world = match &saved {
+            Some(bytes) => World::from_medusa_preview_save(bytes)?,
+            None => World::new_medusa_preview()?,
+        };
+        Ok(Self {
+            world,
+            session: Session::default(),
+            store: Some(store),
+            playing: true,
+            has_save: saved.is_some(),
+            new_armed: false,
+        })
+    }
+
+    pub(crate) fn is_medusa_preview(&self) -> bool {
+        self.world.medusa_preview_fit().is_some()
+    }
+
+    pub(crate) fn medusa_preview_fit(
+        &mut self,
+        fit: meridian_core::MedusaPreviewFit,
+    ) -> Result<String, String> {
+        let current = self
+            .world
+            .medusa_preview_save_bytes()
+            .map_err(|error| error.to_string())?;
+        let mut candidate =
+            World::from_medusa_preview_save(&current).map_err(|error| error.to_string())?;
+        candidate
+            .set_medusa_preview_fit(fit)
+            .map_err(|error| error.to_string())?;
+        let bytes = candidate
+            .medusa_preview_save_bytes()
+            .map_err(|error| error.to_string())?;
+        let published = self
+            .store
+            .as_ref()
+            .ok_or("Preview storage unavailable")?
+            .save(&bytes, MAX_SAVE_FILE_BYTES)
+            .map_err(|error| error.to_string())?;
+        self.world = candidate;
+        self.has_save = true;
+        publication_message(
+            published,
+            "Medusa preview fit saved; no ordinary equipment granted.".into(),
+        )
+    }
+
     pub fn open(directory: PathBuf) -> Result<Self, Box<dyn std::error::Error>> {
         let store = Store::open(directory)?;
-        let has_save = !matches!(store.load(MAX_SAVE_BYTES), Ok(None));
+        let has_save = !matches!(store.load(MAX_SAVE_FILE_BYTES), Ok(None));
         Self::with_store(store, has_save)
     }
 
@@ -38,7 +94,7 @@ impl Profile {
         seed: u64,
     ) -> Result<(Self, Option<String>), Box<dyn std::error::Error>> {
         let store = Store::open(directory)?;
-        let slot = store.load(MAX_SAVE_BYTES);
+        let slot = store.load(MAX_SAVE_FILE_BYTES);
         let mut profile = Self::with_store(store, !matches!(&slot, Ok(None)))?;
         let result = match slot {
             Ok(None) => profile.new_commander(seed).map(|_| ()),
@@ -108,7 +164,7 @@ impl Profile {
             .store
             .as_ref()
             .ok_or("Internal validation has no profile storage")?
-            .save(prepared.bytes(), MAX_SAVE_BYTES)
+            .save(prepared.bytes(), MAX_SAVE_FILE_BYTES)
             .map_err(|e| format!("XYZZY change could not be saved: {e}"))?;
         prepared.commit();
         self.has_save = true;
@@ -116,7 +172,27 @@ impl Profile {
         // A directory-sync warning follows publication, so the host must refresh its authorities.
         Ok(publication_message(
             published,
-            "XYZZY change saved. Supported outfit only; finite missiles and cargo.".into(),
+            match action {
+                meridian_core::XyzzyAction::ActivateMedusa => {
+                    "SH171 Medusa test outfit fitted and saved."
+                }
+                meridian_core::XyzzyAction::Enter => {
+                    "CLARKE active. Maximum outfit fitted and saved."
+                }
+                meridian_core::XyzzyAction::MaximumSupportedHardware
+                | meridian_core::XyzzyAction::RestoreStarter => {
+                    "Outfit refitted, refilled and saved."
+                }
+                meridian_core::XyzzyAction::ToggleUnlimitedFuel => "Fuel setting saved.",
+                meridian_core::XyzzyAction::FitShield(_) => "Selected shield test fit saved.",
+                meridian_core::XyzzyAction::FitFuelScoops => "Fuel Scoops-only test fit saved.",
+                meridian_core::XyzzyAction::FitEcm => "E.C.M.-only test fit saved.",
+                meridian_core::XyzzyAction::ToggleAutoEcm => "Automatic E.C.M. setting saved.",
+                meridian_core::XyzzyAction::MaximumFuelStorage => {
+                    "TEST MAX: four fuel tanks fitted, filled and saved."
+                }
+            }
+            .into(),
         )
         .unwrap_or_else(|warning| warning))
     }
@@ -138,7 +214,7 @@ impl Profile {
             .store
             .as_ref()
             .ok_or("Internal validation has no profile storage")?
-            .save(prepared.bytes(), MAX_SAVE_BYTES)
+            .save(prepared.bytes(), MAX_SAVE_FILE_BYTES)
             .map_err(|e| format!("EMP change could not be saved: {e}"))?;
         prepared.commit();
         self.has_save = true;
@@ -151,7 +227,15 @@ impl Profile {
 
     pub fn new_commander(&mut self, seed: u64) -> Result<bool, String> {
         self.require_profile()?;
-        if self.playing {
+        if self.is_medusa_preview() {
+            return Err("Ordinary commander creation is unavailable in Medusa preview".into());
+        }
+        if self.playing
+            && !self
+                .world
+                .combat_snapshot()
+                .is_some_and(|combat| combat.player.destroyed)
+        {
             return Err("Start a new commander from the title screen".into());
         }
         if self.has_save && !self.new_armed {
@@ -168,18 +252,25 @@ impl Profile {
 
     pub fn continue_saved(&mut self) -> Result<(), String> {
         self.require_profile()?;
+        let missing = if self.is_medusa_preview() {
+            "No saved Medusa preview exists in this slot"
+        } else {
+            "No saved commander exists in this save slot"
+        };
         let bytes = self
             .store
             .as_ref()
             .ok_or("Internal validation has no profile storage")?
-            .load(MAX_SAVE_BYTES)
+            .load(MAX_SAVE_FILE_BYTES)
             .map_err(|e| e.to_string())?
-            .ok_or("No saved commander exists in this save slot")?;
+            .ok_or(missing)?;
         self.accept_save(&bytes)
     }
 
     fn accept_save(&mut self, bytes: &[u8]) -> Result<(), String> {
-        if self.playing {
+        if self.is_medusa_preview() {
+            self.world = World::from_medusa_preview_save(bytes).map_err(|e| e.to_string())?;
+        } else if self.playing {
             self.world.restore_bytes(bytes).map_err(|e| e.to_string())?;
         } else {
             let world = World::from_save_bytes(bytes).map_err(|e| e.to_string())?;
@@ -194,8 +285,39 @@ impl Profile {
 
     pub fn command(&mut self, action: Action) -> Result<String, String> {
         self.require_profile()?;
+        if self.is_medusa_preview() {
+            return match action {
+                Action::Launch | Action::SetFlightView(_) => {
+                    self.session.command(&mut self.world, action)
+                }
+                _ => Err("Only preview flight and the checked preview fit are available".into()),
+            };
+        }
         if !self.playing {
             return Err("N starts a new commander; C continues the existing save".into());
+        }
+        if matches!(action, Action::ActivateEcm) {
+            let tick = self.world.snapshot().tick;
+            let prepared = self
+                .world
+                .prepare_ecm(tick)
+                .map_err(|error| error.to_string())?;
+            let terminated = prepared.terminated();
+            let published = self
+                .store
+                .as_ref()
+                .ok_or("Internal validation has no profile storage")?
+                .save(prepared.bytes(), MAX_SAVE_FILE_BYTES)
+                .map_err(|error| format!("E.C.M. activation could not be saved: {error}"))?;
+            prepared.commit();
+            self.has_save = true;
+            self.session.invalidate();
+            return publication_message(
+                published,
+                format!(
+                    "E.C.M. field active; {terminated} standard missiles terminated. Change saved."
+                ),
+            );
         }
         if let Action::Emp(command) = action {
             return self.emp_equipment(command);
@@ -215,19 +337,49 @@ impl Profile {
                     "Mining Laser purchased and fitted."
                 }
                 meridian_core::ModuleAction::PurchaseFuelScoops => {
-                    "Fuel Scoops purchased and fitted. Physical ore collection remains unavailable."
+                    "Fuel Scoops purchased and fitted for physical ore collection."
+                }
+                meridian_core::ModuleAction::GrantStoredMiningLaser
+                | meridian_core::ModuleAction::FlightLaserExchange { .. } => {
+                    "Automatic equipment action."
+                }
+                meridian_core::ModuleAction::PurchaseLaser { .. } => {
+                    "Laser purchased and fitted to the selected mount."
                 }
                 meridian_core::ModuleAction::Purchase { .. } => {
                     "Owned module purchased and fitted."
                 }
+                meridian_core::ModuleAction::GrantStoredSalvageCutter => {
+                    "Salvage Cutter grant is available only through the explicit test outfit."
+                }
+                meridian_core::ModuleAction::FlightSalvageExchange { .. } => {
+                    "Temporary salvage fit is controlled by the selected lawful recovery."
+                }
                 meridian_core::ModuleAction::Store { .. } => "Owned module stored.",
+                meridian_core::ModuleAction::InstallLaser { .. } => {
+                    "Owned laser fitted to the selected mount."
+                }
                 meridian_core::ModuleAction::Install { .. } => "Owned module fitted.",
+                meridian_core::ModuleAction::Passenger(action) => match action {
+                    meridian_core::PassengerAction::RequestReplies => {
+                        "Mira Talen and Oren Vey have replied. Review their current passage status."
+                    }
+                    meridian_core::PassengerAction::Board => {
+                        "Both consenting original people are aboard in separate private cabins."
+                    }
+                    meridian_core::PassengerAction::Receive => {
+                        "Both original people received at Renas. 610 CR and trusted clue awarded."
+                    }
+                    meridian_core::PassengerAction::Cancel => {
+                        "Both original people released to Avenor. No payment."
+                    }
+                },
             };
             let published = self
                 .store
                 .as_ref()
                 .ok_or("Internal validation has no profile storage")?
-                .save(prepared.bytes(), MAX_SAVE_BYTES)
+                .save(prepared.bytes(), MAX_SAVE_FILE_BYTES)
                 .map_err(|e| format!("Module change could not be saved: {e}"))?;
             prepared.commit();
             self.has_save = true;
@@ -263,7 +415,7 @@ impl Profile {
                 .store
                 .as_ref()
                 .ok_or("Internal validation has no profile storage")?
-                .save(prepared.bytes(), MAX_SAVE_BYTES)
+                .save(prepared.bytes(), MAX_SAVE_FILE_BYTES)
                 .map_err(|e| format!("Cargo equipment change could not be saved: {e}"))?;
             prepared.commit();
             self.has_save = true;
@@ -285,6 +437,24 @@ impl Profile {
                 },
             );
         }
+        if let Action::CommodityTrade(trade) = action {
+            let tick = self.world.snapshot().tick;
+            let prepared = self
+                .world
+                .prepare_commodity_trade(trade, tick)
+                .map_err(|e| e.to_string())?;
+            let message = crate::market::commodity_trade_message(prepared.event())?;
+            let published = self
+                .store
+                .as_ref()
+                .ok_or("Internal validation has no profile storage")?
+                .save(prepared.bytes(), MAX_SAVE_FILE_BYTES)
+                .map_err(|e| format!("Market change could not be saved: {e}"))?;
+            prepared.commit();
+            self.has_save = true;
+            self.session.invalidate();
+            return publication_message(published, message);
+        }
         if let Action::StationService(command) = action {
             let tick = self.world.snapshot().tick;
             let prepared = self
@@ -296,7 +466,7 @@ impl Profile {
                 .store
                 .as_ref()
                 .ok_or("Internal validation has no profile storage")?
-                .save(prepared.bytes(), MAX_SAVE_BYTES)
+                .save(prepared.bytes(), MAX_SAVE_FILE_BYTES)
                 .map_err(|e| format!("Market change could not be saved: {e}"))?;
             prepared.commit();
             self.has_save = true;
@@ -322,7 +492,7 @@ impl Profile {
                 .store
                 .as_ref()
                 .ok_or("Internal validation has no profile storage")?
-                .save(prepared.bytes(), MAX_SAVE_BYTES)
+                .save(prepared.bytes(), MAX_SAVE_FILE_BYTES)
                 .map_err(|e| format!("Missile equipment change could not be saved: {e}"))?;
             prepared.commit();
             self.has_save = true;
@@ -340,7 +510,7 @@ impl Profile {
                 .store
                 .as_ref()
                 .ok_or("Internal validation has no profile storage")?
-                .save(prepared.bytes(), MAX_SAVE_BYTES)
+                .save(prepared.bytes(), MAX_SAVE_FILE_BYTES)
                 .map_err(|e| format!("Market transaction could not be saved: {e}"))?;
             prepared.commit();
             self.has_save = true;
@@ -358,7 +528,7 @@ impl Profile {
                 .store
                 .as_ref()
                 .ok_or("Internal validation has no profile storage")?
-                .save(prepared.bytes(), MAX_SAVE_BYTES)
+                .save(prepared.bytes(), MAX_SAVE_FILE_BYTES)
                 .map_err(|e| format!("Trade lesson confirmation could not be saved: {e}"))?;
             prepared.commit();
             self.has_save = true;
@@ -378,7 +548,7 @@ impl Profile {
                 .store
                 .as_ref()
                 .ok_or("Internal validation has no profile storage")?
-                .save(prepared.bytes(), MAX_SAVE_BYTES)
+                .save(prepared.bytes(), MAX_SAVE_FILE_BYTES)
                 .map_err(|e| format!("Flight lesson confirmation could not be saved: {e}"))?;
             prepared.commit();
             self.has_save = true;
@@ -402,7 +572,7 @@ impl Profile {
                 ),
                 PracticeSelection::Closure(review) => (
                     self.world.prepare_practice_closure(review, tick),
-                    "Practice closed and saved. F10 reviews a fresh attempt; ammunition is not refilled.",
+                    "Practice closed and saved. Shift+3 reviews a fresh attempt; ammunition is not refilled.",
                 ),
                 PracticeSelection::Reception(review) => (
                     self.world.prepare_practice_reception(review, tick),
@@ -414,7 +584,7 @@ impl Profile {
                 .store
                 .as_ref()
                 .ok_or("Internal validation has no profile storage")?
-                .save(prepared.bytes(), MAX_SAVE_BYTES)
+                .save(prepared.bytes(), MAX_SAVE_FILE_BYTES)
                 .map_err(|error| format!("Practice confirmation could not be saved: {error}"))?;
             prepared.commit();
             self.has_save = true;
@@ -430,25 +600,111 @@ impl Profile {
         self.session.command(&mut self.world, action)
     }
 
+    pub fn confirm_occupied_cut(
+        &mut self,
+        review: meridian_core::OccupiedCutReview,
+    ) -> Result<String, String> {
+        self.require_profile()?;
+        if !self.playing {
+            return Err("No active commander".into());
+        }
+        let prepared = self
+            .world
+            .prepare_occupied_cut(review)
+            .map_err(|e| e.to_string())?;
+        let published = self
+            .store
+            .as_ref()
+            .ok_or("No profile storage")?
+            .save(prepared.bytes(), MAX_SAVE_FILE_BYTES)
+            .map_err(|error| format!("Occupied contact could not be saved: {error}"))?;
+        let contact = prepared.commit();
+        self.has_save = true;
+        self.session.invalidate();
+        publication_message(
+            published,
+            if contact.unlawful {
+                "Occupied contact recorded as unlawful; no verified material. Change saved.".into()
+            } else {
+                "Occupied contact attributed; no verified material. Change saved.".into()
+            },
+        )
+    }
+
+    pub(crate) fn navigation_route(
+        &mut self,
+        plan: Option<&meridian_core::navigation::RoutePlan>,
+    ) -> Result<String, String> {
+        self.require_profile()?;
+        if !self.playing {
+            return Err("No active commander to set a route".into());
+        }
+        let tick = self.world.snapshot().tick;
+        let prepared = self
+            .world
+            .prepare_navigation_route(plan, tick)
+            .map_err(|e| e.to_string())?;
+        let published = self
+            .store
+            .as_ref()
+            .ok_or("No profile storage")?
+            .save(prepared.bytes(), MAX_SAVE_FILE_BYTES)
+            .map_err(|error| format!("Navigation change could not be saved: {error}"))?;
+        prepared.commit();
+        self.has_save = true;
+        self.session.invalidate();
+        let message = if plan.is_some() {
+            "Route saved. Check the next leg before launching."
+        } else {
+            "Navigation route cleared."
+        };
+        // Publication happens before the optional directory sync warning.
+        Ok(publication_message(published, message.into()).unwrap_or_else(|warning| warning))
+    }
+
     pub fn save(&mut self) -> Result<String, String> {
+        self.save_with_limits(MAX_SAVE_FILE_BYTES, MAX_SOLAR_HISTORY_BYTES)
+    }
+
+    fn save_with_limits(
+        &mut self,
+        file_limit: usize,
+        solar_limit: usize,
+    ) -> Result<String, String> {
         self.require_profile()?;
         if !self.playing {
             return Err("No active commander to save".into());
         }
-        let bytes = self.world.save_bytes().map_err(|e| e.to_string())?;
+        if self.world.solar_save_limit_reached(solar_limit) {
+            return Err(
+                "Solar save history is full. Flight continues; the previous save is retained."
+                    .into(),
+            );
+        }
+        let bytes = if self.is_medusa_preview() {
+            self.world.medusa_preview_save_bytes()
+        } else {
+            self.world.save_bytes()
+        }
+        .map_err(|e| e.to_string())?;
         let committed = self
             .store
             .as_ref()
             .ok_or("Internal validation has no profile storage")?
-            .save(&bytes, MAX_SAVE_BYTES)
+            .save(&bytes, file_limit)
             .map_err(|e| format!("Save failed; previous file retained: {e}"))?;
         self.has_save = true;
+        let saved_message = if self.is_medusa_preview() {
+            "Medusa preview saved"
+        } else {
+            "Commander saved"
+        };
         match committed {
             #[cfg(unix)]
-            SaveCommit::DirectorySynced => Ok("Commander saved".into()),
+            SaveCommit::DirectorySynced => Ok(saved_message.into()),
             SaveCommit::Published {
                 directory_sync_error: None,
-            } => Ok("Commander saved".into()),
+            } => Ok(saved_message.into()),
             SaveCommit::Published {
                 directory_sync_error: Some(error),
             } => Err(format!(
@@ -458,16 +714,59 @@ impl Profile {
     }
 
     pub fn prepare_quit(&mut self) -> Result<(), String> {
+        self.prepare_quit_with_limits(MAX_SAVE_FILE_BYTES, MAX_SOLAR_HISTORY_BYTES)
+    }
+
+    pub(crate) fn prepare_quit_with_limits(
+        &mut self,
+        file_limit: usize,
+        solar_limit: usize,
+    ) -> Result<(), String> {
         if self.is_internal_validation() {
             return Ok(());
         }
         if self.playing {
-            self.save()?;
+            if self
+                .world
+                .combat_snapshot()
+                .is_some_and(|combat| combat.player.destroyed)
+            {
+                return Err("Commander destroyed; normal Quit retains the previous save. Ctrl+S explicitly saves terminal state.".into());
+            }
+            self.save_with_limits(file_limit, solar_limit)?;
         }
         Ok(())
     }
 
     pub fn lines(&self, active: bool, notice: Option<&str>) -> Vec<String> {
+        if let Some(fit) = self.world.medusa_preview_fit() {
+            let state = self.world.snapshot();
+            let mut lines = vec![
+                "SH171 MEDUSA | ISOLATED PREVIEW / NOT A QUEST REWARD".into(),
+                format!(
+                    "{:?} | SPEED {:.2} / 50.30 | TICK {} | {}",
+                    state.mode,
+                    state.speed,
+                    state.tick,
+                    if active { "RUNNING" } else { "PAUSED" }
+                ),
+                format!(
+                    "CARGO {} / {} t | CABINS {} / 4 | EQUIPMENT {} / 13 | UTILITY {} / 4",
+                    fit.cargo_used_tonnes(),
+                    fit.cargo_capacity_tonnes(),
+                    fit.cabins,
+                    fit.equipment_used(),
+                    fit.utility_used()
+                ),
+                "L launch | W/S throttle | A/D yaw | arrows pitch | Q/E roll | Space brake".into(),
+                "Docked: B cargo expansion | [ / ] cabin count".into(),
+                "Ctrl+S save | Ctrl+R continue | Ctrl+Enter fullscreen | P pause | Esc quit".into(),
+            ];
+            if let Some(notice) = notice {
+                lines.push(notice.into());
+            }
+            return lines;
+        }
         if self.is_internal_validation() {
             let mut lines = vec![
                 "INTERNAL MULE VALIDATION | NO COMMANDER / NO SAVE".into(),
@@ -495,27 +794,7 @@ impl Profile {
             return lines;
         }
         if self.playing {
-            let mut lines = self.session.lines(&self.world, active, notice);
-            if self.world.snapshot().mode == FlightMode::Docked && !self.session.hud_panel_open() {
-                return lines;
-            }
-            if let Some(secret) = self.world.xyzzy_snapshot().filter(|state| state.active) {
-                lines.insert(
-                    0,
-                    format!(
-                        "CLARKE | XYZZY | FUEL {}",
-                        if secret.unlimited_fuel {
-                            "UNLIMITED"
-                        } else {
-                            "NORMAL"
-                        }
-                    ),
-                );
-            }
-            if let Some(emp) = crate::docked_screens::emp::status(&self.world) {
-                lines.push(emp);
-            }
-            return lines;
+            return self.session.lines(&self.world, active, notice);
         }
         vec![
             "MERIDIAN".into(),
@@ -640,6 +919,183 @@ pub(crate) mod tests {
     }
     pub(super) fn action(profile: &mut Profile, value: Action) {
         profile.command(value).unwrap_or_else(|e| panic!("{e}"));
+    }
+    pub(crate) fn solar_history_profile(directory: &TestDirectory) -> Profile {
+        let mut profile = open(&directory.0);
+        assert!(
+            profile
+                .new_commander(18310)
+                .unwrap_or_else(|e| panic!("{e}"))
+        );
+        action(&mut profile, Action::Launch);
+        let step = |profile: &mut Profile, input| {
+            profile.world.step(input).unwrap_or_else(|e| panic!("{e}"));
+        };
+        step(&mut profile, FlightInput::default());
+        let sun = profile
+            .world
+            .celestial_snapshot()
+            .unwrap_or_else(|| panic!("sun"))
+            .sun;
+        let target = [
+            sun.position.x as f32,
+            sun.position.y as f32,
+            sun.position.z as f32,
+        ];
+        let local = |world: &World| {
+            let frame = world.snapshot();
+            let delta = core::array::from_fn(|i| target[i] - frame.position[i]);
+            crate::mesh::rotate_inverse(frame.orientation, delta)
+        };
+        let [x, _, z] = local(&profile.world);
+        let yaw = x.atan2(z);
+        let count = (yaw.abs() / (0.65 / 60.0)).ceil() as u16;
+        for _ in 0..count {
+            step(
+                &mut profile,
+                FlightInput {
+                    yaw: yaw / (0.65 / 60.0) / f32::from(count),
+                    ..FlightInput::default()
+                },
+            );
+        }
+        let [x, y, z] = local(&profile.world);
+        let pitch = y.atan2(x.hypot(z));
+        let count = (pitch.abs() / (0.7 / 60.0)).ceil() as u16;
+        for _ in 0..count {
+            step(
+                &mut profile,
+                FlightInput {
+                    pitch: pitch / (0.7 / 60.0) / f32::from(count),
+                    ..FlightInput::default()
+                },
+            );
+        }
+        let ratio = |world: &World| {
+            world
+                .snapshot()
+                .position
+                .into_iter()
+                .zip(target)
+                .map(|(a, b)| f64::from(a - b).powi(2))
+                .sum::<f64>()
+                .sqrt()
+                / sun.radius
+        };
+        for _ in 0..6000 {
+            if ratio(&profile.world) <= 4.0 {
+                break;
+            }
+            step(
+                &mut profile,
+                FlightInput {
+                    throttle: 1.0,
+                    ..FlightInput::default()
+                },
+            );
+        }
+        assert!(ratio(&profile.world) <= 4.0);
+        for _ in 0..300 {
+            if profile.world.snapshot().speed == 0.0 {
+                break;
+            }
+            step(
+                &mut profile,
+                FlightInput {
+                    brake: true,
+                    ..FlightInput::default()
+                },
+            );
+        }
+        for i in 0..720 {
+            step(
+                &mut profile,
+                FlightInput {
+                    yaw: if i % 2 == 0 { 0.1 } else { -0.1 },
+                    ..FlightInput::default()
+                },
+            );
+        }
+        profile
+    }
+    #[test]
+    fn chunked_solar_profile_publishes_atomically_and_refuses_small_or_failed_writer() {
+        let directory = TestDirectory::new();
+        let mut profile = solar_history_profile(&directory);
+        let before = profile.world.save_bytes().unwrap_or_else(|e| panic!("{e}"));
+        assert!(before.len() > meridian_core::save::MAX_SAVE_BYTES);
+        profile.save().unwrap_or_else(|e| panic!("{e}"));
+        let path = directory.0.join("commander.meridian");
+        assert_eq!(fs::read(&path).unwrap_or_else(|e| panic!("{e}")), before);
+        profile
+            .world
+            .step(FlightInput {
+                yaw: 0.2,
+                ..FlightInput::default()
+            })
+            .unwrap_or_else(|e| panic!("{e}"));
+        let current = profile.world.save_bytes().unwrap_or_else(|e| panic!("{e}"));
+        assert!(
+            profile
+                .save_with_limits(meridian_core::save::MAX_SAVE_BYTES, MAX_SOLAR_HISTORY_BYTES)
+                .is_err()
+        );
+        assert!(
+            profile
+                .prepare_quit_with_limits(
+                    meridian_core::save::MAX_SAVE_BYTES,
+                    MAX_SOLAR_HISTORY_BYTES
+                )
+                .is_err()
+        );
+        assert!(
+            !profile
+                .world
+                .solar_save_limit_reached(MAX_SOLAR_HISTORY_BYTES)
+        );
+        assert!(profile.world.solar_save_limit_reached(1));
+        let failure = profile
+            .save_with_limits(MAX_SAVE_FILE_BYTES, 1)
+            .err()
+            .unwrap_or_else(|| panic!("solar limit admitted save"));
+        assert!(failure.contains("Solar save history is full"));
+        assert_eq!(
+            profile.prepare_quit_with_limits(MAX_SAVE_FILE_BYTES, 1),
+            Err(failure)
+        );
+        assert!(profile.playing());
+        assert_eq!(fs::read(&path).unwrap_or_else(|e| panic!("{e}")), before);
+        assert_eq!(
+            profile.world.save_bytes().unwrap_or_else(|e| panic!("{e}")),
+            current
+        );
+        let previous = World::from_save_bytes(&before).unwrap_or_else(|e| panic!("{e}"));
+        assert!(previous.snapshot().tick < profile.world.snapshot().tick);
+        let backup = directory.0.join("previous-save");
+        fs::rename(&path, &backup).unwrap_or_else(|e| panic!("{e}"));
+        fs::create_dir(&path).unwrap_or_else(|e| panic!("{e}"));
+        assert!(profile.save().is_err());
+        assert!(profile.prepare_quit().is_err());
+        assert!(profile.playing());
+        assert_eq!(fs::read(&backup).unwrap_or_else(|e| panic!("{e}")), before);
+        assert_eq!(
+            profile.world.save_bytes().unwrap_or_else(|e| panic!("{e}")),
+            current
+        );
+        fs::remove_dir(&path).unwrap_or_else(|e| panic!("{e}"));
+        fs::rename(&backup, &path).unwrap_or_else(|e| panic!("{e}"));
+        profile.save().unwrap_or_else(|e| panic!("{e}"));
+        let disk = fs::read(&path).unwrap_or_else(|e| panic!("{e}"));
+        assert_eq!(disk, current);
+        let restored = World::from_save_bytes(&disk).unwrap_or_else(|e| panic!("{e}"));
+        assert_eq!(restored.snapshot(), profile.world.snapshot());
+        assert_eq!(restored.solar_snapshot(), profile.world.solar_snapshot());
+        assert_eq!(restored.commander_id(), profile.world.commander_id());
+        drop(profile);
+        let mut reopened = open(&directory.0);
+        reopened.continue_saved().unwrap_or_else(|e| panic!("{e}"));
+        assert_eq!(reopened.world.snapshot(), restored.snapshot());
+        assert_eq!(reopened.world.solar_snapshot(), restored.solar_snapshot());
     }
     fn travel(profile: &mut Profile) {
         action(profile, Action::Launch);
@@ -1320,3 +1776,6 @@ mod ammunition_tests;
 #[cfg(test)]
 #[path = "profile/traffic_tests.rs"]
 mod traffic_tests;
+
+#[cfg(test)]
+mod medusa_preview_tests;

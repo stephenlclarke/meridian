@@ -1,0 +1,13 @@
+{
+  "schema": 1,
+  "id": "sh171-medusa-preview",
+  "undoBefore": [
+    "sh171-medusa-flight"
+  ],
+  "undoAfter": [],
+  "kind": "inverse",
+  "manifest": "integration/sh171-medusa-preview/PROTECTED-CORE-INVERSE.json",
+  "sha256": "9f1d957d9031c8c289002343b0156ce3ab7604939ebd55c3b677cdac4d38a4c4",
+  "base": "0ee29620932d0f74e0540e8344bcbf319078c3ec",
+  "label": "Isolated Medusa player flight preview"
+}

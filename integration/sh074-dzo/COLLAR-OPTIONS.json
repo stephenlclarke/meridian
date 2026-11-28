@@ -1,0 +1,64 @@
+{
+  "unchangedOtherSupportsUpperMillimetres": {
+    "detailed": 3727,
+    "native": 4986
+  },
+  "collars": {
+    "port-aft-collar": {
+      "intactUpperMillimetres": {
+        "detailed": 4427,
+        "native": 4265
+      },
+      "4SpansUpperMillimetres": {
+        "detailed": 3781,
+        "native": 3894
+      },
+      "8SpansUpperMillimetres": {
+        "detailed": 3073,
+        "native": 1010
+      }
+    },
+    "port-forward-collar": {
+      "intactUpperMillimetres": {
+        "detailed": 4018,
+        "native": 4249
+      },
+      "4SpansUpperMillimetres": {
+        "detailed": 3712,
+        "native": 4842
+      },
+      "8SpansUpperMillimetres": {
+        "detailed": 3073,
+        "native": 1192
+      }
+    },
+    "starboard-aft-collar": {
+      "intactUpperMillimetres": {
+        "detailed": 4427,
+        "native": 4265
+      },
+      "4SpansUpperMillimetres": {
+        "detailed": 3703,
+        "native": 3894
+      },
+      "8SpansUpperMillimetres": {
+        "detailed": 3073,
+        "native": 1010
+      }
+    },
+    "starboard-forward-collar": {
+      "intactUpperMillimetres": {
+        "detailed": 4018,
+        "native": 4249
+      },
+      "4SpansUpperMillimetres": {
+        "detailed": 3712,
+        "native": 4842
+      },
+      "8SpansUpperMillimetres": {
+        "detailed": 3073,
+        "native": 1192
+      }
+    }
+  }
+}

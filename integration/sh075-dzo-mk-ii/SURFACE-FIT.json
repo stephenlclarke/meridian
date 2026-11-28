@@ -1,0 +1,125 @@
+{
+  "nominalPaddingMetres": 0.02,
+  "minimumRefinementTargetsMillimetres": {
+    "detailed": 3900,
+    "native": 5100
+  },
+  "fullUpperMillimetres": {
+    "detailed": 5060,
+    "native": 5096
+  },
+  "pieces": {
+    "port-float": {
+      "detailed": 2471,
+      "native": 5096
+    },
+    "port-aft-collar": {
+      "detailed": 5060,
+      "native": 4912
+    },
+    "port-forward-collar": {
+      "detailed": 4477,
+      "native": 4381
+    },
+    "port-engine": {
+      "detailed": 3727,
+      "native": 4033
+    },
+    "starboard-float": {
+      "detailed": 2471,
+      "native": 5096
+    },
+    "starboard-aft-collar": {
+      "detailed": 5060,
+      "native": 4912
+    },
+    "starboard-forward-collar": {
+      "detailed": 4477,
+      "native": 4381
+    },
+    "starboard-engine": {
+      "detailed": 3727,
+      "native": 4033
+    },
+    "aft-cross-bridge": {
+      "detailed": 2307,
+      "native": 2307
+    },
+    "forward-cross-bridge": {
+      "detailed": 2307,
+      "native": 2307
+    },
+    "dorsal-hull": {
+      "detailed": 1965,
+      "native": 4194
+    },
+    "aft-dorsal-hull": {
+      "detailed": 798,
+      "native": 4291
+    },
+    "dorsal-canopy": {
+      "detailed": 390,
+      "native": 1039
+    },
+    "dorsal-cap": {
+      "detailed": 339,
+      "native": 1839
+    },
+    "port-service-pipe": {
+      "detailed": 260,
+      "native": 4141
+    },
+    "port-instrument-housing": {
+      "detailed": 668,
+      "native": 1342
+    },
+    "port-louvre-1": {
+      "detailed": 248,
+      "native": 816
+    },
+    "port-louvre-2": {
+      "detailed": 248,
+      "native": 844
+    },
+    "port-louvre-3": {
+      "detailed": 248,
+      "native": 905
+    },
+    "port-louvre-4": {
+      "detailed": 248,
+      "native": 673
+    },
+    "port-louvre-5": {
+      "detailed": 248,
+      "native": 680
+    },
+    "starboard-service-pipe": {
+      "detailed": 260,
+      "native": 4141
+    },
+    "starboard-instrument-housing": {
+      "detailed": 668,
+      "native": 1342
+    },
+    "starboard-louvre-1": {
+      "detailed": 248,
+      "native": 821
+    },
+    "starboard-louvre-2": {
+      "detailed": 248,
+      "native": 732
+    },
+    "starboard-louvre-3": {
+      "detailed": 248,
+      "native": 667
+    },
+    "starboard-louvre-4": {
+      "detailed": 248,
+      "native": 673
+    },
+    "starboard-louvre-5": {
+      "detailed": 248,
+      "native": 680
+    }
+  }
+}

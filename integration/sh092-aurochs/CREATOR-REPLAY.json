@@ -1,0 +1,58 @@
+{
+  "host": "SteveMBA",
+  "python": "3.14.3",
+  "numpy": "2.5.5",
+  "pillow": "13.0.0",
+  "testCount": 3,
+  "testResult": "PASS",
+  "sourceRecipeRevision": "a11fe16924d87d06021816f9037952afcbac08db",
+  "staging": "The driver redirects three staged blueprint input paths and restores the original blueprint. The recipe and tests are byte-identical to the historical source.",
+  "candidate": {
+    "vertices": 258,
+    "triangles": 444,
+    "parts": 18,
+    "fixedParts": 11
+  },
+  "receipts": {
+    "SH092-candidate.json": {
+      "bytes": 53079,
+      "sha256": "45edabcc0317e11a8b5e46176136e790536877ccdcd8ae0037fca6c9bf0cd256"
+    },
+    "Sources/L337Core/Resources/Ships/SH092.toml": {
+      "bytes": 399402,
+      "sha256": "c914c1d28437e4109c59f63a94488c37906a10d2ec04024a97c603c348c4960f"
+    },
+    "docs/fleet-physical/SH092-native-candidate-blueprint.json": {
+      "bytes": 4783,
+      "sha256": "bf2b7240e11fea451795d9309ceba6bdb6783f0523f7bc27c8772a3bb07ebe8d"
+    },
+    "docs/fleet-physical/SH092-native-candidate-recipe.py": {
+      "bytes": 7660,
+      "sha256": "5ef26ed3786baba3a57b736aaf3e65e21a448712d66634c8b4f6ad8ac07c7b6d"
+    },
+    "docs/fleet-physical/SH092-native-candidate-tests.py": {
+      "bytes": 7661,
+      "sha256": "c154dc88d71125f2df7f295935ed0985446f0c79432b65ce79ed032a80516df9"
+    },
+    "docs/fleet-physical/creator-ownership-records/SH092.json": {
+      "bytes": 74467,
+      "sha256": "0ec0447fe2ebee2a6e07623527d15149a7c4f5cd40818becccc7292a1429fc9a"
+    },
+    "original-creator/SH092-design.toml": {
+      "bytes": 375309,
+      "sha256": "5636b640e4ece28c7985d56f9643e6f6a24e011fd826ea085f1e811ccf5d30d7"
+    },
+    "original-creator/fleet_redesign.py": {
+      "bytes": 48273,
+      "sha256": "3f029d5a417dea1b787dc5f0327d72687822275cc372de79790c3531e7cba429"
+    },
+    "original-creator/generate.py": {
+      "bytes": 32122,
+      "sha256": "a80f3606edd1ca0c9e4f0133136ab97257b07b2afe3efbbeb8a46960eb836476"
+    },
+    "tests.log": {
+      "bytes": 1605,
+      "sha256": "96286aeef347c46d53290348ce063114180d7d14df410fd776ee20eb4c1c4e1b"
+    }
+  }
+}

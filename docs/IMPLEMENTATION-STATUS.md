@@ -1,5 +1,89 @@
 # Implementation and validation status
 
+## Published Preview 12
+
+Meridian `v0.12.0-preview.1` was published on 28 November 2026 at 04:10 UTC. Its annotated tag points to protected main `83ceae733d6e4f9cffc81c517fabb3eb7b39fba8`. All four public assets passed download verification. The Mac archive was compiled at the tagged commit. The Windows archive was compiled at `af8e64272e403d670d0a5f2f460ec07e4fc889ce`. Both revisions have Git tree `cc0d4d1caa4e69cc98db5498af91e834eb11e5e9`. All six exact-main CI jobs passed, including the Sonar quality gate. Sonar analysis `855e276d-b1f4-431a-9038-660dfd04b480` records the tagged commit as both revision and project version. [Release and checksums](https://github.com/stephenlclarke/meridian/releases/tag/v0.12.0-preview.1) · [Exact-main CI](https://github.com/stephenlclarke/meridian/actions/runs/46095731143)
+
+| Environment | Verified scope |
+| --- | --- |
+| Final Mac archive | Fleet, Medusa and Hull Studio passed strict signature, notarisation ticket and Gatekeeper checks. Both games started on Metal with separate disposable profiles and exited normally. Studio validated its reference, exported it byte for byte and displayed a native nested Showroom frame. Final Fleet archive testing covered startup and exit. A full manual flight remains unverified on that archive. |
+| Final Windows archive | On the locked Dell, both launchers saved and cold-reopened separate profiles. Studio passed offline reference export and headless browser Help checks. The game windows remained in graphics initialisation and the Studio helper returned HTTP 503. Native gameplay, interactive Fleet refit, in-game Continue and a Showroom frame remain unverified. |
+| Earlier Linux visual run | Xvfb captures on `0eaf3fb8` showed the instrument footer, upper-right placement and fallback to the footer under target guidance. The later change at `af8e6427` affected one test assertion. |
+
+The current desktop uses the [number row and Control shortcuts](../README.md#controls) for missiles, training, saves and fullscreen. Earlier qualification entries record the keys used by their named builds.
+
+PR #232 merged the flyable Medusa, Hull Studio, 115 selectable Showroom models and bulk trading. The local Mac build at `78bb0eba` passed Developer ID, notarisation and Gatekeeper checks for all three apps. The Medusa flight test retained its original hull, speed and expanded hold after a cold restart. Native Windows reproduced all 288 hull measurements across 104 hull directories. [Player guide](PREVIEW-RELEASES.md#fleet-medusa-and-hull-studio)
+
+The scanner development branch adds distance-ordered Tab selection and manual designation without a targeting computer. Basic targeting aligns the ship. Advanced targeting can fly a work approach. Fitted docking and work modules enable the corresponding automatic sequence. Mac CI passed for the signed local Scanner Preview at `53e2210a`. Its Metal playtest selected a released ore fragment, switched from manual to assisted control, and saved the collected Alloys. Linux and native Windows tests covered hand-flown mining, scooping, salvage and occupied-ship review. The combined main build passed all required platform, coverage and Sonar checks. [Scanner Preview 11](https://github.com/stephenlclarke/meridian/releases/tag/v0.11.0-preview.1) was published on 26 November 2026 and all four downloads were verified.
+
+The [automatic work candidate](AUTOMATIC-WORK.md) uses the existing targets and fitted tools for approach, mining and salvage. Tab starts work with the required equipment. Delete clears the selection. Manual steering takes over while keeping the scanner mark. The target panel reports the current World operation. Dell passed the earned mining and cold Continue test at `200c0289`. The corrected earned salvage approach on Dell at `63fb125c` recovered all nine cargo units and preserved them through Continue. Combined native acceptance remains open.
+
+The development save store explicitly unlocks on close. Dell Linux reproduced the cold-reopen failure during concurrent process startup and verified the fix while retaining exclusive access for a live owner.
+
+The Fleet XYZZY development change issues an SH171 Medusa to the ordinary commander slot through the testing menu. It includes a five-position missile rack, an expanded 32 t hold, fitted systems, and a test issue tied to the berth and account revision that survives Continue. [Equipment and acceptance scope](EQUIPMENT-PLAYABLE.md#fleet-xyzzy-medusa)
+
+## Ordinary cockpit viewport
+
+The desktop source uses the pilot’s position and projects the flight scene above the scanner. Tool sights follow the current mount and selected work equipment. Flight Help opens a status card with the latest notice and its placement control. Routine feedback defaults to the instrument footer. [Cockpit display and controls](COCKPIT-HUD.md#ordinary-flight-viewport)
+
+## Independent laser fitting
+
+Station Equipment supports paid purchases and stored-item refits for each of the four mounts on the issued Fleet Medusa. The Peregrine supports front fitting. The selected mount supplies the weapon identity, class, damage and cooldown. Reloading a commander retains mixed fits and stored guns. The Medusa’s explicit reissue restores the Naval outfit from owned equipment. [Station fitting and flight controls](FLEET-MEDUSA-LASERS.md)
+
+## Ordinary hyperspace drive source candidate
+
+The station Equipment screen exposes the born Basic drive and the two original paid upgrades. Their actual countdowns are 10, 5 and 1 second, and the existing station mass-lock thresholds are 600, 480 and 360. Purchases, refitting, saved pending jumps, historical completed legs and the explicit XYZZY top-grade grant use the same owned equipment ledger. The [equipment implementation and testing ledger](EQUIPMENT-PLAYABLE.md) reconciles remaining original grades and Medusa design constraints. Authored source and regression coverage await the owning compiler, whole-slice review, CI and native preview.
+
+## Stock shield source candidate
+
+The [seven shield grades](SHIELD-GRADES.md) use the source-defined bank capacities from 300 to 2,760 and unchanged recharge. Four successive shop grades are payable through the existing account; Advanced II retains its unavailable Elite-rank and PLUGH-only acquisition paths, and Elite remains acquisition-only with explicit maximum test access. A separate XYZZY grade selector exercises each real fit without cash, fuel or unrelated equipment changes. The wider bank codec, historical fit/damage replay, actual incoming hit, HUD and paid/refit/Continue regressions await owned execution; no native preview claim follows from authored source.
+
+The [fuel storage source candidate](FUEL-STORAGE.md) implements four separately owned and paid physical units, up to three fitted normally on SH025, actual tank capacity and paid refuel, refusal to store occupied capacity, and an explicit four-tank XYZZY exception with current freight and trade custody guards. Gameplay replay, account/route persistence and native acceptance require owned validation.
+
+The [solar fuel source candidate](SOLAR-FUEL-SCOOPS.md) adds the original near-sun collection rate using the actual fitted Fuel Scoops and real current tank, independent cabin heat and lethal overheat, exact account/flight continuation receipts, an explicit scoop-only test action, and actual cockpit status. Physical ore and cargo intake remain open. Authored tests require owned native validation.
+
+## The Unwritten Route clue journal
+
+The [ordinary clue journal](../integration/unwritten-route/README.md) reads the existing first receipts for five playable source families against the original 64-clue catalogue. Shift+J opens the journal. Later trail instructions and the paid Medusa path follow the original quest prerequisites.
+
+## Passenger cabins and G04 source candidate
+
+The [six paid passenger cabin layouts](PASSENGER-CABINS.md) use actual hold and equipment capacity. The original G04 finite pair requires separate current consent, two distinct private awake cabin reservations, physical Renas reception or Avenor cancellation, and durable settlement once. The source candidate includes focused core and desktop regressions but awaits owned compilation, review, hosted and native testing. General life-support damage, hull-loss custody and other passenger contracts are open.
+
+## Medusa Showroom inspection
+
+The empty stock reference exposes 40,712 kg in the Showroom. The MacBook Air replayed the original 14 finite distributions and passed all six source tests. The `5a924315` Mac desktop test also checked this stock mass and the ordinary Showroom purchase refusal. Final native verification of the ordinary inspection screen remains separate. Ordinary player acquisition, exchange and PLUGH fabrication remain unavailable.
+
+SH171 is available for catalogue inspection with the original detailed artwork and seven materials. The archived native mesh has 76,228 faces and stays outside the 512-face flight gate. The source-bound shield uses 729 local supports and keeps the crown opening clear in its own geometry. The [Medusa inspection record](../integration/sh171-medusa/README.md) describes the measured bounds and the separate isolated flight preview. Ordinary acquisition and PLUGH fabrication remain open.
+
+## Combined Showroom and Hull Studio source candidate
+
+The ordinary station Showroom has 115 selectable stock previews: 109 authenticated schema-1 packages and six original stock models. The final fleet intake adds 78 authored stock packages from SH070 through SH170. The Showroom keeps the linked source identities, engineering readouts and inspection-only exchange rules. The combined source also restores the Studio launcher, including explicit inspection of schema-2 archives. Stock ship and station finishes are display-only; local authored material colours remain exact. Mac build `5a924315` passed 647 core unit tests, 382 desktop unit tests and 13 core integration tests; 20 desktop tests were ignored. The desktop tests checked all 31 schema-package previews on that 37-preview build. The MacBook Air's exact final 50-hull source packet at `e10ab45b` passed 259 Python tests and 107 focused Rust tests with 210 matching replay receipts. Final compiler checks and native presentation acceptance of the 115-preview registry remain separate.
+
+The separate [Medusa player preview](../integration/sh171-medusa-preview/README.md) connects the active World hull identity to the original detailed flight rendering. The renderer retains the Peregrine model for ordinary players and existing traffic. It does not use the archived 729-piece inspection shield or reduced contact hull as flight artwork. On the signed Mac build `5a924315` (tree `61214e3e28f6b2830cfd5c71d52482e049f29ef3`), the Orchestrator saw the original Medusa in flight at 50.30/50.30. The isolated pilot fitted the cargo expansion, launched, saved and cold-restarted. The new process restored FLIGHT, 50.30 and the expanded 32 t hold. The 69-byte save remained byte-identical through both process exits and the ordinary decoder refused it. Core tests at that source passed the actual launch/return, rear-side save and fit-limit cases; native docking return and fit-limit refusal were not observed in that run. This evidence is not publication or full final-build acceptance.
+
+### Outstanding fleet inspection scope
+
+Cheetah (SH082) remains outside the rendered stock registry because its candidate loses four required contacts. The final intake also excludes the following 22 entries in SH099–SH170:
+
+- SH102 Dhole Haven, SH103 Redtail Mk III, SH108 Besra, SH161 Wolf Citadel, SH162 Larvaal Probe and SH164 Toad Drug Factory: original source is outstanding in the queue.
+- SH112 Larvaal Warden, SH113 Larvaal Ravager, SH114 Larvaal Sentinel, SH115 Larvaal Lancer, SH116 Larvaal Broodlord, SH117 Larvaal Provoker, SH118 Larvaal Reaver, SH119 Larvaal Wraith, SH120 Larvaal Seeker, SH121 Larvaal Mender, SH122 Larvaal Harvester, SH123 Larvaal Sovereign, SH124 Larvaal Warship and SH125 Larvaal Drone: original finite-dry record is outstanding. SH123 also has unresolved engineering.
+- SH141 Salamander Station and SH156 Lion Bastion: no authored inspection packet is in the queued refs.
+
+These are outstanding content requirements, not an admission or acquisition decision. No placeholder artwork is registered for them.
+
+## Station chart best-profit scan source candidate
+
+The station Galaxy chart now offers a read-only P toggle for up to five positive, directly reachable trade estimates, with an explicit empty state. The scan uses current in-game stocks and quotes, unreserved cargo, wallet, fitted jump range and fuel. It adapts `Sources/EliteCore/ProfitScan.swift` from immutable Elite source `34790e313c0d6cf8be84fe74aaf8f2f228cd3b3f` to the admitted Meridian markets; unsupported markets and speculative multi-leg refuelling do not count. The toggle is session-local and local flight P remains pause. Authored core and desktop regressions cover finite trade bounds, reserved cargo, range/fuel exclusions, stable ranking, read-only saves and the chart input path. Compiler, CI and native qualification are pending.
+
+The [trade-detail source candidate](../integration/followup-trade-detail/README.md) extends the existing live quote estimates with sale values for unreserved cargo, finite export quantities and unit ask/bid prices. In a route review, D opens per-leg allocations and estimated value. D, B or Enter closes details without installing the route. The underlying estimate and transaction authority are unchanged. The protected-source check passed; focused compiler and native interface checks await execution on the combined candidate.
+
+The [atomic market quantity source candidate](../integration/followup-bulk-market/README.md) adds Market quantity controls in native units, with a review of unit price and total. Every requested unit stages the existing ordinary market receipt and account checks; all settle in a single prospective save or none do. The existing save format, finite markets, paid cabin mass and reserved cargo rules remain. Direct source and protected-source checks passed; focused platform and native Market tests await execution on the combined candidate.
+
+## Generated desktop audio source candidate
+
+The authored desktop integration routes generated launch and docking cues from actual mode transitions, front-laser sounds from accepted Pulse or Mining Laser discharges, and the original missile notification ping after an accepted missile launch. Ctrl+Shift+M toggles sound; Help displays availability. New/Continue primes without replay, and a missing device leaves gameplay active. Application suspension releases the audio device; resuming restores the mute preference without replaying accepted cues. No speech, kill, ECM, continuous cutter or EMP effects are claimed. Native device and Rust qualification remain pending.
+
 ## Goshawk Showroom preview
 
 Preview 10 is published for macOS arm64 and Windows x64. It includes the Goshawk Explorer in the ordinary station Showroom. The signed and notarized app was extracted and checked against the local installation, including all 483 files. Earlier Mac gameplay checks covered the Showroom on the source used for this build. Packaging verification did not include a new graphical launch. [Preview guide](PREVIEW-RELEASES.md)
@@ -32,6 +116,250 @@ includes both luminous recesses. The new World regression awaits owned
 execution. Ordinary placement and gameplay docking remain open.
 [Stock engineering](GOSHAWK-GAMEPLAY-ENVELOPE.md#adopted-stock-engineering)
 
+## Crow Prototype source envelope
+
+SH020 preserves the original 3,472-face detailed mesh and 952-face native mesh. Its 68 collision supports leave the fork open and define a controlled sweep against the SH028 station port. The native mesh exceeds the 512-face limit by 440 faces. Ordinary flight admission, stock Showroom inspection and runtime mass remain open. [Source geometry and clearance measurements](CROW-PROTOTYPE-GAMEPLAY-ENVELOPE.md)
+
+## Stag Liner source envelope
+
+SH035 preserves the two original pearl-teal meshes and uses 26 local supports. SteveMBA verified seven routes, eight structural overlaps and the original SH028 offset lip contact. The full fit bounds are 705 mm detailed and 3,038 mm native. The installed signed Hull Studio exported the exact definition with all 26 groups and seven routes passing. The per-hull Rust contact tests and Showroom qualification remain pending. [Stag Liner source and evidence](STAG-LINER-GAMEPLAY-ENVELOPE.md)
+
+## Saker source envelope
+
+The SH042 Saker source package preserves the original forest-ivory meshes and both frozen engineering records. SteveMBA verified seven routes, seven overlaps in both LODs and the offset contact with the original SH028 station lip. The full fit upper bounds are 448 mm detailed and 2,106 mm native. A detailed instrument housing absent from the native LOD accounts for the limiting native stand-off. The Rust contact tests and Showroom qualification are pending. [Saker source and evidence](SAKER-GAMEPLAY-ENVELOPE.md)
+
+## Eagle Cruiser catalogue source
+
+The nonflyable Eagle Cruiser package preserves the original detailed and 248-face navy-copper native meshes, plus both frozen engineering records. SteveMBA verified seven capital trench routes and five structural overlaps in both LODs. The audited fit upper bounds are 1,772 mm detailed and 5,377 mm native. The installed signed Hull Studio produced two byte-identical offline exports and passed all seven probes. The exact qualification evidence records the export and defines the focused Rust tests. [Eagle Cruiser source and evidence](EAGLE-CRUISER-SOURCE.md)
+
+## Harpy Assault catalogue source
+
+The Harpy Assault inspection package preserves the original sand-maroon detailed and native meshes and both frozen engineering records. The frozen runtime catalogue disables player flight and normal purchase. The original R3 design specifies player flight after blueprint fabrication. SteveMBA verified seven keel and shoulder routes and five structural overlaps in both original meshes. The audited fit upper bounds are 847 mm detailed and 1,642 mm native. [Harpy Assault source and evidence](HARPY-ASSAULT-SOURCE.md)
+
+## Erne Corvette catalogue source
+
+The Erne Corvette inspection package preserves both original ice-cobalt meshes and both frozen dry engineering records. The frozen runtime catalogue disables player flight and normal purchase. The original R3 contract specifies player flight after blueprint fabrication. SteveMBA verified the 23 supports and seven clearance routes. The installed signed Hull Studio accepted the package and passed all seven probes. [Erne Corvette source and evidence](ERNE-CORVETTE-SOURCE.md)
+
+## Harpy Dropship catalogue source
+
+The Harpy Dropship inspection package preserves both sand-maroon meshes and the frozen engineering records. The runtime catalogue disables player flight and normal purchase. The original R3 contract specifies player flight after blueprint fabrication. SteveMBA verified 27 supports, seven clearance routes, and seven original joints. The installed signed Hull Studio accepted the package offline and passed all seven probes. [Harpy Dropship source and evidence](HARPY-DROPSHIP-SOURCE.md)
+
+## Harpy Gunship catalogue source
+
+The Harpy Gunship inspection package preserves both original sand-maroon meshes and the frozen engineering records. The runtime catalogue disables player flight and normal purchase. The original R3 contract specifies player flight after blueprint fabrication. SteveMBA reproduced the fit and contact reports for 28 supports, seven inspection routes, and eight original joints. [Harpy Gunship source and evidence](HARPY-GUNSHIP-SOURCE.md)
+
+## Lanner catalogue source
+
+The Lanner package preserves the original plum-gold meshes and frozen relative coordinate scale. The 936-face archived native mesh remains separate from the 456-face creator-pinned candidate used in the signed offline artwork export. Both retain the 18 original parts. The source replay verifies 75 supports and seven routes across both arrangements. The frozen runtime catalogue disables player flight and normal purchase. The original R3 contract specifies player flight after blueprint fabrication. [Lanner source and evidence](LANNER-SOURCE.md)
+
+## Hyena catalogue source
+
+The Hyena package preserves the original sand-graphite meshes and frozen relative calibration. The signed offline artwork export uses the separate 504-face creator-pinned candidate. The 952-face original native mesh remains archived. Both contain the 26 original native parts. Source replay verifies seven routes across both arrangements. The frozen runtime catalogue disables player flight and normal purchase. The original R3 contract specifies player flight after blueprint fabrication. [Hyena source and evidence](HYENA-SOURCE.md)
+
+## Yak catalogue source
+
+The Yak package preserves the original sage-umber meshes and the frozen relative calibration. The 928-face native archive stays distinct from the 480-face candidate used in the signed artwork export. Both retain the 24 original native parts. Source replay verifies 162 supports and seven sweeps across both arrangements. The frozen runtime catalogue disables player flight and normal purchase. The original R3 contract specifies player flight after blueprint fabrication. [Yak source and evidence](YAK-SOURCE.md)
+
+## Jackal catalogue source
+
+The Jackal package preserves the original violet-pearl meshes and frozen relative calibration. The 940-face native archive stays distinct from the 492-face candidate used in the signed artwork export. Both retain the 25 original native parts. Source replay verifies 163 supports and seven sweeps across both arrangements. The frozen runtime catalogue disables player flight and normal purchase. The original R3 contract specifies player flight after blueprint fabrication. [Jackal source and evidence](JACKAL-SOURCE.md)
+
+## Banteng catalogue source
+
+The Banteng package preserves the original navy-copper meshes and frozen relative calibration. The signed artwork export uses the separately identified 484-face project-authored candidate. The original 1,332-face native archive retains all original wells. Source replay verifies the 85 local groups and both stacked-pod openings. The frozen runtime catalogue disables player flight and normal purchase. The original R3 contract specifies player flight after blueprint fabrication. [Banteng source and evidence](BANTENG-SOURCE.md)
+
+## Caracal Scout catalogue source
+
+The Caracal Scout package preserves the original navy-copper meshes and frozen relative calibration. The signed artwork export uses the separate 492-face project-authored candidate. The original 1,380-face native archive retains all original wells. Source replay verifies 89 local groups and both stacked-pod openings. The frozen runtime catalogue disables player flight and normal purchase. The original R3 contract specifies player flight after blueprint fabrication. [Caracal Scout source and evidence](CARACAL-SCOUT-SOURCE.md)
+
+## Hobby Fighter catalogue source
+
+Hobby Fighter retains both original metre meshes, with 4,620 detailed faces and 192 native faces. Signed Studio evidence covers the offline artwork. Independent source replay verifies 24 local support groups, seven guarded routes, and both wing joints and the canopy joint. [Hobby Fighter source and evidence](HOBBY-FIGHTER-SOURCE.md)
+
+## Condor catalogue source
+
+Condor retains its original 4,504-face detailed and 244-face native metre meshes. Signed Studio evidence covers the offline artwork. The collision model uses 26 local groups, including two overlapping parts per wing. Independent source verification retains all seven guarded routes and eight joints in both meshes. [Condor source and evidence](CONDOR-SOURCE.md)
+
+## Aplomado Interceptor catalogue source
+
+Aplomado Interceptor retains the original 2,340-face detailed and 120-face native metre meshes. Signed Studio evidence covers offline artwork. Independent source replay verifies 23 local groups, seven guarded routes, and five joints in both source meshes. [Aplomado Interceptor source and evidence](APLOMADO-INTERCEPTOR-SOURCE.md)
+
+## Falconet catalogue source
+
+Falconet retains the original 3,108-face detailed and 184-face native metre meshes. Signed Studio evidence covers offline artwork. Independent source replay verifies 25 local groups, seven guarded routes and seven joints in both source meshes. [Falconet source and evidence](FALCONET-SOURCE.md)
+
+## Muskox catalogue source
+
+Muskox retains the original 4,224-face detailed and 244-face native metre meshes. Signed Studio evidence covers offline artwork. Independent source replay verifies 25 local groups, six joints and seven guarded routes, including four narrow bay clearances of 143–144 mm. [Muskox source and evidence](MUSKOX-SOURCE.md)
+
+## Barbary catalogue source
+
+Barbary retains the original 3,852-face detailed and 192-face native metre meshes. Signed Studio evidence covers offline artwork. Independent source replay verifies 22 local groups, eight joints and seven guarded routes. [Barbary source and evidence](BARBARY-SOURCE.md)
+
+## Wombat catalogue source
+
+Wombat retains the original 3,544-face detailed and 1,024-face native meshes with exact relative calibration. A separately identified 496-face inspection candidate retains all seven exact guarded routes, including five through the rectangular frame and centre slit. Signed Studio evidence covers offline artwork. [Wombat source and evidence](WOMBAT-SOURCE.md)
+
+## Saiga catalogue source
+
+Saiga retains its original 5,776-face detailed and 1,720-face native meshes with the archived 20 m/unit calibration. Its separate 512-face appearance candidate preserves both collar holes. The bundled collision verifier retains all seven guarded routes using overlapping collar sectors. [Saiga source and evidence](SAIGA-SOURCE.md)
+
+## Moose Clipper catalogue source
+
+Moose Clipper retains the original 3,468-face detailed and 192-face native metre meshes. Signed Studio evidence covers offline artwork. Independent source replay verifies 24 local supports, six joints and seven guarded routes, including the detailed/native stand-off witness. [Moose Clipper source and evidence](MOOSE-CLIPPER-SOURCE.md)
+
+## Seriema Courier catalogue source
+
+Seriema Courier retains its 1,656-face detailed and 608-face native visible meshes. The separately archived 512-face collision source has seven numerically verified guarded routes. The recorded creator run produced 464 faces. [Seriema Courier source and evidence](SERIEMA-COURIER-SOURCE.md)
+
+## Arna Cutter catalogue source
+
+Arna Cutter preserves the original 3,132-face detailed and 184-face native metre meshes. Signed Studio evidence covers offline artwork. Independent source replay verifies 27 groups, seven guarded routes, five overlapping joints and three flush deck contacts. [Arna Cutter source and evidence](ARNA-CUTTER-SOURCE.md)
+
+## Vulture Raider catalogue source
+
+Vulture Raider preserves the original 4,120-face detailed and 368-face native meshes in metres. Signed Studio evidence covers offline artwork. Independent source replay verifies 27 groups, seven guarded routes and nine overlapping joints. [Vulture Raider source and evidence](VULTURE-RAIDER-SOURCE.md)
+
+## Rabbit Explorer catalogue source
+
+Rabbit Explorer retains its original 2,648-face detailed and 888-face native artwork. The frozen creator recipe generated a separate 480-face inspection candidate. Signed Studio exports include four exterior probes. Independent source checks verify seven guarded routes, including the open bow. [Rabbit Explorer source and evidence](RABBIT-EXPLORER-SOURCE.md)
+
+## Rhinoceros Trader catalogue source
+
+Rhinoceros Trader preserves the original 700-face detailed and 388-face native meshes and their exact calibration. Signed Studio exports and independent checks cover seven inspection paths. [Rhinoceros Trader source and evidence](RHINOCEROS-TRADER-SOURCE.md)
+
+## Badger catalogue source
+
+Badger preserves the original 5,912-face detailed and 284-face native meshes in metres. Seven source checks verify guarded routes outside the collars. Both original meshes confirm that the forward pods occupy the collar centres. [Badger source and evidence](BADGER-SOURCE.md)
+
+## Baza Fighter catalogue source
+
+Baza Fighter preserves the original 2,340-face detailed and 152-face native meshes in metres. Signed Studio and independent source evidence cover seven guarded inspection routes. [Baza Fighter source and evidence](BAZA-FIGHTER-SOURCE.md)
+
+## Baza Mk II catalogue source
+
+Baza Mk II preserves the original 2,364-face detailed and 176-face native meshes in metres. Signed Studio and independent source evidence cover seven guarded inspection routes. [Baza Mk II source and evidence](BAZA-MK-II-SOURCE.md)
+
+## Griffon catalogue source
+
+Griffon retains both original visible meshes, with 1,644 detailed and 596 native faces. The separately archived 512-face collision artifact preserves seven guarded inspection routes. [Griffon source and evidence](GRIFFON-SOURCE.md)
+
+## Griffon Mk II catalogue source
+
+Griffon Mk II retains both original visible meshes, with 1,644 detailed and 596 native faces. The separate 380-face generated inspection candidate preserves seven guarded routes. [Griffon Mk II source and evidence](GRIFFON-MK-II-SOURCE.md)
+
+## Griffon Spectre catalogue source
+
+Griffon Spectre retains both original visible meshes, with 1,644 detailed and 596 native faces. Its separate 380-face generated inspection geometry preserves seven guarded routes. [Griffon Spectre source and evidence](GRIFFON-SPECTRE-SOURCE.md)
+
+## Dzo catalogue source
+
+Dzo preserves the original 9,228-face detailed and 416-face native meshes. Eight overlapping spans per collar tighten the inspection envelope and preserve seven guarded routes. [Dzo source and evidence](DZO-SOURCE.md)
+
+## Dzo Mk II catalogue source
+
+Dzo Mk II preserves the original 9,612-face detailed and 448-face native meshes. Eight overlapping spans per collar tighten the inspection envelope and preserve seven guarded routes. [Dzo Mk II source and evidence](DZO-MK-II-SOURCE.md)
+
+## Hog catalogue source
+
+Hog preserves the original 868-face detailed and 448-face native meshes with their original calibration. Exact source evidence verifies seven guarded routes across the stacked hull. [Hog source and evidence](HOG-SOURCE.md)
+
+## Tamaraw catalogue source
+
+Tamaraw preserves the original 3,864-face detailed and 212-face native artwork. Source checks verify seven guarded routes, eight shared overlaps and two flush rails present in the detailed mesh. [Tamaraw source and evidence](TAMARAW-SOURCE.md)
+
+## Oryx Voyager catalogue source
+
+Oryx Voyager preserves its original 4,620-face detailed and 200-face native meshes. Eight overlapping ring supports preserve two inner passages and all five exterior routes. [Oryx Voyager source and evidence](ORYX-VOYAGER-SOURCE.md)
+
+## Carabao Freighter catalogue source
+
+Carabao Freighter preserves the original 2,448-face detailed and 204-face native artwork. Six guarded lateral routes cross the gaps between cargo bays. [Carabao Freighter source and evidence](CARABAO-FREIGHTER-SOURCE.md)
+
+## Carabao Highliner catalogue source
+
+Carabao Highliner preserves its original 2,856-face detailed and 236-face native artwork. Both original meshes include the passenger spine and preserve seven guarded inspection routes. [Carabao Highliner source and evidence](CARABAO-HIGHLINER-SOURCE.md)
+
+## Jaguar catalogue source
+
+Jaguar preserves its original 5,820-face detailed and 432-face native artwork. Both original records keep Jaguar unavailable for player flight and purchase. Four nozzle contacts and 14 overlap witnesses reproduce in both meshes. [Jaguar source and evidence](JAGUAR-SOURCE.md)
+
+## Hare Explorer catalogue source
+
+Hare Explorer preserves its original 3,108-face detailed and 184-face native artwork. Both meshes retain the canopy and wing-mount overlaps. The detailed nozzles seat flush on the hull, and the original native mesh keeps those parts apart. [Hare Explorer source and evidence](HARE-EXPLORER-SOURCE.md)
+
+## Llama catalogue source
+
+Llama preserves its original 3,096-face detailed and 172-face native artwork. Both meshes preserve the nozzle and deck-rail contacts, plus the canopy and crossbeam overlaps with the cabin. [Llama source and evidence](LLAMA-SOURCE.md)
+
+## Laggar catalogue source
+
+Laggar preserves 3,108 detailed and 184 native original faces. Both meshes retain seven structural overlaps, including the canopy and outrigger assemblies, and preserve the original fin clearances. [Laggar source and evidence](LAGGAR-SOURCE.md)
+
+## Alpaca catalogue source
+
+Alpaca preserves 2,724 detailed and 908 native original faces. A separate, source-derived 508-face inspection candidate preserves the closed shield and ten measured original joins. [Alpaca source and evidence](ALPACA-SOURCE.md)
+
+## Elk catalogue source
+
+Elk preserves its original 1,584 detailed and 536 native faces. A separate 464-face inspection candidate retains all 14 parts and all nine measured original joins. [Elk source and evidence](ELK-SOURCE.md)
+
+## Springbok Starliner catalogue source
+
+Springbok Starliner preserves 2,672 detailed and 912 native original faces. A separate 504-face inspection candidate retains both caps, the open bow gap, and 12 measured original overlaps. [Springbok Starliner source and evidence](SPRINGBOK-STARLINER-SOURCE.md)
+
+## Antelope catalogue source
+
+Antelope preserves 2,672 detailed and 912 native original faces. A separate 504-face inspection candidate retains both caps, the open bow gap, and 14 measured original overlaps. [Antelope source and evidence](ANTELOPE-SOURCE.md)
+
+## Gopher catalogue source
+
+Gopher preserves its original 4,696 detailed and 212 native faces. Both meshes retain the roll frame, the bore assembly and nine measured joints. Four inspection routes pass through the frame openings. [Gopher source and evidence](GOPHER-SOURCE.md)
+
+## Elephant catalogue source
+
+Elephant preserves its original 4,368 detailed and 1,112 native faces. Its separate 512-face inspection candidate retains the shield shoulders, 19 exact original parts and all 22 measured original joins. [Elephant source and evidence](ELEPHANT-SOURCE.md)
+
+## Aurochs catalogue source
+
+Aurochs preserves its original 2,504 detailed and 720 native faces. Its separate 444-face inspection candidate preserves the staggered cargo capsules, 11 exact original parts and all 12 measured original overlaps. [Aurochs source and evidence](AUROCHS-SOURCE.md)
+
+## Giraffe Liner catalogue source
+
+Giraffe Liner preserves 3,492 detailed and 216 native faces, including both elevated galleries. Its evidence records the pressure-hull contacts in the detailed mesh and the gallery-strut separations in the native mesh. [Giraffe Liner source and evidence](GIRAFFE-LINER-SOURCE.md)
+
+## Shikra catalogue source
+
+Shikra preserves the original 5,396 detailed and 1,404 native faces. Its separate 512-face inspection candidate retains all 41 native parts and all 18 measured native overlaps, with clear routes between the diagonal spars. [Shikra source and evidence](SHIKRA-SOURCE.md)
+
+## Shikra Interdictor catalogue source
+
+Shikra Interdictor preserves its original 5,396 detailed and 1,404 native faces. A separate 512-face candidate retains all 41 native parts and 18 measured original overlaps. The seven clearance guards include a 359 mm lower bound in each diagonal-spar opening. [Shikra Interdictor source and evidence](SHIKRA-INTERDICTOR-SOURCE.md)
+
+## Wisent catalogue source
+
+Wisent preserves the original 2,600 detailed and 816 native faces. Its historical 488-face candidate retains 26 native parts and all 35 measured original overlaps. The seven guarded routes include the dock aperture and central freight-bay lane. [Wisent source and evidence](WISENT-SOURCE.md)
+
+## Wisent Mk II catalogue source
+
+Wisent Mk II preserves the original 2,600 detailed and 816 native faces. Its independent 488-face historical candidate retains 26 native parts and all 35 measured native overlaps. The dock aperture retains a 1,469 mm guarded lower bound. [Wisent Mk II source and evidence](WISENT-MK-II-SOURCE.md)
+
+## Anoa catalogue source
+
+Anoa preserves its original 6,720 detailed and 1,928 native faces. Its separate 512-face candidate retains all 34 native parts, the two closed collars, and all 40 measured native overlaps. [Anoa source and evidence](ANOA-SOURCE.md)
+
+## Ox catalogue source
+
+Ox preserves its original 688 detailed and 376 native faces. Both originals retain all 13 measured overlap pairs. Seven swept guards include the longitudinal service gap between the two freight decks. [Ox source and evidence](OX-SOURCE.md)
+
+## Ox Mk II catalogue source
+
+Ox Mk II preserves its own 688 detailed and 376 native faces. Both originals retain the same 13 measured overlap pairs. The seven guarded routes include the service gap between the original freight decks. [Ox Mk II source and evidence](OX-MK-II-SOURCE.md)
+
+## Cavy Racer catalogue source
+
+Cavy Racer preserves both original meshes at 3,084 detailed and 160 native faces. Both contain the same eight measured structural overlap pairs. Seven swept guards include the gap between the aft nozzles. [Cavy Racer source and evidence](CAVY-RACER-SOURCE.md)
+
 ## Goshawk Mk II Custom candidate
 
 SH010 has its own original detailed preview, authenticated engineering record and 73 rounded collision supports. Independent source projection checks cover its open forward channel, both original station fit controls and a strict SH028 lip-contact witness. The Rust controlled World, core fit, shader and minimum Showroom regressions are authored and await the owned platform runs. No additional ordinary ship placement, acquisition or native acceptance follows from this source update. [SH010 geometry and acceptance criteria](GOSHAWK-MK-II-CUSTOM.md)
@@ -56,7 +384,7 @@ PR 52 merged at `22715d60604acc57ac6acad99e3be54a6085a618` on 18 November 2026 a
 
 Source `51b9a9e` corrects the redundant test closure found by strict Clippy on `f5acd97`. Each designated Mac, Linux and native Windows continuation passed strict Clippy first, then 32 importer cases, three observer cases, both release builds, actual CLI Unicode-path conversion, all five independent reference outputs, notice/producer verification, corrupt-reference refusal and the release consumer. The release consumer repeat is separate from the 35 fresh cases. The 628 byte-unchanged core, compatibility and desktop cases, 99 Python checks, 50 Markdown files and locked all-target check retain their explicit `f5acd97` attribution: 663 covered Rust cases per platform, not a fresh full 663-case run. Original Clippy failures remain retained. The current importer has no production GPU/window dependency, does not admit new ships and is not in Preview 8. PR 52 is integrated; the current exact-main outcome and remaining method-reference finding are recorded above.
 
-## Published Preview 8: current delivered checkpoint
+## Published Preview 8 checkpoint
 
 Preview 8 adds an owned EMP utility to the single World, with paid purchase/fit/store/grade transactions, a separate initially empty bank and electrical pool, exact 80-percent transfer, a 600-tick held charge and shared heat/cooldown cost. It queries the actual native SH025 collision scene and drains the facing shield then independent electrical reserve. It preserves fatal hull energy, actor identity, cargo and the one source crew member. Zero electrical power blocks engines/weapons, keeps physical coasting and recovers strictly after 1800 accepted physical ticks. No capsule, bounty or reward is fabricated.
 
@@ -244,7 +572,7 @@ Bounded actual signed Metal qualification passed all five pages, keyboard/mouse 
 
 The HUD implementation integrated through PR 34, followed by corrections in PRs 35 and 36. The callback correction still needs final protected integration, exact-main CI/Sonar and new canonical package/download verification. The existing public v0.4 preview and all previous installed previews/profiles remain separate. Following development includes quantity trading, physical mining, energy/laser equipment, explicit XYZZY/Commander Clarke, further authored hulls and all seven requested NPC populations. Changed source tests remain unrun until their own owning execution. New missions follow core gameplay.
 
-## Latest installed and published preview
+## Published Flight Lesson Preview 3
 
 [Flight Lesson Preview v0.3.0-preview.1](https://github.com/stephenlclarke/meridian/releases/tag/v0.3.0-preview.1) is published for macOS arm64 and Windows x64. Its immutable annotated tag resolves to main `a583b61e4e4536003414ee9f5448131744f62eb2`, tree `ab0530464560eccb23bba6adee62189a1b2148f0`. The compiled source is `152ac26ba848e2ac0c8cb63efec016a10b383155`, tree `a0bb78afde77f3e0298c1e99224fdf90621b229d`: 136 of 139 tracked blobs match, and only README, this status document and the flight guide differ. The trees are distinct; this does not claim a main rebuild. Mac, Linux and native Windows each passed 175 core plus 56 desktop tests (231 top-level Rust cases), 74 Python tests (54 importers plus 20 publisher), formatting, strict Clippy and release builds on that compiled source. Nested subprocess summaries are excluded. [Exact-main CI 43897133293](https://github.com/stephenlclarke/meridian/actions/runs/43897133293) passed all six jobs, including exact-SHA Sonar with Previous version policy and zero open findings.
 
@@ -288,7 +616,7 @@ Native v8 station-hit/interception cold journeys were not repeated; their exact 
 
 ## Qualified attempt closure and retry
 
-Current source adds [reviewed closure and retry](SAFE-GUNNERY-ATTEMPTS.md): F7 reviews failed or incomplete closure at the actual Avenor berth; Enter publishes the save before committing live state, while B cancels. F10 reviews a new attempt after terminal settlement. The HUD uses the current attempt outcome, independently of a previous first trace; I shows retained outcome counts and first-clue status. No refund, reward or ammunition reset occurs.
+Current source adds [reviewed closure and retry](SAFE-GUNNERY-ATTEMPTS.md): Shift+5 reviews failed or incomplete closure at the actual Avenor berth; Enter publishes the save before committing live state, while B cancels. Shift+3 reviews a new attempt after terminal settlement. The HUD uses the current attempt outcome, independently of a previous first trace; I shows retained outcome counts and first-clue status. No refund, reward or ammunition reset occurs.
 
 Candidate `3b5a18b` passed 159 core plus 49 desktop tests (208 top-level Rust cases), 48 importer tests, strict Clippy and release builds on Mac, Linux and native Windows. Nested child-process summaries are excluded. Signed Metal qualification and Root audit covered failed/abandoned closures, explicit retries, paused live retry continuation and two receptions with one retained first trace. Twenty-three named v9 files, seven cold comparisons and ten normal process exits were checked. Six unpaused docked cold sessions advanced ordinary UI ticks; the paused live retry preserved every observed state field. A misaligned approach was recovered with public F9 from the owner's retained valid checkpoint, then a corrected physical approach; both paths remain in evidence. The read-only observer is not a full semantic validator.
 
@@ -331,7 +659,7 @@ Earlier exact-source tests and failures remain in Git history, merged PRs and re
 
 The [T01 flight lesson](FLIGHT-RECEPTION.md) candidate `152ac26ba848e2ac0c8cb63efec016a10b383155`, tree `a0bb78afde77f3e0298c1e99224fdf90621b229d`, passed independent whole-source review. Mac, Linux and genuine native Windows each passed 175 core plus 56 desktop tests: 231 top-level Rust cases, including all 23 new T01 entries. Six filtered child summaries per lane are excluded. Each lane also passed 74 Python tests (54 importer plus 20 publisher), 29 Markdown files, formatting, workspace checks, strict Clippy and release builds. Root checked all 139 source pins per lane, both Dell built/retained binaries and all 236 copied Dell artifacts. Short Dell jobs and the 11-second Mac release ended before Root process inspection; delayed immutable verification supplies their evidence, with no live-observation or visibility-rerun claim. Root observed the Mac make job and staged app live after actual START.
 
-F6 reviews consent or reception; F12 reviews cancellation; C opens lesson details; 0/1/2/3 request World-owned front/rear/left/right views. The host publishes checked proposed saves before committing live state. Actual store-failure, dropped preparation, stale authority, shared occupancy, fit, compatibility and corruption regressions passed. The original docked review-lifetime defect and default HUD row overflow were corrected before qualification, with new regressions and unchanged assertions/row budget. The internal fatal-reducer fixture remains separate from native player-hit or damage-save acceptance.
+Shift+1 reviews consent or reception; Shift+2 reviews cancellation; C opens lesson details; 0/1/2/3 request World-owned front/rear/left/right views. The host publishes checked proposed saves before committing live state. Actual store-failure, dropped preparation, stale authority, shared occupancy, fit, compatibility and corruption regressions passed. The original docked review-lifetime defect and default HUD row overflow were corrected before qualification, with new regressions and unchanged assertions/row budget. The internal fatal-reducer fixture remains separate from native player-hit or damage-save acceptance.
 
 The signed staged Metal/M5 Pro app used a new commander created through N in an empty isolated saves-v10 directory. Actual Back preserved an empty lesson ledger, delayed consent succeeded after ordinary docked ticks, early reception and in-flight cancellation refused, and normal launch/brake/yaw/thrust created a measured closing pair at ticks 9738-9739, ranges 1273.3225 to 1273.2316 and alignment about 0.004 degrees. Genuine Avenor PhysicalEntry followed at tick 15328; separately reviewed reception committed at tick 20083. The account remained 7200 tenths, and equipment, missile ownership, pulse state and markets were unchanged through the lesson. One native completion recorded its first trace. Two completions are current core-test evidence, not two native journey claims.
 
@@ -438,3 +766,15 @@ The Help candidate now lists mission details and flight-lesson review/cancel/det
 ## Preview 8 local installation
 
 The exact public Mac wrapper is installed side-by-side at `/Users/sclarke/Applications/Meridian Preview 8/Meridian EMP Sonar Preview.app`. All 474 published logical files and modes, including the 454 app files and stapled ticket, were independently verified after installation. Strict signature verification, ticket validation and Gatekeeper passed. Installation did not launch the game or alter the prior preview or known task profile. Existing source-bound native evidence carries by exact byte identity; this adds installation acceptance only.
+
+## Flight computer development
+
+Route previews use the station profit scan’s finite wallet, stock, receiving capacity and cargo limits. Trade profit uses current quotes before fuel costs. Each leg is priced independently from the current wallet and hold. The best cargo-sale estimate shows what the existing unreserved cargo can earn at a single stop.
+
+The development branch retains the XYZZY menu selection after a successful save. A failed save retains the confirmation for retry or cancellation. The secret cargo-bay receipt now validates independently of the local shop offer. Native preview qualification is pending.
+
+## Stock ECM candidate (source only)
+
+The [stock E.C.M. equipment and manual field candidate](STOCK-ECM.md) adds paid or guarded fitting, the actual shared energy debit and 32-tick field, durable manual termination of local standard projectiles (including player rounds), cold time-only cooldown and desktop controls. The automatic setting is retained intent only. Current NPC combat uses Pulse and does not produce incoming hostile missiles; incoming defence, automatic activation and full playable ECM acceptance remain open. A player round proves only the manual local effect. No Rust or native preview result is yet claimed for this source.
+
+The separate combined preview candidate retains the passenger cabin and clue journal source, the Medusa Showroom, solar fuel and the manual ECM field. Its added regression cases cover paid cabins and ECM through cold Continue and passenger delivery, and a paid solar collection save with a cabin and all three ordinary utility mounts occupied. Historical passenger admission counts the fitted ECM mount; historical MAX Fuel Storage requires ECM to have been stored at its actual opening revision, even if it is installed again later. Combined native qualification is pending.

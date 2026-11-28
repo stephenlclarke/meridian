@@ -1,0 +1,12 @@
+{
+  "schema": 1,
+  "id": "sh131-warthog-light",
+  "undoBefore": [
+    "sh130-marmot-prospector"
+  ],
+  "undoAfter": [],
+  "kind": "declaration",
+  "module": "warthog_light",
+  "before": "pub mod warthog_escort;\n",
+  "after": "pub mod wildebeest;\n"
+}

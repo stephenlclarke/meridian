@@ -1,0 +1,368 @@
+{
+  "candidateTopology": {
+    "componentCount": 21,
+    "surfaceTriangles": 512,
+    "interiorOverlaps": [
+      {
+        "parts": [
+          0,
+          5
+        ],
+        "pointMetres": [
+          3.3807813,
+          5.2162296,
+          -15.2907634
+        ],
+        "hitCountsAboveBelow": [
+          [
+            1,
+            1
+          ],
+          [
+            1,
+            1
+          ]
+        ]
+      },
+      {
+        "parts": [
+          0,
+          6
+        ],
+        "pointMetres": [
+          3.3807813,
+          5.2162296,
+          -5.8908283
+        ],
+        "hitCountsAboveBelow": [
+          [
+            1,
+            1
+          ],
+          [
+            1,
+            1
+          ]
+        ]
+      },
+      {
+        "parts": [
+          0,
+          7
+        ],
+        "pointMetres": [
+          3.3807813,
+          5.2162296,
+          3.5091069
+        ],
+        "hitCountsAboveBelow": [
+          [
+            1,
+            1
+          ],
+          [
+            1,
+            1
+          ]
+        ]
+      },
+      {
+        "parts": [
+          0,
+          13
+        ],
+        "pointMetres": [
+          -0.4669657,
+          6.3005522,
+          -7.2860671
+        ],
+        "hitCountsAboveBelow": [
+          [
+            1,
+            1
+          ],
+          [
+            1,
+            1
+          ]
+        ]
+      },
+      {
+        "parts": [
+          0,
+          15
+        ],
+        "pointMetres": [
+          -3.0404587,
+          0.9465028,
+          -13.7374401
+        ],
+        "hitCountsAboveBelow": [
+          [
+            1,
+            1
+          ],
+          [
+            1,
+            1
+          ]
+        ]
+      },
+      {
+        "parts": [
+          0,
+          18
+        ],
+        "pointMetres": [
+          2.3300072,
+          1.5584536,
+          -12.8354017
+        ],
+        "hitCountsAboveBelow": [
+          [
+            1,
+            1
+          ],
+          [
+            1,
+            1
+          ]
+        ]
+      },
+      {
+        "parts": [
+          1,
+          5
+        ],
+        "pointMetres": [
+          6.5725366,
+          5.7267554,
+          -14.3481275
+        ],
+        "hitCountsAboveBelow": [
+          [
+            1,
+            1
+          ],
+          [
+            1,
+            1
+          ]
+        ]
+      },
+      {
+        "parts": [
+          2,
+          5
+        ],
+        "pointMetres": [
+          -6.2949546,
+          6.0784418,
+          -15.8710176
+        ],
+        "hitCountsAboveBelow": [
+          [
+            1,
+            1
+          ],
+          [
+            1,
+            1
+          ]
+        ]
+      },
+      {
+        "parts": [
+          3,
+          15
+        ],
+        "pointMetres": [
+          -8.2699165,
+          0.0603422,
+          -16.3160689
+        ],
+        "hitCountsAboveBelow": [
+          [
+            1,
+            1
+          ],
+          [
+            1,
+            1
+          ]
+        ],
+        "witness": "Common exact interior point replayed in both meshes"
+      },
+      {
+        "parts": [
+          4,
+          18
+        ],
+        "pointMetres": [
+          8.2980332,
+          0.1020763,
+          -16.4157021
+        ],
+        "hitCountsAboveBelow": [
+          [
+            1,
+            1
+          ],
+          [
+            1,
+            1
+          ]
+        ]
+      },
+      {
+        "parts": [
+          6,
+          13
+        ],
+        "pointMetres": [
+          3.4770118,
+          7.0725907,
+          -6.2104966
+        ],
+        "hitCountsAboveBelow": [
+          [
+            1,
+            1
+          ],
+          [
+            1,
+            1
+          ]
+        ]
+      },
+      {
+        "parts": [
+          6,
+          14
+        ],
+        "pointMetres": [
+          2.9554601,
+          7.1779614,
+          -5.6819305
+        ],
+        "hitCountsAboveBelow": [
+          [
+            1,
+            1
+          ],
+          [
+            1,
+            1
+          ]
+        ]
+      },
+      {
+        "parts": [
+          9,
+          10
+        ],
+        "pointMetres": [
+          -7.9211053,
+          -2.9003551,
+          14.2467089
+        ],
+        "hitCountsAboveBelow": [
+          [
+            1,
+            1
+          ],
+          [
+            1,
+            1
+          ]
+        ]
+      },
+      {
+        "parts": [
+          11,
+          12
+        ],
+        "pointMetres": [
+          9.8044867,
+          -2.9003551,
+          14.2467089
+        ],
+        "hitCountsAboveBelow": [
+          [
+            1,
+            1
+          ],
+          [
+            1,
+            1
+          ]
+        ]
+      },
+      {
+        "parts": [
+          13,
+          14
+        ],
+        "pointMetres": [
+          2.9554601,
+          7.1779614,
+          -5.6819305
+        ],
+        "hitCountsAboveBelow": [
+          [
+            1,
+            1
+          ],
+          [
+            1,
+            1
+          ]
+        ]
+      },
+      {
+        "parts": [
+          15,
+          16
+        ],
+        "pointMetres": [
+          -12.2156236,
+          -0.7835738,
+          -20.6412096
+        ],
+        "hitCountsAboveBelow": [
+          [
+            1,
+            1
+          ],
+          [
+            1,
+            1
+          ]
+        ]
+      },
+      {
+        "parts": [
+          18,
+          19
+        ],
+        "pointMetres": [
+          12.8969036,
+          0.6917622,
+          -20.1331946
+        ],
+        "hitCountsAboveBelow": [
+          [
+            1,
+            1
+          ],
+          [
+            1,
+            1
+          ]
+        ]
+      }
+    ]
+  },
+  "additionalMeasuredOverlaps": [],
+  "missingMeasuredOverlaps": []
+}

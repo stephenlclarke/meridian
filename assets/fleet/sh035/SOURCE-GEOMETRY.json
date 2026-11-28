@@ -1,0 +1,83 @@
+{
+  "id": "SH035",
+  "name": "Stag Liner",
+  "legacyRevision": "a11fe16924d87d06021816f9037952afcbac08db",
+  "sourceUnits": "metres",
+  "metresPerSourceUnit": 1,
+  "detail": {
+    "vertices": 1806,
+    "faces": 3492,
+    "components": 30,
+    "bounds": [
+      [
+        -13.248,
+        -9.0,
+        -36.09
+      ],
+      [
+        13.248,
+        17.5,
+        33.0
+      ]
+    ]
+  },
+  "native": {
+    "vertices": 130,
+    "faces": 216,
+    "components": 11,
+    "bounds": [
+      [
+        -13.248,
+        -9.0,
+        -36.09
+      ],
+      [
+        13.248,
+        17.5,
+        33.0
+      ]
+    ],
+    "faceLimit": 512,
+    "approvedSourcePath": "fleet-completion-20261019/batch-02-native-lod/SH035-design.toml",
+    "approvedSourceSha256": "78f0f2a3940b7c50c9dafc17323320da23173b25af19c16a0be427167949334a"
+  },
+  "shapePieces": 26,
+  "textures": [
+    "l337-patrol-diffuse",
+    "l337-strike-diffuse",
+    "l337-service-details"
+  ],
+  "unmappedMaterialSlot": 4294967295,
+  "pins": {
+    "resource.toml": "53dc4125b7fa2b1d2789796ccfc24b0ccd20ab5ad0cda73f0a4f8f42c7d44af6",
+    "native-export.json": "0a90f04ef9b3c9e9a8498d20c33e613c025a91328d4d88fc72871f49140d9425",
+    "contract.toml": "dff26cfb4027b272cb7e82c1fd967ec5aa8e27e4a74d2cdfd28a5a01a5836dae",
+    "LICENSE": "033b7058d73f22c3c6b8a5825eb866ca2d67088f3ee94dd5f3e46da59d624766"
+  },
+  "outputs": {
+    "source.vertices": {
+      "bytes": 46480,
+      "sha256": "67515d8641a9ed6d17ede657c848f62ce43a4adcf71cbedb67c1934708658efe"
+    },
+    "source-triangles.bin": {
+      "bytes": 44496,
+      "sha256": "ba32dae6f1d3ea2b0f71a744a5c6ed2f95c11a556a3d253b382e809ba11d97dd"
+    },
+    "source-piece-membership.bin": {
+      "bytes": 1936,
+      "sha256": "a30a6b65924c06feada1c6b8fd6504a4d289cea2282a7d459b911047adee7b23"
+    },
+    "PIECES.json": {
+      "bytes": 645,
+      "sha256": "b3979a1f1a0673a09b125f3de03764aa619e9634c777ef32eb6edf105a79500f"
+    },
+    "visual.bin": {
+      "bytes": 586672,
+      "sha256": "838cdcf3427e23baeef11c23a9b6a2c58c7d1f932a96d92811cda69307e1bd9f"
+    },
+    "native-visual.bin": {
+      "bytes": 36304,
+      "sha256": "7d3353a3c5bde1d5182bf4e0822c4e3a51678f0340811f66499f5c155e5e437c"
+    }
+  }
+}

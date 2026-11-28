@@ -67,6 +67,18 @@ pub struct Snapshot {
     pub angle: f32,
     pub recipe: SurfaceRecipe,
 }
+impl Snapshot {
+    pub(crate) fn blocks_motion(
+        &self,
+        before: [f32; 3],
+        after: [f32; 3],
+        hull_radius: f64,
+    ) -> bool {
+        [self.planet, self.sun]
+            .into_iter()
+            .any(|body| body.blocks_motion(before, after, hull_radius))
+    }
+}
 pub fn scene(system: OriginalSystem, visit: u64, tick: u64, anchor: Vec3) -> Snapshot {
     let seed = mix(u64::from(system.id.galaxy) << 32 | u64::from(system.id.system));
     let mirror = if seed & 1 == 0 { 1.0 } else { -1.0 };

@@ -1,0 +1,157 @@
+{
+  "candidateTopology": {
+    "componentCount": 14,
+    "surfaceTriangles": 512,
+    "interiorOverlaps": [
+      {
+        "parts": [
+          1,
+          8
+        ],
+        "pointMetres": [
+          -6.1334596,
+          1.5596116,
+          -20.8710923
+        ],
+        "hitCountsAboveBelow": [
+          [
+            1,
+            1
+          ],
+          [
+            1,
+            1
+          ]
+        ]
+      },
+      {
+        "parts": [
+          1,
+          11
+        ],
+        "pointMetres": [
+          3.9616447,
+          2.077443,
+          -20.2760875
+        ],
+        "hitCountsAboveBelow": [
+          [
+            1,
+            1
+          ],
+          [
+            1,
+            1
+          ]
+        ]
+      },
+      {
+        "parts": [
+          2,
+          11
+        ],
+        "pointMetres": [
+          8.8805301,
+          2.2877147,
+          -22.53134
+        ],
+        "hitCountsAboveBelow": [
+          [
+            1,
+            1
+          ],
+          [
+            1,
+            1
+          ]
+        ]
+      },
+      {
+        "parts": [
+          3,
+          8
+        ],
+        "pointMetres": [
+          -7.8643135,
+          2.9043529,
+          -22.7895368
+        ],
+        "hitCountsAboveBelow": [
+          [
+            1,
+            1
+          ],
+          [
+            1,
+            1
+          ]
+        ]
+      },
+      {
+        "parts": [
+          6,
+          7
+        ],
+        "pointMetres": [
+          6.6838495,
+          13.4270649,
+          17.0435338
+        ],
+        "hitCountsAboveBelow": [
+          [
+            1,
+            1
+          ],
+          [
+            1,
+            1
+          ]
+        ]
+      },
+      {
+        "parts": [
+          8,
+          9
+        ],
+        "pointMetres": [
+          -18.0333305,
+          -0.3738489,
+          -31.2906013
+        ],
+        "hitCountsAboveBelow": [
+          [
+            1,
+            1
+          ],
+          [
+            1,
+            1
+          ]
+        ]
+      },
+      {
+        "parts": [
+          11,
+          12
+        ],
+        "pointMetres": [
+          22.2467218,
+          1.4452946,
+          -31.3314733
+        ],
+        "hitCountsAboveBelow": [
+          [
+            1,
+            1
+          ],
+          [
+            1,
+            1
+          ]
+        ]
+      }
+    ]
+  },
+  "additionalMeasuredOverlaps": [],
+  "missingMeasuredOverlaps": []
+}

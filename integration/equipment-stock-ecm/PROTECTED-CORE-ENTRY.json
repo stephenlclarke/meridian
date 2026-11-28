@@ -1,0 +1,13 @@
+{
+  "schema": 1,
+  "id": "equipment-stock-ecm",
+  "undoBefore": [
+    "sh171-medusa"
+  ],
+  "undoAfter": [],
+  "kind": "inverse",
+  "manifest": "integration/sh001-mule/STOCK-ECM-INVERSE.json",
+  "sha256": "65c8433601da990abea476d880e6ec1e312189856d7ede5e9da1d03d0ba81a79",
+  "base": "f04385c9fd3119d6ddb797ea80ca419f7495944b",
+  "label": "stock ECM"
+}

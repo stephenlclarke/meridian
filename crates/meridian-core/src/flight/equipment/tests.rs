@@ -2,7 +2,7 @@
 use super::*;
 use crate::equipment::{Error as EquipmentError, ItemId};
 use crate::freight::g02::{self, Choice};
-use crate::navigation::{BASIC_SPOOL_TICKS, SystemId};
+use crate::navigation::SystemId;
 use crate::station_services::{Command as Trade, CommodityId, Error as TradeError};
 use crate::{FlightInput, FlightMode, StepError};
 
@@ -18,7 +18,14 @@ pub(in crate::flight) fn journey(world: &mut World, target: SystemId) {
     world.request_launch(world.snapshot().tick).unwrap();
     world.step(FlightInput::default()).unwrap();
     world.request_jump(target, world.snapshot().tick).unwrap();
-    for _ in 0..BASIC_SPOOL_TICKS {
+    let remaining = world
+        .snapshot()
+        .navigation
+        .unwrap()
+        .travel
+        .unwrap()
+        .remaining_ticks;
+    for _ in 0..remaining {
         world.step(FlightInput::default()).unwrap();
     }
     for _ in 0..9000 {

@@ -175,10 +175,10 @@ fn actual_peer_mesh_occludes_and_missing_peer_or_changed_contact_cannot_load() {
     let hit = state.player_hits[0].clone();
     let mut missing = state.clone();
     Arc::make_mut(&mut missing.player_hits)[0].peers[0] = None;
-    assert!(missing.validate_player_hits(900, &data).is_err());
+    assert!(missing.validate_player_hits(900, &data, None).is_err());
     let mut bad = state.clone();
     Arc::make_mut(&mut bad.player_hits)[0].point.x = hit.point.x + 1.0;
-    assert!(bad.validate_player_hits(900, &data).is_err());
+    assert!(bad.validate_player_hits(900, &data, None).is_err());
 }
 #[test]
 fn full_shared_beam_receipt_bound_refuses_npc_emission_without_spending_or_dropping() {
@@ -236,4 +236,25 @@ fn actual_native_player_hit_admits_pirate_retaliation_without_claiming_player_ca
     );
     assert_eq!(state.player_hits.len(), 1);
     assert_eq!(state.player_hits[0].attacker, contact.id);
+}
+
+#[test]
+fn a_peregrine_hit_before_medusa_issue_replays_against_the_earlier_player_mesh() {
+    let (mut state, market, stock, player, target) = scene();
+    fire(&mut state, &stock, player, target, true);
+    assert_eq!(state.player_hits.len(), 1);
+    let medusa = ok(OriginalStationData::medusa_bundled());
+    ok(state.validate_with_hull_change(12001, 900, 0, &medusa, &market, Some(target.visit)));
+    assert!(
+        state
+            .validate_player_hits(900, &medusa, Some(target.visit - 1))
+            .is_err()
+    );
+    let mut wrong = state.clone();
+    Arc::make_mut(&mut wrong.player_hits)[0].point.x += 1.0;
+    assert!(
+        wrong
+            .validate_player_hits(900, &medusa, Some(target.visit))
+            .is_err()
+    );
 }

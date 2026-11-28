@@ -1,0 +1,470 @@
+{
+  "nominalPaddingMetres": 0.02,
+  "minimumRefinementTargetsMillimetres": {
+    "detailed": 2600,
+    "archivedNative": 2600,
+    "candidateNative": 3000
+  },
+  "fullUpperMillimetres": {
+    "detailed": 2474,
+    "archivedNative": 2412,
+    "candidateNative": 2908
+  },
+  "pieces": {
+    "body primary pressure envelope": {
+      "detailed": 1022,
+      "archivedNative": 1332,
+      "candidateNative": 2029
+    },
+    "body primary pressure envelope/service-well-0-0": {
+      "detailed": 2412,
+      "archivedNative": 2412,
+      "candidateNative": 2462
+    },
+    "body primary pressure envelope/service-well-0-1": {
+      "detailed": 2258,
+      "archivedNative": 2119,
+      "candidateNative": 2119
+    },
+    "body primary pressure envelope/service-well-0-2": {
+      "detailed": 2258,
+      "archivedNative": 892,
+      "candidateNative": 892
+    },
+    "body primary pressure envelope/service-well-1-0": {
+      "detailed": 2412,
+      "archivedNative": 2412,
+      "candidateNative": 2412
+    },
+    "body primary pressure envelope/service-well-1-1": {
+      "detailed": 2258,
+      "archivedNative": 1802,
+      "candidateNative": 1839
+    },
+    "body primary pressure envelope/service-well-1-2": {
+      "detailed": 2258,
+      "archivedNative": 1554,
+      "candidateNative": 2553
+    },
+    "body primary pressure envelope/service-well-2-0": {
+      "detailed": 2412,
+      "archivedNative": 2411,
+      "candidateNative": 2454
+    },
+    "body primary pressure envelope/service-well-2-1": {
+      "detailed": 2258,
+      "archivedNative": 1801,
+      "candidateNative": 1801
+    },
+    "body primary pressure envelope/service-well-2-2": {
+      "detailed": 2258,
+      "archivedNative": 895,
+      "candidateNative": 1102
+    },
+    "body primary pressure envelope/service-well-3-0": {
+      "detailed": 2411,
+      "archivedNative": 2412,
+      "candidateNative": 2412
+    },
+    "body primary pressure envelope/service-well-3-1": {
+      "detailed": 2258,
+      "archivedNative": 1802,
+      "candidateNative": 1802
+    },
+    "body primary pressure envelope/service-well-3-2": {
+      "detailed": 2258,
+      "archivedNative": 1558,
+      "candidateNative": 886
+    },
+    "body primary pressure envelope/longitudinal-service-strut-0": {
+      "detailed": 187,
+      "archivedNative": 468,
+      "candidateNative": 468
+    },
+    "body primary pressure envelope/longitudinal-service-strut-1": {
+      "detailed": 187,
+      "archivedNative": 471,
+      "candidateNative": 738
+    },
+    "cross spar connected support (1)": {
+      "detailed": 1577,
+      "archivedNative": 1577,
+      "candidateNative": 1577
+    },
+    "cross spar outboard envelope (1)": {
+      "detailed": 400,
+      "archivedNative": 428,
+      "candidateNative": 2908
+    },
+    "cross spar outboard envelope/service-well-0-0 (1)": {
+      "detailed": 1817,
+      "archivedNative": 1672,
+      "candidateNative": 1352
+    },
+    "cross spar outboard envelope/service-well-0-1 (1)": {
+      "detailed": 1817,
+      "archivedNative": 724,
+      "candidateNative": 2671
+    },
+    "cross spar outboard envelope/service-well-0-2 (1)": {
+      "detailed": 1817,
+      "archivedNative": 1627,
+      "candidateNative": 1627
+    },
+    "cross spar outboard envelope/service-well-1-0 (1)": {
+      "detailed": 1817,
+      "archivedNative": 1672,
+      "candidateNative": 1494
+    },
+    "cross spar outboard envelope/service-well-1-1 (1)": {
+      "detailed": 1817,
+      "archivedNative": 762,
+      "candidateNative": 2671
+    },
+    "cross spar outboard envelope/service-well-1-2 (1)": {
+      "detailed": 1817,
+      "archivedNative": 813,
+      "candidateNative": 1090
+    },
+    "cross spar outboard envelope/service-well-2-0 (1)": {
+      "detailed": 1817,
+      "archivedNative": 1672,
+      "candidateNative": 1268
+    },
+    "cross spar outboard envelope/service-well-2-1 (1)": {
+      "detailed": 1817,
+      "archivedNative": 726,
+      "candidateNative": 2671
+    },
+    "cross spar outboard envelope/service-well-2-2 (1)": {
+      "detailed": 1817,
+      "archivedNative": 933,
+      "candidateNative": 1091
+    },
+    "cross spar outboard envelope/service-well-3-0 (1)": {
+      "detailed": 1817,
+      "archivedNative": 1672,
+      "candidateNative": 1352
+    },
+    "cross spar outboard envelope/service-well-3-1 (1)": {
+      "detailed": 1817,
+      "archivedNative": 773,
+      "candidateNative": 1177
+    },
+    "cross spar outboard envelope/service-well-3-2 (1)": {
+      "detailed": 1817,
+      "archivedNative": 812,
+      "candidateNative": 1173
+    },
+    "cross spar outboard envelope/longitudinal-service-strut-0 (1)": {
+      "detailed": 187,
+      "archivedNative": 433,
+      "candidateNative": 433
+    },
+    "cross spar outboard envelope/longitudinal-service-strut-1 (1)": {
+      "detailed": 187,
+      "archivedNative": 432,
+      "candidateNative": 432
+    },
+    "cross spar connected support (2)": {
+      "detailed": 1396,
+      "archivedNative": 1396,
+      "candidateNative": 1396
+    },
+    "cross spar outboard envelope (2)": {
+      "detailed": 400,
+      "archivedNative": 573,
+      "candidateNative": 2908
+    },
+    "cross spar outboard envelope/service-well-0-0 (2)": {
+      "detailed": 1817,
+      "archivedNative": 1672,
+      "candidateNative": 1681
+    },
+    "cross spar outboard envelope/service-well-0-1 (2)": {
+      "detailed": 1817,
+      "archivedNative": 724,
+      "candidateNative": 1039
+    },
+    "cross spar outboard envelope/service-well-0-2 (2)": {
+      "detailed": 1817,
+      "archivedNative": 935,
+      "candidateNative": 1171
+    },
+    "cross spar outboard envelope/service-well-1-0 (2)": {
+      "detailed": 1817,
+      "archivedNative": 1672,
+      "candidateNative": 1494
+    },
+    "cross spar outboard envelope/service-well-1-1 (2)": {
+      "detailed": 1817,
+      "archivedNative": 762,
+      "candidateNative": 762
+    },
+    "cross spar outboard envelope/service-well-1-2 (2)": {
+      "detailed": 1817,
+      "archivedNative": 813,
+      "candidateNative": 1105
+    },
+    "cross spar outboard envelope/service-well-2-0 (2)": {
+      "detailed": 1817,
+      "archivedNative": 1672,
+      "candidateNative": 1268
+    },
+    "cross spar outboard envelope/service-well-2-1 (2)": {
+      "detailed": 1817,
+      "archivedNative": 726,
+      "candidateNative": 821
+    },
+    "cross spar outboard envelope/service-well-2-2 (2)": {
+      "detailed": 1817,
+      "archivedNative": 933,
+      "candidateNative": 1102
+    },
+    "cross spar outboard envelope/service-well-3-0 (2)": {
+      "detailed": 1817,
+      "archivedNative": 1672,
+      "candidateNative": 1352
+    },
+    "cross spar outboard envelope/service-well-3-1 (2)": {
+      "detailed": 1817,
+      "archivedNative": 773,
+      "candidateNative": 853
+    },
+    "cross spar outboard envelope/service-well-3-2 (2)": {
+      "detailed": 1817,
+      "archivedNative": 1625,
+      "candidateNative": 1625
+    },
+    "cross spar outboard envelope/longitudinal-service-strut-0 (2)": {
+      "detailed": 187,
+      "archivedNative": 433,
+      "candidateNative": 476
+    },
+    "cross spar outboard envelope/longitudinal-service-strut-1 (2)": {
+      "detailed": 187,
+      "archivedNative": 432,
+      "candidateNative": 740
+    },
+    "cross spar connected support (3)": {
+      "detailed": 1396,
+      "archivedNative": 1396,
+      "candidateNative": 1396
+    },
+    "cross spar outboard envelope (3)": {
+      "detailed": 400,
+      "archivedNative": 428,
+      "candidateNative": 2022
+    },
+    "cross spar outboard envelope/service-well-0-0 (3)": {
+      "detailed": 1817,
+      "archivedNative": 1672,
+      "candidateNative": 1352
+    },
+    "cross spar outboard envelope/service-well-0-1 (3)": {
+      "detailed": 1817,
+      "archivedNative": 724,
+      "candidateNative": 839
+    },
+    "cross spar outboard envelope/service-well-0-2 (3)": {
+      "detailed": 1817,
+      "archivedNative": 935,
+      "candidateNative": 998
+    },
+    "cross spar outboard envelope/service-well-1-0 (3)": {
+      "detailed": 1817,
+      "archivedNative": 1672,
+      "candidateNative": 1352
+    },
+    "cross spar outboard envelope/service-well-1-1 (3)": {
+      "detailed": 1817,
+      "archivedNative": 762,
+      "candidateNative": 2671
+    },
+    "cross spar outboard envelope/service-well-1-2 (3)": {
+      "detailed": 1817,
+      "archivedNative": 1626,
+      "candidateNative": 1626
+    },
+    "cross spar outboard envelope/service-well-2-0 (3)": {
+      "detailed": 1817,
+      "archivedNative": 1672,
+      "candidateNative": 1268
+    },
+    "cross spar outboard envelope/service-well-2-1 (3)": {
+      "detailed": 1817,
+      "archivedNative": 726,
+      "candidateNative": 859
+    },
+    "cross spar outboard envelope/service-well-2-2 (3)": {
+      "detailed": 1817,
+      "archivedNative": 933,
+      "candidateNative": 965
+    },
+    "cross spar outboard envelope/service-well-3-0 (3)": {
+      "detailed": 1817,
+      "archivedNative": 1672,
+      "candidateNative": 1681
+    },
+    "cross spar outboard envelope/service-well-3-1 (3)": {
+      "detailed": 1817,
+      "archivedNative": 763,
+      "candidateNative": 837
+    },
+    "cross spar outboard envelope/service-well-3-2 (3)": {
+      "detailed": 1817,
+      "archivedNative": 812,
+      "candidateNative": 997
+    },
+    "cross spar outboard envelope/longitudinal-service-strut-0 (3)": {
+      "detailed": 187,
+      "archivedNative": 433,
+      "candidateNative": 728
+    },
+    "cross spar outboard envelope/longitudinal-service-strut-1 (3)": {
+      "detailed": 187,
+      "archivedNative": 432,
+      "candidateNative": 782
+    },
+    "cross spar connected support (4)": {
+      "detailed": 1577,
+      "archivedNative": 1577,
+      "candidateNative": 1577
+    },
+    "cross spar outboard envelope (4)": {
+      "detailed": 400,
+      "archivedNative": 573,
+      "candidateNative": 2908
+    },
+    "cross spar outboard envelope/service-well-0-0 (4)": {
+      "detailed": 1817,
+      "archivedNative": 1672,
+      "candidateNative": 1681
+    },
+    "cross spar outboard envelope/service-well-0-1 (4)": {
+      "detailed": 1817,
+      "archivedNative": 724,
+      "candidateNative": 979
+    },
+    "cross spar outboard envelope/service-well-0-2 (4)": {
+      "detailed": 1817,
+      "archivedNative": 935,
+      "candidateNative": 1160
+    },
+    "cross spar outboard envelope/service-well-1-0 (4)": {
+      "detailed": 1817,
+      "archivedNative": 1672,
+      "candidateNative": 1352
+    },
+    "cross spar outboard envelope/service-well-1-1 (4)": {
+      "detailed": 1817,
+      "archivedNative": 762,
+      "candidateNative": 2671
+    },
+    "cross spar outboard envelope/service-well-1-2 (4)": {
+      "detailed": 1817,
+      "archivedNative": 813,
+      "candidateNative": 1538
+    },
+    "cross spar outboard envelope/service-well-2-0 (4)": {
+      "detailed": 1817,
+      "archivedNative": 1672,
+      "candidateNative": 1424
+    },
+    "cross spar outboard envelope/service-well-2-1 (4)": {
+      "detailed": 1817,
+      "archivedNative": 726,
+      "candidateNative": 821
+    },
+    "cross spar outboard envelope/service-well-2-2 (4)": {
+      "detailed": 1817,
+      "archivedNative": 1628,
+      "candidateNative": 1628
+    },
+    "cross spar outboard envelope/service-well-3-0 (4)": {
+      "detailed": 1817,
+      "archivedNative": 1672,
+      "candidateNative": 1352
+    },
+    "cross spar outboard envelope/service-well-3-1 (4)": {
+      "detailed": 1817,
+      "archivedNative": 773,
+      "candidateNative": 819
+    },
+    "cross spar outboard envelope/service-well-3-2 (4)": {
+      "detailed": 1817,
+      "archivedNative": 812,
+      "candidateNative": 1107
+    },
+    "cross spar outboard envelope/longitudinal-service-strut-0 (4)": {
+      "detailed": 187,
+      "archivedNative": 433,
+      "candidateNative": 800
+    },
+    "cross spar outboard envelope/longitudinal-service-strut-1 (4)": {
+      "detailed": 187,
+      "archivedNative": 432,
+      "candidateNative": 740
+    },
+    "cockpit glazing envelope": {
+      "detailed": 503,
+      "archivedNative": 595,
+      "candidateNative": 1211
+    },
+    "cockpit connected structural crossmember": {
+      "detailed": 205,
+      "archivedNative": 205,
+      "candidateNative": 205
+    },
+    "engine_pair/negative side/connected support": {
+      "detailed": 1031,
+      "archivedNative": 1031,
+      "candidateNative": 1031
+    },
+    "engine_pair/negative side/propulsion casing": {
+      "detailed": 2474,
+      "archivedNative": 2367,
+      "candidateNative": 1804
+    },
+    "engine_pair/negative side/propulsion luminous recess": {
+      "detailed": 1474,
+      "archivedNative": 1474,
+      "candidateNative": 1269
+    },
+    "engine_pair/positive side/connected support": {
+      "detailed": 1031,
+      "archivedNative": 1031,
+      "candidateNative": 1031
+    },
+    "engine_pair/positive side/propulsion casing": {
+      "detailed": 2474,
+      "archivedNative": 2367,
+      "candidateNative": 1804
+    },
+    "engine_pair/positive side/propulsion luminous recess": {
+      "detailed": 1474,
+      "archivedNative": 1474,
+      "candidateNative": 936
+    },
+    "explicit military mount upright (1)": {
+      "detailed": 961,
+      "archivedNative": 961,
+      "candidateNative": 961
+    },
+    "explicit military mount longitudinal member (1)": {
+      "detailed": 659,
+      "archivedNative": 659,
+      "candidateNative": 659
+    },
+    "explicit military mount upright (2)": {
+      "detailed": 961,
+      "archivedNative": 961,
+      "candidateNative": 961
+    },
+    "explicit military mount longitudinal member (2)": {
+      "detailed": 659,
+      "archivedNative": 659,
+      "candidateNative": 659
+    }
+  }
+}

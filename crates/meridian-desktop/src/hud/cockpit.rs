@@ -1,9 +1,15 @@
 //! L337 a11fe169 CockpitDisplay.swift gauge grouping/scanner and StationNavigation.swift.
 //! Only World snapshots supply readings. Missing simulations have no invented needle.
+pub(crate) mod notice;
+mod reticle;
 use super::{glyph, quad};
 use crate::mesh::{Vertex, rotate_inverse};
+use meridian_core::equipment::WorkTargetId;
 use meridian_core::traffic::{MAX_TRAFFIC_ACTORS, NpcPhase, Population, TrafficSnapshot};
-use meridian_core::{FlightMode, FlightView, Snapshot, World};
+use meridian_core::{
+    EcmSnapshot, FlightMode, FlightView, Snapshot, SolarScoopStatus, SolarSnapshot, TargetIdentity,
+    World,
+};
 
 const YELLOW: [f32; 3] = [1.0, 1.0, 0.0];
 const GREEN: [f32; 3] = [0.0, 1.0, 0.0];
@@ -14,23 +20,49 @@ const CYAN: [f32; 3] = [0.0, 1.0, 1.0];
 // plus the station and three practice bodies. NPCs have their own disjoint suffix.
 const NPC_CONTACT_START: usize = 4 + crate::mesh::MAX_MISSILE_PROJECTILES;
 pub const MAX_CONTACTS: usize = NPC_CONTACT_START + MAX_TRAFFIC_ACTORS;
-// Two line quads per additional scanner contact; eight edges per added pylon icon.
-pub const MAX_VERTICES: usize = 30_000 + (MAX_CONTACTS - 7) * 12 + (9 - 3) * 8 * 6;
+// Station, finite ordinary actors, one mission Mule, belt rocks and pending physical ore.
+pub const MAX_SCANNER_TARGETS: usize = 2
+    + MAX_TRAFFIC_ACTORS
+    + meridian_core::mining::BELT_BODY_COUNT
+    + meridian_core::mining::MAX_PENDING_ORE;
+// Context markers use three line quads; admitted contacts use two and one selected
+// bracket uses four. Keep the bounded GPU allocation large enough for the complete belt.
+pub const MAX_VERTICES: usize = 30_000
+    + MAX_CONTACTS * 18
+    + MAX_SCANNER_TARGETS * 12
+    + 24
+    + (9 - 3) * 8 * 6
+    + (40 + 12) * 35 * 6;
+
+#[derive(Debug, Clone, Copy, PartialEq)]
+pub struct ScannerTarget {
+    pub identity: TargetIdentity,
+    pub position: [f32; 3],
+    pub color: [f32; 3],
+    pub selected: bool,
+}
 
 #[derive(Debug, Clone, PartialEq)]
 pub struct Cockpit {
     pub flight: Snapshot,
+    sight: Option<reticle::Sight>,
+    pub(crate) notice_placement: Option<notice::Placement>,
     pub view: FlightView,
     pub shield: [Option<f32>; 2],
     pub energy: Option<f32>,
     pub heat: Option<f32>,
     pub fuel: Option<f32>,
+    pub solar: Option<SolarSnapshot>,
+    pub solar_limited: bool,
+    pub ecm: Option<EcmSnapshot>,
     pub missiles: usize,
     pub armed: bool,
     pub locked: bool,
     pub destroyed: bool,
-    /// Player-relative contacts in front flight coordinates, independent of selected camera.
+    /// Non-selectable context markers in front flight coordinates, independent of camera.
     pub contacts: [Option<([f32; 3], [f32; 3])>; MAX_CONTACTS],
+    /// Exactly the selectable World scanner list, in its cycle order.
+    pub scanner_targets: Vec<ScannerTarget>,
     pub station: Option<[f32; 3]>,
 }
 impl Cockpit {
@@ -41,7 +73,13 @@ impl Cockpit {
         let missile = world.missile_snapshot();
         let station = flight.station.map(|s| relative(flight, s.pose.position));
         let mut contacts = [None; MAX_CONTACTS];
-        contacts[0] = station.map(|position| (position, GREEN));
+        let projected = world.scanner_targets();
+        if !projected
+            .iter()
+            .any(|(identity, _)| matches!(identity, TargetIdentity::Station { .. }))
+        {
+            contacts[0] = station.map(|position| (position, GREEN));
+        }
         if let Some(beacons) = world.practice_snapshot().and_then(|p| p.beacons) {
             for (i, b) in beacons.into_iter().enumerate() {
                 contacts[i + 1] = Some((relative(flight, b.pose.position), CYAN));
@@ -53,20 +91,34 @@ impl Cockpit {
         {
             *contact = Some((relative(flight, projectile.position), RED));
         }
-        if let Some(traffic) = world.traffic_snapshot() {
-            fill_traffic_contacts(flight, &traffic, &mut contacts)?;
+        let traffic = world.traffic_snapshot();
+        if let Some(traffic) = &traffic {
+            fill_traffic_contacts(flight, traffic, &mut contacts)?;
+            // An actor already in the authoritative selectable list has no duplicate
+            // context marker. The retained unsupported/depleted bodies remain distinct.
+            for (index, actor) in traffic.actors.iter().enumerate() {
+                if projected.iter().any(|(identity, _)| matches!(identity,
+                    TargetIdentity::Ship(id) | TargetIdentity::Work(WorkTargetId::Wreck(id)) if *id == actor.id))
+                {
+                    contacts[NPC_CONTACT_START + index] = None;
+                }
+            }
         }
+        let scanner_targets = capture_scanner_targets(world, flight, &projected, traffic.as_ref())?;
         Ok(Self {
             flight,
+            sight: reticle::Sight::capture(world, flight),
+            notice_placement: (flight.mode != FlightMode::Docked)
+                .then_some(notice::Placement::default()),
             view: world.flight_view(),
             shield: [
                 combat.map(|c| {
-                    f32::from(c.player.front_shield_hundredths)
-                        / f32::from(meridian_core::SHIELD_CAPACITY)
+                    c.player.front_shield_hundredths as f32
+                        / c.player.shield_capacity_hundredths as f32
                 }),
                 combat.map(|c| {
-                    f32::from(c.player.rear_shield_hundredths)
-                        / f32::from(meridian_core::SHIELD_CAPACITY)
+                    c.player.rear_shield_hundredths as f32
+                        / c.player.shield_capacity_hundredths as f32
                 }),
             ],
             energy: combat.map(|c| {
@@ -74,9 +126,13 @@ impl Cockpit {
                     / f32::from(meridian_core::ENERGY_CAPACITY_HUNDREDTHS)
             }),
             heat: resources.map(|l| f32::from(l.heat_fifths) / (5.0 * 255.0)),
-            fuel: flight.navigation.map(|n| {
-                f32::from(n.fuel_units) / f32::from(meridian_core::navigation::FUEL_CAPACITY)
-            }),
+            fuel: flight
+                .navigation
+                .map(|n| f32::from(n.fuel_units) / f32::from(n.fuel_capacity_units)),
+            solar: world.solar_snapshot(),
+            solar_limited: world
+                .solar_save_limit_reached(meridian_core::save::MAX_SOLAR_HISTORY_BYTES),
+            ecm: world.ecm_snapshot(),
             missiles: world
                 .missile_rounds()
                 .map_or(0, |rounds| rounds.iter().flatten().count()),
@@ -84,6 +140,7 @@ impl Cockpit {
             locked: missile.is_some_and(|m| m.lock.is_some() || m.npc_lock.is_some()),
             destroyed: combat.is_some_and(|c| c.player.destroyed),
             contacts,
+            scanner_targets,
             station,
         })
     }
@@ -98,6 +155,28 @@ impl Cockpit {
             "FLIGHT"
         } // Hostile/Safe requires the unported active hostile-body authority.
     }
+    pub fn solar_label(&self) -> Option<(&'static str, [f32; 3])> {
+        let solar = self.solar?;
+        if self.destroyed && solar.cabin_temperature >= 1.0 {
+            return Some(("CABIN OVERHEAT - HULL DESTROYED", RED));
+        }
+        if solar.cabin_temperature >= 0.9 {
+            return Some(("CABIN CRITICAL - LEAVE CORONA", RED));
+        }
+        if solar.cabin_temperature >= 0.75 {
+            return Some(("CABIN DANGER - LEAVE CORONA", RED));
+        }
+        if self.solar_limited {
+            return Some(("SAVE HISTORY FULL - FLIGHT ACTIVE", YELLOW));
+        }
+        match solar.status {
+            SolarScoopStatus::Inactive => None,
+            SolarScoopStatus::NoScoops => Some(("SOLAR CORONA - NO SCOOPS", YELLOW)),
+            SolarScoopStatus::TurnTowardSun => Some(("SOLAR SCOOP - FACE SUN AND CRUISE", YELLOW)),
+            SolarScoopStatus::Collecting => Some(("SOLAR SCOOP ACTIVE", GREEN)),
+            SolarScoopStatus::TankFull => Some(("SOLAR SCOOP - TANK FULL", GREEN)),
+        }
+    }
     pub fn station_navigation(&self) -> Option<(f32, f32, f32)> {
         let p = self.station?;
         let [x, y, z] = view_position(self.view, p);
@@ -107,6 +186,80 @@ impl Cockpit {
             y.atan2(x.hypot(z)).to_degrees(),
         ))
     }
+}
+
+/// Prefer the player's logical selection until that contact leaves the scanner.
+/// An active work sequence can then keep its physical fragment highlighted.
+fn selected_scanner_identity(
+    projected: &[(TargetIdentity, meridian_core::docking::Vec3)],
+    logical: TargetIdentity,
+    tracked_fragment: Option<TargetIdentity>,
+) -> Option<TargetIdentity> {
+    let admitted = |id| projected.iter().any(|(identity, _)| *identity == id);
+    if admitted(logical) {
+        Some(logical)
+    } else {
+        tracked_fragment.filter(|id| admitted(*id))
+    }
+}
+
+fn capture_scanner_targets(
+    world: &World,
+    flight: Snapshot,
+    projected: &[(TargetIdentity, meridian_core::docking::Vec3)],
+    traffic: Option<&TrafficSnapshot>,
+) -> Result<Vec<ScannerTarget>, String> {
+    if projected.len() > MAX_SCANNER_TARGETS {
+        return Err("Selectable scanner targets exceed the admitted body bound".into());
+    }
+    let selected = world.targeting_snapshot().and_then(|target| {
+        selected_scanner_identity(
+            projected,
+            target.identity,
+            target
+                .tracked_fragment
+                .map(|id| TargetIdentity::Work(WorkTargetId::Ore(id))),
+        )
+    });
+    let mule = world.mule_actor_snapshot();
+    projected
+        .iter()
+        .map(|&(identity, point)| {
+            let position = relative(flight, point);
+            if position.iter().any(|value| !value.is_finite()) {
+                return Err("World produced a non-finite selectable scanner contact".into());
+            }
+            let color = match identity {
+                TargetIdentity::Station { .. } => GREEN,
+                TargetIdentity::Work(WorkTargetId::Asteroid(_)) => YELLOW,
+                TargetIdentity::Work(WorkTargetId::Ore(_)) => CYAN,
+                TargetIdentity::Work(WorkTargetId::Wreck(_)) => BLUE,
+                TargetIdentity::Ship(id) => {
+                    let actor = traffic
+                        .and_then(|s| s.actors.iter().find(|actor| actor.id == id))
+                        .or_else(|| {
+                            mule.as_ref()
+                                .filter(|m| m.actor().id == id)
+                                .map(|m| m.actor())
+                        })
+                        .ok_or("Selectable scanner ship has no current actor")?;
+                    if actor.electrical_disabled || actor.phase == NpcPhase::Destroyed {
+                        BLUE
+                    } else if actor.wanted > 0 {
+                        RED
+                    } else {
+                        YELLOW
+                    }
+                }
+            };
+            Ok(ScannerTarget {
+                identity,
+                position,
+                color,
+                selected: selected == Some(identity),
+            })
+        })
+        .collect()
 }
 
 fn fill_traffic_contacts(
@@ -305,27 +458,67 @@ fn scanner(out: &mut Vec<Vertex>, c: &Cockpit, l: Layout, size: [f32; 2]) {
     }
     line(out, [cx - rx, cy], [cx + rx, cy], GREEN, size);
     line(out, [cx, cy - ry], [cx, cy + ry], GREEN, size);
-    for ([x, y, z], color) in c.contacts.iter().flatten() {
+    let location = |[x, y, z]: [f32; 3]| {
         let sx = cx + (x / 4400.0 * rx).clamp(-rx + 2.0, rx - 2.0);
         let sy = cy + (-z / 8500.0 * ry).clamp(-ry + 2.0, ry - 2.0);
         let lift = (y / 3000.0 * ry).clamp(-ry / 2.0, ry / 2.0);
-        line(out, [sx, sy], [sx, sy - lift], *color, size);
-        line(
-            out,
-            [sx - 2.0, sy - lift],
-            [sx + 2.0, sy - lift],
-            *color,
-            size,
-        );
+        (sx, sy, sy - lift)
+    };
+    // Context contacts use a cross rather than the selectable bar.
+    for (position, color) in c.contacts.iter().flatten() {
+        let (x, base, y) = location(*position);
+        line(out, [x, base], [x, y], *color, size);
+        line(out, [x - 2.0, y - 2.0], [x + 2.0, y + 2.0], *color, size);
+        line(out, [x - 2.0, y + 2.0], [x + 2.0, y - 2.0], *color, size);
+    }
+    for target in &c.scanner_targets {
+        let (x, base, y) = location(target.position);
+        line(out, [x, base], [x, y], target.color, size);
+        line(out, [x - 2.0, y], [x + 2.0, y], target.color, size);
+        if target.selected {
+            let points = [
+                [x - 4.0, y - 4.0],
+                [x + 4.0, y - 4.0],
+                [x + 4.0, y + 4.0],
+                [x - 4.0, y + 4.0],
+            ];
+            for (a, b) in points.into_iter().zip(points.into_iter().cycle().skip(1)) {
+                line(out, a, b, CYAN, size);
+            }
+        }
     }
 }
 /// Appends bounded geometry after the existing review/control overlay, without gameplay access.
+fn flight_layout(width: u32, height: u32) -> Layout {
+    let mut layout = Layout::new(width, height);
+    // Scanner stalks extend half an ellipse above or below their base point.
+    let radius = if width < 900 { 32.0 } else { 46.0 };
+    let scanner_depth = 8.0 + layout.row + 16.0 + 2.5 * radius + 6.0;
+    layout.top = (layout.top.min(height as f32 - scanner_depth) - notice::FOOTER_HEIGHT).max(64.);
+    layout
+}
+
+pub(crate) fn flight_height(width: u32, height: u32) -> f32 {
+    if width >= 320 && height >= 240 {
+        flight_layout(width, height).top
+    } else {
+        height as f32
+    }
+}
+
 pub fn append(c: &Cockpit, width: u32, height: u32, out: &mut Vec<Vertex>) {
+    if let Some(sight) = c.sight {
+        sight.draw(width, height, out);
+    }
     if width < 320 || height < 240 {
         return;
     }
     let size = [width as f32, height as f32];
-    let l = Layout::new(width, height);
+    let l = if c.flight.mode == FlightMode::Docked {
+        Layout::new(width, height)
+    } else {
+        flight_layout(width, height)
+    };
     quad(out, [0.0, l.top, size[0], size[1]], [0.0, 0.0, 0.0], size);
     line(out, [0.0, l.top], [size[0], l.top], YELLOW, size);
     label(
@@ -382,7 +575,11 @@ pub fn append(c: &Cockpit, width: u32, height: u32, out: &mut Vec<Vertex>) {
         ("FRONT SHIELD", c.shield[0], GREEN),
         ("REAR SHIELD", c.shield[1], GREEN),
         ("FUEL", c.fuel, GREEN),
-        ("CABIN TEMP", None, RED),
+        (
+            "CABIN TEMP",
+            c.solar.map(|solar| solar.cabin_temperature as f32),
+            RED,
+        ),
         ("LASER HEAT", c.heat, RED),
         ("ALTITUDE", None, YELLOW),
     ];
@@ -469,6 +666,32 @@ pub fn append(c: &Cockpit, width: u32, height: u32, out: &mut Vec<Vertex>) {
     }
     scanner(out, c, l, size);
     append_station_navigation(out, c, l, size);
+    if c.flight.mode != FlightMode::Docked
+        && let Some((text, color)) = c.solar_label()
+    {
+        label(out, text, 12.0, l.top - 14.0, l.scale, color, size);
+    }
+    if c.flight.mode == FlightMode::Flight
+        && !c.destroyed
+        && let Some(ecm) = c.ecm.filter(|s| s.fitted.is_some())
+    {
+        let (message, color) = if ecm.active.is_some() {
+            ("ECM ACTIVE", GREEN)
+        } else if ecm.remaining_ticks > 0 {
+            ("ECM COOLDOWN", CYAN)
+        } else {
+            ("ECM FITTED", YELLOW)
+        };
+        label(
+            out,
+            message,
+            size[0] - 12.0 - message.len() as f32 * 6.0 * l.scale,
+            l.top - 14.0,
+            l.scale,
+            color,
+            size,
+        );
+    }
 }
 
 fn append_station_navigation(out: &mut Vec<Vertex>, c: &Cockpit, l: Layout, size: [f32; 2]) {
@@ -575,6 +798,30 @@ mod tests {
         );
     }
     #[test]
+    fn every_test_shield_grade_uses_its_own_capacity_in_the_cockpit() {
+        let mut world = world();
+        let review = world
+            .review_xyzzy(meridian_core::XyzzyAction::Enter, 0)
+            .unwrap_or_else(|e| panic!("{e}"));
+        world
+            .prepare_xyzzy(review, 0)
+            .unwrap_or_else(|e| panic!("{e}"))
+            .commit();
+        for grade in meridian_core::ShieldGrade::ALL {
+            let action = meridian_core::XyzzyAction::FitShield(grade);
+            let review = world
+                .review_xyzzy(action, 0)
+                .unwrap_or_else(|e| panic!("{e}"));
+            world
+                .prepare_xyzzy(review, 0)
+                .unwrap_or_else(|e| panic!("{e}"))
+                .commit();
+            let c = Cockpit::capture(&world, world.snapshot()).unwrap_or_else(|e| panic!("{e}"));
+            assert_eq!(c.shield, [Some(1.0); 2], "{}", grade.name());
+        }
+    }
+
+    #[test]
     fn fresh_instruments_are_world_owned_and_rendering_cannot_change_save() {
         let world = world();
         let before = world.save_bytes().unwrap_or_else(|error| panic!("{error}"));
@@ -583,6 +830,7 @@ mod tests {
         assert_eq!(c.energy, Some(1.0));
         assert_eq!(c.fuel, Some(1.0));
         assert_eq!(c.heat, Some(0.0));
+        assert_eq!(c.solar, Some(SolarSnapshot::default()));
         assert_eq!(c.missiles, 3);
         assert!(!c.armed);
         assert!(!c.locked);
@@ -596,6 +844,48 @@ mod tests {
             world.save_bytes().unwrap_or_else(|error| panic!("{error}")),
             before
         );
+    }
+    #[test]
+    fn solar_readout_uses_status_and_thermal_warning_precedence() {
+        let mut world = world();
+        world.request_launch(0).unwrap_or_else(|e| panic!("{e}"));
+        world
+            .step(FlightInput::default())
+            .unwrap_or_else(|e| panic!("{e}"));
+        let mut cockpit =
+            Cockpit::capture(&world, world.snapshot()).unwrap_or_else(|e| panic!("{e}"));
+        let before = world.save_bytes().unwrap_or_else(|e| panic!("{e}"));
+        for (temperature, status, text) in [
+            (0.1, SolarScoopStatus::Collecting, "SOLAR SCOOP ACTIVE"),
+            (0.2, SolarScoopStatus::NoScoops, "SOLAR CORONA - NO SCOOPS"),
+            (
+                0.4,
+                SolarScoopStatus::TurnTowardSun,
+                "SOLAR SCOOP - FACE SUN AND CRUISE",
+            ),
+            (0.6, SolarScoopStatus::TankFull, "SOLAR SCOOP - TANK FULL"),
+            (
+                0.75,
+                SolarScoopStatus::Collecting,
+                "CABIN DANGER - LEAVE CORONA",
+            ),
+            (
+                0.9,
+                SolarScoopStatus::Collecting,
+                "CABIN CRITICAL - LEAVE CORONA",
+            ),
+        ] {
+            cockpit.solar = Some(SolarSnapshot {
+                status,
+                cabin_temperature: temperature,
+                fuel_remainder: 0.0,
+            });
+            assert_eq!(cockpit.solar_label().map(|(label, _)| label), Some(text));
+            let mut vertices = Vec::new();
+            append(&cockpit, 640, 360, &mut vertices);
+            assert!(vertices.len() <= MAX_VERTICES);
+        }
+        assert_eq!(world.save_bytes().unwrap_or_else(|e| panic!("{e}")), before);
     }
     #[test]
     fn actual_flight_and_pulse_change_speed_energy_and_heat_readings() {

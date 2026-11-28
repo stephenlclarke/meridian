@@ -1,0 +1,85 @@
+{
+  "id": "SH043",
+  "name": "Eagle Cruiser",
+  "legacyRevision": "a11fe16924d87d06021816f9037952afcbac08db",
+  "sourceUnits": "metres",
+  "metresPerSourceUnit": 1,
+  "detail": {
+    "vertices": 2000,
+    "faces": 3876,
+    "components": 31,
+    "bounds": [
+      [
+        -29.0,
+        -17.5,
+        -62.0
+      ],
+      [
+        29.0,
+        16.46,
+        50.0
+      ]
+    ]
+  },
+  "native": {
+    "vertices": 148,
+    "faces": 248,
+    "components": 12,
+    "bounds": [
+      [
+        -29.0,
+        -17.5,
+        -62.0
+      ],
+      [
+        29.0,
+        16.41,
+        50.0
+      ]
+    ],
+    "faceLimit": 512,
+    "approvedSourcePath": "fleet-completion-20261019/batch-02-native-lod/SH043-design.toml",
+    "approvedSourceSha256": "1c7a31a989c833da95651924fa5f44ce9d7fbb56be68b4b6cffe710b1c393216"
+  },
+  "shapePieces": 27,
+  "textures": [
+    "l337-patrol-diffuse",
+    "l337-strike-diffuse",
+    "l337-service-details"
+  ],
+  "unmappedMaterialSlot": 4294967295,
+  "pins": {
+    "resource.toml": "421e58d9de72ea55ae6762c5ec1918b114dec57d3f5aee4d69f7722cf93a9a7a",
+    "native-export.json": "c3c285005b6d3a3f9cb04f0c744126af009bd2469c2ff2ec731f8452fd409d73",
+    "contract.toml": "be5d22e65550f8420a4f61ce6c784b1161fcc645d3e542c671dd864e9e736368",
+    "engineering.json": "8cf7dc3345f41175856ef1a571e7aebc709901fd9f186b4e454b0e81e7ce90a5",
+    "finite-dry-source.json": "bf891c958e485c53f5fa941d79ed23ec0780e3a68a71089e5ed5c07006733dce",
+    "LICENSE": "033b7058d73f22c3c6b8a5825eb866ca2d67088f3ee94dd5f3e46da59d624766"
+  },
+  "outputs": {
+    "source.vertices": {
+      "bytes": 51568,
+      "sha256": "dae18bd68625ede5942dff9a8b6e6723005b82da20be55369e7e2242c03076ce"
+    },
+    "source-triangles.bin": {
+      "bytes": 49488,
+      "sha256": "0f998629f3e65fb6b8c4eecb8557add400ae7c9a5e77c967bcc52d53fc65782c"
+    },
+    "source-piece-membership.bin": {
+      "bytes": 2148,
+      "sha256": "07cd5dce22c9afeb812d41d2f0ade36e5a4b20d2ef0da27ec886eb4bae6c1cc2"
+    },
+    "PIECES.json": {
+      "bytes": 685,
+      "sha256": "9a5ddf0fb7b211d55157dfc81d5580434bb3d7b9986634e5f243ed6d5d8dbf49"
+    },
+    "visual.bin": {
+      "bytes": 651184,
+      "sha256": "f730e8875ff2a95290b4987886c53e8b21066813637cc909bd6e43d7443e8a94"
+    },
+    "native-visual.bin": {
+      "bytes": 41680,
+      "sha256": "07ceeef7bff05dad0a190b454b80060c135fec40c74b54159c2278d3603eba2b"
+    }
+  }
+}

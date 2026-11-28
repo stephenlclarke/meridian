@@ -1,0 +1,6 @@
+* -text
+source.vertices binary
+source-triangles.bin binary
+source-piece-membership.bin binary
+visual.bin binary
+native-visual.bin binary

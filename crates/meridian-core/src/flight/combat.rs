@@ -1,10 +1,10 @@
 //! World-owned ordinary impacts. Presentation values confer no contact authority.
+pub use super::shield::SHIELD_CAPACITY;
+use super::shield::{ShieldGrade, ShieldPools};
 use super::{FireError, FlightMode, PulseContact, PulseShot, Snapshot, World, flight_pose};
 use crate::docking::Vec3;
 use crate::navigation::SystemId;
 use crate::save::{Reader, SaveError, Writer};
-pub const SHIELD_CAPACITY: u16 = 30_000;
-const SHIELD_RECHARGE: u16 = 3;
 const ATTACK_WINDOW: u64 = 600;
 
 /// Descriptive target and weapon classes. These values alone grant no impact.
@@ -112,8 +112,10 @@ pub struct OrdinaryImpact {
 }
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub struct PlayerCondition {
-    pub front_shield_hundredths: u16,
-    pub rear_shield_hundredths: u16,
+    pub front_shield_hundredths: u32,
+    pub rear_shield_hundredths: u32,
+    pub shield_capacity_hundredths: u32,
+    pub shield_grade: ShieldGrade,
     pub energy_hundredths: u16,
     pub destroyed: bool,
 }
@@ -127,32 +129,16 @@ struct AttackWindow {
     visit: u64,
     physical_tick: u64,
 }
-#[derive(Debug, Clone, Copy, PartialEq)]
+#[derive(Debug, Clone, Copy, Default, PartialEq)]
 pub(super) struct State {
     pub(super) emissions: u64,
     pub(super) incidents: u64,
     physical_tick: u64,
-    front: u16,
-    rear: u16,
+    shields: ShieldPools,
     windows: [Option<AttackWindow>; 3],
     penalties: u8,
     unbound_player_impact: bool,
     last: Option<OrdinaryImpact>,
-}
-impl Default for State {
-    fn default() -> Self {
-        Self {
-            emissions: 0,
-            incidents: 0,
-            physical_tick: 0,
-            front: SHIELD_CAPACITY,
-            rear: SHIELD_CAPACITY,
-            windows: [None; 3],
-            penalties: 0,
-            unbound_player_impact: false,
-            last: None,
-        }
-    }
 }
 /// Only the verified current command in this module can create this transaction.
 pub(super) struct PreparedPulseImpact {
@@ -180,8 +166,11 @@ impl State {
             .ok_or(FireError::SequenceExhausted)?;
         Ok((next, next.emissions))
     }
-    pub(super) fn shields(self) -> [u16; 2] {
-        [self.front, self.rear]
+    pub(super) fn shields(self) -> ShieldPools {
+        self.shields
+    }
+    pub(super) fn refit_shields(&mut self, grade: ShieldGrade) {
+        self.shields.refit(grade);
     }
     /// Only sealed World producers call this; it never creates a player/station incident.
     pub(super) fn apply_bound_player_damage(
@@ -190,27 +179,14 @@ impl State {
         front: bool,
         damage: u16,
     ) {
-        let shield = if front {
-            &mut self.front
-        } else {
-            &mut self.rear
-        };
-        let absorbed = (*shield).min(damage);
-        *shield -= absorbed;
+        let absorbed = self.shields.absorb(front, damage);
         pulse.damage_energy(damage - absorbed);
     }
     pub(super) fn last_impact(self) -> Option<OrdinaryImpact> {
         self.last
     }
     pub(super) fn absorb_emp(&mut self, front: bool, power: u16) -> u16 {
-        let shield = if front {
-            &mut self.front
-        } else {
-            &mut self.rear
-        };
-        let absorbed = (*shield).min(power);
-        *shield -= absorbed;
-        absorbed
+        self.shields.absorb(front, power)
     }
     pub(super) fn physical_tick(self) -> u64 {
         self.physical_tick
@@ -278,17 +254,16 @@ impl State {
         self.last = Some(hit);
         Ok((hit, penalty))
     }
-    pub(super) fn advance(&mut self, opening: FlightMode, next: FlightMode) {
+    pub(super) fn advance(&mut self, opening: FlightMode, next: FlightMode, medusa: bool) {
         if opening == FlightMode::Docked {
             return;
         }
         self.physical_tick += 1;
         if next == FlightMode::Docked {
-            self.front = SHIELD_CAPACITY;
-            self.rear = SHIELD_CAPACITY;
+            self.shields.fill();
         } else {
-            self.front = (self.front + SHIELD_RECHARGE).min(SHIELD_CAPACITY);
-            self.rear = (self.rear + SHIELD_RECHARGE).min(SHIELD_CAPACITY);
+            self.shields
+                .advance_for_hull(self.physical_tick - 1, 1, medusa);
         }
     }
     pub(super) fn can_advance(self, opening: FlightMode) -> bool {
@@ -320,8 +295,7 @@ impl State {
         w.u64(self.emissions);
         w.u64(self.incidents);
         w.u64(self.physical_tick);
-        w.u16(self.front);
-        w.u16(self.rear);
+        self.shields.encode(w);
         w.u8(self.penalties);
         w.bool(self.unbound_player_impact);
         for window in self.windows {
@@ -337,8 +311,7 @@ impl State {
             emissions: r.u64()?,
             incidents: r.u64()?,
             physical_tick: r.u64()?,
-            front: r.u16()?,
-            rear: r.u16()?,
+            shields: ShieldPools::decode(r)?,
             penalties: r.u8()?,
             unbound_player_impact: r.bool()?,
             windows: r.array(|r| {
@@ -354,9 +327,8 @@ impl State {
     }
     pub(super) fn validate_damage_boundary(self, world: &World) -> Result<(), SaveError> {
         if self.unbound_player_impact
-            || self.front > SHIELD_CAPACITY
-            || self.rear > SHIELD_CAPACITY
-            || ((self.front != SHIELD_CAPACITY || self.rear != SHIELD_CAPACITY)
+            || !self.shields.valid()
+            || (!self.shields.is_full()
                 && !world.missiles.has_player_hit()
                 && world.traffic.player_hits().is_empty())
         {
@@ -450,8 +422,10 @@ impl World {
         let laser = self.flight_resources_snapshot()?;
         Some(CombatSnapshot {
             player: PlayerCondition {
-                front_shield_hundredths: self.combat.front,
-                rear_shield_hundredths: self.combat.rear,
+                front_shield_hundredths: self.combat.shields.amounts()[0],
+                rear_shield_hundredths: self.combat.shields.amounts()[1],
+                shield_capacity_hundredths: self.combat.shields.capacity(),
+                shield_grade: self.combat.shields.grade(),
                 energy_hundredths: laser.energy_hundredths,
                 destroyed: laser.energy_hundredths == 0,
             },
@@ -463,12 +437,12 @@ impl World {
         shot: PulseShot,
     ) -> Result<PreparedPulseImpact, FireError> {
         let identity = self.combat_identity().ok_or(FireError::NoCommander)?;
-        let fitted = self
-            .fitted_front_laser()
-            .ok_or(FireError::NoFittedFrontLaser)?;
+        let fitted = self.selected_fit().ok_or(FireError::NoFittedFrontLaser)?;
         let legal = self.legal_value().ok_or(FireError::NoCommander)?;
         let pose = flight_pose(self.state.position, self.state.orientation)
             .ok_or(FireError::InvalidGeometry)?;
+        let facing = self.selected_laser_view();
+        let pose = facing.laser_ray(pose);
         if shot.tick != self.state.tick
             || self.state.mode != FlightMode::Flight
             || self.is_paused()
@@ -478,7 +452,7 @@ impl World {
         {
             return Err(FireError::StaleCommand);
         }
-        let (_, expected, distance) = self.pulse_scene(pose)?;
+        let (_, expected, distance) = self.pulse_scene_facing(pose, facing)?;
         if shot.contact != expected || shot.end != add_scaled(shot.origin, shot.direction, distance)
         {
             return Err(FireError::InvalidGeometry);
@@ -535,7 +509,9 @@ impl World {
             weapon: fitted.1,
             opening_pulse: self.pulse,
             opening_damage: self.damage.clone(),
-            damage: self.damage.laser(self.combat.physical_tick(), fitted.1)?,
+            damage: self
+                .damage
+                .facing_laser(self.combat.physical_tick(), fitted.1, facing)?,
             pulse,
             epoch: self
                 .freight_session
@@ -580,7 +556,7 @@ impl PreparedPulseImpact {
             || world.damage != self.opening_damage
             || world.combat_identity() != Some(self.identity)
             || world.legal_value() != Some(self.opening_legal)
-            || world.fitted_front_laser() != Some((self.item, self.weapon))
+            || world.selected_fit() != Some((self.item, self.weapon))
         {
             return Err(FireError::StaleCommand);
         }
@@ -699,7 +675,11 @@ impl OrdinaryImpact {
         if self.weapon == OrdinaryWeapon::StandardMissile {
             return world.missiles.validate_ordinary(self, world);
         }
-        let pose = flight_pose(self.position, self.orientation).ok_or(invalid)?;
+        let body = flight_pose(self.position, self.orientation).ok_or(invalid)?;
+        let (facing, weapon) = world
+            .owned_laser_at(self.item, self.tick, self.attacker)
+            .ok_or(invalid)?;
+        let pose = facing.laser_ray(body);
         let station = world.state.station.ok_or(invalid)?;
         let distance = world
             .station_data
@@ -721,7 +701,7 @@ impl OrdinaryImpact {
         if self.victim_entity != 1
             || self.attacker.owner != current.owner
             || self.attacker.hull != current.hull
-            || world.owned_front_laser_at(self.item, self.tick, self.attacker) != Some(self.weapon)
+            || weapon != self.weapon
             || station_index(self.attacker.system).is_none()
             || self.attacker.visit < 2
             || self.attacker.visit > current.visit

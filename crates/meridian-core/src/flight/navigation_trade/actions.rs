@@ -49,6 +49,9 @@ impl World {
         let dock = self.navigation_trade_berth(tick)?;
         let plan = match action {
             Action::Accept => {
+                if self.test_tank_overfit() {
+                    return Err(Error::TestFit);
+                }
                 if self.xyzzy_snapshot().is_some_and(|s| s.unlimited_fuel) {
                     return Err(Error::Fuel);
                 }
@@ -119,16 +122,7 @@ impl World {
         if !legal_tonne(commodity) {
             return Err(Error::CommodityRequired);
         }
-        let account = self.commander_account.as_ref().ok_or(Error::NoCommander)?;
-        let p = account
-            .service_projection(
-                &self
-                    .freight_session
-                    .as_ref()
-                    .ok_or(Error::NoCommander)?
-                    .state,
-            )
-            .map_err(Error::Service)?;
+        let p = self.raw_service_projection().map_err(Error::Service)?;
         if quantity(p, commodity) != 0 {
             return Err(Error::CargoPresent);
         }
@@ -202,6 +196,12 @@ impl World {
             Action::Accept => candidate.attempts.push(Attempt {
                 dock: current.dock,
                 accepted_tick: current.tick,
+                accepted_account_revision: Some(
+                    self.commander_account
+                        .as_ref()
+                        .ok_or(Error::NoCommander)?
+                        .revision(),
+                ),
                 plan: None,
                 buy: None,
                 journeys: Vec::new(),
@@ -230,6 +230,12 @@ impl World {
                     fuel: self
                         .navigation_trade_fuel_anchor()
                         .ok_or(Error::NoCommander)?,
+                    account_revision: Some(
+                        self.commander_account
+                            .as_ref()
+                            .ok_or(Error::NoCommander)?
+                            .revision(),
+                    ),
                 });
                 if outcome == Outcome::Complete && candidate.trace.is_none() {
                     candidate.trace = Some(i as u8);

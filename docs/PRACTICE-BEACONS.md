@@ -1,8 +1,8 @@
 # Avenor practice beacons
 
-The installed v8 preview follows the qualified single-attempt flow below. The authored [closure/retry successor](SAFE-GUNNERY-ATTEMPTS.md) adds F7 reviewed closure, F10 fresh consent and v9 history; review and execution are pending.
+These controls apply to the current Fleet build. Shift+5 reviews closure of an attempt. Shift+3 reviews a fresh attempt after closure. [Practice history and retry](SAFE-GUNNERY-ATTEMPTS.md)
 
-At the Avenor main berth, press F10 to review one safe gunnery practice sortie. Enter confirms and saves the choice. B cancels. After launch, continue into clear flight to open the range. Hold Z to fire the fitted front Pulse Laser. The HUD counts distinct beacon hits and a newly hit beacon flashes white. After the third hit, release Z for three continuous, unpaused flight seconds. Return to the actual Avenor main berth and press F8 to review reception. Enter confirms reception and saves the Safe Gunnery Family Trace once.
+At the Avenor main berth, press Shift+3 to review one safe gunnery practice sortie. Enter confirms and saves the choice. B cancels. After launch, continue into clear flight to open the range. Hold Z to fire the fitted front Pulse Laser. A newly hit beacon flashes white. Press H, then I, to check the distinct hit count in Flight Status. After the third hit, release Z for three continuous, unpaused flight seconds. Return to the actual Avenor main berth and press Shift+4 to review reception. Enter confirms reception and saves the Safe Gunnery Family Trace once.
 
 The practice provider follows original L337 revision
 `a11fe16924d87d06021816f9037952afcbac08db` and its
@@ -42,7 +42,7 @@ and ship-to-beacon physical collision remain open.
 - After all three distinct hits, verify a further discharge resets the
   interval, including a shot stopped by the station. Paused time adds
   nothing. A premature dock and Renas reception refuse. Complete the quiet
-  interval in flight, physically dock at Avenor, review with F8 and confirm
+  interval in flight, physically dock at Avenor, review with Shift+4 and confirm
   after ordinary dock ticks. Cold Continue retains the same receipt and the
   cash balance. A second review cannot create another trace.
 - Load a pre-reception v5 practice save in isolation. An active save must

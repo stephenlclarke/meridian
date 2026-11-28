@@ -140,7 +140,8 @@ impl Ledger {
         &mut self,
         action: AmmunitionAction,
         item: u64,
-        purchase: u32,
+        purchase: Option<u32>,
+        capacity: usize,
     ) -> Result<(), AmmunitionError> {
         match action {
             AmmunitionAction::Purchase => {
@@ -148,21 +149,20 @@ impl Ledger {
                 if self.items.iter().filter(|i| !i.consumed).count() >= 252 {
                     return Err(AmmunitionError::Full);
                 }
-                let pylon = self
-                    .rounds()
+                let pylon = self.rounds()[..capacity]
                     .iter()
                     .position(Option::is_none)
                     .ok_or(AmmunitionError::Full)? as u8;
                 self.items.push(AmmunitionItem {
                     item,
                     pylon: Some(pylon),
-                    purchase: Some(purchase),
+                    purchase,
                     consumed: false,
-                    xyzzy: false,
+                    xyzzy: purchase.is_none(),
                 });
                 self.paid = self
                     .paid
-                    .checked_add(PRICE_TENTHS)
+                    .checked_add(if purchase.is_some() { PRICE_TENTHS } else { 0 })
                     .ok_or(AmmunitionError::SequenceExhausted)?;
             }
             AmmunitionAction::Store { item } => {
@@ -177,7 +177,7 @@ impl Ledger {
                 i.pylon = None;
             }
             AmmunitionAction::Refit { item, pylon } => {
-                if usize::from(pylon) >= PYLONS {
+                if usize::from(pylon) >= capacity {
                     return Err(AmmunitionError::Full);
                 }
                 if self
@@ -331,16 +331,14 @@ impl State {
                 ledger.launch(o)?;
             }
             (purchases, grants) = validate_ammunition_identity(e, world, owner, purchases, grants)?;
-            let paid_before = ledger.paid;
             ledger
-                .apply(e.action, e.item, purchases)
+                .apply(
+                    e.action,
+                    e.item,
+                    (!e.xyzzy).then_some(purchases),
+                    world.missile_capacity_at(e.revision),
+                )
                 .map_err(|_| INVALID)?;
-            if e.xyzzy {
-                let item = ledger.items.last_mut().ok_or(INVALID)?;
-                item.purchase = None;
-                item.xyzzy = true;
-                ledger.paid = paid_before;
-            }
             previous = Some(*e);
         }
         for o in launches {
@@ -456,7 +454,7 @@ impl World {
             name: "Missile",
             purchases,
             items: ledger.items,
-            capacity: PYLONS as u8,
+            capacity: self.missile_capacity_at(u64::MAX) as u8,
             price_tenths: PRICE_TENTHS,
             required_technology: REQUIRED_TECHNOLOGY,
             fit_revision: account.ammunition_revision(),
@@ -501,7 +499,7 @@ impl World {
         if action == AmmunitionAction::Purchase && account.credits_tenths() < PRICE_TENTHS {
             return Err(AmmunitionError::InsufficientCredits);
         }
-        ledger.apply(action, 0, 0)?;
+        ledger.apply(action, 0, Some(0), self.missile_capacity_at(u64::MAX))?;
         if ledger.items.iter().filter(|i| !i.consumed).count()
             + 4
             + usize::from(account.equipment_state().owned().is_some())
@@ -634,6 +632,13 @@ pub(super) fn validate_berth_event(
 }
 
 impl World {
+    fn missile_capacity_at(&self, revision: u64) -> usize {
+        if self.xyzzy.medusa_at(revision) {
+            5
+        } else {
+            PYLONS
+        }
+    }
     pub(super) fn grant_xyzzy_missiles(
         &mut self,
         dock: DockContext,
@@ -642,7 +647,24 @@ impl World {
         loop {
             let current = self.commander_account.as_ref().ok_or(INVALID)?;
             let ledger = self.ammunition.ledger(self, current)?;
-            let Some(pylon) = ledger.rounds().iter().position(Option::is_none) else {
+            let capacity = self.missile_capacity_at(u64::MAX);
+            let rounds = ledger.rounds();
+            if let Some(round) = rounds[capacity..].iter().flatten().next() {
+                let account = current
+                    .prepare_ammunition(0, None, false)
+                    .map_err(|_| INVALID)?;
+                self.ammunition.events.push(Event {
+                    xyzzy: false,
+                    action: AmmunitionAction::Store { item: round.item },
+                    dock,
+                    tick,
+                    revision: account.revision(),
+                    item: round.item,
+                });
+                self.commander_account = Some(account);
+                continue;
+            }
+            let Some(pylon) = rounds[..capacity].iter().position(Option::is_none) else {
                 return Ok(());
             };
             let held = ledger

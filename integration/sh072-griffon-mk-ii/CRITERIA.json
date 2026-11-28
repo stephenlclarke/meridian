@@ -1,0 +1,197 @@
+{
+  "hull": "SH072 Griffon Mk II",
+  "scope": "Original catalogue artwork and distinct generated collision inspection",
+  "source": "assets/fleet/sh072/SOURCE-GEOMETRY.json",
+  "frozenSources": "integration/sh072-griffon-mk-ii/FROZEN-SOURCES.json",
+  "sourceScaleMetresPerUnit": "30000000/3215237",
+  "faces": {
+    "detailedOriginal": 1644,
+    "nativeVisibleOriginal": 596,
+    "generatedInspectionCandidate": 380,
+    "collisionMaximum": 512
+  },
+  "originalAccess": {
+    "runtimeCatalogue": {
+      "playerFlyable": false,
+      "normalPurchaseEligible": false,
+      "purchasePolicy": "pendingFabrication"
+    },
+    "r3DesignContract": {
+      "playerFlyable": true,
+      "purchasePolicy": "blueprintFabrication"
+    }
+  },
+  "engineering": {
+    "sourceReference": "finite-intrinsic-empty-griffon-mk-ii",
+    "massKg": 30031
+  },
+  "creatorReplay": {
+    "path": "integration/sh072-griffon-mk-ii/CREATOR-REPLAY.json",
+    "bytes": 592,
+    "sha256": "00277f7e59b4b5ce31254b4a15a4d15ed34d5913f1f749de1797db6ca340d0b0"
+  },
+  "supportGroups": 29,
+  "minimumRouteClearanceMillimetres": 1002,
+  "sourceContactCounts": {
+    "overlap": 7
+  },
+  "fitUpperMillimetres": {
+    "detailed": 1480,
+    "archiveNative": 1597,
+    "candidateNative": 1597
+  },
+  "hullStudio": {
+    "definition": "integration/sh072-griffon-mk-ii/GRIFFON-MK-II-STUDIO.json",
+    "bytes": 275437,
+    "sha256": "e2d4eb4b34c693ae3c4744210b61ce2e629b8e8e6112646ae442d19f9878c08a",
+    "supports": 29,
+    "probes": 7,
+    "loaderRevision": "27121e66ba37a29781135b56924a9d6e7f38a70a",
+    "signedInstalledExport": {
+      "status": "PASS",
+      "scope": "Signed installed Studio offline artwork and generated collision import/export",
+      "bundleIdentifier": "io.xyzzy.meridian.hullstudio",
+      "bundleVersion": "0.0.0",
+      "codeDirectoryHash": "93938bda9242ebdff508bfb9e16b3cdf83c0a200",
+      "developerIdTeam": "4MEB7MUTAV",
+      "signatureVerification": "deep strict",
+      "definition": {
+        "bytes": 275437,
+        "sha256": "e2d4eb4b34c693ae3c4744210b61ce2e629b8e8e6112646ae442d19f9878c08a"
+      },
+      "exportExitStatuses": [
+        0,
+        0
+      ],
+      "exportMatchesDefinitionExceptTrailingLf": true,
+      "valid": true,
+      "diagnostics": [],
+      "detailedTriangles": 1644,
+      "nativeTriangles": 380,
+      "supportGroups": 29,
+      "engineeringReference": "finite-intrinsic-empty-griffon-mk-ii",
+      "massKg": 30031,
+      "receiptFiles": {
+        "GRIFFON-MK-II.hull.json": {
+          "bytes": 275436,
+          "sha256": "fb3bbcb3abf7b792236a8febd124785ae342a47a793e38830ed9bf890100d779"
+        },
+        "GRIFFON-MK-II-repeat.hull.json": {
+          "bytes": 275436,
+          "sha256": "fb3bbcb3abf7b792236a8febd124785ae342a47a793e38830ed9bf890100d779"
+        },
+        "studio.stdout.json": {
+          "bytes": 74161,
+          "sha256": "e4d125b21dce350bfea79140d50a2ba1fb6851dee816c15be0cbb6b6efb9d7b2"
+        },
+        "studio-repeat.stdout.json": {
+          "bytes": 74161,
+          "sha256": "e4d125b21dce350bfea79140d50a2ba1fb6851dee816c15be0cbb6b6efb9d7b2"
+        },
+        "codesign.log": {
+          "bytes": 13038,
+          "sha256": "c07ba677fcf3698dbae124761faebd1c9cdc80233e826bef9c4196b77774e460"
+        },
+        "codesign-details.log": {
+          "bytes": 1145,
+          "sha256": "46f22bef73c8eab385775b9c33eb76171b43a06b700a46282ba7683d72e141bb"
+        }
+      },
+      "artworkProbeResults": [
+        {
+          "name": "central-dorsal",
+          "passed": true
+        },
+        {
+          "name": "above-forward-cross-bridge",
+          "passed": true
+        },
+        {
+          "name": "below-forward-cross-bridge",
+          "passed": true
+        },
+        {
+          "name": "port-inner-gate",
+          "passed": true
+        },
+        {
+          "name": "port-outside-gate",
+          "passed": true
+        },
+        {
+          "name": "starboard-inner-gate",
+          "passed": true
+        },
+        {
+          "name": "starboard-outside-gate",
+          "passed": true
+        }
+      ],
+      "triangleRoles": {
+        "detail": "original detailed visible",
+        "native": "separately generated inspection geometry"
+      }
+    }
+  },
+  "byteReplay": {
+    "commands": [
+      "python3 -B tools/prepare_griffon_mk_ii_geometry.py --check",
+      "python3 -B tools/verify_griffon_mk_ii_geometry.py | cmp - integration/sh072-griffon-mk-ii/CONTACT-RESULT.json",
+      "python3 -B tools/measure_griffon_mk_ii_geometry.py archive-fit | cmp - integration/sh072-griffon-mk-ii/ARCHIVE-FIT.json",
+      "python3 -B tools/measure_griffon_mk_ii_geometry.py candidate-fit | cmp - integration/sh072-griffon-mk-ii/candidate-fit.json",
+      "python3 -B tools/measure_griffon_mk_ii_geometry.py candidate-fidelity | cmp - integration/sh072-griffon-mk-ii/candidate-fidelity.json"
+    ],
+    "host": "SteveMBA",
+    "startedUtc": "2026-11-24T22:53:31Z",
+    "finishedUtc": "2026-11-24T22:53:52Z",
+    "log": {
+      "bytes": 628,
+      "sha256": "42a0c2a392310f229c3fb632d3e1177665d389b3e3169b98f3d90be5ab6aa248"
+    },
+    "fitDependencies": {
+      "python": "3.14.3",
+      "numpy": "2.5.5",
+      "scipy": "1.18.1",
+      "trimesh": "5.2.1",
+      "rtree": "1.4.1"
+    },
+    "originalCommit": "9388bf2a4bbb77262309e562478b013843b3df47",
+    "historicalReplayPins": {
+      "tools/measure_banteng_geometry.py": "4b7d8d5d972e30d93bebf7f422be71e415d6e4a9c4b622582ecf6e30a6bb9235",
+      "tools/measure_lanner_geometry.py": "cabbaf17ff7efdbcbee9a1fba67c7edafd59dceb8e97f367824a51c134479992",
+      "tools/measure_seriema_courier_geometry.py": "0992ebf43e2ac8800c4f72adf55498efcd88da4003ec9c2ab256fc797f66055e",
+      "tools/verify_eagle_cruiser_geometry.py": "c7926cb6e699ae5ffb445951ce9d4e98a64018a7ecb1db2e5e77a611d742a783"
+    }
+  },
+  "replayPins": {
+    "integration/sh072-griffon-mk-ii/GRIFFON-MK-II-STUDIO.json": "e2d4eb4b34c693ae3c4744210b61ce2e629b8e8e6112646ae442d19f9878c08a",
+    "integration/sh072-griffon-mk-ii/FROZEN-SOURCES.json": "a57fa96888c39b26eae29a16ebb12d160f47638b7b9febeade3117f22397596d",
+    "integration/sh072-griffon-mk-ii/CONTACT-RESULT.json": "a5817cee56ff0b3ce6ed1de6ae938c757d3e9e178571204491d5a84195ef6c55",
+    "integration/sh072-griffon-mk-ii/ORIGINAL-JOINTS.json": "3c0e27cef74c5ea0fd99f1c51a4a883c4e5a9395ac7e63c185fb7dabd852bbcb",
+    "integration/sh072-griffon-mk-ii/ARCHIVE-FIT.json": "d4862767ba6041c05b45ae58addd1db9f59eba9ed83b80c0c6ed1d08b1224748",
+    "integration/sh072-griffon-mk-ii/ARCHIVE-SUPPORT-PREFLIGHT.json": "bf8449ed752dfda934b19f908457f8b05dc5d31638232877b413615125086fc9",
+    "integration/sh072-griffon-mk-ii/candidate-fit.json": "92a3270a6434c13a944a264e225f9b09bb79db459bb020122a16433e22b4f68c",
+    "integration/sh072-griffon-mk-ii/candidate-fidelity.json": "492cbdb4a6810891e137a91ba7f79d7fc76c843dd35eb297566e4f861a8e32df",
+    "integration/sh072-griffon-mk-ii/candidate-support.json": "65796afc1e08e37dd8e37e2397fc738a8a18801a31d293a71f98efbc56829f91",
+    "integration/sh072-griffon-mk-ii/CREATOR-REPLAY.json": "00277f7e59b4b5ce31254b4a15a4d15ed34d5913f1f749de1797db6ca340d0b0",
+    "tools/atomic_asset_output.py": "2d13803823645d3bdea7c855af958eb54d7ebe513ec1bcb0af34e82870164bf0",
+    "tools/banteng_art_mesh.py": "ef5c0f538510486238d69dc301da80026fc93326767b38c50a04756ab9890a09",
+    "tools/encode_goshawk_visual.py": "9e524e9a32a237d71d212c8b5c34ecf12cde5a8e08885b1d03991b95c278f61c",
+    "tools/import_goshawk_envelope_source.py": "14b530725629ee3eaa5b3fd69f01fe00fe371564a1a52cb398d3969142db977e",
+    "tools/measure_banteng_geometry.py": "9356864e227302598fcae4e833ecb706b1ed8a5e600cbb4076b7165dc1e54bea",
+    "tools/measure_goshawk_surface_fit.py": "5407ef1e5fad41810aa95444ca1338fe33a91e5c9857dcb752b4e4cf2fca6d0b",
+    "tools/measure_lanner_geometry.py": "55d13a28602e6ed791adecd85ff43f3c8a7fbe118cf0977272e1747422c2408d",
+    "tools/measure_seriema_courier_geometry.py": "ed138de0a2f857d176a71d42f047daac5f266250c90195df3eb9202fd2c55fbf",
+    "tools/prepare_eagle_cruiser_geometry.py": "a1ea3b5d72f35e1f2932da71afa3ff8a276a504f7309a1086a2b3df35988addc",
+    "tools/prepare_seriema_courier_geometry.py": "179ecc3241c6cd08ca359725b95c7dd958ce31d0a5ab7a132dfcaf344a121bf2",
+    "tools/verify_eagle_cruiser_geometry.py": "cb053ee5873fee62ee456bb3776e98d29b2cbb44c7344599bc617a8579164d43",
+    "tools/vulture_mk_i_exact_fit.py": "479b31f8714a198a82c0e2888b8d19efe46c7b4c43a576b83ab84c571ae738c6",
+    "tools/prepare_griffon_mk_ii_geometry.py": "d99b24ddde960a6aeac84bdee5901df90f90446f39691e6136f88346b6ba42d4",
+    "tools/verify_griffon_mk_ii_geometry.py": "233d53cceaf889e7f99c40aca2ce31ce3df8672186fbc79b82b67344df4d44af",
+    "tools/measure_griffon_mk_ii_geometry.py": "f7080a6dc5451dbfd73d878e3d194f4db87d081ea43946d4db52f54b189af780",
+    "tools/hull_contact_geometry.py": "07606202e6a298ad375a7504991fe6fb93da6a07f9b5cc4a22167bd570b07839",
+    "tools/measure_collar_support_fans.py": "8cf3668680568929c5f6d579d40b5d21c58b35c7bd36581ef7c273b10b84944b",
+    "integration/sh072-griffon-mk-ii/CANDIDATE-FIT-SUPPORT-FANS.json": "f4e700203cec01c0da9c060fe67a7c26abe4e423dd11ea2fa0f5c8cbc4ffbdec",
+    "integration/sh072-griffon-mk-ii/ARCHIVE-FIT-SUPPORT-FANS.json": "c0bfdd85746c8711a914fbc0ac5441e2eb38d0acc0a9fb844817ad6719e77527"
+  }
+}

@@ -1,0 +1,13 @@
+{
+  "schema": 1,
+  "id": "equipment-stock-shield",
+  "undoBefore": [
+    "equipment-hyperspace-drive"
+  ],
+  "undoAfter": [],
+  "kind": "inverse",
+  "manifest": "integration/sh001-mule/STOCK-SHIELD-INVERSE.json",
+  "sha256": "43ddbf3275610d1dd9026a0993a3996670dbefa36b8505f6b0ebf8f14264a6ed",
+  "base": "0a7155698901f1b77846aeafbfcc000a42c62707",
+  "label": "stock shield"
+}

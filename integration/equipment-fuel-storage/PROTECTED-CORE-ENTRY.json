@@ -1,0 +1,13 @@
+{
+  "schema": 1,
+  "id": "equipment-fuel-storage",
+  "undoBefore": [
+    "equipment-stock-shield"
+  ],
+  "undoAfter": [],
+  "kind": "inverse",
+  "manifest": "integration/sh001-mule/FUEL-STORAGE-INVERSE.json",
+  "sha256": "df6ad11baf04b127ed122b7f55e8893b15eba3386f91681fdfe9a79c5d8e90e4",
+  "base": "b99b703964f68812abdaac095c2918a66174e803",
+  "label": "fuel storage"
+}

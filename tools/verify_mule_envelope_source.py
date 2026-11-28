@@ -1,6 +1,5 @@
 """Verify source bytes, old-source preservation and current-gameplay adaptation only."""
 import ast
-import hashlib
 import json
 from pathlib import Path
 import re
@@ -10,15 +9,31 @@ import tomllib
 if not __debug__:
     raise RuntimeError("Mule source verification requires Python assertions")
 
+from protected_core_entries import (
+    CORE_SOURCE, LIB_SOURCE, discover_entries, order_entries, sha, undo_flight_computer,
+)
+
 RUST_TEST_NAME = r'#\[test\]\s*fn\s+(\w+)\('
 FLIGHT_SOURCE = 'flight.rs'
 FLIGHT_PERSISTENCE = 'flight/persistence.rs'
 EMP_TESTS = 'flight/emp/tests.rs'
 ROOT = Path(__file__).resolve().parents[1]
+PROTECTED_CORE = Path('integration/sh001-mule/PROTECTED-CORE.json')
+# Historical generator default and stable fields in the existing JSON result.
+FLIGHT_COMPUTER_BASE = 'fcec61d182b66478846b92390ad17805b0dfc7e0'
+REPORTED_INVERSES = (
+    'equipment-flight-computer', 'equipment-hyperspace-drive', 'equipment-stock-shield',
+    'equipment-fuel-storage', 'equipment-solar-scoops', 'equipment-stock-ecm',
+    'equipment-stock-ecm-field',
+)
 
 
-def sha(data):
-    return hashlib.sha256(data).hexdigest()
+def protected_core_pins(root):
+    pin_bytes = (root / PROTECTED_CORE).read_bytes()
+    assert sha(pin_bytes) == '8a2929218820a8e15536aa554c0f8df56a23981944be85ec1b1947778fd48133'
+    baseline = json.loads(pin_bytes)
+    assert baseline['base'] == '792f4485372ae37d0c1d583ae11229e85932ce2f'
+    return baseline['sha256']
 
 
 def undo_commander_launch(relative, data):
@@ -181,7 +196,7 @@ def undo_goshawk_world(relative, data):
         ],
         FLIGHT_PERSISTENCE: [(b'            goshawk_validation: None,\n', b'')],
         EMP_TESTS: [(b'        goshawk_validation: None,\n', b'')],
-        'lib.rs': [
+        LIB_SOURCE: [
             (b'pub mod goshawk_custom;\n', b''),
             (b'pub use flight::GoshawkCustomApproachSnapshot;\n', b''),
             (b'pub use flight::{GoshawkApproachSnapshot, GoshawkApproachStatus};\n', b''),
@@ -193,49 +208,64 @@ def undo_goshawk_world(relative, data):
     return data
 
 
+MULE_ADDITIONS = {
+    FLIGHT_SOURCE: [
+        b'mod mule_validation;\n',
+        b'    mule_validation: Option<crate::traffic::mule_validation::State>,\n',
+        b'            mule_validation: None,\n',
+        b'        if self.mule_validation.is_some() {\n            return self.step_mule_validation(input);\n        }\n',
+    ],
+    EMP_TESTS: [b'        mule_validation: None,\n'],
+    FLIGHT_PERSISTENCE: [b'            mule_validation: None,\n'],
+    LIB_SOURCE: [b'pub mod mule;\n', b'pub mod goshawk;\n'],
+    'station.rs': [b'mod mule;\n'],
+    'traffic.rs': [
+        b'pub(crate) mod mule_validation;\n',
+        b'pub use mule_validation::{MuleActorSnapshot, MuleValidationRefusal};\n',
+    ],
+}
+
+
+def restore_entries(relative, data, plan):
+    for entry in plan:
+        data = entry.undo(relative, data)
+    return data
+
+
+def restore_historical(relative, data):
+    # Preserve the reviewed historical Mule and pre-Mule intermediate checks.
+    data = undo_goshawk_world(relative, data)
+    data = undo_renas_encounter(relative, data)
+    for addition in MULE_ADDITIONS.get(relative, []):
+        assert data.count(addition) == 1, relative
+        data = data.replace(addition, b'', 1)
+    data = undo_commander_launch(relative, data)
+    if relative == LIB_SOURCE:
+        publication = b'pub mod stag_liner;\n\n'
+        assert data.count(publication) == 1, relative
+        data = data.replace(publication, b'', 1)
+    if relative == FLIGHT_SOURCE:
+        speed_line = b'        if !(0.0..=MAX_SPEED).contains(&self.state.speed) {\n'
+        original_line = b'        if !self.state.speed.is_finite() || !(0.0..=MAX_SPEED).contains(&self.state.speed) {\n'
+        assert data.count(speed_line) == 1, relative
+        data = data.replace(speed_line, original_line, 1)
+    return data
+
+
 def verify_protected_core(root):
-    # Undo the reviewed Mule hooks and the equivalent finite-speed range check.
     # Checking every pre-existing core blob catches unrelated gameplay edits.
-    base = '792f4485372ae37d0c1d583ae11229e85932ce2f'
-    additions = {
-        FLIGHT_SOURCE: [
-            b'mod mule_validation;\n',
-            b'    mule_validation: Option<crate::traffic::mule_validation::State>,\n',
-            b'            mule_validation: None,\n',
-            b'        if self.mule_validation.is_some() {\n            return self.step_mule_validation(input);\n        }\n',
-        ],
-        EMP_TESTS: [b'        mule_validation: None,\n'],
-        FLIGHT_PERSISTENCE: [b'            mule_validation: None,\n'],
-        'lib.rs': [b'pub mod mule;\n', b'pub mod goshawk;\n'],
-        'station.rs': [b'mod mule;\n'],
-        'traffic.rs': [
-            b'pub(crate) mod mule_validation;\n',
-            b'pub use mule_validation::{MuleActorSnapshot, MuleValidationRefusal};\n',
-        ],
-    }
-    pin_bytes = (root / 'integration/sh001-mule/PROTECTED-CORE.json').read_bytes()
-    additions['lib.rs'].append(b'pub mod crow_prototype;\n')
-    assert sha(pin_bytes) == '8a2929218820a8e15536aa554c0f8df56a23981944be85ec1b1947778fd48133'
-    baseline = json.loads(pin_bytes)
-    assert baseline['base'] == base
-    checked = set()
-    for relative, expected in baseline['sha256'].items():
-        data = (root / 'crates/meridian-core/src' / relative).read_bytes()
-        data = undo_goshawk_world(relative, data)
-        data = undo_renas_encounter(relative, data)
-        for addition in additions.get(relative, []):
-            assert data.count(addition) == 1, relative
-            data = data.replace(addition, b'', 1)
-        data = undo_commander_launch(relative, data)
-        if relative == FLIGHT_SOURCE:
-            speed_line = b'        if !(0.0..=MAX_SPEED).contains(&self.state.speed) {\n'
-            original_line = b'        if !self.state.speed.is_finite() || !(0.0..=MAX_SPEED).contains(&self.state.speed) {\n'
-            assert data.count(speed_line) == 1, relative
-            data = data.replace(speed_line, original_line, 1)
+    baseline = protected_core_pins(root)
+    entries = discover_entries(root, baseline)
+    plan = order_entries(entries)
+    unchanged = 0
+    for relative, expected in baseline.items():
+        current = (root / CORE_SOURCE / relative).read_bytes()
+        data = restore_historical(relative, restore_entries(relative, current, plan))
         assert sha(data) == expected, relative
-        checked.add(relative)
-    assert set(additions) <= checked and len(checked) == 115
-    return len(checked), len(additions)
+        unchanged += data == current
+    assert MULE_ADDITIONS.keys() <= baseline.keys() and len(baseline) == 115
+    return (len(baseline), len(MULE_ADDITIONS), unchanged,
+            *(len(entries[name].files) for name in REPORTED_INVERSES))
 
 
 def verify_test_registry(criteria):
@@ -294,14 +324,20 @@ def verify():
     folder = ROOT / 'assets/fleet/sh001'
     verify_inputs(folder)
     groups = verify_geometry(folder)
-    checked, hooks = verify_protected_core(ROOT)
+    checked, hooks, unchanged, flight_computer, hyperspace_drive, stock_shield, fuel_storage, solar_scoops, stock_ecm, stock_ecm_field = verify_protected_core(ROOT)
     counts = verify_historical_bindings(folder, groups)
     return {
         'status': 'PASS_SOURCE_ONLY',
-        # flight.rs is shared by the two changes, and flight/mission.rs is additional.
-        'protectedGameplayCoreFilesUnchanged': checked - hooks - 1,
+        'protectedGameplayCoreFilesUnchanged': unchanged,
         'protectedCoreFilesWithCommanderLaunch': 2,
         'protectedCoreFilesWithMuleHooks': hooks,
+        'protectedCoreFilesWithFlightComputerChanges': flight_computer,
+        'protectedCoreFilesWithHyperspaceDriveChanges': hyperspace_drive,
+        'protectedCoreFilesWithStockShieldChanges': stock_shield,
+        'protectedCoreFilesWithFuelStorageChanges': fuel_storage,
+        'protectedCoreFilesWithSolarScoopsChanges': solar_scoops,
+        'protectedCoreFilesWithStockEcmChanges': stock_ecm,
+        'protectedCoreFilesWithStockEcmFieldChanges': stock_ecm_field,
         'protectedCoreFilesChecked': checked,
         **counts,
         'vertexEncoding': 5344,

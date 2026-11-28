@@ -1,0 +1,13 @@
+{
+  "schema": 1,
+  "id": "equipment-hyperspace-drive",
+  "undoBefore": [
+    "sh063-seriema-courier"
+  ],
+  "undoAfter": [],
+  "kind": "inverse",
+  "manifest": "integration/sh001-mule/HYPERSPACE-DRIVE-INVERSE.json",
+  "sha256": "cfd9f7ce2cc2c35cd37407fb7b4483d821e9e9777d7fdd2def6845c6aefa9b00",
+  "base": "7ecc9794db40b2207db5e66a96e7d45b1a84c9c4",
+  "label": "hyperspace drive"
+}

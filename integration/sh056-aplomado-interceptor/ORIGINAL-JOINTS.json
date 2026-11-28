@@ -1,0 +1,272 @@
+[
+  {
+    "name": "canopy-to-central-hull",
+    "pointMetres": [
+      0.19,
+      1.31,
+      9.31
+    ],
+    "originalFaces": {
+      "detailed": {
+        "canopy": {
+          "faceRange": [
+            1200,
+            2160
+          ],
+          "hitCountsAboveBelow": [
+            1,
+            1
+          ]
+        },
+        "central-hull": {
+          "faceRange": [
+            0,
+            384
+          ],
+          "hitCountsAboveBelow": [
+            1,
+            1
+          ]
+        }
+      },
+      "native": {
+        "canopy": {
+          "faceRange": [
+            112,
+            120
+          ],
+          "hitCountsAboveBelow": [
+            1,
+            1
+          ]
+        },
+        "central-hull": {
+          "faceRange": [
+            0,
+            32
+          ],
+          "hitCountsAboveBelow": [
+            1,
+            1
+          ]
+        }
+      }
+    }
+  },
+  {
+    "name": "port-wing-to-central-hull",
+    "pointMetres": [
+      -0.9,
+      -0.29,
+      -10.21
+    ],
+    "originalFaces": {
+      "detailed": {
+        "port-wing": {
+          "faceRange": [
+            384,
+            396
+          ],
+          "hitCountsAboveBelow": [
+            1,
+            1
+          ]
+        },
+        "central-hull": {
+          "faceRange": [
+            0,
+            384
+          ],
+          "hitCountsAboveBelow": [
+            1,
+            1
+          ]
+        }
+      },
+      "native": {
+        "port-wing": {
+          "faceRange": [
+            32,
+            44
+          ],
+          "hitCountsAboveBelow": [
+            1,
+            1
+          ]
+        },
+        "central-hull": {
+          "faceRange": [
+            0,
+            32
+          ],
+          "hitCountsAboveBelow": [
+            1,
+            1
+          ]
+        }
+      }
+    }
+  },
+  {
+    "name": "port-fin-to-wing",
+    "pointMetres": [
+      -7.57,
+      -0.29,
+      -17.09
+    ],
+    "originalFaces": {
+      "detailed": {
+        "port-fin": {
+          "faceRange": [
+            396,
+            408
+          ],
+          "hitCountsAboveBelow": [
+            1,
+            1
+          ]
+        },
+        "port-wing": {
+          "faceRange": [
+            384,
+            396
+          ],
+          "hitCountsAboveBelow": [
+            1,
+            1
+          ]
+        }
+      },
+      "native": {
+        "port-fin": {
+          "faceRange": [
+            44,
+            56
+          ],
+          "hitCountsAboveBelow": [
+            1,
+            1
+          ]
+        },
+        "port-wing": {
+          "faceRange": [
+            32,
+            44
+          ],
+          "hitCountsAboveBelow": [
+            1,
+            1
+          ]
+        }
+      }
+    }
+  },
+  {
+    "name": "starboard-wing-to-central-hull",
+    "pointMetres": [
+      0.9,
+      -0.29,
+      -10.21
+    ],
+    "originalFaces": {
+      "detailed": {
+        "starboard-wing": {
+          "faceRange": [
+            792,
+            804
+          ],
+          "hitCountsAboveBelow": [
+            1,
+            1
+          ]
+        },
+        "central-hull": {
+          "faceRange": [
+            0,
+            384
+          ],
+          "hitCountsAboveBelow": [
+            1,
+            1
+          ]
+        }
+      },
+      "native": {
+        "starboard-wing": {
+          "faceRange": [
+            72,
+            84
+          ],
+          "hitCountsAboveBelow": [
+            1,
+            1
+          ]
+        },
+        "central-hull": {
+          "faceRange": [
+            0,
+            32
+          ],
+          "hitCountsAboveBelow": [
+            1,
+            1
+          ]
+        }
+      }
+    }
+  },
+  {
+    "name": "starboard-fin-to-wing",
+    "pointMetres": [
+      7.57,
+      -0.29,
+      -17.09
+    ],
+    "originalFaces": {
+      "detailed": {
+        "starboard-fin": {
+          "faceRange": [
+            804,
+            816
+          ],
+          "hitCountsAboveBelow": [
+            1,
+            1
+          ]
+        },
+        "starboard-wing": {
+          "faceRange": [
+            792,
+            804
+          ],
+          "hitCountsAboveBelow": [
+            1,
+            1
+          ]
+        }
+      },
+      "native": {
+        "starboard-fin": {
+          "faceRange": [
+            84,
+            96
+          ],
+          "hitCountsAboveBelow": [
+            1,
+            1
+          ]
+        },
+        "starboard-wing": {
+          "faceRange": [
+            72,
+            84
+          ],
+          "hitCountsAboveBelow": [
+            1,
+            1
+          ]
+        }
+      }
+    }
+  }
+]

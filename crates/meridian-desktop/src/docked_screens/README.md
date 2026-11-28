@@ -33,7 +33,7 @@ Root owns the binding map. Translate physical keys into `Key`, typed text into `
 | `Close` | Close the station interface, without launching, quitting or resetting a commander |
 | `ReviewRoute` | Ask the actual navigation owner to review the selected supported system |
 | `ReviewBodyRoute` | Resolve the actual provider's `(system, ordinal)` body identity and review navigation to its physical position |
-| `ReviewCommodity` | Review one native ordinary-market buy/sell using the actual selected `CommodityId` |
+| `ReviewCommodity` | Review an exact native-unit quantity using the actual selected `CommodityId`; one confirmation is atomic |
 | `InspectEquipmentSlot` | Reproject equipment for that real slot; no purchase or fitting effect |
 | `ReviewEquipment` | Resolve the actual node, owned instance and destination slot; obtain a real buy/fit/store/configuration review |
 | `ReviewShipExchange` | Obtain a real admitted hull/ownership/exchange proposal; source flyability is insufficient |

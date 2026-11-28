@@ -1,0 +1,557 @@
+{
+  "detailed": {
+    "pressure-hull-to-bore-shaft": {
+      "pointMetres": [
+        0.6966943,
+        -3.5032969,
+        -2.823136
+      ],
+      "parts": {
+        "pressure-hull": {
+          "faceRange": [
+            0,
+            960
+          ],
+          "hitCountsAboveBelow": [
+            1,
+            1
+          ]
+        },
+        "bore-shaft": {
+          "faceRange": [
+            2496,
+            2508
+          ],
+          "hitCountsAboveBelow": [
+            1,
+            1
+          ]
+        }
+      }
+    },
+    "bore-shaft-to-bore-head": {
+      "pointMetres": [
+        0.6966943,
+        -3.5032969,
+        10.6530592
+      ],
+      "parts": {
+        "bore-shaft": {
+          "faceRange": [
+            2496,
+            2508
+          ],
+          "hitCountsAboveBelow": [
+            1,
+            1
+          ]
+        },
+        "bore-head": {
+          "faceRange": [
+            2508,
+            2764
+          ],
+          "hitCountsAboveBelow": [
+            1,
+            1
+          ]
+        }
+      }
+    },
+    "pressure-hull-to-canopy": {
+      "pointMetres": [
+        -1.8470134,
+        3.7305222,
+        -4.7022709
+      ],
+      "parts": {
+        "pressure-hull": {
+          "faceRange": [
+            0,
+            960
+          ],
+          "hitCountsAboveBelow": [
+            1,
+            1
+          ]
+        },
+        "canopy": {
+          "faceRange": [
+            3556,
+            4516
+          ],
+          "hitCountsAboveBelow": [
+            1,
+            1
+          ]
+        }
+      }
+    },
+    "port-frame-stay-to-pressure-hull": {
+      "pointMetres": [
+        -3.1382758,
+        -1.4210514,
+        -2.1661202
+      ],
+      "parts": {
+        "port-frame-stay": {
+          "faceRange": [
+            2764,
+            2776
+          ],
+          "hitCountsAboveBelow": [
+            1,
+            1
+          ]
+        },
+        "pressure-hull": {
+          "faceRange": [
+            0,
+            960
+          ],
+          "hitCountsAboveBelow": [
+            1,
+            1
+          ]
+        }
+      }
+    },
+    "starboard-frame-stay-to-pressure-hull": {
+      "pointMetres": [
+        3.9122261,
+        -0.7402426,
+        -2.0677309
+      ],
+      "parts": {
+        "starboard-frame-stay": {
+          "faceRange": [
+            3160,
+            3172
+          ],
+          "hitCountsAboveBelow": [
+            1,
+            1
+          ]
+        },
+        "pressure-hull": {
+          "faceRange": [
+            0,
+            960
+          ],
+          "hitCountsAboveBelow": [
+            1,
+            1
+          ]
+        }
+      }
+    },
+    "port-frame-stay-to-roll-frame": {
+      "pointMetres": [
+        -8.2434918,
+        -0.9818478,
+        -0.4058612
+      ],
+      "parts": {
+        "port-frame-stay": {
+          "faceRange": [
+            2764,
+            2776
+          ],
+          "hitCountsAboveBelow": [
+            1,
+            1
+          ]
+        },
+        "roll-frame": {
+          "faceRange": [
+            960,
+            2496
+          ],
+          "hitCountsAboveBelow": [
+            1,
+            1
+          ]
+        }
+      }
+    },
+    "starboard-frame-stay-to-roll-frame": {
+      "pointMetres": [
+        8.4451449,
+        -1.1053474,
+        0.1689501
+      ],
+      "parts": {
+        "starboard-frame-stay": {
+          "faceRange": [
+            3160,
+            3172
+          ],
+          "hitCountsAboveBelow": [
+            1,
+            1
+          ]
+        },
+        "roll-frame": {
+          "faceRange": [
+            960,
+            2496
+          ],
+          "hitCountsAboveBelow": [
+            1,
+            1
+          ]
+        }
+      }
+    },
+    "pressure-hull-to-port-nozzle": {
+      "pointMetres": [
+        -1.0735375,
+        -1.366741,
+        -11.4035777
+      ],
+      "parts": {
+        "pressure-hull": {
+          "faceRange": [
+            0,
+            960
+          ],
+          "hitCountsAboveBelow": [
+            1,
+            1
+          ]
+        },
+        "port-nozzle": {
+          "faceRange": [
+            2776,
+            3160
+          ],
+          "hitCountsAboveBelow": [
+            1,
+            1
+          ]
+        }
+      }
+    },
+    "pressure-hull-to-starboard-nozzle": {
+      "pointMetres": [
+        1.891218,
+        -1.7809834,
+        -11.381308
+      ],
+      "parts": {
+        "pressure-hull": {
+          "faceRange": [
+            0,
+            960
+          ],
+          "hitCountsAboveBelow": [
+            1,
+            1
+          ]
+        },
+        "starboard-nozzle": {
+          "faceRange": [
+            3172,
+            3556
+          ],
+          "hitCountsAboveBelow": [
+            1,
+            1
+          ]
+        }
+      }
+    },
+    "canopy-to-canopy-ridge": {
+      "pointMetres": [
+        -0.0994546,
+        5.8098483,
+        -4.5056351
+      ],
+      "parts": {
+        "canopy": {
+          "faceRange": [
+            3556,
+            4516
+          ],
+          "hitCountsAboveBelow": [
+            1,
+            1
+          ]
+        },
+        "canopy-ridge": {
+          "faceRange": [
+            4516,
+            4528
+          ],
+          "hitCountsAboveBelow": [
+            1,
+            1
+          ]
+        }
+      }
+    }
+  },
+  "native": {
+    "pressure-hull-to-bore-shaft": {
+      "pointMetres": [
+        0.6966943,
+        -3.5032969,
+        -2.823136
+      ],
+      "parts": {
+        "pressure-hull": {
+          "faceRange": [
+            0,
+            48
+          ],
+          "hitCountsAboveBelow": [
+            1,
+            1
+          ]
+        },
+        "bore-shaft": {
+          "faceRange": [
+            112,
+            124
+          ],
+          "hitCountsAboveBelow": [
+            1,
+            1
+          ]
+        }
+      }
+    },
+    "bore-shaft-to-bore-head": {
+      "pointMetres": [
+        0.6966943,
+        -3.5032969,
+        10.6530592
+      ],
+      "parts": {
+        "bore-shaft": {
+          "faceRange": [
+            112,
+            124
+          ],
+          "hitCountsAboveBelow": [
+            1,
+            1
+          ]
+        },
+        "bore-head": {
+          "faceRange": [
+            124,
+            148
+          ],
+          "hitCountsAboveBelow": [
+            1,
+            1
+          ]
+        }
+      }
+    },
+    "pressure-hull-to-canopy": {
+      "pointMetres": [
+        -0.0210037,
+        4.2166318,
+        -5.8105215
+      ],
+      "parts": {
+        "pressure-hull": {
+          "faceRange": [
+            0,
+            48
+          ],
+          "hitCountsAboveBelow": [
+            1,
+            1
+          ]
+        },
+        "canopy": {
+          "faceRange": [
+            204,
+            212
+          ],
+          "hitCountsAboveBelow": [
+            1,
+            1
+          ]
+        }
+      }
+    },
+    "port-frame-stay-to-pressure-hull": {
+      "pointMetres": [
+        -3.1382758,
+        -1.4210514,
+        -2.1661202
+      ],
+      "parts": {
+        "port-frame-stay": {
+          "faceRange": [
+            148,
+            160
+          ],
+          "hitCountsAboveBelow": [
+            1,
+            1
+          ]
+        },
+        "pressure-hull": {
+          "faceRange": [
+            0,
+            48
+          ],
+          "hitCountsAboveBelow": [
+            1,
+            1
+          ]
+        }
+      }
+    },
+    "starboard-frame-stay-to-pressure-hull": {
+      "pointMetres": [
+        3.9122261,
+        -0.7402426,
+        -2.0677309
+      ],
+      "parts": {
+        "starboard-frame-stay": {
+          "faceRange": [
+            176,
+            188
+          ],
+          "hitCountsAboveBelow": [
+            1,
+            1
+          ]
+        },
+        "pressure-hull": {
+          "faceRange": [
+            0,
+            48
+          ],
+          "hitCountsAboveBelow": [
+            1,
+            1
+          ]
+        }
+      }
+    },
+    "port-frame-stay-to-roll-frame": {
+      "pointMetres": [
+        -8.4873403,
+        -0.9604026,
+        0.0953848
+      ],
+      "parts": {
+        "port-frame-stay": {
+          "faceRange": [
+            148,
+            160
+          ],
+          "hitCountsAboveBelow": [
+            1,
+            1
+          ]
+        },
+        "roll-frame": {
+          "faceRange": [
+            48,
+            112
+          ],
+          "hitCountsAboveBelow": [
+            1,
+            1
+          ]
+        }
+      }
+    },
+    "starboard-frame-stay-to-roll-frame": {
+      "pointMetres": [
+        7.8801683,
+        -1.176235,
+        0.0877201
+      ],
+      "parts": {
+        "starboard-frame-stay": {
+          "faceRange": [
+            176,
+            188
+          ],
+          "hitCountsAboveBelow": [
+            1,
+            1
+          ]
+        },
+        "roll-frame": {
+          "faceRange": [
+            48,
+            112
+          ],
+          "hitCountsAboveBelow": [
+            3,
+            1
+          ]
+        }
+      }
+    },
+    "pressure-hull-to-port-nozzle": {
+      "pointMetres": [
+        -1.5681391,
+        -1.048156,
+        -11.4634071
+      ],
+      "parts": {
+        "pressure-hull": {
+          "faceRange": [
+            0,
+            48
+          ],
+          "hitCountsAboveBelow": [
+            1,
+            1
+          ]
+        },
+        "port-nozzle": {
+          "faceRange": [
+            160,
+            176
+          ],
+          "hitCountsAboveBelow": [
+            1,
+            1
+          ]
+        }
+      }
+    },
+    "pressure-hull-to-starboard-nozzle": {
+      "pointMetres": [
+        1.3475032,
+        -1.1538732,
+        -11.5536619
+      ],
+      "parts": {
+        "pressure-hull": {
+          "faceRange": [
+            0,
+            48
+          ],
+          "hitCountsAboveBelow": [
+            1,
+            1
+          ]
+        },
+        "starboard-nozzle": {
+          "faceRange": [
+            188,
+            204
+          ],
+          "hitCountsAboveBelow": [
+            1,
+            1
+          ]
+        }
+      }
+    }
+  }
+}

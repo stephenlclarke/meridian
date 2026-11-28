@@ -1,0 +1,12 @@
+{
+  "schema": 1,
+  "id": "sh148-morepork",
+  "undoBefore": [
+    "sh147-hawk"
+  ],
+  "undoAfter": [],
+  "kind": "declaration",
+  "module": "morepork",
+  "before": "pub mod moose_clipper;\n",
+  "after": "pub mod mule;\n"
+}

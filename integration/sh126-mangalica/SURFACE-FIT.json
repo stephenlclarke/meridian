@@ -1,0 +1,101 @@
+{
+  "nominalPaddingMetres": 0.02,
+  "minimumRefinementTargetsMillimetres": {
+    "detailed": 2400,
+    "native": 4500
+  },
+  "fullUpperMillimetres": {
+    "detailed": 2357,
+    "native": 4496
+  },
+  "pieces": {
+    "forward pressure body": {
+      "detailed": 2331,
+      "native": 4496
+    },
+    "aft cargo body": {
+      "detailed": 2175,
+      "native": 4330
+    },
+    "port nacelle": {
+      "detailed": 1308,
+      "native": 3667
+    },
+    "port nozzle": {
+      "detailed": 2357,
+      "native": 3325
+    },
+    "starboard nacelle": {
+      "detailed": 812,
+      "native": 3645
+    },
+    "starboard nozzle": {
+      "detailed": 2357,
+      "native": 3325
+    },
+    "canopy": {
+      "detailed": 435,
+      "native": 1409
+    },
+    "canopy ridge": {
+      "detailed": 339,
+      "native": 1842
+    },
+    "port service line": {
+      "detailed": 260,
+      "native": 4410
+    },
+    "port instrument housing": {
+      "detailed": 668,
+      "native": 3021
+    },
+    "port louvre 1": {
+      "detailed": 249,
+      "native": 2411
+    },
+    "port louvre 2": {
+      "detailed": 249,
+      "native": 2420
+    },
+    "port louvre 3": {
+      "detailed": 249,
+      "native": 2429
+    },
+    "port louvre 4": {
+      "detailed": 249,
+      "native": 2438
+    },
+    "port louvre 5": {
+      "detailed": 249,
+      "native": 2447
+    },
+    "starboard service line": {
+      "detailed": 260,
+      "native": 4479
+    },
+    "starboard instrument housing": {
+      "detailed": 668,
+      "native": 3021
+    },
+    "starboard louvre 1": {
+      "detailed": 249,
+      "native": 2391
+    },
+    "starboard louvre 2": {
+      "detailed": 249,
+      "native": 2397
+    },
+    "starboard louvre 3": {
+      "detailed": 249,
+      "native": 2403
+    },
+    "starboard louvre 4": {
+      "detailed": 249,
+      "native": 2409
+    },
+    "starboard louvre 5": {
+      "detailed": 249,
+      "native": 2415
+    }
+  }
+}

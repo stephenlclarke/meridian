@@ -1,0 +1,187 @@
+{
+  "hull": "SH048 Lanner",
+  "scope": "Original catalogue inspection and geometry queries",
+  "frozenSources": "integration/sh048-lanner/FROZEN-SOURCES.json",
+  "source": "assets/fleet/sh048/SOURCE-GEOMETRY.json",
+  "originalAccess": {
+    "runtimeCatalogue": {
+      "playerFlyable": false,
+      "normalPurchaseEligible": false
+    },
+    "r3DesignContract": {
+      "playerFlyable": true,
+      "purchasePolicy": "blueprintFabrication"
+    }
+  },
+  "originalScaleRatio": [
+    5000000,
+    597893
+  ],
+  "archivedDetailed": {
+    "vertices": 1476,
+    "faces": 2696,
+    "parts": 64
+  },
+  "archivedNative": {
+    "vertices": 504,
+    "faces": 936,
+    "parts": 18,
+    "budgetAccepted": false
+  },
+  "nativeCandidate": {
+    "source": "assets/fleet/sh048/SH048-candidate.json",
+    "bytes": 173836,
+    "sha256": "23fcbce1da185ab97a296712fc550d10f040130b8e5715936b0331170d3f4b47",
+    "vertices": 264,
+    "faces": 456,
+    "parts": 18,
+    "faceLimit": 512,
+    "byteExactOriginalParts": 11,
+    "resampledCurvedParts": 7,
+    "archiveToCandidateUpperMillimetres": 682,
+    "candidateToArchiveUpperMillimetres": 631,
+    "frozenRecipe": {
+      "bytes": 8971,
+      "sha256": "30249df7a70a38087ec7be15238b23d1f85e4848fcaac5aa38c4ad019de864a7"
+    },
+    "frozenBlueprint": {
+      "bytes": 4860,
+      "sha256": "c6070f060c1b7b91b24b1801083fd8da45916923dc54e672bce79a0d4035c82a"
+    },
+    "frozenTests": {
+      "bytes": 8092,
+      "sha256": "c54914bb5235205cae87780292b8422ed4a123c7ddaf4b57576fceb3fc9ba112"
+    },
+    "recipeTestsPassing": 3,
+    "recipeTestLog": {
+      "bytes": 617,
+      "sha256": "123ccaec91d31e138c7731662e9321ce527fb0c253cd26ae876af757507af339"
+    }
+  },
+  "supportGroups": 75,
+  "minimumRouteClearanceMillimetres": 571,
+  "fitUpperMillimetres": {
+    "detailed": 1399,
+    "archiveNative": 1395,
+    "candidateNative": 1579
+  },
+  "referenceTriangulation": {
+    "path": "integration/sh048-lanner/REFERENCE-FANS.json",
+    "scope": "Derived whole reference triangulation for exact replay; no original artwork or stored numerical bounds",
+    "sourceRevision": "ce24795b2e08c54c71f63cbb5c1e061a9f3dcff6",
+    "sourceMeasurementSha256": "cabbaf17ff7efdbcbee9a1fba67c7edafd59dceb8e97f367824a51c134479992",
+    "sourceDiagnosticScriptSha256": "55397f4513a502708ee534dd8cecf9cedbbf5cbb594b00bc3d3395bfba1a67f1",
+    "sourceDiagnosticOutputSha256": "489a52a30b1c20cb647f6fac4954b395f2b51f4a6567731ba383537b0c32191c",
+    "certificateExtractionScriptSha256": "36d138ba1a0d94e58154c35020717c12f9e057a40107d1be38c686a133e5147e",
+    "sourceEnvironment": {"platform": "macOS arm64", "python": "3.14.7", "numpy": "2.5.5", "scipy": "1.18.1", "trimesh": "5.2.1"},
+    "archive": {"supports": 75, "triangles": 2744, "supportPointIndices": 2200},
+    "candidate": {"supports": 75, "triangles": 2644, "supportPointIndices": 1916},
+    "validation": "Bind complete scaled point streams, memberships and support-local indices, then prove the original outward fan and unchanged radial tolerance before recomputing every bound."
+  },
+  "engineering": {
+    "sourceReference": "finite-intrinsic-empty-lanner",
+    "massKg": 22321
+  },
+  "replayPins": {
+    "integration/sh048-lanner/FROZEN-SOURCES.json": "aa1da4eaf7f58816bf4f5b5dbf431f5dffa86072405d717df4d129b1e1653a09",
+    "integration/sh048-lanner/ORIGINAL-OWNERSHIP.json": "ffadcbf087c16b54f922fe3fb1ed8b568cec2034194c56e2f3233f5134dd7f29",
+    "integration/sh048-lanner/ARCHIVE-SUPPORT-PREFLIGHT.json": "9bfeabfeec3da0d95f79994f94101513e4994cb1227a0a52ee0393325fe9d7a3",
+    "integration/sh048-lanner/candidate-support.json": "c4531642192b5d589fa3e56d4a441eb1f1990092bddbc296e01cfeb71c10ecc7",
+    "integration/sh048-lanner/LANNER-STUDIO.json": "70acd3e20bab8507774ad4a30c2a7c5b828fcc9738cf8ac5d7927fa5a41c578e",
+    "integration/sh048-lanner/CONTACT-RESULT.json": "fa31cea1dec6a5a996b95e2132d2ef5163c0f45d623a872bc3b794414c9cea06",
+    "integration/sh048-lanner/ARCHIVE-FIT.json": "a740d04e11ef82ed12d27d16a820236c3083e6a7a720a6947b484eaf5c26f116",
+    "integration/sh048-lanner/candidate-fit.json": "a7918695d93af72a5ce66eb26671665596e733f47cb6a89570f78b5dd36fd057",
+    "integration/sh048-lanner/candidate-fidelity.json": "279557e8470d599e4a342b328b4eb3e63597cf7551fcab95e711b465d1e7d231",
+    "integration/sh048-lanner/REFERENCE-FANS.json": "a5d99c432b6dd1f9efdced1935dd501478199878177da440a0a776256b25f5d7",
+    "tools/atomic_asset_output.py": "2d13803823645d3bdea7c855af958eb54d7ebe513ec1bcb0af34e82870164bf0",
+    "tools/prepare_eagle_cruiser_geometry.py": "a1ea3b5d72f35e1f2932da71afa3ff8a276a504f7309a1086a2b3df35988addc",
+    "tools/encode_goshawk_visual.py": "9e524e9a32a237d71d212c8b5c34ecf12cde5a8e08885b1d03991b95c278f61c",
+    "tools/import_goshawk_envelope_source.py": "14b530725629ee3eaa5b3fd69f01fe00fe371564a1a52cb398d3969142db977e",
+    "tools/measure_goshawk_surface_fit.py": "5407ef1e5fad41810aa95444ca1338fe33a91e5c9857dcb752b4e4cf2fca6d0b",
+    "tools/vulture_mk_i_exact_fit.py": "479b31f8714a198a82c0e2888b8d19efe46c7b4c43a576b83ab84c571ae738c6",
+    "tools/verify_eagle_cruiser_geometry.py": "cb053ee5873fee62ee456bb3776e98d29b2cbb44c7344599bc617a8579164d43",
+    "tools/lanner_art_mesh.py": "f5cb59dcc0940ee02e039ba5218eb42c638ba0fed692f4b2216699620aba334b",
+    "tools/prepare_lanner_geometry.py": "3e1dc0ba15e493f8d53f385c7e2e166420e0082228b355547b3810fb028cdbc8",
+    "tools/verify_lanner_geometry.py": "5abc5160c6e3ebcfeccbf1c7a4d8fad69ce73aa126df911f4aa63a631506b576",
+    "tools/measure_lanner_geometry.py": "55d13a28602e6ed791adecd85ff43f3c8a7fbe118cf0977272e1747422c2408d",
+    "tools/hull_contact_geometry.py": "07606202e6a298ad375a7504991fe6fb93da6a07f9b5cc4a22167bd570b07839"
+  },
+  "byteReplay": {
+    "host": "SteveMBA",
+    "startedUtc": "2026-11-24T17:27:25Z",
+    "finishedUtc": "2026-11-24T17:28:09Z",
+    "log": {
+      "bytes": 697,
+      "sha256": "3b04d850bc204a0e39086f2773ed76b3b061992de11913eeaa029e2214dfdad6"
+    },
+    "fitDependencies": {
+      "python": "3.14.3",
+      "numpy": "2.5.5",
+      "scipy": "1.18.1",
+      "trimesh": "5.2.1",
+      "rtree": "1.4.1"
+    },
+    "commands": [
+      "python3 -B tools/prepare_lanner_geometry.py --check",
+      "python3 -B tools/verify_lanner_geometry.py | cmp - integration/sh048-lanner/CONTACT-RESULT.json",
+      "python3 -B tools/measure_lanner_geometry.py archive-fit | cmp - integration/sh048-lanner/ARCHIVE-FIT.json",
+      "python3 -B tools/measure_lanner_geometry.py candidate-fit | cmp - integration/sh048-lanner/candidate-fit.json",
+      "python3 -B tools/measure_lanner_geometry.py candidate-fidelity | cmp - integration/sh048-lanner/candidate-fidelity.json"
+    ]
+  },
+  "hullStudio": {
+    "definition": "integration/sh048-lanner/LANNER-STUDIO.json",
+    "bytes": 386725,
+    "sha256": "70acd3e20bab8507774ad4a30c2a7c5b828fcc9738cf8ac5d7927fa5a41c578e",
+    "loaderRevision": "27121e66ba37a29781135b56924a9d6e7f38a70a",
+    "supports": 75,
+    "probes": 7,
+    "signedInstalledExport": {
+      "status": "PASS",
+      "scope": "Signed installed Studio offline visual artwork export",
+      "bundleIdentifier": "io.xyzzy.meridian.hullstudio",
+      "bundleVersion": "0.0.0",
+      "codeDirectoryHash": "93938bda9242ebdff508bfb9e16b3cdf83c0a200",
+      "developerIdTeam": "4MEB7MUTAV",
+      "signatureVerification": "deep strict",
+      "definition": {
+        "bytes": 386725,
+        "sha256": "70acd3e20bab8507774ad4a30c2a7c5b828fcc9738cf8ac5d7927fa5a41c578e"
+      },
+      "exportExitStatuses": [
+        0,
+        0
+      ],
+      "exportMatchesDefinitionExceptTrailingLf": true,
+      "detailedTriangles": 2696,
+      "candidateNativeTriangles": 456,
+      "archivedNativeTriangles": 936,
+      "originalScaleRatio": [
+        5000000,
+        597893
+      ],
+      "receiptFiles": {
+        "LANNER.hull.json": {
+          "bytes": 386724,
+          "sha256": "ef558813076b9bc0e6c77e77a151bcf8a0103ff1d29ceb849390d7d65479a32e"
+        },
+        "LANNER-repeat.hull.json": {
+          "bytes": 386724,
+          "sha256": "ef558813076b9bc0e6c77e77a151bcf8a0103ff1d29ceb849390d7d65479a32e"
+        },
+        "studio.stdout.json": {
+          "bytes": 121988,
+          "sha256": "20e1e372b75d12e6a81c0aab2b381548a2aec93e0d5d6d257ef2bff5994caa2a"
+        },
+        "studio-repeat.stdout.json": {
+          "bytes": 121988,
+          "sha256": "20e1e372b75d12e6a81c0aab2b381548a2aec93e0d5d6d257ef2bff5994caa2a"
+        },
+        "codesign.log": {
+          "bytes": 14189,
+          "sha256": "6d27a847f7fda12cab52f38fc9fd3871f503faa73cbbc1131223862db6a8876a"
+        }
+      }
+    }
+  }
+}

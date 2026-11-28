@@ -1,0 +1,13 @@
+{
+  "schema": 1,
+  "id": "sh070-baza-mk-ii",
+  "undoBefore": [
+    "sh069-baza-fighter",
+    "showroom-studio-followup"
+  ],
+  "undoAfter": [],
+  "kind": "declaration",
+  "module": "baza_mk_ii",
+  "before": "pub mod baza_fighter;\n",
+  "after": "pub mod caracal_scout;\n"
+}

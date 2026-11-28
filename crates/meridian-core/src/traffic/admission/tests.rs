@@ -108,7 +108,7 @@ fn preexisting_trader_physically_yields_before_unmodified_continuous_player_swee
             SystemId::AVENOR,
             player.position,
             next.position,
-            radius
+            data.player_npc_clearance()
         ));
         let before = some(traffic.actors[0]);
         (traffic, market) = ok(traffic.prepare_step(context(&data, tick, player, next), &market));
@@ -133,7 +133,7 @@ fn preexisting_trader_physically_yields_before_unmodified_continuous_player_swee
         SystemId::AVENOR,
         sub(yielded.position, Vec3::new(0.0, 0.0, 1000.0)),
         add(yielded.position, Vec3::new(0.0, 0.0, 1000.0)),
-        radius
+        data.player_npc_clearance()
     ));
     ok(traffic.validate(12005, last, 0, &data, &market));
 }

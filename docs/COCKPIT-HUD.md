@@ -4,6 +4,16 @@ The cockpit adds separate shield, fuel, laser heat, speed and four-bank energy i
 
 The layout uses the frozen L337 cockpit as a style reference: a yellow separator, left resource gauges, central green scanner and right flight/energy instruments. Labels use logical points; Retina backing resolution does not change cockpit proportions. The original outline geometry is retained for the missile icons. Existing independently drawn Meridian glyphs remain; this change imports no L337 bitmap-font table or Elite/Oolite art. [The reference manifest](../assets/legacy/hud-reference-manifest.json) records the immutable source hashes and provenance limits. Source presence does not establish authorship or permission for unrelated historical content.
 
+## Ordinary flight viewport
+
+The cockpit camera sits at the pilot’s position in all four views. The scanner and gauges sit below the flight scene. The selected target keeps its own cyan marker. The isolated Medusa inspection preview still has an exterior view.
+
+The sight marks the centre of the flight scene and follows the action bound to **Z**. During automatic work it continues to identify the pilot’s mounted laser. The target readout reports the automatic operation. Pulse has single arms, Beam has parallel bars, Military has chevrons and Naval has crossbars. Mining has an open diamond, the salvage cutter has hooked jaws and the scoop has stepped corners. The scoop symbol identifies the active collection tool. Ore still enters through the physical lower aperture. Looking away from the active mount clears its sight.
+
+Press **H**, then **I**, to inspect flight status, including the fitted or empty laser mount, EMP, test fuel settings, manual assistance, practice, docking, jump countdown and current rock contact when available. **Escape** closes the card. Input feedback and pilot-opened reviews remain visible when needed.
+
+Flight notices appear below the instruments by default. Open **H**, then **I**, and press **N** to cycle through **Instruments**, **Upper left**, **Upper right** and **Status only**. The choice applies for the current app session. Flight Status retains the latest notice after it expires. Corner notices return to the instrument footer while target guidance is visible. Contact warnings and terminal recovery instructions always use the footer.
+
 ## Published scope
 
 [Preview 7 v0.7.0-preview.1](https://github.com/stephenlclarke/meridian/releases/tag/v0.7.0-preview.1) includes the joined HUD, nine-pylon feed, NPC scanner and contextual Help. All three owned platforms passed 603 Rust tests and 99 Python tests on compiled `076639d`; final-head/main coverage and exact-main zero-issue Sonar passed before publication. The new signed Mac binary passed bounded title/System Help and cold Continue; earlier `c98fc86` native checks cover all five station cards, fitted flight Help and manual pause. These are separate immutable runs. The sections below retain the original authoring context; their old UNRUN and integration-pending statements do not describe the published source. Native compact resizing, precise ticks, original screenshot comparison, FPS/race and leak cure remain unobserved or unresolved.

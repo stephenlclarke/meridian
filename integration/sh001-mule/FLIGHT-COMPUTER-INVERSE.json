@@ -1,0 +1,552 @@
+{
+  "base": "fcec61d182b66478846b92390ad17805b0dfc7e0",
+  "files": {
+    "equipment.rs": {
+      "beforeSHA256": "1d82d363f03f293e8ef8ba5c3d8916802fa3e5b21ad6d41c9421ea5f70e08ffe",
+      "afterSHA256": "03f18b8069ac215897ad718687b65d947d3f476d583d800fedca929e43b5c42f",
+      "hunks": [
+        {
+          "offset": 353,
+          "before": "",
+          "after": "\n/// Original fictional catalogue grades, ordered for inventory progression.\n#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]\n#[repr(u8)]\npub enum TargetingTier {\n    Basic = 1,\n    Advanced,\n    Docking,\n    Identification,\n    Pirate,\n    Military,\n}\n\nimpl TargetingTier {\n    pub const ALL: [Self; 6] = [\n        Self::Basic,\n        Self::Advanced,\n        Self::Docking,\n        Self::Identification,\n        Self::Pirate,\n        Self::Military,\n    ];\n    pub const fn label(self) -> &'static str {\n        match self {\n            Self::Basic => \"Basic\",\n            Self::Advanced => \"Advanced\",\n            Self::Docking => \"Docking\",\n            Self::Identification => \"Identification\",\n            Self::Pirate => \"Pirate\",\n            Self::Military => \"Military\",\n        }\n    }\n    pub const fn price_tenths(self) -> u32 {\n        [8_000, 20_000, 40_000, 60_000, 100_000, 120_000][self as usize - 1]\n    }\n    /// Displayed, one-based station technology levels.\n    pub const fn required_technology(self) -> u8 {\n        [4, 5, 7, 9, 10, 11][self as usize - 1]\n    }\n    pub const fn predecessor(self) -> Option<Self> {\n        match self {\n            Self::Basic => None,\n            Self::Advanced => Some(Self::Basic),\n            Self::Docking => Some(Self::Advanced),\n            Self::Identification => Some(Self::Docking),\n            Self::Pirate => Some(Self::Identification),\n            Self::Military => Some(Self::Pirate),\n        }\n    }\n}\n\n/// Usable work targeting requires both the independent fitted module and a fitted core.\n#[derive(Debug, Default, Clone, Copy, PartialEq, Eq)]\npub struct WorkTargetingFit {\n    pub mining: bool,\n    pub salvage: bool,\n}\n\n#[derive(Debug, Clone, Copy, PartialEq, Eq)]\npub enum WorkTargetId {\n    Asteroid(crate::mining::AsteroidId),\n    Ore(crate::mining::OreId),\n    Wreck(crate::traffic::NpcId),\n}\n\n#[derive(Debug, Clone, Copy, PartialEq, Eq)]\npub enum WorkTargetRole {\n    RockHold,\n    OreTracking,\n    WreckTracking,\n}\n\n/// Guidance observation. This neither issues a work tool nor transfers custody.\n#[derive(Debug, Clone, Copy, PartialEq)]\npub struct WorkTarget {\n    pub id: WorkTargetId,\n    pub role: WorkTargetRole,\n    pub position: crate::docking::Vec3,\n}\n"
+        },
+        {
+          "offset": 8214,
+          "before": "            || !declared.offer(p.site).purchase_available\n",
+          "after": "            || (!p.xyzzy && !declared.offer(p.site).purchase_available)\n"
+        },
+        {
+          "offset": 13639,
+          "before": "",
+          "after": "    fn secret_cargo_fit_at_each_berth_is_independent_of_local_shop_stock() {\n        for site in [MarketSite::Avenor, MarketSite::Renas, MarketSite::Lareria] {\n            let granted = State::default()\n                .grant_xyzzy(21, 22, 1, site)\n                .unwrap_or_else(|e| panic!(\"{e}\"));\n            assert_eq!(granted.validate(21, 22, 2), Ok(()));\n            assert!(\n                granted\n                    .owned()\n                    .is_some_and(|item| item.xyzzy && item.fitted)\n            );\n            let paid = State::default().prepare(21, 22, 1, 0, site, Command::PurchaseCargoBay);\n            assert_eq!(\n                paid.is_ok(),\n                definition()\n                    .unwrap_or_else(|e| panic!(\"{e}\"))\n                    .offer(site)\n                    .purchase_available\n            );\n        }\n    }\n    #[test]\n"
+        }
+      ]
+    },
+    "flight.rs": {
+      "beforeSHA256": "75ce2e728fd3a459c343c70950a2d49f26676e90c2fea5ca0e7ab87cfedef935",
+      "afterSHA256": "dd699789001f17118e6f6e93af48ff4779c780bd75e49572e7e2b9870c8aef00",
+      "hunks": [
+        {
+          "offset": 655,
+          "before": "",
+          "after": "mod route;\npub use route::PreparedNavigationRoute;\nmod auto_docking;\nmod targeting;\n"
+        },
+        {
+          "offset": 1114,
+          "before": "",
+          "after": "};\npub use targeting::{\n    TargetFilter, TargetIdentity, TargetMode, TargetingSnapshot, TargetingViewport,\n"
+        },
+        {
+          "offset": 3003,
+          "before": "",
+          "after": "mod profit_scan;\n"
+        },
+        {
+          "offset": 3034,
+          "before": "",
+          "after": "pub use profit_scan::ProfitDestination;\n"
+        },
+        {
+          "offset": 6789,
+          "before": "",
+          "after": "    targeting: targeting::State,\n    auto_docking: Option<auto_docking::Phase>,\n"
+        },
+        {
+          "offset": 7305,
+          "before": "",
+          "after": "    navigation_route: Option<crate::navigation::RoutePlan>,\n"
+        },
+        {
+          "offset": 8566,
+          "before": "",
+          "after": "            targeting: targeting::State::default(),\n            auto_docking: None,\n"
+        },
+        {
+          "offset": 9011,
+          "before": "",
+          "after": "            navigation_route: None,\n"
+        },
+        {
+          "offset": 15204,
+          "before": "",
+          "after": "        let origin = navigation.snapshot(0).system;\n"
+        },
+        {
+          "offset": 15504,
+          "before": "",
+          "after": "        self.cancel_route_on_manual_jump(origin, target);\n"
+        },
+        {
+          "offset": 20940,
+          "before": "",
+          "after": "        let previous_targeting = self.targeting.clone();\n        let previous_docking = self.auto_docking;\n        let input = self.flight_computer_input(input);\n        let result = self.step_flight(input);\n        if result.is_err() {\n            self.targeting = previous_targeting;\n            self.auto_docking = previous_docking;\n        } else if self.state.mode != FlightMode::Flight || self.state.motion_refusal.is_some() {\n            // An accepted stop must release every computer controller, not just docking.\n            // Otherwise selected work guidance resumes thrust on the next idle tick.\n            self.cancel_targeting();\n            self.cancel_auto_docking();\n        }\n        result\n    }\n\n    fn step_flight(&mut self, input: FlightInput) -> Result<(), StepError> {\n"
+        },
+        {
+          "offset": 27270,
+          "before": "",
+          "after": "        let entry = next.mode == FlightMode::Docked && self.state.mode != FlightMode::Docked;\n"
+        },
+        {
+          "offset": 27411,
+          "before": "            let entry = next.mode == FlightMode::Docked && self.state.mode != FlightMode::Docked;\n",
+          "after": ""
+        },
+        {
+          "offset": 33443,
+          "before": "",
+          "after": "        if entry || completed_leg.is_some() {\n            self.reconcile_navigation_route(entry);\n        }\n"
+        }
+      ]
+    },
+    "flight/ammunition.rs": {
+      "beforeSHA256": "1badcdb362b210ac2468ccf36bb09e6488264eeec1f41edae6febab9b967eb4e",
+      "afterSHA256": "fa936a3746563a7a2ce733a4e29c0cfb2d8140190c2fdb0e6f083df2ec3cc07f",
+      "hunks": [
+        {
+          "offset": 3843,
+          "before": "        purchase: u32,\n",
+          "after": "        purchase: Option<u32>,\n"
+        },
+        {
+          "offset": 4529,
+          "before": "                    purchase: Some(purchase),\n",
+          "after": "                    purchase,\n"
+        },
+        {
+          "offset": 4596,
+          "before": "                    xyzzy: false,\n",
+          "after": "                    xyzzy: purchase.is_none(),\n"
+        },
+        {
+          "offset": 4722,
+          "before": "                    .checked_add(PRICE_TENTHS)\n",
+          "after": "                    .checked_add(if purchase.is_some() { PRICE_TENTHS } else { 0 })\n"
+        },
+        {
+          "offset": 10351,
+          "before": "            let paid_before = ledger.paid;\n",
+          "after": ""
+        },
+        {
+          "offset": 10370,
+          "before": "                .apply(e.action, e.item, purchases)\n",
+          "after": "                .apply(e.action, e.item, (!e.xyzzy).then_some(purchases))\n"
+        },
+        {
+          "offset": 10484,
+          "before": "            if e.xyzzy {\n                let item = ledger.items.last_mut().ok_or(INVALID)?;\n                item.purchase = None;\n                item.xyzzy = true;\n                ledger.paid = paid_before;\n            }\n",
+          "after": ""
+        },
+        {
+          "offset": 16251,
+          "before": "        ledger.apply(action, 0, 0)?;\n",
+          "after": "        ledger.apply(action, 0, Some(0))?;\n"
+        }
+      ]
+    },
+    "flight/ammunition/xyzzy_tests.rs": {
+      "beforeSHA256": "b55c99f3795cdb342424431e7854046dc0bb34c1ccdea374cdb5942758ee2b69",
+      "afterSHA256": "dc1f67177e5e0898fa6462195a308c580b9eb86b77455f50de91a8d15ebdb968",
+      "hunks": [
+        {
+          "offset": 987,
+          "before": "",
+          "after": "\n#[test]\nfn xyzzy_fills_every_pylon_and_preserves_a_stored_paid_round_on_reload() {\n    use crate::{AmmunitionAction, XyzzyAction};\n    let mut w = World::new_commander(15402).unwrap();\n    let buy = w.review_ammunition(AmmunitionAction::Purchase, 0).unwrap();\n    let id = w.prepare_ammunition(buy, 0).unwrap().commit();\n    let store = w\n        .review_ammunition(AmmunitionAction::Store { item: id }, 0)\n        .unwrap();\n    w.prepare_ammunition(store, 0).unwrap().commit();\n    let paid_history = w.ammunition_snapshot().unwrap().purchases;\n    assert_eq!(paid_history[0].price_tenths, super::PRICE_TENTHS);\n    for action in [XyzzyAction::Enter, XyzzyAction::MaximumSupportedHardware] {\n        let review = w.review_xyzzy(action, 0).unwrap();\n        w.prepare_xyzzy(review, 0).unwrap().commit();\n        w = World::from_save_bytes(&w.save_bytes().unwrap()).unwrap();\n        let inventory = w.ammunition_snapshot().unwrap();\n        assert_eq!(inventory.purchases, paid_history);\n        assert_eq!(inventory.items.len(), super::PYLONS);\n        for pylon in 0..inventory.capacity {\n            assert_eq!(\n                inventory\n                    .items\n                    .iter()\n                    .filter(|i| i.pylon == Some(pylon) && !i.consumed)\n                    .count(),\n                1\n            );\n        }\n        assert!(\n            inventory\n                .items\n                .iter()\n                .any(|i| i.item == id && !i.xyzzy && i.purchase == Some(1))\n        );\n        assert_eq!(\n            w.credits_tenths(),\n            Some(crate::flight::xyzzy::STARTING_CREDITS_TENTHS)\n        );\n    }\n}\n"
+        }
+      ]
+    },
+    "flight/emp.rs": {
+      "beforeSHA256": "2152fd55fef854d372f6b5ad1476028b47bb6dd4363888dfe0cbed9c6a3be083",
+      "afterSHA256": "d950fe5202e5cbd0668268216274f9fbd45a160eea7985c8ed2b842ef9ed55dc",
+      "hunks": [
+        {
+          "offset": 2409,
+          "before": "",
+          "after": "impl EquipmentEvent {\n    fn terms(self, grades: &mut EmpGrades) -> Result<(u32, u8), SaveError> {\n        let offer = match self.action {\n            EmpEquipmentAction::Purchase => (policy::BASE_PRICE, policy::BASE_TECHNOLOGY),\n            EmpEquipmentAction::Upgrade { axis, .. } => {\n                let offer = grades.upgrade_offer(axis).map_err(|_| INVALID)?;\n                *grades = grades.advancing(axis).map_err(|_| INVALID)?;\n                offer\n            }\n            EmpEquipmentAction::Store { .. } if self.secret => return Err(INVALID),\n            _ => (0, 0),\n        };\n        Ok(if self.secret { (0, 0) } else { offer })\n    }\n}\n"
+        },
+        {
+          "offset": 5678,
+          "before": "                            if current.provenance != EmpProvenance::Paid {\n",
+          "after": "                            if !event.secret && current.provenance != EmpProvenance::Paid {\n"
+        },
+        {
+          "offset": 6864,
+          "before": "                && (event.action != EmpEquipmentAction::Purchase\n                    || !world\n                        .xyzzy\n                        .authorizes(event.dock, event.tick, event.revision))\n",
+          "after": "                && !world\n                    .xyzzy\n                    .authorizes(event.dock, event.tick, event.revision)\n"
+        },
+        {
+          "offset": 7054,
+          "before": "            let (price, required) = match event.action {\n                EmpEquipmentAction::Purchase => {\n                    if event.secret {\n                        (0, 0)\n                    } else {\n                        (policy::BASE_PRICE, policy::BASE_TECHNOLOGY)\n                    }\n                }\n                EmpEquipmentAction::Upgrade { axis, .. } => {\n                    let offer = grades.upgrade_offer(axis).map_err(|_| INVALID)?;\n                    grades = grades.advancing(axis).map_err(|_| INVALID)?;\n                    offer\n                }\n                _ => (0, 0),\n            };\n",
+          "after": "            let (price, required) = event.terms(&mut grades)?;\n"
+        }
+      ]
+    },
+    "flight/emp/equipment.rs": {
+      "beforeSHA256": "705e5b47d61718869750d6872dac26a5dfcbd61c571e0b2ccb75811f5fd2c0dd",
+      "afterSHA256": "4beca3f8ea8d7af03120b4bcfe1e6399cc9d7209b06028f9bc684219568d41d3",
+      "hunks": [
+        {
+          "offset": 1162,
+          "before": "            let price = match event.action {\n                EmpEquipmentAction::Purchase => {\n                    if event.secret {\n                        0\n                    } else {\n                        policy::BASE_PRICE\n                    }\n                }\n                EmpEquipmentAction::Upgrade { axis, .. } => {\n                    let (price, _) = grades.upgrade_offer(axis).map_err(|_| INVALID)?;\n                    grades = grades.advancing(axis).map_err(|_| INVALID)?;\n                    price\n                }\n                _ => 0,\n            };\n",
+          "after": "            let (price, _) = event.terms(&mut grades)?;\n"
+        },
+        {
+          "offset": 7025,
+          "before": "        if current.is_some_and(|item| item.fitted) {\n            return Ok(());\n",
+          "after": "        if current.is_none() {\n            self.record_xyzzy_emp(dock, tick, EmpEquipmentAction::Purchase)?;\n            self.emp.meter_clock = self.combat.physical_tick();\n            self.emp.bank_clock = self.emp.meter_clock;\n"
+        },
+        {
+          "offset": 7264,
+          "before": "",
+          "after": "        let item = self.emp.owned()?.ok_or(INVALID)?;\n        if !item.fitted {\n            self.record_xyzzy_emp(dock, tick, EmpEquipmentAction::Fit { item: item.item })?;\n        }\n        for axis in [EmpAxis::Power, EmpAxis::Capacity, EmpAxis::Recharge] {\n            for _ in item.grades.level(axis)..policy::MAX_GRADE {\n                self.record_xyzzy_emp(\n                    dock,\n                    tick,\n                    EmpEquipmentAction::Upgrade {\n                        item: item.item,\n                        axis,\n                    },\n                )?;\n                self.emp.bank_clock = self.combat.physical_tick();\n            }\n        }\n        Ok(())\n    }\n\n    fn record_xyzzy_emp(\n        &mut self,\n        dock: DockContext,\n        tick: u64,\n        action: EmpEquipmentAction,\n    ) -> Result<(), SaveError> {\n"
+        },
+        {
+          "offset": 8417,
+          "before": "        let action = current.map_or(EmpEquipmentAction::Purchase, |item| {\n            EmpEquipmentAction::Fit { item: item.item }\n        });\n        let mut state = self.emp.clone();\n        if current.is_none() {\n            state.meter_clock = self.combat.physical_tick();\n            state.bank_clock = state.meter_clock;\n",
+          "after": "        if !self.xyzzy.authorizes(dock, tick, account.revision()) {\n            return Err(INVALID);\n"
+        },
+        {
+          "offset": 8528,
+          "before": "        Arc::make_mut(&mut state.equipment).push(EquipmentEvent {\n            secret: current.is_none(),\n",
+          "after": "        Arc::make_mut(&mut self.emp.equipment).push(EquipmentEvent {\n            secret: true,\n"
+        },
+        {
+          "offset": 8733,
+          "before": "        state.owned()?;\n        self.emp = state;\n",
+          "after": ""
+        }
+      ]
+    },
+    "flight/emp/policy.rs": {
+      "beforeSHA256": "91284bc437a971a9b60b7379b3256dd42fde5965b78a3b362e99086168bd944e",
+      "afterSHA256": "2fd346391b2cf4722281684a929813404c5bcf1bd9a8e44746d83df0a1d6a619",
+      "hunks": [
+        {
+          "offset": 695,
+          "before": "",
+          "after": "pub(super) const MAX_GRADE: u8 = 3;\n"
+        },
+        {
+          "offset": 930,
+          "before": "        self.power <= 3 && self.capacity <= 3 && self.recharge <= 3\n",
+          "after": "        self.power <= MAX_GRADE && self.capacity <= MAX_GRADE && self.recharge <= MAX_GRADE\n"
+        },
+        {
+          "offset": 1333,
+          "before": "        if !self.valid() || self.level(axis) == 3 {\n",
+          "after": "        if !self.valid() || self.level(axis) == MAX_GRADE {\n"
+        },
+        {
+          "offset": 1811,
+          "before": "        if !self.valid() || level >= 3 {\n",
+          "after": "        if !self.valid() || level >= MAX_GRADE {\n"
+        }
+      ]
+    },
+    "flight/emp/tests.rs": {
+      "beforeSHA256": "2bb5109e080d4a8be11462ba7285a1728a9d4b4e72413d89f9cf8c54a64911df",
+      "afterSHA256": "fab141eb5b07b2d8f8d8b70e13656e2cf11504f4206fb2e5d3524b910b1e2d2a",
+      "hunks": [
+        {
+          "offset": 3606,
+          "before": "",
+          "after": "}\nfn legacy_funded_paid_base() -> World {\n    let w = World::from_save_bytes(include_bytes!(\n        \"../../../tests/fixtures/xyzzy-paid-base-v17.bin\"\n    ))\n    .unwrap();\n    assert_eq!(w.owned_emp().unwrap().grades, EmpGrades::default());\n    assert_eq!(w.credits_tenths(), Some(10_000_000));\n    w\n"
+        },
+        {
+          "offset": 7986,
+          "before": "fn secret_grant_reuses_paid_emp_and_secret_only_base_cannot_buy_grades() {\n    let mut w = paid();\n    let old = w.owned_emp().unwrap();\n",
+          "after": "fn xyzzy_maxes_paid_or_granted_emp_at_lower_tech_berths_and_preserves_custody() {\n    let max = EmpGrades {\n        power: 3,\n        capacity: 3,\n        recharge: 3,\n    };\n    let mut w = legacy_funded_paid_base();\n    let mut old = w.owned_emp().unwrap();\n    for _ in 0..2 {\n        equipment(\n            &mut w,\n            EmpEquipmentAction::Upgrade {\n                item: old.item,\n                axis: EmpAxis::Capacity,\n            },\n        );\n    }\n    let paid_history = Arc::clone(&w.emp.equipment);\n    assert_eq!(\n        w.review_emp_equipment(\n            EmpEquipmentAction::Upgrade {\n                item: old.item,\n                axis: EmpAxis::Capacity\n            },\n            w.snapshot().tick\n        ),\n        Err(EmpError::TechnologyUnavailable)\n    );\n    equipment(&mut w, EmpEquipmentAction::Store { item: old.item });\n    let balance = w.credits_tenths();\n    let tick = w.snapshot().tick;\n    let review = w\n        .review_xyzzy(XyzzyAction::MaximumSupportedHardware, tick)\n        .unwrap();\n    w.prepare_xyzzy(review, tick).unwrap().commit();\n    old.grades = max;\n    assert_eq!(w.owned_emp(), Some(old));\n    assert_eq!(w.credits_tenths(), balance);\n    assert!(w.emp.equipment.starts_with(&paid_history));\n    assert!(\n        w.emp\n            .equipment\n            .iter()\n            .skip(paid_history.len() + 1)\n            .all(|e| e.secret)\n    );\n    let count = w.emp.equipment.len();\n"
+        },
+        {
+          "offset": 9449,
+          "before": "    assert_eq!(w.owned_emp(), Some(old));\n",
+          "after": "    assert_eq!(w.emp.equipment.len(), count);\n    cold(&w);\n"
+        },
+        {
+          "offset": 9640,
+          "before": "",
+          "after": "    assert_eq!(item.grades, max);\n"
+        },
+        {
+          "offset": 10084,
+          "before": "    cold(&granted);\n",
+          "after": "    let mut live = cold(&granted);\n    Arc::make_mut(&mut granted.emp.equipment)[1].secret = false;\n    poison_refuses(&granted, &mut live);\n"
+        },
+        {
+          "offset": 24076,
+          "before": "",
+          "after": "        targeting: w.targeting.clone(),\n        auto_docking: w.auto_docking,\n"
+        },
+        {
+          "offset": 24411,
+          "before": "",
+          "after": "        navigation_route: decoded.navigation_route,\n"
+        },
+        {
+          "offset": 28246,
+          "before": "    let mut w = paid();\n    // The base is bought with earned market cash. Explicit XYZZY supplies later grade funds and\n    // Elite energy; this is not a claim of a wholly ordinary high-grade acquisition journey.\n    secret(&mut w);\n",
+          "after": "    let mut w = legacy_funded_paid_base();\n"
+        },
+        {
+          "offset": 44942,
+          "before": "    let mut w = paid();\n    // As in the retained World case, the base is paid with earned cash; later funds/Elite\n    // energy are an explicit XYZZY test setup, not an ordinary progression acceptance.\n    secret(&mut w);\n",
+          "after": "    let mut w = legacy_funded_paid_base();\n"
+        }
+      ]
+    },
+    "flight/mission.rs": {
+      "beforeSHA256": "62785b56b0be4af0036b8e1c6a1dfea1bd0a6cd346969611bb09cc4d09c96b60",
+      "afterSHA256": "a6128370c0520ecd266dfe6600f1d7a68bf16b1f3a3e1266276d7271052e938d",
+      "hunks": [
+        {
+          "offset": 7265,
+          "before": "",
+          "after": "        if paused {\n            self.cancel_auto_docking();\n            self.cancel_targeting();\n        }\n"
+        }
+      ]
+    },
+    "flight/modular.rs": {
+      "beforeSHA256": "5d6d2a453547f694a478563f10041a46ef737c992c1a378d4b76d90b1747dfc6",
+      "afterSHA256": "4a59e658d2682417482918b20e118ff16d99bc05b513569c7a1b9df73fc9cbbd",
+      "hunks": [
+        {
+          "offset": 143,
+          "before": "",
+          "after": "    equipment::TargetingTier,\n"
+        },
+        {
+          "offset": 347,
+          "before": "",
+          "after": "mod work;\n"
+        },
+        {
+          "offset": 927,
+          "before": "",
+          "after": "    Targeting(TargetingTier),\n    MiningTargeting,\n    SalvageTargeting,\n"
+        },
+        {
+          "offset": 1445,
+          "before": "",
+          "after": "            Self::Targeting(_) => \"targeting-core\",\n            Self::MiningTargeting => \"targeting-mining\",\n            Self::SalvageTargeting => \"targeting-salvage\",\n"
+        },
+        {
+          "offset": 1907,
+          "before": "",
+          "after": "            Self::Targeting(tier) => match tier {\n                TargetingTier::Basic => \"Targeting: Basic\",\n                TargetingTier::Advanced => \"Targeting: Advanced\",\n                TargetingTier::Docking => \"Targeting: Docking\",\n                TargetingTier::Identification => \"Targeting: Identification\",\n                TargetingTier::Pirate => \"Targeting: Pirate\",\n                TargetingTier::Military => \"Targeting: Military\",\n            },\n            Self::MiningTargeting => \"Targeting: Mining Module\",\n            Self::SalvageTargeting => \"Targeting: Salvage Module\",\n"
+        },
+        {
+          "offset": 2750,
+          "before": "",
+          "after": "            Self::MiningTargeting => \"Mining Targeting Module\",\n            Self::SalvageTargeting => \"Salvage Targeting Module\",\n"
+        },
+        {
+          "offset": 3475,
+          "before": "",
+          "after": "            Self::Targeting(tier) => match tier {\n                TargetingTier::Basic => \"Basic Targeting Module\",\n                TargetingTier::Advanced => \"Advanced Targeting Module\",\n                TargetingTier::Docking => \"Docking Targeting Module\",\n                TargetingTier::Identification => \"Identification Targeting Module\",\n                TargetingTier::Pirate => \"Pirate Targeting Module\",\n                TargetingTier::Military => \"Military Targeting Module\",\n            },\n"
+        },
+        {
+          "offset": 4564,
+          "before": "",
+          "after": "            Self::Targeting(_) => ModuleSlot::Targeting,\n            Self::MiningTargeting => ModuleSlot::MiningTargeting,\n            Self::SalvageTargeting => ModuleSlot::SalvageTargeting,\n"
+        },
+        {
+          "offset": 5530,
+          "before": "            Self::NavalLaser | Self::EliteEnergyUnit | Self::AdvancedNavigation | Self::FuelScoops\n",
+          "after": "            Self::NavalLaser\n                | Self::EliteEnergyUnit\n                | Self::AdvancedNavigation\n                | Self::FuelScoops\n                | Self::Targeting(TargetingTier::Military)\n                | Self::MiningTargeting\n                | Self::SalvageTargeting\n"
+        },
+        {
+          "offset": 6163,
+          "before": "",
+          "after": "            Self::Targeting(_) | Self::MiningTargeting | Self::SalvageTargeting => 1,\n"
+        },
+        {
+          "offset": 7077,
+          "before": "",
+          "after": "            Self::Targeting(tier) => Some((tier.price_tenths(), tier.required_technology())),\n            // Frozen original shop, in credit tenths and displayed technology levels.\n            Self::MiningTargeting => Some((20_000, 6)),\n            Self::SalvageTargeting => Some((40_000, 8)),\n"
+        },
+        {
+          "offset": 7801,
+          "before": "",
+          "after": "            Self::Targeting(tier) => tier.predecessor().map(Self::Targeting),\n            Self::MiningTargeting | Self::SalvageTargeting => {\n                Some(Self::Targeting(TargetingTier::Basic))\n            }\n"
+        },
+        {
+          "offset": 8835,
+          "before": "",
+          "after": "            Self::Targeting(tier) => 12 + tier as u8,\n            Self::MiningTargeting => 19,\n            Self::SalvageTargeting => 20,\n"
+        },
+        {
+          "offset": 9622,
+          "before": "",
+          "after": "            13..=18 => Ok(Self::Targeting(TargetingTier::ALL[usize::from(tag - 13)])),\n            19 => Ok(Self::MiningTargeting),\n            20 => Ok(Self::SalvageTargeting),\n"
+        },
+        {
+          "offset": 10002,
+          "before": "",
+          "after": "    Targeting,\n    MiningTargeting,\n    SalvageTargeting,\n"
+        },
+        {
+          "offset": 12544,
+          "before": "",
+          "after": "    LowerTargetingGrade,\n"
+        },
+        {
+          "offset": 16516,
+          "before": "        if self.fitted(slot).map(|i| i.id) != replacing {\n",
+          "after": "        if matches!(\n            slot,\n            ModuleSlot::MiningTargeting | ModuleSlot::SalvageTargeting\n        ) && self.fitted(ModuleSlot::Targeting).is_none()\n        {\n            return Err(ModuleError::MissingPrerequisite);\n        }\n        let fitted = self.fitted(slot);\n        if fitted.map(|i| i.id) != replacing {\n"
+        },
+        {
+          "offset": 16901,
+          "before": "",
+          "after": "        }\n        if let (\n            ModuleKind::Targeting(next),\n            Some(OwnedModule {\n                kind: ModuleKind::Targeting(current),\n                ..\n            }),\n        ) = (self.items[index].kind, fitted)\n            && next < current\n        {\n            return Err(ModuleError::LowerTargetingGrade);\n"
+        },
+        {
+          "offset": 31604,
+          "before": "",
+          "after": "    /// The actual fitted fictional inventory grade, or no installed module.\n    pub fn targeting_tier(&self) -> Option<TargetingTier> {\n        let account = self.commander_account.as_ref()?;\n        let ledger = self.modular.ledger(self, account).ok()?;\n        match ledger.fitted(ModuleSlot::Targeting)?.kind {\n            ModuleKind::Targeting(tier) => Some(tier),\n            _ => None,\n        }\n    }\n"
+        },
+        {
+          "offset": 33756,
+          "before": "",
+          "after": "            ModuleKind::Targeting(TargetingTier::Basic),\n            ModuleKind::Targeting(TargetingTier::Advanced),\n            ModuleKind::Targeting(TargetingTier::Docking),\n            ModuleKind::Targeting(TargetingTier::Identification),\n            ModuleKind::Targeting(TargetingTier::Pirate),\n            ModuleKind::Targeting(TargetingTier::Military),\n            ModuleKind::MiningTargeting,\n            ModuleKind::SalvageTargeting,\n"
+        }
+      ]
+    },
+    "flight/modular/tests.rs": {
+      "beforeSHA256": "a0b92d8d1c30bdc3a96f20af8f992892640554572dd2550d0b872808c7afd5a1",
+      "afterSHA256": "225ef5d2554942f1fb640255a04d71b04d1d929086cc1a054f223152cb27b05e",
+      "hunks": [
+        {
+          "offset": 1567,
+          "before": "",
+          "after": "}\n#[test]\nfn targeting_inventory_has_six_original_paid_grades() {\n    let mut w = funded(15901);\n    let kinds = TargetingTier::ALL.map(ModuleKind::Targeting);\n    let prices = [8_000, 20_000, 40_000, 60_000, 100_000, 120_000];\n    let technologies = [4, 5, 7, 9, 10, 11];\n    let dock = w.current_dock_context().unwrap();\n    let mut ledger = Ledger::born(15901).unwrap();\n    for (i, kind) in kinds.into_iter().enumerate() {\n        let offer = w\n            .module_offers()\n            .into_iter()\n            .find(|o| o.kind == kind)\n            .unwrap();\n        assert_eq!(\n            (\n                offer.price_tenths,\n                offer.required_technology,\n                offer.slot,\n                offer.equipment_units\n            ),\n            (prices[i], technologies[i], ModuleSlot::Targeting, 1)\n        );\n        assert_eq!(\n            offer.prerequisite,\n            i.checked_sub(1).map(|previous| kinds[previous])\n        );\n        assert_eq!(\n            validate_purchase(kind, technologies[i] - 1, prices[i]),\n            Err(ModuleError::TechnologyUnavailable)\n        );\n        assert_eq!(\n            validate_purchase(kind, technologies[i], prices[i] - 1),\n            Err(ModuleError::InsufficientCredits)\n        );\n        assert_eq!(ModuleKind::from_tag(kind.tag()).unwrap(), kind);\n        let id = 200_000 + i as u64;\n        ledger\n            .apply(\n                Event {\n                    xyzzy: false,\n                    action: ModuleAction::Purchase { kind },\n                    item: id,\n                    dock,\n                    tick: 0,\n                    revision: i as u64,\n                },\n                i as u32 + 1,\n            )\n            .unwrap();\n        assert_eq!(ledger.fitted(ModuleSlot::Targeting).unwrap().id, id);\n    }\n    let cash = w.credits_tenths().unwrap();\n    let buy = |kind| ModuleAction::Purchase { kind };\n    assert_eq!(w.targeting_tier(), None);\n    assert!(matches!(\n        w.review_module(buy(kinds[1]), w.snapshot().tick),\n        Err(ModuleError::MissingPrerequisite)\n    ));\n    let basic = apply(&mut w, buy(kinds[0]));\n    let advanced = apply(&mut w, buy(kinds[1]));\n    assert_eq!(w.credits_tenths(), Some(cash - prices[0] - prices[1]));\n    let before = w.save_bytes().unwrap();\n    assert!(matches!(\n        w.review_module(\n            ModuleAction::Install {\n                item: basic,\n                replacing: Some(advanced)\n            },\n            w.snapshot().tick\n        ),\n        Err(ModuleError::LowerTargetingGrade)\n    ));\n    assert_eq!(w.save_bytes().unwrap(), before);\n    apply(&mut w, ModuleAction::Store { item: advanced });\n    assert_eq!(w.targeting_tier(), None);\n    apply(\n        &mut w,\n        ModuleAction::Install {\n            item: basic,\n            replacing: None,\n        },\n    );\n    assert_eq!(cold(&w).targeting_tier(), Some(TargetingTier::Basic));\n}\n#[test]\nfn xyzzy_targeting_inventory_refits_same_maximum_item_without_another_grant() {\n    let mut w = World::new_commander(15902).unwrap();\n    let review = w.review_xyzzy(crate::XyzzyAction::Enter, 0).unwrap();\n    w.prepare_xyzzy(review, 0).unwrap().commit();\n    let maximum = snap(&w)\n        .items\n        .into_iter()\n        .find(|item| item.kind == ModuleKind::Targeting(TargetingTier::Military))\n        .unwrap();\n    assert!(matches!(maximum.provenance, ModuleProvenance::XYZzy { .. }));\n    assert_eq!(w.targeting_tier(), Some(TargetingTier::Military));\n    apply(&mut w, ModuleAction::Store { item: maximum.id });\n    apply(\n        &mut w,\n        ModuleAction::Purchase {\n            kind: ModuleKind::Targeting(TargetingTier::Basic),\n        },\n    );\n    let cash = w.credits_tenths();\n    let tick = w.snapshot().tick;\n    let review = w\n        .review_xyzzy(crate::XyzzyAction::MaximumSupportedHardware, tick)\n        .unwrap();\n    w.prepare_xyzzy(review, tick).unwrap().commit();\n    let restored = cold(&w);\n    assert_eq!(restored.credits_tenths(), cash);\n    assert_eq!(restored.targeting_tier(), Some(TargetingTier::Military));\n    assert_eq!(\n        snap(&restored)\n            .items\n            .into_iter()\n            .filter(|item| item.kind == maximum.kind)\n            .collect::<Vec<_>>(),\n        vec![maximum]\n    );\n"
+        }
+      ]
+    },
+    "flight/persistence.rs": {
+      "beforeSHA256": "15103d3e2169d91af038dbb79d9b592e831872edfe7ab9d6a988a7c3069b5353",
+      "afterSHA256": "0fc2dd17457df82c0d88c737a3e219ce153718b9a4cd70a97469d7e6f3f2944c",
+      "hunks": [
+        {
+          "offset": 651,
+          "before": "",
+          "after": "// A route is optional in v17. The exact legacy encoding is retained when no\n// route exists; a distinct tag separates the additive trailer from corruption.\nconst ROUTE_EXTENSION: &[u8; 8] = b\"MRTE0001\";\n"
+        },
+        {
+          "offset": 12196,
+          "before": "",
+          "after": "        if let Some(route) = &self.navigation_route {\n            w.bytes.extend(ROUTE_EXTENSION);\n            route.encode_save(&mut w);\n        }\n"
+        },
+        {
+          "offset": 16017,
+          "before": "",
+          "after": "            targeting: super::targeting::State::default(),\n            auto_docking: None,\n"
+        },
+        {
+          "offset": 16605,
+          "before": "",
+          "after": "            navigation_route: None,\n"
+        },
+        {
+          "offset": 18025,
+          "before": "",
+          "after": "        if !r.finished() {\n            if r.fixed::<8>().map_err(|_| SaveError::InvalidEncoding)? != *ROUTE_EXTENSION {\n                return Err(SaveError::InvalidEncoding);\n            }\n            candidate.navigation_route = Some(crate::navigation::RoutePlan::decode_save(&mut r)?);\n        }\n"
+        },
+        {
+          "offset": 21819,
+          "before": "",
+          "after": "        self.validate_saved_navigation_route()?;\n"
+        }
+      ]
+    },
+    "flight/persistence/tests.rs": {
+      "beforeSHA256": "13b8fc2735ab05ed4f5a2d30bb21f9f0d665b1ff8326cb799b070262c2ce6d96",
+      "afterSHA256": "1a9fab13b88dd05146c296ec534a0bcc3675584c2c99d9c5ceded6108f34bbd1",
+      "hunks": [
+        {
+          "offset": 13628,
+          "before": "",
+          "after": "}\n\n#[test]\nfn v17_route_extension_preserves_absent_route_and_refuses_unidentified_trailers() {\n    let mut world = World::new_commander(702).unwrap();\n    let original = world.save_bytes().unwrap();\n    let decoded = World::decode_saved_world(&original).unwrap();\n    assert!(decoded.navigation_route.is_none());\n    assert_eq!(decoded.save_bytes().unwrap(), original);\n    for extension in [\n        ROUTE_EXTENSION[..4].to_vec(),\n        b\"UNKNOWN1\".to_vec(),\n        ROUTE_EXTENSION.to_vec(),\n    ] {\n        let mut malformed = original.clone();\n        let tail = malformed.len() - 8;\n        malformed.splice(tail..tail, extension);\n        reseal(&mut malformed);\n        assert_refused_unchanged(&mut world, &malformed);\n        assert!(world.navigation_route.is_none());\n        assert_eq!(world.save_bytes().unwrap(), original);\n    }\n"
+        }
+      ]
+    },
+    "flight/xyzzy.rs": {
+      "beforeSHA256": "f68ce06aa0ee3153e850379a220c59c7671afc29f36691088c22ff89245bbc67",
+      "afterSHA256": "e7fd218c895c7212f329096317ff21d8293764e187b55354a96c27e06aadf4c9",
+      "hunks": [
+        {
+          "offset": 13041,
+          "before": "",
+          "after": "                super::modular::ModuleKind::Targeting(crate::equipment::TargetingTier::Military),\n                super::modular::ModuleKind::MiningTargeting,\n                super::modular::ModuleKind::SalvageTargeting,\n"
+        }
+      ]
+    },
+    "lib.rs": {
+      "beforeSHA256": "d86d26993509fcdc52278d6ecad128b84fdff3e1b6a96d53e374d8ba47b435d6",
+      "afterSHA256": "04eda03d5ccd6759a7b7f6518cfbde8bed96f2128e3d8ded1f772c2674236688",
+      "hunks": [
+        {
+          "offset": 417,
+          "before": "",
+          "after": "pub use flight::PreparedNavigationRoute;\npub use flight::ProfitDestination;\n"
+        },
+        {
+          "offset": 1607,
+          "before": "",
+          "after": "pub use flight::{TargetFilter, TargetIdentity, TargetMode, TargetingSnapshot, TargetingViewport};\n"
+        }
+      ]
+    },
+    "navigation.rs": {
+      "beforeSHA256": "ede196c4a81114e3ab169744dfc085011bd1457f0d297f614b74540bae085c69",
+      "afterSHA256": "f597ab501c65ca5e33f728e70487ba11f4c626bf5696523a3e96ba150195f4f3",
+      "hunks": [
+        {
+          "offset": 206,
+          "before": "",
+          "after": "mod route;\n"
+        },
+        {
+          "offset": 232,
+          "before": "pub(crate) use journal::{CompletedJump, JumpJournal, NavigationFitChange, NavigationGrade};\n",
+          "after": "pub use journal::NavigationGrade;\npub(crate) use journal::{CompletedJump, JumpJournal, NavigationFitChange};\n"
+        },
+        {
+          "offset": 393,
+          "before": "",
+          "after": "pub use route::{\n    ROUTE_SYSTEMS, RouteAlternative, RouteError, RoutePlan, RoutePreference, RouteProgress,\n    RouteStatus,\n};\npub(crate) use route::{RouteEconomy, route_alternatives, route_feasible, route_hop};\n"
+        }
+      ]
+    },
+    "navigation/journal.rs": {
+      "beforeSHA256": "68926ee5115002a09f497886444c266663f190efc3d0c4cc02fd156aaaeec649",
+      "afterSHA256": "28f288a81b7dfd5d06f13fba213dcddb307c2bee38cd549873e2baca7ea01877",
+      "hunks": [
+        {
+          "offset": 468,
+          "before": "pub(crate) enum NavigationGrade {\n",
+          "after": "pub enum NavigationGrade {\n"
+        },
+        {
+          "offset": 574,
+          "before": "",
+          "after": "    pub const fn label(self) -> &'static str {\n        match self {\n            Self::Empty => \"No computer\",\n            Self::Basic => \"Basic\",\n            Self::Intermediate => \"Intermediate\",\n            Self::Advanced => \"Advanced\",\n        }\n    }\n\n    pub fn planning_radius_ly(self) -> Option<f64> {\n        let tank = f64::from(FUEL_CAPACITY) / 10.0;\n        match self {\n            Self::Empty => Some(0.0),\n            Self::Basic => Some(tank + 7.0),\n            Self::Intermediate => Some(tank + 14.0),\n            Self::Advanced => None,\n        }\n    }\n\n"
+        },
+        {
+          "offset": 1572,
+          "before": "    fn tag(self) -> u8 {\n",
+          "after": "    pub(super) fn tag(self) -> u8 {\n"
+        },
+        {
+          "offset": 1775,
+          "before": "    fn decode(r: &mut Reader<'_>) -> Result<Self, SaveError> {\n",
+          "after": "    pub(super) fn decode(r: &mut Reader<'_>) -> Result<Self, SaveError> {\n"
+        },
+        {
+          "offset": 4689,
+          "before": "",
+          "after": "    }\n\n    pub(crate) fn matches_route_prefix(&self, start: u64, travelled: &[SystemId]) -> bool {\n        let Ok(start) = usize::try_from(start) else {\n            return false;\n        };\n        let Some(legs) = self.legs.get(start..) else {\n            return false;\n        };\n        let origin = start\n            .checked_sub(1)\n            .map_or(SystemId::AVENOR, |index| self.legs[index].destination);\n        travelled.first() == Some(&origin)\n            && legs.len() == travelled.len().saturating_sub(1)\n            && legs\n                .iter()\n                .zip(travelled.windows(2))\n                .all(|(leg, hop)| leg.source == hop[0] && leg.destination == hop[1])\n"
+        }
+      ]
+    }
+  }
+}

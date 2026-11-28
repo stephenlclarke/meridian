@@ -1,0 +1,12 @@
+{
+  "schema": 1,
+  "id": "sh146-merlin",
+  "undoBefore": [
+    "sh145-kestrel"
+  ],
+  "undoAfter": [],
+  "kind": "declaration",
+  "module": "merlin",
+  "before": "pub mod medusa;\n",
+  "after": "pub mod mining;\n"
+}

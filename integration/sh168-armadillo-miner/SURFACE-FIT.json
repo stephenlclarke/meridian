@@ -1,0 +1,770 @@
+{
+  "nominalPaddingMetres": 0.02,
+  "minimumRefinementTargetsMillimetres": {
+    "detailed": 2800,
+    "archivedNative": 3800,
+    "candidateNative": 4400
+  },
+  "fullUpperMillimetres": {
+    "detailed": 2788,
+    "archivedNative": 3761,
+    "candidateNative": 4382
+  },
+  "pieces": {
+    "body primary pressure envelope": {
+      "detailed": 2401,
+      "archivedNative": 3683,
+      "candidateNative": 2731
+    },
+    "body primary pressure envelope/service-well-0-0": {
+      "detailed": 2765,
+      "archivedNative": 3232,
+      "candidateNative": 4369
+    },
+    "body primary pressure envelope/service-well-0-0/recess-service-strut-0": {
+      "detailed": 258,
+      "archivedNative": 1673,
+      "candidateNative": 1673
+    },
+    "body primary pressure envelope/service-well-0-0/recess-service-strut-1": {
+      "detailed": 258,
+      "archivedNative": 1585,
+      "candidateNative": 1596
+    },
+    "body primary pressure envelope/service-well-0-0/recess-service-strut-2": {
+      "detailed": 258,
+      "archivedNative": 365,
+      "candidateNative": 297
+    },
+    "body primary pressure envelope/service-well-0-1": {
+      "detailed": 2022,
+      "archivedNative": 3106,
+      "candidateNative": 3231
+    },
+    "body primary pressure envelope/service-well-0-1/recess-service-strut-0": {
+      "detailed": 258,
+      "archivedNative": 1753,
+      "candidateNative": 1753
+    },
+    "body primary pressure envelope/service-well-0-1/recess-service-strut-1": {
+      "detailed": 258,
+      "archivedNative": 1698,
+      "candidateNative": 1701
+    },
+    "body primary pressure envelope/service-well-0-1/recess-service-strut-2": {
+      "detailed": 258,
+      "archivedNative": 1148,
+      "candidateNative": 1873
+    },
+    "body primary pressure envelope/service-well-0-2": {
+      "detailed": 2022,
+      "archivedNative": 3348,
+      "candidateNative": 3543
+    },
+    "body primary pressure envelope/service-well-0-2/recess-service-strut-0": {
+      "detailed": 258,
+      "archivedNative": 829,
+      "candidateNative": 829
+    },
+    "body primary pressure envelope/service-well-0-2/recess-service-strut-1": {
+      "detailed": 258,
+      "archivedNative": 1843,
+      "candidateNative": 1328
+    },
+    "body primary pressure envelope/service-well-0-2/recess-service-strut-2": {
+      "detailed": 258,
+      "archivedNative": 1898,
+      "candidateNative": 1824
+    },
+    "body primary pressure envelope/service-well-1-0": {
+      "detailed": 2717,
+      "archivedNative": 3419,
+      "candidateNative": 4382
+    },
+    "body primary pressure envelope/service-well-1-0/recess-service-strut-0": {
+      "detailed": 258,
+      "archivedNative": 1683,
+      "candidateNative": 1683
+    },
+    "body primary pressure envelope/service-well-1-0/recess-service-strut-1": {
+      "detailed": 258,
+      "archivedNative": 1596,
+      "candidateNative": 1607
+    },
+    "body primary pressure envelope/service-well-1-0/recess-service-strut-2": {
+      "detailed": 244,
+      "archivedNative": 365,
+      "candidateNative": 297
+    },
+    "body primary pressure envelope/service-well-1-1": {
+      "detailed": 2022,
+      "archivedNative": 3076,
+      "candidateNative": 3238
+    },
+    "body primary pressure envelope/service-well-1-1/recess-service-strut-0": {
+      "detailed": 258,
+      "archivedNative": 1351,
+      "candidateNative": 1351
+    },
+    "body primary pressure envelope/service-well-1-1/recess-service-strut-1": {
+      "detailed": 244,
+      "archivedNative": 1709,
+      "candidateNative": 1712
+    },
+    "body primary pressure envelope/service-well-1-1/recess-service-strut-2": {
+      "detailed": 258,
+      "archivedNative": 1233,
+      "candidateNative": 1882
+    },
+    "body primary pressure envelope/service-well-1-2": {
+      "detailed": 2022,
+      "archivedNative": 3436,
+      "candidateNative": 3655
+    },
+    "body primary pressure envelope/service-well-1-2/recess-service-strut-0": {
+      "detailed": 258,
+      "archivedNative": 1023,
+      "candidateNative": 1207
+    },
+    "body primary pressure envelope/service-well-1-2/recess-service-strut-1": {
+      "detailed": 258,
+      "archivedNative": 1881,
+      "candidateNative": 1333
+    },
+    "body primary pressure envelope/service-well-1-2/recess-service-strut-2": {
+      "detailed": 258,
+      "archivedNative": 1908,
+      "candidateNative": 1835
+    },
+    "body primary pressure envelope/service-well-2-0": {
+      "detailed": 2748,
+      "archivedNative": 3623,
+      "candidateNative": 3623
+    },
+    "body primary pressure envelope/service-well-2-0/recess-service-strut-0": {
+      "detailed": 258,
+      "archivedNative": 950,
+      "candidateNative": 950
+    },
+    "body primary pressure envelope/service-well-2-0/recess-service-strut-1": {
+      "detailed": 258,
+      "archivedNative": 503,
+      "candidateNative": 859
+    },
+    "body primary pressure envelope/service-well-2-0/recess-service-strut-2": {
+      "detailed": 258,
+      "archivedNative": 365,
+      "candidateNative": 901
+    },
+    "body primary pressure envelope/service-well-2-1": {
+      "detailed": 2022,
+      "archivedNative": 2443,
+      "candidateNative": 2443
+    },
+    "body primary pressure envelope/service-well-2-1/recess-service-strut-0": {
+      "detailed": 258,
+      "archivedNative": 1762,
+      "candidateNative": 1762
+    },
+    "body primary pressure envelope/service-well-2-1/recess-service-strut-1": {
+      "detailed": 258,
+      "archivedNative": 1942,
+      "candidateNative": 1942
+    },
+    "body primary pressure envelope/service-well-2-1/recess-service-strut-2": {
+      "detailed": 258,
+      "archivedNative": 1142,
+      "candidateNative": 1142
+    },
+    "body primary pressure envelope/service-well-2-2": {
+      "detailed": 2022,
+      "archivedNative": 1678,
+      "candidateNative": 1678
+    },
+    "body primary pressure envelope/service-well-2-2/recess-service-strut-0": {
+      "detailed": 258,
+      "archivedNative": 830,
+      "candidateNative": 830
+    },
+    "body primary pressure envelope/service-well-2-2/recess-service-strut-1": {
+      "detailed": 258,
+      "archivedNative": 849,
+      "candidateNative": 849
+    },
+    "body primary pressure envelope/service-well-2-2/recess-service-strut-2": {
+      "detailed": 258,
+      "archivedNative": 868,
+      "candidateNative": 868
+    },
+    "body primary pressure envelope/service-well-3-0": {
+      "detailed": 2706,
+      "archivedNative": 3616,
+      "candidateNative": 4138
+    },
+    "body primary pressure envelope/service-well-3-0/recess-service-strut-0": {
+      "detailed": 258,
+      "archivedNative": 946,
+      "candidateNative": 946
+    },
+    "body primary pressure envelope/service-well-3-0/recess-service-strut-1": {
+      "detailed": 258,
+      "archivedNative": 519,
+      "candidateNative": 855
+    },
+    "body primary pressure envelope/service-well-3-0/recess-service-strut-2": {
+      "detailed": 258,
+      "archivedNative": 365,
+      "candidateNative": 888
+    },
+    "body primary pressure envelope/service-well-3-1": {
+      "detailed": 2022,
+      "archivedNative": 2475,
+      "candidateNative": 3086
+    },
+    "body primary pressure envelope/service-well-3-1/recess-service-strut-0": {
+      "detailed": 258,
+      "archivedNative": 1005,
+      "candidateNative": 1776
+    },
+    "body primary pressure envelope/service-well-3-1/recess-service-strut-1": {
+      "detailed": 258,
+      "archivedNative": 1117,
+      "candidateNative": 1956
+    },
+    "body primary pressure envelope/service-well-3-1/recess-service-strut-2": {
+      "detailed": 258,
+      "archivedNative": 1240,
+      "candidateNative": 1160
+    },
+    "body primary pressure envelope/service-well-3-2": {
+      "detailed": 2022,
+      "archivedNative": 2809,
+      "candidateNative": 1661
+    },
+    "body primary pressure envelope/service-well-3-2/recess-service-strut-0": {
+      "detailed": 244,
+      "archivedNative": 1017,
+      "candidateNative": 826
+    },
+    "body primary pressure envelope/service-well-3-2/recess-service-strut-1": {
+      "detailed": 258,
+      "archivedNative": 916,
+      "candidateNative": 845
+    },
+    "body primary pressure envelope/service-well-3-2/recess-service-strut-2": {
+      "detailed": 244,
+      "archivedNative": 864,
+      "candidateNative": 864
+    },
+    "body primary pressure envelope/longitudinal-service-strut-0": {
+      "detailed": 289,
+      "archivedNative": 3000,
+      "candidateNative": 2628
+    },
+    "body primary pressure envelope/longitudinal-service-strut-1": {
+      "detailed": 289,
+      "archivedNative": 759,
+      "candidateNative": 1265
+    },
+    "open hopper collar 1 span 1": {
+      "detailed": 2553,
+      "archivedNative": 3120,
+      "candidateNative": 2356
+    },
+    "open hopper collar 1 span 2": {
+      "detailed": 2740,
+      "archivedNative": 3750,
+      "candidateNative": 3750
+    },
+    "open hopper collar 1 span 3": {
+      "detailed": 1993,
+      "archivedNative": 3545,
+      "candidateNative": 1824
+    },
+    "open hopper collar 1 span 4": {
+      "detailed": 2728,
+      "archivedNative": 3435,
+      "candidateNative": 1824
+    },
+    "open hopper collar 1 span 5": {
+      "detailed": 2788,
+      "archivedNative": 3761,
+      "candidateNative": 2928
+    },
+    "open hopper collar 1 span 6": {
+      "detailed": 2553,
+      "archivedNative": 3120,
+      "candidateNative": 2356
+    },
+    "open hopper collar 2 span 1": {
+      "detailed": 2553,
+      "archivedNative": 3120,
+      "candidateNative": 2356
+    },
+    "open hopper collar 2 span 2": {
+      "detailed": 2740,
+      "archivedNative": 3334,
+      "candidateNative": 3553
+    },
+    "open hopper collar 2 span 3": {
+      "detailed": 2269,
+      "archivedNative": 3599,
+      "candidateNative": 4147
+    },
+    "open hopper collar 2 span 4": {
+      "detailed": 2269,
+      "archivedNative": 3435,
+      "candidateNative": 2460
+    },
+    "open hopper collar 2 span 5": {
+      "detailed": 2788,
+      "archivedNative": 3160,
+      "candidateNative": 3553
+    },
+    "open hopper collar 2 span 6": {
+      "detailed": 2553,
+      "archivedNative": 3120,
+      "candidateNative": 2356
+    },
+    "open hopper collar 3 span 1": {
+      "detailed": 2553,
+      "archivedNative": 3120,
+      "candidateNative": 2356
+    },
+    "open hopper collar 3 span 2": {
+      "detailed": 2740,
+      "archivedNative": 3131,
+      "candidateNative": 2900
+    },
+    "open hopper collar 3 span 3": {
+      "detailed": 2307,
+      "archivedNative": 3545,
+      "candidateNative": 4139
+    },
+    "open hopper collar 3 span 4": {
+      "detailed": 2306,
+      "archivedNative": 3435,
+      "candidateNative": 2460
+    },
+    "open hopper collar 3 span 5": {
+      "detailed": 2788,
+      "archivedNative": 2890,
+      "candidateNative": 1782
+    },
+    "open hopper collar 3 span 6": {
+      "detailed": 2553,
+      "archivedNative": 3120,
+      "candidateNative": 2356
+    },
+    "open hopper collar 4 span 1": {
+      "detailed": 2553,
+      "archivedNative": 3120,
+      "candidateNative": 2356
+    },
+    "open hopper collar 4 span 2": {
+      "detailed": 2788,
+      "archivedNative": 3131,
+      "candidateNative": 1782
+    },
+    "open hopper collar 4 span 3": {
+      "detailed": 2553,
+      "archivedNative": 3599,
+      "candidateNative": 3016
+    },
+    "open hopper collar 4 span 4": {
+      "detailed": 2553,
+      "archivedNative": 3450,
+      "candidateNative": 3016
+    },
+    "open hopper collar 4 span 5": {
+      "detailed": 2788,
+      "archivedNative": 2890,
+      "candidateNative": 1782
+    },
+    "open hopper collar 4 span 6": {
+      "detailed": 2553,
+      "archivedNative": 3120,
+      "candidateNative": 2356
+    },
+    "boring-head structural support": {
+      "detailed": 1949,
+      "archivedNative": 1949,
+      "candidateNative": 1949
+    },
+    "boring head": {
+      "detailed": 1673,
+      "archivedNative": 1673,
+      "candidateNative": 1673
+    },
+    "boring head collar 1 span 1": {
+      "detailed": 1224,
+      "archivedNative": 613,
+      "candidateNative": 613
+    },
+    "boring head collar 1 span 2": {
+      "detailed": 1224,
+      "archivedNative": 613,
+      "candidateNative": 613
+    },
+    "boring head collar 1 span 3": {
+      "detailed": 1224,
+      "archivedNative": 613,
+      "candidateNative": 609
+    },
+    "boring head collar 1 span 4": {
+      "detailed": 1224,
+      "archivedNative": 613,
+      "candidateNative": 609
+    },
+    "boring head collar 1 span 5": {
+      "detailed": 1224,
+      "archivedNative": 613,
+      "candidateNative": 609
+    },
+    "boring head collar 1 span 6": {
+      "detailed": 1224,
+      "archivedNative": 613,
+      "candidateNative": 609
+    },
+    "boring head collar 1 span 7": {
+      "detailed": 1224,
+      "archivedNative": 613,
+      "candidateNative": 613
+    },
+    "boring head collar 1 span 8": {
+      "detailed": 1224,
+      "archivedNative": 613,
+      "candidateNative": 613
+    },
+    "boring head collar 2 span 1": {
+      "detailed": 1224,
+      "archivedNative": 1071,
+      "candidateNative": 1071
+    },
+    "boring head collar 2 span 2": {
+      "detailed": 1224,
+      "archivedNative": 1138,
+      "candidateNative": 1071
+    },
+    "boring head collar 2 span 3": {
+      "detailed": 1224,
+      "archivedNative": 1071,
+      "candidateNative": 1138
+    },
+    "boring head collar 2 span 4": {
+      "detailed": 1224,
+      "archivedNative": 1138,
+      "candidateNative": 1138
+    },
+    "boring head collar 2 span 5": {
+      "detailed": 1224,
+      "archivedNative": 1071,
+      "candidateNative": 1138
+    },
+    "boring head collar 2 span 6": {
+      "detailed": 1224,
+      "archivedNative": 1138,
+      "candidateNative": 1138
+    },
+    "boring head collar 2 span 7": {
+      "detailed": 1224,
+      "archivedNative": 1071,
+      "candidateNative": 1138
+    },
+    "boring head collar 2 span 8": {
+      "detailed": 1224,
+      "archivedNative": 1138,
+      "candidateNative": 1138
+    },
+    "boring head collar 3 span 1": {
+      "detailed": 1224,
+      "archivedNative": 1178,
+      "candidateNative": 1178
+    },
+    "boring head collar 3 span 2": {
+      "detailed": 1224,
+      "archivedNative": 1110,
+      "candidateNative": 1178
+    },
+    "boring head collar 3 span 3": {
+      "detailed": 1224,
+      "archivedNative": 1178,
+      "candidateNative": 1178
+    },
+    "boring head collar 3 span 4": {
+      "detailed": 1224,
+      "archivedNative": 1110,
+      "candidateNative": 1178
+    },
+    "boring head collar 3 span 5": {
+      "detailed": 1224,
+      "archivedNative": 1178,
+      "candidateNative": 1178
+    },
+    "boring head collar 3 span 6": {
+      "detailed": 1224,
+      "archivedNative": 1110,
+      "candidateNative": 1178
+    },
+    "boring head collar 3 span 7": {
+      "detailed": 1224,
+      "archivedNative": 1178,
+      "candidateNative": 1110
+    },
+    "boring head collar 3 span 8": {
+      "detailed": 1224,
+      "archivedNative": 1110,
+      "candidateNative": 1110
+    },
+    "boring head collar 4 span 1": {
+      "detailed": 1224,
+      "archivedNative": 626,
+      "candidateNative": 626
+    },
+    "boring head collar 4 span 2": {
+      "detailed": 1224,
+      "archivedNative": 626,
+      "candidateNative": 626
+    },
+    "boring head collar 4 span 3": {
+      "detailed": 1224,
+      "archivedNative": 626,
+      "candidateNative": 979
+    },
+    "boring head collar 4 span 4": {
+      "detailed": 1224,
+      "archivedNative": 626,
+      "candidateNative": 979
+    },
+    "boring head collar 4 span 5": {
+      "detailed": 1224,
+      "archivedNative": 626,
+      "candidateNative": 979
+    },
+    "boring head collar 4 span 6": {
+      "detailed": 1224,
+      "archivedNative": 626,
+      "candidateNative": 979
+    },
+    "boring head collar 4 span 7": {
+      "detailed": 1224,
+      "archivedNative": 626,
+      "candidateNative": 626
+    },
+    "boring head collar 4 span 8": {
+      "detailed": 1224,
+      "archivedNative": 626,
+      "candidateNative": 626
+    },
+    "boring-head structural support (2)": {
+      "detailed": 1949,
+      "archivedNative": 1949,
+      "candidateNative": 1949
+    },
+    "boring head (2)": {
+      "detailed": 1673,
+      "archivedNative": 1673,
+      "candidateNative": 2259
+    },
+    "boring head collar 5 span 1": {
+      "detailed": 1224,
+      "archivedNative": 613,
+      "candidateNative": 609
+    },
+    "boring head collar 5 span 2": {
+      "detailed": 1224,
+      "archivedNative": 613,
+      "candidateNative": 609
+    },
+    "boring head collar 5 span 3": {
+      "detailed": 1224,
+      "archivedNative": 613,
+      "candidateNative": 613
+    },
+    "boring head collar 5 span 4": {
+      "detailed": 1224,
+      "archivedNative": 613,
+      "candidateNative": 613
+    },
+    "boring head collar 5 span 5": {
+      "detailed": 1224,
+      "archivedNative": 613,
+      "candidateNative": 613
+    },
+    "boring head collar 5 span 6": {
+      "detailed": 1224,
+      "archivedNative": 613,
+      "candidateNative": 613
+    },
+    "boring head collar 5 span 7": {
+      "detailed": 1224,
+      "archivedNative": 613,
+      "candidateNative": 609
+    },
+    "boring head collar 5 span 8": {
+      "detailed": 1224,
+      "archivedNative": 613,
+      "candidateNative": 609
+    },
+    "boring head collar 6 span 1": {
+      "detailed": 1224,
+      "archivedNative": 1071,
+      "candidateNative": 1138
+    },
+    "boring head collar 6 span 2": {
+      "detailed": 1224,
+      "archivedNative": 1138,
+      "candidateNative": 1138
+    },
+    "boring head collar 6 span 3": {
+      "detailed": 1224,
+      "archivedNative": 1071,
+      "candidateNative": 1138
+    },
+    "boring head collar 6 span 4": {
+      "detailed": 1224,
+      "archivedNative": 1138,
+      "candidateNative": 1138
+    },
+    "boring head collar 6 span 5": {
+      "detailed": 1224,
+      "archivedNative": 1071,
+      "candidateNative": 1138
+    },
+    "boring head collar 6 span 6": {
+      "detailed": 1224,
+      "archivedNative": 1138,
+      "candidateNative": 1138
+    },
+    "boring head collar 6 span 7": {
+      "detailed": 1224,
+      "archivedNative": 1071,
+      "candidateNative": 1138
+    },
+    "boring head collar 6 span 8": {
+      "detailed": 1224,
+      "archivedNative": 1138,
+      "candidateNative": 1138
+    },
+    "boring head collar 7 span 1": {
+      "detailed": 1224,
+      "archivedNative": 1178,
+      "candidateNative": 1110
+    },
+    "boring head collar 7 span 2": {
+      "detailed": 1224,
+      "archivedNative": 1110,
+      "candidateNative": 1178
+    },
+    "boring head collar 7 span 3": {
+      "detailed": 1224,
+      "archivedNative": 1178,
+      "candidateNative": 1110
+    },
+    "boring head collar 7 span 4": {
+      "detailed": 1224,
+      "archivedNative": 1110,
+      "candidateNative": 1110
+    },
+    "boring head collar 7 span 5": {
+      "detailed": 1224,
+      "archivedNative": 1178,
+      "candidateNative": 1110
+    },
+    "boring head collar 7 span 6": {
+      "detailed": 1224,
+      "archivedNative": 1110,
+      "candidateNative": 1110
+    },
+    "boring head collar 7 span 7": {
+      "detailed": 1224,
+      "archivedNative": 1178,
+      "candidateNative": 1178
+    },
+    "boring head collar 7 span 8": {
+      "detailed": 1224,
+      "archivedNative": 1110,
+      "candidateNative": 1110
+    },
+    "boring head collar 8 span 1": {
+      "detailed": 1224,
+      "archivedNative": 626,
+      "candidateNative": 979
+    },
+    "boring head collar 8 span 2": {
+      "detailed": 1224,
+      "archivedNative": 626,
+      "candidateNative": 979
+    },
+    "boring head collar 8 span 3": {
+      "detailed": 1224,
+      "archivedNative": 626,
+      "candidateNative": 626
+    },
+    "boring head collar 8 span 4": {
+      "detailed": 1224,
+      "archivedNative": 626,
+      "candidateNative": 626
+    },
+    "boring head collar 8 span 5": {
+      "detailed": 1224,
+      "archivedNative": 626,
+      "candidateNative": 626
+    },
+    "boring head collar 8 span 6": {
+      "detailed": 1224,
+      "archivedNative": 626,
+      "candidateNative": 626
+    },
+    "boring head collar 8 span 7": {
+      "detailed": 1224,
+      "archivedNative": 626,
+      "candidateNative": 979
+    },
+    "boring head collar 8 span 8": {
+      "detailed": 1224,
+      "archivedNative": 626,
+      "candidateNative": 979
+    },
+    "cockpit glazing envelope": {
+      "detailed": 864,
+      "archivedNative": 2592,
+      "candidateNative": 2399
+    },
+    "cockpit connected structural crossmember": {
+      "detailed": 319,
+      "archivedNative": 319,
+      "candidateNative": 319
+    },
+    "engine_pair/negative side/connected support": {
+      "detailed": 1504,
+      "archivedNative": 1504,
+      "candidateNative": 1504
+    },
+    "engine_pair/negative side/propulsion casing": {
+      "detailed": 2761,
+      "archivedNative": 2761,
+      "candidateNative": 3929
+    },
+    "engine_pair/negative side/propulsion luminous recess": {
+      "detailed": 2664,
+      "archivedNative": 3091,
+      "candidateNative": 2196
+    },
+    "engine_pair/positive side/connected support": {
+      "detailed": 1650,
+      "archivedNative": 1650,
+      "candidateNative": 1650
+    },
+    "engine_pair/positive side/propulsion casing": {
+      "detailed": 2761,
+      "archivedNative": 2761,
+      "candidateNative": 2882
+    },
+    "engine_pair/positive side/propulsion luminous recess": {
+      "detailed": 2664,
+      "archivedNative": 3091,
+      "candidateNative": 2196
+    }
+  }
+}

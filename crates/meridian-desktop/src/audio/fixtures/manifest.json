@@ -1,0 +1,43 @@
+{
+  "referenceCommit": "a11fe16924d87d06021816f9037952afcbac08db",
+  "source": "Sources/L337Core/Sound.swift",
+  "method": "independent Python transcription, not an executed Swift oracle",
+  "fixtures": [
+    {
+      "name": "laser",
+      "bytes": 5336,
+      "samples": 2646,
+      "sha256": "b375304c710e6d2befb0c7e4a57faec5c8e0e1c31133a83b8e57cf6d7e7d8e7b"
+    },
+    {
+      "name": "launch",
+      "bytes": 35324,
+      "samples": 17640,
+      "sha256": "7ade6e94e02efb4e71ff08737168bb00d4ef10be94c78616041aad6f67f12956"
+    },
+    {
+      "name": "dock",
+      "bytes": 26504,
+      "samples": 13230,
+      "sha256": "7de00199181de0dac633d519fc61d640a305ec049dbdb4e117701886f4f14739"
+    },
+    {
+      "name": "explosion",
+      "bytes": 15478,
+      "samples": 7717,
+      "sha256": "f283aa37125fbf7e4234a192242ba03ca4a675377bd9b6a4b5533160a61c7380"
+    },
+    {
+      "name": "ping",
+      "bytes": 4454,
+      "samples": 2205,
+      "sha256": "2390dae08b805866ea725104c95cae1a53104a59dfd68d09521ce74dd65d58d0"
+    },
+    {
+      "name": "ecm",
+      "bytes": 13274,
+      "samples": 6615,
+      "sha256": "19c304b09f133f663dcfab461f785d00f5f0d61b67726e0ac170d4cbadebb967"
+    }
+  ]
+}

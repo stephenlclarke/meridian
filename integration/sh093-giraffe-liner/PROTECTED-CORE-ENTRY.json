@@ -1,0 +1,12 @@
+{
+  "schema": 1,
+  "id": "sh093-giraffe-liner",
+  "undoBefore": [
+    "sh092-aurochs"
+  ],
+  "undoAfter": [],
+  "kind": "declaration",
+  "module": "giraffe_liner",
+  "before": "pub mod freight;\n",
+  "after": "pub mod gopher;\n"
+}

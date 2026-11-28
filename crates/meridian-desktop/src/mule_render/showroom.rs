@@ -1,4 +1,4 @@
-//! Source-authenticated Goshawk showroom presentation. Inputs grant no World authority.
+//! Source-authenticated hull showroom presentation. Inputs grant no World authority.
 use super::{
     Piece, Triangle, Vec3, VisualVertex, decode_visual, gpu, subtract, support_mesh, vector,
 };
@@ -14,8 +14,23 @@ use meridian_core::{
         GoshawkCustomHullSource,
     },
     mule::EnvelopeError,
+    peregrine_mk_i::{
+        PEREGRINE_I_DETAILED_FACES, PEREGRINE_I_DETAILED_VERTICES, PEREGRINE_I_NATIVE_VERTICES,
+        PEREGRINE_I_PIECES, PeregrineMkIHullSource,
+    },
+    peregrine_mk3::{
+        PEREGRINE_MK3_DETAILED_FACES, PEREGRINE_MK3_DETAILED_VERTICES,
+        PEREGRINE_MK3_NATIVE_VERTICES, PEREGRINE_MK3_PIECES, PeregrineMk3HullSource,
+    },
 };
+mod authored;
+pub(crate) use authored::{AuthoredFace, AuthoredPass, AuthoredVisual};
 
+mod medusa;
+mod player;
+pub(crate) use player::PlayerMedusaPass;
+
+pub(crate) const MEDUSA_GEOMETRY_KEY: &str = "assets/fleet/sh171/visual.bin";
 pub(crate) const GEOMETRY_KEY: &str = "assets/fleet/sh008/visual.bin";
 const VISUAL: &[u8] = include_bytes!("../../../../assets/fleet/sh008/visual.bin");
 const VERTICES: usize = 3_484 * 3;
@@ -23,6 +38,12 @@ const VISUAL_FNV: u64 = 0x7a17_0c0c_6cdc_d5fd;
 pub(crate) const CUSTOM_GEOMETRY_KEY: &str = "assets/fleet/sh010/visual.bin";
 const CUSTOM_VISUAL: &[u8] = include_bytes!("../../../../assets/fleet/sh010/visual.bin");
 const CUSTOM_VISUAL_FNV: u64 = 0xfe21_3755_8ea3_8ccb;
+pub(crate) const PEREGRINE_I_GEOMETRY_KEY: &str = "assets/fleet/sh022/visual.bin";
+const PEREGRINE_I_VISUAL: &[u8] = include_bytes!("../../../../assets/fleet/sh022/visual.bin");
+const PEREGRINE_I_VISUAL_FNV: u64 = 0x0259_dab8_59ed_15d8;
+pub(crate) const PEREGRINE_III_GEOMETRY_KEY: &str = "assets/fleet/sh023/visual.bin";
+const PEREGRINE_III_VISUAL: &[u8] = include_bytes!("../../../../assets/fleet/sh023/visual.bin");
+const PEREGRINE_III_VISUAL_FNV: u64 = 0x09d8_c8bd_7b6a_6a63;
 const EMPTY_PIECE: Piece = Piece {
     range: [0; 4],
     low: [0.0; 4],
@@ -33,12 +54,18 @@ const EMPTY_PIECE: Piece = Piece {
 pub(crate) enum Hull {
     Explorer,
     Custom,
+    Medusa,
+    PeregrineMkI,
+    PeregrineMkIII,
 }
 
 pub(crate) fn hull(model: &ModelPreview) -> Option<Hull> {
     match (model.object.as_str(), model.geometry_key.as_str()) {
         ("SH008", GEOMETRY_KEY) => Some(Hull::Explorer),
         ("SH010", CUSTOM_GEOMETRY_KEY) => Some(Hull::Custom),
+        ("SH171", MEDUSA_GEOMETRY_KEY) => Some(Hull::Medusa),
+        ("SH022", PEREGRINE_I_GEOMETRY_KEY) => Some(Hull::PeregrineMkI),
+        ("SH023", PEREGRINE_III_GEOMETRY_KEY) => Some(Hull::PeregrineMkIII),
         _ => None,
     }
 }
@@ -53,13 +80,16 @@ fn authenticated_visual(
     magic: &[u8; 8],
     count: usize,
 ) -> Result<Vec<VisualVertex>, &'static str> {
-    let hash = bytes.iter().fold(0xcbf2_9ce4_8422_2325_u64, |hash, byte| {
-        (hash ^ u64::from(*byte)).wrapping_mul(0x100_0000_01b3)
-    });
-    if hash != expected_hash {
-        return Err("Goshawk preview bytes changed");
+    if fnv(bytes) != expected_hash {
+        return Err("Showroom preview bytes changed");
     }
     decode_visual(bytes, magic, count)
+}
+
+fn fnv(bytes: &[u8]) -> u64 {
+    bytes.iter().fold(0xcbf2_9ce4_8422_2325_u64, |hash, byte| {
+        (hash ^ u64::from(*byte)).wrapping_mul(0x100_0000_01b3)
+    })
 }
 
 fn visual() -> Result<Vec<VisualVertex>, &'static str> {
@@ -84,6 +114,19 @@ impl Hull {
                 b"SH010VZ1",
                 CUSTOM_DETAILED_FACES * 3,
             ),
+            Self::Medusa => medusa::visual(),
+            Self::PeregrineMkI => authenticated_visual(
+                PEREGRINE_I_VISUAL,
+                PEREGRINE_I_VISUAL_FNV,
+                b"SH022VZ1",
+                PEREGRINE_I_DETAILED_FACES * 3,
+            ),
+            Self::PeregrineMkIII => authenticated_visual(
+                PEREGRINE_III_VISUAL,
+                PEREGRINE_III_VISUAL_FNV,
+                b"PRG3VIZ1",
+                PEREGRINE_MK3_DETAILED_FACES * 3,
+            ),
         }
     }
 
@@ -91,11 +134,15 @@ impl Hull {
         match self {
             Self::Explorer => GOSHAWK_PIECES,
             Self::Custom => CUSTOM_PIECES,
+            Self::Medusa => medusa::PIECES,
+            Self::PeregrineMkI => PEREGRINE_I_PIECES,
+            Self::PeregrineMkIII => PEREGRINE_MK3_PIECES,
         }
     }
 
     fn supports(self) -> Result<(Vec<Triangle>, Vec<Piece>), SupportError> {
         match self {
+            Self::Medusa => medusa::supports().map_err(SupportError::Render),
             Self::Explorer => {
                 let source = GoshawkHullSource::bundled().map_err(SupportError::Source)?;
                 let (triangles, pieces) = support_mesh(
@@ -110,6 +157,24 @@ impl Hull {
                 let (triangles, pieces) = support_mesh(
                     source.pieces(),
                     CUSTOM_DETAILED_VERTICES + CUSTOM_NATIVE_VERTICES,
+                )
+                .map_err(SupportError::Render)?;
+                Ok((triangles, pieces.to_vec()))
+            }
+            Self::PeregrineMkI => {
+                let source = PeregrineMkIHullSource::bundled().map_err(SupportError::Source)?;
+                let (triangles, pieces) = support_mesh(
+                    source.pieces(),
+                    PEREGRINE_I_DETAILED_VERTICES + PEREGRINE_I_NATIVE_VERTICES,
+                )
+                .map_err(SupportError::Render)?;
+                Ok((triangles, pieces.to_vec()))
+            }
+            Self::PeregrineMkIII => {
+                let source = PeregrineMk3HullSource::bundled().map_err(SupportError::Source)?;
+                let (triangles, pieces) = support_mesh(
+                    source.pieces(),
+                    PEREGRINE_MK3_DETAILED_VERTICES + PEREGRINE_MK3_NATIVE_VERTICES,
                 )
                 .map_err(SupportError::Render)?;
                 Ok((triangles, pieces.to_vec()))
@@ -202,7 +267,7 @@ impl View {
             || aspect <= 0.0
             || self.radius <= 0.0
         {
-            return Err("Invalid Goshawk showroom view".into());
+            return Err("Invalid showroom view".into());
         }
         // The original bow points +Z. The Showroom's camera looks along +Z, so start
         // bow-on and retain the existing pitch, roll and yaw controls in the preview.
@@ -271,7 +336,9 @@ impl Pass {
     ) -> Result<Self, String> {
         match hull {
             Hull::Explorer => Self::new(device, queue, format),
-            Hull::Custom => Self::construct(device, queue, format, hull),
+            Hull::Custom | Hull::Medusa | Hull::PeregrineMkI | Hull::PeregrineMkIII => {
+                Self::construct(device, queue, format, hull)
+            }
         }
     }
 
@@ -307,6 +374,8 @@ impl Pass {
                 uniform_size: (size_of::<Uniforms>() + pieces.len() * size_of::<Piece>()) as u64,
                 points: &triangles,
                 visual: &vertices,
+                authored_materials: false,
+                display_paint: true,
             },
         )?;
         // The uniform header and all source-local support records are contiguous in WGSL.
@@ -335,7 +404,7 @@ impl Pass {
         srgb: bool,
     ) -> Result<(), String> {
         if hull(model) != Some(self.hull) {
-            return Err("Goshawk Showroom hull mismatch".into());
+            return Err("Showroom hull mismatch".into());
         }
         let [x, y, width, height] = [
             bounds.x * scale[0],
@@ -402,6 +471,24 @@ mod tests {
     }
 
     #[test]
+    fn medusa_original_untextured_artwork_and_shield_bind_to_the_shader() {
+        check_variant(Hull::Medusa, medusa::DETAIL_FACES, medusa::PIECES);
+        let mut material_colours = std::collections::BTreeSet::new();
+        for vertex in ok(Hull::Medusa.visual()) {
+            assert_eq!(vertex.texture, u32::MAX);
+            material_colours.insert((vertex.color.map(f32::to_bits), vertex.emissive));
+        }
+        assert_eq!(material_colours.len(), 7);
+        assert_eq!(
+            material_colours
+                .iter()
+                .filter(|(_, emissive)| *emissive == 1)
+                .count(),
+            1
+        );
+    }
+
+    #[test]
     fn custom_original_visual_and_all_local_supports_bind_to_its_own_shader() {
         check_variant(Hull::Custom, CUSTOM_DETAILED_FACES, CUSTOM_PIECES);
         assert!(authenticated_visual(CUSTOM_VISUAL, VISUAL_FNV, b"GOSHVIZ1", VERTICES).is_err());
@@ -427,6 +514,147 @@ mod tests {
         assert_eq!(hull(&model), Some(Hull::Explorer));
         model.geometry_key = CUSTOM_GEOMETRY_KEY.into();
         assert!(!matches(&model));
+    }
+
+    #[test]
+    fn peregrine_mk_i_original_visual_and_all_local_supports_bind_to_its_own_shader() {
+        check_variant(
+            Hull::PeregrineMkI,
+            PEREGRINE_I_DETAILED_FACES,
+            PEREGRINE_I_PIECES,
+        );
+        assert!(
+            authenticated_visual(PEREGRINE_I_VISUAL, VISUAL_FNV, b"GOSHVIZ1", VERTICES).is_err()
+        );
+        assert!(
+            authenticated_visual(
+                PEREGRINE_I_VISUAL,
+                CUSTOM_VISUAL_FNV,
+                b"SH010VZ1",
+                CUSTOM_DETAILED_FACES * 3
+            )
+            .is_err()
+        );
+        assert!(
+            authenticated_visual(
+                CUSTOM_VISUAL,
+                PEREGRINE_I_VISUAL_FNV,
+                b"SH022VZ1",
+                PEREGRINE_I_DETAILED_FACES * 3
+            )
+            .is_err()
+        );
+        assert!(
+            authenticated_visual(
+                VISUAL,
+                PEREGRINE_I_VISUAL_FNV,
+                b"SH022VZ1",
+                PEREGRINE_I_DETAILED_FACES * 3
+            )
+            .is_err()
+        );
+        let mut model = ModelPreview {
+            object: "SH022".into(),
+            geometry_key: PEREGRINE_I_GEOMETRY_KEY.into(),
+            bounds: Rect::new(0.0, 0.0, 256.0, 256.0),
+            orientation: Orientation::default(),
+        };
+        assert_eq!(hull(&model), Some(Hull::PeregrineMkI));
+        model.geometry_key = GEOMETRY_KEY.into();
+        assert!(!matches(&model));
+        model.object = "SH008".into();
+        assert_eq!(hull(&model), Some(Hull::Explorer));
+        model.geometry_key = PEREGRINE_I_GEOMETRY_KEY.into();
+        assert!(!matches(&model));
+        model.object = "SH010".into();
+        assert!(!matches(&model));
+        model.geometry_key = CUSTOM_GEOMETRY_KEY.into();
+        assert_eq!(hull(&model), Some(Hull::Custom));
+        model.object = "SH022".into();
+        assert!(!matches(&model));
+        model.geometry_key = PEREGRINE_III_GEOMETRY_KEY.into();
+        assert!(!matches(&model));
+        model.object = "SH023".into();
+        assert_eq!(hull(&model), Some(Hull::PeregrineMkIII));
+        model.geometry_key = PEREGRINE_I_GEOMETRY_KEY.into();
+        assert!(!matches(&model));
+        assert!(
+            authenticated_visual(
+                PEREGRINE_I_VISUAL,
+                PEREGRINE_I_VISUAL_FNV,
+                b"PRG3VIZ1",
+                PEREGRINE_I_DETAILED_FACES * 3,
+            )
+            .is_err()
+        );
+    }
+
+    #[test]
+    fn peregrine_mk_iii_original_visual_and_all_local_supports_bind_to_its_own_shader() {
+        check_variant(
+            Hull::PeregrineMkIII,
+            PEREGRINE_MK3_DETAILED_FACES,
+            PEREGRINE_MK3_PIECES,
+        );
+    }
+
+    #[test]
+    fn peregrine_mk_i_and_mk_iii_refuse_actual_crossed_visual_payloads() {
+        let mk3 = PEREGRINE_III_VISUAL;
+        const MK3_FNV: u64 = PEREGRINE_III_VISUAL_FNV;
+        const MK3_MAGIC: &[u8; 8] = b"PRG3VIZ1";
+        const MK3_VERTICES: usize = PEREGRINE_MK3_DETAILED_FACES * 3;
+        assert_eq!(ok(Hull::PeregrineMkIII.visual()).len(), MK3_VERTICES);
+        assert_eq!(
+            ok(Hull::PeregrineMkI.visual()).len(),
+            PEREGRINE_I_DETAILED_FACES * 3
+        );
+        assert!(
+            authenticated_visual(
+                mk3,
+                PEREGRINE_I_VISUAL_FNV,
+                b"SH022VZ1",
+                PEREGRINE_I_DETAILED_FACES * 3
+            )
+            .is_err()
+        );
+        assert!(
+            authenticated_visual(PEREGRINE_I_VISUAL, MK3_FNV, MK3_MAGIC, MK3_VERTICES).is_err()
+        );
+        // Even with each payload's real fingerprint, the other original's header must refuse.
+        assert!(
+            authenticated_visual(mk3, MK3_FNV, b"SH022VZ1", PEREGRINE_I_DETAILED_FACES * 3)
+                .is_err()
+        );
+        assert!(
+            authenticated_visual(
+                PEREGRINE_I_VISUAL,
+                PEREGRINE_I_VISUAL_FNV,
+                MK3_MAGIC,
+                MK3_VERTICES
+            )
+            .is_err()
+        );
+        let native = include_bytes!("../../../../assets/fleet/sh023/native-visual.bin");
+        assert!(authenticated_visual(native, MK3_FNV, MK3_MAGIC, MK3_VERTICES).is_err());
+        let source_i = include_bytes!("../../../../assets/fleet/sh022/source.vertices");
+        let membership_i =
+            include_bytes!("../../../../assets/fleet/sh022/source-piece-membership.bin");
+        let source_iii = include_bytes!("../../../../assets/fleet/sh023/source.vertices");
+        let membership_iii =
+            include_bytes!("../../../../assets/fleet/sh023/source-piece-membership.bin");
+        assert!(PeregrineMkIHullSource::from_bytes(source_iii, membership_iii).is_err());
+        assert!(PeregrineMk3HullSource::from_bytes(source_i, membership_i).is_err());
+        assert!(PeregrineMkIHullSource::from_bytes(source_i, membership_iii).is_err());
+        assert!(PeregrineMk3HullSource::from_bytes(source_iii, membership_i).is_err());
+        assert_eq!(
+            PeregrineMkIHullSource::from_bytes(source_iii, membership_i),
+            Err(EnvelopeError::ChangedSource)
+        );
+        assert_eq!(
+            PeregrineMk3HullSource::from_bytes(source_i, membership_iii),
+            Err(EnvelopeError::ChangedSource)
+        );
     }
 
     fn check_variant(hull: Hull, face_count: usize, piece_count: usize) {
@@ -485,5 +713,36 @@ mod tests {
         };
         assert_eq!(count.get() as usize, piece_count);
         assert_eq!(*stride as usize, size_of::<Piece>());
+    }
+}
+
+#[cfg(test)]
+mod display_paint_tests {
+    use super::*;
+    #[test]
+    fn original_materials_and_painted_vertices_are_distinct_for_each_hull() {
+        for (vertices, source, finish) in [
+            (super::super::visual(), [214, 217, 211], [45, 112, 124]),
+            (Hull::Explorer.visual(), [75, 117, 101], [39, 126, 83]),
+            (Hull::Custom.visual(), [75, 117, 101], [39, 126, 83]),
+        ] {
+            let vertices = vertices.unwrap_or_else(|error| panic!("{error}"));
+            let rgb = |channels: [u8; 3]| channels.map(|c| f32::from(c) / 255.0);
+            let mut matching = 0;
+            for v in vertices {
+                let painted = v.with_display_paint();
+                if v.color[..3] == rgb(source) {
+                    assert_eq!(painted.color[..3], rgb(finish));
+                    matching += 1;
+                }
+                assert_eq!(v.position, painted.position);
+                assert_eq!(v.normal, painted.normal);
+                assert_eq!(v.uv, painted.uv);
+                assert_eq!(v.texture, painted.texture);
+                assert_eq!(v.emissive, painted.emissive);
+                assert_eq!(v.color[3], painted.color[3]);
+            }
+            assert!(matching > 0);
+        }
     }
 }

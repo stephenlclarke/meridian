@@ -1,0 +1,221 @@
+{
+  "nominalPaddingMetres": 0.02,
+  "minimumRefinementTargetsMillimetres": {
+    "detailed": 2500,
+    "native": 4000
+  },
+  "fullUpperMillimetres": {
+    "detailed": 2446,
+    "native": 3950
+  },
+  "pieces": {
+    "port drill collar span 1": {
+      "detailed": 1064,
+      "native": 522
+    },
+    "port drill collar span 2": {
+      "detailed": 1068,
+      "native": 522
+    },
+    "port drill collar span 3": {
+      "detailed": 1064,
+      "native": 522
+    },
+    "port drill collar span 4": {
+      "detailed": 1068,
+      "native": 522
+    },
+    "port drill collar span 5": {
+      "detailed": 1064,
+      "native": 522
+    },
+    "port drill collar span 6": {
+      "detailed": 1068,
+      "native": 522
+    },
+    "port drill collar span 7": {
+      "detailed": 1064,
+      "native": 522
+    },
+    "port drill collar span 8": {
+      "detailed": 1068,
+      "native": 522
+    },
+    "central drill collar span 1": {
+      "detailed": 1064,
+      "native": 522
+    },
+    "central drill collar span 2": {
+      "detailed": 1068,
+      "native": 522
+    },
+    "central drill collar span 3": {
+      "detailed": 1064,
+      "native": 522
+    },
+    "central drill collar span 4": {
+      "detailed": 1068,
+      "native": 522
+    },
+    "central drill collar span 5": {
+      "detailed": 1064,
+      "native": 522
+    },
+    "central drill collar span 6": {
+      "detailed": 1068,
+      "native": 522
+    },
+    "central drill collar span 7": {
+      "detailed": 1064,
+      "native": 522
+    },
+    "central drill collar span 8": {
+      "detailed": 1068,
+      "native": 522
+    },
+    "starboard drill collar span 1": {
+      "detailed": 1064,
+      "native": 522
+    },
+    "starboard drill collar span 2": {
+      "detailed": 1068,
+      "native": 522
+    },
+    "starboard drill collar span 3": {
+      "detailed": 1064,
+      "native": 522
+    },
+    "starboard drill collar span 4": {
+      "detailed": 1068,
+      "native": 522
+    },
+    "starboard drill collar span 5": {
+      "detailed": 1064,
+      "native": 522
+    },
+    "starboard drill collar span 6": {
+      "detailed": 1068,
+      "native": 522
+    },
+    "starboard drill collar span 7": {
+      "detailed": 1064,
+      "native": 522
+    },
+    "starboard drill collar span 8": {
+      "detailed": 1068,
+      "native": 522
+    },
+    "pressure deck": {
+      "detailed": 2203,
+      "native": 2203
+    },
+    "aft envelope": {
+      "detailed": 2191,
+      "native": 3950
+    },
+    "port drill beam": {
+      "detailed": 1714,
+      "native": 1714
+    },
+    "port drill shaft": {
+      "detailed": 2021,
+      "native": 2162
+    },
+    "central drill beam": {
+      "detailed": 1714,
+      "native": 1714
+    },
+    "central drill shaft": {
+      "detailed": 2021,
+      "native": 2162
+    },
+    "starboard drill beam": {
+      "detailed": 1714,
+      "native": 1714
+    },
+    "starboard drill shaft": {
+      "detailed": 2021,
+      "native": 2162
+    },
+    "port radiator": {
+      "detailed": 1950,
+      "native": 2901
+    },
+    "port nozzle": {
+      "detailed": 2446,
+      "native": 3721
+    },
+    "starboard radiator": {
+      "detailed": 1950,
+      "native": 2901
+    },
+    "starboard nozzle": {
+      "detailed": 2446,
+      "native": 3721
+    },
+    "canopy": {
+      "detailed": 486,
+      "native": 1481
+    },
+    "canopy ridge": {
+      "detailed": 340,
+      "native": 2198
+    },
+    "port service line": {
+      "detailed": 260,
+      "native": 2388
+    },
+    "port instrument housing": {
+      "detailed": 668,
+      "native": 2871
+    },
+    "port louvre 1": {
+      "detailed": 249,
+      "native": 2615
+    },
+    "port louvre 2": {
+      "detailed": 249,
+      "native": 2682
+    },
+    "port louvre 3": {
+      "detailed": 249,
+      "native": 2799
+    },
+    "port louvre 4": {
+      "detailed": 249,
+      "native": 2961
+    },
+    "port louvre 5": {
+      "detailed": 249,
+      "native": 3161
+    },
+    "starboard service line": {
+      "detailed": 260,
+      "native": 3119
+    },
+    "starboard instrument housing": {
+      "detailed": 668,
+      "native": 2834
+    },
+    "starboard louvre 1": {
+      "detailed": 249,
+      "native": 2615
+    },
+    "starboard louvre 2": {
+      "detailed": 249,
+      "native": 2682
+    },
+    "starboard louvre 3": {
+      "detailed": 249,
+      "native": 2799
+    },
+    "starboard louvre 4": {
+      "detailed": 249,
+      "native": 2961
+    },
+    "starboard louvre 5": {
+      "detailed": 249,
+      "native": 3161
+    }
+  }
+}
