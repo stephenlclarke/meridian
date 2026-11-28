@@ -18,6 +18,11 @@ GROUP_SOURCES = {
         "path": "integration/sh038-vulture-mk2/ORIGINAL-ARCHIVE-CANDIDATE.json",
         "sha256": "830146297942971a87cef9c9d8527f15c48ccd1ecdd87d16b5c2b39ae1fcf208",
     },
+    "SH039": {
+        "meridianRevision": "3059eb7b9a4bb938ec999c4e6fd5df0b0a8b97db",
+        "path": "integration/sh039-vulture-mk3/VULTURE-MK3-ORIGINAL-STUDIO.json",
+        "sha256": "10f3bdab6409ab73c7603966b506893d7534b2fe1917f4428f283c334b879fc8",
+    },
 }
 
 

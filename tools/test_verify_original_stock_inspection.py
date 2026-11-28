@@ -46,6 +46,12 @@ class StockArchiveGroupTests(unittest.TestCase):
             "79da2b2d38c3f41ce337c8f0f05ae0a55cb301e607d0de74f714f9211697d462",
         )
 
+    def test_vulture_mk_iii_group_membership(self):
+        self.check_group_mutations(
+            "integration/sh039-vulture-mk-iii/ORIGINAL-INSPECTION.json",
+            "2a0c7fee34a90a4b42da8927b1640d5c297e990890ef172aebf0844942f310d9",
+        )
+
     def test_group_archive_hash_checked_before_decode(self):
         pin = verifier.GROUP_SOURCES["SH038"]
         with patch.object(verifier.subprocess, "check_output", return_value=b"wrong archive") as read:

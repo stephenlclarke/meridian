@@ -159,6 +159,12 @@ const DESCRIPTORS: &[StockDescriptor] = &[
         "integration/sh038-vulture-mk-ii/ORIGINAL-INSPECTION.json",
         0xbf21_a600_ba1f_c57d
     ),
+    stock_package!(
+        "SH039",
+        "Vulture Mk III",
+        "integration/sh039-vulture-mk-iii/ORIGINAL-INSPECTION.json",
+        0xd022_46bf_8021_1278
+    ),
     StockDescriptor {
         model: AvailableModel {
             object: "SH040",
@@ -917,7 +923,7 @@ mod tests {
     #[test]
     fn every_stock_descriptor_authenticates_its_own_source_and_real_preview() {
         let catalogue = ok(crate::docked_screens::Catalogue::bundled());
-        assert_eq!(STOCK_MODELS.len(), 119);
+        assert_eq!(STOCK_MODELS.len(), 120);
         for held in [
             "SH082", "SH102", "SH103", "SH108", "SH112", "SH113", "SH114", "SH115", "SH116",
             "SH117", "SH118", "SH119", "SH120", "SH121", "SH122", "SH123", "SH124", "SH125",
@@ -1387,6 +1393,20 @@ mod tests {
     #[test]
     fn vulture_mk_ii_keeps_both_original_meshes_for_inspection() {
         let entry = descriptor("SH038");
+        let package = ok(HullPackage::from_json(entry.package));
+        assert_eq!(
+            package.schema,
+            meridian_core::hull_package::ARCHIVED_INSPECTION_SCHEMA
+        );
+        assert_eq!(package.detail.triangles.len(), 8_272);
+        assert_eq!(package.native.triangles.len(), 3_016);
+        assert!(package.pieces().is_err());
+        assert_stock_and_local(entry.model.object, entry.model.geometry_key);
+    }
+
+    #[test]
+    fn vulture_mk_iii_keeps_both_original_meshes_for_inspection() {
+        let entry = descriptor("SH039");
         let package = ok(HullPackage::from_json(entry.package));
         assert_eq!(
             package.schema,

@@ -34,7 +34,7 @@ Preview 12 offers 115 selectable stock previews in the ordinary station Showroom
 
 The development source adds the [Serval Fighter](docs/SERVAL-GAMEPLAY-ENVELOPE.md), [Vulture Mk I](docs/VULTURE-MK-I-GAMEPLAY-ENVELOPE.md), [Newt Escape Pod](integration/sh040-newt-escape-pod/README.md), [Zebu](docs/ZEBU-GAMEPLAY-ENVELOPE.md), [Panther Scout](integration/sh033-panther-scout/README.md), [Panther Explorer](docs/PANTHER-EXPLORER-GAMEPLAY-ENVELOPE.md), [Okapi](docs/OKAPI-GAMEPLAY-ENVELOPE.md), [Ibex](docs/IBEX-GAMEPLAY-ENVELOPE.md) and [Harrier](docs/HARRIER-GAMEPLAY-ENVELOPE.md) for stock inspection.
 
-Stock inspection also includes Vulture Mk II (SH038). Each archive keeps all 8,272 detailed faces and 3,016 original native faces. The source Showroom now has 125 previews.
+Stock inspection also includes Vulture Mk II (SH038) and Vulture Mk III (SH039). Each archive keeps all 8,272 detailed faces and 3,016 original native faces. The source Showroom now has 126 previews.
 
 The separate [Medusa player flight preview](integration/sh171-medusa-preview/README.md) uses a dedicated profile and the admitted reduced flight geometry. On signed Mac build `5a924315`, the original SH171 artwork was visible in actual flight at 50.30/50.30. A cold restart restored the same ship, speed and expanded 32 t hold. Native docking return and fit-limit refusal were not observed in that run. Ordinary progression, fabrication and exchange do not grant the Medusa. See the [Preview 12 validation record](docs/IMPLEMENTATION-STATUS.md#published-preview-12) for final-package checks.
 
