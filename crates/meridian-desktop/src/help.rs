@@ -103,9 +103,10 @@ impl Panel {
             ],
         );
         if has_berth {
-            panel
-                .lines
-                .insert(0, "L Launch | 0 Commander details".into());
+            panel.lines.insert(
+                0,
+                "L Launch | I Mission details | 0 Commander details".into(),
+            );
             panel.lines.push(
                 "Shift+1/2 Lesson review/cancel | Shift+3/4/5 Gunnery review/receive/close".into(),
             );

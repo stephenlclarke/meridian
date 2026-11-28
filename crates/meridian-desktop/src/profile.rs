@@ -1097,7 +1097,7 @@ pub(crate) mod tests {
         assert_eq!(reopened.world.snapshot(), restored.snapshot());
         assert_eq!(reopened.world.solar_snapshot(), restored.solar_snapshot());
     }
-    fn travel(profile: &mut Profile) {
+    pub(crate) fn travel(profile: &mut Profile) {
         action(profile, Action::Launch);
         profile
             .world
