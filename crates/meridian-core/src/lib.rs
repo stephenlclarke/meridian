@@ -54,6 +54,7 @@ pub mod hare_explorer;
 pub mod harpy_assault;
 pub mod harpy_dropship;
 pub mod harpy_gunship;
+pub mod harrier;
 pub mod hawk;
 pub mod hippo;
 pub mod hobby_fighter;

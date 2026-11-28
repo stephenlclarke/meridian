@@ -1,0 +1,13 @@
+{
+  "schema": 1,
+  "id": "sh026-harrier",
+  "undoBefore": [
+    "sh171-medusa-preview",
+    "sh170-caracara-mk-ii"
+  ],
+  "undoAfter": [],
+  "kind": "declaration",
+  "module": "harrier",
+  "before": "pub mod harpy_gunship;\n",
+  "after": "pub mod hawk;\n"
+}

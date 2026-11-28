@@ -1,0 +1,401 @@
+{
+  "clearanceMillimetres": {
+    "left-pod-channel": 1036,
+    "left-empty-rail": 99,
+    "right-pod-channel": 851,
+    "right-empty-rail": 99
+  },
+  "alignedMillimetres": 46493,
+  "offsetStartMillimetres": 979,
+  "sourceLipWitness": {
+    "fraction": 0.5000000000000044,
+    "pointMetres": [
+      69.4,
+      0.0,
+      136.32
+    ],
+    "barycentrics": [
+      0.3599999999999949,
+      0.14000000000000512,
+      0.5
+    ]
+  },
+  "sourceRailContactsMetres": [
+    [
+      -6.954675572519084,
+      -4.2853053435114505,
+      7.5143129770992365
+    ],
+    [
+      5.64074427480916,
+      -4.2853053435114505,
+      7.5143129770992365
+    ]
+  ],
+  "originalJoints": [
+    {
+      "name": "left-aft-bridge-to-body",
+      "pointMetres": [
+        -3.095181,
+        -0.250477,
+        -7.299618
+      ],
+      "sourceFaceHitCountsAboveBelow": [
+        [
+          1,
+          1
+        ],
+        [
+          1,
+          1
+        ],
+        [
+          1,
+          1
+        ],
+        [
+          1,
+          1
+        ]
+      ]
+    },
+    {
+      "name": "left-aft-bridge-to-pod",
+      "pointMetres": [
+        -6.136689,
+        -0.250477,
+        -7.299618
+      ],
+      "sourceFaceHitCountsAboveBelow": [
+        [
+          1,
+          1
+        ],
+        [
+          1,
+          1
+        ],
+        [
+          1,
+          1
+        ],
+        [
+          1,
+          1
+        ]
+      ]
+    },
+    {
+      "name": "left-forward-bridge-to-body",
+      "pointMetres": [
+        -3.184637,
+        -0.250477,
+        1.145038
+      ],
+      "sourceFaceHitCountsAboveBelow": [
+        [
+          1,
+          1
+        ],
+        [
+          1,
+          1
+        ],
+        [
+          1,
+          1
+        ],
+        [
+          1,
+          1
+        ]
+      ]
+    },
+    {
+      "name": "left-forward-bridge-to-pod",
+      "pointMetres": [
+        -6.190363,
+        -0.250477,
+        1.145038
+      ],
+      "sourceFaceHitCountsAboveBelow": [
+        [
+          1,
+          1
+        ],
+        [
+          1,
+          1
+        ],
+        [
+          1,
+          1
+        ],
+        [
+          1,
+          1
+        ]
+      ]
+    },
+    {
+      "name": "right-aft-bridge-to-body",
+      "pointMetres": [
+        3.095181,
+        -0.250477,
+        -7.299618
+      ],
+      "sourceFaceHitCountsAboveBelow": [
+        [
+          1,
+          1
+        ],
+        [
+          1,
+          1
+        ],
+        [
+          1,
+          1
+        ],
+        [
+          1,
+          1
+        ]
+      ]
+    },
+    {
+      "name": "right-aft-bridge-to-pod",
+      "pointMetres": [
+        6.136689,
+        -0.250477,
+        -7.299618
+      ],
+      "sourceFaceHitCountsAboveBelow": [
+        [
+          1,
+          1
+        ],
+        [
+          1,
+          1
+        ],
+        [
+          1,
+          1
+        ],
+        [
+          1,
+          1
+        ]
+      ]
+    },
+    {
+      "name": "right-forward-bridge-to-body",
+      "pointMetres": [
+        3.184637,
+        -0.250477,
+        1.145038
+      ],
+      "sourceFaceHitCountsAboveBelow": [
+        [
+          1,
+          1
+        ],
+        [
+          1,
+          1
+        ],
+        [
+          1,
+          1
+        ],
+        [
+          1,
+          1
+        ]
+      ]
+    },
+    {
+      "name": "right-forward-bridge-to-pod",
+      "pointMetres": [
+        6.190363,
+        -0.250477,
+        1.145038
+      ],
+      "sourceFaceHitCountsAboveBelow": [
+        [
+          1,
+          1
+        ],
+        [
+          1,
+          1
+        ],
+        [
+          1,
+          1
+        ],
+        [
+          1,
+          1
+        ]
+      ]
+    },
+    {
+      "name": "housing-to-body",
+      "pointMetres": [
+        0.061,
+        1.193279,
+        11.199905
+      ],
+      "sourceFaceHitCountsAboveBelow": [
+        [
+          1,
+          1
+        ],
+        [
+          1,
+          1
+        ],
+        [
+          1,
+          1
+        ],
+        [
+          1,
+          1
+        ]
+      ]
+    },
+    {
+      "name": "housing-to-hammerhead",
+      "pointMetres": [
+        0.061,
+        1.169556,
+        12.380725
+      ],
+      "sourceFaceHitCountsAboveBelow": [
+        [
+          1,
+          1
+        ],
+        [
+          1,
+          1
+        ],
+        [
+          1,
+          1
+        ],
+        [
+          1,
+          1
+        ]
+      ]
+    },
+    {
+      "name": "glazing-0-to-housing",
+      "pointMetres": [
+        1.211729,
+        2.187613,
+        12.488073
+      ],
+      "sourceFaceHitCountsAboveBelow": [
+        [
+          1,
+          1
+        ],
+        [
+          1,
+          1
+        ],
+        [
+          1,
+          1
+        ],
+        [
+          1,
+          1
+        ]
+      ]
+    },
+    {
+      "name": "glazing-1-to-housing",
+      "pointMetres": [
+        0.47075,
+        2.423123,
+        12.488073
+      ],
+      "sourceFaceHitCountsAboveBelow": [
+        [
+          1,
+          1
+        ],
+        [
+          1,
+          1
+        ],
+        [
+          1,
+          1
+        ],
+        [
+          1,
+          1
+        ]
+      ]
+    },
+    {
+      "name": "glazing-2-to-housing",
+      "pointMetres": [
+        -0.574204,
+        2.412127,
+        12.488073
+      ],
+      "sourceFaceHitCountsAboveBelow": [
+        [
+          1,
+          1
+        ],
+        [
+          1,
+          1
+        ],
+        [
+          1,
+          1
+        ],
+        [
+          1,
+          1
+        ]
+      ]
+    },
+    {
+      "name": "glazing-3-to-housing",
+      "pointMetres": [
+        -1.286057,
+        2.200831,
+        12.251908
+      ],
+      "sourceFaceHitCountsAboveBelow": [
+        [
+          1,
+          1
+        ],
+        [
+          1,
+          1
+        ],
+        [
+          1,
+          1
+        ],
+        [
+          1,
+          1
+        ]
+      ]
+    }
+  ]
+}

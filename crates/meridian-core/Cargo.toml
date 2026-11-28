@@ -11,4 +11,5 @@ workspace = true
 
 [dependencies]
 serde = { version = "=1.0.229", features = ["derive"] }
-serde_json = "=1.0.154"
+# Preserve original binary64 metre coordinates when loading authored hulls.
+serde_json = { version = "=1.0.154", features = ["float_roundtrip"] }
