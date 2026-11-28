@@ -647,9 +647,3 @@ integration/sh073-griffon-spectre/ARCHIVE-FIT-SUPPORT-FANS.json text eol=lf
 # Shared algorithm pinned by the directed hull measurement receipts.
 tools/directed_hull_fit.py text eol=lf
 tools/fleet_hull_measurement.py text eol=lf
-
-# Crow Prototype replay checks hash these scripts and compare the JSON output byte for byte.
-tools/measure_crow_prototype_air.py text eol=lf
-tools/prepare_crow_prototype_geometry.py text eol=lf
-tools/verify_crow_prototype_geometry.py text eol=lf
-integration/sh020-crow-prototype/*.json text eol=lf

@@ -6,3 +6,7 @@ measure_goshawk_surface_fit.py text eol=lf
 measure_peregrine_mk3_air.py text eol=lf
 prepare_peregrine_mk3_geometry.py text eol=lf
 verify_peregrine_mk3_geometry.py text eol=lf
+# SH020 source and measurement programs are pinned as Git blob bytes.
+measure_crow_prototype_air.py text eol=lf
+prepare_crow_prototype_geometry.py text eol=lf
+verify_crow_prototype_geometry.py text eol=lf
